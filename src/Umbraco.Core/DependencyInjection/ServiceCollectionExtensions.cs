@@ -7,50 +7,102 @@ namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddUnique<TService, TImplementing>(this IServiceCollection services)
+        /// <summary>
+        /// Adds a service of type <typeparamref name="TService"/> with an implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <remarks>
+        /// Removes all previous registrations for the type <typeparamref name="TService"/>.
+        /// </remarks>
+        public static void AddUnique<TService, TImplementing>(
+            this IServiceCollection services)
             where TService : class
             where TImplementing : class, TService
-            => services.Replace(ServiceDescriptor.Singleton<TService, TImplementing>());
+        {
+            AddUnique<TService, TImplementing>(services, ServiceLifetime.Singleton);
+        }
 
         /// <summary>
-        /// Registers a singleton instance against multiple interfaces.
+        /// Adds a service of type <typeparamref name="TService"/> with an implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        public static void AddMultipleUnique<TService1, TService2, TImplementing>(this IServiceCollection services)
+        /// <remarks>
+        /// Removes all previous registrations for the type <typeparamref name="TService"/>.
+        /// </remarks>
+        public static void AddUnique<TService, TImplementing>(
+            this IServiceCollection services,
+            ServiceLifetime lifetime)
+            where TService : class
+            where TImplementing : class, TService
+        {
+            services.RemoveAll<TService>();
+            services.Add(ServiceDescriptor.Describe(typeof(TService), typeof(TImplementing), lifetime));
+        }
+
+        /// <summary>
+        /// Adds services of types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/> with a shared implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <remarks>
+        /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
+        /// </remarks>
+        public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+            this IServiceCollection services,
+            ServiceLifetime lifetime = ServiceLifetime.Singleton)
             where TService1 : class
             where TService2 : class
             where TImplementing : class, TService1, TService2
         {
-            services.AddUnique<TService1, TImplementing>();
-            services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>());
+            services.AddUnique<TService1, TImplementing>(lifetime);
+            services.AddUnique<TService2>(factory => (TImplementing)factory.GetRequiredService<TService1>(), lifetime);
         }
 
         // TODO(V11): Remove this function.
         [Obsolete("This method is functionally equivalent to AddSingleton<TImplementing>() please use that instead.")]
         public static void AddUnique<TImplementing>(this IServiceCollection services)
             where TImplementing : class
-            => services.Replace(ServiceDescriptor.Singleton<TImplementing, TImplementing>());
+        {
+            services.RemoveAll<TImplementing>();
+            services.AddSingleton<TImplementing>();
+        }
 
         /// <summary>
-        /// Registers a unique service with an implementation factory.
+        /// Adds a service of type <typeparamref name="TService"/> with an implementation factory method to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
-        public static void AddUnique<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory)
+        /// <remarks>
+        /// Removes all previous registrations for the type <typeparamref name="TService"/>.
+        /// </remarks>
+        public static void AddUnique<TService>(
+            this IServiceCollection services,
+            Func<IServiceProvider, TService> factory,
+            ServiceLifetime lifetime = ServiceLifetime.Singleton)
             where TService : class
-            => services.Replace(ServiceDescriptor.Singleton(factory));
+        {
+            services.RemoveAll<TService>();
+            services.Add(ServiceDescriptor.Describe(typeof(TService), factory, lifetime));
+        }
 
         /// <summary>
-        /// Registers a unique service with an implementing instance.
+        /// Adds a singleton service of the type specified by <paramref name="serviceType"/> to the specified <see cref="IServiceCollection"/>.
         /// </summary>
-        /// <remarks>Unique services have one single implementation, and a Singleton lifetime.</remarks>
+        /// <remarks>
+        /// Removes all previous registrations for the type specified by <paramref name="serviceType"/>.
+        /// </remarks>
         public static void AddUnique(this IServiceCollection services, Type serviceType, object instance)
-            => services.Replace(ServiceDescriptor.Singleton(serviceType, instance));
+        {
+            services.RemoveAll(serviceType);
+            services.AddSingleton(serviceType, instance);
+        }
 
         /// <summary>
-        /// Registers a unique service with an implementing instance.
+        /// Adds a singleton service of type <typeparamref name="TService"/> to the specified <see cref="IServiceCollection"/>.
         /// </summary>
+        /// <remarks>
+        /// Removes all previous registrations for the type type <typeparamref name="TService"/>.
+        /// </remarks>
         public static void AddUnique<TService>(this IServiceCollection services, TService instance)
             where TService : class
-            => services.Replace(ServiceDescriptor.Singleton(instance));
+        {
+            services.RemoveAll<TService>();
+            services.AddSingleton(instance);
+        }
 
         internal static IServiceCollection AddLazySupport(this IServiceCollection services)
         {

@@ -20,11 +20,11 @@ namespace Umbraco.Cms.Web.Website.Security
 
         public MemberAuthenticationBuilder(
             IServiceCollection services,
-            Action<MemberExternalLoginProviderOptions> loginProviderOptions = null)
+            Action<MemberExternalLoginProviderOptions>? loginProviderOptions = null)
             : base(services)
             => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
-        public string SchemeForMembers(string scheme)
+        public string? SchemeForMembers(string scheme)
             =>  scheme?.EnsureStartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix);
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.Website.Security
         /// <param name="displayName"></param>
         /// <param name="configureOptions"></param>
         /// <returns></returns>
-        public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string displayName, Action<TOptions> configureOptions)
+        public override AuthenticationBuilder AddRemoteScheme<TOptions, THandler>(string authenticationScheme, string? displayName, Action<TOptions>? configureOptions)
         {
             // Validate that the prefix is set
             if (!authenticationScheme.StartsWith(Constants.Security.MemberExternalAuthenticationTypePrefix))

@@ -14,6 +14,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
@@ -191,7 +194,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                IQuery<IDictionaryItem> query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey == "Article");
+                IQuery<IDictionaryItem> query = provider.CreateQuery<IDictionaryItem>().Where(x => x.ItemKey == "Article");
                 IEnumerable<IDictionaryItem> result = repository.Get(query);
 
                 // Assert
@@ -211,7 +214,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IDictionaryRepository repository = CreateRepository();
 
                 // Act
-                IQuery<IDictionaryItem> query = provider.SqlContext.Query<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
+                IQuery<IDictionaryItem> query = provider.CreateQuery<IDictionaryItem>().Where(x => x.ItemKey.StartsWith("Read"));
                 int result = repository.Count(query);
 
                 // Assert

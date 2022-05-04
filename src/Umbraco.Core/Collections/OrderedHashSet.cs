@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Collections
     /// and is customizable to keep the newest or oldest equatable item
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class OrderedHashSet<T> : KeyedCollection<T, T>
+    public class OrderedHashSet<T> : KeyedCollection<T, T> where T : notnull
     {
         private readonly bool _keepOldest;
 

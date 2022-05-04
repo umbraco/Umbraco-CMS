@@ -40,12 +40,12 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             return typeof(T).IsAssignableFrom(objectType);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             return JsonSerializer.CreateDefault(JsonSerializerSettings).Deserialize(reader, objectType);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             JsonSerializer.CreateDefault(JsonSerializerSettings).Serialize(writer, value);
         }

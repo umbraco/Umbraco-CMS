@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -153,11 +154,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Store token, so we can re-use this during restart
             _cancellationToken = cancellationToken;
 
+            // Just in-case HostBuilder.ConfigureUmbracoDefaults() isn't used (e.g. upgrade from 9 and ignored advice).
+            if (StaticServiceProvider.Instance == null!)
+            {
+                StaticServiceProvider.Instance = _serviceProvider;
+            }
+
             if (isRestarting == false)
             {
-                StaticApplicationLogging.Initialize(_loggerFactory);
-                StaticServiceProvider.Instance = _serviceProvider;
-
                 AppDomain.CurrentDomain.UnhandledException += (_, args)
                     => _logger.LogError(args.ExceptionObject as Exception, $"Unhandled exception in AppDomain{(args.IsTerminating ? " (terminating)" : null)}.");
             }

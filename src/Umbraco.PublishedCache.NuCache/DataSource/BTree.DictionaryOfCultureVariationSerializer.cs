@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
         private static readonly IReadOnlyDictionary<string, CultureVariation> Empty = new Dictionary<string, CultureVariation>();
 
-        public void WriteTo(IReadOnlyDictionary<string, CultureVariation> value, Stream stream)
+        public void WriteTo(IReadOnlyDictionary<string, CultureVariation>? value, Stream stream)
         {
             var variations = value ?? Empty;
 

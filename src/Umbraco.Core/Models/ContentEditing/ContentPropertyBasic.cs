@@ -27,14 +27,14 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public Guid DataTypeKey { get; set; }
 
         [DataMember(Name = "value")]
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         [DataMember(Name = "alias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "editor", IsRequired = false)]
-        public string Editor { get; set; }
+        public string? Editor { get; set; }
 
         /// <summary>
         /// Flags the property to denote that it can contain sensitive data
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "culture")]
         [ReadOnly(true)]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         /// <summary>
         /// The segment of the property
@@ -62,12 +62,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "segment")]
         [ReadOnly(true)]
-        public string Segment { get; set; }
+        public string? Segment { get; set; }
 
         /// <summary>
         /// Used internally during model mapping
         /// </summary>
         [IgnoreDataMember]
-        public IDataEditor PropertyEditor { get; set; }
+        public IDataEditor? PropertyEditor { get; set; }
     }
 }

@@ -15,6 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public Guid NodeObjectType { get; set; }
 
         [Column("action")]
-        public string Action { get; set; }
+        public string Action { get; set; } = null!;
     }
 }

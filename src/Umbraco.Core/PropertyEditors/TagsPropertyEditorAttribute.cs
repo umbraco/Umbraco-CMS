@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Gets the type of the dynamic configuration provider.
         /// </summary>
         //TODO: This is not used and should be implemented in a nicer way, see https://github.com/umbraco/Umbraco-CMS/issues/6017#issuecomment-516253562
-        public Type TagsConfigurationProviderType { get; }
+        public Type? TagsConfigurationProviderType { get; }
     }
 }

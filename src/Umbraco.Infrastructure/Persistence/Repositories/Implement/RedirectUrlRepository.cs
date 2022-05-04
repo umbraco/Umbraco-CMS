@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -9,8 +10,8 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -23,12 +24,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
         }
 
-        public IRedirectUrl Get(string url, Guid contentKey, string culture)
+        public IRedirectUrl? Get(string url, Guid contentKey, string? culture)
         {
             var urlHash = url.GenerateHash<SHA1>();
             Sql<ISqlContext> sql = GetBaseQuery(false).Where<RedirectUrlDto>(x =>
                 x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey && x.Culture == culture);
-            RedirectUrlDto dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
+            RedirectUrlDto? dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
@@ -39,31 +40,71 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public void Delete(Guid id) => Database.Delete<RedirectUrlDto>(id);
 
-        public IRedirectUrl GetMostRecentUrl(string url)
+        public IRedirectUrl? GetMostRecentUrl(string url)
+        {
+            Sql<ISqlContext> sql = GetMostRecentSql(url);
+            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+        public  async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
+        {
+            Sql<ISqlContext> sql = GetMostRecentSql(url);
+            List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+
+        private Sql<ISqlContext> GetMostRecentSql(string url)
         {
             var urlHash = url.GenerateHash<SHA1>();
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
-            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-            RedirectUrlDto dto = dtos.FirstOrDefault();
-            return dto == null ? null : Map(dto);
+            return sql;
         }
 
-        public IRedirectUrl GetMostRecentUrl(string url, string culture)
+        public IRedirectUrl? GetMostRecentUrl(string url, string culture)
         {
             if (string.IsNullOrWhiteSpace(culture))
             {
                 return GetMostRecentUrl(url);
             }
 
+            Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
+
+            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+
+            if (dto == null)
+            {
+                dto = dtos.FirstOrDefault(f => string.IsNullOrWhiteSpace(f.Culture));
+            }
+
+            return dto == null ? null : Map(dto);
+        }
+
+        private Sql<ISqlContext> GetMostRecentUrlSql(string url, string culture)
+        {
             var urlHash = url.GenerateHash<SHA1>();
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash &&
                                             (x.Culture == culture.ToLower() || x.Culture == null || x.Culture == string.Empty))
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
-            List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-            RedirectUrlDto dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+            return sql;
+        }
+
+        public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                return GetMostRecentUrl(url);
+            }
+
+            Sql<ISqlContext> sql = GetMostRecentUrlSql(url, culture);
+
+            List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
+            RedirectUrlDto? dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
 
             if (dto == null)
             {
@@ -79,7 +120,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<RedirectUrlDto>(x => x.ContentKey == contentKey)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-            return dtos.Select(Map);
+            return dtos.Select(Map).WhereNotNull();
         }
 
         public IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total)
@@ -88,7 +129,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
-            return result.Items.Select(Map);
+            return result.Items.Select(Map).WhereNotNull();
         }
 
         public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
@@ -101,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
 
-            IEnumerable<IRedirectUrl> rules = result.Items.Select(Map);
+            IEnumerable<IRedirectUrl> rules = result.Items.Select(Map).WhereNotNull();
             return rules;
         }
 
@@ -116,7 +157,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Page<RedirectUrlDto> result = Database.Page<RedirectUrlDto>(pageIndex + 1, pageSize, sql);
             total = Convert.ToInt32(result.TotalItems);
 
-            IEnumerable<IRedirectUrl> rules = result.Items.Select(Map);
+            IEnumerable<IRedirectUrl> rules = result.Items.Select(Map).WhereNotNull();
             return rules;
         }
 
@@ -125,16 +166,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override bool PerformExists(Guid id) => PerformGet(id) != null;
 
-        protected override IRedirectUrl PerformGet(Guid id)
+        protected override IRedirectUrl? PerformGet(Guid id)
         {
             Sql<ISqlContext> sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Id == id);
-            RedirectUrlDto dto = Database.Fetch<RedirectUrlDto>(sql.SelectTop(1)).FirstOrDefault();
+            RedirectUrlDto? dto = Database.Fetch<RedirectUrlDto>(sql.SelectTop(1)).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
-        protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[] ids)
+        protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[]? ids)
         {
-            if (ids.Length > Constants.Sql.MaxParameterCount)
+            if (ids?.Length > Constants.Sql.MaxParameterCount)
             {
                 throw new NotSupportedException(
                     $"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
@@ -142,7 +183,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
             List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
-            return dtos.WhereNotNull().Select(Map);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
         }
 
         protected override IEnumerable<IRedirectUrl> PerformGetByQuery(IQuery<IRedirectUrl> query) =>
@@ -177,18 +218,21 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         protected override void PersistNewItem(IRedirectUrl entity)
         {
-            RedirectUrlDto dto = Map(entity);
+            RedirectUrlDto? dto = Map(entity);
             Database.Insert(dto);
             entity.Id = entity.Key.GetHashCode();
         }
 
         protected override void PersistUpdatedItem(IRedirectUrl entity)
         {
-            RedirectUrlDto dto = Map(entity);
-            Database.Update(dto);
+            RedirectUrlDto? dto = Map(entity);
+            if (dto is not null)
+            {
+                Database.Update(dto);
+            }
         }
 
-        private static RedirectUrlDto Map(IRedirectUrl redirectUrl)
+        private static RedirectUrlDto? Map(IRedirectUrl redirectUrl)
         {
             if (redirectUrl == null)
             {
@@ -206,7 +250,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
             };
         }
 
-        private static IRedirectUrl Map(RedirectUrlDto dto)
+        private static IRedirectUrl? Map(RedirectUrlDto dto)
         {
             if (dto == null)
             {

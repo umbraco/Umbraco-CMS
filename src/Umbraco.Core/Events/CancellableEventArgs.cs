@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Events
     public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     {
         private bool _cancel;
-        private IDictionary<string, object> _eventState;
+        private IDictionary<string, object>? _eventState;
 
         private static readonly ReadOnlyDictionary<string, object> EmptyAdditionalData = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
 
@@ -108,14 +108,14 @@ namespace Umbraco.Cms.Core.Events
             set => _eventState = value;
         }
 
-        public bool Equals(CancellableEventArgs other)
+        public bool Equals(CancellableEventArgs? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return Equals(AdditionalData, other.AdditionalData);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             _logger = logger;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {

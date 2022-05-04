@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Events
             _auditService.Add(
                 AuditType.Copy,
                 notification.Copy.WriterId,
-                notification.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document),
+                notification.Copy.Id, ObjectTypes.GetName(UmbracoObjectTypes.Document) ?? string.Empty,
                 $"Copied content with Id: '{notification.Copy.Id}' related to original content with Id: '{notification.Original.Id}'");
         }
     }

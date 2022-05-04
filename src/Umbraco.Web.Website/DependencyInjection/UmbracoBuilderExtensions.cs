@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
         {
-            builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
+            builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()?
                  .Add(builder.TypeLoader.GetSurfaceControllers());
 
             // Configure MVC startup options for custom view locations

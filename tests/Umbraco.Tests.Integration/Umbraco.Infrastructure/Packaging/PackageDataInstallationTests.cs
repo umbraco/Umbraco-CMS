@@ -22,6 +22,9 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
     [TestFixture]
@@ -150,7 +153,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             using IScope scope = ScopeProvider.CreateScope();
             foreach (IPropertyType propertyType in mRBasePage.PropertyTypes)
             {
-                PropertyTypeDto propertyTypeDto = scope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                PropertyTypeDto propertyTypeDto = ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
                 Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
             }
         }
@@ -424,7 +427,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             string configuration;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
+                List<DataTypeDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;
             }
 

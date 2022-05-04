@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public long TotalRecords { get; set; }
 
         [DataMember(Name = "results")]
-        public IEnumerable<SearchResult> Results { get; set; }
+        public IEnumerable<SearchResult>? Results { get; set; }
     }
 }

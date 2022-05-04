@@ -24,7 +24,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     {
         private readonly IMemberGroupService _memberGroupService;
 
-        [ActivatorUtilitiesConstructor]
+        [
+            ActivatorUtilitiesConstructor]
         public MemberGroupTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
@@ -58,17 +59,21 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 .OrderBy(x => x.Name)
                 .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.MemberGroup, false));
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
-            ActionResult<TreeNode> rootResult = base.CreateRootNode(queryStrings);
+            ActionResult<TreeNode?> rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
             {
-                return rootResult;
+                return rootResult.Result;
             }
-            TreeNode root = rootResult.Value;
+            TreeNode? root = rootResult.Value;
 
-            //check if there are any groups
-            root.HasChildren = _memberGroupService.GetAll().Any();
+            if (root is not null)
+            {
+                // Check if there are any groups
+                root.HasChildren = _memberGroupService.GetAll().Any();
+            }
+
             return root;
         }
     }

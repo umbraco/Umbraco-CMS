@@ -36,9 +36,11 @@ namespace Umbraco.Extensions
     public static class HtmlHelperRenderExtensions
     {
         private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
+        where T : notnull
             => GetRequiredService<T>(htmlHelper.ViewContext);
 
         private static T GetRequiredService<T>(ViewContext viewContext)
+        where T : notnull
             => viewContext.HttpContext.RequestServices.GetRequiredService<T>();
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Renders a partial view that is found in the specified area
         /// </summary>
-        public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
+        public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object? model = null, ViewDataDictionary? viewData = null)
         {
             var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
             helper.ViewContext.RouteData.DataTokens["area"] = area;
@@ -77,7 +79,7 @@ namespace Umbraco.Extensions
                         contentSettings.PreviewBadge,
                         ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                         WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                        umbracoContext.PublishedRequest.PublishedContent.Id);
+                        umbracoContext.PublishedRequest?.PublishedContent?.Id);
                 return new HtmlString(htmlBadge);
             }
 
@@ -85,15 +87,15 @@ namespace Umbraco.Extensions
 
         }
 
-        public static async Task<IHtmlContent> CachedPartialAsync(
+        public static async Task<IHtmlContent?> CachedPartialAsync(
             this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
             TimeSpan cacheTimeout,
             bool cacheByPage = false,
             bool cacheByMember = false,
-            ViewDataDictionary viewData = null,
-            Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
+            ViewDataDictionary? viewData = null,
+            Func<object, ViewDataDictionary?, string>? contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
             // let's always cache by the current culture to allow variants to have different cache results
@@ -132,7 +134,7 @@ namespace Umbraco.Extensions
             var appCaches = GetRequiredService<AppCaches>(htmlHelper);
             var hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
 
-            return appCaches.CachedPartialView(hostingEnvironment, umbracoContext, htmlHelper, partialViewName, model, cacheTimeout, cacheKey.ToString(), viewData);
+            return appCaches.CachedPartialView(hostingEnvironment, umbracoContext!, htmlHelper, partialViewName, model, cacheTimeout, cacheKey.ToString(), viewData);
         }
 
         // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -161,7 +163,7 @@ namespace Umbraco.Extensions
             string prefix = "",
             bool excludePropertyErrors = false,
             string message = "",
-            object htmlAttributes = null)
+            object? htmlAttributes = null)
         {
             if (prefix.IsNullOrWhiteSpace())
             {
@@ -216,7 +218,7 @@ namespace Umbraco.Extensions
             }
 
             SurfaceControllerTypeCollection surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
-            Type surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
+            Type? surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
             {
                 throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
@@ -253,7 +255,7 @@ namespace Umbraco.Extensions
             this IHtmlHelper htmlHelper,
             string controllerAction,
             string area,
-            object additionalRouteVals = null)
+            object? additionalRouteVals = null)
             where TSurface : SurfaceController
         {
             var inputField = GetSurfaceControllerHiddenInput(
@@ -271,7 +273,7 @@ namespace Umbraco.Extensions
             string controllerName,
             string controllerAction,
             string area,
-            object additionalRouteVals = null)
+            object? additionalRouteVals = null)
         {
             var encryptedString = EncryptionHelper.CreateEncryptedRouteString(
                 dataProtectionProvider,
@@ -300,7 +302,7 @@ namespace Umbraco.Extensions
                 string controllerName,
                 string controllerAction,
                 string area,
-                object additionalRouteVals = null)
+                object? additionalRouteVals = null)
                 : base(viewContext, htmlEncoder)
             {
                 _viewContext = viewContext;
@@ -335,25 +337,25 @@ namespace Umbraco.Extensions
         /// <param name="method">The method.</param>
         /// <returns>the <see cref="MvcForm"/></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, FormMethod method)
-            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>(), method);
+            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object?>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName)
-            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>());
+            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object?>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, object additionalRouteVals, FormMethod method)
-            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>(), method);
+            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object?>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, object additionalRouteVals)
-            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>());
+            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object?>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
@@ -383,8 +385,8 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             string controllerName,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes,
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes,
             FormMethod method)
         {
             if (action == null)
@@ -417,8 +419,8 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             string controllerName,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes)
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes)
         {
             if (action == null)
             {
@@ -447,13 +449,13 @@ namespace Umbraco.Extensions
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType, FormMethod method)
-            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>(), method);
+            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object?>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType)
-            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>());
+            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object?>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
@@ -477,7 +479,7 @@ namespace Umbraco.Extensions
             string action,
             Type surfaceType,
             object additionalRouteVals,
-            FormMethod method) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>(), method);
+            FormMethod method) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object?>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
@@ -486,7 +488,7 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             Type surfaceType,
-            object additionalRouteVals) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>());
+            object additionalRouteVals) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object?>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
@@ -552,8 +554,8 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             Type surfaceType,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes,
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes,
             FormMethod method)
         {
 
@@ -588,7 +590,7 @@ namespace Umbraco.Extensions
                 area = metaData.AreaName;
             }
 
-            return html.BeginUmbracoForm(action, metaData.ControllerName, area, additionalRouteVals, htmlAttributes, method);
+            return html.BeginUmbracoForm(action, metaData.ControllerName, area!, additionalRouteVals, htmlAttributes, method);
         }
 
         /// <summary>
@@ -598,8 +600,8 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             Type surfaceType,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes)
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes)
             => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes, FormMethod.Post);
 
         /// <summary>
@@ -610,7 +612,7 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes,
+            IDictionary<string, object?> htmlAttributes,
             FormMethod method)
             where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes, method);
 
@@ -622,20 +624,20 @@ namespace Umbraco.Extensions
             this IHtmlHelper html,
             string action,
             object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes)
+            IDictionary<string, object?> htmlAttributes)
             where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area, FormMethod method)
-            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>(), method);
+            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object?>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area)
-            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>());
+            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object?>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
@@ -643,10 +645,10 @@ namespace Umbraco.Extensions
         public static MvcForm BeginUmbracoForm(
             this IHtmlHelper html,
             string action,
-            string controllerName,
+            string? controllerName,
             string area,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes,
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes,
             FormMethod method)
         {
             if (action == null)
@@ -683,8 +685,8 @@ namespace Umbraco.Extensions
             string action,
             string controllerName,
             string area,
-            object additionalRouteVals,
-            IDictionary<string, object> htmlAttributes) => html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes, FormMethod.Post);
+            object? additionalRouteVals,
+            IDictionary<string, object?> htmlAttributes) => html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes, FormMethod.Post);
 
         /// <summary>
         /// This renders out the form for us
@@ -696,11 +698,11 @@ namespace Umbraco.Extensions
             this IHtmlHelper htmlHelper,
             string formAction,
             FormMethod method,
-            IDictionary<string, object> htmlAttributes,
+            IDictionary<string, object?> htmlAttributes,
             string surfaceController,
             string surfaceAction,
             string area,
-            object additionalRouteVals = null)
+            object? additionalRouteVals = null)
         {
             // ensure that the multipart/form-data is added to the HTML attributes
             if (htmlAttributes.ContainsKey("enctype") == false)

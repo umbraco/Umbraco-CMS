@@ -51,14 +51,14 @@ namespace Umbraco.Cms.Web.Common.Filters
 
             }
 
-            public void ValidateRouteString(string ufprt, string currentController, string currentAction, string currentArea)
+            public void ValidateRouteString(string? ufprt, string currentController, string currentAction, string? currentArea)
             {
                 if (ufprt.IsNullOrWhiteSpace())
                 {
                     throw new HttpUmbracoFormRouteStringException("The required request field \"ufprt\" is not present.");
                 }
 
-                if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(_dataProtectionProvider, ufprt, out var additionalDataParts))
+                if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(_dataProtectionProvider, ufprt!, out var additionalDataParts))
                 {
                     throw new HttpUmbracoFormRouteStringException("The Umbraco form request route string could not be decrypted.");
                 }

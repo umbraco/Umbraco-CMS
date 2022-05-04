@@ -21,6 +21,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
         private IMediaRepository MediaRepository => GetRequiredService<IMediaRepository>();
 
-        private UserRepository CreateRepository(IScopeProvider provider)
+        private UserRepository CreateRepository(ICoreScopeProvider provider)
         {
             var accessor = (IScopeAccessor)provider;
             Mock<IRuntimeState> mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
@@ -59,7 +60,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             return mockRuntimeState;
         }
 
-        private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
+        private UserGroupRepository CreateUserGroupRepository(ICoreScopeProvider provider)
         {
             var accessor = (IScopeAccessor)provider;
             return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
@@ -69,8 +70,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Add_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -88,8 +89,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -111,8 +112,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -132,8 +133,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Delete_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -161,8 +162,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Get_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
                 UserGroupRepository userGroupRepository = CreateUserGroupRepository(provider);
@@ -184,15 +185,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetByQuery_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
                 CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                IQuery<IUser> query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1");
+                IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1");
                 IEnumerable<IUser> result = repository.Get(query);
 
                 // Assert
@@ -204,8 +205,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -225,8 +226,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetAll_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -246,8 +247,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Exists_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -265,15 +266,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Count_On_UserRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
                 IUser[] users = CreateAndCommitMultipleUsers(repository);
 
                 // Act
-                IQuery<IUser> query = scope.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 int result = repository.Count(query);
 
                 // Assert
@@ -284,18 +285,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Get_Paged_Results_By_Query_And_Filter_And_Groups()
         {
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
                 IUser[] users = CreateAndCommitMultipleUsers(repository);
-                IQuery<IUser> query = provider.SqlContext.Query<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
+                IQuery<IUser> query = provider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     IEnumerable<IUser> result = repository.GetPagedResultsByQuery(
@@ -306,15 +307,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         user => user.Id,
                         Direction.Ascending,
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id > -1));
+                        filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                     // Assert
                     Assert.AreEqual(2, totalRecs);
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -322,8 +323,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Get_Paged_Results_With_Filter_And_Groups()
         {
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
 
@@ -331,8 +332,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 try
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
                     // Act
                     IEnumerable<IUser> result = repository.GetPagedResultsByQuery(
@@ -344,15 +345,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         Direction.Ascending,
                         includeUserGroups: new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
-                        filter: provider.SqlContext.Query<IUser>().Where(x => x.Id == -1));
+                        filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                     // Assert
                     Assert.AreEqual(1, totalRecs);
                 }
                 finally
                 {
-                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
                 }
             }
         }
@@ -361,8 +362,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Invalidate_SecurityStamp_On_Username_Change()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 UserRepository repository = CreateRepository(provider);
                 UserGroupRepository userGroupRepository = CreateUserGroupRepository(provider);
@@ -390,21 +391,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Validate_Login_Session()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
+            ICoreScopeProvider provider = ScopeProvider;
             User user = UserBuilder.CreateUser();
-            using (IScope scope = provider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = provider.CreateCoreScope(autoComplete: true))
             {
                 UserRepository repository = CreateRepository(provider);
                 repository.Save(user);
             }
 
-            using (IScope scope = provider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = provider.CreateCoreScope(autoComplete: true))
             {
                 UserRepository repository = CreateRepository(provider);
                 Guid sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
 
                 // manually update this record to be in the past
-                scope.Database.Execute(scope.SqlContext.Sql()
+                ScopeAccessor.AmbientScope.Database.Execute(ScopeAccessor.AmbientScope.SqlContext.Sql()
                     .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow.AddDays(-100)))
                     .Where<UserLoginDto>(x => x.SessionId == sessionId));
 
@@ -425,8 +426,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             MediaType mt = MediaTypeBuilder.CreateSimpleMediaType("testmedia", "TestMedia");
 
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope(autoComplete: true))
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope(autoComplete: true))
             {
                 UserRepository userRepository = CreateRepository(provider);
                 UserGroupRepository userGroupRepository = CreateUserGroupRepository(provider);

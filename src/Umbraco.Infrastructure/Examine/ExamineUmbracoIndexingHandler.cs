@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly IMainDom _mainDom;
         private readonly ILogger<ExamineUmbracoIndexingHandler> _logger;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IExamineManager _examineManager;
         private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             IMainDom mainDom,
             ILogger<ExamineUmbracoIndexingHandler> logger,
             IProfilingLogger profilingLogger,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IExamineManager examineManager,
             IBackgroundTaskQueue backgroundTaskQueue,
             IContentValueSetBuilder contentValueSetBuilder,
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             .Field("nodeType", id.ToInvariantString())
                             .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
                         total = results.TotalItemCount;
-                        
+
                         foreach (ISearchResult item in results)
                         {
                             if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int contentId))
@@ -214,9 +214,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             private readonly List<DeferedAction> _actions = new List<DeferedAction>();
 
-            public static DeferedActions Get(IScopeProvider scopeProvider)
+            public static DeferedActions? Get(ICoreScopeProvider scopeProvider)
             {
-                IScopeContext scopeContext = scopeProvider.Context;
+                IScopeContext? scopeContext = scopeProvider.Context;
 
                 return scopeContext?.Enlist("examineEvents",
                     () => new DeferedActions(), // creator
@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     {
                         if (completed)
                         {
-                            actions.Execute();
+                            actions?.Execute();
                         }
                     }, EnlistPriority);
             }
@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
                 => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
                     // for content we have a different builder for published vs unpublished
                     // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
@@ -325,7 +325,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 // perform the ValueSet lookup on a background thread
                 backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
                     var valueSet = examineUmbracoIndexingHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
 
@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 // perform the ValueSet lookup on a background thread
                 backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
                     var valueSet = examineUmbracoIndexingHandler._memberValueSetBuilder.GetValueSets(member).ToList();
 
@@ -384,7 +384,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly int _id;
-            private readonly IReadOnlyCollection<int> _ids;
+            private readonly IReadOnlyCollection<int>? _ids;
             private readonly bool _keepIfUnpublished;
 
             public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)

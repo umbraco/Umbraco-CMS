@@ -6,15 +6,15 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class PublicAccess
     {
         [DataMember(Name = "groups")]
-        public MemberGroupDisplay[] Groups { get; set; }
+        public MemberGroupDisplay[]? Groups { get; set; }
 
         [DataMember(Name = "loginPage")]
-        public EntityBasic LoginPage { get; set; }
+        public EntityBasic? LoginPage { get; set; }
 
         [DataMember(Name = "errorPage")]
-        public EntityBasic ErrorPage { get; set; }
+        public EntityBasic? ErrorPage { get; set; }
 
         [DataMember(Name = "members")]
-        public MemberDisplay[] Members { get; set; }
+        public MemberDisplay[]? Members { get; set; }
     }
 }

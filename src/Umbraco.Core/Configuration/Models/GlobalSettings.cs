@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticHideTopLevelNodeFromPath = true;
         internal const bool StaticUseHttps = false;
         internal const int StaticVersionCheckPeriod = 7;
-        internal const string StaticUmbracoPath = "~/umbraco";
+        internal const string StaticUmbracoPath = Constants.System.DefaultUmbracoPath;
         internal const string StaticIconsPath = "~/umbraco/assets/icons";
         internal const string StaticUmbracoCssPath = "~/css";
         internal const string StaticUmbracoScriptsPath = "~/scripts";
@@ -27,7 +27,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticInstallMissingDatabase = false;
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
-        internal const string StaticSqlWriteLockTimeOut = "00:00:05";
+        internal const string StaticDistributedLockingReadLockDefaultTimeout = "00:01:00";
+        internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
         internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
 
@@ -114,7 +115,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <remarks>
         /// If the value is a virtual path, it's resolved relative to the webroot.
         /// </remarks>
-        public string UmbracoMediaPhysicalRootPath { get; set; }
+        public string UmbracoMediaPhysicalRootPath { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.
@@ -182,7 +183,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP settings.
         /// </summary>
-        public SmtpSettings Smtp { get; set; }
+        public SmtpSettings? Smtp { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether SMTP is configured.
@@ -201,12 +202,26 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool SanitizeTinyMce { get; set; } = StaticSanitizeTinyMce;
 
         /// <summary>
-        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed read lock.
         /// </summary>
         /// <remarks>
-        /// The default value is 5000 milliseconds.
+        /// The default value is 60 seconds.
         /// </remarks>
-        [DefaultValue(StaticSqlWriteLockTimeOut)]
-        public TimeSpan SqlWriteLockTimeOut { get; set; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
+        [DefaultValue(StaticDistributedLockingReadLockDefaultTimeout)]
+        public TimeSpan DistributedLockingReadLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingReadLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets or sets a value representing the maximum time to wait whilst attempting to obtain a distributed write lock.
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5 seconds.
+        /// </remarks>
+        [DefaultValue(StaticDistributedLockingWriteLockDefaultTimeout)]
+        public TimeSpan DistributedLockingWriteLockDefaultTimeout { get; set; } = TimeSpan.Parse(StaticDistributedLockingWriteLockDefaultTimeout);
+
+        /// <summary>
+        /// Gets or sets a value representing the DistributedLockingMechanism to use.
+        /// </summary>
+        public string DistributedLockingMechanism { get; set; } = string.Empty;
     }
 }

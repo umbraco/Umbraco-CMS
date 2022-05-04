@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets or sets the path of the view to show when setting up this 2fa provider
         /// </summary>
-        public string SetupViewPath { get; set; }
+        public string? SetupViewPath { get; set; }
     }
 }

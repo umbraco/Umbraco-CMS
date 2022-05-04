@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.Models.Entities
     {
         private static readonly IReadOnlyDictionary<string, string> Empty = new Dictionary<string, string>();
 
-        private IReadOnlyDictionary<string, string> _cultureNames;
-        private IEnumerable<string> _publishedCultures;
-        private IEnumerable<string> _editedCultures;
+        private IReadOnlyDictionary<string, string>? _cultureNames;
+        private IEnumerable<string>? _publishedCultures;
+        private IEnumerable<string>? _editedCultures;
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, string> CultureNames

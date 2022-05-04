@@ -1,4 +1,7 @@
-﻿using Umbraco.Cms.Core.Composing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Actions
 {
@@ -11,36 +14,36 @@ namespace Umbraco.Cms.Core.Actions
     public interface IAction : IDiscoverable
     {
         /// <summary>
-        /// The letter used to assign a permission (must be unique)
+        /// Gets the letter used to assign a permission (must be unique)
         /// </summary>
         char Letter { get; }
 
         /// <summary>
-        /// Whether to allow subscribing to notifications for this action
+        /// Gets a value indicating whether whether to allow subscribing to notifications for this action
         /// </summary>
         bool ShowInNotifier { get; }
 
         /// <summary>
-        /// Whether to allow assigning permissions based on this action
+        /// Gets a value indicating whether whether to allow assigning permissions based on this action
         /// </summary>
         bool CanBePermissionAssigned { get; }
 
         /// <summary>
-        /// The icon to display for this action
+        /// Gets the icon to display for this action
         /// </summary>
         string Icon { get; }
 
         /// <summary>
-        /// The alias for this action (must be unique)
+        /// Gets the alias for this action (must be unique)
         /// </summary>
         string Alias { get; }
 
         /// <summary>
-        /// The category used for this action
+        /// Gets the category used for this action
         /// </summary>
         /// <remarks>
         /// Used in the UI when assigning permissions
         /// </remarks>
-        string Category { get; }
+        string? Category { get; }
     }
 }

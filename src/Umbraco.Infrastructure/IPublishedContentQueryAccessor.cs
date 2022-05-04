@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Umbraco.Cms.Core
 {
     /// <remarks>
@@ -15,6 +17,6 @@ namespace Umbraco.Cms.Core
     /// </remarks>
     public interface IPublishedContentQueryAccessor
     {
-        bool TryGetValue(out IPublishedContentQuery publishedContentQuery);
+        bool TryGetValue([MaybeNullWhen(false)]out IPublishedContentQuery publishedContentQuery);
     }
 }

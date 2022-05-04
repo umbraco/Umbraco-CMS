@@ -41,30 +41,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         private object _lock = new object();
 
-        private DatabaseFactory _npocoDatabaseFactory;
-        private IPocoDataFactory _pocoDataFactory;
-        private string _providerName;
-        private DatabaseType _databaseType;
-        private ISqlSyntaxProvider _sqlSyntax;
-        private IBulkSqlInsertProvider _bulkSqlInsertProvider;
-        private RetryPolicy _connectionRetryPolicy;
-        private RetryPolicy _commandRetryPolicy;
-        private NPoco.MapperCollection _pocoMappers;
-        private SqlContext _sqlContext;
+        private DatabaseFactory? _npocoDatabaseFactory;
+        private IPocoDataFactory? _pocoDataFactory;
+        private DatabaseType? _databaseType;
+        private ISqlSyntaxProvider? _sqlSyntax;
+        private IBulkSqlInsertProvider? _bulkSqlInsertProvider;
+        private NPoco.MapperCollection? _pocoMappers;
+        private SqlContext _sqlContext = null!;
         private bool _upgrading;
         private bool _initialized;
 
-        private DbProviderFactory _dbProviderFactory = null;
+        private ConnectionStrings? _umbracoConnectionString;
 
-        private DbProviderFactory DbProviderFactory
+        private DbProviderFactory? _dbProviderFactory = null;
+
+        private DbProviderFactory? DbProviderFactory
         {
             get
             {
                 if (_dbProviderFactory == null)
                 {
-                    _dbProviderFactory = string.IsNullOrWhiteSpace(_providerName)
+                    _dbProviderFactory = string.IsNullOrWhiteSpace(ProviderName)
                         ? null
-                        : _dbProviderFactoryCreator.CreateFactory(_providerName);
+                        : _dbProviderFactoryCreator.CreateFactory(ProviderName);
                 }
 
                 return _dbProviderFactory;
@@ -74,45 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         #region Constructors
 
 
-          /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
-        /// </summary>
-        /// <remarks>Used by the other ctor and in tests.</remarks>
-          internal UmbracoDatabaseFactory(
-            ILogger<UmbracoDatabaseFactory> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<GlobalSettings> globalSettings,
-            IMapperCollection mappers,
-            IDbProviderFactoryCreator dbProviderFactoryCreator,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers,
-            string connectionString)
-        {
-            _globalSettings = globalSettings;
-            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
-            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
-            _npocoMappers = npocoMappers;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory;
 
-            if (connectionString is null)
-            {
-                logger.LogDebug("Missing connection string, defer configuration.");
-                return; // not configured
-            }
-
-            var configConnectionString = new ConfigConnectionString("Custom", connectionString);
-            // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
-            // so need to test the values too
-            if (configConnectionString.IsConnectionStringConfigured() == false)
-            {
-                logger.LogDebug("Empty connection string or provider name, defer configuration.");
-                return; // not configured
-            }
-
-            Configure(configConnectionString.ConnectionString, configConnectionString.ProviderName);
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
@@ -126,10 +87,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers):
-            this(logger, loggerFactory, globalSettings, mappers, dbProviderFactoryCreator, databaseSchemaCreatorFactory, npocoMappers, connectionStrings?.CurrentValue?.UmbracoConnectionString?.ConnectionString)
+            NPocoMapperCollection npocoMappers)
         {
+            _globalSettings = globalSettings;
+            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
+            _npocoMappers = npocoMappers;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
 
+            ConnectionStrings umbracoConnectionString = connectionStrings.Get(Constants.System.UmbracoConnectionName);
+            if (!umbracoConnectionString.IsConnectionStringConfigured())
+            {
+                logger.LogDebug("Missing connection string, defer configuration.");
+                return; // not configured
+            }
+
+            Configure(umbracoConnectionString);
         }
 
         #endregion
@@ -141,7 +116,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 lock (_lock)
                 {
-                    return !ConnectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace();
+                    return !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace();
                 }
             }
         }
@@ -150,51 +125,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public bool Initialized => Volatile.Read(ref _initialized);
 
         /// <inheritdoc />
-        public string ConnectionString { get; private set; }
+        public string? ConnectionString => _umbracoConnectionString?.ConnectionString;
 
         /// <inheritdoc />
-        public string ProviderName => _providerName;
+        public string? ProviderName => _umbracoConnectionString?.ProviderName;
 
         /// <inheritdoc />
         public bool CanConnect =>
             // actually tries to connect to the database (regardless of configured/initialized)
-            !ConnectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
+            !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace() &&
             DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory);
-
-        private void UpdateSqlServerDatabaseType()
-        {
-            // replace NPoco database type by a more efficient one
-            var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
-            var fromSettings = false;
-
-            if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
-                || !Enum<SqlServerSyntaxProvider.VersionName>.TryParse(setting.Substring("SqlServer.".Length), out var versionName, true))
-            {
-                versionName = ((SqlServerSyntaxProvider) _sqlSyntax).GetSetVersion(ConnectionString, _providerName, _logger).ProductVersionName;
-            }
-            else
-            {
-                fromSettings = true;
-            }
-
-            switch (versionName)
-            {
-                case SqlServerSyntaxProvider.VersionName.V2008:
-                    _databaseType = DatabaseType.SqlServer2008;
-                    break;
-                case SqlServerSyntaxProvider.VersionName.V2012:
-                case SqlServerSyntaxProvider.VersionName.V2014:
-                case SqlServerSyntaxProvider.VersionName.V2016:
-                case SqlServerSyntaxProvider.VersionName.V2017:
-                case SqlServerSyntaxProvider.VersionName.V2019:
-                    _databaseType = DatabaseType.SqlServer2012;
-                    break;
-                // else leave unchanged
-            }
-
-            _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
-                versionName, _databaseType, fromSettings ? "settings" : "detected");
-        }
 
         /// <inheritdoc />
         public ISqlContext SqlContext
@@ -209,7 +149,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         /// <inheritdoc />
-        public IBulkSqlInsertProvider BulkSqlInsertProvider
+        public IBulkSqlInsertProvider? BulkSqlInsertProvider
         {
             get
             {
@@ -224,18 +164,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public void ConfigureForUpgrade() => _upgrading = true;
 
         /// <inheritdoc />
-        public void Configure(string connectionString, string providerName)
+        public void Configure(ConnectionStrings umbracoConnectionString)
         {
-            if (connectionString.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(connectionString));
-            if (providerName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(providerName));
+            if (umbracoConnectionString is null)
+            {
+                throw new ArgumentNullException(nameof(umbracoConnectionString));
+            }
 
             lock (_lock)
             {
                 if (Volatile.Read(ref _initialized))
+                {
                     throw new InvalidOperationException("Already initialized.");
+                }
 
-                ConnectionString = connectionString;
-                _providerName = providerName;
+                _umbracoConnectionString = umbracoConnectionString;
             }
 
             // rest to be lazy-initialized
@@ -252,37 +195,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
             }
 
-            if (_providerName.IsNullOrWhiteSpace())
+            if (ProviderName.IsNullOrWhiteSpace())
             {
                 throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
             }
 
             if (DbProviderFactory == null)
             {
-                throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
+                throw new Exception($"Can't find a provider factory for provider name \"{ProviderName}\".");
             }
 
-            _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(ConnectionString);
-            _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(ConnectionString);
-
-            _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, _providerName);
+            _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, ProviderName);
             if (_databaseType == null)
             {
-                throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
+                throw new Exception($"Can't find an NPoco database type for provider name \"{ProviderName}\".");
             }
 
-            _sqlSyntax = _dbProviderFactoryCreator.GetSqlSyntaxProvider(_providerName);
+            _sqlSyntax = _dbProviderFactoryCreator.GetSqlSyntaxProvider(ProviderName!);
             if (_sqlSyntax == null)
             {
-                throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
+                throw new Exception($"Can't find a sql syntax provider for provider name \"{ProviderName}\".");
             }
 
-            _bulkSqlInsertProvider = _dbProviderFactoryCreator.CreateBulkSqlInsertProvider(_providerName);
+            _bulkSqlInsertProvider = _dbProviderFactoryCreator.CreateBulkSqlInsertProvider(ProviderName!);
 
-            if (_databaseType.IsSqlServer())
-            {
-                UpdateSqlServerDatabaseType();
-            }
+            _databaseType = _sqlSyntax.GetUpdatedDatabaseType(_databaseType, ConnectionString);
 
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
             // so that everything NPoco is properly cached for the lifetime of the application
@@ -290,16 +227,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             // add all registered mappers for NPoco
             _pocoMappers.AddRange(_npocoMappers);
 
-            _pocoMappers.AddRange(_dbProviderFactoryCreator.ProviderSpecificMappers(_providerName));
+            _pocoMappers.AddRange(_dbProviderFactoryCreator.ProviderSpecificMappers(ProviderName!));
 
-            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
+            var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver, _pocoMappers);
             _pocoDataFactory = factory;
             var config = new FluentConfig(xmappers => factory);
 
             // create the database factory
-            _npocoDatabaseFactory = DatabaseFactory.Config(x => x
-                .UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
-                .WithFluentConfig(config)); // with proper configuration
+            _npocoDatabaseFactory = DatabaseFactory.Config(cfg =>
+            {
+                cfg.UsingDatabase(CreateDatabaseInstance) // creating UmbracoDatabase instances
+                    .WithFluentConfig(config); // with proper configuration
+
+                foreach (IProviderSpecificInterceptor interceptor in _dbProviderFactoryCreator.GetProviderSpecificInterceptors(ProviderName!))
+                {
+                    cfg.WithInterceptor(interceptor);
+                }
+            });
 
             if (_npocoDatabaseFactory == null)
             {
@@ -316,28 +260,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             // must be initialized to create a database
             EnsureInitialized();
-            return (IUmbracoDatabase) _npocoDatabaseFactory.GetDatabase();
+            return (IUmbracoDatabase) _npocoDatabaseFactory!.GetDatabase();
         }
 
         // gets initialized poco data builders
         private InitializedPocoDataBuilder GetPocoDataFactoryResolver(Type type, IPocoDataFactory factory)
             => new UmbracoPocoDataBuilder(type, _pocoMappers, _upgrading).Init();
 
-
-
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
-        private UmbracoDatabase CreateDatabaseInstance()
-            => new UmbracoDatabase(
+        private UmbracoDatabase? CreateDatabaseInstance()
+        {
+            if (ConnectionString is null || SqlContext is null || DbProviderFactory is null)
+            {
+                return null;
+            }
+
+            return new UmbracoDatabase(
                 ConnectionString,
                 SqlContext,
                 DbProviderFactory,
                 _loggerFactory.CreateLogger<UmbracoDatabase>(),
                 _bulkSqlInsertProvider,
                 _databaseSchemaCreatorFactory,
-                _connectionRetryPolicy,
-                _commandRetryPolicy,
-                _pocoMappers
-                );
+                _pocoMappers);
+        }
 
         protected override void DisposeResources()
         {

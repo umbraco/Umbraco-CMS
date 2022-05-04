@@ -9,20 +9,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockListConfiguration
     {
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
-        public BlockConfiguration[] Blocks { get; set; }
+        public BlockConfiguration[] Blocks { get; set; } = null!;
 
         [DataContract]
         public class BlockConfiguration
         {
 
             [DataMember(Name ="backgroundColor")]
-            public string BackgroundColor { get; set; }
+            public string? BackgroundColor { get; set; }
 
             [DataMember(Name ="iconColor")]
-            public string IconColor { get; set; }
+            public string? IconColor { get; set; }
 
             [DataMember(Name ="thumbnail")]
-            public string Thumbnail { get; set; }
+            public string? Thumbnail { get; set; }
 
             [DataMember(Name ="contentElementTypeKey")]
             public Guid ContentElementTypeKey { get; set; }
@@ -31,16 +31,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public Guid? SettingsElementTypeKey { get; set; }
 
             [DataMember(Name ="view")]
-            public string View { get; set; }
+            public string? View { get; set; }
 
             [DataMember(Name ="stylesheet")]
-            public string Stylesheet { get; set; }
+            public string? Stylesheet { get; set; }
 
             [DataMember(Name ="label")]
-            public string Label { get; set; }
+            public string? Label { get; set; }
 
             [DataMember(Name ="editorSize")]
-            public string EditorSize { get; set; }
+            public string? EditorSize { get; set; }
 
             [DataMember(Name ="forceHideContentEditorInOverlay")]
             public bool ForceHideContentEditorInOverlay { get; set; }
@@ -66,6 +66,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public bool UseInlineEditingAsDefault { get; set; }
 
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
-        public string MaxPropertyWidth { get; set; }
+        public string? MaxPropertyWidth { get; set; }
     }
 }

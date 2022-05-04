@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class DefaultPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
         /// <inheritdoc />
-        public IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
         {
-            yield return new KeyValuePair<string, IEnumerable<object>>(
+            yield return new KeyValuePair<string, IEnumerable<object?>>(
                 property.Alias,
                 property.GetValue(culture, segment, published).Yield());
         }

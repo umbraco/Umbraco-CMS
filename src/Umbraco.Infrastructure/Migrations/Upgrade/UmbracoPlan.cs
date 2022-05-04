@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -99,7 +101,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// <returns>
         ///     <c>true</c> when the state contains a version; otherwise, <c>false</c>.D
         /// </returns>
-        private static bool TryGetInitStateVersion(string state, out string version)
+        private static bool TryGetInitStateVersion(string state, [MaybeNullWhen(false)] out string version)
         {
             if (state.StartsWith(InitPrefix) && state.EndsWith(InitSuffix))
             {
@@ -284,6 +286,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // TO 9.4.0
             To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
             To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
+
+            // TO 10.0.0
+            To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
         }
     }
 }

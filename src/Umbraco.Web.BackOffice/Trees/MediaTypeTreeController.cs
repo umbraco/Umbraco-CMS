@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _entityService = entityService;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
@@ -134,7 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 }
 
                 menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
-                if(ct.IsSystemMediaType() == false)
+                if(ct?.IsSystemMediaType() == false)
                 {
                     menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
                 }
@@ -145,8 +146,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out totalFound, searchFrom);
-
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
     }
 }

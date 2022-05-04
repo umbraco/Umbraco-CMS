@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             _contentService = contentService;
         }
 
-        protected override IContent GetExisting(ContentItemSave model)
+        protected override IContent? GetExisting(ContentItemSave model)
         {
             return _contentService.GetBlueprintById(model.Id);
         }

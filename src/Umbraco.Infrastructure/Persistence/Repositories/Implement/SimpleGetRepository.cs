@@ -6,8 +6,8 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         protected abstract TEntity ConvertToEntity(TDto dto);
-        protected abstract object GetBaseWhereClauseArguments(TId id);
+        protected abstract object GetBaseWhereClauseArguments(TId? id);
         protected abstract string GetWhereInClauseForGetAll();
 
         protected virtual IEnumerable<TDto> PerformFetch(Sql sql)
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.Fetch<TDto>(sql);
         }
 
-        protected override TEntity PerformGet(TId id)
+        protected override TEntity? PerformGet(TId? id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), GetBaseWhereClauseArguments(id));
@@ -54,11 +54,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
-        protected override IEnumerable<TEntity> PerformGetAll(params TId[] ids)
+        protected override IEnumerable<TEntity> PerformGetAll(params TId[]? ids)
         {
             var sql = Sql().From<TEntity>();
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
             }

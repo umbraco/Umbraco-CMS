@@ -39,16 +39,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("url")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        public string Url { get; set; }
+        public string Url { get; set; } = null!;
 
         [Column("culture")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         [Column("urlHash")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, culture, createDateUtc")]
         [Length(40)]
-        public string UrlHash { get; set; }
+        public string UrlHash { get; set; } = null!;
     }
 }

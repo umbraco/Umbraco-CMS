@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -82,15 +83,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override bool RecycleBinSmells => _contentService.RecycleBinSmells();
 
-        private int[] _userStartNodes;
+        private int[]? _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService, _appCaches) ?? Array.Empty<int>());
 
 
 
         /// <inheritdoc />
-        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
+        protected override TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
         {
             var culture = queryStrings?["culture"].ToString();
 
@@ -137,7 +138,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                 node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
 
-                if (_publicAccessService.IsProtected(entity.Path))
+                if (_publicAccessService.IsProtected(entity.Path).Success)
                     node.SetProtectedStyle();
 
                 return node;
@@ -163,7 +164,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
@@ -199,7 +200,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService, _appCaches))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService, _appCaches) ?? false)
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -252,10 +253,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
-            var cultureVal = (culture.Success ? culture.Result : null).IfNullOrWhiteSpace(_localizationService.GetDefaultLanguageIsoCode());
+            var cultureVal = (culture.Success ? culture.Result : null)?.IfNullOrWhiteSpace(_localizationService.GetDefaultLanguageIsoCode());
 
             // set names according to variations
-            foreach (var entity in result.Value)
+            foreach (var entity in result.Value!)
             {
                 EnsureName(entity, cultureVal);
             }
@@ -320,7 +321,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="culture"></param>
-        private void EnsureName(IEntitySlim entity, string culture)
+        private void EnsureName(IEntitySlim entity, string? culture)
         {
             if (culture == null)
             {
@@ -366,9 +367,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+            var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
         }
     }
 }

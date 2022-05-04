@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="state">The state of the consent.</param>
         /// <param name="comment">Additional free text.</param>
         /// <returns>The corresponding consent entity.</returns>
-        IConsent RegisterConsent(string source, string context, string action, ConsentState state, string comment = null);
+        IConsent RegisterConsent(string source, string context, string action, ConsentState state, string? comment = null);
 
         /// <summary>
         /// Retrieves consents.
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="actionStartsWith">Determines whether <paramref name="action"/> is a start pattern.</param>
         /// <param name="includeHistory">Determines whether to include the history of consents.</param>
         /// <returns>Consents matching the parameters.</returns>
-        IEnumerable<IConsent> LookupConsent(string source = null, string context = null, string action = null,
+        IEnumerable<IConsent>? LookupConsent(string? source = null, string? context = null, string? action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false);
     }

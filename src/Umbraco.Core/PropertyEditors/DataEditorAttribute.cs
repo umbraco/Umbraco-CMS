@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets the view to use to render the editor.
         /// </summary>
-        public string View { get; }
+        public string? View { get; }
 
         /// <summary>
         /// Gets or sets the type of the edited value.

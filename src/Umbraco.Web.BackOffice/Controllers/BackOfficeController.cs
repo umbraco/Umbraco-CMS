@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeState _runtimeState;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeUserManager userManager,
             IRuntimeState runtimeState,
             IRuntimeMinifier runtimeMinifier,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             ILocalizedTextService textService,
             IGridConfig gridConfig,
@@ -114,50 +114,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _manifestParser = manifestParser;
             _serverVariables = serverVariables;
             _securitySettings = securitySettings;
-        }
-
-        [Obsolete("Use ctor with all params. This overload will be removed in Umbraco 10.")]
-        public BackOfficeController(
-            IBackOfficeUserManager userManager,
-            IRuntimeState runtimeState,
-            IRuntimeMinifier runtimeMinifier,
-            IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment,
-            ILocalizedTextService textService,
-            IGridConfig gridConfig,
-            BackOfficeServerVariables backOfficeServerVariables,
-            AppCaches appCaches,
-            IBackOfficeSignInManager signInManager,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            ILogger<BackOfficeController> logger,
-            IJsonSerializer jsonSerializer,
-            IBackOfficeExternalLoginProviders externalLogins,
-            IHttpContextAccessor httpContextAccessor,
-            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
-            IManifestParser manifestParser,
-            ServerVariablesParser serverVariables)
-        : this(userManager,
-            runtimeState,
-            runtimeMinifier,
-            globalSettings,
-            hostingEnvironment,
-            textService,
-            gridConfig,
-            backOfficeServerVariables,
-            appCaches,
-            signInManager,
-            backofficeSecurityAccessor,
-            logger,
-            jsonSerializer,
-            externalLogins,
-            httpContextAccessor,
-            backOfficeTwoFactorOptions,
-            manifestParser,
-            serverVariables,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>()
-            )
-        {
-
         }
 
         [HttpGet]
@@ -228,7 +184,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return RedirectToAction(nameof(Default));
             }
 
-            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded);
+            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded!);
 
             if (result.Succeeded == false)
             {
@@ -293,9 +249,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string culture = null)
+        public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string? culture = null)
         {
-            CultureInfo cultureInfo;
+            CultureInfo? cultureInfo;
             if (string.IsNullOrWhiteSpace(culture))
             {
                 // Force authentication to occur since this is not an authorized endpoint, we need this to get a user.
@@ -313,7 +269,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 cultureInfo = CultureInfo.GetCultureInfo(culture);
             }
 
-            var allValues = _textService.GetAllStoredValues(cultureInfo);
+            var allValues = _textService.GetAllStoredValues(cultureInfo!);
             var pathedValues = allValues.Select(kv =>
             {
                 var slashIndex = kv.Key.IndexOf('/');
@@ -364,7 +320,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult ExternalLogin(string provider, string redirectUrl = null)
+        public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
         {
             if (redirectUrl == null)
             {
@@ -435,7 +391,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
-            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
+            ExternalLoginInfo? info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
 
             if (info == null)
             {
@@ -492,7 +448,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
                     if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())
                     {
-                        return ExternalLogin(oauthRedirectAuthProvider);
+                        return ExternalLogin(oauthRedirectAuthProvider!);
                     }
                 }
 
@@ -555,13 +511,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else if (result == SignInResult.LockedOut)
             {
-                errors.Add($"The local user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
+                errors.Add($"The local user {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
             }
             else if (result == SignInResult.NotAllowed)
             {
                 // This occurs when SignInManager.CanSignInAsync fails which is when RequireConfirmedEmail , RequireConfirmedPhoneNumber or RequireConfirmedAccount fails
                 // however since we don't enforce those rules (yet) this shouldn't happen.
-                errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
+                errors.Add($"The user {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
             }
             else if (result == SignInResult.Failed)
             {
@@ -571,7 +527,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else if (result == ExternalLoginSignInResult.NotAllowed)
             {
                 // This occurs when the external provider has approved the login but custom logic in OnExternalLogin has denined it.
-                errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
+                errors.Add($"The user {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
             }
             else if (result == AutoLinkSignInResult.FailedNotLinked)
             {
@@ -602,7 +558,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return response();
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        private IActionResult RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
             {

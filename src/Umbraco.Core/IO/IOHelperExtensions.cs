@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         /// <param name="ioHelper"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string ResolveRelativeOrVirtualUrl(this IIOHelper ioHelper, string path)
+        public static string? ResolveRelativeOrVirtualUrl(this IIOHelper ioHelper, string? path)
         {
             if (string.IsNullOrWhiteSpace(path)) return path;
             return path.StartsWith("~/") ? ioHelper.ResolveUrl(path) : path;

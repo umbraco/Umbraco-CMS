@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -42,18 +42,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 
-        protected override ITwoFactorLogin PerformGet(int id)
+        protected override ITwoFactorLogin? PerformGet(int id)
         {
             var sql = GetBaseQuery(false).Where<TwoFactorLoginDto>(x => x.Id == id);
             var dto = Database.Fetch<TwoFactorLoginDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
         }
 
-        protected override IEnumerable<ITwoFactorLogin> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ITwoFactorLogin> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false).WhereIn<TwoFactorLoginDto>(x => x.Id, ids);
             var dtos = Database.Fetch<TwoFactorLoginDto>(sql);
-            return dtos.WhereNotNull().Select(Map);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
         }
 
         protected override IEnumerable<ITwoFactorLogin> PerformGetByQuery(IQuery<ITwoFactorLogin> query)
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<ITwoFactorLogin>(sqlClause, query);
             var sql = translator.Translate();
-            return Database.Fetch<TwoFactorLoginDto>(sql).Select(Map);
+            return Database.Fetch<TwoFactorLoginDto>(sql).Select(Map).WhereNotNull();
         }
 
         protected override void PersistNewItem(ITwoFactorLogin entity)
@@ -73,10 +73,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(ITwoFactorLogin entity)
         {
             var dto = Map(entity);
-            Database.Update(dto);
+            if (dto is not null)
+            {
+                Database.Update(dto);
+            }
         }
 
-        private static TwoFactorLoginDto Map(ITwoFactorLogin entity)
+        private static TwoFactorLoginDto? Map(ITwoFactorLogin entity)
         {
             if (entity == null) return null;
 
@@ -89,7 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
         }
 
-        private static ITwoFactorLogin Map(TwoFactorLoginDto dto)
+        private static ITwoFactorLogin? Map(TwoFactorLoginDto dto)
         {
             if (dto == null) return null;
 
@@ -107,7 +110,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return await DeleteUserLoginsAsync(userOrMemberKey, null);
         }
 
-        public async Task<bool> DeleteUserLoginsAsync(Guid userOrMemberKey, string providerName)
+        public async Task<bool> DeleteUserLoginsAsync(Guid userOrMemberKey, string? providerName)
         {
             var sql = Sql()
                 .Delete()
@@ -131,7 +134,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<TwoFactorLoginDto>()
                 .Where<TwoFactorLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
             var dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
-            return dtos.WhereNotNull().Select(Map);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
         }
     }
 }

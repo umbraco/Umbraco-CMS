@@ -24,12 +24,12 @@ namespace Umbraco.Cms.Web.Common.Profiler
         {
             _ = x;
         });
-        private MiniProfiler _startupProfiler;
+        private MiniProfiler? _startupProfiler;
         private int _first;
 
 
 
-        public IDisposable Step(string name)
+        public IDisposable? Step(string name)
         {
             return MiniProfiler.Current?.Step(name);
         }
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
 
         public void StartBoot() => _startupProfiler = MiniProfiler.StartNew("Startup Profiler");
 
-        public void StopBoot() => _startupProfiler.Stop();
+        public void StopBoot() => _startupProfiler?.Stop();
 
         public void Stop(bool discardResults = false) => MiniProfilerContext.Value?.Stop(discardResults);
 
@@ -80,7 +80,10 @@ namespace Umbraco.Cms.Web.Common.Profiler
                     var first = Interlocked.Exchange(ref _first, 1) == 0;
                     if (first)
                     {
-                        AddSubProfiler(_startupProfiler);
+                        if (_startupProfiler is not null)
+                        {
+                            AddSubProfiler(_startupProfiler);
+                        }
 
                         _startupProfiler = null;
                     }
@@ -110,10 +113,12 @@ namespace Umbraco.Cms.Web.Common.Profiler
         private void AddSubProfiler(MiniProfiler subProfiler)
         {
             var startupDuration = subProfiler.Root.DurationMilliseconds.GetValueOrDefault();
-            MiniProfilerContext.Value.DurationMilliseconds += startupDuration;
-            MiniProfilerContext.Value.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
-            MiniProfilerContext.Value.Root.AddChild(subProfiler.Root);
-
+            if (MiniProfilerContext.Value is not null)
+            {
+                MiniProfilerContext.Value.DurationMilliseconds += startupDuration;
+                MiniProfilerContext.Value.GetTimingHierarchy().First().DurationMilliseconds += startupDuration;
+                MiniProfilerContext.Value.Root.AddChild(subProfiler.Root);
+            }
         }
 
         private static bool ShouldProfile(HttpRequest request)

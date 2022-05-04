@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Routing
         /// to help pick the best matches.</para>
         /// <para>The filter _must_ return something else an exception will be thrown.</para>
         /// </remarks>
-        DomainAndUri MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string culture, string defaultCulture);
+        DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture, string? defaultCulture);
 
         /// <summary>
         /// Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
@@ -40,6 +40,6 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>The <paramref name="culture"/> may be null, but when non-null, it can be used
         /// to help pick the best matches.</para>
         /// </remarks>
-        IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string culture, string defaultCulture);
+        IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture);
     }
 }

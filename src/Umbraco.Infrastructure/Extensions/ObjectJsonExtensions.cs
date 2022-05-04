@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
         /// <param name="obj">The object to convert.</param>
         /// <param name="namer">A property namer function.</param>
         /// <returns>A dictionary containing each properties.</returns>
-        public static Dictionary<string, object> ToObjectDictionary<T>(T obj, Func<PropertyInfo, string> namer = null)
+        public static Dictionary<string, object> ToObjectDictionary<T>(T obj, Func<PropertyInfo, string>? namer = null)
         {
             if (obj == null) return new Dictionary<string, object>();
 

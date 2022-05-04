@@ -12,7 +12,9 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -31,6 +33,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class MediaPicker3PropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public MediaPicker3PropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper,
+            EditorType type = EditorType.PropertyValue)
+            : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPicker3PropertyEditor" /> class.
@@ -38,18 +51,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public MediaPicker3PropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser,
             EditorType type = EditorType.PropertyValue)
             : base(dataValueEditorFactory, type)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPicker3ConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() =>
+            new MediaPicker3ConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() =>
+            DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute!);
 
         internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -69,7 +86,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _dataTypeService = dataTypeService;
             }
 
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var value = property.GetValue(culture, segment);
 
@@ -89,7 +106,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return dtos;
             }
 
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value is JArray dtos)
                 {
@@ -109,8 +126,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// Note: no FromEditor() and ToEditor() methods
             /// We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
             /// </remarks>
-
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 foreach (var dto in Deserialize(_jsonSerializer, value))
                 {
@@ -118,7 +134,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 }
             }
 
-            internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer,object value)
+            internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer, object? value)
             {
                 var rawJson = value is string str ? str : value?.ToString();
                 if (string.IsNullOrWhiteSpace(rawJson))
@@ -131,28 +147,28 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     // Old comma seperated UDI format
                     foreach (var udiStr in rawJson.Split(Constants.CharArrays.Comma))
                     {
-                        if (UdiParser.TryParse(udiStr, out GuidUdi udi))
+                        if (UdiParser.TryParse(udiStr, out Udi? udi) && udi is GuidUdi guidUdi)
                         {
                             yield return new MediaWithCropsDto
                             {
                                 Key = Guid.NewGuid(),
-                                MediaKey = udi.Guid,
+                                MediaKey = guidUdi.Guid,
                                 Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
-                                FocalPoint = new ImageCropperValue.ImageCropperFocalPoint
-                                {
-                                    Left = 0.5m,
-                                    Top = 0.5m
-                                }
+                                FocalPoint = new ImageCropperValue.ImageCropperFocalPoint {Left = 0.5m, Top = 0.5m}
                             };
                         }
                     }
                 }
                 else
                 {
-                    // New JSON format
-                    foreach (var dto in jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson))
+                    var dtos = jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson);
+                    if (dtos is not null)
                     {
-                        yield return dto;
+                        // New JSON format
+                        foreach (var dto in dtos)
+                        {
+                            yield return dto;
+                        }
                     }
                 }
             }
@@ -163,23 +179,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
             [DataContract]
             internal class MediaWithCropsDto
             {
-                [DataMember(Name = "key")]
-                public Guid Key { get; set; }
+                [DataMember(Name = "key")] public Guid Key { get; set; }
 
-                [DataMember(Name = "mediaKey")]
-                public Guid MediaKey { get; set; }
+                [DataMember(Name = "mediaKey")] public Guid MediaKey { get; set; }
 
-                [DataMember(Name = "crops")]
-                public IEnumerable<ImageCropperValue.ImageCropperCrop> Crops { get; set; }
+                [DataMember(Name = "crops")] public IEnumerable<ImageCropperValue.ImageCropperCrop>? Crops { get; set; }
 
                 [DataMember(Name = "focalPoint")]
-                public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
+                public ImageCropperValue.ImageCropperFocalPoint? FocalPoint { get; set; }
 
                 /// <summary>
                 /// Applies the configuration to ensure only valid crops are kept and have the correct width/height.
                 /// </summary>
                 /// <param name="configuration">The configuration.</param>
-                public void ApplyConfiguration(MediaPicker3Configuration configuration)
+                public void ApplyConfiguration(MediaPicker3Configuration? configuration)
                 {
                     var crops = new List<ImageCropperValue.ImageCropperCrop>();
 
@@ -215,7 +228,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 /// <remarks>
                 /// Because the DTO uses the same JSON keys as the image cropper value for crops and focal point, we can re-use the prune method.
                 /// </remarks>
-                public static void Prune(JObject value) => ImageCropperValue.Prune(value);
+                public static void Prune(JObject? value) => ImageCropperValue.Prune(value);
             }
         }
     }

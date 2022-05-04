@@ -28,8 +28,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         public BackOfficeExternalLoginProviderOptions Options { get; }
 
-        public override bool Equals(object obj) => Equals(obj as BackOfficeExternalLoginProvider);
-        public bool Equals(BackOfficeExternalLoginProvider other) => other != null && AuthenticationType == other.AuthenticationType;
+        public override bool Equals(object? obj) => Equals(obj as BackOfficeExternalLoginProvider);
+        public bool Equals(BackOfficeExternalLoginProvider? other) => other != null && AuthenticationType == other.AuthenticationType;
         public override int GetHashCode() => HashCode.Combine(AuthenticationType);
     }
 

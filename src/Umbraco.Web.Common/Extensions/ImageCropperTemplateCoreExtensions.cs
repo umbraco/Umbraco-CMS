@@ -24,7 +24,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this IPublishedContent mediaItem,
             string cropAlias,
             IImageUrlGenerator imageUrlGenerator,
@@ -44,7 +44,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this MediaWithCrops mediaWithCrops,
             string cropAlias,
             IImageUrlGenerator imageUrlGenerator,
@@ -65,7 +65,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The image crop URL.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this IPublishedContent mediaItem,
             ImageCropperValue imageCropperValue,
             string cropAlias,
@@ -87,7 +87,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this IPublishedContent mediaItem,
             string propertyAlias,
             string cropAlias,
@@ -109,7 +109,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(this MediaWithCrops mediaWithCrops,
+        public static string? GetCropUrl(this MediaWithCrops mediaWithCrops,
             IPublishedValueFallback publishedValueFallback,
             IPublishedUrlProvider publishedUrlProvider,
             string propertyAlias,
@@ -142,7 +142,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
              this IPublishedContent mediaItem,
              IImageUrlGenerator imageUrlGenerator,
              IPublishedValueFallback publishedValueFallback,
@@ -150,14 +150,14 @@ namespace Umbraco.Extensions
              int? width = null,
              int? height = null,
              string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
-             string cropAlias = null,
+             string? cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
              ImageCropAnchor? imageCropAnchor = null,
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
+             string? furtherOptions = null,
              UrlMode urlMode = UrlMode.Default) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, null, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
              this MediaWithCrops mediaWithCrops,
              IImageUrlGenerator imageUrlGenerator,
              IPublishedValueFallback publishedValueFallback,
@@ -193,14 +193,14 @@ namespace Umbraco.Extensions
              int? width = null,
              int? height = null,
              string propertyAlias = Constants.Conventions.Media.File,
-             string cropAlias = null,
+             string? cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
              ImageCropAnchor? imageCropAnchor = null,
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
+             string? furtherOptions = null,
              UrlMode urlMode = UrlMode.Default)
         {
             if (mediaWithCrops == null)
@@ -211,24 +211,24 @@ namespace Umbraco.Extensions
             return mediaWithCrops.Content.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, mediaWithCrops.LocalCrops, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
         }
 
-        private static string GetCropUrl(
+        private static string? GetCropUrl(
              this IPublishedContent mediaItem,
              IImageUrlGenerator imageUrlGenerator,
              IPublishedValueFallback publishedValueFallback,
              IPublishedUrlProvider publishedUrlProvider,
-             ImageCropperValue localCrops,
+             ImageCropperValue? localCrops,
              bool localCropsOnly,
              int? width = null,
              int? height = null,
              string propertyAlias = Constants.Conventions.Media.File,
-             string cropAlias = null,
+             string? cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
              ImageCropAnchor? imageCropAnchor = null,
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
+             string? furtherOptions = null,
              UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
@@ -302,27 +302,27 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this string imageUrl,
             IImageUrlGenerator imageUrlGenerator,
             int? width = null,
             int? height = null,
-            string imageCropperValue = null,
-            string cropAlias = null,
+            string? imageCropperValue = null,
+            string? cropAlias = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
             ImageCropAnchor? imageCropAnchor = null,
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
-            string cacheBusterValue = null,
-            string furtherOptions = null)
+            string? cacheBusterValue = null,
+            string? furtherOptions = null)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
                 return null;
             }
 
-            ImageCropperValue cropDataSet = null;
+            ImageCropperValue? cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
                 cropDataSet = imageCropperValue.DeserializeImageCropperValue();
@@ -355,20 +355,20 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
-        public static string GetCropUrl(
+        public static string? GetCropUrl(
             this string imageUrl,
             IImageUrlGenerator imageUrlGenerator,
-            ImageCropperValue cropDataSet,
+            ImageCropperValue? cropDataSet,
             int? width = null,
             int? height = null,
-            string cropAlias = null,
+            string? cropAlias = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
             ImageCropAnchor? imageCropAnchor = null,
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
-            string cacheBusterValue = null,
-            string furtherOptions = null)
+            string? cacheBusterValue = null,
+            string? furtherOptions = null)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
@@ -378,7 +378,7 @@ namespace Umbraco.Extensions
             ImageUrlGenerationOptions options;
             if (cropDataSet != null && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                ImageCropperValue.ImageCropperCrop crop = cropDataSet.GetCrop(cropAlias);
+                ImageCropperValue.ImageCropperCrop? crop = cropDataSet.GetCrop(cropAlias);
 
                 // If a crop was specified, but not found, return null
                 if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))

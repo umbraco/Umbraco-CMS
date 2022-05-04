@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         private readonly IPublishedRouter _publishedRouter;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
         private readonly IModelMetadataProvider _modelMetadataProvider;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Templates
             IPublishedRouter publishedRouter,
             IFileService fileService,
             ILocalizationService textService,
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IHttpContextAccessor httpContextAccessor,
             ICompositeViewEngine viewEngine,
             IModelMetadataProvider modelMetadataProvider,
@@ -56,11 +56,13 @@ namespace Umbraco.Cms.Web.Common.Templates
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.CurrentValue ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
             _modelMetadataProvider = modelMetadataProvider;
             _tempDataDictionaryFactory = tempDataDictionaryFactory;
+
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -74,7 +76,7 @@ namespace Umbraco.Cms.Web.Common.Templates
             // terribly much for this implementation since we are just creating a doc content request to modify it's properties manually.
             var requestBuilder = await _publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
-            var doc = umbracoContext.Content.GetById(pageId);
+            var doc = umbracoContext.Content?.GetById(pageId);
 
             if (doc == null)
             {
@@ -91,7 +93,7 @@ namespace Umbraco.Cms.Web.Common.Templates
 
                 requestBuilder.SetCulture(defaultLanguage == null
                     ? CultureInfo.CurrentUICulture.Name
-                    : defaultLanguage.CultureInfo.Name);
+                    : defaultLanguage.CultureInfo?.Name);
             }
             else
             {
@@ -128,7 +130,7 @@ namespace Umbraco.Cms.Web.Common.Templates
 
             // First, save all of the items locally that we know are used in the chain of execution, we'll need to restore these
             // after this page has rendered.
-            SaveExistingItems(out IPublishedRequest oldPublishedRequest);
+            SaveExistingItems(out IPublishedRequest? oldPublishedRequest);
 
             IPublishedRequest contentRequest = requestBuilder.Build();
 
@@ -197,7 +199,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         /// <summary>
         /// Save all items that we know are used for rendering execution to variables so we can restore after rendering
         /// </summary>
-        private void SaveExistingItems(out IPublishedRequest oldPublishedRequest)
+        private void SaveExistingItems(out IPublishedRequest? oldPublishedRequest)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // Many objects require that these legacy items are in the http context items... before we render this template we need to first
@@ -208,7 +210,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         /// <summary>
         /// Restores all items back to their context's to continue normal page rendering execution
         /// </summary>
-        private void RestoreItems(IPublishedRequest oldPublishedRequest)
+        private void RestoreItems(IPublishedRequest? oldPublishedRequest)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             umbracoContext.PublishedRequest = oldPublishedRequest;

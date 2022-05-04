@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
     <Product>Umbraco CMS</Product>
     <Title>Umbraco.Examine.Lucene</Title>
     <!-- But we still need to have PackageId for the depdents to know the actual name of the package. -->
     <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,11 +23,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Examine" Version="2.0.1" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Umbraco.Code" Version="1.2.0">
+    <PackageReference Include="Umbraco.Code" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

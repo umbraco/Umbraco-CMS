@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// The error affiliated with the failing password changes, null if changing was successful
         /// </summary>
-        public ValidationResult ChangeError { get; set; }
+        public ValidationResult? ChangeError { get; set; }
 
         /// <summary>
         /// If the password was reset, this is the value it has been changed to
         /// </summary>
-        public string ResetPassword { get; set; }
+        public string? ResetPassword { get; set; }
     }
 }

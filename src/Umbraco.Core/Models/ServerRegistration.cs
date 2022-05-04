@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     public class ServerRegistration : EntityBase, IServerRegistration
     {
-        private string _serverAddress;
-        private string _serverIdentity;
+        private string? _serverAddress;
+        private string? _serverIdentity;
         private bool _isActive;
         private bool _isSchedulingPublisher;
 
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="accessed">The date and time the registration was last accessed.</param>
         /// <param name="isActive">A value indicating whether the registration is active.</param>
         /// <param name="isMaster">A value indicating whether the registration is master.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
+        public ServerRegistration(int id, string? serverAddress, string? serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
         {
             UpdateDate = accessed;
             CreateDate = registered;
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the server URL.
         /// </summary>
-        public string ServerAddress
+        public string? ServerAddress
         {
             get => _serverAddress;
             set => SetPropertyValueAndDetectChanges(value, ref _serverAddress, nameof(ServerAddress));
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the server unique identity.
         /// </summary>
-        public string ServerIdentity
+        public string? ServerIdentity
         {
             get => _serverIdentity;
             set => SetPropertyValueAndDetectChanges(value, ref _serverIdentity, nameof(ServerIdentity));

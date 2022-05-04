@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Core
         /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<TResult> Succeed<TResult>(TResult result)
+        public static Attempt<TResult?> Succeed<TResult>(TResult? result)
         {
-            return Attempt<TResult>.Succeed(result);
+            return Attempt<TResult?>.Succeed(result);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace Umbraco.Cms.Core
         /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult> Fail<TResult>(TResult result)
+        public static Attempt<TResult?> Fail<TResult>(TResult result)
         {
-            return Attempt<TResult>.Fail(result);
+            return Attempt<TResult?>.Fail(result);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core
         /// <param name="result">The result of the attempt.</param>
         /// <param name="exception">The exception causing the failure of the attempt.</param>
         /// <returns>The failed attempt.</returns>
-        public static Attempt<TResult> Fail<TResult>(TResult result, Exception exception)
+        public static Attempt<TResult?> Fail<TResult>(TResult result, Exception exception)
         {
             return Attempt<TResult>.Fail(result, exception);
         }

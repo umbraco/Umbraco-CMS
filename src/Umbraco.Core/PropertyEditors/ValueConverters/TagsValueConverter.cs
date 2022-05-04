@@ -30,24 +30,24 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return Array.Empty<string>();
 
             // if Json storage type deserialize and return as string array
             if (JsonStorageType(propertyType.DataType.Id))
             {
-                var array = _jsonSerializer.Deserialize<string[]>(source.ToString());
+                var array = source.ToString() is not null ? _jsonSerializer.Deserialize<string[]>(source.ToString()!) : null;
                 return array ?? Array.Empty<string>();
             }
 
             // Otherwise assume CSV storage type and return as string array
-            return source.ToString().Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+            return source.ToString()?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
         {
-            return (string[]) source;
+            return (string[]?) source;
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
             return Storages.GetOrAdd(dataTypeId, id =>
             {
-                var configuration = _dataTypeService.GetDataType(id).ConfigurationAs<TagConfiguration>();
-                return configuration.StorageType == TagsStorageType.Json;
+                var configuration = _dataTypeService.GetDataType(id)?.ConfigurationAs<TagConfiguration>();
+                return configuration?.StorageType == TagsStorageType.Json;
             });
         }
 

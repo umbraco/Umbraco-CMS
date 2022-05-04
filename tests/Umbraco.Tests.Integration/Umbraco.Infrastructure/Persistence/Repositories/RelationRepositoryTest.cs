@@ -15,10 +15,14 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -477,7 +481,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
 
                 // Act
-                IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == _textpage.Id);
+                IQuery<IRelation> query = ScopeProvider.CreateQuery<IRelation>().Where(x => x.ParentId == _textpage.Id);
                 int count = repository.Count(query);
 
                 // Assert
@@ -494,7 +498,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 RelationRepository repository = CreateRepository(ScopeProvider, out RelationTypeRepository repositoryType);
 
                 // Act
-                IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.RelationTypeId == _relateContent.Id);
+                IQuery<IRelation> query = ScopeProvider.CreateQuery<IRelation>().Where(x => x.RelationTypeId == _relateContent.Id);
                 IEnumerable<IRelation> relations = repository.Get(query);
 
                 // Assert

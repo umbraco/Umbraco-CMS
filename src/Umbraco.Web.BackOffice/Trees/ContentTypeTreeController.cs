@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _entityService = entityService;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -48,12 +49,17 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return rootResult;
             }
             var root = rootResult.Value;
-            //check if there are any types
-            root.HasChildren = _contentTypeService.GetAll().Any();
+
+            if (root is not null)
+            {
+                //check if there are any types
+                root.HasChildren = _contentTypeService.GetAll().Any();
+            }
+
             return root;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
         {
             if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
@@ -98,8 +104,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                         node.Path = dt.Path;
 
                         // now we can enrich the result with content type data that's not available in the entity service output
-                        node.Alias = contentType.Alias;
-                        node.AdditionalData["isElement"] = contentType.IsElement;
+                        node.Alias = contentType?.Alias ?? string.Empty;
+                        node.AdditionalData["isElement"] = contentType?.IsElement;
 
                         return node;
                     }));
@@ -175,8 +181,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out totalFound, searchFrom);
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
 
     }
 }

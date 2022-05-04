@@ -20,13 +20,13 @@ namespace Umbraco.Cms.Core.Models
             : this(path, null)
         { }
 
-        public Stylesheet(string path, Func<File, string> getFileContent)
+        public Stylesheet(string path, Func<File, string?>? getFileContent)
             : base(string.IsNullOrEmpty(path) ? path : path.EnsureEndsWith(".css"), getFileContent)
         {
             InitializeProperties();
         }
 
-        private Lazy<List<StylesheetProperty>> _properties;
+        private Lazy<List<StylesheetProperty>>? _properties;
 
         private void InitializeProperties()
         {
@@ -85,23 +85,26 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void Property_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            var prop = (StylesheetProperty) sender;
+            var prop = (StylesheetProperty?) sender;
 
-            //Ensure we are setting base.Content here so that the properties don't get reset and thus any event handlers would get reset too
-            base.Content = StylesheetHelper.ReplaceRule(Content, prop.Name, new StylesheetRule
+            if (prop is not null)
             {
-                Name = prop.Name,
-                Selector = prop.Alias,
-                Styles = prop.Value
-            });
+                //Ensure we are setting base.Content here so that the properties don't get reset and thus any event handlers would get reset too
+                base.Content = StylesheetHelper.ReplaceRule(Content, prop.Name, new StylesheetRule
+                {
+                    Name = prop.Name,
+                    Selector = prop.Alias,
+                    Styles = prop.Value
+                });
+            }
         }
 
         /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
-        public override string Content
+        public override string? Content
         {
             get { return base.Content; }
             set
@@ -121,9 +124,9 @@ namespace Umbraco.Cms.Core.Models
         /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
         [IgnoreDataMember]
-        public IEnumerable<IStylesheetProperty> Properties
+        public IEnumerable<IStylesheetProperty>? Properties
         {
-            get { return _properties.Value; }
+            get { return _properties?.Value; }
         }
 
         /// <summary>
@@ -132,7 +135,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="property"></param>
         public void AddProperty(IStylesheetProperty property)
         {
-            if (Properties.Any(x => x.Name.InvariantEquals(property.Name)))
+            if (Properties is not null && Properties.Any(x => x.Name.InvariantEquals(property.Name)))
             {
                 throw new DuplicateNameException("The property with the name " + property.Name + " already exists in the collection");
             }
@@ -155,7 +158,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name"></param>
         public void RemoveProperty(string name)
         {
-            if (Properties.Any(x => x.Name.InvariantEquals(name)))
+            if (Properties is not null && Properties.Any(x => x.Name.InvariantEquals(name)))
             {
                 Content = StylesheetHelper.ReplaceRule(Content, name, null);
             }

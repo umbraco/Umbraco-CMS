@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// The icon
         /// </summary>
-        string Icon { get; set; }
+        string? Icon { get; set; }
 
         /// <summary>
         /// The name
         /// </summary>
-        string Name { get; set; }
+        string? Name { get; set; }
 
         /// <summary>
         /// The set of default permissions
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <remarks>
         /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
         /// </remarks>
-        IEnumerable<string> Permissions { get; set; }
+        IEnumerable<string>? Permissions { get; set; }
 
         IEnumerable<string> AllowedSections { get; }
 

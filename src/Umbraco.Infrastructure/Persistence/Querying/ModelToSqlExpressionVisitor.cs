@@ -13,18 +13,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
     internal class ModelToSqlExpressionVisitor<T> : ExpressionVisitorBase
     {
-        private readonly IMapperCollection _mappers;
-        private readonly BaseMapper _mapper;
+        private readonly IMapperCollection? _mappers;
+        private readonly BaseMapper? _mapper;
 
-        public ModelToSqlExpressionVisitor(ISqlSyntaxProvider sqlSyntax, IMapperCollection mappers)
+        public ModelToSqlExpressionVisitor(ISqlSyntaxProvider sqlSyntax, IMapperCollection? mappers)
             : base(sqlSyntax)
         {
             _mappers = mappers;
-            _mapper = mappers[typeof(T)]; // throws if not found
+            _mapper = mappers?[typeof(T)]; // throws if not found
         }
 
-        protected override string VisitMemberAccess(MemberExpression m)
+        protected override string VisitMemberAccess(MemberExpression? m)
         {
+            if (m is null)
+            {
+                return string.Empty;
+            }
             if (m.Expression != null &&
                 m.Expression.NodeType == ExpressionType.Parameter
                 && m.Expression.Type == typeof(T))
@@ -32,10 +36,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(m.Member.Name);
+                    var field = _mapper?.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
-                    return field;
+                    return field!;
                 }
 
                 //already compiled, return
@@ -47,10 +51,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(m.Member.Name);
+                    var field = _mapper?.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
-                    return field;
+                    return field!;
                 }
 
                 //already compiled, return
@@ -60,6 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             if (m.Expression != null
                 && m.Expression.Type != typeof(T)
                 && EndsWithConstant(m) == false
+                && _mappers is not null
                 && _mappers.TryGetMapper(m.Expression.Type, out var subMapper))
             {
                 //if this is the case, it means we have a sub expression / nested property access, such as: x.ContentType.Alias == "Test";
@@ -116,12 +121,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         /// <returns></returns>
         private static bool EndsWithConstant(MemberExpression m)
         {
-            Expression expr = m;
+            Expression? expr = m;
 
             while (expr is MemberExpression)
             {
                 var memberExpr = expr as MemberExpression;
-                expr = memberExpr.Expression;
+                if (memberExpr is not null)
+                {
+                    expr = memberExpr.Expression;
+                }
+
             }
 
             var constExpr = expr as ConstantExpression;

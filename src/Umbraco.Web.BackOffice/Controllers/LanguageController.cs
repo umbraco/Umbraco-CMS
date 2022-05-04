@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public LanguageController(ILocalizationService localizationService,
             IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Language> GetAllLanguages()
+        public IEnumerable<Language>? GetAllLanguages()
         {
             var allLanguages = _localizationService.GetAllLanguages();
 
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<Language> GetLanguage(int id)
+        public ActionResult<Language?> GetLanguage(int id)
         {
             var lang = _localizationService.GetLanguageById(id);
             if (lang == null)
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessLanguages)]
         [HttpPost]
-        public ActionResult<Language> SaveLanguage(Language language)
+        public ActionResult<Language?> SaveLanguage(Language language)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 CultureInfo culture;
                 try
                 {
-                    culture = CultureInfo.GetCultureInfo(language.IsoCode);
+                    culture = CultureInfo.GetCultureInfo(language.IsoCode!);
                 }
                 catch (CultureNotFoundException)
                 {
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             try
             {
                 // language has the CultureName of the previous lang so we get information about new culture.
-                cultureAfterChange = CultureInfo.GetCultureInfo(language.IsoCode);
+                cultureAfterChange = CultureInfo.GetCultureInfo(language.IsoCode!);
             }
             catch (CultureNotFoundException)
             {
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             existingById.CultureName = cultureAfterChange.DisplayName;
             existingById.IsDefault = language.IsDefault;
             existingById.FallbackLanguageId = language.FallbackLanguageId;
-            existingById.IsoCode = language.IsoCode;
+            existingById.IsoCode = language.IsoCode!;
 
             // modifying an existing language can create a fallback, verify
             // note that the service will check again, dealing with race conditions

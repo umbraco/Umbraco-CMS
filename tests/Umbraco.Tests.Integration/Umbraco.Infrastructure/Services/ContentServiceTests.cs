@@ -30,6 +30,9 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     /// <summary>
@@ -223,14 +226,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 c.Name = "name" + i;
                 if (i % 2 == 0)
                 {
-                    c.ContentSchedule.Add(now.AddSeconds(5), null); // release in 5 seconds
-                    OperationResult r = ContentService.Save(c);
+                    var contentSchedule = ContentScheduleCollection.CreateWithEntry(now.AddSeconds(5), null); // release in 5 seconds
+                    OperationResult r = ContentService.Save(c, contentSchedule: contentSchedule);
                     Assert.IsTrue(r.Success, r.Result.ToString());
                 }
                 else
                 {
-                    c.ContentSchedule.Add(null, now.AddSeconds(5)); // expire in 5 seconds
                     PublishResult r = ContentService.SaveAndPublish(c);
+
+                    var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, now.AddSeconds(5)); // expire in 5 seconds
+                    ContentService.PersistContentSchedule(c, contentSchedule);
+
                     Assert.IsTrue(r.Success, r.Result.ToString());
                 }
 
@@ -248,16 +254,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 if (i % 2 == 0)
                 {
-                    c.ContentSchedule.Add(alternatingCulture, now.AddSeconds(5), null); // release in 5 seconds
-                    OperationResult r = ContentService.Save(c);
+                    var contentSchedule = ContentScheduleCollection.CreateWithEntry(alternatingCulture, now.AddSeconds(5), null); // release in 5 seconds
+                    OperationResult r = ContentService.Save(c, contentSchedule: contentSchedule);
                     Assert.IsTrue(r.Success, r.Result.ToString());
 
                     alternatingCulture = alternatingCulture == langFr.IsoCode ? langUk.IsoCode : langFr.IsoCode;
                 }
                 else
                 {
-                    c.ContentSchedule.Add(alternatingCulture, null, now.AddSeconds(5)); // expire in 5 seconds
                     PublishResult r = ContentService.SaveAndPublish(c);
+
+                    var contentSchedule = ContentScheduleCollection.CreateWithEntry(alternatingCulture, null, now.AddSeconds(5)); // expire in 5 seconds
+                    ContentService.PersistContentSchedule(c, contentSchedule);
+
                     Assert.IsTrue(r.Success, r.Result.ToString());
                 }
 
@@ -306,20 +315,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Act
             IContent content = ContentService.CreateAndSave("Test", Constants.System.Root, "umbTextpage");
 
-            content.ContentSchedule.Add(null, DateTime.Now.AddHours(2));
-            ContentService.Save(content);
-            Assert.AreEqual(1, content.ContentSchedule.FullSchedule.Count);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddHours(2));
+            ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
+            Assert.AreEqual(1, contentSchedule.FullSchedule.Count);
 
-            content = ContentService.GetById(content.Id);
-            IReadOnlyList<ContentSchedule> sched = content.ContentSchedule.FullSchedule;
+            contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
+            IReadOnlyList<ContentSchedule> sched = contentSchedule.FullSchedule;
             Assert.AreEqual(1, sched.Count);
             Assert.AreEqual(1, sched.Count(x => x.Culture == string.Empty));
-            content.ContentSchedule.Clear(ContentScheduleAction.Expire);
-            ContentService.Save(content);
+            contentSchedule.Clear(ContentScheduleAction.Expire);
+            ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
             // Assert
-            content = ContentService.GetById(content.Id);
-            sched = content.ContentSchedule.FullSchedule;
+            contentSchedule = ContentService.GetContentScheduleByContentId(content.Id);
+            sched = contentSchedule.FullSchedule;
             Assert.AreEqual(0, sched.Count);
             Assert.IsTrue(ContentService.SaveAndPublish(content).Success);
         }
@@ -652,7 +661,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IContent root = ContentService.GetById(Textpage.Id);
             ContentService.SaveAndPublish(root);
             IContent content = ContentService.GetById(Subpage.Id);
-            content.ContentSchedule.Add(null, DateTime.Now.AddSeconds(1));
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddSeconds(1));
+            ContentService.PersistContentSchedule(content, contentSchedule);
             ContentService.SaveAndPublish(content);
 
             // Act
@@ -1314,8 +1324,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // Arrange
             IContent content = ContentService.GetById(Subpage.Id); // This Content expired 5min ago
-            content.ContentSchedule.Add(null, DateTime.Now.AddMinutes(-5));
-            ContentService.Save(content);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(null, DateTime.Now.AddMinutes(-5));
+            ContentService.Save(content, contentSchedule: contentSchedule);
 
             IContent parent = ContentService.GetById(Textpage.Id);
             PublishResult parentPublished =
@@ -1342,8 +1352,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Content content = ContentBuilder.CreateBasicContent(contentType);
             content.SetCultureName("Hello", "en-US");
-            content.ContentSchedule.Add("en-US", null, DateTime.Now.AddMinutes(-5));
-            ContentService.Save(content);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", null, DateTime.Now.AddMinutes(-5));
+            ContentService.Save(content, contentSchedule: contentSchedule);
 
             PublishResult published = ContentService.SaveAndPublish(content, "en-US");
 
@@ -1357,8 +1367,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             // Arrange
             IContent content = ContentService.GetById(Subpage.Id);
-            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
-            ContentService.Save(content);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null);
+            ContentService.Save(content, Constants.Security.SuperUserId, contentSchedule);
 
             IContent parent = ContentService.GetById(Textpage.Id);
             PublishResult parentPublished =
@@ -1408,8 +1418,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             contentService.SaveAndPublish(content);
 
             content.Properties[0].SetValue("Foo", string.Empty);
-            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
             contentService.Save(content);
+            contentService.PersistContentSchedule(content, ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
 
             // Act
             PublishResult result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1458,7 +1468,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             contentService.SaveAndPublish(content);
 
-            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.PersistContentSchedule(content, ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
             contentService.Save(content);
 
             // Act
@@ -1486,8 +1496,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Content content = ContentBuilder.CreateBasicContent(contentType);
             content.SetCultureName("Hello", "en-US");
-            content.ContentSchedule.Add("en-US", DateTime.Now.AddHours(2), null);
-            ContentService.Save(content);
+            var contentSchedule = ContentScheduleCollection.CreateWithEntry("en-US", DateTime.Now.AddHours(2), null);
+            ContentService.Save(content, contentSchedule: contentSchedule);
 
             PublishResult published = ContentService.SaveAndPublish(content, "en-US");
 

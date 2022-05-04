@@ -1,6 +1,6 @@
 using System.IO;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
+// using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
@@ -23,12 +23,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
         /// <inheritdoc />
         protected override void Migrate()
         {
-            var logViewerQueryFile = MigrateLogViewerQueriesFromFileToDb.GetLogViewerQueryFile(_hostingEnvironment);
-
-            if(File.Exists(logViewerQueryFile))
-            {
-                File.Delete(logViewerQueryFile);
-            }
+            // var logViewerQueryFile = MigrateLogViewerQueriesFromFileToDb.GetLogViewerQueryFile(_hostingEnvironment);
+            //
+            // if(File.Exists(logViewerQueryFile))
+            // {
+            //     File.Delete(logViewerQueryFile);
+            // }
         }
     }
 }

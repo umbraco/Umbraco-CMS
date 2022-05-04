@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
   </PropertyGroup>
 
@@ -19,7 +19,17 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+    <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
+<!--    <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />-->
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
     <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
@@ -30,20 +40,23 @@
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="Umbraco.Code" Version="1.2.0" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Umbraco.Code" Version="2.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <_ContentIncludedByDefault Remove="wwwroot\umbraco\views\common\infiniteeditors\twofactor\enabletwofactor.html" />
   </ItemGroup>
 
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <UseRazorSourceGenerator>false</UseRazorSourceGenerator> <!-- Disabling the Razor source generators in .NET 6 -->
   </PropertyGroup>
 
   <PropertyGroup>
@@ -64,6 +77,8 @@
     <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Importance="High" Condition="Exists('$(JsonSchemaPath)')" />
     <Message Text="Generate the appsettings json schema." Importance="High" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
+
+
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>

@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _connectionStrings = connectionStrings;
         }
 
-        public override Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
@@ -55,13 +55,13 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
                 var result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
-                if (result.Success == false)
+                if (result?.Success == false)
                 {
                     throw new InstallException("The database failed to upgrade. ERROR: " + result.Message);
                 }
             }
 
-            return Task.FromResult((InstallSetupResult)null);
+            return Task.FromResult((InstallSetupResult?)null);
         }
 
         public override bool RequiresExecution(object model)
@@ -77,14 +77,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
 
             if (databaseSettings.IsConnectionStringConfigured())
             {
                 // a connection string was present, determine whether this is an install/upgrade
                 // return true (upgrade) if there is an installed version, else false (install)
                 var result = _databaseBuilder.ValidateSchema();
-                return result.DetermineHasInstalledVersion();
+                return result?.DetermineHasInstalledVersion() ?? false;
             }
 
             //no connection string configured, probably a fresh install

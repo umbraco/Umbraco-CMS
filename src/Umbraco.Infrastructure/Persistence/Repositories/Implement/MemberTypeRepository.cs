@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -43,30 +43,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         // every PerformGet/Exists just GetMany() and then filters
         // except PerformGetAll which is the one really doing the job
 
-        protected override IMemberType PerformGet(int id)
-            => GetMany().FirstOrDefault(x => x.Id == id);
+        protected override IMemberType? PerformGet(int id)
+            => GetMany()?.FirstOrDefault(x => x.Id == id);
 
-        protected override IMemberType PerformGet(Guid id)
-            => GetMany().FirstOrDefault(x => x.Key == id);
+        protected override IMemberType? PerformGet(Guid id)
+            => GetMany()?.FirstOrDefault(x => x.Key == id);
 
-        protected override IEnumerable<IMemberType> PerformGetAll(params Guid[] ids)
+        protected override IEnumerable<IMemberType>? PerformGetAll(params Guid[]? ids)
         {
             var all = GetMany();
-            return ids.Any() ? all.Where(x => ids.Contains(x.Key)) : all;
+            return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
         }
 
         protected override bool PerformExists(Guid id)
-            => GetMany().FirstOrDefault(x => x.Key == id) != null;
+            => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
 
-        protected override IMemberType PerformGet(string alias)
-            => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        protected override IMemberType? PerformGet(string alias)
+            => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
-        protected override IEnumerable<IMemberType> GetAllWithFullCachePolicy()
+        protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy()
         {
-            return CommonRepository.GetAllTypes().OfType<IMemberType>();
+            return CommonRepository.GetAllTypes()?.OfType<IMemberType>();
         }
 
-        protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)
+        protected override IEnumerable<IMemberType>? PerformGetByQuery(IQuery<IMemberType> query)
         {
             var subQuery = GetSubquery();
             var translator = new SqlTranslator<IMemberType>(subQuery, query);
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderBy<NodeDto>(x => x.SortOrder);
             var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IMemberType>();
+            return ids.Length > 0 ? GetMany(ids)?.OrderBy(x => x.Name) : Enumerable.Empty<IMemberType>();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //custom property type constructor logic to set explicit dbtype's for built in properties
             var builtinProperties = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out var propertyType);
-            storageType = readonlyStorageType ? propertyType.ValueStorageType : storageType;
+            storageType = readonlyStorageType ? propertyType!.ValueStorageType : storageType;
             return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
         }
 

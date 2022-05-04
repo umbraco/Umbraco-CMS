@@ -19,18 +19,18 @@ namespace Umbraco.Cms.Web.Website.Models
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         /// <summary>
         /// The member's real name
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [ReadOnly(true)]
-        public string UserName { get; set; }
+        public string UserName { get; set; } = null!;
 
         [ReadOnly(true)]
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
 
         [ReadOnly(true)]
         public bool IsApproved { get; set; }

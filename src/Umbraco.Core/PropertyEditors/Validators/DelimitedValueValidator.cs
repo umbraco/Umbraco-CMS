@@ -16,11 +16,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         /// <summary>
         /// Gets or sets the configuration, when parsed as <see cref="IManifestValueValidator"/>.
         /// </summary>
-        public DelimitedValueValidatorConfig Configuration { get; set; }
+        public DelimitedValueValidatorConfig? Configuration { get; set; }
 
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             // TODO: localize these!
             if (value != null)
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
                 var regex = (Configuration?.Pattern != null) ? new Regex(Configuration.Pattern) : null;
 
                 var stringVal = value.ToString();
-                var split = stringVal.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+                var split = stringVal!.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
                 for (var i = 0; i < split.Length; i++)
                 {
                     var s = split[i];
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
 
     public class DelimitedValueValidatorConfig
     {
-        public string Delimiter { get; set; }
-        public string Pattern { get; set; }
+        public string? Delimiter { get; set; }
+        public string? Pattern { get; set; }
     }
 }

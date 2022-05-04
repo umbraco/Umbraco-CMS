@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Core.ContentApps
     {
         private const int Weight = -100;
 
-        private ContentApp _dictionaryApp;
+        private ContentApp? _dictionaryApp;
 
-        public ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             switch (source)
             {

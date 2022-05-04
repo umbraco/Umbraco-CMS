@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             });
         }
 
-        public string GetCookieValue(string cookieName)
+        public string? GetCookieValue(string cookieName)
         {
             return _httpContextAccessor.HttpContext?.Request.Cookies[cookieName];
         }

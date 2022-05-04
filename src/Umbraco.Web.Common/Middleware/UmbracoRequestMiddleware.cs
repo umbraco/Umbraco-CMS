@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -47,7 +46,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
@@ -56,12 +54,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IOptions<UmbracoRequestOptions> _umbracoRequestOptions;
-        private readonly SmidgeOptions _smidgeOptions;
-        private readonly WebProfiler _profiler;
-
-        private static bool s_cacheInitialized;
-        private static bool s_cacheInitializedFlag = false;
-        private static object s_cacheInitializedLock = new object();
+        private SmidgeOptions _smidgeOptions;
+        private readonly WebProfiler? _profiler;
 
 #pragma warning disable IDE0044 // Add readonly modifier
         private static bool s_firstBackOfficeRequest;
@@ -78,13 +72,12 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
             IHostingEnvironment hostingEnvironment,
             UmbracoRequestPaths umbracoRequestPaths,
             BackOfficeWebAssets backOfficeWebAssets,
-            IOptions<SmidgeOptions> smidgeOptions,
+            IOptionsMonitor<SmidgeOptions> smidgeOptions,
             IRuntimeState runtimeState,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor)
@@ -92,7 +85,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 logger,
                 umbracoContextFactory,
                 requestCache,
-                publishedSnapshotServiceEventHandler,
                 eventAggregator,
                 profiler,
                 hostingEnvironment,
@@ -113,13 +105,12 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
             IHostingEnvironment hostingEnvironment,
             UmbracoRequestPaths umbracoRequestPaths,
             BackOfficeWebAssets backOfficeWebAssets,
-            IOptions<SmidgeOptions> smidgeOptions,
+            IOptionsMonitor<SmidgeOptions> smidgeOptions,
             IRuntimeState runtimeState,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor,
@@ -128,7 +119,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
             _umbracoRequestPaths = umbracoRequestPaths;
@@ -137,8 +127,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _variationContextAccessor = variationContextAccessor;
             _defaultCultureAccessor = defaultCultureAccessor;
             _umbracoRequestOptions = umbracoRequestOptions;
-            _smidgeOptions = smidgeOptions.Value;
+            _smidgeOptions = smidgeOptions.CurrentValue;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
+
+            smidgeOptions.OnChange(x => _smidgeOptions = x);
         }
 
         /// <inheritdoc/>
@@ -157,12 +149,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
             _profiler?.UmbracoApplicationBeginRequest(context, _runtimeState.Level);
 
-            EnsureContentCacheInitialized();
-
             _variationContextAccessor.VariationContext ??= new VariationContext(_defaultCultureAccessor.DefaultCulture);
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
-            Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
+            Uri? currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
             _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
             var pathAndQuery = context.Request.GetEncodedPathAndQuery();
@@ -170,7 +160,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             try
             {
                 // Verbose log start of every request
-                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
                 _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
 
                 try
@@ -200,7 +190,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             {
                 // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
                 // strange since we always logged the beginning, so now we just log start/end of all requests)
-                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
                 _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
 
                 try
@@ -232,8 +222,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
 
             if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
-                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}")
-                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}"))
+                || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}") ?? false)
+                || (absPath.Value?.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}") ?? false))
             {
                 LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag, ref s_firstBackOfficeRequestLocker, () =>
                 {
@@ -243,7 +233,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
         }
 
-        private Uri GetApplicationUrlFromCurrentRequest(HttpRequest request)
+        private Uri? GetApplicationUrlFromCurrentRequest(HttpRequest request)
         {
             // We only consider GET and POST.
             // Especially the DEBUG sent when debugging the application is annoying because it uses http, even when the https is available.
@@ -270,18 +260,5 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();
             httpScopeReference.Register();
         }
-
-        /// <summary>
-        /// Initializes the content cache one time
-        /// </summary>
-        private void EnsureContentCacheInitialized() => LazyInitializer.EnsureInitialized(
-            ref s_cacheInitialized,
-            ref s_cacheInitializedFlag,
-            ref s_cacheInitializedLock,
-            () =>
-            {
-                _publishedSnapshotServiceEventHandler.Initialize();
-                return true;
-            });
     }
 }

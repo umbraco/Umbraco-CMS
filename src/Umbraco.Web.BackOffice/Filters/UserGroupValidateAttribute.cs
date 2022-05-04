@@ -34,14 +34,17 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var userGroupSave = (UserGroupSave) context.ActionArguments["userGroupSave"];
+                var userGroupSave = (UserGroupSave?) context.ActionArguments["userGroupSave"];
 
-                userGroupSave.Name = userGroupSave.Name.CleanForXss('[', ']', '(', ')', ':');
-                userGroupSave.Alias = userGroupSave.Alias.CleanForXss('[', ']', '(', ')', ':');
+                if (userGroupSave is not null)
+                {
+                    userGroupSave.Name = userGroupSave.Name?.CleanForXss('[', ']', '(', ')', ':');
+                    userGroupSave.Alias = userGroupSave.Alias.CleanForXss('[', ']', '(', ')', ':');
+                }
 
                 //Validate the usergroup exists or create one if required
-                IUserGroup persisted;
-                switch (userGroupSave.Action)
+                IUserGroup? persisted;
+                switch (userGroupSave?.Action)
                 {
                     case ContentSaveAction.Save:
                         persisted = _userService.GetUserGroupById(Convert.ToInt32(userGroupSave.Id));

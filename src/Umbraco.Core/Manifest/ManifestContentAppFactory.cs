@@ -43,13 +43,13 @@ namespace Umbraco.Cms.Core.Manifest
             _ioHelper = ioHelper;
         }
 
-        private ContentApp _app;
-        private ShowRule[] _showRules;
+        private ContentApp? _app;
+        private ShowRule[]? _showRules;
 
         /// <inheritdoc />
-        public ContentApp GetContentAppFor(object o,IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object o,IEnumerable<IReadOnlyUserGroup> userGroups)
         {
-            string partA, partB;
+            string? partA, partB;
 
             switch (o)
             {
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Manifest
                     break;
                 case IContentType contentType:
                     partA = "contentType";
-                    partB = contentType.Alias;
+                    partB = contentType?.Alias;
                     break;
                 case IDictionaryItem _:
                     partA = "dictionary";
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Manifest
 
             foreach (var rule in rules)
             {
-                if (rule.PartA.InvariantEquals("role"))
+                if (rule.PartA?.InvariantEquals("role") ?? false)
                 {
                     // if roles have been ok-ed already, skip the rule
                     if (okRole)
@@ -160,12 +160,12 @@ namespace Umbraco.Cms.Core.Manifest
             private static readonly Regex ShowRegex = new Regex("^([+-])?([a-z]+)/([a-z0-9_]+|\\*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
             public bool Show { get; private set; }
-            public string PartA { get; private set; }
-            public string PartB { get; private set; }
+            public string? PartA { get; private set; }
+            public string? PartB { get; private set; }
 
-            public bool Matches(string partA, string partB)
+            public bool Matches(string? partA, string? partB)
             {
-                return (PartA == "*" || PartA.InvariantEquals(partA)) && (PartB == "*" || PartB.InvariantEquals(partB));
+                return (PartA == "*" || (PartA?.InvariantEquals(partA) ?? false)) && (PartB == "*" || (PartB?.InvariantEquals(partB) ?? false));
             }
 
             public static IEnumerable<ShowRule> Parse(string[] rules)

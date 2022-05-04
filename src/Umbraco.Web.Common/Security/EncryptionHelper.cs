@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
         /// </summary>
-        public static string CreateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string controllerName, string controllerAction, string area, object additionalRouteVals = null)
+        public static string CreateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string controllerName, string controllerAction, string area, object? additionalRouteVals = null)
         {
             if (dataProtectionProvider is null)
             {
@@ -56,7 +57,7 @@ namespace Umbraco.Cms.Web.Common.Security
             var surfaceRouteParams = $"{ViewConstants.ReservedAdditionalKeys.Controller}={WebUtility.UrlEncode(controllerName)}&{ViewConstants.ReservedAdditionalKeys.Action}={WebUtility.UrlEncode(controllerAction)}&{ViewConstants.ReservedAdditionalKeys.Area}={area}";
 
             // checking if the additional route values is already a dictionary and convert to querystring
-            string additionalRouteValsAsQuery;
+            string? additionalRouteValsAsQuery;
             if (additionalRouteVals != null)
             {
                 if (additionalRouteVals is Dictionary<string, object> additionalRouteValsAsDictionary)
@@ -81,7 +82,7 @@ namespace Umbraco.Cms.Web.Common.Security
             return Encrypt(surfaceRouteParams, dataProtectionProvider);
         }
 
-        public static bool DecryptAndValidateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string encryptedString, out IDictionary<string, string> parts)
+        public static bool DecryptAndValidateEncryptedRouteString(IDataProtectionProvider dataProtectionProvider, string encryptedString, [MaybeNullWhen(false)] out IDictionary<string, string?> parts)
         {
             if (dataProtectionProvider == null)
             {
@@ -101,10 +102,13 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             NameValueCollection parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
-            parts = new Dictionary<string, string>();
+            parts = new Dictionary<string, string?>();
             foreach (var key in parsedQueryString.AllKeys)
             {
-                parts[key] = parsedQueryString[key];
+                if (key is not null)
+                {
+                    parts[key] = parsedQueryString[key];
+                }
             }
 
             // validate all required keys exist

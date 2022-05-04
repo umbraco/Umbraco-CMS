@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public class UpgradeCheckRepository : IUpgradeCheckRepository
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private static HttpClient _httpClient;
+        private static HttpClient? _httpClient;
         private const string RestApiUpgradeChecklUrl = "https://our.umbraco.com/umbraco/api/UpgradeCheck/CheckUpgrade";
 
         public UpgradeCheckRepository(IJsonSerializer jsonSerializer)

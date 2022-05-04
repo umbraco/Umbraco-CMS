@@ -19,6 +19,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>The <paramref name="format" /> is expected to be a valid regular expression.</para>
         /// <para>This is used to validate values against the property type validation regular expression.</para>
         /// </remarks>
-        IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format);
+        IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format);
     }
 }

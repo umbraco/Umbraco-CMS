@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Web.Common.Routing
         public UmbracoRouteValues(
             IPublishedRequest publishedRequest,
             ControllerActionDescriptor controllerActionDescriptor,
-            string templateName = null)
+            string? templateName = null)
         {
             PublishedRequest = publishedRequest;
             ControllerActionDescriptor = controllerActionDescriptor;
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.Common.Routing
         /// <summary>
         /// Gets the template name
         /// </summary>
-        public string TemplateName { get; }
+        public string? TemplateName { get; }
 
         /// <summary>
         /// Gets the controller type

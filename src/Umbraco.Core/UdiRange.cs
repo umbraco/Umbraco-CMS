@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core
 
         public static UdiRange Parse(string s)
         {
-            Uri uri;
+            Uri? uri;
 
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
                 || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)
@@ -78,10 +78,9 @@ namespace Umbraco.Cms.Core
             return _uriValue.ToString();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var other = obj as UdiRange;
-            return other != null && GetType() == other.GetType() && _uriValue == other._uriValue;
+            return obj is UdiRange other && GetType() == other.GetType() && _uriValue == other._uriValue;
         }
 
         public override int GetHashCode()

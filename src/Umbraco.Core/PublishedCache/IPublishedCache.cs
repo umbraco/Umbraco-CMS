@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetById(bool preview, int contentId);
+        IPublishedContent? GetById(bool preview, int contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetById(bool preview, Guid contentId);
+        IPublishedContent? GetById(bool preview, Guid contentId);
 
         /// <summary>
         /// Gets a content identified by its Udi identifier.
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content Udi identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetById(bool preview, Udi contentId);
+        IPublishedContent? GetById(bool preview, Udi contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetById(int contentId);
+        IPublishedContent? GetById(int contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetById(Guid contentId);
+        IPublishedContent? GetById(Guid contentId);
 
         /// <summary>
         /// Gets a content identified by its unique identifier.
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetById(Udi contentId);
+        IPublishedContent? GetById(Udi contentId);
 
         /// <summary>
         /// Gets a value indicating whether the cache contains a specified content.
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
+        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
         /// <summary>
         /// Gets contents at root.
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(string culture = null);
+        IEnumerable<IPublishedContent> GetAtRoot(string? culture = null);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
+        IPublishedContent? GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetSingleByXPath(string xpath, params XPathVariable[] vars);
+        IPublishedContent? GetSingleByXPath(string xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IPublishedContent GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
+        IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets a content resulting from an XPath query.
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="vars">Optional XPath variables.</param>
         /// <returns>The content, or null.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        IPublishedContent GetSingleByXPath(XPathExpression xpath, params XPathVariable[] vars);
+        IPublishedContent? GetSingleByXPath(XPathExpression xpath, params XPathVariable[] vars);
 
         /// <summary>
         /// Gets contents resulting from an XPath query.
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// compatibility + transition reasons, we should obsolete that one as soon as possible.</para>
         /// <para>If the node does not exist, returns null.</para>
         /// </remarks>
-        XPathNavigator CreateNodeNavigator(int id, bool preview);
+        XPathNavigator? CreateNodeNavigator(int id, bool preview);
 
         /// <summary>
         /// Gets a value indicating whether the cache contains published content.
@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// </summary>
         /// <param name="id">The content type unique identifier.</param>
         /// <returns>The content type, or null.</returns>
-        IPublishedContentType GetContentType(int id);
+        IPublishedContentType? GetContentType(int id);
 
         /// <summary>
         /// Gets a content type identified by its alias.
@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="alias">The content type alias.</param>
         /// <returns>The content type, or null.</returns>
         /// <remarks>The alias is case-insensitive.</remarks>
-        IPublishedContentType GetContentType(string alias);
+        IPublishedContentType? GetContentType(string alias);
 
         /// <summary>
         /// Gets contents of a given content type.
@@ -240,6 +240,6 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// </summary>
         /// <param name="key">The content type key.</param>
         /// <returns>The content type, or null.</returns>
-        IPublishedContentType GetContentType(Guid key);
+        IPublishedContentType? GetContentType(Guid key);
     }
 }

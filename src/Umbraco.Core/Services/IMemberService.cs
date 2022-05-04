@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "");
+            string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "");
 
         /// <summary>
         /// Gets a list of paged <see cref="IMember"/> objects
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns><see cref="IEnumerable{T}"/></returns>
         IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection, bool orderBySystemField, string memberTypeAlias, string filter);
+            string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter);
 
         /// <summary>
         /// Creates an <see cref="IMember"/> object without persisting it
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>If no alias is supplied then the count for all Member will be returned</remarks>
         /// <param name="memberTypeAlias">Optional alias for the MemberType when counting number of Members</param>
         /// <returns><see cref="System.int"/> with number of Members</returns>
-        int Count(string memberTypeAlias = null);
+        int Count(string? memberTypeAlias = null);
 
         /// <summary>
         /// Checks if a Member with the id exists
@@ -113,28 +113,28 @@ namespace Umbraco.Cms.Core.Services
         /// and the user id in the membership provider.</remarks>
         /// <param name="id"><see cref="Guid"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember GetByKey(Guid id);
+        IMember? GetByKey(Guid id);
 
         /// <summary>
         /// Gets a Member by its integer id
         /// </summary>
         /// <param name="id"><see cref="System.int"/> Id</param>
         /// <returns><see cref="IMember"/></returns>
-        IMember GetById(int id);
+        IMember? GetById(int id);
 
         /// <summary>
         /// Gets all Members for the specified MemberType alias
         /// </summary>
         /// <param name="memberTypeAlias">Alias of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
+        IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias);
 
         /// <summary>
         /// Gets all Members for the MemberType id
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
+        IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId);
 
         /// <summary>
         /// Gets all Members within the specified MemberGroup name
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.string"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
+        IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
 
         /// <summary>
         /// Gets a list of Members based on a property search
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.int"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+        IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
         /// <summary>
         /// Gets a list of Members based on a property search
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="propertyTypeAlias">Alias of the PropertyType to search for</param>
         /// <param name="value"><see cref="System.bool"/> Value to match</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
+        IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
         /// <summary>
         /// Gets a list of Members based on a property search
@@ -201,6 +201,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="value"><see cref="System.DateTime"/> Value to match</param>
         /// <param name="matchType">The type of match to make as <see cref="StringPropertyMatchType"/>. Default is <see cref="StringPropertyMatchType.Exact"/></param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+        IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
     }
 }

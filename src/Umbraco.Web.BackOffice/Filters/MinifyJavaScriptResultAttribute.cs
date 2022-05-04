@@ -14,15 +14,18 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             // logic before action goes here
             var serviceProvider = context.HttpContext.RequestServices;
             var hostingEnvironment = serviceProvider.GetService<IHostingEnvironment>();
-            if (!hostingEnvironment.IsDebugMode)
+            if (!hostingEnvironment?.IsDebugMode ?? false)
             {
                 var runtimeMinifier = serviceProvider.GetService<IRuntimeMinifier>();
 
                 if (context.Result is JavaScriptResult jsResult)
                 {
                     var result = jsResult.Content;
-                    var minified = await runtimeMinifier.MinifyAsync(result, AssetType.Javascript);
-                    jsResult.Content = minified;
+                    if (runtimeMinifier is not null)
+                    {
+                        var minified = await runtimeMinifier.MinifyAsync(result, AssetType.Javascript);
+                        jsResult.Content = minified;
+                    }
                 }
             }
 
