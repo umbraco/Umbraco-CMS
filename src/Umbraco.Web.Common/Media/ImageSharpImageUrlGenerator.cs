@@ -39,9 +39,9 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     public IEnumerable<string> SupportedImageFileTypes { get; }
 
     /// <inheritdoc />
-    public string? GetImageUrl(ImageUrlGenerationOptions options)
+    public string? GetImageUrl(ImageUrlGenerationOptions? options)
     {
-        if (options.ImageUrl == null)
+        if (options?.ImageUrl == null)
         {
             return null;
         }

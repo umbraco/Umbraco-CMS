@@ -17,6 +17,7 @@ public class BackOfficeSecurityAccessor : IBackOfficeSecurityAccessor
     /// <summary>
     ///     Gets the current <see cref="IBackOfficeSecurity" /> object.
     /// </summary>
+    // RequestServices can be null when testing, even though compiler says it can't
     public IBackOfficeSecurity? BackOfficeSecurity
-        => _httpContextAccessor.HttpContext?.RequestServices.GetService<IBackOfficeSecurity>();
+        => _httpContextAccessor.HttpContext?.RequestServices?.GetService<IBackOfficeSecurity>();
 }
