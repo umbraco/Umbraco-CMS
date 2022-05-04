@@ -24,6 +24,37 @@ public class UmbracoHelper
 
     private IPublishedContent? _currentPage;
 
+    #region Constructors
+
+    /// <summary>
+    ///     Initializes a new instance of <see cref="UmbracoHelper" />.
+    /// </summary>
+    /// <param name="cultureDictionary"></param>
+    /// <param name="componentRenderer"></param>
+    /// <param name="publishedContentQuery"></param>
+    /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
+    public UmbracoHelper(
+        ICultureDictionaryFactory cultureDictionary,
+        IUmbracoComponentRenderer componentRenderer,
+        IPublishedContentQuery publishedContentQuery)
+    {
+        _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
+        _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
+        _publishedContentQuery =
+            publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
+    }
+
+    /// <summary>
+    ///     Initializes a new empty instance of <see cref="UmbracoHelper" />.
+    /// </summary>
+    /// <remarks>For tests - nothing is initialized.</remarks>
+#pragma warning disable CS8618
+    internal UmbracoHelper()
+#pragma warning restore CS8618
+    {
+    }
+
+    #endregion
 
     /// <summary>
     ///     Gets (or sets) the current <see cref="IPublishedContent" /> item assigned to the UmbracoHelper.
@@ -56,8 +87,7 @@ public class UmbracoHelper
             }
 
             throw new InvalidOperationException(
-                $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was not constructed with an {nameof(IPublishedContent)}."
-            );
+                $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was not constructed with an {nameof(IPublishedContent)}.");
         }
         set => _currentPage = value;
     }
@@ -70,38 +100,6 @@ public class UmbracoHelper
     public async Task<IHtmlEncodedString> RenderTemplateAsync(int contentId, int? altTemplateId = null)
         => await _componentRenderer.RenderTemplateAsync(contentId, altTemplateId);
 
-    #region Constructors
-
-    /// <summary>
-    ///     Initializes a new instance of <see cref="UmbracoHelper" />.
-    /// </summary>
-    /// <param name="currentPage">The <see cref="IPublishedContent" /> item assigned to the helper.</param>
-    /// <param name="cultureDictionary"></param>
-    /// <param name="componentRenderer"></param>
-    /// <param name="publishedContentQuery"></param>
-    /// <remarks>Sets the current page to the context's published content request's content item.</remarks>
-    public UmbracoHelper(ICultureDictionaryFactory cultureDictionary,
-        IUmbracoComponentRenderer componentRenderer,
-        IPublishedContentQuery publishedContentQuery)
-    {
-        _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
-        _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-        _publishedContentQuery =
-            publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
-    }
-
-    /// <summary>
-    ///     Initializes a new empty instance of <see cref="UmbracoHelper" />.
-    /// </summary>
-    /// <remarks>For tests - nothing is initialized.</remarks>
-#pragma warning disable CS8618
-    internal UmbracoHelper()
-#pragma warning restore CS8618
-    {
-    }
-
-    #endregion
-
     #region RenderMacro
 
     /// <summary>
@@ -110,7 +108,7 @@ public class UmbracoHelper
     /// <param name="alias">The alias.</param>
     /// <returns></returns>
     public async Task<IHtmlEncodedString> RenderMacroAsync(string alias)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null);
+        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, null);
 
     /// <summary>
     ///     Renders the macro with the specified alias, passing in the specified parameters.
@@ -119,8 +117,7 @@ public class UmbracoHelper
     /// <param name="parameters">The parameters.</param>
     /// <returns></returns>
     public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, object parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias,
-            parameters?.ToDictionary<object>());
+        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters.ToDictionary<object>());
 
     /// <summary>
     ///     Renders the macro with the specified alias, passing in the specified parameters.
@@ -129,7 +126,7 @@ public class UmbracoHelper
     /// <param name="parameters">The parameters.</param>
     /// <returns></returns>
     public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, IDictionary<string, object> parameters)
-        => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters);
+        => await _componentRenderer.RenderMacroAsync(AssignedContentItem.Id, alias, parameters);
 
     #endregion
 
@@ -165,7 +162,6 @@ public class UmbracoHelper
     public ICultureDictionary CultureDictionary => _cultureDictionary ??= _cultureDictionaryFactory.CreateDictionary();
 
     #endregion
-
 
     #region Content
 
@@ -227,9 +223,6 @@ public class UmbracoHelper
     /// <returns>The existing contents corresponding to the identifiers.</returns>
     /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids) => _publishedContentQuery.Content(ids);
-
-    private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids) =>
-        _publishedContentQuery.Content(ids);
 
     /// <summary>
     ///     Gets content items from the cache.
@@ -335,9 +328,6 @@ public class UmbracoHelper
     /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Media(params object[] ids) => _publishedContentQuery.Media(ids);
 
-    private IEnumerable<IPublishedContent> MediaForObjects(IEnumerable<object> ids) =>
-        _publishedContentQuery.Media(ids);
-
     /// <summary>
     ///     Gets the medias corresponding to the identifiers.
     /// </summary>
@@ -353,7 +343,6 @@ public class UmbracoHelper
     /// <returns>The existing medias corresponding to the identifiers.</returns>
     /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
     public IEnumerable<IPublishedContent> Media(params string[] ids) => _publishedContentQuery.Media(ids);
-
 
     /// <summary>
     ///     Gets the medias corresponding to the identifiers.

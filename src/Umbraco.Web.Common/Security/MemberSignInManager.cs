@@ -175,14 +175,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         return properties;
     }
 
-    /// <inheritdoc />
-    public override Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync() =>
 
-        // That can be done by either checking the scheme (maybe) or comparing it to what we have registered in the collection of BackOfficeExternalLoginProvider
-        base.GetExternalAuthenticationSchemesAsync();
-
-    protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent,
-        string? loginProvider = null, bool bypassTwoFactor = false)
+    protected override async Task<SignInResult> SignInOrTwoFactorAsync(MemberIdentityUser user, bool isPersistent, string? loginProvider = null, bool bypassTwoFactor = false)
     {
         SignInResult result = await base.SignInOrTwoFactorAsync(user, isPersistent, loginProvider, bypassTwoFactor);
 
@@ -250,8 +244,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             throw new InvalidOperationException("The Name value cannot be null");
         }
 
-        autoLinkUser = MemberIdentityUser.CreateNew(email, email, autoLinkOptions.DefaultMemberTypeAlias,
-            autoLinkOptions.DefaultIsApproved, name);
+        autoLinkUser = MemberIdentityUser.CreateNew(email, email, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
 
         foreach (var userGroup in autoLinkOptions.DefaultMemberGroups)
         {
@@ -328,7 +321,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>
         Logger.LogWarning(
             "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
-            loginInfo.LoginProvider, user.Id);
+            loginInfo.LoginProvider,
+            user.Id);
 
     protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
         user,

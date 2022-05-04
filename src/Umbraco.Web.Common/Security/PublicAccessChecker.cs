@@ -12,8 +12,7 @@ public class PublicAccessChecker : IPublicAccessChecker
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPublicAccessService _publicAccessService;
 
-    public PublicAccessChecker(IHttpContextAccessor httpContextAccessor, IPublicAccessService publicAccessService,
-        IContentService contentService)
+    public PublicAccessChecker(IHttpContextAccessor httpContextAccessor, IPublicAccessService publicAccessService, IContentService contentService)
     {
         _httpContextAccessor = httpContextAccessor;
         _publicAccessService = publicAccessService;
@@ -29,7 +28,7 @@ public class PublicAccessChecker : IPublicAccessChecker
             return PublicAccessStatus.NotLoggedIn;
         }
 
-        MemberIdentityUser currentMember = await memberManager.GetUserAsync(httpContext.User);
+        MemberIdentityUser? currentMember = await memberManager.GetUserAsync(httpContext.User);
         if (currentMember == null)
         {
             return PublicAccessStatus.NotLoggedIn;

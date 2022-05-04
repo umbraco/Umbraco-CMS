@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -16,6 +15,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.Views;
 
@@ -25,7 +25,6 @@ public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
 
 public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
 {
-    private readonly IUmbracoContext? _umbracoContext;
     private UmbracoHelper? _helper;
 
     /// <summary>
@@ -40,7 +39,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                 return _helper;
             }
 
-            TModel? model = ViewData.Model;
+            TModel model = ViewData.Model;
             var content = model as IPublishedContent;
             if (content is null && model is IContentModel contentModel)
             {
@@ -78,19 +77,6 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         }
     }
 
-    private IUmbracoContextAccessor UmbracoContextAccessor =>
-        Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
-
-    private GlobalSettings GlobalSettings =>
-        Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-
-    private ContentSettings ContentSettings =>
-        Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
-
-    private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
-
-    private IIOHelper IOHelper => Context.RequestServices.GetRequiredService<IIOHelper>();
-
     /// <summary>
     ///     Gets the <see cref="IUmbracoContext" />
     /// </summary>
@@ -106,6 +92,19 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
             return umbracoContext;
         }
     }
+
+    private IUmbracoContextAccessor UmbracoContextAccessor =>
+        Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+
+    private GlobalSettings GlobalSettings =>
+        Context.RequestServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+    private ContentSettings ContentSettings =>
+        Context.RequestServices.GetRequiredService<IOptions<ContentSettings>>().Value;
+
+    private IProfilerHtml ProfilerHtml => Context.RequestServices.GetRequiredService<IProfilerHtml>();
+
+    private IHostingEnvironment HostingEnvironment => Context.RequestServices.GetRequiredService<IHostingEnvironment>();
 
     /// <inheritdoc />
     public override void Write(object? value)
@@ -125,12 +124,11 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         }
     }
 
-    /// <inheritdoc />
     public void WriteUmbracoContent(TagHelperOutput tagHelperOutput)
     {
         // filter / add preview banner
         // ASP.NET default value is text/html
-        if (Context.Response?.ContentType?.InvariantContains("text/html") ?? false)
+        if (Context.Response.ContentType.InvariantContains("text/html"))
         {
             if (((UmbracoContext?.IsDebug ?? false) || (UmbracoContext?.InPreviewMode ?? false))
                 && tagHelperOutput.TagName != null
@@ -144,7 +142,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
                     markupToInject =
                         string.Format(
                             ContentSettings.PreviewBadge,
-                            IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
+                            HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoPath),
                             Context.Request.GetEncodedUrl(),
                             UmbracoContext.PublishedRequest?.PublishedContent?.Id);
                 }
@@ -158,6 +156,12 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
             }
         }
     }
+
+    /// <summary>
+    ///     Renders a section with default content if the section isn't defined
+    /// </summary>
+    public HtmlString? RenderSection(string name, string defaultContents) =>
+        RazorPageExtensions.RenderSection(this, name, defaultContents);
 
     /// <summary>
     ///     Renders a section with default content if the section isn't defined
@@ -254,10 +258,4 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
         var nViewData = (ViewDataDictionary?)Activator.CreateInstance(nViewDataType, tViewData);
         return nViewData;
     }
-
-    /// <summary>
-    ///     Renders a section with default content if the section isn't defined
-    /// </summary>
-    public HtmlString? RenderSection(string name, string defaultContents) =>
-        RazorPageExtensions.RenderSection(this, name, defaultContents);
 }

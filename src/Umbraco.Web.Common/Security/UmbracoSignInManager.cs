@@ -43,8 +43,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     protected abstract string TwoFactorRememberMeAuthenticationType { get; }
 
     /// <inheritdoc />
-    public override async Task<SignInResult> PasswordSignInAsync(TUser user, string password, bool isPersistent,
-        bool lockoutOnFailure)
+    public override async Task<SignInResult> PasswordSignInAsync(TUser user, string password, bool isPersistent, bool lockoutOnFailure)
     {
         // override to handle logging/events
         SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
@@ -56,9 +55,9 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
-        AuthenticateResult? auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
-        IDictionary<string, string?>? items = auth?.Properties?.Items;
-        if (auth?.Principal == null || items == null)
+        AuthenticateResult auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
+        IDictionary<string, string?>? items = auth.Properties?.Items;
+        if (auth.Principal == null || items == null)
         {
             Logger.LogDebug(
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
@@ -86,7 +85,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         }
 
         var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (providerKey == null || items[UmbracoSignInMgrLoginProviderKey] is not string provider)
+        var provider = items[UmbracoSignInMgrLoginProviderKey];
+        if (providerKey == null || provider is not null)
         {
             return null;
         }
@@ -116,8 +116,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     /// <inheritdoc />
-    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent,
-        bool lockoutOnFailure)
+    public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
     {
         // override to handle logging/events
         TUser? user = await UserManager.FindByNameAsync(userName);
@@ -139,13 +138,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             throw new ArgumentNullException(nameof(principal));
         }
 
-        return principal?.Identities != null &&
-               principal.Identities.Any(i => i.AuthenticationType == AuthenticationType);
+        return principal.Identities.Any(i => i.AuthenticationType == AuthenticationType);
     }
 
     /// <inheritdoc />
-    public override async Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent,
-        bool rememberClient)
+    public override async Task<SignInResult> TwoFactorSignInAsync(string? provider, string? code, bool isPersistent, bool rememberClient)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L552
         // replaced in order to use a custom auth type and to implement logging/events
@@ -170,12 +167,12 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         if (await UserManager.VerifyTwoFactorTokenAsync(user, provider, code))
         {
             await DoTwoFactorSignInAsync(user, twoFactorInfo, isPersistent, rememberClient);
-            return await HandleSignIn(user, user?.UserName, SignInResult.Success);
+            return await HandleSignIn(user, user.UserName, SignInResult.Success);
         }
 
         // If the token is incorrect, record the failure which also may cause the user to be locked out
         await UserManager.AccessFailedAsync(user);
-        return await HandleSignIn(user, user?.UserName, SignInResult.Failed);
+        return await HandleSignIn(user, user.UserName, SignInResult.Failed);
     }
 
     /// <inheritdoc />
@@ -183,11 +180,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L126
         // replaced in order to use a custom auth type
-        AuthenticateResult? auth = await Context.AuthenticateAsync(AuthenticationType);
+        AuthenticateResult auth = await Context.AuthenticateAsync(AuthenticationType);
         IList<Claim> claims = Array.Empty<Claim>();
 
-        Claim? authenticationMethod = auth?.Principal?.FindFirst(ClaimTypes.AuthenticationMethod);
-        Claim? amr = auth?.Principal?.FindFirst("amr");
+        Claim? authenticationMethod = auth.Principal?.FindFirst(ClaimTypes.AuthenticationMethod);
+        Claim? amr = auth.Principal?.FindFirst("amr");
 
         if (authenticationMethod != null || amr != null)
         {
@@ -203,12 +200,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             }
         }
 
-        await SignInWithClaimsAsync(user, auth?.Properties, claims);
+        await SignInWithClaimsAsync(user, auth.Properties, claims);
     }
 
     /// <inheritdoc />
-    public override async Task SignInWithClaimsAsync(TUser user, AuthenticationProperties? authenticationProperties,
-        IEnumerable<Claim> additionalClaims)
+    public override async Task SignInWithClaimsAsync(TUser user, AuthenticationProperties? authenticationProperties, IEnumerable<Claim> additionalClaims)
     {
         // override to replace IdentityConstants.ApplicationScheme with custom AuthenticationType
         // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
@@ -255,8 +251,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs#L422
         // to replace the auth scheme
         var userId = await UserManager.GetUserIdAsync(user);
-        AuthenticateResult? result = await Context.AuthenticateAsync(TwoFactorRememberMeAuthenticationType);
-        return result?.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId;
+        AuthenticateResult result = await Context.AuthenticateAsync(TwoFactorRememberMeAuthenticationType);
+        return result.Principal != null && result.Principal.FindFirstValue(ClaimTypes.Name) == userId;
     }
 
     /// <inheritdoc />
@@ -333,24 +329,27 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
             await UserManager.UpdateAsync(user);
 
-            Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username,
-                Context.Connection.RemoteIpAddress);
+            Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
         }
         else if (result.IsLockedOut)
         {
             Logger.LogInformation(
                 "Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked",
-                username, Context.Connection.RemoteIpAddress);
+                username,
+                Context.Connection.RemoteIpAddress);
         }
         else if (result.RequiresTwoFactor)
         {
             Logger.LogInformation(
-                "Login attempt requires verification for username {UserName} from IP address {IpAddress}", username,
+                "Login attempt requires verification for username {UserName} from IP address {IpAddress}",
+                username,
                 Context.Connection.RemoteIpAddress);
         }
         else if (!result.Succeeded || result.IsNotAllowed)
         {
-            Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username,
+            Logger.LogInformation(
+                "Login attempt failed for username {UserName} from IP address {IpAddress}",
+                username,
                 Context.Connection.RemoteIpAddress);
         }
         else
@@ -362,8 +361,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     }
 
     /// <inheritdoc />
-    protected override async Task<SignInResult> SignInOrTwoFactorAsync(TUser user, bool isPersistent,
-        string? loginProvider = null, bool bypassTwoFactor = false)
+    protected override async Task<SignInResult> SignInOrTwoFactorAsync(TUser user, bool isPersistent, string? loginProvider = null, bool bypassTwoFactor = false)
     {
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         // to replace custom auth types
@@ -386,7 +384,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         if (loginProvider == null)
         {
-            await SignInWithClaimsAsync(user, isPersistent, new[] { new("amr", "pwd") });
+            await SignInWithClaimsAsync(user, isPersistent, new[] { new Claim("amr", "pwd") });
         }
         else
         {
@@ -437,8 +435,8 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     // copy is required in order to use a custom auth type
     private async Task<TwoFactorAuthenticationInfo?> RetrieveTwoFactorInfoAsync()
     {
-        AuthenticateResult? result = await Context.AuthenticateAsync(TwoFactorAuthenticationType);
-        if (result?.Principal != null)
+        AuthenticateResult result = await Context.AuthenticateAsync(TwoFactorAuthenticationType);
+        if (result.Principal != null)
         {
             return new TwoFactorAuthenticationInfo
             {
@@ -452,8 +450,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     // copy is required in order to use custom auth types
-    private async Task DoTwoFactorSignInAsync(TUser user, TwoFactorAuthenticationInfo twoFactorInfo, bool isPersistent,
-        bool rememberClient)
+    private async Task DoTwoFactorSignInAsync(TUser user, TwoFactorAuthenticationInfo twoFactorInfo, bool isPersistent, bool rememberClient)
     {
         // When token is verified correctly, clear the access failed count used for lockout
         await ResetLockout(user);

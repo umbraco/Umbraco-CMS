@@ -192,7 +192,7 @@ public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCa
         }
 
         return items
-            .Where(x => x.Key is string s && s.StartsWith(prefix));
+            .Where(x => x.Value is not null && x.Key is string s && s.StartsWith(prefix))!;
     }
 
     protected override void RemoveEntry(string key)
