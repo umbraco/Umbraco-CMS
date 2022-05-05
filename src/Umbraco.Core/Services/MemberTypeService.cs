@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -16,8 +14,8 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberTypeRepository _memberTypeRepository;
 
         public MemberTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
-            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository, IEventAggregator eventAggregator)
-            : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository, eventAggregator)
+            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IMemberTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository, IEventAggregator eventAggregator)
+            : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, entityContainerRepository, entityRepository, eventAggregator)
         {
             MemberService = memberService;
             _memberTypeRepository = memberTypeRepository;
