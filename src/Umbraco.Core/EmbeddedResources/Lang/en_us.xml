@@ -2885,7 +2885,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="basicLevelDescription">We will send an anonymized site ID, umbraco version, and packages installed</key>
     <key alias="detailedLevelDescription">
       <![CDATA[
-      <br> We will send:
+          We will send:
           <br>- Anonymized site ID, umbraco version, and packages installed.
           <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
           <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.
