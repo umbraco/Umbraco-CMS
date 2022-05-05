@@ -44,7 +44,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
-        private readonly SnippetCollection _snippetCollection;
+        private readonly PartialViewSnippetCollection _partialViewSnippetCollection;
+        private readonly PartialViewMacroSnippetCollection _partialViewMacroSnippetCollection;
 
         [ActivatorUtilitiesConstructor]
         public CodeFileController(
@@ -56,7 +57,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
             IOptionsSnapshot<GlobalSettings> globalSettings,
-            SnippetCollection snippetCollection)
+            PartialViewSnippetCollection partialViewSnippetCollection,
+            PartialViewMacroSnippetCollection partialViewMacroSnippetCollection)
         {
             _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;
@@ -66,7 +68,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _umbracoMapper = umbracoMapper;
             _shortStringHelper = shortStringHelper;
             _globalSettings = globalSettings.Value;
-            _snippetCollection = snippetCollection;
+            _partialViewSnippetCollection = partialViewSnippetCollection;
+            _partialViewMacroSnippetCollection = partialViewMacroSnippetCollection;
         }
 
         [Obsolete("Use ctor will all params. Scheduled for removal in V12.")]
@@ -87,7 +90,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 umbracoMapper,
                 shortStringHelper,
                 globalSettings,
-                StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()) //StaticServiceProvider.Instance.GetRequiredService<SnippetCollection>()
+                StaticServiceProvider.Instance.GetRequiredService<PartialViewSnippetCollection>(),
+                StaticServiceProvider.Instance.GetRequiredService<PartialViewMacroSnippetCollection>())
         {
         }
 
@@ -297,10 +301,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (type)
             {
                 case Constants.Trees.PartialViews:
-                    snippets = _snippetCollection.GetPartialViewSnippetNames();
+                    snippets = _partialViewSnippetCollection.GetNames();
                     break;
                 case Constants.Trees.PartialViewMacros:
-                    snippets = _snippetCollection.GetPartialViewMacroSnippetNames();
+                    snippets = _partialViewMacroSnippetCollection.GetNames();
                     break;
                 default:
                     return NotFound();
@@ -332,7 +336,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
                         if (snippetName.IsNullOrWhiteSpace() == false)
                         {
-                            codeFileDisplay.Content = _snippetCollection.GetPartialViewSnippetContent(snippetName!);
+                            codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
                         }
                     }
 
@@ -344,7 +348,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
                         if (snippetName.IsNullOrWhiteSpace() == false)
                         {
-                            codeFileDisplay.Content = _snippetCollection.GetPartialViewMacroSnippetContent(snippetName!);
+                            codeFileDisplay.Content = _partialViewMacroSnippetCollection.GetContentFromName(snippetName!);
                         }
                     }
 
