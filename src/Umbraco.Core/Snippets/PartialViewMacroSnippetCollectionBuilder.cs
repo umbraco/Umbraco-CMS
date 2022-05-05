@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Snippets
                 embeddedSnippets.Add(new Snippet(file.Name, stream.ReadToEnd().Trim()));
             }
 
-            var customSnippetsDir = new DirectoryInfo(hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates"));
+            var customSnippetsDir = new DirectoryInfo(hostEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates"));
             if (!customSnippetsDir.Exists)
             {
                 return embeddedSnippets;
