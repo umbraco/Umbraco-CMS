@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Collections.Specialized;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -42,6 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IMetricsConsentService _metricsConsentService;
 
         public NewInstallStep(
             IUserService userService,
@@ -54,7 +52,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             IBackOfficeUserManager userManager,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-            ILocalizedTextService localizedTextService)
+            ILocalizedTextService localizedTextService,
+            IMetricsConsentService metricsConsentService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -67,11 +66,40 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _databaseProviderMetadata = databaseProviderMetadata;
             _localizedTextService = localizedTextService;
+            _metricsConsentService = metricsConsentService;
+        }
+
+        [Obsolete("Please use constructor that takes an IMetricsConsentService instead")]
+        public NewInstallStep(
+            IUserService userService,
+            DatabaseBuilder databaseBuilder,
+            IHttpClientFactory httpClientFactory,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<SecuritySettings> securitySettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            ICookieManager cookieManager,
+            IBackOfficeUserManager userManager,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+            ILocalizedTextService localizedTextService)
+        : this(
+            userService,
+            databaseBuilder,
+            httpClientFactory,
+            passwordConfiguration,
+            securitySettings,
+            connectionStrings,
+            cookieManager,
+            userManager,
+            dbProviderFactoryCreator,
+            databaseProviderMetadata,
+            localizedTextService,
+            StaticServiceProvider.Instance.GetRequiredService<IMetricsConsentService>())
+        {
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
         {
-            throw new Exception($"TODO: Save the TelemetryLevel {user.TelemetryLevel}");
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
@@ -98,6 +126,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+
+            _metricsConsentService.SetConsentLevel(user.TelemetryLevel);
 
             if (user.SubscribeToNewsLetter)
             {
