@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="entity">The entity.</param>
         /// <param name="connector">The service connector deploying the artifact.</param>
         /// <param name="nextPass">The next pass number.</param>
-        public ArtifactDeployState(TArtifact art, TEntity entity, IServiceConnector connector, int nextPass)
+        public ArtifactDeployState(TArtifact art, TEntity? entity, IServiceConnector connector, int nextPass)
         {
             Artifact = art;
             Entity = entity;
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <summary>
         /// Gets or sets the entity.
         /// </summary>
-        public TEntity Entity { get; set; }
+        public TEntity? Entity { get; set; }
 
         /// <inheritdoc/>
         protected sealed override IArtifact GetArtifactAsIArtifact()

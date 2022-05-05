@@ -53,6 +53,6 @@ namespace Umbraco.Cms.Core.Deploy
 
         public string Name { get; set; }
 
-        public string? Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
     }
 }
