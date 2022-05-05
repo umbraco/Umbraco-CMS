@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IBackOfficeUserManager _userManager;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
+        private readonly ILocalizedTextService _localizedTextService;
 
         public NewInstallStep(
             IUserService userService,
@@ -52,7 +53,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ICookieManager cookieManager,
             IBackOfficeUserManager userManager,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+            ILocalizedTextService localizedTextService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -64,10 +66,12 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _databaseProviderMetadata = databaseProviderMetadata;
+            _localizedTextService = localizedTextService;
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
         {
+            throw new Exception($"TODO: Save the TelemetryLevel {user.TelemetryLevel}");
             var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
@@ -136,7 +140,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                     quickInstallSettings,
                     customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
-                    consentLevels = Enum.GetValues(typeof(TelemetryLevel)),
+                    consentLevels = Enum.GetValues(typeof(TelemetryLevel)).Cast<TelemetryLevel>().ToList().Select(level => new
+                    {
+                        level,
+                        description = GetTelemetryLevelDescription(level),
+                    }),
                 };
             }
         }
@@ -152,6 +160,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     : "continueinstall";
             }
         }
+
+        private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
+        {
+            TelemetryLevel.Minimal => _localizedTextService.Localize("analytics", "minimalLevelDescription"),
+            TelemetryLevel.Basic => _localizedTextService.Localize("analytics", "basicLevelDescription"),
+            TelemetryLevel.Detailed => _localizedTextService.Localize("analytics", "detailedLevelDescription"),
+            _ => throw new ArgumentOutOfRangeException(nameof(telemetryLevel), $"Did not expect telemetry level of {telemetryLevel}")
+        };
 
         private InstallState GetInstallState()
         {
