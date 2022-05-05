@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="parentId">Id of the parent</param>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        IEnumerable<IDictionaryItem>? GetDictionaryItemChildren(Guid parentId);
+        IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId);
 
         /// <summary>
         /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
