@@ -6,22 +6,39 @@
  * @description
  * The controller for the settings view of the datatype editor
  */
- function DataTypeSettingsController($scope, editorService) {
+ function DataTypeSettingsController($scope, $routeParams, dataTypeResource, editorService) {
 
   var vm = this;
 
   vm.selectedEditorModel = null;
-  
-  // TODO - get setting value from data type and config
-  // 'on': allow the user to change the property editor
-  // 'off': don't allow the user to change the property editor
-  // 'disabled': don't allow the user to change the property editor, but show a help text where to change the setting
-  vm.canChangePropertyEditor = 'on';
+
+  const dataTypeId = $routeParams.id;
+  const dataTypesCanBeChangedConfig = window.Umbraco.Sys.ServerVariables.umbracoSettings.dataTypesCanBeChanged;
+
+  vm.allowChangePropertyEditor = false;
+  vm.dataTypeHasValues = false;
+  vm.loadingDataTypeValuesCheck = false;
 
   vm.openPropertyEditorPicker = openPropertyEditorPicker;
 
   function init () {
     vm.selectedEditorModel = $scope.model.content.availableEditors.find(editor => editor.alias === $scope.model.content.selectedEditor);
+
+    if (dataTypeId !== "-1" && (dataTypesCanBeChangedConfig === "False" || dataTypesCanBeChangedConfig === "FalseWithHelpText")) {
+      
+      vm.loadingDataTypeValuesCheck = true;
+
+      // We always allow changing the property editor if the data type is not in use.
+      dataTypeResource.hasValues($routeParams.id)
+        .then(data => {
+          vm.dataTypeHasValues = data.hasValues;
+          vm.allowChangePropertyEditor = !vm.dataTypeHasValues;
+          vm.changePropertyEditorHelpTextIsVisible = !vm.allowChangePropertyEditor && dataTypesCanBeChangedConfig === "FalseWithHelpText";
+          vm.loadingDataTypeValuesCheck = false;
+        });
+    } else {
+      vm.allowChangePropertyEditor = true;
+    }
   }
 
   function openPropertyEditorPicker () {

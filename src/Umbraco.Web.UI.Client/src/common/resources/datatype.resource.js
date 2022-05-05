@@ -391,6 +391,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "PostRenameContainer",
                         { id: id, name: encodeURIComponent(name) })),
                 "Failed to rename the folder with id " + id);
+        },
+
+        hasValues: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "hasvalues",
+                        { id }
+                    )),
+                "Failed to check if the data type with " + id + " has values");
         }
     };
 }

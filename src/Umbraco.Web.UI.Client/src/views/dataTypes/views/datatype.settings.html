@@ -31,12 +31,14 @@
                                 icon="vm.selectedEditorModel.icon || 'icon-autofill'"
                                 name="vm.selectedEditorModel.name"
                                 description="vm.selectedEditorModel.alias"
-                                allow-change="vm.canChangePropertyEditor === 'on'"
+                                allow-change="vm.allowChangePropertyEditor"
                                 on-change="vm.openPropertyEditorPicker()">
                             </umb-node-preview>
 
-                            <div ng-if="vm.canChangePropertyEditor === 'disabled'" class="mt2 umb-alert umb-alert--compact umb-alert--info">
-                                Temp help message
+                            <div ng-if="vm.changePropertyEditorHelpTextIsVisible" class="mt2 umb-alert umb-alert--compact umb-alert--info" style="max-width: 800px;">
+                                <localize key="editdatatype_canChangePropertyEditorHelp">
+                                    Changing a property editor on a data type with a stored value is disabled.
+                                </localize>
                             </div>
                         </div>
                     </div>

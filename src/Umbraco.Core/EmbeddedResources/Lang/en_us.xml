@@ -662,6 +662,7 @@
     <key alias="folderWasRenamed">%0% was renamed to %1%</key>
   </area>
   <area alias="editdatatype">
+    <key alias="canChangePropertyEditorHelp">Changing a property editor on a data type with stored values is disabled.</key>
     <key alias="addPrevalue">Add prevalue</key>
     <key alias="dataBaseDatatype">Database datatype</key>
     <key alias="guid">Property editor GUID</key>
