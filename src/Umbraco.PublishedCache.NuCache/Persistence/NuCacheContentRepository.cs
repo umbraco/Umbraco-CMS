@@ -137,7 +137,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
                 && (mediaTypeIds == null || !mediaTypeIds.Any())
                 && (memberTypeIds == null || !memberTypeIds.Any()))
             {
-                Database.Execute("TRUNCATE TABLE cmsContentNu");
+                if(Database.DatabaseType is NPoco.DatabaseTypes.SqlServerDatabaseType)
+                {
+                    Database.Execute("TRUNCATE TABLE cmsContentNu");
+                }
+                else if (Database.DatabaseType is NPoco.DatabaseTypes.SQLiteDatabaseType)
+                {
+                    Database.Execute("DELETE FROM cmsContentNu");
+                }
             }
 
             RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
