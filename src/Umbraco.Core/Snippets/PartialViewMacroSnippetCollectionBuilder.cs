@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Snippets
 
         protected override IEnumerable<ISnippet> CreateItems(IServiceProvider factory)
         {
-            var hostingEnvironment = factory.GetRequiredService<IHostEnvironment>();
+            var hostEnvironment = factory.GetRequiredService<IHostEnvironment>();
 
             var embeddedSnippets = new List<ISnippet>();
             var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
