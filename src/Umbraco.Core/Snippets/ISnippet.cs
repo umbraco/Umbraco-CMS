@@ -1,11 +1,9 @@
-using Umbraco.Cms.Core.Composing;
-
 namespace Umbraco.Cms.Core.Snippets
 {
     /// <summary>
     /// Defines a partial view macro snippet.
     /// </summary>
-    public interface ISnippet : IDiscoverable
+    public interface ISnippet
     {
         /// <summary>
         /// Gets the name of the snippet.
