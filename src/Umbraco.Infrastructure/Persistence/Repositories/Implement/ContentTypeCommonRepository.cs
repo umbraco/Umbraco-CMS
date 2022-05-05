@@ -43,7 +43,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _shortStringHelper = shortStringHelper;
         }
 
-        private IDatabaseScope? AmbientScope => _scopeAccessor.AmbientScope;
+        private Scoping.IScope? AmbientScope => _scopeAccessor.AmbientScope;
+
         private IUmbracoDatabase? Database => AmbientScope?.Database;
 
         private ISqlContext? SqlContext => AmbientScope?.SqlContext;

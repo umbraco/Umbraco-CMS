@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentService"/> class.
         /// </summary>
-        public ConsentService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
+        public ConsentService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _consentRepository = consentRepository;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Services
                 Comment = comment
             };
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 _consentRepository.ClearCurrent(source, context, action);
                 _consentRepository.Save(consent);
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Services
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false)
         {
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IConsent>();
 

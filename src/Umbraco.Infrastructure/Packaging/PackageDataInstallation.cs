@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -16,10 +13,10 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
@@ -35,11 +32,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly GlobalSettings _globalSettings;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -57,11 +52,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
             IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
+            IMediaTypeService mediaTypeService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -69,22 +62,58 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _macroService = macroService;
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
-            _propertyEditors = propertyEditors;
-            _scopeProvider = scopeProvider;
-            _shortStringHelper = shortStringHelper;
-            _globalSettings = globalSettings.Value;
-            _serializer = serializer;
-            _mediaService = mediaService;
-            _mediaTypeService = mediaTypeService;
-            _hostingEnvironment = hostingEnvironment;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
+            _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
+            _shortStringHelper = shortStringHelper;
+            _serializer = serializer;
+            _mediaService = mediaService;
+            _mediaTypeService = mediaTypeService;
         }
+
+        // Also remove factory service registration when this constructor is removed
+        [Obsolete("Use the constructor with Infrastructure.IScopeProvider and without global settings and hosting environment instead.")]
+        public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILogger<PackageDataInstallation> logger,
+            IFileService fileService,
+            IMacroService macroService,
+            ILocalizationService localizationService,
+            IDataTypeService dataTypeService,
+            IEntityService entityService,
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            PropertyEditorCollection propertyEditors,
+            Core.Scoping.IScopeProvider scopeProvider,
+            IShortStringHelper shortStringHelper,
+            IOptions<GlobalSettings> globalSettings,
+            IConfigurationEditorJsonSerializer serializer,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            IHostingEnvironment hostingEnvironment)
+            : this(
+                  dataValueEditorFactory,
+                  logger,
+                  fileService,
+                  macroService,
+                  localizationService,
+                  dataTypeService,
+                  entityService,
+                  contentTypeService,
+                  contentService,
+                  propertyEditors,
+                  scopeProvider,
+                  shortStringHelper,
+                  serializer,
+                  mediaService,
+                  mediaTypeService)
+        { }
 
         #region Install/Uninstall
 
-        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
+            public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -1435,14 +1464,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             foreach (var languageElement in languageElements)
             {
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
+                if (string.IsNullOrEmpty(isoCode))
+                {
+                    continue;
+                }
+
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
                 if (existingLanguage != null)
-                    continue;
-                var langauge = new Language(_globalSettings, isoCode!)
                 {
-                    CultureName = languageElement.AttributeValue<string>("FriendlyName")!
-                };
+                    continue;
+                }
+
+                var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
+
+                var langauge = new Language(isoCode, cultureName);
                 _localizationService.Save(langauge, userId);
+
                 list.Add(langauge);
             }
 

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly Scoping.IScopeProvider _scopeProvider;
         private readonly INuCacheContentService _publishedContentService;
         private readonly ILogger<PublishedSnapshotService> _logger;
         private readonly ILoggerFactory _loggerFactory;
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IVariationContextAccessor variationContextAccessor,
             IProfilingLogger profilingLogger,
             ILoggerFactory loggerFactory,
-            IScopeProvider scopeProvider,
+            Scoping.IScopeProvider scopeProvider,
             INuCacheContentService publishedContentService,
             IDefaultCultureAccessor defaultCultureAccessor,
             IOptions<GlobalSettings> globalSettings,

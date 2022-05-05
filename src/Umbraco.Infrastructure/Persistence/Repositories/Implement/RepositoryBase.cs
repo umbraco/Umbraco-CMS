@@ -35,11 +35,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Gets the AmbientScope
         /// </summary>
-        protected IDatabaseScope AmbientScope
+        protected IScope AmbientScope
         {
             get
             {
-                IDatabaseScope? scope = ScopeAccessor.AmbientScope;
+                IScope? scope = ScopeAccessor.AmbientScope;
                 if (scope == null)
                 {
                     throw new InvalidOperationException("Cannot run a repository without an ambient scope.");

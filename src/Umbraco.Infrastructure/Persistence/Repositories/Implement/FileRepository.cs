@@ -202,20 +202,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return null;
         }
 
-        public Stream? GetFileContentStream(string filepath)
+        public Stream GetFileContentStream(string filepath)
         {
             if (FileSystem?.FileExists(filepath) == false)
             {
-                return null;
+                return Stream.Null;
             }
 
             try
             {
-                return FileSystem?.OpenFile(filepath);
+                return FileSystem?.OpenFile(filepath) ?? Stream.Null;
             }
             catch
             {
-                return null; // deal with race conds
+                return Stream.Null; // deal with race conds
             }
         }
 

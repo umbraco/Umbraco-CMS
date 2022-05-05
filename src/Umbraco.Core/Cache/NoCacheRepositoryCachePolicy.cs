@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Core.Cache
             persistDeleted(entity);
         }
 
-        public TEntity[]? GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
+        public TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
-            return performGetAll(ids)?.ToArray();
+            return performGetAll(ids)?.ToArray() ?? Array.Empty<TEntity>();
         }
 
         public void ClearAll()

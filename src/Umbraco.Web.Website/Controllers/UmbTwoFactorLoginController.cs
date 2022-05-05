@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly IMemberManager _memberManager;
         private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly ILogger<UmbTwoFactorLoginController> _logger;
-        private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
+        private readonly IMemberSignInManager _memberSignInManager;
 
         public UmbTwoFactorLoginController(
             ILogger<UmbTwoFactorLoginController> logger,
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
-            IMemberSignInManagerExternalLogins memberSignInManager,
+            IMemberSignInManager memberSignInManager,
             IMemberManager memberManager,
             ITwoFactorLoginService twoFactorLoginService)
             : base(

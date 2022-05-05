@@ -16,7 +16,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
-        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString);
+        DatabaseType GetUpdatedDatabaseType(DatabaseType current, string? connectionString) =>
+            current; // Default implementation.
 
         string ProviderName { get; }
 
@@ -160,6 +161,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin,
             string? alias = null);
 
-        IDictionary<Type, IScalarMapper>? ScalarMappers { get; }
+        IDictionary<Type, IScalarMapper>? ScalarMappers => null;
     }
 }

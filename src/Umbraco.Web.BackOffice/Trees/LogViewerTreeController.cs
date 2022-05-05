@@ -17,24 +17,28 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [CoreTree]
     public class LogViewerTreeController : TreeController
     {
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
         public LogViewerTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
             : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
-        protected override ActionResult<TreeNodeCollection?> GetTreeNodes(string id, FormCollection queryStrings)
+        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             //We don't have any child nodes & only use the root node to load a custom UI
             return new TreeNodeCollection();
         }
 
-        protected override ActionResult<MenuItemCollection>? GetMenuForNode(string id, FormCollection queryStrings)
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             //We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
-            return null;
+            return _menuItemCollectionFactory.Create();
         }
 
         /// <summary>

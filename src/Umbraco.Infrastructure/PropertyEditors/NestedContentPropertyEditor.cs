@@ -4,17 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -32,21 +32,33 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class NestedContentPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
 
         public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
         public NestedContentPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper)
+            : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public NestedContentPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser)
             : base (dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         #region Pre Value Editor
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new NestedContentConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         #endregion
 

@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Core.IO
             return FileSystem.GetFiles(path, filter);
         }
 
-        public Stream? OpenFile(string path)
+        public Stream OpenFile(string path)
         {
             return FileSystem.OpenFile(path);
         }

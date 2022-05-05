@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ForUpdate();
 
             // deduplicate the logins
-            logins = logins.LegacyDistinctBy(x => x!.ProviderKey + x.LoginProvider).ToList();
+            logins = logins.DistinctBy(x => x.ProviderKey + x.LoginProvider).ToList();
 
             var toUpdate = new Dictionary<int, IExternalLogin>();
             var toDelete = new List<int>();
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .ToDictionary(x => x.LoginProvider, x => x.Id);
 
             // deduplicate the tokens
-            tokens = tokens.LegacyDistinctBy(x => x!.LoginProvider + x.Name).ToList();
+            tokens = tokens.DistinctBy(x => x.LoginProvider + x.Name).ToList();
 
             var providers = tokens.Select(x => x.LoginProvider).Distinct().ToList();
 

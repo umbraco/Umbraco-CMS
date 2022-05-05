@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IEntityRepository _entityRepository;
         private readonly IEventAggregator _eventAggregator;
 
-        protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        protected ContentTypeServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository? containerRepository, IEntityRepository entityRepository,
             IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Services
         {
             try
             {
-                using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+                using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
                 {
                     scope.ReadLock(ReadLockIds);
                     ValidateLocked(compo!);
@@ -263,7 +263,7 @@ namespace Umbraco.Cms.Core.Services
 
         public TItem? Get(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(id);
@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Core.Services
 
         public TItem? Get(string alias)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(alias);
@@ -281,7 +281,7 @@ namespace Umbraco.Cms.Core.Services
 
         public TItem? Get(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Get(id);
@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<TItem> GetAll(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.GetMany(ids);
@@ -304,7 +304,8 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<TItem>();
             }
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.GetMany(ids.ToArray());
@@ -313,7 +314,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<TItem>? GetChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
@@ -323,7 +324,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<TItem>? GetChildren(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var found = Get(id);
@@ -335,7 +336,7 @@ namespace Umbraco.Cms.Core.Services
 
         public bool HasChildren(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var query = Query<TItem>().Where(x => x.ParentId == id);
@@ -346,7 +347,7 @@ namespace Umbraco.Cms.Core.Services
 
         public bool HasChildren(Guid id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 var found = Get(id);
@@ -364,7 +365,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         public bool HasContainerInPath(string contentPath)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // can use same repo for both content and media
                 return Repository.HasContainerInPath(contentPath);
@@ -373,7 +374,7 @@ namespace Umbraco.Cms.Core.Services
 
         public bool HasContainerInPath(params int[] ids)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 // can use same repo for both content and media
                 return Repository.HasContainerInPath(ids);
@@ -382,7 +383,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
 
@@ -434,7 +435,7 @@ namespace Umbraco.Cms.Core.Services
 
         public int Count()
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.Count(Query<TItem>());
@@ -443,7 +444,7 @@ namespace Umbraco.Cms.Core.Services
 
         public bool HasContentNodes(int id)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
                 return Repository.HasContentNodes(id);
@@ -461,7 +462,8 @@ namespace Umbraco.Cms.Core.Services
                 return;
             }
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
@@ -515,7 +517,7 @@ namespace Umbraco.Cms.Core.Services
         {
             TItem[] itemsA = items.ToArray();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 SavingNotification<TItem> savingNotification = GetSavingNotification(itemsA, eventMessages);
@@ -566,7 +568,7 @@ namespace Umbraco.Cms.Core.Services
 
         public void Delete(TItem item, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
@@ -621,7 +623,7 @@ namespace Umbraco.Cms.Core.Services
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
-                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.LegacyDistinctBy(x => x!.Id), eventMessages);
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);
                 scope.Notifications.Publish(deletedNotification);
 
@@ -634,7 +636,7 @@ namespace Umbraco.Cms.Core.Services
         {
             TItem[] itemsA = items.ToArray();
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 DeletingNotification<TItem> deletingNotification = GetDeletingNotification(itemsA, eventMessages);
@@ -647,9 +649,7 @@ namespace Umbraco.Cms.Core.Services
                 scope.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
-                TItem[] allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true))
-                    .LegacyDistinctBy(x => x!.Id)
-                    .ToArray();
+                TItem[] allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true)).DistinctBy(x => x.Id).ToArray();
                 TItem[] deleted = allDescendantsAndSelf;
 
                 // all impacted (through composition) probably lose some properties
@@ -679,7 +679,7 @@ namespace Umbraco.Cms.Core.Services
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
-                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.LegacyDistinctBy(x => x!.Id), eventMessages);
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);
                 scope.Notifications.Publish(deletedNotification);
 
@@ -752,7 +752,7 @@ namespace Umbraco.Cms.Core.Services
             var evtMsgs = EventMessagesFactory.Get();
 
             TItem copy;
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(WriteLockIds);
 
@@ -805,7 +805,7 @@ namespace Umbraco.Cms.Core.Services
             EventMessages eventMessages = EventMessagesFactory.Get();
 
             var moveInfo = new List<MoveEventInfo<TItem>>();
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
                 MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
@@ -857,7 +857,7 @@ namespace Umbraco.Cms.Core.Services
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 
@@ -913,7 +913,7 @@ namespace Umbraco.Cms.Core.Services
                 return OperationResult.Attempt.Fail(eventMessages, ex);
             }
 
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
@@ -939,7 +939,7 @@ namespace Umbraco.Cms.Core.Services
 
         public EntityContainer? GetContainer(int containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -949,7 +949,7 @@ namespace Umbraco.Cms.Core.Services
 
         public EntityContainer? GetContainer(Guid containerId)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -959,7 +959,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -984,7 +984,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<EntityContainer>? GetContainers(string name, int level)
         {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
@@ -995,7 +995,7 @@ namespace Umbraco.Cms.Core.Services
         public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 
@@ -1036,7 +1036,7 @@ namespace Umbraco.Cms.Core.Services
         public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 

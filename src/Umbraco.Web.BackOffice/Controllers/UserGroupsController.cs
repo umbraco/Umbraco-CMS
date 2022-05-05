@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Returns all user groups
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<UserGroupBasic?> GetUserGroups(bool onlyCurrentUserGroups = true)
+        public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
             var allGroups = _umbracoMapper.MapEnumerable<IUserGroup, UserGroupBasic>(_userService.GetAllUserGroups())
                 .ToList();
@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (onlyCurrentUserGroups == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
-                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic?.Alias == Constants.Security.AdminGroupAlias)));
+                allGroups.RemoveAt(allGroups.IndexOf(allGroups.Find(basic => basic.Alias == Constants.Security.AdminGroupAlias)!));
                 return allGroups;
             }
 

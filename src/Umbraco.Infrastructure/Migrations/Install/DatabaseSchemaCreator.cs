@@ -227,21 +227,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
             //Check constraints in configured database against constraints in schema
-            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).LegacyDistinctBy(x => x!.Item3).ToList();
-            var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_"))
-                .Select(x => x.Item3).ToList();
-            var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_"))
-                .Select(x => x.Item3).ToList();
+            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+            var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
+            var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
 
-            var unknownConstraintsInDatabase =
-                constraintsInDatabase.Where(
-                    x =>
-                        x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
-                        x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
-            var foreignKeysInSchema =
-                result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).Where(x => x is not null).ToList();
-            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
-                .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
+            var unknownConstraintsInDatabase = constraintsInDatabase.Where(
+                x => x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false && x.Item3.InvariantStartsWith("IX_") == false
+            ).Select(x => x.Item3).ToList();
+
+            var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).Where(x => x is not null).ToList();
+            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName)).Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
             // Add valid and invalid foreign key differences to the result object
             // We'll need to do invariant contains with case insensitivity because foreign key, primary key is not standardized
@@ -258,10 +253,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             }
 
-            //Foreign keys:
-
-            IEnumerable<string?> validForeignKeyDifferences =
-                foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+            // Foreign keys:
+            IEnumerable<string?> validForeignKeyDifferences = foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var foreignKey in validForeignKeyDifferences)
             {
                 if (foreignKey is not null)
@@ -270,30 +263,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 }
             }
 
-            IEnumerable<string?> invalidForeignKeyDifferences =
-                foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
-                    .Union(foreignKeysInSchema.Except(foreignKeysInDatabase,
-                        StringComparer.InvariantCultureIgnoreCase));
+            IEnumerable<string?> invalidForeignKeyDifferences = foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var foreignKey in invalidForeignKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey ?? "NULL"));
             }
 
-
-            //Primary keys:
-
-            //Add valid and invalid primary key differences to the result object
-            IEnumerable<string> validPrimaryKeyDifferences =
-                primaryKeysInDatabase!.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
+            // Primary keys:
+            // Add valid and invalid primary key differences to the result object
+            IEnumerable<string> validPrimaryKeyDifferences = primaryKeysInDatabase!.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!;
             foreach (var primaryKey in validPrimaryKeyDifferences)
             {
                 result.ValidConstraints.Add(primaryKey);
             }
 
-            IEnumerable<string> invalidPrimaryKeyDifferences =
-                primaryKeysInDatabase!.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
-                    .Union(primaryKeysInSchema.Except(primaryKeysInDatabase,
-                        StringComparer.InvariantCultureIgnoreCase))!;
+            IEnumerable<string> invalidPrimaryKeyDifferences = primaryKeysInDatabase!.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)!
+                .Union(primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase))!;
             foreach (var primaryKey in invalidPrimaryKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));

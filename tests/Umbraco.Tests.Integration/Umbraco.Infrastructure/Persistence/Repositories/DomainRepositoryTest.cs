@@ -16,6 +16,8 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -41,8 +43,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var globalSettings = new GlobalSettings();
-                var lang = new Language(globalSettings, isoName);
+                var lang = new Language(isoName, isoName);
                 LanguageRepository.Save(lang);
 
                 ct = ContentTypeBuilder.CreateBasicContentType("test", "Test");
@@ -172,7 +173,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // more test data
                 ILanguage lang1 = LanguageRepository.GetByIsoCode("en-AU");
                 var globalSettings = new GlobalSettings();
-                var lang2 = new Language(globalSettings, "es");
+                var lang2 = new Language("es", "Spanish");
                 LanguageRepository.Save(lang2);
                 var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
                 DocumentRepository.Save(content2);

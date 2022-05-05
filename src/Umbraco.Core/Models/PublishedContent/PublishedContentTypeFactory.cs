@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (_publishedDataTypes == null)
                 {
                     var dataTypes = _dataTypeService.GetAll();
-                    _publishedDataTypes = dataTypes?.ToDictionary(x => x.Id, CreatePublishedDataType);
+                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
                 }
 
                 publishedDataTypes = _publishedDataTypes;
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 if (_publishedDataTypes == null)
                 {
                     var dataTypes = _dataTypeService.GetAll();
-                    _publishedDataTypes = dataTypes?.ToDictionary(x => x.Id, CreatePublishedDataType);
+                    _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
                 }
                 else
                 {
@@ -112,11 +112,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                         _publishedDataTypes.Remove(id);
 
                     var dataTypes = _dataTypeService.GetAll(ids);
-                    if (dataTypes is not null)
-                    {
-                        foreach (var dataType in dataTypes)
-                            _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
-                    }
+                    foreach (var dataType in dataTypes)
+                        _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
                 }
             }
         }

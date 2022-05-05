@@ -1,16 +1,10 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Loader;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -54,7 +48,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly Lazy<string> _pureLiveDirectory = null!;
         private bool _disposedValue;
 
-
         public InMemoryModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
@@ -76,6 +69,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _errors = new ModelsGenerationError(config, _hostingEnvironment);
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
+
             if (!hostingEnvironment.IsHosted)
             {
                 return;
@@ -169,6 +163,24 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             return info is null || info.Ctor is null ? element : info.Ctor(element, _publishedValueFallback);
         }
 
+        /// <inheritdoc />
+        public Type GetModelType(string? alias)
+        {
+            Infos infos = EnsureModels();
+
+            // fail fast
+            if (infos is null ||
+                alias is null ||
+                infos.ModelInfos is null ||
+                !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo) ||
+                modelInfo.ModelType is null)
+            {
+                return typeof(IPublishedElement);
+            }
+
+            return modelInfo.ModelType;
+        }
+
         // this runs only once the factory is ready
         // NOT when building models
         public Type MapModelType(Type type)
@@ -184,12 +196,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             Infos infos = EnsureModels();
 
             // fail fast
-            if (infos is null || alias is null)
-            {
-                return new List<IPublishedElement>();
-            }
-
-            if (infos.ModelInfos is null || !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo))
+            if (infos is null || alias is null || infos.ModelInfos is null || !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo))
             {
                 return new List<IPublishedElement>();
             }

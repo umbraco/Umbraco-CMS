@@ -16,10 +16,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
@@ -145,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ILocalizationService service = LocalizationService;
             IAppPolicyCache globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(ILanguage));
 
-            var lang = (ILanguage)new Language(GlobalSettings, "fr-FR");
+            ILanguage lang = new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             // global cache has been flushed, reload
@@ -238,7 +242,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ILocalizationService service = LocalizationService;
             IAppPolicyCache globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IDictionaryItem));
 
-            var lang = (ILanguage)new Language(GlobalSettings, "fr-FR");
+            var lang = new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             var item = (IDictionaryItem)new DictionaryItem("item-key");

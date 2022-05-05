@@ -1,8 +1,6 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Logging;
@@ -25,9 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// </summary>
         public NestedContentSingleValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
             : base(publishedSnapshotAccessor, publishedModelFactory)
-        {
-            _proflog = proflog;
-        }
+            => _proflog = proflog;
 
         /// <inheritdoc />
         public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -36,10 +32,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
-            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>()!.ContentTypes;
-            return contentTypes?.Length > 1
-                ? typeof(IPublishedElement)
-                : ModelType.For(contentTypes?[0].Alias);
+            var contentTypes = propertyType.DataType.ConfigurationAs<NestedContentConfiguration>()?.ContentTypes;
+
+            return contentTypes?.Length == 1
+                ? ModelType.For(contentTypes[0].Alias)
+                : typeof(IPublishedElement);
         }
 
         /// <inheritdoc />
@@ -48,9 +45,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
-        {
-            return source?.ToString();
-        }
+            => source?.ToString();
 
         /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
@@ -58,14 +53,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             using (_proflog.DebugDuration<NestedContentSingleValueConverter>($"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))
             {
                 var value = (string?)inter;
-                if (string.IsNullOrWhiteSpace(value)) return null;
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return null;
+                }
 
                 var objects = JsonConvert.DeserializeObject<List<JObject>>(value)!;
                 if (objects.Count == 0)
+                {
                     return null;
-                if (objects.Count > 1)
-                    throw new InvalidOperationException();
+                }
 
+                // Only return the first (existing data might contain more than is currently configured)
                 return ConvertToElement(objects[0], referenceCacheLevel, preview);
             }
         }

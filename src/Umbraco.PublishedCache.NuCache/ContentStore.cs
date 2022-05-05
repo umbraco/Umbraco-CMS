@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         // gets a scope contextual representing a locked writer to the dictionary
         // TODO: GetScopedWriter? should the dict have a ref onto the scope provider?
-        public IDisposable? GetScopedWriteLock(IScopeProvider scopeProvider)
+        public IDisposable? GetScopedWriteLock(ICoreScopeProvider scopeProvider)
         {
             return ScopeContextualBase.Get(scopeProvider, _instanceId, scoped => new ScopedWriteLock(this, scoped));
         }

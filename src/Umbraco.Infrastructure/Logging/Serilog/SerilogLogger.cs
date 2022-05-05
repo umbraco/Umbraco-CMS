@@ -1,8 +1,8 @@
 using System;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Extensions;
 
@@ -21,8 +21,9 @@ namespace Umbraco.Cms.Core.Logging.Serilog
             SerilogLog = logConfig.CreateLogger();
         }
 
+        [Obsolete]
         public static SerilogLogger CreateWithDefaultConfiguration(
-            IHostingEnvironment hostingEnvironment,
+            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
@@ -33,8 +34,9 @@ namespace Umbraco.Cms.Core.Logging.Serilog
         /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
+        [Obsolete]
         public static SerilogLogger CreateWithDefaultConfiguration(
-            IHostingEnvironment hostingEnvironment,
+            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration,
             out UmbracoFileConfiguration umbracoFileConfig)

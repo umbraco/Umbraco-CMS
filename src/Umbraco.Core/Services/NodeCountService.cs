@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
     public class NodeCountService : INodeCountService
     {
         private readonly INodeCountRepository _nodeCountRepository;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
-        public NodeCountService(INodeCountRepository nodeCountRepository, IScopeProvider scopeProvider)
+        public NodeCountService(INodeCountRepository nodeCountRepository, ICoreScopeProvider scopeProvider)
         {
             _nodeCountRepository = nodeCountRepository;
             _scopeProvider = scopeProvider;
@@ -18,13 +18,13 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
 
         public int GetNodeCount(Guid nodeType)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            using var scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             return _nodeCountRepository.GetNodeCount(nodeType);
         }
 
         public int GetMediaCount()
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            using var scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             return _nodeCountRepository.GetMediaCount();
         }
     }

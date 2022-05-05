@@ -23,15 +23,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        private readonly GlobalSettings _globalSettings;
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
 
-        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger, IOptions<GlobalSettings> globalSettings)
+        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger)
             : base(scopeAccessor, cache, logger)
-        {
-            _globalSettings = globalSettings.Value;
-        }
+        { }
 
         protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()
         {
@@ -238,17 +235,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #endregion
 
         protected ILanguage ConvertFromDto(LanguageDto dto)
-        {
-            var entity = LanguageFactory.BuildEntity(_globalSettings, dto);
-            return entity;
-        }
+            => LanguageFactory.BuildEntity(dto);
 
         public ILanguage? GetByIsoCode(string isoCode)
         {
             // ensure cache is populated, in a non-expensive way
             if (TypedCachePolicy != null)
+            {
                 TypedCachePolicy.GetAllCached(PerformGetAll);
-
+            }
 
             var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
             return id.HasValue ? Get(id.Value) : null;

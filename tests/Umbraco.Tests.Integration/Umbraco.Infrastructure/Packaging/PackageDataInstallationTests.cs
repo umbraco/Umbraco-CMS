@@ -4,11 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,6 +19,9 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
@@ -839,9 +840,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 
         private void AddLanguages()
         {
-            var globalSettings = new GlobalSettings();
-            var norwegian = new Language(globalSettings, "nb-NO");
-            var english = new Language(globalSettings, "en-GB");
+            var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)");
+            var english = new Language("en-GB", "English (United Kingdom)");
             LocalizationService.Save(norwegian, 0);
             LocalizationService.Save(english, 0);
         }

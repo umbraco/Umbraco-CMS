@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// Gets the ambient scope.
         /// </summary>
         /// <remarks>Returns <c>null</c> if there is no ambient scope.</remarks>
-        IDatabaseScope? AmbientScope { get; }
+        IScope? AmbientScope { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public Guid Key => _content.Key;
 
         /// <inheritdoc />
-        public IEnumerable<IPublishedProperty>? Properties => _content.Properties;
+        public IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
         /// <inheritdoc />
         public IPublishedProperty? GetProperty(string alias) => _content.GetProperty(alias);

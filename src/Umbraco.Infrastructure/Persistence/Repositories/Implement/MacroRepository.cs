@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _macroByAliasCachePolicy.Get(alias, PerformGetByAlias, PerformGetAllByAlias);
         }
 
-        public IEnumerable<IMacro>? GetAllByAlias(string[] aliases)
+        public IEnumerable<IMacro> GetAllByAlias(string[] aliases)
         {
             if (aliases.Any() is false)
             {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return PerformGetByQuery(query)?.FirstOrDefault();
         }
 
-        private IEnumerable<IMacro>? PerformGetAllByAlias(params string[]? aliases)
+        private IEnumerable<IMacro> PerformGetAllByAlias(params string[]? aliases)
         {
             if (aliases is null || aliases.Any() is false)
             {
@@ -131,13 +131,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        protected override IEnumerable<IMacro>? PerformGetByQuery(IQuery<IMacro> query)
+        protected override IEnumerable<IMacro> PerformGetByQuery(IQuery<IMacro> query)
         {
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
-            return Database?
+            return Database
                 .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
                 .Select(x => Get(x.Id)!);
         }

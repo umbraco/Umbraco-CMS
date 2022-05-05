@@ -41,7 +41,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly HtmlLocalLinkParser _localLinkParser;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IHtmlMacroParameterParser _macroParameterParser;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
         public GridPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -51,15 +54,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator,
             IHtmlMacroParameterParser macroParameterParser)
-            : base(dataValueEditorFactory)
+            : this(
+                dataValueEditorFactory,
+                backOfficeSecurityAccessor,
+                imageSourceParser,
+                pastedImages,
+                localLinkParser,
+                ioHelper,
+                imageUrlGenerator,
+                macroParameterParser,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
-            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-            _ioHelper = ioHelper;
-            _imageSourceParser = imageSourceParser;
-            _pastedImages = pastedImages;
-            _localLinkParser = localLinkParser;
-            _imageUrlGenerator = imageUrlGenerator;
-            _macroParameterParser = macroParameterParser;
         }
 
         [Obsolete("Use the constructor which takes an IHtmlMacroParameterParser instead")]
@@ -71,8 +76,39 @@ namespace Umbraco.Cms.Core.PropertyEditors
             HtmlLocalLinkParser localLinkParser,
             IIOHelper ioHelper,
             IImageUrlGenerator imageUrlGenerator)
-            : this (dataValueEditorFactory, backOfficeSecurityAccessor, imageSourceParser, pastedImages, localLinkParser, ioHelper, imageUrlGenerator, StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+            : this(
+                dataValueEditorFactory,
+                backOfficeSecurityAccessor,
+                imageSourceParser,
+                pastedImages,
+                localLinkParser,
+                ioHelper,
+                imageUrlGenerator,
+                StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>(),
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
         {
+        }
+
+        public GridPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            HtmlImageSourceParser imageSourceParser,
+            RichTextEditorPastedImages pastedImages,
+            HtmlLocalLinkParser localLinkParser,
+            IIOHelper ioHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            IHtmlMacroParameterParser macroParameterParser,
+            IEditorConfigurationParser editorConfigurationParser)
+            : base(dataValueEditorFactory)
+        {
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _ioHelper = ioHelper;
+            _imageSourceParser = imageSourceParser;
+            _pastedImages = pastedImages;
+            _localLinkParser = localLinkParser;
+            _imageUrlGenerator = imageUrlGenerator;
+            _macroParameterParser = macroParameterParser;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         public override IPropertyIndexValueFactory PropertyIndexValueFactory => new GridPropertyIndexValueFactory();
@@ -83,7 +119,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns></returns>
         protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<GridPropertyValueEditor>(Attribute!);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         internal class GridPropertyValueEditor : DataValueEditor, IDataValueReference
         {

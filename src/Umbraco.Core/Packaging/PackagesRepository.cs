@@ -456,22 +456,20 @@ namespace Umbraco.Cms.Core.Packaging
                     throw new InvalidOperationException("No file found with path " + file);
                 }
 
-                using (Stream? stream = fileSystem?.OpenFile(file))
+                using (Stream stream = fileSystem!.OpenFile(file))
                 {
-                    if (stream is not null)
+                    using (var reader = new StreamReader(stream))
                     {
-                        using (var reader = new StreamReader(stream))
-                        {
-                            var fileContents = reader.ReadToEnd();
-                            scriptsXml.Add(
-                                new XElement(
-                                    elementName,
-                                    new XAttribute("path", file),
-                                    new XCData(fileContents)));
-                        }
+                        var fileContents = reader.ReadToEnd();
+                        scriptsXml.Add(
+                            new XElement(
+                                elementName,
+                                new XAttribute("path", file),
+                                new XCData(fileContents)));
                     }
                 }
             }
+
             root.Add(scriptsXml);
         }
 
@@ -579,7 +577,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                         ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
                         //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
-                        //    .LegacyDistinctBy(x => x.EntityId)
+                        //    .DistinctBy(x => x.EntityId)
                         //    .OrderBy(x => x.EntityId);
 
                         //foreach (var taggedEntity in allExportedTaggedEntities)

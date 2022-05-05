@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Media
                     // if anything goes wrong, just reset the properties
                     try
                     {
-                        using (var filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
+                        using (Stream filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
                         {
                             SetProperties(content, autoFillConfig, filepath, filestream, culture, segment);
                         }

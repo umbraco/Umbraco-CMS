@@ -7,8 +7,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.Cms.Web.Common.Extensions;
-using Umbraco.Cms.Web.Common.Middleware;
+
 
 namespace Umbraco.Extensions
 {

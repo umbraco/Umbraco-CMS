@@ -520,13 +520,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     new Mock<IHostingEnvironment>().Object,
                     new Mock<IOptionsMonitor<ContentSettings>>().Object)
             });
-            var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
+            var scopeProvider = Mock.Of<ICoreScopeProvider>(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
                 It.IsAny<IScopedNotificationPublisher>(),
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
-                It.IsAny<bool>()) == Mock.Of<IScope>());
+                It.IsAny<bool>()) == Mock.Of<ICoreScope>());
 
             _mapper = new UmbracoMapper(map, scopeProvider);
 
