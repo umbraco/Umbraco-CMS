@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         }
 
         [Test]
-        public void LanguageFilesAreLowercase()
+        public void LanguageFilesAreLowerCase()
         {
             var languageProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang");
             var files = languageProvider.GetDirectoryContents(string.Empty)
