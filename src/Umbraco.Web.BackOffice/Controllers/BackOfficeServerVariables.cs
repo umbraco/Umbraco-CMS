@@ -446,6 +446,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             "analyticsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AnalyticsController>(
                                 controller => controller.GetConsentLevel())
                         },
+                        {
+                          "propertyTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PropertyTypeController>(
+                              controller => controller.HasValues(string.Empty))
+                        },
                     }
                 },
                 {
