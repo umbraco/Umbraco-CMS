@@ -522,14 +522,11 @@ namespace Umbraco.Cms.Core.Services
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get URL encoded folder names
-                var folders = _contentTypeService.GetContainers(contentType)?
+                IOrderedEnumerable<EntityContainer> folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level);
 
-                if (folders is not null)
-                {
-                    folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
-                    folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
-                }
+                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
