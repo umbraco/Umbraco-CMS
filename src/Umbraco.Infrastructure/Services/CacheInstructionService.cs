@@ -163,8 +163,7 @@ namespace Umbraco.Cms
                 using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken,
-                        localIdentity, ref lastId);
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                     // Check for pruning throttling.
                     if (cancellationToken.IsCancellationRequested || DateTime.UtcNow - lastPruned <=
@@ -239,8 +238,7 @@ namespace Umbraco.Cms
             private CacheInstruction CreateCacheInstruction(
                 IEnumerable<RefreshInstruction> instructions,
                 string localIdentity) =>
-                new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None),
-                    localIdentity, instructions.Sum(x => x.JsonIdCount));
+                new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
 
             /// <summary>
             ///     Process instructions from the database.
@@ -249,9 +247,7 @@ namespace Umbraco.Cms
             ///     Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
             /// </remarks>
             /// <returns>Number of instructions processed.</returns>
-            private int ProcessDatabaseInstructions(
-                CacheRefresherCollection cacheRefreshers,
-                CancellationToken cancellationToken, string localIdentity, ref int lastId)
+            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, ref int lastId)
             {
                 // NOTE:
                 // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -307,8 +303,7 @@ namespace Umbraco.Cms
                     List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                     // Process as per-normal.
-                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed,
-                        cancellationToken, ref lastId);
+                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                     // If they couldn't be all processed (i.e. we're shutting down) then exit.
                     if (success == false)
@@ -343,9 +338,7 @@ namespace Umbraco.Cms
                 }
                 catch (JsonException ex)
                 {
-                    _logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
-                        instruction.Id,
-                        instruction.Instructions);
+                    _logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').", instruction.Id, instruction.Instructions);
                     jsonInstructions = null;
                     return false;
                 }
@@ -485,8 +478,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier,
-                string? jsonPayload)
+            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload)
             {
                 IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
                 if (jsonPayload is not null)

@@ -30,7 +30,8 @@ public static class PublishedModelUtility
     // }
     public static IPublishedContentType? GetModelContentType(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        PublishedItemType itemType, string alias)
+        PublishedItemType itemType,
+        string alias)
     {
         IPublishedSnapshot publishedSnapshot = publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         switch (itemType)

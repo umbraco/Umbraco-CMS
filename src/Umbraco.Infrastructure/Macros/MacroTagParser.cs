@@ -168,7 +168,7 @@ public class MacroTagParser
         var stop = false;
         while (!stop)
         {
-            var tagIndex = fieldResult.ToString().ToLower().IndexOf("<?umbraco");
+            var tagIndex = fieldResult.ToString().ToLower().IndexOf("<?umbraco", StringComparison.InvariantCulture);
             if (tagIndex > -1)
             {
                 var tempElementContent = string.Empty;
@@ -178,21 +178,21 @@ public class MacroTagParser
 
                 fieldResult.Remove(0, tagIndex);
 
-                var tag = fieldResult.ToString()[..(fieldResult.ToString().IndexOf(">") + 1)];
+                var tag = fieldResult.ToString()[..(fieldResult.ToString().IndexOf(">", StringComparison.InvariantCulture) + 1)];
                 Dictionary<string, string> attributes = XmlHelper.GetAttributesFromElement(tag);
 
                 // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
-                if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ") > -1)
+                if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ", StringComparison.InvariantCulture) > -1)
                 {
-                    var closingTag = "</" + tag[1..tag.IndexOf(" ")] + ">";
+                    var closingTag = "</" + tag[1..tag.IndexOf(" ", StringComparison.InvariantCulture)] + ">";
 
                     // Tag with children are only used when a macro is inserted by the umbraco-editor, in the
                     // following format: "<?UMBRACO_MACRO ...><IMG SRC="..."..></?UMBRACO_MACRO>", so we
                     // need to delete extra information inserted which is the image-tag and the closing
                     // umbraco_macro tag
-                    if (fieldResult.ToString().IndexOf(closingTag) > -1)
+                    if (fieldResult.ToString().IndexOf(closingTag, StringComparison.InvariantCulture) > -1)
                     {
-                        fieldResult.Remove(0, fieldResult.ToString().IndexOf(closingTag));
+                        fieldResult.Remove(0, fieldResult.ToString().IndexOf(closingTag, StringComparison.InvariantCulture));
                     }
                 }
 
@@ -201,7 +201,7 @@ public class MacroTagParser
                 // call the callback now that we have the macro parsed
                 macroFoundCallback(macroAlias, attributes);
 
-                fieldResult.Remove(0, fieldResult.ToString().IndexOf(">") + 1);
+                fieldResult.Remove(0, fieldResult.ToString().IndexOf(">", StringComparison.InvariantCulture) + 1);
                 fieldResult.Insert(0, tempElementContent);
             }
             else

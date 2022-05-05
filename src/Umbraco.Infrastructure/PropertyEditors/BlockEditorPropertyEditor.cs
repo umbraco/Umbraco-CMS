@@ -162,8 +162,7 @@ public abstract class BlockEditorPropertyEditor : DataEditor
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
                             _logger.LogWarning(
-                                "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                                prop.Key, row.Key, property.PropertyType.Alias);
+                                "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}", prop.Key, row.Key, property.PropertyType.Alias);
                             continue;
                         }
 
@@ -265,7 +264,8 @@ public abstract class BlockEditorPropertyEditor : DataEditor
 
         public BlockEditorValidator(
             IPropertyValidationService propertyValidationService,
-            BlockEditorValues blockEditorValues, IContentTypeService contentTypeService)
+            BlockEditorValues blockEditorValues,
+            IContentTypeService contentTypeService)
             : base(propertyValidationService)
         {
             _blockEditorValues = blockEditorValues;
@@ -352,7 +352,9 @@ public abstract class BlockEditorPropertyEditor : DataEditor
                     blockEditorData.Layout?.Count() < validationLimit.Min))
             {
                 yield return new ValidationResult(
-                    _textService.Localize("validation", "entriesShort",
+                    _textService.Localize(
+                        "validation",
+                        "entriesShort",
                         new[]
                         {
                             validationLimit.Min.ToString(),
@@ -365,7 +367,9 @@ public abstract class BlockEditorPropertyEditor : DataEditor
                 blockEditorData.Layout?.Count() > validationLimit.Max)
             {
                 yield return new ValidationResult(
-                    _textService.Localize("validation", "entriesExceed",
+                    _textService.Localize(
+                        "validation",
+                        "entriesExceed",
                         new[]
                         {
                             validationLimit.Max.ToString(),
@@ -386,8 +390,7 @@ public abstract class BlockEditorPropertyEditor : DataEditor
         private readonly BlockEditorDataConverter _dataConverter;
         private readonly ILogger _logger;
 
-        public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService,
-            ILogger logger)
+        public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
         {
             _contentTypes =
                 new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
@@ -472,7 +475,10 @@ public abstract class BlockEditorPropertyEditor : DataEditor
                     block.RawPropertyValues.Remove(prop.Key);
                     _logger.LogWarning(
                         "The property {PropertyKey} for block {BlockKey} was removed because the property type {PropertyTypeAlias} was not found on {ContentTypeAlias}",
-                        prop.Key, block.Key, prop.Key, contentType.Alias);
+                        prop.Key,
+                        block.Key,
+                        prop.Key,
+                        contentType.Alias);
                 }
                 else
                 {

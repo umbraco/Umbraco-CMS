@@ -21,9 +21,9 @@ internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRep
     }
 
     public IDomain? GetByName(string domainName) =>
-        GetMany()?.FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
+        GetMany().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName));
 
-    public bool Exists(string domainName) => GetMany()?.Any(x => x.DomainName.InvariantEquals(domainName)) ?? false;
+    public bool Exists(string domainName) => GetMany().Any(x => x.DomainName.InvariantEquals(domainName));
 
     public IEnumerable<IDomain> GetAll(bool includeWildcards) =>
         GetMany().Where(x => includeWildcards || x.IsWildcard == false);
@@ -40,7 +40,7 @@ internal class DomainRepository : EntityRepositoryBase<int, IDomain>, IDomainRep
     protected override IDomain? PerformGet(int id) =>
 
         // use the underlying GetAll which will force cache all domains
-        GetMany()?.FirstOrDefault(x => x.Id == id);
+        GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IDomain> PerformGetAll(params int[]? ids)
     {

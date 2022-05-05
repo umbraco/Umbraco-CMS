@@ -54,8 +54,7 @@ public static class LoggerConfigExtensions
             "BASEDIR",
             hostingEnvironment.MapPathContentRoot("/").TrimEnd(Path.DirectorySeparatorChar),
             EnvironmentVariableTarget.Process);
-        Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory,
-            EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
         logConfig.MinimumLevel
@@ -101,10 +100,8 @@ public static class LoggerConfigExtensions
 
         // Set this environment variable - so that it can be used in external config file
         // add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-        Environment.SetEnvironmentVariable("BASEDIR", hostEnvironment.MapPathContentRoot("/").TrimEnd("\\"),
-            EnvironmentVariableTarget.Process);
-        Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory,
-            EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("BASEDIR", hostEnvironment.MapPathContentRoot("/").TrimEnd("\\"), EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
         logConfig.MinimumLevel
@@ -136,12 +133,8 @@ public static class LoggerConfigExtensions
     ///     Outputs a .txt format log at /App_Data/Logs/
     /// </summary>
     /// <param name="logConfig">A Serilog LoggerConfiguration</param>
-    /// <param name="loggingConfiguration"></param>
+    /// <param name="hostingEnvironment"></param>
     /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
-    /// <param name="retainedFileCount">
-    ///     The number of days to keep log files. Default is set to null which means all logs are
-    ///     kept
-    /// </param>
     public static LoggerConfiguration OutputDefaultTextFile(
         this LoggerConfiguration logConfig,
         IHostingEnvironment hostingEnvironment,
@@ -157,8 +150,7 @@ public static class LoggerConfigExtensions
             rollingInterval: RollingInterval.Day,
             restrictedToMinimumLevel: minimumLevel,
             retainedFileCountLimit: null, // Setting to null means we keep all files - default is 31 days
-            outputTemplate:
-            "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
 
         return logConfig;
     }
@@ -208,6 +200,7 @@ public static class LoggerConfigExtensions
     ///     Outputs a CLEF format JSON log at /App_Data/Logs/
     /// </summary>
     /// <param name="logConfig">A Serilog LoggerConfiguration</param>
+    /// <param name="hostingEnvironment"></param>
     /// <param name="loggingConfiguration">The logging configuration</param>
     /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
     /// <param name="retainedFileCount">
@@ -217,7 +210,8 @@ public static class LoggerConfigExtensions
     public static LoggerConfiguration OutputDefaultJsonFile(
         this LoggerConfiguration logConfig,
         IHostingEnvironment hostingEnvironment,
-        ILoggingConfiguration loggingConfiguration, LogEventLevel minimumLevel = LogEventLevel.Verbose,
+        ILoggingConfiguration loggingConfiguration,
+        LogEventLevel minimumLevel = LogEventLevel.Verbose,
         int? retainedFileCount = null)
     {
         // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)

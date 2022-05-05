@@ -11,8 +11,7 @@ public class UdiJsonConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>
         writer.WriteValue(value?.ToString());
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var jo = JToken.ReadFrom(reader);
         var val = jo.ToObject<string>();

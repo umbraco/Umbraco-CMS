@@ -137,12 +137,12 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         List<RelationDto>? dtos = page.Items;
         totalRecords = page.TotalItems;
 
-        var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())?
+        var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())
             .ToDictionary(x => x.Id, x => x);
 
         var result = dtos.Select(r =>
         {
-            if (relTypes is null || !relTypes.TryGetValue(r.RelationType, out IRelationType? relType))
+            if (!relTypes.TryGetValue(r.RelationType, out IRelationType? relType))
             {
                 throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist",
                     r.RelationType));

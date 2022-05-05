@@ -57,7 +57,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         }
         else
         {
-            PerformGetAll(); //we don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
+            PerformGetAll(); // We don't have a typed cache (i.e. unit tests) but need to populate the _codeIdMap
         }
 
         lock (_codeIdMap)
@@ -70,8 +70,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
         if (throwOnNotFound)
         {
-            throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.",
-                nameof(isoCode));
+            throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
         }
 
         return null;
@@ -96,7 +95,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             PerformGetAll();
         }
 
-        lock (_codeIdMap) // yes, we want to lock _codeIdMap
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
         {
             if (_idCodeMap.TryGetValue(id.Value, out var isoCode))
             {
@@ -114,11 +114,10 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
     public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
-    public int? GetDefaultId() => GetDefault()?.Id;
+    public int? GetDefaultId() => GetDefault().Id;
 
     protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected ILanguage ConvertFromDto(LanguageDto dto)
         => LanguageFactory.BuildEntity(dto);
@@ -130,8 +129,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         var languages =
             (TypedCachePolicy
                  ?.GetAllCached(
-                     PerformGetAll) //try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
-             ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)!).ToList();
+                     PerformGetAll) // Try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
+             ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)).ToList();
 
         ILanguage? language = languages.FirstOrDefault(x => x.IsDefault);
         if (language != null)
@@ -144,7 +143,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             "There is no default language. Fix this anomaly by editing the language table in database and setting one language as the default language.");
 
         // still, don't kill the site, and return "something"
-
         ILanguage? first = null;
         foreach (ILanguage l in languages)
         {
@@ -169,8 +167,8 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             sql.WhereIn<LanguageDto>(x => x.Id, ids);
         }
 
-        //this needs to be sorted since that is the way legacy worked - default language is the first one!!
-        //even though legacy didn't sort, it should be by id
+        // this needs to be sorted since that is the way legacy worked - default language is the first one!!
+        // even though legacy didn't sort, it should be by id
         sql.OrderBy<LanguageDto>(x => x.Id);
 
         // get languages
@@ -223,7 +221,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
     {
         var list = new List<string>
         {
-            //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
+            // NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
             // but we still need to remove them
             "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
@@ -232,7 +230,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
             "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " +
             Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id"
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id",
         };
         return list;
     }
@@ -309,7 +307,7 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
 
         if (entity.IsPropertyDirty(nameof(ILanguage.IsoCode)))
         {
-            //if the iso code is changing, ensure there's not another lang with the same code already assigned
+            // If the iso code is changing, ensure there's not another lang with the same code already assigned
             Sql<ISqlContext> sameCode = Sql()
                 .SelectCount()
                 .From<LanguageDto>()
@@ -335,7 +333,6 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
     {
         // validate that the entity is not the default language.
         // safe (no race cond) because the service locks languages
-
         Sql<ISqlContext> selectDefaultId = Sql()
             .Select<LanguageDto>(x => x.Id)
             .From<LanguageDto>()

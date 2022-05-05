@@ -134,8 +134,7 @@ internal class Scope :
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
-        logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N")[..8],
-            Thread.CurrentThread.ManagedThreadId);
+        logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
         if (detachable)
         {
@@ -755,14 +754,10 @@ internal class Scope :
                     switch (currentType)
                     {
                         case DistributedLockType.ReadLock:
-                            EagerReadLockInner(
-                                currentInstanceId,
-                                currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            EagerReadLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                             break;
                         case DistributedLockType.WriteLock:
-                            EagerWriteLockInner(
-                                currentInstanceId,
-                                currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            EagerWriteLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                             break;
                     }
                 }
@@ -811,10 +806,9 @@ internal class Scope :
     /// <param name="dict">Lock dictionary to report on.</param>
     /// <param name="builder">String builder to write to.</param>
     /// <param name="dictName">The name to report the dictionary as.</param>
-    private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder,
-        string dictName)
+    private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
     {
-        if (dict?.Count > 0)
+        if (dict.Count > 0)
         {
             builder.AppendLine($"Remaining {dictName}:");
             foreach (KeyValuePair<Guid, Dictionary<int, int>> instance in dict)

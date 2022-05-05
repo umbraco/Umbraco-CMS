@@ -85,14 +85,14 @@ public class TagsPropertyEditor : DataEditor
         /// <inheritdoc />
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            var value = editorValue?.Value?.ToString();
+            var value = editorValue.Value?.ToString();
 
             if (string.IsNullOrEmpty(value))
             {
                 return null;
             }
 
-            if (editorValue?.Value is JArray json)
+            if (editorValue.Value is JArray json)
             {
                 return json.HasValues ? json.Select(x => x.Value<string>()) : null;
             }

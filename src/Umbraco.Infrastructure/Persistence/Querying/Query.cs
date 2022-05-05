@@ -20,7 +20,7 @@ public class Query<T> : IQuery<T>
     /// <summary>
     ///     Adds a where clause to the query.
     /// </summary>
-    public virtual IQuery<T> Where(Expression<Func<T, bool>> predicate)
+    public virtual IQuery<T> Where(Expression<Func<T, bool>>? predicate)
     {
         if (predicate == null)
         {
@@ -36,7 +36,7 @@ public class Query<T> : IQuery<T>
     /// <summary>
     ///     Adds a where-in clause to the query.
     /// </summary>
-    public virtual IQuery<T> WhereIn(Expression<Func<T, object>> fieldSelector, IEnumerable? values)
+    public virtual IQuery<T> WhereIn(Expression<Func<T, object>>? fieldSelector, IEnumerable? values)
     {
         if (fieldSelector == null)
         {
@@ -52,7 +52,7 @@ public class Query<T> : IQuery<T>
     /// <summary>
     ///     Adds a set of OR-ed where clauses to the query.
     /// </summary>
-    public virtual IQuery<T> WhereAny(IEnumerable<Expression<Func<T, bool>>> predicates)
+    public virtual IQuery<T> WhereAny(IEnumerable<Expression<Func<T, bool>>>? predicates)
     {
         if (predicates == null)
         {

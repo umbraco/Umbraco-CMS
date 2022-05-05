@@ -25,17 +25,14 @@ public class DateTimePropertyEditor : DataEditor
     private readonly IIOHelper _ioHelper;
 
     public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DateTimePropertyEditor" /> class.
     /// </summary>
-    /// <param name="loggerFactory"></param>
-    public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;

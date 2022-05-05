@@ -96,7 +96,7 @@ internal class MacroRepository : EntityRepositoryBase<int, IMacro>, IMacroWithAl
     private IMacro? PerformGetByAlias(string? alias)
     {
         IQuery<IMacro> query = Query<IMacro>().Where(x => x.Alias.Equals(alias));
-        return PerformGetByQuery(query)?.FirstOrDefault();
+        return PerformGetByQuery(query).FirstOrDefault();
     }
 
     private IEnumerable<IMacro> PerformGetAllByAlias(params string[]? aliases)

@@ -37,8 +37,7 @@ public class MediaPickerPropertyEditor : DataEditor
     public MediaPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

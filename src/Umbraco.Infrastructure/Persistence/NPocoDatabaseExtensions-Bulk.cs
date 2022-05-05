@@ -53,7 +53,7 @@ public static partial class NPocoDatabaseExtensions
     /// <returns>The sql commands to execute.</returns>
     internal static IDbCommand[] GenerateBulkInsertCommands<T>(this IUmbracoDatabase database, T[] records)
     {
-        if (database?.Connection == null)
+        if (database.Connection == null)
         {
             throw new ArgumentException("Null database?.connection.", nameof(database));
         }

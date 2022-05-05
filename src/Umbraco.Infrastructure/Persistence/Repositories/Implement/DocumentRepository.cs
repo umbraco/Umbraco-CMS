@@ -40,18 +40,9 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
     /// <summary>
     ///     Constructor
     /// </summary>
-    /// <param name="scopeAccessor"></param>
-    /// <param name="appCaches"></param>
-    /// <param name="logger"></param>
-    /// <param name="loggerFactory"></param>
-    /// <param name="contentTypeRepository"></param>
-    /// <param name="templateRepository"></param>
-    /// <param name="tagRepository"></param>
-    /// <param name="languageRepository"></param>
-    /// <param name="propertyEditors">
     ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors
     ///     require services, yet these services require property editors
-    /// </param>
+
     public DocumentRepository(
         IScopeAccessor scopeAccessor,
         AppCaches appCaches,
@@ -68,8 +59,17 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository,
-            propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditors,
+            dataValueReferenceFactories,
+            dataTypeService,
+            eventAggregator)
     {
         _contentTypeRepository =
             contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
@@ -269,8 +269,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
         if (loadTemplates)
         {
             // load all required templates in 1 query, and index
-            templates = _templateRepository.GetMany(templateIds.ToArray())?
-                .ToDictionary(x => x.Id, x => x);
+            templates = _templateRepository.GetMany(templateIds.ToArray()).ToDictionary(x => x.Id, x => x);
         }
 
         IDictionary<int, PropertyCollection>? properties = null;
@@ -357,7 +356,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // TODO: shall we get published properties or not?
             //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
+            var publishedVersionId = dto.PublishedVersionDto.Id;
 
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
             var ltemp = new List<TempContent<Content>> {temp};
@@ -650,7 +649,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                             .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
                                 r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
                             .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                                r1.Select(documentVersionDto => documentVersionDto!.ContentVersionDto, "pcv")))
+                                r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
 
                     // select the variant name, coalesce to the invariant name, as "variantName"
                     .AndSelect(VariantNameSqlExpression + " AS variantName");
@@ -1694,10 +1693,8 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
             // and then, we need to set the invariant name implicitly,
             // using the default culture if it has a name, otherwise anything we can
             var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-            content.Name = defaultCulture != null &&
-                           (content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos cultureName) ??
-                            false)
-                ? cultureName.Name!
+            content.Name = content.CultureInfos?.TryGetValue(defaultCulture, out ContentCultureInfos cultureName) ?? false
+                ? cultureName.Name
                 : content.CultureInfos![0].Name!;
         }
         else

@@ -4,7 +4,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
 [InstallSetupStep(
     InstallationType.NewInstall | InstallationType.Upgrade,
-    "UmbracoVersion", 50, "Installation is complete! Get ready to be redirected to your new CMS.",
+    "UmbracoVersion",
+    50,
+    "Installation is complete! Get ready to be redirected to your new CMS.",
     PerformsAppRestart = true)]
 public class CompleteInstallStep : InstallSetupStep<object>
 {

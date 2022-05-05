@@ -779,10 +779,7 @@ internal abstract class ExpressionVisitorBase
     public virtual string GetQuotedName(string name)
         => Visited ? name : "\"" + name + "\"";
 
-    public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax) =>
-        paramValue == null
-            ? string.Empty
-            : sqlSyntax.EscapeString(paramValue.ToString()!);
+    public virtual string EscapeParam(object paramValue, ISqlSyntaxProvider sqlSyntax) => paramValue == null ? string.Empty : sqlSyntax.EscapeString(paramValue.ToString()!);
 
     protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
     {

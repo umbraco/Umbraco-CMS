@@ -22,8 +22,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
         _serilogLog = serilogLog;
     }
 
-    protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader,
-        ILogger serilogLog)
+    protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, ILogger serilogLog)
     {
         _logViewerConfig = logViewerConfig;
         _logLevelLoader = logLevelLoader;
@@ -57,7 +56,7 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     public string GetLogLevel()
     {
         LogEventLevel? logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>()
-            .Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
+            .Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information).Min();
         return logLevel?.ToString() ?? string.Empty;
     }
 
@@ -82,7 +81,8 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
 
     public PagedResult<LogMessage> GetLogs(
         LogTimePeriod logTimePeriod,
-        int pageNumber = 1, int pageSize = 100,
+        int pageNumber = 1,
+        int pageSize = 100,
         Direction orderDirection = Direction.Descending,
         string? filterExpression = null,
         string[]? logLevels = null)
@@ -145,6 +145,5 @@ public abstract class SerilogLogViewerSourceBase : ILogViewer
     /// <summary>
     ///     Get all logs from your chosen data source back as Serilog LogEvents
     /// </summary>
-    protected abstract IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip,
-        int take);
+    protected abstract IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take);
 }

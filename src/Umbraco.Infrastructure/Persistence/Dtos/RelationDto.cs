@@ -16,8 +16,7 @@ internal class RelationDto
 
     [Column("parentId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_umbracoRelation_umbracoNode")]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType",
-        ForColumns = "parentId,childId,relType")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelation_parentChildType", ForColumns = "parentId,childId,relType")]
     public int ParentId { get; set; }
 
     [Column("childId")]

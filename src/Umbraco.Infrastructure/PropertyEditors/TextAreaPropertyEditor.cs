@@ -29,8 +29,7 @@ public class TextAreaPropertyEditor : DataEditor
     public TextAreaPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

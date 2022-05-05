@@ -136,7 +136,7 @@ public class PublishedContentTypeCache : IDisposable
             _lock.EnterWriteLock();
 
             IPublishedContentType[] toRemove = _typesById.Values
-                .Where(x => x.PropertyTypes?.Any(xx => xx.DataType.Id == id) ?? false).ToArray();
+                .Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
             foreach (IPublishedContentType type in toRemove)
             {
                 _typesByAlias.Remove(GetAliasKey(type));

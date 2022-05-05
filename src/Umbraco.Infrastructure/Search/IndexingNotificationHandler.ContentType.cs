@@ -34,7 +34,6 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     /// <summary>
     ///     Updates indexes based on content type changes
     /// </summary>
-    /// <param name="sender"></param>
     /// <param name="args"></param>
     public void Handle(ContentTypeCacheRefresherNotification args)
     {

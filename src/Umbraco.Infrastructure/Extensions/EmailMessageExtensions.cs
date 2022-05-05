@@ -71,8 +71,7 @@ internal static class EmailMessageExtensions
             emailMessage.IsBodyHtml);
     }
 
-    private static void AddAddresses(MimeMessage message, string?[]? addresses,
-        Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
+    private static void AddAddresses(MimeMessage message, string?[]? addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
     {
         var foundValid = false;
         if (addresses != null)

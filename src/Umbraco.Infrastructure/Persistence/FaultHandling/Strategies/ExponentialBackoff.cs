@@ -44,8 +44,7 @@ public class ExponentialBackoff : RetryStrategy
     ///     The value that will be used for calculating a random delta in the exponential delay between
     ///     retries.
     /// </param>
-    public ExponentialBackoff(string name, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff,
-        TimeSpan deltaBackoff)
+    public ExponentialBackoff(string name, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff)
         : this(name, retryCount, minBackoff, maxBackoff, deltaBackoff, DefaultFirstFastRetry)
     {
     }
@@ -65,8 +64,7 @@ public class ExponentialBackoff : RetryStrategy
     ///     Indicates whether or not the very first retry attempt will be made immediately
     ///     whereas the subsequent retries will remain subject to retry interval.
     /// </param>
-    public ExponentialBackoff(string? name, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff,
-        TimeSpan deltaBackoff, bool firstFastRetry)
+    public ExponentialBackoff(string? name, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff, bool firstFastRetry)
         : base(name, firstFastRetry)
     {
         // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");

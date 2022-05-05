@@ -30,8 +30,7 @@ public class TagQuery : ITagQuery
     {
         IEnumerable<int> ids = _tagService.GetTaggedContentByTag(tag, group, culture)
             .Select(x => x.EntityId);
-        return _contentQuery.Content(ids)
-            .Where(x => x != null);
+        return _contentQuery.Content(ids);
     }
 
     /// <inheritdoc />
@@ -39,8 +38,7 @@ public class TagQuery : ITagQuery
     {
         IEnumerable<int> ids = _tagService.GetTaggedContentByTagGroup(group, culture)
             .Select(x => x.EntityId);
-        return _contentQuery.Content(ids)
-            .Where(x => x != null);
+        return _contentQuery.Content(ids);
     }
 
     /// <inheritdoc />
@@ -48,8 +46,7 @@ public class TagQuery : ITagQuery
     {
         IEnumerable<int> ids = _tagService.GetTaggedMediaByTag(tag, group, culture)
             .Select(x => x.EntityId);
-        return _contentQuery.Media(ids)
-            .Where(x => x != null);
+        return _contentQuery.Media(ids);
     }
 
     /// <inheritdoc />
@@ -57,8 +54,7 @@ public class TagQuery : ITagQuery
     {
         IEnumerable<int> ids = _tagService.GetTaggedMediaByTagGroup(group, culture)
             .Select(x => x.EntityId);
-        return _contentQuery.Media(ids)
-            .Where(x => x != null);
+        return _contentQuery.Media(ids);
     }
 
     /// <inheritdoc />
@@ -78,10 +74,8 @@ public class TagQuery : ITagQuery
         _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetAllMemberTags(group, culture));
 
     /// <inheritdoc />
-    public IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null) =>
-        _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group,
-            culture));
+    public IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null) =>
+        _mapper.MapEnumerable<ITag, TagModel>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, group, culture));
 
     /// <inheritdoc />
     public IEnumerable<TagModel?> GetTagsForEntity(int contentId, string? group = null, string? culture = null) =>

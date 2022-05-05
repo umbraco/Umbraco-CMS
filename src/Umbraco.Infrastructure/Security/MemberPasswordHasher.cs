@@ -52,8 +52,7 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     /// <param name="providedPassword"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException">Thrown when the correct hashing algorith cannot be determined</exception>
-    public override PasswordVerificationResult VerifyHashedPassword(MemberIdentityUser user, string hashedPassword,
-        string providedPassword)
+    public override PasswordVerificationResult VerifyHashedPassword(MemberIdentityUser user, string hashedPassword, string providedPassword)
     {
         if (user is null)
         {
@@ -162,9 +161,7 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
             }
         }
 
-        var result = LegacyPasswordSecurity.VerifyPassword(
-            Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName,
-            providedPassword, hashedPassword);
+        var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
         return result || LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
     }
 

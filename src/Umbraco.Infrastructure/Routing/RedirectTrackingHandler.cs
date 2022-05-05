@@ -116,7 +116,7 @@ public sealed class RedirectTrackingHandler :
         }
 
         // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
-        var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys
+        var defaultCultures = entityContent.AncestorsOrSelf().FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys
                                   .ToArray()
                               ?? Array.Empty<string>();
 

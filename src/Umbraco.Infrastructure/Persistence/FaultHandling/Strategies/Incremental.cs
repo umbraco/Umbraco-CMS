@@ -5,9 +5,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 /// </summary>
 public class Incremental : RetryStrategy
 {
-    private readonly TimeSpan increment;
-    private readonly TimeSpan initialInterval;
-    private readonly int retryCount;
+    private readonly TimeSpan _increment;
+    private readonly TimeSpan _initialInterval;
+    private readonly int _retryCount;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Incremental" /> class.
@@ -66,9 +66,9 @@ public class Incremental : RetryStrategy
         // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
         // Guard.ArgumentNotNegativeValue(initialInterval.Ticks, "initialInterval");
         // Guard.ArgumentNotNegativeValue(increment.Ticks, "increment");
-        this.retryCount = retryCount;
-        this.initialInterval = initialInterval;
-        this.increment = increment;
+        this._retryCount = retryCount;
+        this._initialInterval = initialInterval;
+        this._increment = increment;
     }
 
     /// <summary>
@@ -78,10 +78,10 @@ public class Incremental : RetryStrategy
     public override ShouldRetry GetShouldRetry() =>
         delegate(int currentRetryCount, Exception lastException, out TimeSpan retryInterval)
         {
-            if (currentRetryCount < retryCount)
+            if (currentRetryCount < _retryCount)
             {
-                retryInterval = TimeSpan.FromMilliseconds(initialInterval.TotalMilliseconds +
-                                                          (increment.TotalMilliseconds * currentRetryCount));
+                retryInterval = TimeSpan.FromMilliseconds(_initialInterval.TotalMilliseconds +
+                                                          (_increment.TotalMilliseconds * currentRetryCount));
 
                 return true;
             }

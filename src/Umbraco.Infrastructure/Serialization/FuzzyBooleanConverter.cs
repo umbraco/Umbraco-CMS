@@ -11,8 +11,7 @@ public class FuzzyBooleanConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>
         throw new NotSupportedException();
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var value = reader.Value;
         if (value is bool)

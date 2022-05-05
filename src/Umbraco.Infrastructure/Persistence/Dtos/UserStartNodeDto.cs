@@ -31,11 +31,12 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
 
     [Column("startNodeType")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "startNodeType, startNode, userId",
-        Name = "IX_umbracoUserStartNode_startNodeType")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = "startNodeType, startNode, userId", Name = "IX_umbracoUserStartNode_startNodeType")]
     public int StartNodeType { get; set; }
 
     public static bool operator ==(UserStartNodeDto left, UserStartNodeDto right) => Equals(left, right);
+
+    public static bool operator !=(UserStartNodeDto left, UserStartNodeDto right) => !Equals(left, right);
 
     public bool Equals(UserStartNodeDto? other)
     {
@@ -73,6 +74,4 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     }
 
     public override int GetHashCode() => Id;
-
-    public static bool operator !=(UserStartNodeDto left, UserStartNodeDto right) => !Equals(left, right);
 }

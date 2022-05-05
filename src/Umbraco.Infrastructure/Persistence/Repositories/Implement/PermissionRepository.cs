@@ -25,8 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, ContentPermissionSet>
     where TEntity : class, IEntity
 {
-    public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<PermissionRepository<TEntity>> logger)
+    public PermissionRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<PermissionRepository<TEntity>> logger)
         : base(scopeAccessor, cache, logger)
     {
     }
@@ -338,8 +337,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 var perms = permission.Select(x => x.Permission).Distinct().ToArray();
 
                 // perms can contain null if there are no permissions assigned, but the node is chosen in the UI.
-                permissions.Add(new EntityPermission(permission.Key, np.Key,
-                    perms.WhereNotNull().ToArray()));
+                permissions.Add(new EntityPermission(permission.Key, np.Key, perms.WhereNotNull().ToArray()));
             }
         }
 

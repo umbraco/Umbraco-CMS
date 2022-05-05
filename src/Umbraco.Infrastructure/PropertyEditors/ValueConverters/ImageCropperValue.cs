@@ -131,19 +131,19 @@ public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValu
     /// </summary>
     /// <returns></returns>
     public bool HasFocalPoint()
-        => FocalPoint is ImageCropperFocalPoint focalPoint && (focalPoint.Left != 0.5m || focalPoint.Top != 0.5m);
+        => FocalPoint is not null && (FocalPoint.Left != 0.5m || FocalPoint.Top != 0.5m);
 
     /// <summary>
     ///     Determines whether the value has crops.
     /// </summary>
     public bool HasCrops()
-        => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any();
+        => Crops is not null && Crops.Any();
 
     /// <summary>
     ///     Determines whether the value has a specified crop.
     /// </summary>
     public bool HasCrop(string alias)
-        => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any(x => x.Alias == alias);
+        => Crops is not null && Crops.Any(x => x.Alias == alias);
 
     /// <summary>
     ///     Determines whether the value has a source image.
@@ -155,7 +155,7 @@ public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValu
     {
         List<ImageCropperCrop> crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
 
-        IEnumerable<ImageCropperCrop>? incomingCrops = imageCropperValue?.Crops;
+        IEnumerable<ImageCropperCrop>? incomingCrops = imageCropperValue.Crops;
         if (incomingCrops != null)
         {
             foreach (ImageCropperCrop incomingCrop in incomingCrops)
@@ -176,9 +176,9 @@ public class ImageCropperValue : IHtmlEncodedString, IEquatable<ImageCropperValu
 
         return new ImageCropperValue
         {
-            Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue?.Src,
+            Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue.Src,
             Crops = crops,
-            FocalPoint = FocalPoint ?? imageCropperValue?.FocalPoint
+            FocalPoint = FocalPoint ?? imageCropperValue.FocalPoint
         };
     }
 

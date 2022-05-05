@@ -20,8 +20,11 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-    public MultiUrlPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, IProfilingLogger proflog,
-        IJsonSerializer jsonSerializer, IUmbracoContextAccessor umbracoContextAccessor,
+    public MultiUrlPickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IProfilingLogger proflog,
+        IJsonSerializer jsonSerializer,
+        IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
@@ -46,11 +49,9 @@ public class MultiUrlPickerValueConverter : PropertyValueConverterBase
     public override bool? IsValue(object? value, PropertyValueLevel level) =>
         value is not null && value.ToString() != "[]";
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview) => source?.ToString()!;
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview) => source?.ToString()!;
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         using (_proflog.DebugDuration<MultiUrlPickerValueConverter>(
                    $"ConvertPropertyToLinks ({propertyType.DataType.Id})"))

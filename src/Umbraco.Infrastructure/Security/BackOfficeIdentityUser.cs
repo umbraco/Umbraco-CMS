@@ -67,8 +67,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
                 value = new int[0];
             }
 
-            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds),
-                SStartIdsComparer);
+            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), SStartIdsComparer);
         }
     }
 
@@ -85,8 +84,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
                 value = new int[0];
             }
 
-            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds),
-                SStartIdsComparer);
+            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds), SStartIdsComparer);
         }
     }
 
@@ -111,8 +109,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
     ///     Used to construct a new instance without an identity
     /// </summary>
     /// <param name="email">This is allowed to be null (but would need to be filled in if trying to persist this instance)</param>
-    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email,
-        string culture, string? name = null)
+    public static BackOfficeIdentityUser CreateNew(GlobalSettings globalSettings, string? username, string email, string culture, string? name = null)
     {
         if (string.IsNullOrWhiteSpace(username))
         {
@@ -145,7 +142,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
         // so they recalculate
         _allowedSections = null;
 
-        _groups = value.Where(x => x.Alias != null).ToArray();
+        _groups = value.ToArray();
 
         var roles = new List<IdentityUserRole<string>>();
         foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>

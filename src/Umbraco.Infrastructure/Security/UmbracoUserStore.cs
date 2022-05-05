@@ -29,8 +29,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// </summary>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public override Task AddClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     protected static int UserIdToInt(string? userId)
     {
@@ -53,8 +52,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// <summary>
     ///     Adds a user to a role (user group)
     /// </summary>
-    public override Task AddToRoleAsync(TUser user, string normalizedRoleName,
-        CancellationToken cancellationToken = default)
+    public override Task AddToRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -162,8 +160,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// <summary>
     ///     Returns true if a user is in the role
     /// </summary>
-    public override Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName,
-        CancellationToken cancellationToken = default)
+    public override Task<bool> IsInRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -180,14 +177,12 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// </summary>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public override Task RemoveClaimsAsync(TUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <summary>
     ///     Removes the role (user group) for the user
     /// </summary>
-    public override Task RemoveFromRoleAsync(TUser user, string normalizedRoleName,
-        CancellationToken cancellationToken = default)
+    public override Task RemoveFromRoleAsync(TUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -223,22 +218,18 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// </summary>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim,
-        CancellationToken cancellationToken = default) => throw new NotImplementedException();
+    public override Task ReplaceClaimAsync(TUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public override Task SetNormalizedEmailAsync(TUser user, string normalizedEmail,
-        CancellationToken cancellationToken)
+    public override Task SetNormalizedEmailAsync(TUser user, string normalizedEmail, CancellationToken cancellationToken)
         => SetEmailAsync(user, normalizedEmail, cancellationToken);
 
     /// <inheritdoc />
-    public override Task SetNormalizedUserNameAsync(TUser user, string normalizedName,
-        CancellationToken cancellationToken = default)
+    public override Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken = default)
         => SetUserNameAsync(user, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public override async Task SetPasswordHashAsync(TUser user, string passwordHash,
-        CancellationToken cancellationToken = default)
+    public override async Task SetPasswordHashAsync(TUser user, string passwordHash, CancellationToken cancellationToken = default)
     {
         await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
         user.LastPasswordChangeDateUtc = DateTime.UtcNow;
@@ -256,8 +247,7 @@ public abstract class UmbracoUserStore<TUser, TRole>
     /// </summary>
     /// <inheritdoc />
     [EditorBrowsable(EditorBrowsableState.Never)]
-    protected override Task<IdentityUserToken<string>> FindTokenAsync(TUser user, string loginProvider, string name,
-        CancellationToken cancellationToken) => throw new NotImplementedException();
+    protected override Task<IdentityUserToken<string>> FindTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     /// <summary>
     ///     Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync

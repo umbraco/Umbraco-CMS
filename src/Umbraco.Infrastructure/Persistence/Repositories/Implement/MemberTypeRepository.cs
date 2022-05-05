@@ -21,8 +21,12 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
 {
     private readonly IShortStringHelper _shortStringHelper;
 
-    public MemberTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberTypeRepository> logger,
-        IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository,
+    public MemberTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MemberTypeRepository> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper) =>
         _shortStringHelper = shortStringHelper;
@@ -32,8 +36,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MemberType;
 
     protected override IRepositoryCachePolicy<IMemberType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMemberType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached
@@ -41,22 +44,22 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     // every PerformGet/Exists just GetMany() and then filters
     // except PerformGetAll which is the one really doing the job
     protected override IMemberType? PerformGet(int id)
-        => GetMany()?.FirstOrDefault(x => x.Id == id);
+        => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IMemberType? PerformGet(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id);
+        => GetMany().FirstOrDefault(x => x.Key == id);
 
-    protected override IEnumerable<IMemberType>? PerformGetAll(params Guid[]? ids)
+    protected override IEnumerable<IMemberType> PerformGetAll(params Guid[]? ids)
     {
-        IEnumerable<IMemberType>? all = GetMany();
-        return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
+        IEnumerable<IMemberType> all = GetMany();
+        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
     }
 
     protected override bool PerformExists(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
+        => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
     protected override IMemberType? PerformGet(string alias)
-        => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
     protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IMemberType>();
@@ -204,16 +207,14 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     /// <param name="storageType"></param>
     /// <param name="propertyTypeAlias"></param>
     /// <returns></returns>
-    protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
-        string propertyTypeAlias)
+    protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
     {
         // custom property type constructor logic to set explicit dbtype's for built in properties
         Dictionary<string, PropertyType> builtinProperties =
             ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
         var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out PropertyType? propertyType);
         storageType = readonlyStorageType ? propertyType!.ValueStorageType : storageType;
-        return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType,
-            propertyTypeAlias);
+        return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
     }
 
     /// <summary>
@@ -230,8 +231,7 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
             if (builtinProperties.ContainsKey(propertyType.Alias))
             {
                 // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition) &&
-                    propDefinition != null)
+                if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
                 {
                     propertyType.DataTypeId = propDefinition.DataTypeId;
                     propertyType.DataTypeKey = propDefinition.DataTypeKey;

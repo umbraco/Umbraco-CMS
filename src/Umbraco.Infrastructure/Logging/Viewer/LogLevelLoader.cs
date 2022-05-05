@@ -30,7 +30,7 @@ public class LogLevelLoader : ILogLevelLoader
     public LogEventLevel? GetGlobalMinLogLevel()
     {
         LogEventLevel? logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(Log.IsEnabled)
-            .DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
+            .DefaultIfEmpty(LogEventLevel.Information).Min();
         return logLevel;
     }
 }

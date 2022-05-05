@@ -38,8 +38,7 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
         => PropertyCacheLevel.Element;
 
     /// <inheritdoc />
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -58,8 +57,7 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
         catch (Exception ex)
         {
             // cannot deserialize, assume it may be a raw image URL
-            _logger.LogError(ex, "Could not deserialize string '{JsonString}' into an image cropper value.",
-                sourceString);
+            _logger.LogError(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
             value = new ImageCropperValue { Src = sourceString };
         }
 

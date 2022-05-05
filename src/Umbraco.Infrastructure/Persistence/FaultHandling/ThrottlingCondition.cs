@@ -143,7 +143,7 @@ public class ThrottlingCondition
     ///     Maintains a collection of key-value pairs where a key is resource type and a value is the type of throttling
     ///     applied to the given resource type.
     /// </summary>
-    private readonly IList<Tuple<ThrottledResourceType, ThrottlingType>> throttledResources =
+    private readonly IList<Tuple<ThrottledResourceType, ThrottlingType>> _throttledResources =
         new List<Tuple<ThrottledResourceType, ThrottlingType>>(9);
 
     /// <summary>
@@ -154,7 +154,7 @@ public class ThrottlingCondition
         get
         {
             var unknownCondition = new ThrottlingCondition { ThrottlingMode = ThrottlingMode.Unknown };
-            unknownCondition.throttledResources.Add(Tuple.Create(
+            unknownCondition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.Unknown,
                 ThrottlingType.Unknown));
 
@@ -170,44 +170,44 @@ public class ThrottlingCondition
     /// <summary>
     ///     Gets a list of resources in SQL Azure that were subject to throttling conditions.
     /// </summary>
-    public IEnumerable<Tuple<ThrottledResourceType, ThrottlingType>> ThrottledResources => throttledResources;
+    public IEnumerable<Tuple<ThrottledResourceType, ThrottlingType>> ThrottledResources => _throttledResources;
 
     /// <summary>
     ///     Gets a value indicating whether physical data file space throttling was reported by SQL Azure.
     /// </summary>
     public bool IsThrottledOnDataSpace =>
-        throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalDatabaseSpace);
+        _throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalDatabaseSpace);
 
     /// <summary>
     ///     Gets a value indicating whether physical log space throttling was reported by SQL Azure.
     /// </summary>
-    public bool IsThrottledOnLogSpace => throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalLogSpace);
+    public bool IsThrottledOnLogSpace => _throttledResources.Any(x => x.Item1 == ThrottledResourceType.PhysicalLogSpace);
 
     /// <summary>
     ///     Gets a value indicating whether transaction activity throttling was reported by SQL Azure.
     /// </summary>
-    public bool IsThrottledOnLogWrite => throttledResources.Any(x => x.Item1 == ThrottledResourceType.LogWriteIoDelay);
+    public bool IsThrottledOnLogWrite => _throttledResources.Any(x => x.Item1 == ThrottledResourceType.LogWriteIoDelay);
 
     /// <summary>
     ///     Gets a value indicating whether data read activity throttling was reported by SQL Azure.
     /// </summary>
-    public bool IsThrottledOnDataRead => throttledResources.Any(x => x.Item1 == ThrottledResourceType.DataReadIoDelay);
+    public bool IsThrottledOnDataRead => _throttledResources.Any(x => x.Item1 == ThrottledResourceType.DataReadIoDelay);
 
     /// <summary>
     ///     Gets a value indicating whether CPU throttling was reported by SQL Azure.
     /// </summary>
-    public bool IsThrottledOnCpu => throttledResources.Any(x => x.Item1 == ThrottledResourceType.Cpu);
+    public bool IsThrottledOnCpu => _throttledResources.Any(x => x.Item1 == ThrottledResourceType.Cpu);
 
     /// <summary>
     ///     Gets a value indicating whether database size throttling was reported by SQL Azure.
     /// </summary>
-    public bool IsThrottledOnDatabaseSize => throttledResources.Any(x => x.Item1 == ThrottledResourceType.DatabaseSize);
+    public bool IsThrottledOnDatabaseSize => _throttledResources.Any(x => x.Item1 == ThrottledResourceType.DatabaseSize);
 
     /// <summary>
     ///     Gets a value indicating whether concurrent requests throttling was reported by SQL Azure.
     /// </summary>
     public bool IsThrottledOnWorkerThreads =>
-        throttledResources.Any(x => x.Item1 == ThrottledResourceType.WorkerThreads);
+        _throttledResources.Any(x => x.Item1 == ThrottledResourceType.WorkerThreads);
 
     /// <summary>
     ///     Gets a value indicating whether throttling conditions were not determined with certainty.
@@ -225,7 +225,7 @@ public class ThrottlingCondition
     ///     An instance of the object holding the decoded reason codes returned from SQL Azure upon encountering
     ///     throttling conditions.
     /// </returns>
-    public static ThrottlingCondition FromException(SqlException ex)
+    public static ThrottlingCondition FromException(SqlException? ex)
     {
         if (ex != null)
         {
@@ -252,14 +252,13 @@ public class ThrottlingCondition
     ///     An instance of the object holding the decoded reason codes returned from SQL Azure when encountering
     ///     throttling conditions.
     /// </returns>
-    public static ThrottlingCondition FromError(SqlError error)
+    public static ThrottlingCondition FromError(SqlError? error)
     {
         if (error != null)
         {
             Match match = SqlErrorCodeRegEx.Match(error.Message);
 
-            if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture,
-                    out int reasonCode))
+            if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int reasonCode))
             {
                 return FromReasonCode(reasonCode);
             }
@@ -292,31 +291,31 @@ public class ThrottlingCondition
             var groupCode = reasonCode >> 8;
 
             // Determine throttling type for all well-known resources that may be subject to throttling conditions.
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.PhysicalDatabaseSpace,
                 (ThrottlingType)(groupCode & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.PhysicalLogSpace,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.LogWriteIoDelay,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.DataReadIoDelay,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.Cpu,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.DatabaseSize,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.Internal,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.WorkerThreads,
                 (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition.throttledResources.Add(Tuple.Create(
+            condition._throttledResources.Add(Tuple.Create(
                 ThrottledResourceType.Internal,
                 (ThrottlingType)((groupCode >> 2) & 3)));
 
@@ -338,7 +337,7 @@ public class ThrottlingCondition
         result.AppendFormat(CultureInfo.CurrentCulture, "Mode: {0} | ", ThrottlingMode);
 
         var resources =
-            throttledResources
+            _throttledResources
                 .Where(x => x.Item1 != ThrottledResourceType.Internal)
                 .Select(x => string.Format(CultureInfo.CurrentCulture, "{0}: {1}", x.Item1, x.Item2))
                 .OrderBy(x => x).ToArray();

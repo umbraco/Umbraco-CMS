@@ -21,13 +21,12 @@ internal class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessE
     }
 
     protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected override PublicAccessEntry? PerformGet(Guid id) =>
 
         // return from GetAll - this will be cached as a collection
-        GetMany()?.FirstOrDefault(x => x.Key == id);
+        GetMany().FirstOrDefault(x => x.Key == id);
 
     protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)
     {

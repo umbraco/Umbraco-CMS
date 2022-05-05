@@ -45,7 +45,7 @@ public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackO
 
         // ensure our required claims are there
         id.AddRequiredClaims(
-            user.Id!,
+            user.Id,
             user.UserName,
             user.Name!,
             user.CalculatedContentStartNodeIds,

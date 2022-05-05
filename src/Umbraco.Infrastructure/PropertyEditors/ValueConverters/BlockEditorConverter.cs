@@ -45,8 +45,7 @@ public sealed class BlockEditorConverter
             Guid.TryParse(keyo!.ToString(), out key);
         }
 
-        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview,
-            referenceCacheLevel, _publishedSnapshotAccessor);
+        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
         element = _publishedModelFactory.CreateModel(element);
 
         return element;

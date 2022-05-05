@@ -13,9 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
-[InstallSetupStep(
-    InstallationType.Upgrade | InstallationType.NewInstall,
-    "DatabaseUpgrade", 12, "")]
+[InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
 public class DatabaseUpgradeStep : InstallSetupStep<object>
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;

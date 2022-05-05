@@ -20,9 +20,9 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
     }
 
     /// <inheritdoc />
-    public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
-        => Get(Query<IKeyValue>().Where(entity => entity.Identifier!.StartsWith(keyPrefix)))?
-            .ToDictionary(x => x.Identifier!, x => x.Value);
+    public IReadOnlyDictionary<string, string?> FindByKeyPrefix(string keyPrefix)
+        => Get(Query<IKeyValue>().Where(entity => entity.Identifier.StartsWith(keyPrefix)))
+            .ToDictionary(x => x.Identifier, x => x.Value);
 
     #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
 
@@ -97,7 +97,7 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
         }
     }
 
-    private static KeyValueDto? Map(IKeyValue keyValue)
+    private static KeyValueDto? Map(IKeyValue? keyValue)
     {
         if (keyValue == null)
         {
@@ -107,7 +107,7 @@ internal class KeyValueRepository : EntityRepositoryBase<string, IKeyValue>, IKe
         return new KeyValueDto { Key = keyValue.Identifier, Value = keyValue.Value, UpdateDate = keyValue.UpdateDate };
     }
 
-    private static IKeyValue? Map(KeyValueDto dto)
+    private static IKeyValue? Map(KeyValueDto? dto)
     {
         if (dto == null)
         {

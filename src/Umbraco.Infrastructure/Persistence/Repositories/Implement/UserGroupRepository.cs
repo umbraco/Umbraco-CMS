@@ -25,27 +25,23 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UserGroupWithUsersRepository _userGroupWithUsersRepository;
 
-    public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<UserGroupRepository> logger,
-        ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper)
+    public UserGroupRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<UserGroupRepository> logger, ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper)
         : base(scopeAccessor, appCaches, logger)
     {
         _shortStringHelper = shortStringHelper;
-        _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches,
-            loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
-        _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches,
-            loggerFactory.CreateLogger<PermissionRepository<IContent>>());
+        _userGroupWithUsersRepository = new UserGroupWithUsersRepository(this, scopeAccessor, appCaches, loggerFactory.CreateLogger<UserGroupWithUsersRepository>());
+        _permissionRepository = new PermissionRepository<IContent>(scopeAccessor, appCaches, loggerFactory.CreateLogger<PermissionRepository<IContent>>());
     }
 
     public IUserGroup? Get(string alias)
     {
         try
         {
-            //need to do a simple query to get the id - put this cache
+            // need to do a simple query to get the id - put this cache
             var id = IsolatedCache.GetCacheItem(GetByAliasCacheKey(alias), () =>
             {
                 var groupId =
-                    Database.ExecuteScalar<int?>("SELECT id FROM umbracoUserGroup WHERE userGroupAlias=@alias",
-                        new {alias});
+                    Database.ExecuteScalar<int?>("SELECT id FROM umbracoUserGroup WHERE userGroupAlias=@alias", new { alias });
                 if (groupId.HasValue == false)
                 {
                     throw new InvalidOperationException("No group found with alias " + alias);
@@ -54,31 +50,30 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return groupId.Value;
             });
 
-            //return from the normal method which will cache
+            // Return from the normal method which will cache
             return Get(id);
         }
         catch (InvalidOperationException)
         {
-            //if this is caught it's because we threw this in the caching method
+            // If this is caught it's because we threw this in the caching method
             return null;
         }
     }
 
     public IEnumerable<IUserGroup> GetGroupsAssignedToSection(string sectionAlias)
     {
-        //Here we're building up a query that looks like this, a sub query is required because the resulting structure
+        // Here we're building up a query that looks like this, a sub query is required because the resulting structure
         // needs to still contain all of the section rows per user group.
 
-        //SELECT *
-        //FROM [umbracoUserGroup]
-        //LEFT JOIN [umbracoUserGroup2App]
-        //ON [umbracoUserGroup].[id] = [umbracoUserGroup2App].[user]
-        //WHERE umbracoUserGroup.id IN (SELECT umbracoUserGroup.id
+        // SELECT *
+        // FROM [umbracoUserGroup]
+        // LEFT JOIN [umbracoUserGroup2App]
+        // ON [umbracoUserGroup].[id] = [umbracoUserGroup2App].[user]
+        // WHERE umbracoUserGroup.id IN (SELECT umbracoUserGroup.id
         //    FROM [umbracoUserGroup]
         //    LEFT JOIN [umbracoUserGroup2App]
         //    ON [umbracoUserGroup].[id] = [umbracoUserGroup2App].[user]
         //    WHERE umbracoUserGroup2App.app = 'content')
-
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many);
         Sql<ISqlContext> innerSql = GetBaseQuery(QueryType.Ids);
         innerSql.Where("umbracoUserGroup2App.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
@@ -90,7 +85,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds) =>
         _userGroupWithUsersRepository.Save(new UserGroupWithUsers(userGroup, userIds));
-
 
     /// <summary>
     ///     Gets explicitly defined permissions for the group for specified entities
@@ -109,8 +103,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     ///     explicitly assigned
     /// </param>
     /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-    public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[]? groups, bool fallbackToDefaultPermissions,
-        params int[] nodeIds)
+    public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[]? groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
     {
         if (groups == null)
         {
@@ -124,12 +117,12 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         // If requested, and no permissions are assigned to a particular node, then we will fill in those permissions with the group's defaults
         if (fallbackToDefaultPermissions)
         {
-            //if no node ids are passed in, then we need to determine the node ids for the explicit permissions set
+            // if no node ids are passed in, then we need to determine the node ids for the explicit permissions set
             nodeIds = nodeIds.Length == 0
                 ? explicitPermissions.Select(x => x.EntityId).Distinct().ToArray()
                 : nodeIds;
 
-            //if there are still no nodeids we can just exit
+            // if there are still no nodeids we can just exit
             if (nodeIds.Length == 0)
             {
                 return result;
@@ -142,10 +135,9 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                     // TODO: We could/should change the EntityPermissionsCollection into a KeyedCollection and they key could be
                     // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                     // going to be included in the result!
+                    var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions?.ToArray() ?? Array.Empty<string>(), true);
 
-                    var defaultPermission = new EntityPermission(group.Id, nodeId,
-                        group.Permissions?.ToArray() ?? Array.Empty<string>(), true);
-                    //Since this is a hashset, this will not add anything that already exists by group/node combination
+                    // Since this is a hashset, this will not add anything that already exists by group/node combination
                     result.Add(defaultPermission);
                 }
             }
@@ -175,7 +167,6 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     public void AssignGroupPermission(int groupId, char permission, params int[] entityIds) =>
         _permissionRepository.AssignPermission(groupId, permission, entityIds);
 
-
     public static string GetByAliasCacheKey(string alias) => CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
 
     /// <summary>
@@ -192,6 +183,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         public override bool HasIdentity => UserGroup.HasIdentity;
 
         public IUserGroup UserGroup { get; }
+
         public int[]? UserIds { get; }
     }
 
@@ -202,14 +194,13 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         private readonly UserGroupRepository _userGroupRepo;
 
-        public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor,
-            AppCaches cache, ILogger<UserGroupWithUsersRepository> logger)
+        public UserGroupWithUsersRepository(UserGroupRepository userGroupRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<UserGroupWithUsersRepository> logger)
             : base(scopeAccessor, cache, logger) =>
             _userGroupRepo = userGroupRepo;
 
         protected override void PersistNewItem(UserGroupWithUsers entity)
         {
-            //save the user group
+            // Save the user group
             _userGroupRepo.PersistNewItem(entity.UserGroup);
 
             if (entity.UserIds == null)
@@ -217,13 +208,13 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return;
             }
 
-            //now the user association
+            // Now the user association
             RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
         }
 
         protected override void PersistUpdatedItem(UserGroupWithUsers entity)
         {
-            //save the user group
+            // Save the user group
             _userGroupRepo.PersistUpdatedItem(entity.UserGroup);
 
             if (entity.UserIds == null)
@@ -231,7 +222,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return;
             }
 
-            //now the user association
+            // Now the user association
             RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
         }
 
@@ -251,7 +242,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         /// </summary>
         /// <param name="groupId">Id of group</param>
         private void RemoveAllUsersFromGroup(int groupId) =>
-            Database.Delete<User2UserGroupDto>("WHERE userGroupId = @groupId", new {groupId});
+            Database.Delete<User2UserGroupDto>("WHERE userGroupId = @groupId", new { groupId });
 
         /// <summary>
         ///     Adds a set of users to a group
@@ -262,7 +253,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         {
             foreach (var userId in userIds)
             {
-                var dto = new User2UserGroupDto {UserGroupId = groupId, UserId = userId};
+                var dto = new User2UserGroupDto { UserGroupId = groupId, UserId = userId };
                 Database.Insert(dto);
             }
         }
@@ -295,7 +286,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     protected override IUserGroup? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
 
         AppendGroupBy(sql);
         sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
@@ -368,8 +359,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             case QueryType.Single:
             case QueryType.Many:
                 sql
-                    .Select<UserGroupDto>(r =>
-                            r.Select(x => x.UserGroup2AppDtos),
+                    .Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos),
                         s => s.Append(
                             $", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
                 addFrom = true;
@@ -396,9 +386,16 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
     private static void AppendGroupBy(Sql<ISqlContext> sql) =>
         sql
-            .GroupBy<UserGroupDto>(x => x.CreateDate, x => x.Icon, x => x.Id, x => x.StartContentId,
+            .GroupBy<UserGroupDto>(x =>
+                    x.CreateDate,
+                x => x.Icon,
+                x => x.Id,
+                x => x.StartContentId,
                 x => x.StartMediaId,
-                x => x.UpdateDate, x => x.Alias, x => x.DefaultPermissions, x => x.Name)
+                x => x.UpdateDate,
+                x => x.Alias,
+                x => x.DefaultPermissions,
+                x => x.Name)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
@@ -448,12 +445,12 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         IUserGroup userGroup = entity;
 
         // First delete all
-        Database.Delete<UserGroup2AppDto>("WHERE UserGroupId = @UserGroupId", new {UserGroupId = userGroup.Id});
+        Database.Delete<UserGroup2AppDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
 
         // Then re-add any associated with the group
         foreach (var app in userGroup.AllowedSections)
         {
-            var dto = new UserGroup2AppDto {UserGroupId = userGroup.Id, AppAlias = app};
+            var dto = new UserGroup2AppDto { UserGroupId = userGroup.Id, AppAlias = app };
             Database.Insert(dto);
         }
     }

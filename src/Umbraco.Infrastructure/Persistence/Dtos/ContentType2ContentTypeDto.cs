@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal class ContentType2ContentTypeDto
 {
     [Column("parentContentTypeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentType2ContentType",
-        OnColumns = "parentContentTypeId, childContentTypeId")]
+    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentType2ContentType", OnColumns = "parentContentTypeId, childContentTypeId")]
     [ForeignKey(typeof(NodeDto), Name = "FK_cmsContentType2ContentType_umbracoNode_parent")]
     public int ParentId { get; set; }
 

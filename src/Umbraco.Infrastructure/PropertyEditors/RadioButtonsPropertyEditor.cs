@@ -30,8 +30,7 @@ public class RadioButtonsPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         ILocalizedTextService localizedTextService)
-        : this(dataValueEditorFactory, ioHelper, localizedTextService,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
         _ioHelper = ioHelper;
         _localizedTextService = localizedTextService;

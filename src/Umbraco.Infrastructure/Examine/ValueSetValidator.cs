@@ -53,6 +53,8 @@ public class ValueSetValidator : IValueSetValidator
     /// </remarks>
     public IEnumerable<string>? ExcludeFields { get; }
 
+    protected virtual IEnumerable<string>? ValidIndexCategories { get; }
+
     public virtual ValueSetValidationResult Validate(ValueSet valueSet)
     {
         if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
@@ -99,6 +101,4 @@ public class ValueSetValidator : IValueSetValidator
         return new ValueSetValidationResult(
             isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
     }
-
-    protected virtual IEnumerable<string>? ValidIndexCategories { get; }
 }

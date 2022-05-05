@@ -26,8 +26,7 @@ public class SliderPropertyEditor : DataEditor
     public SliderPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

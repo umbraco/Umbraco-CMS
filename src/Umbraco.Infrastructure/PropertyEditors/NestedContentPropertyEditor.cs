@@ -37,8 +37,7 @@ public class NestedContentPropertyEditor : DataEditor
     public NestedContentPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 
@@ -91,8 +90,7 @@ public class NestedContentPropertyEditor : DataEditor
             _dataTypeService = dataTypeService;
             _logger = logger;
             _nestedContentValues = new NestedContentValues(contentTypeService);
-            Validators.Add(new NestedContentValidator(propertyValidationService, _nestedContentValues,
-                contentTypeService));
+            Validators.Add(new NestedContentValidator(propertyValidationService, _nestedContentValues, contentTypeService));
         }
 
         /// <inheritdoc />
@@ -187,10 +185,7 @@ public class NestedContentPropertyEditor : DataEditor
                     {
                         // deal with weird situations by ignoring them (no comment)
                         row.RawPropertyValues.Remove(prop.Key);
-                        _logger.LogWarning(
-                            ex,
-                            "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                            prop.Key, row.Id, propertyType.Alias);
+                        _logger.LogWarning(ex, "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}", prop.Key, row.Id, propertyType.Alias);
                     }
                 }
             }
@@ -208,7 +203,6 @@ public class NestedContentPropertyEditor : DataEditor
         ///     Ensure that sub-editor values are translated through their ToEditor methods
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="dataTypeService"></param>
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
@@ -265,10 +259,7 @@ public class NestedContentPropertyEditor : DataEditor
                     {
                         // deal with weird situations by ignoring them (no comment)
                         row.RawPropertyValues.Remove(prop.Key);
-                        _logger.LogWarning(
-                            ex,
-                            "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                            prop.Key, row.Id, property.PropertyType.Alias);
+                        _logger.LogWarning(ex, "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}", prop.Key, row.Id, property.PropertyType.Alias);
                     }
                 }
             }
@@ -340,8 +331,7 @@ public class NestedContentPropertyEditor : DataEditor
         private readonly IContentTypeService _contentTypeService;
         private readonly NestedContentValues _nestedContentValues;
 
-        public NestedContentValidator(IPropertyValidationService propertyValidationService,
-            NestedContentValues nestedContentValues, IContentTypeService contentTypeService)
+        public NestedContentValidator(IPropertyValidationService propertyValidationService, NestedContentValues nestedContentValues, IContentTypeService contentTypeService)
             : base(propertyValidationService)
         {
             _nestedContentValues = nestedContentValues;
@@ -361,6 +351,7 @@ public class NestedContentPropertyEditor : DataEditor
             // need to validate that data for each property especially for things like 'required' data to work.
             // Lookup all element types for all content/settings and then we can populate any empty properties.
             var allElementAliases = rows.Select(x => x.ContentTypeAlias).ToList();
+
             // unfortunately we need to get all content types and post filter - but they are cached so its ok, there's
             // no overload to lookup by many aliases.
             var allElementTypes = _contentTypeService.GetAll().Where(x => allElementAliases.Contains(x.Alias))
@@ -381,7 +372,7 @@ public class NestedContentPropertyEditor : DataEditor
                         // set values to null
                         row.PropertyValues[elementTypeProp.Alias] = new NestedContentValues.NestedContentPropertyValue
                         {
-                            PropertyType = elementTypeProp, Value = null
+                            PropertyType = elementTypeProp, Value = null,
                         };
                         row.RawPropertyValues[elementTypeProp.Alias] = null;
                     }
@@ -458,8 +449,7 @@ public class NestedContentPropertyEditor : DataEditor
 
                 // get the prop types for this content type but keep a dictionary of found ones so we don't have to keep re-looking and re-creating
                 // objects on each iteration.
-                if (!contentTypePropertyTypes.TryGetValue(contentType.Alias,
-                        out Dictionary<string, IPropertyType>? propertyTypes))
+                if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out Dictionary<string, IPropertyType>? propertyTypes))
                 {
                     propertyTypes = contentTypePropertyTypes[contentType.Alias] =
                         contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
@@ -485,7 +475,8 @@ public class NestedContentPropertyEditor : DataEditor
                             // set the value to include the resolved property type
                             row.PropertyValues[prop.Key] = new NestedContentPropertyValue
                             {
-                                PropertyType = propType, Value = prop.Value
+                                PropertyType = propType,
+                                Value = prop.Value,
                             };
                         }
                     }
@@ -510,11 +501,14 @@ public class NestedContentPropertyEditor : DataEditor
         /// </summary>
         internal class NestedContentRowValue
         {
-            [JsonProperty("key")] public Guid Id { get; set; }
+            [JsonProperty("key")]
+            public Guid Id { get; set; }
 
-            [JsonProperty("name")] public string? Name { get; set; }
+            [JsonProperty("name")]
+            public string? Name { get; set; }
 
-            [JsonProperty("ncContentTypeAlias")] public string ContentTypeAlias { get; set; } = null!;
+            [JsonProperty("ncContentTypeAlias")]
+            public string ContentTypeAlias { get; set; } = null!;
 
             public IPropertyType? PropType { get; }
 

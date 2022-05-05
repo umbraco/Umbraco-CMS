@@ -32,8 +32,7 @@ public class PackageInstallation : IPackageInstallation
         return compiledPackage;
     }
 
-    public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId,
-        out PackageDefinition packageDefinition)
+    public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition)
     {
         packageDefinition = new PackageDefinition { Name = compiledPackage.Name };
 

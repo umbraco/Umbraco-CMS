@@ -1021,7 +1021,7 @@ public static class NPocoSqlExtensions
         /// <param name="tableAlias">The referenced Dto table alias.</param>
         /// <param name="reference">An optional expression representing a nested reference selection.</param>
         /// <returns>A SqlRef statement.</returns>
-        public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>> field, string? tableAlias,
+        public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, TRefDto>>? field, string? tableAlias,
             Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
         {
             PropertyInfo? property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;
@@ -1053,7 +1053,7 @@ public static class NPocoSqlExtensions
         /// <remarks>
         ///     <para>The referencing property has to be a <c>List{<typeparamref name="TRefDto" />}</c>.</para>
         /// </remarks>
-        public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>> field, string? tableAlias,
+        public SqlRef<TDto> Select<TRefDto>(Expression<Func<TDto, List<TRefDto>>>? field, string? tableAlias,
             Func<SqlRef<TRefDto>, SqlRef<TRefDto>>? reference = null)
         {
             PropertyInfo? property = field == null ? null : ExpressionHelper.FindProperty(field).Item1 as PropertyInfo;

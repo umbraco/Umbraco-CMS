@@ -46,7 +46,6 @@ public class SerilogLogger : IDisposable
         return new SerilogLogger(serilogConfig);
     }
 
-    /// <inheritdoc />
     public bool IsEnabled(Type reporting, LogLevel level)
         => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
@@ -80,14 +79,12 @@ public class SerilogLogger : IDisposable
         throw new NotSupportedException($"LogLevel \"{level}\" is not supported.");
     }
 
-    /// <inheritdoc />
     public void Fatal(Type reporting, Exception exception, string message)
     {
         ILogger logger = LoggerFor(reporting);
         logger.Fatal(exception, message);
     }
 
-    /// <inheritdoc />
     public void Fatal(Type reporting, Exception exception)
     {
         ILogger logger = LoggerFor(reporting);
@@ -95,28 +92,23 @@ public class SerilogLogger : IDisposable
         logger.Fatal(exception, message);
     }
 
-    /// <inheritdoc />
     public void Fatal(Type reporting, string message) => LoggerFor(reporting).Fatal(message);
 
-    /// <inheritdoc />
     public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Fatal(messageTemplate, propertyValues);
 
-    /// <inheritdoc />
     public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
     {
         ILogger logger = LoggerFor(reporting);
         logger.Fatal(exception, messageTemplate, propertyValues);
     }
 
-    /// <inheritdoc />
     public void Error(Type reporting, Exception exception, string message)
     {
         ILogger logger = LoggerFor(reporting);
         logger.Error(exception, message);
     }
 
-    /// <inheritdoc />
     public void Error(Type reporting, Exception exception)
     {
         ILogger logger = LoggerFor(reporting);
@@ -124,53 +116,40 @@ public class SerilogLogger : IDisposable
         logger.Error(exception, message);
     }
 
-    /// <inheritdoc />
     public void Error(Type reporting, string message) => LoggerFor(reporting).Error(message);
 
-    /// <inheritdoc />
     public void Error(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Error(messageTemplate, propertyValues);
 
-    /// <inheritdoc />
     public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
     {
         ILogger logger = LoggerFor(reporting);
         logger.Error(exception, messageTemplate, propertyValues);
     }
 
-    /// <inheritdoc />
     public void Warn(Type reporting, string message) => LoggerFor(reporting).Warning(message);
 
-    /// <inheritdoc />
     public void Warn(Type reporting, string message, params object[] propertyValues) =>
         LoggerFor(reporting).Warning(message, propertyValues);
 
-    /// <inheritdoc />
     public void Warn(Type reporting, Exception exception, string message) =>
         LoggerFor(reporting).Warning(exception, message);
 
-    /// <inheritdoc />
     public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Warning(exception, messageTemplate, propertyValues);
 
-    /// <inheritdoc />
     public void Info(Type reporting, string message) => LoggerFor(reporting).Information(message);
 
-    /// <inheritdoc />
     public void Info(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Information(messageTemplate, propertyValues);
 
-    /// <inheritdoc />
     public void Debug(Type reporting, string message) => LoggerFor(reporting).Debug(message);
 
-    /// <inheritdoc />
     public void Debug(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Debug(messageTemplate, propertyValues);
 
-    /// <inheritdoc />
     public void Verbose(Type reporting, string message) => LoggerFor(reporting).Verbose(message);
 
-    /// <inheritdoc />
     public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues) =>
         LoggerFor(reporting).Verbose(messageTemplate, propertyValues);
 }

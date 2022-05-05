@@ -24,8 +24,7 @@ public class NoTypeConverterJsonConverter<T> : JsonConverter
 
     public override bool CanConvert(Type objectType) => typeof(T).IsAssignableFrom(objectType);
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer) =>
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) =>
         JsonSerializer.CreateDefault(JsonSerializerSettings).Deserialize(reader, objectType);
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>

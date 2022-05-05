@@ -30,8 +30,7 @@ public class CheckBoxListPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         ILocalizedTextService textService,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, textService, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

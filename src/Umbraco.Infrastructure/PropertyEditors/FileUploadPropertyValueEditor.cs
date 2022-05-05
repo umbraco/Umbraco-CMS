@@ -92,7 +92,8 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
 
         ContentPropertyFile? file = uploads.Length > 0 ? uploads[0] : null;
 
-        if (file == null) // not uploading a file
+        // not uploading a file
+        if (file == null)
         {
             // if editorFile is empty then either there was nothing to begin with,
             // or it has been cleared and we need to remove the file - else the

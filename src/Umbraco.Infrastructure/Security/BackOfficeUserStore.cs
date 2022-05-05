@@ -326,8 +326,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash,
-        CancellationToken cancellationToken = default)
+    public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash, CancellationToken cancellationToken = default)
     {
         await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
 
@@ -336,8 +335,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    public override Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login,
-        CancellationToken cancellationToken = default)
+    public override Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -352,19 +350,15 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         }
 
         ICollection<IIdentityUserLogin> logins = user.Logins;
-        if (user.Id is not null)
-        {
-            var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id);
-            IdentityUserLogin userLogin = instance;
-            logins.Add(userLogin);
-        }
+        var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id);
+        IdentityUserLogin userLogin = instance;
+        logins.Add(userLogin);
 
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
-    public override Task RemoveLoginAsync(BackOfficeIdentityUser user, string loginProvider, string providerKey,
-        CancellationToken cancellationToken = default)
+    public override Task RemoveLoginAsync(BackOfficeIdentityUser user, string loginProvider, string providerKey, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -434,8 +428,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task SetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, string value,
-        CancellationToken cancellationToken)
+    public override Task SetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -460,8 +453,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider,
-        string providerKey, CancellationToken cancellationToken)
+    protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -490,8 +482,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override Task<IdentityUserLogin<string>> FindUserLoginAsync(string loginProvider, string providerKey,
-        CancellationToken cancellationToken)
+    protected override Task<IdentityUserLogin<string>> FindUserLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -527,8 +518,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     }
 
     /// <inheritdoc />
-    protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId,
-        CancellationToken cancellationToken)
+    protected override async Task<IdentityUserRole<string>> FindUserRoleAsync(string userId, string roleId, CancellationToken cancellationToken)
     {
         BackOfficeIdentityUser user = await FindUserAsync(userId, cancellationToken);
         if (user == null)
@@ -690,7 +680,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
             user.ClearGroups();
 
             // go lookup all these groups
-            IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles!)
+            IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles)
                 .Select(x => x.ToReadOnlyGroup()).ToArray();
 
             // use all of the ones assigned and add them
@@ -722,8 +712,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task RemoveTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name,
-        CancellationToken cancellationToken)
+    public override Task RemoveTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -752,8 +741,7 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
     ///     tracking ORMs like EFCore.
     /// </remarks>
     /// <inheritdoc />
-    public override Task<string?> GetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name,
-        CancellationToken cancellationToken)
+    public override Task<string?> GetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();

@@ -20,8 +20,7 @@ public class MessageTemplates : IMessageTemplates
         // resolve a minimal logger instance which is used to bind message templates
         ILogger logger = MinimalLogger.Value;
 
-        var bound = logger.BindMessageTemplate(messageTemplate, args, out MessageTemplate? parsedTemplate,
-            out IEnumerable<LogEventProperty>? boundProperties);
+        var bound = logger.BindMessageTemplate(messageTemplate, args, out MessageTemplate? parsedTemplate, out IEnumerable<LogEventProperty>? boundProperties);
 
         if (!bound)
         {

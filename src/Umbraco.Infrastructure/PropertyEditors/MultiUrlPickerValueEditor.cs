@@ -64,7 +64,8 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         {
             foreach (LinkDto link in links)
             {
-                if (link.Udi != null) // Links can be absolute links without a Udi
+                // Links can be absolute links without a Udi
+                if (link.Udi != null)
                 {
                     yield return new UmbracoEntityReference(link.Udi);
                 }

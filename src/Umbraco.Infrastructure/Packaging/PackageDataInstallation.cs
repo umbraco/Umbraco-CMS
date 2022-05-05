@@ -172,10 +172,6 @@ public class PackageDataInstallation
             if (script == null)
             {
                 var content = scriptXml.Value;
-                if (content == null)
-                {
-                    continue;
-                }
 
                 script = new Script(path!) { Content = content };
                 _fileService.SaveScript(script, userId);
@@ -204,7 +200,7 @@ public class PackageDataInstallation
             // only update if it doesn't exist
             if (partialView == null)
             {
-                var content = partialViewXml.Value ?? string.Empty;
+                var content = partialViewXml.Value;
 
                 partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                 _fileService.SavePartialView(partialView, userId);
@@ -245,7 +241,7 @@ public class PackageDataInstallation
             foreach (XElement prop in n.XPathSelectElements("Properties/Property"))
             {
                 var alias = prop.Element("Alias")!.Value;
-                IStylesheetProperty? sp = s.Properties?.SingleOrDefault(p => p != null && p.Alias == alias);
+                IStylesheetProperty? sp = s.Properties?.SingleOrDefault(p => p.Alias == alias);
                 var name = prop.Element("Name")!.Value;
                 if (sp == null)
                 {
@@ -288,19 +284,16 @@ public class PackageDataInstallation
             {
                 Warnings = compiledPackage.Warnings,
                 DataTypesInstalled =
-                    ImportDataTypes(compiledPackage.DataTypes.ToList(), userId,
-                        out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
+                    ImportDataTypes(compiledPackage.DataTypes.ToList(), userId, out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                 LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                 DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
                 MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
                 MacroPartialViewsInstalled = ImportMacroPartialViews(compiledPackage.MacroPartialViews, userId),
                 TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                 DocumentTypesInstalled =
-                    ImportDocumentTypes(compiledPackage.DocumentTypes, userId,
-                        out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
+                    ImportDocumentTypes(compiledPackage.DocumentTypes, userId, out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
                 MediaTypesInstalled =
-                    ImportMediaTypes(compiledPackage.MediaTypes, userId,
-                        out IEnumerable<EntityContainer> mediaTypeEntityContainersInstalled),
+                    ImportMediaTypes(compiledPackage.MediaTypes, userId, out IEnumerable<EntityContainer> mediaTypeEntityContainersInstalled),
                 StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId),
                 ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId),
                 PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId),
@@ -316,10 +309,8 @@ public class PackageDataInstallation
             var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
             var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
-            installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes,
-                userId, _contentTypeService, _contentService);
-            installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes,
-                userId, _mediaTypeService, _mediaService);
+            installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
+            installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
 
             scope.Complete();
 
@@ -346,10 +337,8 @@ public class PackageDataInstallation
     ///     those created in installing data types.
     /// </param>
     /// <returns>An enumerable list of generated ContentTypes</returns>
-    public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId,
-        out IEnumerable<EntityContainer> entityContainersInstalled)
-        => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService,
-            out entityContainersInstalled);
+    public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId, out IEnumerable<EntityContainer> entityContainersInstalled)
+        => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService, out entityContainersInstalled);
 
     #endregion
 
@@ -364,15 +353,22 @@ public class PackageDataInstallation
         where TContentBase : class, IContentBase
         where TContentTypeComposition : IContentTypeComposition
         => docs.SelectMany(x =>
-            ImportContentBase(x.XmlData.Elements().Where(doc => (string?)doc.Attribute("isDoc") == string.Empty), -1,
-                importedDocumentTypes, userId, typeService, service)).ToList();
+            ImportContentBase(x.XmlData.Elements().Where(doc => (string?)doc.Attribute("isDoc") == string.Empty),
+                -1,
+                importedDocumentTypes,
+                userId,
+                typeService,
+                service))
+            .ToList();
 
     /// <summary>
     ///     Imports and saves package xml as <see cref="IContent" />
     /// </summary>
-    /// <param name="packageDocument">Xml to import</param>
     /// <param name="parentId">Optional parent Id for the content being imported</param>
     /// <param name="importedDocumentTypes">A dictionary of already imported document types (basically used as a cache)</param>
+    /// <param name="roots">Roots of the xml doc</param>
+    /// <param name="typeService">ContentTypeBaseService</param>
+    /// <param name="service">The content service</param>
     /// <param name="userId">Optional Id of the user performing the import</param>
     /// <returns>An enumerable list of generated content</returns>
     public IEnumerable<TContentBase> ImportContentBase<TContentBase, TContentTypeComposition>(
@@ -444,8 +440,7 @@ public class PackageDataInstallation
                 importedContentTypes.Add(contentTypeAlias, contentType);
             }
 
-            if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId, service,
-                    out TContentBase content))
+            if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], null, parentId, service, out TContentBase content))
             {
                 contents.Add(content);
             }
@@ -484,8 +479,7 @@ public class PackageDataInstallation
             }
 
             // Create and add the child to the list
-            if (TryCreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service,
-                    out TContentBase content))
+            if (TryCreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service, out TContentBase content))
             {
                 list.Add(content);
             }
@@ -494,8 +488,7 @@ public class PackageDataInstallation
             var grandChildren = child.Elements().Where(x => (string?)x.Attribute("isDoc") == string.Empty).ToList();
             if (grandChildren.Any())
             {
-                list.AddRange(CreateContentFromXml(grandChildren, content, importedContentTypes, typeService,
-                    service));
+                list.AddRange(CreateContentFromXml(grandChildren, content, importedContentTypes, typeService, service));
             }
         }
 
@@ -509,7 +502,7 @@ public class PackageDataInstallation
         int parentId,
         IContentServiceBase<TContentBase> service,
         out TContentBase output)
-        where TContentBase : class?, IContentBase
+        where TContentBase : class, IContentBase
         where TContentTypeComposition : IContentTypeComposition
     {
         Guid key = element.RequiredAttributeValue<Guid>("key");
@@ -597,7 +590,7 @@ public class PackageDataInstallation
                 // Handle properties language attributes
                 var propertyLang = property.Attribute(XName.Get("lang"))?.Value ?? null;
                 foundLanguages.Add(propertyLang);
-                if (propTypes.TryGetValue(propertyTypeAlias, out IPropertyType? propertyType))
+                if (propTypes.TryGetValue(propertyTypeAlias, out _))
                 {
                     // set property value
                     // Skip unsupported language variation, otherwise we'll get a "not supported error"
@@ -623,9 +616,16 @@ public class PackageDataInstallation
         return true;
     }
 
-    private TContentBase? CreateContent<TContentBase, TContentTypeComposition>(string name, TContentBase? parent,
-        int parentId, TContentTypeComposition contentType, Guid key, int level, int sortOrder, int? templateId)
-        where TContentBase : class?, IContentBase
+    private TContentBase? CreateContent<TContentBase, TContentTypeComposition>(
+        string name,
+        TContentBase? parent,
+        int parentId,
+        TContentTypeComposition contentType,
+        Guid key,
+        int level,
+        int sortOrder,
+        int? templateId)
+        where TContentBase : class, IContentBase
         where TContentTypeComposition : IContentTypeComposition
     {
         switch (contentType)
@@ -688,10 +688,8 @@ public class PackageDataInstallation
     ///     those created in installing data types.
     /// </param>
     /// <returns>An enumerable list of generated ContentTypes</returns>
-    public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId,
-        out IEnumerable<EntityContainer> entityContainersInstalled)
-        => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService,
-            out entityContainersInstalled);
+    public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId, out IEnumerable<EntityContainer> entityContainersInstalled)
+        => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService, out entityContainersInstalled);
 
     /// <summary>
     ///     Imports and saves package xml as <see cref="IContentType" />
@@ -702,7 +700,9 @@ public class PackageDataInstallation
     /// <returns>An enumerable list of generated ContentTypes</returns>
     public IReadOnlyList<T> ImportDocumentTypes<T>(
         IReadOnlyCollection<XElement> unsortedDocumentTypes,
-        bool importStructure, int userId, IContentTypeBaseService<T> service)
+        bool importStructure,
+        int userId,
+        IContentTypeBaseService<T> service)
         where T : class, IContentTypeComposition
         => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, service);
 
@@ -719,7 +719,9 @@ public class PackageDataInstallation
     /// <returns>An enumerable list of generated ContentTypes</returns>
     public IReadOnlyList<T> ImportDocumentTypes<T>(
         IReadOnlyCollection<XElement> unsortedDocumentTypes,
-        bool importStructure, int userId, IContentTypeBaseService<T> service,
+        bool importStructure,
+        int userId,
+        IContentTypeBaseService<T> service,
         out IEnumerable<EntityContainer> entityContainersInstalled)
         where T : class, IContentTypeComposition
     {
@@ -763,8 +765,7 @@ public class PackageDataInstallation
                     }
                 }
 
-                graph.AddItem(TopoGraph.CreateNode(infoElement!.Element("Alias")!.Value, elementCopy,
-                    dependencies.ToArray()));
+                graph.AddItem(TopoGraph.CreateNode(infoElement!.Element("Alias")!.Value, elementCopy, dependencies.ToArray()));
             }
         }
 
@@ -782,9 +783,7 @@ public class PackageDataInstallation
             {
                 T? contentType = service.Get(alias);
 
-                importedContentTypes.Add(alias, contentType == null
-                    ? CreateContentTypeFromXml(documentType, importedContentTypes, service)
-                    : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service));
+                importedContentTypes.Add(alias, contentType == null ? CreateContentTypeFromXml(documentType, importedContentTypes, service) : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service));
             }
         }
 
@@ -819,8 +818,7 @@ public class PackageDataInstallation
                     continue;
                 }
 
-                T updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement,
-                    importedContentTypes, service);
+                T updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement, importedContentTypes, service);
                 updatedContentTypes.Add(updated);
             }
 
@@ -897,8 +895,7 @@ public class PackageDataInstallation
 
                     if (tryCreateFolder == false)
                     {
-                        _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}",
-                            rootFolder);
+                        _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                         throw tryCreateFolder.Exception!;
                     }
 
@@ -1443,7 +1440,7 @@ public class PackageDataInstallation
                 // however, the actual editor with this alias could be installed with the package, and
                 // therefore not yet part of the _propertyEditors collection, so we cannot try and get
                 // the actual editor - going with a void editor
-                var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
+                var editorAlias = dataTypeElement.Attribute("Id")?.Value.Trim();
                 if (!_propertyEditors.TryGet(editorAlias, out IDataEditor? editor))
                 {
                     editor = new VoidEditor(_dataValueEditorFactory) { Alias = editorAlias ?? string.Empty };
@@ -1592,7 +1589,7 @@ public class PackageDataInstallation
                 {
                     var folderName = WebUtility.UrlDecode(folders[i]);
                     Guid? folderKey = folderKeys.Length == folders.Length ? folderKeys[i] : null;
-                    current = CreateDataTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current!);
+                    current = CreateDataTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
                     trackEntityContainersInstalled.Add(current!);
                     importedFolders[name!] = current!.Id;
                 }
@@ -1735,7 +1732,7 @@ public class PackageDataInstallation
             // only update if it doesn't exist
             if (macroPartialView == null)
             {
-                var content = macroPartialViewXml.Value ?? string.Empty;
+                var content = macroPartialViewXml.Value;
 
                 macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) { Content = content };
                 _fileService.SavePartialViewMacro(macroPartialView, userId);

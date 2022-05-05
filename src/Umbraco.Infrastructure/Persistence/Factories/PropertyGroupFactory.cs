@@ -15,7 +15,7 @@ internal static class PropertyGroupFactory
             ContentTypeNodeId = contentTypeId,
             Text = propertyGroup.Name,
             Alias = propertyGroup.Alias,
-            SortOrder = propertyGroup.SortOrder
+            SortOrder = propertyGroup.SortOrder,
         };
 
         if (propertyGroup.HasIdentity)
@@ -45,7 +45,7 @@ internal static class PropertyGroupFactory
             ValidationRegExpMessage = propertyType.ValidationRegExpMessage,
             UniqueId = propertyType.Key,
             Variations = (byte)propertyType.Variations,
-            LabelOnTop = propertyType.LabelOnTop
+            LabelOnTop = propertyType.LabelOnTop,
         };
 
         if (groupId != default)
@@ -67,7 +67,8 @@ internal static class PropertyGroupFactory
 
     #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
-    public static IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos,
+    public static IEnumerable<PropertyGroup> BuildEntity(
+        IEnumerable<PropertyTypeGroupDto> groupDtos,
         bool isPublishing,
         int contentTypeId,
         DateTime createDate,
@@ -100,13 +101,14 @@ internal static class PropertyGroupFactory
 
                 group.PropertyTypes = new PropertyTypeCollection(isPublishing);
 
-                //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
+                // Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
                 IEnumerable<PropertyTypeDto> typeDtos = groupDto.PropertyTypeDtos?.Where(x => x.Id > 0) ??
                                                         Enumerable.Empty<PropertyTypeDto>();
                 foreach (PropertyTypeDto typeDto in typeDtos)
                 {
                     PropertyTypeGroupDto tempGroupDto = groupDto;
-                    PropertyType propertyType = propertyTypeCtor(typeDto.DataTypeDto.EditorAlias,
+                    PropertyType propertyType = propertyTypeCtor(
+                        typeDto.DataTypeDto.EditorAlias,
                         typeDto.DataTypeDto.DbType.EnumParse<ValueStorageType>(true),
                         typeDto.Alias);
 

@@ -2,8 +2,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 public class ColumnInfo
 {
-    public ColumnInfo(string tableName, string columnName, int ordinal, string columnDefault, string isNullable,
-        string dataType)
+    public ColumnInfo(string tableName, string columnName, int ordinal, string columnDefault, string isNullable, string dataType)
     {
         TableName = tableName;
         ColumnName = columnName;

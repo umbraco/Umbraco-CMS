@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Mapping;
+
 // notes:
 // AutoMapper maps null to empty arrays, lists, etc
 
@@ -40,7 +41,6 @@ public class UmbracoMapper : IUmbracoMapper
     //
     // the outer dictionary *can* be modified, see GetCtor and GetMap, hence have to be ConcurrentDictionary
     // the inner dictionaries are never modified and therefore can be simple Dictionary
-
     private readonly ConcurrentDictionary<Type, Dictionary<Type, Func<object, MapperContext, object>>> _ctors =
         new();
 
@@ -106,7 +106,8 @@ public class UmbracoMapper : IUmbracoMapper
     /// <typeparam name="TTarget">The target type.</typeparam>
     /// <param name="ctor">A constructor method.</param>
     /// <param name="map">A mapping method.</param>
-    public void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor,
+    public void Define<TSource, TTarget>(
+        Func<TSource, MapperContext, TTarget> ctor,
         Action<TSource, TTarget, MapperContext> map)
     {
         Type sourceType = typeof(TSource);
@@ -226,7 +227,6 @@ public class UmbracoMapper : IUmbracoMapper
         }
 
         // otherwise, see if we can deal with enumerable
-
         Type? ienumerableOfT = typeof(IEnumerable<>);
 
         bool IsIEnumerableOfT(Type? type)
@@ -272,8 +272,12 @@ public class UmbracoMapper : IUmbracoMapper
         throw new InvalidOperationException($"Don't know how to map {sourceType?.FullName} to {targetType.FullName}.");
     }
 
-    private TTarget? MapEnumerableInternal<TTarget>(IEnumerable source, Type targetGenericArg,
-        Func<object, MapperContext, object> ctor, Action<object, object, MapperContext> map, MapperContext context)
+    private TTarget? MapEnumerableInternal<TTarget>(
+        IEnumerable source,
+        Type targetGenericArg,
+        Func<object, MapperContext, object> ctor,
+        Action<object, object, MapperContext> map,
+        MapperContext context)
     {
         var targetList = (IList?)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
@@ -360,7 +364,6 @@ public class UmbracoMapper : IUmbracoMapper
         }
 
         // we cannot really map to an existing enumerable - give up
-
         throw new InvalidOperationException(
             $"Don't know how to map {typeof(TSource).FullName} to {typeof(TTarget).FullName}.");
     }
@@ -379,7 +382,6 @@ public class UmbracoMapper : IUmbracoMapper
         }
 
         // we *may* run this more than once but it does not matter
-
         ctor = null;
         foreach ((Type stype, Dictionary<Type, Func<object, MapperContext, object>> sctors) in _ctors)
         {
@@ -416,7 +418,6 @@ public class UmbracoMapper : IUmbracoMapper
             return v;
         });
 
-
         return ctor;
     }
 
@@ -434,7 +435,6 @@ public class UmbracoMapper : IUmbracoMapper
         }
 
         // we *may* run this more than once but it does not matter
-
         map = null;
         foreach ((Type stype, Dictionary<Type, Action<object, object, MapperContext>> smap) in _maps)
         {
@@ -528,7 +528,8 @@ public class UmbracoMapper : IUmbracoMapper
     /// <param name="source">The source objects.</param>
     /// <param name="f">A mapper context preparation method.</param>
     /// <returns>A list containing the target objects.</returns>
-    public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source,
+    public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(
+        IEnumerable<TSourceElement> source,
         Action<MapperContext> f)
     {
         var context = new MapperContext(this);
@@ -548,8 +549,7 @@ public class UmbracoMapper : IUmbracoMapper
     /// <param name="source">The source objects.</param>
     /// <param name="context">A mapper context.</param>
     /// <returns>A list containing the target objects.</returns>
-    public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source,
-        MapperContext context) =>
+    public List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source, MapperContext context) =>
         source
             .Select(x => Map<TSourceElement, TTargetElement>(x, context))
             .Where(x => x is not null)

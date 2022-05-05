@@ -30,8 +30,7 @@ public class BackOfficeJavaScriptInitializer
     /// <param name="globalSettings"></param>
     /// <param name="hostingEnvironment"></param>
     /// <returns></returns>
-    public static string GetJavascriptInitialization(IEnumerable<string> scripts, string angularModule,
-        GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
+    public static string GetJavascriptInitialization(IEnumerable<string> scripts, string angularModule, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
     {
         var jarray = new StringBuilder();
         jarray.AppendLine("[");

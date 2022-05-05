@@ -11,13 +11,11 @@ internal class ContentTypeAllowedContentTypeDto
 {
     [Column("Id")]
     [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType", Column = "nodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType",
-        OnColumns = "Id, AllowedId")]
+    [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_cmsContentTypeAllowedContentType", OnColumns = "Id, AllowedId")]
     public int Id { get; set; }
 
     [Column("AllowedId")]
-    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1",
-        Column = "nodeId")]
+    [ForeignKey(typeof(ContentTypeDto), Name = "FK_cmsContentTypeAllowedContentType_cmsContentType1", Column = "nodeId")]
     public int AllowedId { get; set; }
 
     [Column("SortOrder")]

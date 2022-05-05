@@ -17,7 +17,7 @@ internal class ContentBaseFactory
         NodeDto nodeDto = contentDto.NodeDto;
         DocumentVersionDto documentVersionDto = dto.DocumentVersionDto;
         ContentVersionDto contentVersionDto = documentVersionDto.ContentVersionDto;
-        DocumentVersionDto? publishedVersionDto = dto.PublishedVersionDto;
+        DocumentVersionDto publishedVersionDto = dto.PublishedVersionDto;
 
         var content = new Content(nodeDto.Text, nodeDto.ParentId, contentType);
 
@@ -47,13 +47,10 @@ internal class ContentBaseFactory
 
             // TODO: shall we get published infos or not?
             // if (dto.Published)
-            if (publishedVersionDto != null)
-            {
-                content.PublishedVersionId = publishedVersionDto.Id;
-                content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-                content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-            }
+            content.PublishedVersionId = publishedVersionDto.Id;
+            content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+            content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+            content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
 
             // templates = ignored, managed by the repository
 
@@ -176,7 +173,8 @@ internal class ContentBaseFactory
 
     public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(
         IContent entity,
-        ContentScheduleCollection contentSchedule, ILanguageRepository languageRepository) =>
+        ContentScheduleCollection contentSchedule,
+        ILanguageRepository languageRepository) =>
         contentSchedule.FullSchedule.Select(x =>
             (x,
                 new ContentScheduleDto
@@ -237,9 +235,7 @@ internal class ContentBaseFactory
     {
         var dto = new ContentDto
         {
-            NodeId = entity.Id,
-            ContentTypeId = entity.ContentTypeId,
-            NodeDto = BuildNodeDto(entity, objectType),
+            NodeId = entity.Id, ContentTypeId = entity.ContentTypeId, NodeDto = BuildNodeDto(entity, objectType),
         };
 
         return dto;
@@ -299,25 +295,21 @@ internal class ContentBaseFactory
         return dto;
     }
 
-    private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity,
-        ContentDto contentDto)
+    private static MediaVersionDto BuildMediaVersionDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity, ContentDto contentDto)
     {
         // try to get a path from the string being stored for media
         // TODO: only considering umbracoFile
         string? path = null;
 
         if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out IProperty? property)
-            && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(),
-                out var mediaPath))
+            && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))
         {
             path = mediaPath;
         }
 
         var dto = new MediaVersionDto
         {
-            Id = entity.VersionId,
-            Path = path,
-            ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+            Id = entity.VersionId, Path = path, ContentVersionDto = BuildContentVersionDto(entity, contentDto),
         };
 
         return dto;

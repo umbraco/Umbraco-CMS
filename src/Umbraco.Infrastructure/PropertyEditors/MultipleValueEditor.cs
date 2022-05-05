@@ -34,7 +34,6 @@ public class MultipleValueEditor : DataValueEditor
     ///     Override so that we can return an array to the editor for multi-select values
     /// </summary>
     /// <param name="property"></param>
-    /// <param name="dataTypeService"></param>
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>

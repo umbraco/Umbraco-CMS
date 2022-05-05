@@ -28,8 +28,7 @@ public class TextboxPropertyEditor : DataEditor
     public TextboxPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

@@ -4,7 +4,7 @@ namespace Umbraco.Extensions;
 
 internal static class InstanceIdentifiableExtensions
 {
-    public static string GetDebugInfo(this IInstanceIdentifiable instance)
+    public static string GetDebugInfo(this IInstanceIdentifiable? instance)
     {
         if (instance == null)
         {

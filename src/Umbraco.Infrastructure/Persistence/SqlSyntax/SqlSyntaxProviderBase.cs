@@ -177,8 +177,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         return "NVARCHAR";
     }
 
-    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string? referenceName = null, bool forInsert = false)
+    public virtual string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         tableName = GetQuotedTableName(tableName);
         columnName = GetQuotedColumnName(columnName);
@@ -213,8 +212,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
 
-    public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
-        [MaybeNullWhen(false)] out string constraintName);
+    public abstract bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
     public virtual string GetFieldNameForUpdate<TDto>(
         Expression<Func<TDto, object?>> fieldSelector,
@@ -224,9 +222,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public virtual Sql<ISqlContext> AppendForUpdateHint(Sql<ISqlContext> sql) => sql;
 
-    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
-        Sql<ISqlContext> sql,
-        Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
+    public abstract Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string? alias = null);
 
     public virtual bool DoesTableExist(IDatabase db, string tableName) => GetTablesInSchema(db).Contains(tableName);
 
@@ -269,8 +265,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
             : GetQuotedColumnName(index.ColumnName);
 
-        return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
-            GetQuotedTableName(index.TableName), columns);
+        return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name), GetQuotedTableName(index.TableName), columns);
     }
 
     public virtual List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys) =>
@@ -409,8 +404,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public abstract Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 
-    public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
-        bool skipKeysAndIndexes = false);
+    public abstract void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false);
 
     public virtual string CreateTable => "CREATE TABLE {0} ({1})";
 
@@ -563,7 +557,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
             return string.Format(DecimalColumnDefinitionFormat, precision, scale);
         }
 
-        var definition = DbTypeMap.ColumnTypeMap[type!];
+        var definition = DbTypeMap.ColumnTypeMap[type];
         var dbTypeDefinition = column.Size != default
             ? $"{definition}({column.Size})"
             : definition;

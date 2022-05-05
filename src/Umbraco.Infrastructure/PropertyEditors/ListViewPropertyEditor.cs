@@ -28,8 +28,7 @@ public class ListViewPropertyEditor : DataEditor
     public ListViewPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper iioHelper)
-        : this(dataValueEditorFactory, iioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, iioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

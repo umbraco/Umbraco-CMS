@@ -90,8 +90,7 @@ public interface ISqlSyntaxProvider
 
     string GetConcat(params string[] args);
 
-    string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string? referenceName = null, bool forInsert = false);
+    string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false);
 
     string GetQuotedTableName(string? tableName);
 
@@ -187,8 +186,7 @@ public interface ISqlSyntaxProvider
     ///         unspecified.
     ///     </para>
     /// </remarks>
-    bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
-        [MaybeNullWhen(false)] out string constraintName);
+    bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName);
 
     string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null);
 

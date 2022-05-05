@@ -22,8 +22,7 @@ public abstract class JsonReadConverter<T> : JsonConverter
     protected abstract T Create(Type objectType, string path, JObject jObject);
 
     /// <inheritdoc />
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         // Load JObject from stream
         var jObject = JObject.Load(reader);

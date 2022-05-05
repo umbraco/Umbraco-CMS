@@ -301,7 +301,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         {
             if (disposing)
             {
-                _syncIdle?.Dispose();
+                _syncIdle.Dispose();
             }
 
             _disposedValue = true;

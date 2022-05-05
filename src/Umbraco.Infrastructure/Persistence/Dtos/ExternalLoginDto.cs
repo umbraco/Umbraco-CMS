@@ -31,8 +31,7 @@ internal class ExternalLoginDto
     [Column("loginProvider")]
     [Length(400)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey",
-        Name = "IX_" + TableName + "_LoginProvider")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userOrMemberKey", Name = "IX_" + TableName + "_LoginProvider")]
     public string LoginProvider { get; set; } = null!;
 
     /// <summary>
@@ -41,8 +40,7 @@ internal class ExternalLoginDto
     [Column("providerKey")]
     [Length(4000)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey",
-        Name = "IX_" + TableName + "_ProviderKey")]
+    [Index(IndexTypes.NonClustered, ForColumns = "loginProvider,providerKey", Name = "IX_" + TableName + "_ProviderKey")]
     public string ProviderKey { get; set; } = null!;
 
     [Column("createDate")]

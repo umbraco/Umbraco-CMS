@@ -115,7 +115,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
             _memberService.AssignRoles(
                 new[] { memberEntity.Id },
-                user.Roles.Select(x => x.RoleId).Where(x => x is not null).ToArray()!);
+                user.Roles.Select(x => x.RoleId).Where(x => x is not null).ToArray());
 
             if (!memberEntity.HasIdentity)
             {
@@ -272,7 +272,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return Task.FromResult(result);
     }
 
-    public IPublishedContent? GetPublishedMember(MemberIdentityUser user)
+    public IPublishedContent? GetPublishedMember(MemberIdentityUser? user)
     {
         if (user == null)
         {

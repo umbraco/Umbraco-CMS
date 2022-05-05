@@ -103,8 +103,7 @@ public class RetryPolicy
     ///     The time value that will be used for calculating a random delta in the exponential delay
     ///     between retries.
     /// </param>
-    public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan minBackoff,
-        TimeSpan maxBackoff, TimeSpan deltaBackoff)
+    public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan minBackoff, TimeSpan maxBackoff, TimeSpan deltaBackoff)
         : this(errorDetectionStrategy, new ExponentialBackoff(retryCount, minBackoff, maxBackoff, deltaBackoff))
     {
     }
@@ -123,8 +122,7 @@ public class RetryPolicy
     ///     The incremental time value that will be used for calculating the progressive delay between
     ///     retries.
     /// </param>
-    public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount,
-        TimeSpan initialInterval, TimeSpan increment)
+    public RetryPolicy(ITransientErrorDetectionStrategy errorDetectionStrategy, int retryCount, TimeSpan initialInterval, TimeSpan increment)
         : this(errorDetectionStrategy, new Incremental(retryCount, initialInterval, increment))
     {
     }

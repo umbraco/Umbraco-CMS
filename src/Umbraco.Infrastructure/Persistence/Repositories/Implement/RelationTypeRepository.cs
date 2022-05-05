@@ -25,8 +25,7 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     }
 
     protected override IRepositoryCachePolicy<IRelationType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IRelationType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 
     private void CheckNullObjectTypeValues(IRelationType entity)
     {
@@ -44,12 +43,14 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     #region Overrides of RepositoryBase<int,RelationType>
 
     protected override IRelationType? PerformGet(int id) =>
+
         // use the underlying GetAll which will force cache all content types
-        GetMany()?.FirstOrDefault(x => x.Id == id);
+        GetMany().FirstOrDefault(x => x.Id == id);
 
     public IRelationType? Get(Guid id) =>
+
         // use the underlying GetAll which will force cache all content types
-        GetMany()?.FirstOrDefault(x => x.Key == id);
+        GetMany().FirstOrDefault(x => x.Key == id);
 
     public bool Exists(Guid id) => Get(id) != null;
 
@@ -118,7 +119,7 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     {
         var list = new List<string>
         {
-            "DELETE FROM umbracoRelation WHERE relType = @id", "DELETE FROM umbracoRelationType WHERE id = @id"
+            "DELETE FROM umbracoRelation WHERE relType = @id", "DELETE FROM umbracoRelationType WHERE id = @id",
         };
         return list;
     }

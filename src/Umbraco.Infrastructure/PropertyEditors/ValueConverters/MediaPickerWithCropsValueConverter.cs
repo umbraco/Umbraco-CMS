@@ -51,8 +51,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
         PropertyCacheLevel.Snapshot;
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
         if (string.IsNullOrEmpty(inter?.ToString()))
@@ -82,8 +81,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
 
                 // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                 Type mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
-                var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem,
-                    _publishedValueFallback, localCrops)!;
+                var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, _publishedValueFallback, localCrops)!;
 
                 mediaItems.Add(mediaWithCrops);
 

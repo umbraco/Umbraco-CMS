@@ -27,8 +27,7 @@ public class ColorPickerPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         IJsonSerializer jsonSerializer)
-        : this(dataValueEditorFactory, ioHelper, jsonSerializer,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

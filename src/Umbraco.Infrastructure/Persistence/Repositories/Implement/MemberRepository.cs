@@ -131,16 +131,11 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
                 throw new ArgumentOutOfRangeException(nameof(matchType));
         }
 
-        IMember[]? matchedMembers = Get(query)?.ToArray();
+        IMember[] matchedMembers = Get(query).ToArray();
 
         var membersInGroup = new List<IMember>();
 
-        if (matchedMembers is null)
-        {
-            return membersInGroup;
-        }
-
-        //then we need to filter the matched members that are in the role
+        // Then we need to filter the matched members that are in the role
         foreach (IEnumerable<int> group in matchedMembers.Select(x => x.Id)
                      .InGroupsOf(Constants.Sql.MaxParameterCount))
         {

@@ -32,8 +32,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         IServiceProvider services,
         ILogger<UserManager<TUser>> logger,
         IOptions<TPasswordConfig> passwordConfiguration)
-        : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(),
-            errors, services, logger)
+        : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
     {
         IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
         PasswordConfiguration =
@@ -125,8 +124,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
         if (!isValid)
         {
-            Logger.LogWarning(14, "Password validation failed: {errors}.",
-                string.Join(";", errors.Select(e => e.Code)));
+            Logger.LogWarning(14, "Password validation failed: {errors}.", string.Join(";", errors.Select(e => e.Code)));
             return IdentityResult.Failed(errors.ToArray());
         }
 
@@ -160,8 +158,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
     ///     is to generate a token and reset it, however, when we do this we want to track a password change, not a password
     ///     reset
     /// </remarks>
-    public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token,
-        string? newPassword)
+    public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
     {
         TUser user = await FindByIdAsync(userId);
         if (user == null)
@@ -236,9 +233,7 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
 
         if (count >= Options.Lockout.MaxFailedAccessAttempts)
         {
-            await lockoutStore.SetLockoutEndDateAsync(
-                user,
-                DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan), CancellationToken.None);
+            await lockoutStore.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.Add(Options.Lockout.DefaultLockoutTimeSpan), CancellationToken.None);
 
             // NOTE: in normal aspnet identity this would do set the number of failed attempts back to 0
             // here we are persisting the value for the back office
@@ -254,7 +249,6 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return result;
     }
 
-    /// <inheritdoc />
     public async Task<bool> ValidateCredentialsAsync(string username, string password)
     {
         TUser user = await FindByNameAsync(username);
@@ -274,7 +268,6 @@ public abstract class UmbracoUserManager<TUser, TPasswordConfig> : UserManager<T
         return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
     }
 
-    /// <inheritdoc />
     public virtual async Task<IList<string>> GetValidTwoFactorProvidersAsync(TUser user)
     {
         IList<string>? results = await base.GetValidTwoFactorProvidersAsync(user);

@@ -142,14 +142,14 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         _umbracoDatabase.Execute(query);
     }
 
-    public bool SavePackage(PackageDefinition definition)
+    public bool SavePackage(PackageDefinition? definition)
     {
         if (definition == null)
         {
             throw new NullReferenceException("PackageDefinition cannot be null when saving");
         }
 
-        if (definition.Name == null || string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
+        if (string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
         {
             return false;
         }
@@ -214,8 +214,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             PackageTemplates(definition, root);
             PackageStylesheets(definition, root);
             PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem!);
-            PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View",
-                _fileSystems.PartialViewsFileSystem!);
+            PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem!);
             PackageMacros(definition, root);
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
@@ -408,8 +407,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                     if (processed.ContainsKey(dictionaryItem.ParentId.Value))
                     {
                         // we've processed this parent element already so we can just append this xml child to it
-                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key,
-                            serializedDictionaryValue);
+                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
                     }
                     else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                     {
@@ -420,8 +418,7 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                     {
                         // in this case, the parent of this item doesn't exist in our collection, we have no
                         // choice but to add it to the root.
-                        AppendDictionaryElement(rootDictionaryItems, items, processed, key,
-                            serializedDictionaryValue);
+                        AppendDictionaryElement(rootDictionaryItems, items, processed, key, serializedDictionaryValue);
                     }
                 }
             }
@@ -432,7 +429,9 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
         static void AppendDictionaryElement(
             XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
-            Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
+            Dictionary<Guid, XElement> processed,
+            Guid key,
+            XElement serializedDictionaryValue)
         {
             // track it
             processed.Add(key, serializedDictionaryValue);
@@ -516,18 +515,16 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 throw new InvalidOperationException("No file found with path " + file);
             }
 
-            using Stream? stream = fileSystem.OpenFile(file);
-            if (stream is not null)
+            using Stream stream = fileSystem.OpenFile(file);
+
+            using (var reader = new StreamReader(stream))
             {
-                using (var reader = new StreamReader(stream))
-                {
-                    var fileContents = reader.ReadToEnd();
-                    scriptsXml.Add(
-                        new XElement(
-                            elementName,
-                            new XAttribute("path", file),
-                            new XCData(fileContents)));
-                }
+                var fileContents = reader.ReadToEnd();
+                scriptsXml.Add(
+                    new XElement(
+                        elementName,
+                        new XAttribute("path", file),
+                        new XCData(fileContents)));
             }
         }
 
@@ -616,8 +613,10 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
         // Documents and tags
         if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
-            definition.ContentNodeId,
-            NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
+                definition.ContentNodeId,
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out var contentNodeId))
         {
             if (contentNodeId > 0)
             {
@@ -652,14 +651,11 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             // get the media file path and store that separately in the XML.
             // the media file path is different from the URL and is specifically
             // extracted using the property editor for this media file and the current media file system.
-            Stream? mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
-            if (mediaStream != null)
-            {
-                xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath!));
+            Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
+            xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath!));
 
-                // add the stream to our outgoing stream
-                mediaStreams.Add(mediaFilePath!, mediaStream);
-            }
+            // add the stream to our outgoing stream
+            mediaStreams.Add(mediaFilePath!, mediaStream);
         }
 
         IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);

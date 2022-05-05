@@ -78,8 +78,7 @@ public abstract class RetryStrategy
     ///     <see cref="RetryStrategy.DefaultMaxBackoff" /> and <see cref="RetryStrategy.DefaultClientBackoff" /> parameters.
     ///     The default retry policy treats all caught exceptions as transient errors.
     /// </summary>
-    public static readonly RetryStrategy DefaultExponential = new ExponentialBackoff(DefaultClientRetryCount,
-        DefaultMinBackoff, DefaultMaxBackoff, DefaultClientBackoff);
+    public static readonly RetryStrategy DefaultExponential = new ExponentialBackoff(DefaultClientRetryCount, DefaultMinBackoff, DefaultMaxBackoff, DefaultClientBackoff);
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RetryStrategy" /> class.

@@ -123,7 +123,7 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         }
 
         admin.Email = user.Email.Trim();
-        admin.Name = user.Name!.Trim();
+        admin.Name = user.Name.Trim();
         admin.Username = user.Email.Trim();
 
         _userService.Save(admin);

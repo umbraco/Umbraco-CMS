@@ -71,7 +71,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         };
 
         IEnumerable<IEnumerable<IDictionaryItem>> childItems = parentId.HasValue == false
-            ? new[] { GetRootDictionaryItems()! }
+            ? new[] { GetRootDictionaryItems() }
             : getItemsFromParents(new[] { parentId.Value });
 
         return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray()))
@@ -127,7 +127,7 @@ internal class DictionaryRepository : EntityRepositoryBase<int, IDictionaryItem>
         return entity;
     }
 
-    private IEnumerable<IDictionaryItem>? GetRootDictionaryItems()
+    private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
     {
         IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
         return Get(query);

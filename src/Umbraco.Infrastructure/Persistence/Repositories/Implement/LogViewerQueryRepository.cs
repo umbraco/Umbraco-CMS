@@ -14,8 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQuery>, ILogViewerQueryRepository
 {
-    public LogViewerQueryRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<LogViewerQueryRepository> logger)
+    public LogViewerQueryRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LogViewerQueryRepository> logger)
         : base(scopeAccessor, cache, logger)
     {
     }
@@ -23,11 +22,10 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
     public ILogViewerQuery? GetByName(string name) =>
 
         // use the underlying GetAll which will force cache all log queries
-        GetMany()?.FirstOrDefault(x => x.Name == name);
+        GetMany().FirstOrDefault(x => x.Name == name);
 
     protected override IRepositoryCachePolicy<ILogViewerQuery, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<ILogViewerQuery, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[]? ids)
     {
@@ -101,7 +99,7 @@ internal class LogViewerQueryRepository : EntityRepositoryBase<int, ILogViewerQu
     protected override ILogViewerQuery? PerformGet(int id) =>
 
         // use the underlying GetAll which will force cache all log queries
-        GetMany()?.FirstOrDefault(x => x.Id == id);
+        GetMany().FirstOrDefault(x => x.Id == id);
 
     private ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)
     {

@@ -22,8 +22,7 @@ internal class TwoFactorLoginDto
     [Column("providerName")]
     [Length(400)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, ForColumns = "providerName,userOrMemberKey",
-        Name = "IX_" + TableName + "_ProviderName")]
+    [Index(IndexTypes.UniqueNonClustered, ForColumns = "providerName,userOrMemberKey", Name = "IX_" + TableName + "_ProviderName")]
     public string ProviderName { get; set; } = null!;
 
     [Column("secret")]

@@ -20,8 +20,7 @@ public class AutoInterningStringConverter : JsonConverter
         // CanConvert is not called when a converter is applied directly to a property.
         new NotImplementedException($"{nameof(AutoInterningStringConverter)} should not be used globally");
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         if (reader.TokenType == JsonToken.Null)
         {

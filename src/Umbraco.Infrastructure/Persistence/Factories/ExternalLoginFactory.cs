@@ -8,8 +8,7 @@ internal static class ExternalLoginFactory
 {
     public static IIdentityUserToken BuildEntity(ExternalLoginTokenDto dto)
     {
-        var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value,
-            dto.ExternalLoginDto.UserOrMemberKey.ToString(), dto.CreateDate);
+        var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserOrMemberKey.ToString(), dto.CreateDate);
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);

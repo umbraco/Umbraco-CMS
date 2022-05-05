@@ -31,14 +31,12 @@ internal class NotFoundHandlerHelper
 
             if (cultureErr != null)
             {
-                return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery,
-                    domainContentId);
+                return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery, domainContentId);
             }
         }
         else if (error404Collection.Length == 1)
         {
-            return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery,
-                domainContentId);
+            return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery, domainContentId);
         }
 
         return null;
@@ -97,8 +95,7 @@ internal class NotFoundHandlerHelper
             }
             catch (Exception ex)
             {
-                StaticApplicationLogging.Logger.LogError(ex, "Could not parse xpath expression: {ContentXPath}",
-                    errorPage.ContentXPath);
+                StaticApplicationLogging.Logger.LogError(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
                 return null;
             }
         }

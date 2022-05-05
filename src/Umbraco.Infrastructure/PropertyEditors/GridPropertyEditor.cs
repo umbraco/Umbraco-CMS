@@ -167,8 +167,17 @@ public class GridPropertyEditor : DataEditor
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper)
-            : this(dataValueEditorFactory, attribute, backOfficeSecurityAccessor, localizedTextService,
-                imageSourceParser, pastedImages, shortStringHelper, imageUrlGenerator, jsonSerializer, ioHelper,
+            : this(
+                dataValueEditorFactory,
+                attribute,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                imageSourceParser,
+                pastedImages,
+                shortStringHelper,
+                imageUrlGenerator,
+                jsonSerializer,
+                ioHelper,
                 StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
         {
         }
@@ -187,9 +196,7 @@ public class GridPropertyEditor : DataEditor
                 yield break;
             }
 
-            DeserializeGridValue(rawJson!, out IEnumerable<GridValue.GridControl>? richTextEditorValues,
-                out IEnumerable<GridValue.GridControl>? mediaValues,
-                out IEnumerable<GridValue.GridControl>? macroValues);
+            DeserializeGridValue(rawJson!, out IEnumerable<GridValue.GridControl>? richTextEditorValues, out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl>? macroValues);
 
             if (richTextEditorValues is not null)
             {
@@ -248,7 +255,7 @@ public class GridPropertyEditor : DataEditor
             GridValue? grid =
                 DeserializeGridValue(rawJson!, out IEnumerable<GridValue.GridControl>? rtes, out _, out _);
 
-            var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ??
+            var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ??
                          Constants.Security.SuperUserId;
 
             if (rtes is null)
@@ -260,16 +267,13 @@ public class GridPropertyEditor : DataEditor
             foreach (GridValue.GridControl rte in rtes)
             {
                 // Parse the HTML
-                var html = rte.Value?.ToString();
+                var html = rte.Value.ToString();
 
-                if (html is not null)
-                {
-                    var parseAndSavedTempImages =
-                        _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId, _imageUrlGenerator);
-                    var editorValueWithMediaUrlsRemoved =
-                        _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
-                    rte.Value = editorValueWithMediaUrlsRemoved;
-                }
+                var parseAndSavedTempImages =
+                    _pastedImages.FindAndPersistPastedTempImages(html, mediaParentId, userId, _imageUrlGenerator);
+                var editorValueWithMediaUrlsRemoved =
+                    _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
+                rte.Value = editorValueWithMediaUrlsRemoved;
             }
 
             // Convert back to raw JSON for persisting
@@ -302,20 +306,19 @@ public class GridPropertyEditor : DataEditor
             // process the rte values
             foreach (GridValue.GridControl rte in rtes.ToList())
             {
-                var html = rte.Value?.ToString();
-
-                if (html is not null)
-                {
-                    var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(html);
-                    rte.Value = propertyValueWithMediaResolved;
-                }
+                var html = rte.Value.ToString();
+                var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(html);
+                rte.Value = propertyValueWithMediaResolved;
             }
 
             return grid;
         }
 
-        private GridValue? DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl>? richTextValues,
-            out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl>? macroValues)
+        private GridValue? DeserializeGridValue(
+            string rawJson,
+            out IEnumerable<GridValue.GridControl>? richTextValues,
+            out IEnumerable<GridValue.GridControl>? mediaValues,
+            out IEnumerable<GridValue.GridControl>? macroValues)
         {
             GridValue? grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 

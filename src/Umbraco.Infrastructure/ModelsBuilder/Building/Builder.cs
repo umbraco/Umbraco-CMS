@@ -21,7 +21,7 @@ public abstract class Builder
     ///     the result of code parsing, and a models namespace.
     /// </summary>
     /// <param name="typeModels">The list of models to generate.</param>
-    /// <param name="modelsNamespace">The models namespace.</param>
+    /// <param name="config">Configuration for modelsbuilder settings</param>
     protected Builder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
     {
         TypeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));

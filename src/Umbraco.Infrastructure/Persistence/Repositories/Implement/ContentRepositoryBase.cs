@@ -39,16 +39,6 @@ public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityR
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
     private readonly IEventAggregator _eventAggregator;
 
-    /// <summary>
-    /// </summary>
-    /// <param name="scopeAccessor"></param>
-    /// <param name="cache"></param>
-    /// <param name="logger"></param>
-    /// <param name="languageRepository"></param>
-    /// <param name="propertyEditors">
-    ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors
-    ///     require services, yet these services require property editors
-    /// </param>
     protected ContentRepositoryBase(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -711,13 +701,12 @@ public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityR
                 .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
             .ToDictionary(x => x.UniqueId, x => x.NodeId);
 
-        var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
+        var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())
             .ToDictionary(x => x.Alias, x => x);
 
         IEnumerable<ReadOnlyRelation> toSave = trackedRelations.Select(rel =>
         {
-            if (allRelationTypes is null ||
-                !allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
+            if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
             {
                 throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
             }

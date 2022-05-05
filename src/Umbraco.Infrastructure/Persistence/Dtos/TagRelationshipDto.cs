@@ -12,8 +12,7 @@ internal class TagRelationshipDto
     public const string TableName = Constants.DatabaseSchema.Tables.TagRelationship;
 
     [Column("nodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship",
-        OnColumns = "nodeId, propertyTypeId, tagId")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsTagRelationship", OnColumns = "nodeId, propertyTypeId, tagId")]
     [ForeignKey(typeof(ContentDto), Name = "FK_cmsTagRelationship_cmsContent", Column = "nodeId")]
     public int NodeId { get; set; }
 

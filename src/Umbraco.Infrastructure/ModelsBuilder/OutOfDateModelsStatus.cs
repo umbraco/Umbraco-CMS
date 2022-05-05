@@ -60,7 +60,7 @@ public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCach
         }
 
         var path = GetFlagPath();
-        if (path == null || !File.Exists(path))
+        if (!File.Exists(path))
         {
             return;
         }

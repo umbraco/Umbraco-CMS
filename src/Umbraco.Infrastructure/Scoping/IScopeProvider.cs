@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping;
 /// </summary>
 public interface IScopeProvider : ICoreScopeProvider
 {
-    new
-
     /// <summary>
     ///     Gets the scope context.
     /// </summary>

@@ -27,8 +27,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
     /// </summary>
-    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches,
-        ILogger<EntityRepositoryBase<TId, TEntity>> logger)
+    protected EntityRepositoryBase(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger<EntityRepositoryBase<TId, TEntity>> logger)
         : base(scopeAccessor, appCaches) =>
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -151,17 +150,14 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
         if (ids?.Length <= Constants.Sql.MaxParameterCount)
         {
-            return CachePolicy.GetAll(ids, PerformGetAll) ?? Enumerable.Empty<TEntity>();
+            return CachePolicy.GetAll(ids, PerformGetAll);
         }
 
         var entities = new List<TEntity>();
         foreach (IEnumerable<TId> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            TEntity[]? groups = CachePolicy.GetAll(group.ToArray(), PerformGetAll);
-            if (groups is not null)
-            {
-                entities.AddRange(groups);
-            }
+            TEntity[] groups = CachePolicy.GetAll(group.ToArray(), PerformGetAll);
+            entities.AddRange(groups);
         }
 
         return entities;

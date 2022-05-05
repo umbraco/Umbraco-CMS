@@ -57,12 +57,7 @@ public sealed class RichTextEditorPastedImages
     /// <summary>
     ///     Used by the RTE (and grid RTE) for drag/drop/persisting images
     /// </summary>
-    /// <param name="html"></param>
-    /// <param name="mediaParentFolder"></param>
-    /// <param name="userId"></param>
-    /// <returns></returns>
-    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId,
-        IImageUrlGenerator imageUrlGenerator)
+    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
     {
         // Find all img's that has data-tmpimg attribute
         // Use HTML Agility Pack - https://html-agility-pack.net
@@ -101,13 +96,11 @@ public sealed class RichTextEditorPastedImages
             {
                 if (mediaParentFolder == Guid.Empty)
                 {
-                    mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root,
-                        Constants.Conventions.MediaTypes.Image, userId);
+                    mediaFile = _mediaService.CreateMedia(mediaItemName, Constants.System.Root, Constants.Conventions.MediaTypes.Image, userId);
                 }
                 else
                 {
-                    mediaFile = _mediaService.CreateMedia(mediaItemName, mediaParentFolder,
-                        Constants.Conventions.MediaTypes.Image, userId);
+                    mediaFile = _mediaService.CreateMedia(mediaItemName, mediaParentFolder, Constants.Conventions.MediaTypes.Image, userId);
                 }
 
                 var fileInfo = new FileInfo(absoluteTempImagePath);
@@ -120,8 +113,7 @@ public sealed class RichTextEditorPastedImages
 
                 using (fileStream)
                 {
-                    mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper,
-                        _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
+                    mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
                 }
 
                 _mediaService.Save(mediaFile, userId);

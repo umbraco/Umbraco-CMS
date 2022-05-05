@@ -151,14 +151,13 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         var versionId = dto.ContentVersionDto.Id;
         var temp = new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType);
         IDictionary<int, PropertyCollection> properties =
-            GetPropertyCollections(new List<TempContent<Core.Models.Media>> {temp});
+            GetPropertyCollections(new List<TempContent<Core.Models.Media>> { temp });
         media.Properties = properties[versionId];
 
         // reset dirty initial properties (U4-1946)
         media.ResetDirtyProperties(false);
         return media;
     }
-
 
     #region Repository Base
 
@@ -204,8 +203,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType);
 
-    protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current = true,
-        bool joinMediaVersion = false)
+    protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current = true, bool joinMediaVersion = false)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();
 
@@ -277,7 +275,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
             "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+            "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id",
         };
         return list;
     }
@@ -331,8 +329,8 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     protected override void PerformDeleteVersion(int id, int versionId)
     {
-        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new {versionId});
-        Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new {versionId});
+        Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
+        Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new { versionId });
     }
 
     #endregion
@@ -515,7 +513,6 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
 
     public bool Exists(Guid id) => _mediaByGuidReadRepository.Exists(id);
 
-
     // A reading repository purely for looking up by GUID
     // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
     // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
@@ -523,8 +520,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     {
         private readonly MediaRepository _outerRepo;
 
-        public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache,
-            ILogger<MediaByGuidReadRepository> logger)
+        public MediaByGuidReadRepository(MediaRepository outerRepo, IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaByGuidReadRepository> logger)
             : base(scopeAccessor, cache, logger) =>
             _outerRepo = outerRepo;
 

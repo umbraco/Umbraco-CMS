@@ -10,8 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 internal class ContentTypeTemplateDto
 {
     [Column("contentTypeNodeId")]
-    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType",
-        OnColumns = "contentTypeNodeId, templateNodeId")]
+    [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsDocumentType", OnColumns = "contentTypeNodeId, templateNodeId")]
     [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
     [ForeignKey(typeof(NodeDto))]
     public int ContentTypeNodeId { get; set; }

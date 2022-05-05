@@ -10,13 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Services;
 
 public class EditorConfigurationParser : IEditorConfigurationParser
 {
-    public TConfiguration? ParseFromConfigurationEditor<TConfiguration>(IDictionary<string, object?>? editorValues,
-        IEnumerable<ConfigurationField> fields)
+    public TConfiguration? ParseFromConfigurationEditor<TConfiguration>(IDictionary<string, object?>? editorValues, IEnumerable<ConfigurationField> fields)
     {
         // note - editorValue contains a mix of CLR types (string, int...) and JToken
         // turning everything back into a JToken... might not be fastest but is simplest
         // for now
-
         var o = new JObject();
 
         foreach (ConfigurationField field in fields)
@@ -24,17 +22,17 @@ public class EditorConfigurationParser : IEditorConfigurationParser
             // field only, JsonPropertyAttribute is ignored here
             // only keep fields that have a non-null/empty value
             // rest will fall back to default during ToObject()
-            if (editorValues is not null && editorValues.TryGetValue(field.Key!, out var value) && value != null &&
+            if (editorValues is not null && editorValues.TryGetValue(field.Key, out var value) && value != null &&
                 (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
             {
                 if (value is JToken jtoken)
                 {
-                    //if it's a jtoken then set it
+                    // If it's a jtoken then set it
                     o[field.PropertyName!] = jtoken;
                 }
                 else if (field.PropertyType == typeof(bool) && value is string sBool)
                 {
-                    //if it's a boolean property type but a string is found, try to do a conversion
+                    // If it's a boolean property type but a string is found, try to do a conversion
                     Attempt<bool> converted = sBool.TryConvertTo<bool>();
                     if (converted.Success)
                     {
@@ -43,7 +41,7 @@ public class EditorConfigurationParser : IEditorConfigurationParser
                 }
                 else
                 {
-                    //default behavior
+                    // Default behavior
                     o[field.PropertyName!] = JToken.FromObject(value);
                 }
             }
@@ -58,7 +56,7 @@ public class EditorConfigurationParser : IEditorConfigurationParser
         {
             // try the field
             ConfigurationFieldAttribute? field = property.GetCustomAttribute<ConfigurationFieldAttribute>();
-            if (field is not null && field.Key is not null)
+            if (field is not null)
             {
                 return field.Key;
             }

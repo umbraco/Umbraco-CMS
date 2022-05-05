@@ -7,8 +7,12 @@ internal static class PublicAccessEntryFactory
 {
     public static PublicAccessEntry BuildEntity(AccessDto dto)
     {
-        var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId,
-            dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
+        var entity = new PublicAccessEntry(
+                dto.Id,
+                dto.NodeId,
+                dto.LoginNodeId,
+                dto.NoAccessNodeId,
+                dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
             {
                 RuleValue = x.RuleValue,
                 RuleType = x.RuleType,
@@ -39,7 +43,7 @@ internal static class PublicAccessEntryFactory
                 RuleValue = x.RuleValue,
                 RuleType = x.RuleType,
                 CreateDate = x.CreateDate,
-                UpdateDate = x.UpdateDate
+                UpdateDate = x.UpdateDate,
             }).ToList(),
         };
 

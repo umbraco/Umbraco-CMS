@@ -117,10 +117,10 @@ public class BackOfficeWebAssets
                 GetScriptsForBackOfficeExtensions(jsAssets)));
 
         // Create a bundle per package manifest that is declaring an Independent bundle type
-        RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest?.Scripts, AssetType.Javascript);
+        RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Scripts, AssetType.Javascript);
 
         // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
-        RegisterPackageBundlesForNoneOption(_parser.CombinedManifest?.Scripts, UmbracoNonOptimizedPackageJsBundleName);
+        RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Scripts, UmbracoNonOptimizedPackageJsBundleName);
 
         // This bundle includes all CSS from property editor assets,
         // custom back office assets, and any CSS found in package manifests
@@ -211,9 +211,9 @@ public class BackOfficeWebAssets
         var scripts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         // only include scripts with the default bundle options here
-        if (_parser.CombinedManifest?.Scripts.TryGetValue(
+        if (_parser.CombinedManifest.Scripts.TryGetValue(
             BundleOptions.Default,
-            out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
+            out IReadOnlyList<ManifestAssets>? manifestAssets))
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {
@@ -251,9 +251,9 @@ public class BackOfficeWebAssets
         var stylesheets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         // only include css with the default bundle options here
-        if (_parser.CombinedManifest?.Stylesheets.TryGetValue(
+        if (_parser.CombinedManifest.Stylesheets.TryGetValue(
             BundleOptions.Default,
-            out IReadOnlyList<ManifestAssets>? manifestAssets) ?? false)
+            out IReadOnlyList<ManifestAssets>? manifestAssets))
         {
             foreach (var script in manifestAssets.SelectMany(x => x.Assets))
             {

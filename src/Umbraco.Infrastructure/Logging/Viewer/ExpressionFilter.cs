@@ -31,11 +31,12 @@ internal class ExpressionFilter : ILogFilter
         {
             filter = PerformMessageLikeFilter(filterExpression);
         }
-        else // check if it's a valid expression
+
+        // check if it's a valid expression
+        else
         {
             // If the expression evaluates then make it into a filter
-            if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions,
-                    out CompiledExpression? compiled, out var error))
+            if (SerilogExpression.TryCompile(filterExpression, null, customSerilogFunctions, out CompiledExpression? compiled, out var error))
             {
                 filter = evt =>
                 {

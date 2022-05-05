@@ -49,8 +49,7 @@ public static class DefinitionFactory
             {
                 foreach (ForeignKeyAttribute foreignKeyAttribute in foreignKeyAttributes)
                 {
-                    ForeignKeyDefinition foreignKeyDefinition = GetForeignKeyDefinition(modelType, propertyInfo,
-                        foreignKeyAttribute, columnName, tableName);
+                    ForeignKeyDefinition foreignKeyDefinition = GetForeignKeyDefinition(modelType, propertyInfo, foreignKeyAttribute, columnName, tableName);
                     tableDefinition.ForeignKeys.Add(foreignKeyDefinition);
                 }
             }
@@ -68,8 +67,7 @@ public static class DefinitionFactory
         return tableDefinition;
     }
 
-    public static ColumnDefinition GetColumnDefinition(Type modelType, PropertyInfo propertyInfo, string columnName,
-        string tableName, ISqlSyntaxProvider sqlSyntax)
+    public static ColumnDefinition GetColumnDefinition(Type modelType, PropertyInfo propertyInfo, string columnName, string tableName, ISqlSyntaxProvider sqlSyntax)
     {
         var definition = new ColumnDefinition
         {
@@ -130,8 +128,7 @@ public static class DefinitionFactory
         return definition;
     }
 
-    public static ForeignKeyDefinition GetForeignKeyDefinition(Type modelType, PropertyInfo propertyInfo,
-        ForeignKeyAttribute attribute, string columnName, string tableName)
+    public static ForeignKeyDefinition GetForeignKeyDefinition(Type modelType, PropertyInfo propertyInfo, ForeignKeyAttribute attribute, string columnName, string tableName)
     {
         TableNameAttribute? referencedTable = attribute.Type.FirstAttribute<TableNameAttribute>();
         PrimaryKeyAttribute? referencedPrimaryKey = attribute.Type.FirstAttribute<PrimaryKeyAttribute>();
@@ -158,8 +155,7 @@ public static class DefinitionFactory
         return definition;
     }
 
-    public static IndexDefinition GetIndexDefinition(Type modelType, PropertyInfo propertyInfo,
-        IndexAttribute attribute, string columnName, string tableName)
+    public static IndexDefinition GetIndexDefinition(Type modelType, PropertyInfo propertyInfo, IndexAttribute attribute, string columnName, string tableName)
     {
         var indexName = string.IsNullOrEmpty(attribute.Name)
             ? string.Format("IX_{0}_{1}", tableName, columnName)

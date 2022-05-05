@@ -36,13 +36,11 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
         => PropertyCacheLevel.Element;
 
     /// <inheritdoc />
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => source?.ToString();
 
     /// <inheritdoc />
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
         using (_proflog.DebugDuration<BlockListPropertyValueConverter>(
@@ -106,23 +104,20 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
             var settingsPublishedElements = new Dictionary<Guid, IPublishedElement>();
             var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey)
                 .Where(x => x.HasValue).Distinct().ToList();
-            if (validSettingsElementTypes is not null)
+            foreach (BlockItemData data in converted.BlockValue.SettingsData)
             {
-                foreach (BlockItemData data in converted.BlockValue.SettingsData)
+                if (!validSettingsElementTypes.Contains(data.ContentTypeKey))
                 {
-                    if (!validSettingsElementTypes.Contains(data.ContentTypeKey))
-                    {
-                        continue;
-                    }
-
-                    IPublishedElement? element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
-                    if (element is null)
-                    {
-                        continue;
-                    }
-
-                    settingsPublishedElements[element.Key] = element;
+                    continue;
                 }
+
+                IPublishedElement? element = _blockConverter.ConvertToElement(data, referenceCacheLevel, preview);
+                if (element is null)
+                {
+                    continue;
+                }
+
+                settingsPublishedElements[element.Key] = element;
             }
 
             // Cache constructors locally (it's tied to the current IPublishedSnapshot and IPublishedModelFactory)
@@ -163,9 +158,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
                 }
 
                 // Create instance (use content/settings type from configuration)
-                BlockListItem layoutRef = blockListItemActivator.CreateInstance(
-                    blockConfig.ContentElementTypeKey,
-                    blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                BlockListItem layoutRef = blockListItemActivator.CreateInstance(blockConfig.ContentElementTypeKey, blockConfig.SettingsElementTypeKey, contentGuidUdi, contentData, settingGuidUdi, settingsData);
 
                 list.Add(layoutRef);
             }
@@ -185,8 +178,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase
         public BlockListItemActivator(BlockEditorConverter blockConverter)
             => _blockConverter = blockConverter;
 
-        public BlockListItem CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Udi contentUdi,
-            IPublishedElement contentData, Udi? settingsUdi, IPublishedElement? settingsData)
+        public BlockListItem CreateInstance(Guid contentTypeKey, Guid? settingsTypeKey, Udi contentUdi, IPublishedElement contentData, Udi? settingsUdi, IPublishedElement? settingsData)
         {
             if (!_contructorCache.TryGetValue(
                 (contentTypeKey, settingsTypeKey),

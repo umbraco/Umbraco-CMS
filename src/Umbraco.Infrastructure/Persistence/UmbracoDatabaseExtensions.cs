@@ -23,7 +23,7 @@ internal static class UmbracoDatabaseExtensions
     /// </summary>
     /// <remarks>Used by <see cref="CoreRuntimeBootstrapper" /> to determine the runtime state.</remarks>
     public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(
-        this IUmbracoDatabase database,
+        this IUmbracoDatabase? database,
         string keyPrefix)
     {
         if (database is null)
@@ -44,7 +44,7 @@ internal static class UmbracoDatabaseExtensions
             .Where(whereParam, keyPrefix + sqlSyntax.GetWildcardPlaceholder());
 
         return database.Fetch<KeyValueDto>(sql)
-            .ToDictionary(x => x.Key!, x => x.Value);
+            .ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>

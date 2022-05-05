@@ -16,8 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
 {
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
-        string? segment, bool published)
+    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
@@ -38,9 +37,9 @@ public class GridPropertyIndexValueFactory : IPropertyIndexValueFactory
 
                     foreach (GridValue.GridControl control in row.Areas.SelectMany(x => x.Controls))
                     {
-                        JToken? controlVal = control.Value;
+                        JToken controlVal = control.Value;
 
-                        if (controlVal?.Type == JTokenType.String)
+                        if (controlVal.Type == JTokenType.String)
                         {
                             var str = controlVal.Value<string>();
                             str = XmlHelper.CouldItBeXml(str) ? str!.StripHtml() : str;

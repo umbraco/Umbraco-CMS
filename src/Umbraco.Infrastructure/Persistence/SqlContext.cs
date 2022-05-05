@@ -18,8 +18,7 @@ public class SqlContext : ISqlContext
     /// <param name="pocoDataFactory">The Poco data factory.</param>
     /// <param name="databaseType">The database type.</param>
     /// <param name="mappers">The mappers.</param>
-    public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory,
-        IMapperCollection? mappers = null)
+    public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection? mappers = null)
     {
         // for tests
         Mappers = mappers;
@@ -40,6 +39,12 @@ public class SqlContext : ISqlContext
     public SqlTemplates Templates { get; }
 
     /// <inheritdoc />
+    public IPocoDataFactory PocoDataFactory { get; }
+
+    /// <inheritdoc />
+    public IMapperCollection? Mappers { get; }
+
+    /// <inheritdoc />
     public Sql<ISqlContext> Sql() => NPoco.Sql.BuilderFor((ISqlContext)this);
 
     /// <inheritdoc />
@@ -47,10 +52,4 @@ public class SqlContext : ISqlContext
 
     /// <inheritdoc />
     public IQuery<T> Query<T>() => new Query<T>(this);
-
-    /// <inheritdoc />
-    public IPocoDataFactory PocoDataFactory { get; }
-
-    /// <inheritdoc />
-    public IMapperCollection? Mappers { get; }
 }

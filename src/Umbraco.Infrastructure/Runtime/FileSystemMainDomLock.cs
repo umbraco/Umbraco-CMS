@@ -92,8 +92,7 @@ internal class FileSystemMainDomLock : IMainDomLock
     }
 
     public void CreateLockReleaseSignalFile() =>
-        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
-                FileShare.ReadWrite | FileShare.Delete)
+        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete)
             .Close();
 
     public void DeleteLockReleaseSignalFile() =>

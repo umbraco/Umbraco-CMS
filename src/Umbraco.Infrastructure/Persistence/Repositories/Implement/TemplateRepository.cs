@@ -292,7 +292,7 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
 
     protected override ITemplate? PerformGet(int id) =>
         //use the underlying GetAll which will force cache all templates
-        GetMany()?.FirstOrDefault(x => x.Id == id);
+        GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
     {
@@ -544,9 +544,9 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
 
     #region Implementation of ITemplateRepository
 
-    public ITemplate? Get(string? alias) => GetAll(alias)?.FirstOrDefault();
+    public ITemplate? Get(string? alias) => GetAll(alias).FirstOrDefault();
 
-    public IEnumerable<ITemplate>? GetAll(params string?[] aliases)
+    public IEnumerable<ITemplate> GetAll(params string?[] aliases)
     {
         //We must call the base (normal) GetAll method
         // which is cached. This is a specialized method and unfortunately with the params[] it
@@ -557,37 +557,37 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         }
 
         //return from base.GetAll, this is all cached
-        return GetMany()?.Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
+        return GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
     }
 
-    public IEnumerable<ITemplate>? GetChildren(int masterTemplateId)
+    public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
     {
         //return from base.GetAll, this is all cached
-        ITemplate[]? all = GetMany()?.ToArray();
+        ITemplate[] all = GetMany().ToArray();
 
         if (masterTemplateId <= 0)
         {
-            return all?.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+            return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
         }
 
-        ITemplate? parent = all?.FirstOrDefault(x => x.Id == masterTemplateId);
+        ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
         if (parent == null)
         {
             return Enumerable.Empty<ITemplate>();
         }
 
-        IEnumerable<ITemplate>? children = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+        IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
         return children;
     }
 
     public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
     {
         //return from base.GetAll, this is all cached
-        ITemplate[]? all = GetMany()?.ToArray();
+        ITemplate[] all = GetMany().ToArray();
         var descendants = new List<ITemplate>();
         if (masterTemplateId > 0)
         {
-            ITemplate? parent = all?.FirstOrDefault(x => x.Id == masterTemplateId);
+            ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
@@ -598,14 +598,11 @@ internal class TemplateRepository : EntityRepositoryBase<int, ITemplate>, ITempl
         }
         else
         {
-            if (all is not null)
+            descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+            foreach (ITemplate parent in descendants)
             {
-                descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
-                foreach (ITemplate parent in descendants)
-                {
-                    //recursively add all children with a level
-                    AddChildren(all, descendants, parent.Alias);
-                }
+                //recursively add all children with a level
+                AddChildren(all, descendants, parent.Alias);
             }
         }
 

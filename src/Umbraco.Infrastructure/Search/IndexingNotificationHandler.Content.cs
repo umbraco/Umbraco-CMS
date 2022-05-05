@@ -26,7 +26,6 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
     /// <summary>
     ///     Updates indexes based on content changes
     /// </summary>
-    /// <param name="sender"></param>
     /// <param name="args"></param>
     public void Handle(ContentCacheRefresherNotification args)
     {
@@ -69,7 +68,9 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
 
                 // TODO: Rebuild the index at this point?
             }
-            else // RefreshNode or RefreshBranch (maybe trashed)
+
+            // RefreshNode or RefreshBranch (maybe trashed)
+            else
             {
                 if (deleteBatch != null && deleteBatch.Contains(payload.Id))
                 {
@@ -113,16 +114,15 @@ public sealed class ContentIndexingNotificationHandler : INotificationHandler<Co
                     var total = long.MaxValue;
                     while (page * pageSize < total)
                     {
-                        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++,
-                            pageSize, out total,
-
-                            // order by shallowest to deepest, this allows us to check it's published state without checking every item
-                            ordering: Ordering.By("Path"));
+                        // order by shallowest to deepest, this allows us to check it's published state without checking every item
+                        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(content.Id, page++, pageSize, out total, ordering: Ordering.By("Path"));
 
                         foreach (IContent descendant in descendants)
                         {
                             published = null;
-                            if (masked != null) // else everything is masked
+
+                            // else everything is masked
+                            if (masked != null)
                             {
                                 if (masked.Contains(descendant.ParentId) || !descendant.Published)
                                 {

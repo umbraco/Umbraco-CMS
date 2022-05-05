@@ -27,8 +27,7 @@ public class MultiUrlPickerPropertyEditor : DataEditor
     public MultiUrlPickerPropertyEditor(
         IIOHelper ioHelper,
         IDataValueEditorFactory dataValueEditorFactory)
-        : this(ioHelper, dataValueEditorFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

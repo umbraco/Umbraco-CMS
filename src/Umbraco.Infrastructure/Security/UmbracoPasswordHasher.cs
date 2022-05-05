@@ -38,8 +38,7 @@ public class UmbracoPasswordHasher<TUser> : PasswordHasher<TUser>
     ///     hash. This could be any hashes
     ///     from the very old v4, to the older v6-v8, to the older aspnet identity and finally to the most recent
     /// </remarks>
-    public override PasswordVerificationResult VerifyHashedPassword(TUser user, string hashedPassword,
-        string providedPassword)
+    public override PasswordVerificationResult VerifyHashedPassword(TUser user, string hashedPassword, string providedPassword)
     {
         if (user is null)
         {

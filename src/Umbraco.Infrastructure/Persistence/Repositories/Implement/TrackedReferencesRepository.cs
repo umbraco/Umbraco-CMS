@@ -18,8 +18,7 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
     /// </summary>
-    public IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords)
+    public IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
                 "[pn].[id] as nodeId",
@@ -35,15 +34,11 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
                 "[umbracoRelationType].[dual] as relationTypeIsBidirectional")
             .From<RelationDto>("r")
             .InnerJoin<RelationTypeDto>("umbracoRelationType")
-            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r",
-                "umbracoRelationType")
+            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r", "umbracoRelationType")
             .InnerJoin<NodeDto>("cn").On<RelationDto, NodeDto, RelationTypeDto>(
-                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) ||
-                               (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn",
-                "umbracoRelationType")
+                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) || (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn", "umbracoRelationType")
             .InnerJoin<NodeDto>("pn").On<RelationDto, NodeDto, NodeDto>(
-                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) ||
-                               (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
+                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) || (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
             .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, "pn", "c")
             .LeftJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, "c", "ct")
@@ -73,8 +68,7 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
     /// <summary>
     ///     Gets a page of the descending items that have any references, given a parent id.
     /// </summary>
-    public IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords)
+    public IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
     {
         ISqlSyntaxProvider? syntax = _scopeAccessor.AmbientScope?.Database.SqlContext.SqlSyntax;
 
@@ -105,15 +99,11 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
                 "[umbracoRelationType].[dual] as relationTypeIsBidirectional")
             .From<RelationDto>("r")
             .InnerJoin<RelationTypeDto>("umbracoRelationType")
-            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r",
-                "umbracoRelationType")
+            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r", "umbracoRelationType")
             .InnerJoin<NodeDto>("cn").On<RelationDto, NodeDto, RelationTypeDto>(
-                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) ||
-                               (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn",
-                "umbracoRelationType")
+                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) || (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn", "umbracoRelationType")
             .InnerJoin<NodeDto>("pn").On<RelationDto, NodeDto, NodeDto>(
-                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) ||
-                               (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
+                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) || (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
             .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, "pn", "c")
             .LeftJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, "c", "ct")
@@ -140,8 +130,7 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
     ///     Gets a page of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    public IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords)
+    public IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql().SelectDistinct(
                 "[cn].[id] as nodeId",
@@ -157,15 +146,11 @@ internal class TrackedReferencesRepository : ITrackedReferencesRepository
                 "[umbracoRelationType].[dual] as relationTypeIsBidirectional")
             .From<RelationDto>("r")
             .InnerJoin<RelationTypeDto>("umbracoRelationType")
-            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r",
-                "umbracoRelationType")
+            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, "r", "umbracoRelationType")
             .InnerJoin<NodeDto>("cn").On<RelationDto, NodeDto, RelationTypeDto>(
-                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) ||
-                               (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn",
-                "umbracoRelationType")
+                (r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) || (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), "r", "cn", "umbracoRelationType")
             .InnerJoin<NodeDto>("pn").On<RelationDto, NodeDto, NodeDto>(
-                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) ||
-                               (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
+                (r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) || (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), "r", "pn", "cn")
             .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, "cn", "c")
             .LeftJoin<ContentTypeDto>("ct")
             .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, "c", "ct")

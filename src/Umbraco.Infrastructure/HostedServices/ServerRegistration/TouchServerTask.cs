@@ -29,9 +29,10 @@ public class TouchServerTask : RecurringHostedServiceBase
     /// </summary>
     /// <param name="runtimeState">Representation of the state of the Umbraco runtime.</param>
     /// <param name="serverRegistrationService">Services for server registrations.</param>
-    /// <param name="requestAccessor">Accessor for the current request.</param>
     /// <param name="logger">The typed logger.</param>
     /// <param name="globalSettings">The configuration for global settings.</param>
+    /// <param name="hostingEnvironment">The hostingEnviroment.</param>
+    /// <param name="serverRoleAccessor">The accessor for the server role</param>
     public TouchServerTask(
         IRuntimeState runtimeState,
         IServerRegistrationService serverRegistrationService,
@@ -39,8 +40,7 @@ public class TouchServerTask : RecurringHostedServiceBase
         ILogger<TouchServerTask> logger,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(logger, globalSettings.CurrentValue.DatabaseServerRegistrar.WaitTimeBetweenCalls,
-            TimeSpan.FromSeconds(15))
+        : base(logger, globalSettings.CurrentValue.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
     {
         _runtimeState = runtimeState;
         _serverRegistrationService = serverRegistrationService ??

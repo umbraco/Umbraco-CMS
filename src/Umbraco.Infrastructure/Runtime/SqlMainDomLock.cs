@@ -89,7 +89,7 @@ public class SqlMainDomLock : IMainDomLock
             db = _dbFactory.CreateDatabase();
 
 
-            _hasTable = db!.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+            _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
             if (!_hasTable)
             {
                 _logger.LogDebug(
@@ -98,7 +98,7 @@ public class SqlMainDomLock : IMainDomLock
                 return true;
             }
 
-            db!.BeginTransaction(IsolationLevel.Serializable);
+            db.BeginTransaction(IsolationLevel.Serializable);
 
             RecordPersistenceType
                 result = InsertLockRecord(tempId,
@@ -186,7 +186,7 @@ public class SqlMainDomLock : IMainDomLock
                     {
                         // re-check if its still false, we don't want to re-query once we know its there since this
                         // loop needs to use minimal resources
-                        _hasTable = db!.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                        _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
                         if (!_hasTable)
                         {
                             // the Db does not contain the required table, we just keep looping since we can't query the db
@@ -198,10 +198,10 @@ public class SqlMainDomLock : IMainDomLock
                     if (_acquireWhenTablesNotAvailable)
                     {
                         _acquireWhenTablesNotAvailable = false;
-                        InsertLockRecord(_lockId, db!);
+                        InsertLockRecord(_lockId, db);
                     }
 
-                    db!.BeginTransaction(IsolationLevel.Serializable);
+                    db.BeginTransaction(IsolationLevel.Serializable);
 
                     if (!IsMainDomValue(_lockId, db))
                     {
@@ -258,7 +258,7 @@ public class SqlMainDomLock : IMainDomLock
                         // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
                         Thread.Sleep(1000);
 
-                        var acquired = TryAcquire(db!, tempId, updatedTempId);
+                        var acquired = TryAcquire(db, tempId, updatedTempId);
                         if (acquired.HasValue)
                         {
                             return acquired.Value;
@@ -266,7 +266,7 @@ public class SqlMainDomLock : IMainDomLock
 
                         if (watch.ElapsedMilliseconds >= millisecondsTimeout)
                         {
-                            return AcquireWhenMaxWaitTimeElapsed(db!);
+                            return AcquireWhenMaxWaitTimeElapsed(db);
                         }
                     }
                 }

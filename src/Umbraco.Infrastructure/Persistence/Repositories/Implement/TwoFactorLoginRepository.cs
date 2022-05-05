@@ -14,8 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLogin>, ITwoFactorLoginRepository
 {
-    public TwoFactorLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache,
-        ILogger<TwoFactorLoginRepository> logger)
+    public TwoFactorLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TwoFactorLoginRepository> logger)
         : base(scopeAccessor, cache, logger)
     {
     }
@@ -105,7 +104,7 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
         }
     }
 
-    private static TwoFactorLoginDto? Map(ITwoFactorLogin entity)
+    private static TwoFactorLoginDto? Map(ITwoFactorLogin? entity)
     {
         if (entity == null)
         {
@@ -121,7 +120,7 @@ internal class TwoFactorLoginRepository : EntityRepositoryBase<int, ITwoFactorLo
         };
     }
 
-    private static ITwoFactorLogin? Map(TwoFactorLoginDto dto)
+    private static ITwoFactorLogin? Map(TwoFactorLoginDto? dto)
     {
         if (dto == null)
         {

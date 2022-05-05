@@ -43,8 +43,7 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
         // note: this means that the ServerRegistrationRepository does *not* implement scoped cache,
         // and this is because the repository is special and should not participate in scopes
         // (cleanup in v8)
-        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ false);
+        new FullDataSetRepositoryCachePolicy<IServerRegistration, int>(AppCaches.RuntimeCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
     protected override int PerformCount(IQuery<IServerRegistration> query) =>
         throw new NotSupportedException("This repository does not support this method.");
@@ -52,12 +51,12 @@ internal class ServerRegistrationRepository : EntityRepositoryBase<int, IServerR
     protected override bool PerformExists(int id) =>
 
         // use the underlying GetAll which force-caches all registrations
-        GetMany()?.Any(x => x.Id == id) ?? false;
+        GetMany().Any(x => x.Id == id);
 
     protected override IServerRegistration? PerformGet(int id) =>
 
         // use the underlying GetAll which force-caches all registrations
-        GetMany()?.FirstOrDefault(x => x.Id == id);
+        GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<IServerRegistration> PerformGetAll(params int[]? ids) =>
         Database.Fetch<ServerRegistrationDto>("WHERE id > 0")

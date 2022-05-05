@@ -57,6 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _loggerFactory = loggerFactory;
             _requestCache = requestCache;
             _eventAggregator = eventAggregator;
+
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
@@ -99,8 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             MoveContexts(s_contextItemKey, source, stack, (k, v) => _requestCache.Set(k, v));
         }
 
-        private void MoveContexts<T>(string key, ConcurrentStack<T>? source, ConcurrentStack<T>? stack,
-            Action<string, ConcurrentStack<T>> setter)
+        private void MoveContexts<T>(string key, ConcurrentStack<T>? source, ConcurrentStack<T>? stack, Action<string, ConcurrentStack<T>> setter)
             where T : class, IInstanceIdentifiable
         {
             if (source == null)
@@ -192,7 +192,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 s_scopeContextStack.Value = stack;
             }
         }
-
 
         private T? GetHttpContextObject<T>(string key, bool required = true)
             where T : class
@@ -364,7 +363,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 // may be migrating context with the callContext = true flag.
                 // This is a weird case when forcing callContext when HttpContext
                 // is available. Required by Deploy.
-
                 if (_requestCache.IsAvailable)
                 {
                     MoveHttpContextScopeToCallContext();
@@ -400,9 +398,21 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             IEventDispatcher? eventDispatcher = null,
             IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null)
-            => new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator,
-                _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode,
-                eventDispatcher, scopedNotificationPublisher, scopeFileSystems);
+            =>
+                new Scope(
+                    this,
+                    _coreDebugSettings,
+                    _mediaFileManager,
+                    _eventAggregator,
+                    _loggerFactory.CreateLogger<Scope>(),
+                    _fileSystems,
+                    true,
+                    null,
+                    isolationLevel,
+                    repositoryCacheMode,
+                    eventDispatcher,
+                    scopedNotificationPublisher,
+                    scopeFileSystems);
 
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
@@ -484,9 +494,21 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 IScopeContext? ambientContext = AmbientContext;
                 ScopeContext? newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator,
-                    _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel,
-                    repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext,
+                var scope = new Scope(
+                    this,
+                    _coreDebugSettings,
+                    _mediaFileManager,
+                    _eventAggregator,
+                    _loggerFactory.CreateLogger<Scope>(),
+                    _fileSystems,
+                    false,
+                    newContext,
+                    isolationLevel,
+                    repositoryCacheMode,
+                    eventDispatcher,
+                    notificationPublisher,
+                    scopeFileSystems,
+                    callContext,
                     autoComplete);
 
                 // assign only if scope creation did not throw!
@@ -499,14 +521,25 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator,
-                _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode,
-                eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(
+                this,
+                _coreDebugSettings,
+                _mediaFileManager,
+                _eventAggregator,
+                _loggerFactory.CreateLogger<Scope>(),
+                _fileSystems,
+                ambientScope,
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                notificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete);
             PushAmbientScope(nested);
             return nested;
         }
 
-        /// <inheritdoc />
         public IScopeContext? Context => AmbientContext;
 
         // for testing

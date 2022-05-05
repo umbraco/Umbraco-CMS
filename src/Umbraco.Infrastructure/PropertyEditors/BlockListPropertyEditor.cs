@@ -29,8 +29,7 @@ public class BlockListPropertyEditor : BlockEditorPropertyEditor
         IDataValueEditorFactory dataValueEditorFactory,
         PropertyEditorCollection propertyEditors,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, propertyEditors, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, propertyEditors, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

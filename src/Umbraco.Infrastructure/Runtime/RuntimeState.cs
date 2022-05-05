@@ -240,7 +240,7 @@ public class RuntimeState : IRuntimeState
             // no scope, no service - just directly accessing the database
             using (IUmbracoDatabase database = databaseFactory.CreateDatabase())
             {
-                if (!database!.IsUmbracoInstalled())
+                if (!database.IsUmbracoInstalled())
                 {
                     return UmbracoDatabaseState.NotInstalled;
                 }
@@ -248,7 +248,7 @@ public class RuntimeState : IRuntimeState
                 // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
                 // All will be prefixed with the same key.
                 IReadOnlyDictionary<string, string?>? keyValues =
-                    database!.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
+                    database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
                 // This could need both an upgrade AND package migrations to execute but
                 // we will process them one at a time, first the upgrade, then the package migrations.

@@ -17,7 +17,6 @@ internal class CacheInstructionRepository : ICacheInstructionRepository
 
     public CacheInstructionRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
-    /// <inheritdoc />
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
     /// <inheritdoc />

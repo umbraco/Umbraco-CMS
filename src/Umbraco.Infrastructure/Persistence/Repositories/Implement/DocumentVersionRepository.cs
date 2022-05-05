@@ -62,8 +62,7 @@ internal class DocumentVersionRepository : IDocumentVersionRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<ContentVersionMeta>? GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize,
-        out long totalRecords, int? languageId = null)
+    public IEnumerable<ContentVersionMeta>? GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize, out long totalRecords, int? languageId = null)
     {
         Sql<ISqlContext>? query = _scopeAccessor.AmbientScope?.SqlContext.Sql();
 

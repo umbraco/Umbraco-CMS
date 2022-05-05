@@ -43,8 +43,7 @@ internal class RedirectUrlDto
 
     [Column("urlHash")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl",
-        ForColumns = "urlHash, contentKey, culture, createDateUtc")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRedirectUrl", ForColumns = "urlHash, contentKey, culture, createDateUtc")]
     [Length(40)]
     public string UrlHash { get; set; } = null!;
 }

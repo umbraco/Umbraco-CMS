@@ -16,9 +16,7 @@ public class BlockEditorData
     {
         if (string.IsNullOrWhiteSpace(propertyEditorAlias))
         {
-            throw new ArgumentException(
-                $"'{nameof(propertyEditorAlias)}' cannot be null or whitespace",
-                nameof(propertyEditorAlias));
+            throw new ArgumentException($"'{nameof(propertyEditorAlias)}' cannot be null or whitespace", nameof(propertyEditorAlias));
         }
 
         _propertyEditorAlias = propertyEditorAlias;

@@ -38,8 +38,7 @@ public abstract class NestedContentValueConverterBase : PropertyValueConverterBa
     public static bool IsNestedMany(IPublishedPropertyType publishedProperty)
         => IsNested(publishedProperty) && !IsSingle(publishedProperty);
 
-    protected IPublishedElement? ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel,
-        bool preview)
+    protected IPublishedElement? ConvertToElement(JObject sourceObject, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         var elementTypeAlias =
             sourceObject[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
@@ -64,8 +63,7 @@ public abstract class NestedContentValueConverterBase : PropertyValueConverterBa
             key = Guid.Empty;
         }
 
-        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview,
-            referenceCacheLevel, _publishedSnapshotAccessor);
+        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
         element = PublishedModelFactory.CreateModel(element);
 
         return element;

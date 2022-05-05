@@ -18,8 +18,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMediaTypeRepository
 {
-    public MediaTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaTypeRepository> logger,
-        IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository,
+    public MediaTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MediaTypeRepository> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
     {
@@ -30,8 +34,7 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
     protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MediaType;
 
     protected override IRepositoryCachePolicy<IMediaType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IMediaType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached
@@ -39,24 +42,24 @@ internal class MediaTypeRepository : ContentTypeRepositoryBase<IMediaType>, IMed
     // every PerformGet/Exists just GetMany() and then filters
     // except PerformGetAll which is the one really doing the job
     protected override IMediaType? PerformGet(int id)
-        => GetMany()?.FirstOrDefault(x => x.Id == id);
+        => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IMediaType? PerformGet(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id);
+        => GetMany().FirstOrDefault(x => x.Key == id);
 
     protected override bool PerformExists(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
+        => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
     protected override IMediaType? PerformGet(string alias)
-        => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
     protected override IEnumerable<IMediaType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IMediaType>();
 
-    protected override IEnumerable<IMediaType>? PerformGetAll(params Guid[]? ids)
+    protected override IEnumerable<IMediaType> PerformGetAll(params Guid[]? ids)
     {
-        IEnumerable<IMediaType>? all = GetMany();
-        return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
+        IEnumerable<IMediaType> all = GetMany();
+        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
     }
 
     protected override IEnumerable<IMediaType> PerformGetByQuery(IQuery<IMediaType> query)

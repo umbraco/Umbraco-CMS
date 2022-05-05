@@ -108,13 +108,13 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
         }
     }
 
+    public abstract Task PerformExecuteAsync(object? state);
+
     /// <summary>
     ///     Change the period between operations.
     /// </summary>
     /// <param name="newPeriod">The new period between tasks</param>
     protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
-
-    public abstract Task PerformExecuteAsync(object? state);
 
     protected virtual void Dispose(bool disposing)
     {

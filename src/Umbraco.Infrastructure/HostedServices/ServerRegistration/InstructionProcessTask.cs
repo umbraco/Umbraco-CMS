@@ -27,8 +27,7 @@ public class InstructionProcessTask : RecurringHostedServiceBase
     /// <param name="messenger">Service broadcasting cache notifications to registered servers.</param>
     /// <param name="logger">The typed logger.</param>
     /// <param name="globalSettings">The configuration for global settings.</param>
-    public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger,
-        ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
+    public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
         : base(logger, globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
     {
         _runtimeState = runtimeState;

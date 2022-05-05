@@ -17,12 +17,13 @@ internal class PropertyDataDto
     private decimal? _decimalValue;
 
     // pk, not used at the moment (never updating)
-    [Column("id")] [PrimaryKeyColumn] public int Id { get; set; }
+    [Column("id")]
+    [PrimaryKeyColumn]
+    public int Id { get; set; }
 
     [Column("versionId")]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId",
-        ForColumns = "versionId,propertyTypeId,languageId,segment")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment")]
     public int VersionId { get; set; }
 
     [Column("propertyTypeId")]
@@ -118,7 +119,7 @@ internal class PropertyDataDto
             DateValue = DateValue,
             VarcharValue = VarcharValue,
             TextValue = TextValue,
-            PropertyTypeDto = PropertyTypeDto
+            PropertyTypeDto = PropertyTypeDto,
         };
 
     protected bool Equals(PropertyDataDto other) => Id == other.Id;
@@ -129,6 +130,7 @@ internal class PropertyDataDto
             || (other is PropertyDataDto pdata && pdata.Id == Id));
 
     public override int GetHashCode() =>
+
         // ReSharper disable once NonReadonlyMemberInGetHashCode
         Id;
 }

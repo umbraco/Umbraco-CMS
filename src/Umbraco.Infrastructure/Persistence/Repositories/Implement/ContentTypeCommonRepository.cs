@@ -196,10 +196,6 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
         // var templates = templateRepository.GetMany(templateDtos.Select(x => x.TemplateNodeId).ToArray()).ToDictionary(x => x.Id, x => x);
         IEnumerable<ITemplate>? allTemplates = _templateRepository.GetMany();
-        if (allTemplates is null)
-        {
-            return;
-        }
 
         var templates = allTemplates.ToDictionary(x => x.Id, x => x);
         var templateDtoIx = 0;

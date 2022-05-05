@@ -88,8 +88,6 @@ public sealed class TreeRootNode : TreeNode
     /// <summary>
     ///     Creates a group node for grouped multiple trees
     /// </summary>
-    /// <param name="children"></param>
-    /// <returns></returns>
     public static TreeRootNode CreateGroupNode(TreeNodeCollection children, string section)
     {
         var sectionRoot = new TreeRootNode(RootId, string.Empty, string.Empty)
@@ -145,8 +143,7 @@ public sealed class TreeRootNode : TreeNode
     /// <param name="children"></param>
     /// <param name="isSingleNodeTree"></param>
     /// <returns></returns>
-    public static TreeRootNode CreateSingleTreeRoot(string nodeId, string? getChildNodesUrl, string? menuUrl,
-        string? title, TreeNodeCollection? children, bool isSingleNodeTree = false) =>
+    public static TreeRootNode CreateSingleTreeRoot(string nodeId, string? getChildNodesUrl, string? menuUrl, string? title, TreeNodeCollection? children, bool isSingleNodeTree = false) =>
         new TreeRootNode(nodeId, getChildNodesUrl, menuUrl)
         {
             Children = children,

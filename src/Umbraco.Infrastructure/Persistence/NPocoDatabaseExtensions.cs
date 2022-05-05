@@ -43,8 +43,7 @@ public static partial class NPocoDatabaseExtensions
         do
         {
             // Get the paged queries
-            database.BuildPageQueries<T>(pageIndex * pageSize, pageSize, sqlString, ref sqlArgs,
-                out var generatedSqlCount, out var sqlPage);
+            database.BuildPageQueries<T>(pageIndex * pageSize, pageSize, sqlString, ref sqlArgs, out var generatedSqlCount, out var sqlPage);
 
             // get the item count once
             if (itemCount == null)
@@ -187,8 +186,9 @@ public static partial class NPocoDatabaseExtensions
                 db.Insert(poco);
                 return RecordPersistenceType.Insert;
             }
-            catch (SqlException) // assuming all db engines will throw that exception
+            catch (SqlException)
             {
+                // assuming all db engines will throw SQLException exception
                 // failed: exists (due to race cond RC1)
                 // RC2 race cond here: another thread may remove the record
 
@@ -322,7 +322,6 @@ public static partial class NPocoDatabaseExtensions
         return transaction?.IsolationLevel ?? IsolationLevel.Unspecified;
     }
 
-    public static IEnumerable<TResult> FetchByGroups<TResult, TSource>(this IDatabase db, IEnumerable<TSource> source,
-        int groupSize, Func<IEnumerable<TSource>, Sql<ISqlContext>> sqlFactory) =>
+    public static IEnumerable<TResult> FetchByGroups<TResult, TSource>(this IDatabase db, IEnumerable<TSource> source, int groupSize, Func<IEnumerable<TSource>, Sql<ISqlContext>> sqlFactory) =>
         source.SelectByGroups(x => db.Fetch<TResult>(sqlFactory(x)), groupSize);
 }

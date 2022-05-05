@@ -9,9 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class PropertyFactory
 {
-    public static IEnumerable<IProperty> BuildEntities(
-        IPropertyType[]? propertyTypes,
-        IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
+    public static IEnumerable<IProperty> BuildEntities(IPropertyType[]? propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
     {
         var properties = new List<IProperty>();
         var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>)x);
@@ -34,7 +32,9 @@ internal static class PropertyFactory
                     propertyId = propDto.Id;
                     values.Add(new Property.InitialPropertyValue(
                         languageRepository.GetIsoCodeById(propDto.LanguageId),
-                        propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value));
+                        propDto.Segment,
+                        propDto.VersionId == publishedVersionId,
+                        propDto.Value));
                 }
             }
 
@@ -61,9 +61,13 @@ internal static class PropertyFactory
     ///     The value of this will be used to populate the edited cultures in the umbracoDocumentCultureVariation table.
     /// </param>
     /// <returns></returns>
-    public static IEnumerable<PropertyDataDto> BuildDtos(ContentVariation contentVariation, int currentVersionId,
-        int publishedVersionId, IEnumerable<IProperty> properties,
-        ILanguageRepository languageRepository, out bool edited,
+    public static IEnumerable<PropertyDataDto> BuildDtos(
+        ContentVariation contentVariation,
+        int currentVersionId,
+        int publishedVersionId,
+        IEnumerable<IProperty> properties,
+        ILanguageRepository languageRepository,
+        out bool edited,
         out HashSet<string>? editedCultures)
     {
         var propertyDataDtos = new List<PropertyDataDto>();
@@ -86,7 +90,7 @@ internal static class PropertyFactory
                 }
 
                 // publishing = deal with edit and published values
-                foreach (IPropertyValue? propertyValue in property.Values)
+                foreach (IPropertyValue propertyValue in property.Values)
                 {
                     var isInvariantValue = propertyValue.Culture == null && propertyValue.Segment == null;
                     var isCultureValue = propertyValue.Culture != null;
@@ -95,17 +99,13 @@ internal static class PropertyFactory
                     // deal with published value
                     if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
                     {
-                        propertyDataDtos.Add(BuildDto(publishedVersionId, property,
-                            languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue?.Segment,
-                            propertyValue?.PublishedValue));
+                        propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
                     }
 
                     // deal with edit value
-                    if (propertyValue?.EditedValue != null || isSegmentValue)
+                    if (propertyValue.EditedValue != null || isSegmentValue)
                     {
-                        propertyDataDtos.Add(BuildDto(currentVersionId, property,
-                            languageRepository.GetIdByIsoCode(propertyValue?.Culture), propertyValue?.Segment,
-                            propertyValue?.EditedValue));
+                        propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
 
                     // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the
@@ -154,9 +154,7 @@ internal static class PropertyFactory
                     // not publishing = only deal with edit values
                     if (propertyValue.EditedValue != null)
                     {
-                        propertyDataDtos.Add(BuildDto(currentVersionId, property,
-                            languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment,
-                            propertyValue.EditedValue));
+                        propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
                 }
 
@@ -167,8 +165,7 @@ internal static class PropertyFactory
         return propertyDataDtos;
     }
 
-    private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string? segment,
-        object? value)
+    private static PropertyDataDto BuildDto(int versionId, IProperty property, int? languageId, string? segment, object? value)
     {
         var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 

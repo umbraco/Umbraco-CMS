@@ -60,7 +60,9 @@ public sealed class MediaIndexingNotificationHandler : INotificationHandler<Medi
                 // just ignore that payload
                 // so what?!
             }
-            else // RefreshNode or RefreshBranch (maybe trashed)
+
+            // RefreshNode or RefreshBranch (maybe trashed)
+            else
             {
                 if (deleteBatch != null && deleteBatch.Contains(payload.Id))
                 {

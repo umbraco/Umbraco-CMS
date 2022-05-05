@@ -57,6 +57,7 @@ public class RoslynCompiler
 
         SyntaxTree syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, _parseOptions);
 
+        // Not entirely certain that assemblyIdentityComparer is nececary?
         var compilation = CSharpCompilation.Create(
             GeneratedAssemblyName,
             new[] { syntaxTree },
@@ -64,8 +65,6 @@ public class RoslynCompiler
             new CSharpCompilationOptions(
                 _outputKind,
                 optimizationLevel: OptimizationLevel.Release,
-
-                // Not entirely certain that assemblyIdentityComparer is nececary?
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default));
 
         EmitResult emitResult = compilation.Emit(savePath);

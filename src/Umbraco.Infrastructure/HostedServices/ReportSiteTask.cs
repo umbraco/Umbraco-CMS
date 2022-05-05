@@ -62,18 +62,17 @@ public class ReportSiteTask : RecurringHostedServiceBase
 #endif
             }
 
-
             s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
-                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8,
-                    "application/json"); //CONTENT-TYPE header
+                // CONTENT-TYPE header
+                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json");
 
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/
                 // Fire & Forget, do not need to know if its a 200, 500 etc
-                using (HttpResponseMessage response = await s_httpClient.SendAsync(request))
+                using (await s_httpClient.SendAsync(request))
                 {
                 }
             }

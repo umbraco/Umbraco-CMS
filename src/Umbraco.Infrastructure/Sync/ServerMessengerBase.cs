@@ -16,6 +16,7 @@ public abstract class ServerMessengerBase : IServerMessenger
     protected bool DistributedEnabled { get; set; }
 
     public abstract void Sync();
+
     public abstract void SendMessages();
 
     /// <summary>
@@ -211,14 +212,13 @@ public abstract class ServerMessengerBase : IServerMessenger
         Deliver(refresher, MessageType.RefreshAll);
     }
 
-    //public void PerformNotify(ICacheRefresher refresher, object payload)
-    //{
+    // public void PerformNotify(ICacheRefresher refresher, object payload)
+    // {
     //    if (servers == null) throw new ArgumentNullException("servers");
     //    if (refresher == null) throw new ArgumentNullException("refresher");
 
-    //    Deliver(refresher, payload);
-    //}
-
+    // Deliver(refresher, payload);
+    // }
     #endregion
 
     #region Deliver
@@ -255,8 +255,7 @@ public abstract class ServerMessengerBase : IServerMessenger
     ///     Since this is only for non strongly typed <see cref="ICacheRefresher" /> it will throw for message types that by
     ///     instance
     /// </remarks>
-    protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null,
-        string? json = null)
+    protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
     {
         if (refresher == null)
         {
@@ -264,8 +263,7 @@ public abstract class ServerMessengerBase : IServerMessenger
         }
 
         StaticApplicationLogging.Logger.LogDebug(
-            "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(),
-            messageType);
+            "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
         switch (messageType)
         {
@@ -329,8 +327,8 @@ public abstract class ServerMessengerBase : IServerMessenger
                 break;
 
             default:
-                //case MessageType.RefreshByInstance:
-                //case MessageType.RemoveByInstance:
+                // Case MessageType.RefreshByInstance:
+                // Case MessageType.RemoveByInstance:
                 throw new NotSupportedException("Invalid message type " + messageType);
         }
     }
@@ -347,8 +345,7 @@ public abstract class ServerMessengerBase : IServerMessenger
     ///     Since this is only for strongly typed <see cref="ICacheRefresher{T}" /> it will throw for message types that are
     ///     not by instance
     /// </remarks>
-    protected void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId,
-        IEnumerable<T> instances)
+    protected void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
     {
         if (refresher == null)
         {
@@ -356,8 +353,7 @@ public abstract class ServerMessengerBase : IServerMessenger
         }
 
         StaticApplicationLogging.Logger.LogDebug(
-            "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(),
-            messageType);
+            "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
 
         var typedRefresher = refresher as ICacheRefresher<T>;
 
@@ -395,9 +391,9 @@ public abstract class ServerMessengerBase : IServerMessenger
                 break;
 
             default:
-                //case MessageType.RefreshById:
-                //case MessageType.RemoveById:
-                //case MessageType.RefreshByJson:
+                // Case MessageType.RefreshById:
+                // Case MessageType.RemoveById:
+                // Case MessageType.RefreshByJson:
                 throw new NotSupportedException("Invalid message type " + messageType);
         }
     }
@@ -412,11 +408,9 @@ public abstract class ServerMessengerBase : IServerMessenger
     //    refresher.Notify(payload);
     //}
 
-    protected abstract void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
-        IEnumerable<object>? ids = null, string? json = null);
+    protected abstract void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null);
 
-    //protected abstract void DeliverRemote(ICacheRefresher refresher, object payload);
-
+    // Protected abstract void DeliverRemote(ICacheRefresher refresher, object payload);
     protected virtual void Deliver<TPayload>(ICacheRefresher refresher, TPayload[] payload)
     {
         if (refresher == null)
@@ -438,8 +432,7 @@ public abstract class ServerMessengerBase : IServerMessenger
         DeliverRemote(refresher, MessageType.RefreshByJson, null, json);
     }
 
-    protected virtual void Deliver(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null,
-        string? json = null)
+    protected virtual void Deliver(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
     {
         if (refresher == null)
         {
@@ -461,8 +454,7 @@ public abstract class ServerMessengerBase : IServerMessenger
         DeliverRemote(refresher, messageType, idsA, json);
     }
 
-    protected virtual void Deliver<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId,
-        IEnumerable<T> instances)
+    protected virtual void Deliver<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
     {
         if (refresher == null)
         {

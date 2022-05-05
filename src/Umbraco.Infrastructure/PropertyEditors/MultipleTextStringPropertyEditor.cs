@@ -36,8 +36,7 @@ public class MultipleTextStringPropertyEditor : DataEditor
     public MultipleTextStringPropertyEditor(
         IIOHelper ioHelper,
         IDataValueEditorFactory dataValueEditorFactory)
-        : this(ioHelper, dataValueEditorFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 

@@ -128,15 +128,12 @@ public class ManifestParser : IManifestParser
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(text));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
         }
 
         PackageManifest? manifest = JsonConvert.DeserializeObject<PackageManifest>(
             text,
-            new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper,
-                _jsonSerializer),
+            new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
             new ValueValidatorConverter(_validators),
             new DashboardAccessRuleConverter());
 
@@ -194,57 +191,33 @@ public class ManifestParser : IManifestParser
 
         foreach (PackageManifest manifest in manifests)
         {
-            if (manifest.Scripts != null)
+            if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? scriptsPerBundleOption))
             {
-                if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? scriptsPerBundleOption))
-                {
-                    scriptsPerBundleOption = new List<ManifestAssets>();
-                    scripts[manifest.BundleOptions] = scriptsPerBundleOption;
-                }
-
-                scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
+                scriptsPerBundleOption = new List<ManifestAssets>();
+                scripts[manifest.BundleOptions] = scriptsPerBundleOption;
             }
 
-            if (manifest.Stylesheets != null)
-            {
-                if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? stylesPerBundleOption))
-                {
-                    stylesPerBundleOption = new List<ManifestAssets>();
-                    stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
-                }
+            scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
 
-                stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
+            if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets>? stylesPerBundleOption))
+            {
+                stylesPerBundleOption = new List<ManifestAssets>();
+                stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
             }
 
-            if (manifest.PropertyEditors != null)
-            {
-                propertyEditors.AddRange(manifest.PropertyEditors);
-            }
+            stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
 
-            if (manifest.ParameterEditors != null)
-            {
-                parameterEditors.AddRange(manifest.ParameterEditors);
-            }
+            propertyEditors.AddRange(manifest.PropertyEditors);
 
-            if (manifest.GridEditors != null)
-            {
-                gridEditors.AddRange(manifest.GridEditors);
-            }
+            parameterEditors.AddRange(manifest.ParameterEditors);
 
-            if (manifest.ContentApps != null)
-            {
-                contentApps.AddRange(manifest.ContentApps);
-            }
+            gridEditors.AddRange(manifest.GridEditors);
 
-            if (manifest.Dashboards != null)
-            {
-                dashboards.AddRange(manifest.Dashboards);
-            }
+            contentApps.AddRange(manifest.ContentApps);
 
-            if (manifest.Sections != null)
-            {
-                sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias, StringComparer.OrdinalIgnoreCase));
-            }
+            dashboards.AddRange(manifest.Dashboards);
+
+            sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias, StringComparer.OrdinalIgnoreCase));
         }
 
         return new CompositePackageManifest(

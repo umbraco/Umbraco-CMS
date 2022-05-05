@@ -249,8 +249,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
         if (EnableSqlTrace)
         {
-            _logger.LogDebug("SQL Trace:\r\n{Sql}",
-                CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+            _logger.LogDebug("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
         }
 
 #if DEBUG_DATABASES
@@ -265,8 +264,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         base.OnExecutingCommand(cmd);
     }
 
-    private string CommandToString(DbCommand cmd) => CommandToString(cmd.CommandText,
-        cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).WhereNotNull().ToArray());
+    private string CommandToString(DbCommand cmd) => CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).WhereNotNull().ToArray());
 
     private string CommandToString(string? sql, object[]? args)
     {
@@ -327,8 +325,11 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         }
 
         public string Name { get; }
+
         public object? Value { get; }
+
         public DbType DbType { get; }
+
         public int Size { get; }
     }
 

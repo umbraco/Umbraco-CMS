@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 /// </summary>
 public class NetworkConnectivityErrorDetectionStrategy : ITransientErrorDetectionStrategy
 {
-    public bool IsTransient(Exception ex)
+    public bool IsTransient(Exception? ex)
     {
         if (ex != null && ex is SqlException sqlException)
         {

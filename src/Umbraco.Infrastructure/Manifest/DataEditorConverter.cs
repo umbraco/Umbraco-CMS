@@ -211,8 +211,8 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
             jobject.Remove("config");
         }
 
-        if (jobject["editor"]?[
-                "view"] is JValue view) // We need to null check, if view do not exists, then editor do not exists
+        // We need to null check, if view do not exists, then editor do not exists
+        if (jobject["editor"]?["view"] is JValue view)
         {
             jobject["editor"]!["view"] = RewriteVirtualUrl(view);
         }

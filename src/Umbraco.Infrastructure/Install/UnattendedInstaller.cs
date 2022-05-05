@@ -99,7 +99,7 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
         {
             using (database = _databaseFactory.CreateDatabase())
             {
-                var hasUmbracoTables = database?.IsUmbracoInstalled() ?? false;
+                var hasUmbracoTables = database.IsUmbracoInstalled();
 
                 // database has umbraco tables, assume Umbraco is already installed
                 if (hasUmbracoTables)
@@ -110,10 +110,10 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
                 // all conditions fulfilled, do the install
                 _logger.LogInformation("Starting unattended install.");
 
-                database?.BeginTransaction();
+                database.BeginTransaction();
                 DatabaseSchemaCreator creator = _databaseSchemaCreatorFactory.Create(database);
                 creator.InitializeDatabaseSchema();
-                database?.CompleteTransaction();
+                database.CompleteTransaction();
                 _logger.LogInformation("Unattended install completed.");
 
                 // Emit an event with EventAggregator that unattended install completed

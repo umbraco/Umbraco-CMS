@@ -27,6 +27,5 @@ public interface IEntityRepositoryExtended : IEntityRepository
     ///     <see cref="IMemberEntitySlim" />
     /// </returns>
     IEnumerable<IEntitySlim> GetPagedResultsByQuery(
-        IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter, Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization = null);
+        IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords, IQuery<IUmbracoEntity>? filter, Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization = null);
 }

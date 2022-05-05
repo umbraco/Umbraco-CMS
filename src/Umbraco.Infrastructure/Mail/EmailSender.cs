@@ -54,7 +54,6 @@ public class EmailSender : IEmailSender
     /// <summary>
     ///     Sends the message async
     /// </summary>
-    /// <param name="message"></param>
     /// <returns></returns>
     public async Task SendAsync(EmailMessage message, string emailType) =>
         await SendAsyncInternal(message, emailType, false);

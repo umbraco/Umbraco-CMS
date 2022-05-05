@@ -16,8 +16,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
     private readonly IMacroService _macroService;
     private readonly ParameterEditorCollection _parameterEditors;
 
-    public HtmlMacroParameterParser(IMacroService macroService, ILogger<HtmlMacroParameterParser> logger,
-        ParameterEditorCollection parameterEditors)
+    public HtmlMacroParameterParser(IMacroService macroService, ILogger<HtmlMacroParameterParser> logger, ParameterEditorCollection parameterEditors)
     {
         _macroService = macroService;
         _logger = logger;
@@ -36,7 +35,9 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
 
         // This legacy ParseMacros() already finds the macros within a Rich Text Editor using regexes
         // It seems to lowercase the macro parameter alias - so making the dictionary case insensitive
-        MacroTagParser.ParseMacros(text, textblock => { },
+        MacroTagParser.ParseMacros(
+            text,
+            textblock => { },
             (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(
                 macroAlias,
                 new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
@@ -104,7 +105,7 @@ public sealed class HtmlMacroParameterParser : IHtmlMacroParameterParser
                 new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Macro, macroConfig.Key)));
 
             // Only do this if the macros actually have parameters
-            if (macroConfig.Properties is not null && macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
+            if (macroConfig.Properties.Keys.Any(f => f != "macroAlias"))
             {
                 foreach (UmbracoEntityReference umbracoEntityReference in GetUmbracoEntityReferencesFromMacroParameters(
                              macro.Item2, macroConfig, _parameterEditors))

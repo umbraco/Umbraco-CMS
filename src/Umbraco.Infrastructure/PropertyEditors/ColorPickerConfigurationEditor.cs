@@ -91,19 +91,19 @@ internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerC
             // in:  { "value": "<color>", "id": <id>, "label": "<label>" }
             // out: ValueListItem, Id = <id>, Value = <color> | { "value": "<color>", "label": "<label>" }
             //                                        (depending on useLabel)
-            var value = item.Property("value")?.Value?.Value<string>();
+            var value = item.Property("value")?.Value.Value<string>();
             if (string.IsNullOrWhiteSpace(value))
             {
                 continue;
             }
 
-            var id = item.Property("id")?.Value?.Value<int>() ?? 0;
+            var id = item.Property("id")?.Value.Value<int>() ?? 0;
             if (id >= nextId)
             {
                 nextId = id + 1;
             }
 
-            var label = item.Property("label")?.Value?.Value<string>();
+            var label = item.Property("label")?.Value.Value<string>();
             value = _jsonSerializer.Serialize(new { value, label });
 
             output.Items.Add(new ValueListConfiguration.ValueListItem { Id = id, Value = value });

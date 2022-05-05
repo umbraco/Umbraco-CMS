@@ -184,10 +184,10 @@ public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificati
                      prop.Name != "contentTypeKey")
             {
                 // this is an arbitrary property that could contain a nested complex editor
-                var propVal = prop.Value?.ToString();
+                var propVal = prop.Value.ToString();
 
                 // check if this might contain a nested Block Editor
-                if (!propVal.IsNullOrWhiteSpace() && (propVal?.DetectIsJson() ?? false) &&
+                if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() &&
                     propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
                 {
                     if (_converter.TryDeserialize(propVal, out BlockEditorData? nestedBlockData))

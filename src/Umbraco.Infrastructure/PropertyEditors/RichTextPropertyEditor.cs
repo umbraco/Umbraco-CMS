@@ -181,8 +181,18 @@ public class RichTextPropertyEditor : DataEditor
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IHtmlSanitizer htmlSanitizer)
-            : this(attribute, backOfficeSecurityAccessor, localizedTextService, shortStringHelper, imageSourceParser,
-                localLinkParser, pastedImages, imageUrlGenerator, jsonSerializer, ioHelper, htmlSanitizer,
+            : this(
+                attribute,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                shortStringHelper,
+                imageSourceParser,
+                localLinkParser,
+                pastedImages,
+                imageUrlGenerator,
+                jsonSerializer,
+                ioHelper,
+                htmlSanitizer,
                 StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
         {
         }
@@ -246,7 +256,6 @@ public class RichTextPropertyEditor : DataEditor
         ///     Format the data for the editor
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="dataTypeService"></param>
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
@@ -277,7 +286,7 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
-            var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ??
+            var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ??
                          Constants.Security.SuperUserId;
 
             var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
@@ -290,8 +299,7 @@ public class RichTextPropertyEditor : DataEditor
             }
 
             var parseAndSavedTempImages =
-                _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId,
-                    _imageUrlGenerator);
+                _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId, _imageUrlGenerator);
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
             var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
             var sanitized = _htmlSanitizer.Sanitize(parsed);
@@ -302,9 +310,7 @@ public class RichTextPropertyEditor : DataEditor
 
     internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
-            IProperty property,
-            string? culture, string? segment, bool published)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
         {
             var val = property.GetValue(culture, segment, published);
 

@@ -18,8 +18,7 @@ public class GridValueConverter : JsonValueConverter
 {
     private readonly IGridConfig _config;
 
-    public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config,
-        ILogger<GridValueConverter> logger)
+    public GridValueConverter(PropertyEditorCollection propertyEditors, IGridConfig config, ILogger<GridValueConverter> logger)
         : base(propertyEditors, logger) =>
         _config = config;
 
@@ -32,8 +31,7 @@ public class GridValueConverter : JsonValueConverter
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -97,9 +95,7 @@ public class GridValueConverter : JsonValueConverter
             }
             catch (Exception ex)
             {
-                StaticApplicationLogging.Logger.LogError(
-                    ex,
-                    "Could not parse the string '{JsonString}' to a json object", sourceString);
+                StaticApplicationLogging.Logger.LogError(ex, "Could not parse the string '{JsonString}' to a json object", sourceString);
             }
         }
 

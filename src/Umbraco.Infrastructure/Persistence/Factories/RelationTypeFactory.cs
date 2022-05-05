@@ -9,8 +9,7 @@ internal static class RelationTypeFactory
 
     public static IRelationType BuildEntity(RelationTypeDto dto)
     {
-        var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType,
-            dto.IsDependency);
+        var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType, dto.IsDependency);
 
         try
         {

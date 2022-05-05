@@ -25,8 +25,7 @@ public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfigu
     {
     }
 
-    public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser)
+    public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(ioHelper, editorConfigurationParser)
     {
         ConfigurationField items = Fields.First(x => x.Key == "items");
@@ -98,13 +97,13 @@ public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfigu
         // create ValueListItem instances - sortOrder is ignored here
         foreach (JObject item in jItems.OfType<JObject>())
         {
-            var value = item.Property("value")?.Value?.Value<string>();
+            var value = item.Property("value")?.Value.Value<string>();
             if (string.IsNullOrWhiteSpace(value))
             {
                 continue;
             }
 
-            var id = item.Property("id")?.Value?.Value<int>() ?? 0;
+            var id = item.Property("id")?.Value.Value<int>() ?? 0;
             if (id >= nextId)
             {
                 nextId = id + 1;

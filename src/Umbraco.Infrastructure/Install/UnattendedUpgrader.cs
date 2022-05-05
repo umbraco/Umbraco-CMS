@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Runtime;
@@ -57,8 +56,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                         {
                             var innerException = new UnattendedInstallException(
                                 "An error occurred while running the unattended upgrade.\n" + result.Message);
-                            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException,
-                                innerException);
+                            _runtimeState.Configure(RuntimeLevel.BootFailed, RuntimeLevelReason.BootFailedOnException, innerException);
                         }
 
                         notification.UnattendedUpgradeResult =
@@ -87,8 +85,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
 
                     try
                     {
-                        IEnumerable<ExecutedMigrationPlan> result =
-                            _packageMigrationRunner.RunPackagePlans(pendingMigrations);
+                        _packageMigrationRunner.RunPackagePlans(pendingMigrations);
                         notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult
                             .PackageMigrationComplete;
                     }

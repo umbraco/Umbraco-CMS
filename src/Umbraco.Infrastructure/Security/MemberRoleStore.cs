@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Security;
 /// <summary>
 ///     A custom user store that uses Umbraco member data
 /// </summary>
-public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleStore<UmbracoIdentityRole>
+public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 {
     // TODO: Move into custom error describer.
     // TODO: How revealing can the error messages be?

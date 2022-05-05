@@ -19,8 +19,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
 {
-    public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ContentTypeRepository> logger,
-        IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository,
+    public ContentTypeRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<ContentTypeRepository> logger,
+        IContentTypeCommonRepository commonRepository,
+        ILanguageRepository languageRepository,
         IShortStringHelper shortStringHelper)
         : base(scopeAccessor, cache, logger, commonRepository, languageRepository, shortStringHelper)
     {
@@ -34,7 +38,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
     {
         var ints = PerformGetByQuery(query).ToArray();
-        return ints.Length > 0 ? GetMany(ints) ?? Enumerable.Empty<IContentType>() : Enumerable.Empty<IContentType>();
+        return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
     }
 
     /// <summary>
@@ -86,8 +90,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     }
 
     protected override IRepositoryCachePolicy<IContentType, int> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor,
-            GetEntityId, /*expires:*/ true);
+        new FullDataSetRepositoryCachePolicy<IContentType, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ true);
 
     // every GetExists method goes cachePolicy.GetSomething which in turns goes PerformGetAll,
     // since this is a FullDataSet policy - and everything is cached
@@ -100,24 +103,24 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     // and ah, well, this all caching should be refactored + the cache refreshers
     // should to repository.Clear() not deal with magic caches by themselves
     protected override IContentType? PerformGet(int id)
-        => GetMany()?.FirstOrDefault(x => x.Id == id);
+        => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IContentType? PerformGet(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id);
+        => GetMany().FirstOrDefault(x => x.Key == id);
 
     protected override IContentType? PerformGet(string alias)
-        => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
     protected override bool PerformExists(Guid id)
-        => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
+        => GetMany().FirstOrDefault(x => x.Key == id) != null;
 
     protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy() =>
         CommonRepository.GetAllTypes()?.OfType<IContentType>();
 
-    protected override IEnumerable<IContentType>? PerformGetAll(params Guid[]? ids)
+    protected override IEnumerable<IContentType> PerformGetAll(params Guid[]? ids)
     {
-        IEnumerable<IContentType>? all = GetMany();
-        return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
+        IEnumerable<IContentType> all = GetMany();
+        return ids?.Any() ?? false ? all.Where(x => ids.Contains(x.Key)) : all;
     }
 
     protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
@@ -128,7 +131,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
         return ids.Length > 0
-            ? GetMany(ids)?.OrderBy(x => x.Name) ?? Enumerable.Empty<IContentType>()
+            ? GetMany(ids).OrderBy(x => x.Name)
             : Enumerable.Empty<IContentType>();
     }
 
@@ -193,13 +196,10 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
     protected override void PersistDeletedItem(IContentType entity)
     {
         IQuery<IContentType> query = Query<IContentType>().Where(x => x.ParentId == entity.Id);
-        IEnumerable<IContentType>? children = Get(query);
-        if (children is not null)
+        IEnumerable<IContentType> children = Get(query);
+        foreach (IContentType child in children)
         {
-            foreach (IContentType child in children)
-            {
-                PersistDeletedItem(child);
-            }
+            PersistDeletedItem(child);
         }
 
         // Before we call the base class methods to run all delete clauses, we need to first
@@ -217,8 +217,7 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
             .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
 
         // Delete all PropertyData where propertytypeid EXISTS in the subquery above
-        Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid",
-            sql));
+        Database.Execute(SqlSyntax.GetDeleteSubquery(Constants.DatabaseSchema.Tables.PropertyData, "propertytypeid", sql));
 
         base.PersistDeletedItem(entity);
     }
@@ -255,20 +254,16 @@ internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, 
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id,
-                TemplateNodeId = defaultTemplateId,
-                IsDefault = true,
+                ContentTypeNodeId = entity.Id, TemplateNodeId = defaultTemplateId, IsDefault = true,
             });
         }
 
-        foreach (ITemplate template in entity.AllowedTemplates?.Where(x => x != null && x.Id != defaultTemplateId) ??
+        foreach (ITemplate template in entity.AllowedTemplates?.Where(x => x.Id != defaultTemplateId) ??
                                        Array.Empty<ITemplate>())
         {
             Database.Insert(new ContentTypeTemplateDto
             {
-                ContentTypeNodeId = entity.Id,
-                TemplateNodeId = template.Id,
-                IsDefault = false,
+                ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false,
             });
         }
     }

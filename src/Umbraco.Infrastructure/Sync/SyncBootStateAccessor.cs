@@ -71,10 +71,7 @@ public class SyncBootStateAccessor : ISyncBootStateAccessor
                 if (_cacheInstructionService.IsInstructionCountOverLimit(lastId, limit, out var count))
                 {
                     // Too many instructions, proceed to cold boot.
-                    _logger.LogWarning(
-                        "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount}). "
-                        + "A cold boot will be triggered.",
-                        count, limit);
+                    _logger.LogWarning("The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount}). " + "A cold boot will be triggered.", count, limit);
 
                     coldboot = true;
                 }

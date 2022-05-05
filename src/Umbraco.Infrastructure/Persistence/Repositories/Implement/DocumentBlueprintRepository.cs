@@ -38,9 +38,22 @@ internal class DocumentBlueprintRepository : DocumentRepository, IDocumentBluepr
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator)
-        : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository,
-            tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection,
-            dataValueReferenceFactories, dataTypeService, serializer, eventAggregator)
+        : base(
+            scopeAccessor,
+            appCaches,
+            logger,
+            loggerFactory,
+            contentTypeRepository,
+            templateRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            dataValueReferenceFactories,
+            dataTypeService,
+            serializer,
+            eventAggregator)
     {
     }
 

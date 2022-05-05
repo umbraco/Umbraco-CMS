@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+
 // See https://docs.microsoft.com/en-us/azure/azure-sql/database/troubleshoot-common-connectivity-issues
 // Also we could just use the nuget package instead https://www.nuget.org/packages/EnterpriseLibrary.TransientFaultHandling/ ?
 // but i guess that's not netcore so we'll just leave it.
@@ -17,7 +18,7 @@ public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionS
     /// </summary>
     /// <param name="ex">The exception object to be verified.</param>
     /// <returns>true if the specified exception is considered as transient; otherwise, false.</returns>
-    public bool IsTransient(Exception ex)
+    public bool IsTransient(Exception? ex)
     {
         if (ex != null)
         {
@@ -98,6 +99,7 @@ public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionS
             {
                 return true;
             }
+
             // else
             // {
             //     EntityException entityException;
@@ -164,7 +166,7 @@ public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionS
 
         EncryptionError = 19,
 
-        EncryptionNotSupported = 20
+        EncryptionNotSupported = 20,
     }
 
     #endregion

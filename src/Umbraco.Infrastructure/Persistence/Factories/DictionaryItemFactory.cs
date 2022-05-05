@@ -28,7 +28,6 @@ internal static class DictionaryItemFactory
         }
     }
 
-
     private static List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
     {
         var list = new List<LanguageTextDto>();
@@ -40,7 +39,7 @@ internal static class DictionaryItemFactory
                 {
                     LanguageId = translation.LanguageId,
                     UniqueId = translation.Key,
-                    Value = translation.Value!,
+                    Value = translation.Value,
                 };
 
                 if (translation.HasIdentity)

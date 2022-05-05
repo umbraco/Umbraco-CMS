@@ -251,8 +251,8 @@ WHERE r.tagId IS NULL";
         {
             unchecked
             {
-                var h = obj.Text?.GetHashCode() ?? 1;
-                h = (h * 397) ^ obj.Group?.GetHashCode() ?? 0;
+                var h = obj.Text.GetHashCode();
+                h = (h * 397) ^ obj.Group.GetHashCode();
                 h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                 return h;
             }

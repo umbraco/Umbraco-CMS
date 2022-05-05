@@ -77,7 +77,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
     /// <returns></returns>
     public bool Exists(Guid id) => PerformExists(id);
 
-    public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
+    public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer? container)
     {
         var parentId = Constants.System.Root;
         if (container != null)
@@ -110,16 +110,11 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         Save(moving);
 
         // update all descendants, update in order of level
-        IEnumerable<TEntity>? descendants = Get(Query<TEntity>().Where(type => type.Path.StartsWith(movingPath)));
+        IEnumerable<TEntity> descendants = Get(Query<TEntity>().Where(type => type.Path.StartsWith(movingPath)));
         var paths = new Dictionary<int, string>
         {
             [moving.Id] = moving.Path,
         };
-
-        if (descendants is null)
-        {
-            return moveInfo;
-        }
 
         foreach (TEntity descendant in descendants.OrderBy(x => x.Level))
         {
@@ -1486,7 +1481,6 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         return test;
     }
 
-    /// <inheritdoc />
     public bool HasContainerInPath(string contentPath)
     {
         var ids = contentPath.Split(Constants.CharArrays.Comma)
@@ -1494,7 +1488,6 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         return HasContainerInPath(ids);
     }
 
-    /// <inheritdoc />
     public bool HasContainerInPath(params int[] ids)
     {
         var sql = new Sql(

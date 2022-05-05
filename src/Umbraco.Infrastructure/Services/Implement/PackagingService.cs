@@ -66,8 +66,7 @@ public class PackagingService : IPackagingService
 
         InstallationSummary summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
-        _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package",
-            $"Package data installed for package '{compiledPackage.Name}'.");
+        _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
         // trigger the ImportedPackage event
         _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
@@ -100,8 +99,7 @@ public class PackagingService : IPackagingService
             return;
         }
 
-        _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package",
-            $"Created package '{package.Name}' deleted. Package id: {package.Id}");
+        _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Created package '{package.Name}' deleted. Package id: {package.Id}");
         _createdPackages.Delete(id);
     }
 

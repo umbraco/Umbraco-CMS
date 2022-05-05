@@ -25,7 +25,8 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase
     /// </summary>
     public NestedContentManyValueConverter(
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IPublishedModelFactory publishedModelFactory, IProfilingLogger proflog)
+        IPublishedModelFactory publishedModelFactory,
+        IProfilingLogger proflog)
         : base(publishedSnapshotAccessor, publishedModelFactory)
         => _proflog = proflog;
 
@@ -49,13 +50,11 @@ public class NestedContentManyValueConverter : NestedContentValueConverterBase
         => PropertyCacheLevel.Element;
 
     /// <inheritdoc />
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         => source?.ToString();
 
     /// <inheritdoc />
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         using (_proflog.DebugDuration<NestedContentManyValueConverter>(
                    $"ConvertPropertyToNestedContent ({propertyType.DataType.Id})"))

@@ -17,8 +17,7 @@ public class NotificationsRepository : INotificationsRepository
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
-    public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action,
-        IEnumerable<int> nodeIds, Guid objectType)
+    public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
         var nodeIdsA = nodeIds.ToArray();
         Sql<ISqlContext>? sql = AmbientScope?.SqlContext.Sql()

@@ -35,12 +35,15 @@ public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
 
     private class MigrateToPackageData : PackageMigrationBase
     {
-        public MigrateToPackageData(IPackagingService packagingService, IMediaService mediaService,
-            MediaFileManager mediaFileManager, MediaUrlGeneratorCollection mediaUrlGenerators,
-            IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        public MigrateToPackageData(
+            IPackagingService packagingService,
+            IMediaService mediaService,
+            MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IShortStringHelper shortStringHelper,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IMigrationContext context)
-            : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators,
-            shortStringHelper, contentTypeBaseServiceProvider, context)
+            : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context)
         {
         }
 

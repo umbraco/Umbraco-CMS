@@ -42,8 +42,8 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
             () =>
             {
                 IQuery<IMemberGroup> qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(name));
-                IEnumerable<IMemberGroup>? result = Get(qry);
-                return result?.FirstOrDefault();
+                IEnumerable<IMemberGroup> result = Get(qry);
+                return result.FirstOrDefault();
             },
 
             // cache for 5 mins since that is the default in the Runtime app cache
@@ -55,9 +55,9 @@ internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, 
     public IMemberGroup? CreateIfNotExists(string roleName)
     {
         IQuery<IMemberGroup> qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(roleName));
-        IEnumerable<IMemberGroup>? result = Get(qry);
+        IEnumerable<IMemberGroup> result = Get(qry);
 
-        if (result?.Any() ?? false)
+        if (result.Any())
         {
             return null;
         }

@@ -77,7 +77,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
         Save(toMove);
 
         // update all descendants from the original path, update in order of level
-        IEnumerable<IDataType>? descendants =
+        IEnumerable<IDataType> descendants =
             Get(Query<IDataType>().Where(type => type.Path.StartsWith(origPath + ",")));
 
         IDataType lastParent = toMove;
@@ -126,7 +126,7 @@ internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataT
 
     #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
-    protected override IDataType? PerformGet(int id) => GetMany(id)?.FirstOrDefault();
+    protected override IDataType? PerformGet(int id) => GetMany(id).FirstOrDefault();
 
     private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
     {

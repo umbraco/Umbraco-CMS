@@ -12,8 +12,7 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
     public override bool IsConverter(IPublishedPropertyType propertyType) =>
         propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.DropDownListFlexible);
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -23,8 +22,7 @@ public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
         return JsonConvert.DeserializeObject<string[]>(source.ToString()!) ?? Array.Empty<string>();
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (inter == null)
         {

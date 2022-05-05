@@ -39,17 +39,18 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
         // content will be lazy-loaded when required
         DateTime created = FileSystem.GetCreated(path).UtcDateTime;
         DateTime updated = FileSystem.GetLastModified(path).UtcDateTime;
-        //var content = GetFileContent(path);
 
+        // var content = GetFileContent(path);
         var view = new PartialView(ViewType, path, file => GetFileContent(file.OriginalPath))
         {
-            //id can be the hash
+            // id can be the hash
             Id = path.GetHashCode(),
             Key = path.EncodeAsGuid(),
-            //Content = content,
+
+            // Content = content,
             CreateDate = created,
             UpdateDate = updated,
-            VirtualPath = FileSystem.GetUrl(id)
+            VirtualPath = FileSystem.GetUrl(id),
         };
 
         // reset dirty initial properties (U4-1946)
@@ -77,7 +78,7 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
 
     public override IEnumerable<IPartialView> GetMany(params string[]? ids)
     {
-        //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+        // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
         ids = ids?.Distinct().ToArray();
 
         if (ids?.Any() ?? false)
@@ -93,7 +94,7 @@ internal class PartialViewRepository : FileRepository<string, IPartialView>, IPa
         }
         else
         {
-            IEnumerable<string> files = FindAllFiles("", "*.*");
+            IEnumerable<string> files = FindAllFiles(string.Empty, "*.*");
             foreach (var file in files)
             {
                 IPartialView? partialView = Get(file);

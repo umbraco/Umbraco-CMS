@@ -927,7 +927,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         return sql;
     }
 
-    private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object?>> orderBy,
+    private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object?>>? orderBy,
         Direction orderDirection)
     {
         if (orderBy == null)
@@ -985,7 +985,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         // now get the actual users and ensure they are ordered properly (same clause)
         return ids.Length == 0
             ? Enumerable.Empty<IUser>()
-            : GetMany(ids)?.OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
+            : GetMany(ids).OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
     }
 
     #endregion

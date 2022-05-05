@@ -88,7 +88,7 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
         try
         {
-            using Stream? stream = FileSystem?.OpenFile(filename!);
+            using Stream? stream = FileSystem?.OpenFile(filename);
             if (stream is not null)
             {
                 using var reader = new StreamReader(stream, Encoding.UTF8, true);

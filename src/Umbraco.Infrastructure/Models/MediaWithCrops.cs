@@ -15,8 +15,7 @@ public class MediaWithCrops : PublishedContentWrapped
     /// <param name="content">The content.</param>
     /// <param name="publishedValueFallback">The published value fallback.</param>
     /// <param name="localCrops">The local crops.</param>
-    public MediaWithCrops(IPublishedContent content, IPublishedValueFallback publishedValueFallback,
-        ImageCropperValue localCrops)
+    public MediaWithCrops(IPublishedContent content, IPublishedValueFallback publishedValueFallback, ImageCropperValue localCrops)
         : base(content, publishedValueFallback) =>
         LocalCrops = localCrops;
 

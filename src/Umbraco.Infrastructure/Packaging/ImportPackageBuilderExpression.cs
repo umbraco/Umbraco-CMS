@@ -83,7 +83,8 @@ internal class ImportPackageBuilderExpression : MigrationExpressionBase
         {
             if (PackageMigrationResource.TryGetEmbeddedPackageDataManifest(
                     EmbeddedResourceMigrationType,
-                    out XDocument? xml, out ZipArchive? zipPackage))
+                    out XDocument? xml,
+                    out ZipArchive? zipPackage))
             {
                 // first install the package
                 installationSummary = _packagingService.InstallCompiledPackageData(xml!);

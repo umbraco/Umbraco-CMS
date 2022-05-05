@@ -51,8 +51,6 @@ public abstract class ComplexEditorValidator : IValueValidator
     /// <summary>
     ///     Return a nested validation result per row (Element Type)
     /// </summary>
-    /// <param name="rawValue"></param>
-    /// <returns></returns>
     protected IEnumerable<ComplexEditorElementTypeValidationResult> GetNestedValidationResults(
         IEnumerable<ElementTypeValidationModel> elements)
     {
