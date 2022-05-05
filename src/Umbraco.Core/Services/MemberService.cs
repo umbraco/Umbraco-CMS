@@ -406,7 +406,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeAlias">Alias of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias)
+        public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -421,7 +421,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId)
+        public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
