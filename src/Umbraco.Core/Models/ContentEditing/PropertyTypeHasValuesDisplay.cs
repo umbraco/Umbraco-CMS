@@ -5,15 +5,15 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "propertyTypeHasValueDisplay")]
 public class PropertyTypeHasValuesDisplay
 {
-    public PropertyTypeHasValuesDisplay(string propertyTypeAlias, bool hasValue)
+    public PropertyTypeHasValuesDisplay(string propertyTypeAlias, bool hasValues)
     {
         PropertyTypeAlias = propertyTypeAlias;
-        HasValue = hasValue;
+        HasValues = hasValues;
     }
 
     [DataMember(Name = "propertyTypeAlias")]
     public string PropertyTypeAlias { get; }
 
-    [DataMember(Name = "hasValue")]
-    public bool HasValue { get; }
+    [DataMember(Name = "hasValues")]
+    public bool HasValues { get; }
 }

@@ -68,7 +68,7 @@ public class PropertyTypeControllerTests : UmbracoTestServerTestBase
         {
             Assert.IsNotNull(result);
             Assert.AreEqual(propertyTypeAlias, result.PropertyTypeAlias);
-            Assert.AreEqual(expectHasValues, result.HasValue);
+            Assert.AreEqual(expectHasValues, result.HasValues);
         });
 
     }

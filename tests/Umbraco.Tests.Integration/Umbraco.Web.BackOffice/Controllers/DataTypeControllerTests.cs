@@ -73,7 +73,7 @@ public class DataTypeControllerTests : UmbracoTestServerTestBase
         {
             Assert.IsNotNull(result);
             Assert.AreEqual(dataType.Id, result.Id);
-            Assert.AreEqual(expectHasValues, result.HasValue);
+            Assert.AreEqual(expectHasValues, result.HasValues);
         });
     }
 }
