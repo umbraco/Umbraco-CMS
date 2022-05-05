@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public bool TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -58,7 +59,10 @@ namespace Umbraco.Cms.Core.Routing
 
             if (redirectUrl == null)
             {
-                _logger.LogDebug("No match for route: {Route}", route);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("No match for route: {Route}", route);
+                }
                 return false;
             }
 
@@ -66,14 +70,19 @@ namespace Umbraco.Cms.Core.Routing
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
+                }
                 return false;
             }
 
             // Appending any querystring from the incoming request to the redirect URL
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
-
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
+            }
 
             frequest
                 .SetRedirectPermanent(url)

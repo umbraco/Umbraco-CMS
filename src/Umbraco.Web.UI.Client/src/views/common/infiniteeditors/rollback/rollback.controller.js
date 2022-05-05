@@ -57,7 +57,7 @@
             });
 
             // Load in diff library
-            assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {
+            assetsService.loadJs('lib/jsdiff/diff.js', $scope).then(function () {
 
                 getVersions().then(function(){
                     vm.loading = false;
@@ -148,7 +148,7 @@
             vm.diff.properties = [];
 
             // find diff in name
-            vm.diff.name = JsDiff.diffWords(currentVersion.name, previousVersion.name);
+            vm.diff.name = Diff.diffWords(currentVersion.name, previousVersion.name);
 
             // extract all properties from the tabs and create new object for the diff
             currentVersion.tabs.forEach(function (tab) {
@@ -192,7 +192,7 @@
                         const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
-                            'diff': property.isObject ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
+                            'diff': property.isObject ? Diff.diffJson(property.value, oldProperty.value) : Diff.diffWords(property.value, oldProperty.value),
                             'isObject': property.isObject || oldProperty.isObject
                         };
                         

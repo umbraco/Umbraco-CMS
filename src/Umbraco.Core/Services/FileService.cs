@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -152,7 +153,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetStylesheetFileContentStream(string filepath)
+        public Stream GetStylesheetFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -282,7 +283,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetScriptFileContentStream(string filepath)
+        public Stream GetScriptFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -596,11 +597,7 @@ namespace Umbraco.Cms.Core.Services
                 fileName = $"{fileName}.cshtml";
             }
 
-            Stream? fs = _templateRepository.GetFileContentStream(fileName);
-            if (fs == null)
-            {
-                return null;
-            }
+            Stream fs = _templateRepository.GetFileContentStream(fileName);
 
             using (var view = new StreamReader(fs))
             {
@@ -609,7 +606,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetTemplateFileContentStream(string filepath)
+        public Stream GetTemplateFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -642,9 +639,12 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
-            var snippetPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
-            var files = Directory.GetFiles(snippetPath, "*.cshtml")
-                .Select(Path.GetFileNameWithoutExtension)
+            var snippetProvider =
+                new EmbeddedFileProvider(this.GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
+
+            var files = snippetProvider.GetDirectoryContents(string.Empty)
+                .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"))
+                .Select(x => Path.GetFileNameWithoutExtension(x.Name))
                 .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
                 .ToArray();
 
@@ -894,7 +894,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetPartialViewFileContentStream(string filepath)
+        public Stream GetPartialViewFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -922,7 +922,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public Stream? GetPartialViewMacroFileContentStream(string filepath)
+        public Stream GetPartialViewMacroFileContentStream(string filepath)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -977,14 +977,18 @@ namespace Umbraco.Cms.Core.Services
                     throw new ArgumentOutOfRangeException(nameof(partialViewType));
             }
 
+            var snippetProvider =
+                new EmbeddedFileProvider(this.GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
+
+            var file = snippetProvider.GetDirectoryContents(string.Empty).FirstOrDefault(x=>x.Exists && x.Name.Equals(snippetName + ".cshtml"));
+
             // Try and get the snippet path
-            Attempt<string> snippetPathAttempt = TryGetSnippetPath(snippetName);
-            if (snippetPathAttempt.Success == false)
+            if (file is null)
             {
                 throw new InvalidOperationException("Could not load snippet with name " + snippetName);
             }
 
-            using (var snippetFile = new StreamReader(System.IO.File.OpenRead(snippetPathAttempt.Result!)))
+            using (var snippetFile = new StreamReader(file.CreateReadStream()))
             {
                 var snippetContent = snippetFile.ReadToEnd().Trim();
 

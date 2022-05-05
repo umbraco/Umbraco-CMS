@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Services
     {
         void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
-        IEnumerable<IAuditItem>? GetLogs(int objectId);
+        IEnumerable<IAuditItem> GetLogs(int objectId);
         IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
         IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
         void CleanLogs(int maximumAgeOfLogsInMinutes);

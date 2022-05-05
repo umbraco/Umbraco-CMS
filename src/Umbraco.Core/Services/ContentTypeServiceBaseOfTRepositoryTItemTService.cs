@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<TItem>();
             }
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
 
             {
                 scope.ReadLock(ReadLockIds);
@@ -312,7 +312,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem>? GetChildren(int id)
+        public IEnumerable<TItem> GetChildren(int id)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -322,7 +322,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem>? GetChildren(Guid id)
+        public IEnumerable<TItem> GetChildren(Guid id)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -403,7 +403,7 @@ namespace Umbraco.Cms.Core.Services
                 {
                     var i = ids.Pop();
                     var query = Query<TItem>().Where(x => x.ParentId == i);
-                    var result = Repository.Get(query)?.ToArray();
+                    var result = Repository.Get(query).ToArray();
 
                     if (result is not null)
                     {

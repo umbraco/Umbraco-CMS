@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -42,7 +43,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public bool TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -70,7 +71,10 @@ namespace Umbraco.Cms.Core.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.LogDebug("Id={NodeId}", nodeId);
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Id={NodeId}", nodeId);
+                    }
                     node = umbracoContext?.Content?.GetById(nodeId);
 
                     if (node != null)
@@ -86,7 +90,10 @@ namespace Umbraco.Cms.Core.Routing
                         }
 
                         frequest.SetPublishedContent(node);
-                        _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
+                        if (_logger.IsEnabled(LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
+                        }
                     }
                     else
                     {
@@ -97,7 +104,10 @@ namespace Umbraco.Cms.Core.Routing
 
             if (nodeId == -1)
             {
-                _logger.LogDebug("Not a node id");
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Not a node id");
+                }
             }
 
             return node != null;
