@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
@@ -94,6 +96,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
-        
+
+        [Test]
+        public void LanguageFilesAreLowercase()
+        {
+            var languageProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang");
+            var files = languageProvider.GetDirectoryContents(string.Empty)
+                                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"))
+                                    .Select(x => x.Name);
+
+            foreach (var fileName in files)
+            {
+                Assert.AreEqual(
+                    fileName.ToLower(),
+                    fileName,
+                    $"Language files must be all lowercase but {fileName} is not lowercase.");
+            }
+        }
     }
 }
