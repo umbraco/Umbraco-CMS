@@ -7,11 +7,11 @@ using Umbraco.Cms.Core.Extensions;
 namespace Umbraco.Cms.Core.Snippets
 {
     /// <summary>
-    /// The partial view (macro) snippet collection builder.
+    /// The partial view macro snippet collection builder.
     /// </summary>
-    public class SnippetCollectionBuilder : LazyCollectionBuilderBase<SnippetCollectionBuilder, SnippetCollection, ISnippet>
+    public class PartialViewMacroSnippetCollectionBuilder : LazyCollectionBuilderBase<PartialViewMacroSnippetCollectionBuilder, PartialViewMacroSnippetCollection, ISnippet>
     {
-        protected override SnippetCollectionBuilder This => this;
+        protected override PartialViewMacroSnippetCollectionBuilder This => this;
 
         protected override IEnumerable<ISnippet> CreateItems(IServiceProvider factory)
         {
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Snippets
                 .Select(s => s.First()); // Takes the first element from a grouping, which is the embeded snippet with that same name,
                                          // since the physical snippet files are placed after the embedded ones in the all snippets colleciton
 
-            // Remove any embedded Snippets if a physical file with the same name can be found
+            // Remove any embedded snippets if a physical file with the same name can be found
             return allSnippets.Except(duplicates);
         }
     }
