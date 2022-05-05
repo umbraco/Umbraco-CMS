@@ -78,12 +78,12 @@
                                         description="model.property.editor"
                                         allow-edit="true"
                                         on-edit="vm.openDataTypeSettings(model.property)"
-                                        allow-change="vm.canChangeDataType === 'on'"
+                                        allow-change="vm.allowChangeDataType"
                                         on-change="vm.openDataTypePicker(model.property)">
                                     </umb-node-preview>
                                     
-                                    <div ng-if="vm.canChangeDataType === 'disabled'" class="mt2 umb-alert umb-alert--compact umb-alert--info">
-                                        Temp help message
+                                    <div ng-if="vm.changeDataTypeHelpTextIsVisible" class="mt2 umb-alert umb-alert--compact umb-alert--info">
+                                        <localize key="contentTypeEditor_changeDataTypeHelpText">
                                     </div>
                                 </div>
                             </div>

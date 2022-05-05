@@ -1930,6 +1930,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="changeDataTypeHelpText">Changing a data type on a property with stored values is disabled.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

@@ -16,8 +16,8 @@
   const dataTypesCanBeChangedConfig = window.Umbraco.Sys.ServerVariables.umbracoSettings.dataTypesCanBeChanged;
 
   vm.allowChangePropertyEditor = false;
+  vm.changePropertyEditorHelpTextIsVisible = false;
   vm.dataTypeHasValues = false;
-  vm.loadingDataTypeValuesCheck = false;
 
   vm.openPropertyEditorPicker = openPropertyEditorPicker;
 
@@ -25,8 +25,6 @@
     vm.selectedEditorModel = $scope.model.content.availableEditors.find(editor => editor.alias === $scope.model.content.selectedEditor);
 
     if (dataTypeId !== "-1" && (dataTypesCanBeChangedConfig === "False" || dataTypesCanBeChangedConfig === "FalseWithHelpText")) {
-      
-      vm.loadingDataTypeValuesCheck = true;
 
       // We always allow changing the property editor if the data type is not in use.
       dataTypeResource.hasValues($routeParams.id)
@@ -34,7 +32,6 @@
           vm.dataTypeHasValues = data.hasValues;
           vm.allowChangePropertyEditor = !vm.dataTypeHasValues;
           vm.changePropertyEditorHelpTextIsVisible = !vm.allowChangePropertyEditor && dataTypesCanBeChangedConfig === "FalseWithHelpText";
-          vm.loadingDataTypeValuesCheck = false;
         });
     } else {
       vm.allowChangePropertyEditor = true;
