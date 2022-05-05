@@ -5,6 +5,6 @@
     /// </summary>
     public class MediaEntitySlim : ContentEntitySlim, IMediaEntitySlim
     {
-        public string MediaPath { get; set; }
+        public string? MediaPath { get; set; }
     }
 }

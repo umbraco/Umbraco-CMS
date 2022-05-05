@@ -14,17 +14,17 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class DataType : TreeEntityBase, IDataType
     {
-        private IDataEditor _editor;
+        private IDataEditor? _editor;
         private ValueStorageType _databaseType;
         private readonly IConfigurationEditorJsonSerializer _serializer;
-        private object _configuration;
+        private object? _configuration;
         private bool _hasConfiguration;
-        private string _configurationJson;
+        private string? _configurationJson;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataType"/> class.
         /// </summary>
-        public DataType(IDataEditor editor, IConfigurationEditorJsonSerializer serializer, int parentId = -1)
+        public DataType(IDataEditor? editor, IConfigurationEditorJsonSerializer serializer, int parentId = -1)
         {
             _editor = editor ?? throw new ArgumentNullException(nameof(editor));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(editor));
@@ -36,13 +36,13 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [IgnoreDataMember]
-        public IDataEditor Editor
+        public IDataEditor? Editor
         {
             get => _editor;
             set
             {
                 // ignore if no change
-                if (_editor.Alias == value.Alias) return;
+                if (_editor?.Alias == value?.Alias) return;
                 OnPropertyChanged(nameof(Editor));
 
                 // try to map the existing configuration to the new configuration
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Models
 
                 try
                 {
-                    Configuration = _editor.GetConfigurationEditor().FromDatabase(json, _serializer);
+                    Configuration = _editor?.GetConfigurationEditor().FromDatabase(json, _serializer);
                 }
                 catch (Exception e)
                 {
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public string EditorAlias => _editor.Alias;
+        public string EditorAlias => _editor?.Alias ?? string.Empty;
 
         /// <inheritdoc />
         [DataMember]
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public object Configuration
+        public object? Configuration
         {
             get
             {
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Core.Models
 
                 try
                 {
-                    _configuration = _editor.GetConfigurationEditor().FromDatabase(_configurationJson, _serializer);
+                    _configuration = _editor?.GetConfigurationEditor().FromDatabase(_configurationJson, _serializer);
                 }
                 catch (Exception e)
                 {
@@ -113,8 +113,8 @@ namespace Umbraco.Cms.Core.Models
                     throw new ArgumentException("Configurations are kinda non-mutable. Do not reassign the same object.", nameof(value));
 
                 // validate configuration type
-                if (!_editor.GetConfigurationEditor().IsConfiguration(value))
-                    throw new ArgumentException($"Value of type {value.GetType().Name} cannot be a configuration for editor {_editor.Alias}, expecting.", nameof(value));
+                if (!_editor?.GetConfigurationEditor().IsConfiguration(value) ?? true)
+                    throw new ArgumentException($"Value of type {value.GetType().Name} cannot be a configuration for editor {_editor?.Alias}, expecting.", nameof(value));
 
                 // extract database type from configuration object, if appropriate
                 if (value is IConfigureValueType valueTypeConfiguration)
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Models
         /// type, and they should be the same.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        public void SetLazyConfiguration(string configurationJson)
+        public void SetLazyConfiguration(string? configurationJson)
         {
             _hasConfiguration = false;
             _configuration = null;
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>This method is meant to be used when creating published datatypes, exclusively.</para>
         /// <para>Think before using!</para>
         /// </remarks>
-        internal Lazy<object> GetLazyConfiguration()
+        internal Lazy<object?> GetLazyConfiguration()
         {
             // note: in both cases, make sure we capture what we need - we don't want
             // to capture a reference to this full, potentially heavy, DataType instance.
@@ -171,18 +171,18 @@ namespace Umbraco.Cms.Core.Models
             {
                 // if configuration has already been de-serialized, return
                 var capturedConfiguration = _configuration;
-                return new Lazy<object>(() => capturedConfiguration);
+                return new Lazy<object?>(() => capturedConfiguration);
             }
             else
             {
                 // else, create a Lazy de-serializer
                 var capturedConfiguration = _configurationJson;
                 var capturedEditor = _editor;
-                return new Lazy<object>(() =>
+                return new Lazy<object?>(() =>
                 {
                     try
                     {
-                        return capturedEditor.GetConfigurationEditor().FromDatabase(capturedConfiguration, _serializer);
+                        return capturedEditor?.GetConfigurationEditor().FromDatabase(capturedConfiguration, _serializer);
                     }
                     catch (Exception e)
                     {

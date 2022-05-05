@@ -25,12 +25,12 @@ namespace Umbraco.Cms.Web.Common.Filters
             private readonly string _format = "yyyy-MM-dd HH:mm:ss";
 
             private readonly ArrayPool<char> _arrayPool;
-            private readonly IOptions<MvcOptions> _options;
+            private readonly MvcOptions _options;
 
-            public JsonDateTimeFormatFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+            public JsonDateTimeFormatFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
             {
                 _arrayPool = arrayPool;
-                _options = options;
+                _options = options.Value;
             }
 
             public void OnResultExecuted(ResultExecutedContext context)
@@ -47,9 +47,8 @@ namespace Umbraco.Cms.Web.Common.Filters
                         {
                             DateTimeFormat = _format
                         });
-
                     objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options.Value));
+                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
                 }
             }
         }

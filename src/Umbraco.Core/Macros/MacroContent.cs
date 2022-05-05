@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Macros
     public class MacroContent
     {
         // gets or sets the text content
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         // gets or sets the date the content was generated
         public DateTime Date { get; set; } = DateTime.Now;

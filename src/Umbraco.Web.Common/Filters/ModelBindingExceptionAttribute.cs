@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             private readonly ExceptionFilterSettings _exceptionFilterSettings;
             private readonly IPublishedModelFactory _publishedModelFactory;
 
-            public ModelBindingExceptionFilter(IOptions<ExceptionFilterSettings> exceptionFilterSettings, IPublishedModelFactory publishedModelFactory)
+            public ModelBindingExceptionFilter(IOptionsSnapshot<ExceptionFilterSettings> exceptionFilterSettings, IPublishedModelFactory publishedModelFactory)
             {
                 _exceptionFilterSettings = exceptionFilterSettings.Value;
                 _publishedModelFactory = publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));

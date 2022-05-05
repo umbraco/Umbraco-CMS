@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <remarks>The default alias of the editor is "Umbraco.Void". When a suffix is provided,
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
         public VoidEditor(
-            string aliasSuffix,
+            string? aliasSuffix,
             IDataValueEditorFactory dataValueEditorFactory)
             : base(dataValueEditorFactory)
         {

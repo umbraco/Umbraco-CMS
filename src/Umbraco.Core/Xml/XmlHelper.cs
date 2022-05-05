@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Xml
             }
             else
             {
-                n.Attributes[name].Value = value;
+                n.Attributes[name]!.Value = value;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <param name="xml">The xml string.</param>
         /// <param name="doc">The XPath document.</param>
         /// <returns>A value indicating whether it has been possible to create the document.</returns>
-        public static bool TryCreateXPathDocument(string xml, out XPathDocument doc)
+        public static bool TryCreateXPathDocument(string xml, out XPathDocument? doc)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <param name="doc">The XPath document.</param>
         /// <returns>A value indicating whether it has been possible to create the document.</returns>
         /// <remarks>The value can be anything... Performance-wise, this is bad.</remarks>
-        public static bool TryCreateXPathDocumentFromPropertyValue(object value, out XPathDocument doc)
+        public static bool TryCreateXPathDocumentFromPropertyValue(object value, out XPathDocument? doc)
         {
             // DynamicNode.ConvertPropertyValueByDataType first cleans the value by calling
             // XmlHelper.StripDashesInElementOrAttributeName - this is because the XML is
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Xml
             if (IsXmlWhitespace(xml)) return false; // string is whitespace, xml-wise
             if (TryCreateXPathDocument(xml, out doc) == false) return false; // string can't be parsed into xml
 
-            var nav = doc.CreateNavigator();
+            var nav = doc!.CreateNavigator();
             if (nav.MoveToFirstChild())
             {
                 //SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
@@ -137,14 +137,17 @@ namespace Umbraco.Cms.Core.Xml
             string childNodesXPath,
             Func<XmlNode, int> orderBy)
         {
-            var sortedChildNodes = parentNode.SelectNodes(childNodesXPath).Cast<XmlNode>()
+            var sortedChildNodes = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
                 .OrderBy(orderBy)
                 .ToArray();
 
             // append child nodes to last position, in sort-order
             // so all child nodes will go after the property nodes
-            foreach (var node in sortedChildNodes)
-                parentNode.AppendChild(node); // moves the node to the last position
+            if (sortedChildNodes is not null)
+            {
+                foreach (var node in sortedChildNodes)
+                    parentNode.AppendChild(node); // moves the node to the last position
+            }
         }
 
 
@@ -165,11 +168,11 @@ namespace Umbraco.Cms.Core.Xml
             Func<XmlNode, int> orderBy)
         {
             var nodeSortOrder = orderBy(node);
-            var childNodesAndOrder = parentNode.SelectNodes(childNodesXPath).Cast<XmlNode>()
+            var childNodesAndOrder = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
                 .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
 
             // only one node = node is in the right place already, obviously
-            if (childNodesAndOrder.Length == 1) return false;
+            if (childNodesAndOrder is null || childNodesAndOrder.Length == 1) return false;
 
             // find the first node with a sortOrder > node.sortOrder
             var i = 0;
@@ -363,7 +366,7 @@ namespace Umbraco.Cms.Core.Xml
         /// <returns>
         ///     <c>true</c> if the specified string appears to be XML; otherwise, <c>false</c>.
         /// </returns>
-        public static bool CouldItBeXml(string xml)
+        public static bool CouldItBeXml(string? xml)
         {
             if (string.IsNullOrEmpty(xml)) return false;
 

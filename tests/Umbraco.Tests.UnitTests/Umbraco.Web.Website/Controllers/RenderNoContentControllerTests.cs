@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
             var mockIOHelper = new Mock<IIOHelper>();
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, Options.Create(new GlobalSettings()));
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()));
 
             var result = controller.Index() as RedirectResult;
 
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
             var mockIOHelper = new Mock<IIOHelper>();
             mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == UmbracoPathSetting))).Returns(UmbracoPath);
 
-            IOptions<GlobalSettings> globalSettings = Options.Create(new GlobalSettings()
+            var globalSettings = new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()
             {
                 UmbracoPath = UmbracoPathSetting,
                 NoNodesViewPath = ViewPath,

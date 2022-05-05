@@ -96,30 +96,30 @@ namespace Umbraco.Cms.Web.Website.Routing
             // If we aren't running, then we have nothing to route
             if (_runtime.Level != RuntimeLevel.Run)
             {
-                return null;
+                return null!;
             }
             // will be null for any client side requests like JS, etc...
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
             {
-                return null;
+                return null!;
             }
 
             if (!_routableDocumentFilter.IsDocumentRequest(httpContext.Request.Path))
             {
-                return null;
+                return null!;
             }
 
             // Don't execute if there are already UmbracoRouteValues assigned.
             // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
             // the routing work being done there.
-            UmbracoRouteValues umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
+            UmbracoRouteValues? umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
             if (umbracoRouteValues != null)
             {
-                return null;
+                return null!;
             }
 
             // Check if there is no existing content and return the no content controller
-            if (!umbracoContext.Content.HasContent())
+            if (!umbracoContext.Content?.HasContent() ?? false)
             {
                 return new RouteValueDictionary
                 {
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             httpContext.Features.Set(umbracoRouteValues);
 
             // Need to check if there is form data being posted back to an Umbraco URL
-            PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
+            PostedDataProxyInfo? postedInfo = GetFormInfo(httpContext, values);
             if (postedInfo != null)
             {
                 return HandlePostedValues(postedInfo, httpContext);
@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // our default 404 page but we cannot return route values now because
                 // it's possible that a developer is handling dynamic routes too.
                 // Our 404 page will be handled with the NotFoundSelectorPolicy
-                return null;
+                return null!;
             }
 
             // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
@@ -162,9 +162,9 @@ namespace Umbraco.Cms.Web.Website.Routing
             // So we create new ones.
             var newValues = new RouteValueDictionary
             {
-                [ControllerToken] = umbracoRouteValues.ControllerName
+                [ControllerToken] = umbracoRouteValues?.ControllerName
             };
-            if (string.IsNullOrWhiteSpace(umbracoRouteValues.ActionName) == false)
+            if (string.IsNullOrWhiteSpace(umbracoRouteValues?.ActionName) == false)
             {
                 newValues[ActionToken] = umbracoRouteValues.ActionName;
             }
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// Checks the request and query strings to see if it matches the definition of having a Surface controller
         /// posted/get value, if so, then we return a PostedDataProxyInfo object with the correct information.
         /// </summary>
-        private PostedDataProxyInfo GetFormInfo(HttpContext httpContext, RouteValueDictionary values)
+        private PostedDataProxyInfo? GetFormInfo(HttpContext httpContext, RouteValueDictionary values)
         {
             if (httpContext is null)
             {
@@ -211,13 +211,13 @@ namespace Umbraco.Cms.Web.Website.Routing
             if (!EncryptionHelper.DecryptAndValidateEncryptedRouteString(
                 _dataProtectionProvider,
                 ufprt,
-                out IDictionary<string, string> decodedUfprt))
+                out IDictionary<string, string?>? decodedUfprt))
             {
                 return null;
             }
 
             // Get all route values that are not the default ones and add them separately so they eventually get to action parameters
-            foreach (KeyValuePair<string, string> item in decodedUfprt.Where(x => ReservedAdditionalKeys.AllKeys.Contains(x.Key) == false))
+            foreach (KeyValuePair<string, string?> item in decodedUfprt.Where(x => ReservedAdditionalKeys.AllKeys.Contains(x.Key) == false))
             {
                 values[item.Key] = item.Value;
             }
@@ -240,7 +240,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 [ActionToken] = postedInfo.ActionName
             };
 
-            ControllerActionDescriptor surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName);
+            ControllerActionDescriptor? surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName, postedInfo.Area);
 
             if (surfaceControllerDescriptor == null)
             {
@@ -258,11 +258,11 @@ namespace Umbraco.Cms.Web.Website.Routing
 
         private class PostedDataProxyInfo
         {
-            public string ControllerName { get; set; }
+            public string? ControllerName { get; set; }
 
-            public string ActionName { get; set; }
+            public string? ActionName { get; set; }
 
-            public string Area { get; set; }
+            public string? Area { get; set; }
         }
 
         // Define reserved dictionary keys for controller, action and area specified in route additional values data

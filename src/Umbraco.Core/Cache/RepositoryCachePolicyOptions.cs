@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Callback required to get count for GetAllCacheValidateCount
         /// </summary>
-        public Func<int> PerformCount { get; set; }
+        public Func<int>? PerformCount { get; set; }
 
         /// <summary>
         /// True/false as to validate the total item count when all items are returned from cache, the default is true but this

@@ -19,6 +19,9 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
@@ -142,7 +145,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 .From<CacheInstructionDto>();
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                cacheInstructions = scope.Database.Fetch<CacheInstructionDto>(sql);
+                cacheInstructions = ScopeAccessor.AmbientScope.Database.Fetch<CacheInstructionDto>(sql);
                 scope.Complete();
             }
 

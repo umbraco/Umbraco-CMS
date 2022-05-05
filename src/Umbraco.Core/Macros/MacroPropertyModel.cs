@@ -4,12 +4,14 @@
     {
         public string Key { get; set; }
 
-        public string Value { get; set; }
+        public string? Value { get; set; }
 
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         public MacroPropertyModel()
-        { }
+        {
+            Key = string.Empty;
+        }
 
         public MacroPropertyModel(string key, string value)
         {

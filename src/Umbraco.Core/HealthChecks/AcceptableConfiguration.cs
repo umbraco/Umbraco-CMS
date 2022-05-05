@@ -2,7 +2,7 @@
 {
     public class AcceptableConfiguration
     {
-        public string Value { get; set; }
+        public string? Value { get; set; }
         public bool IsRecommended { get; set; }
     }
 }

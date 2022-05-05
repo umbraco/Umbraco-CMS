@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models
         { }
 
         protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper,IContentTypeComposition parent)
-            : this(shortStringHelper, parent, null)
+            : this(shortStringHelper, parent, string.Empty)
         { }
 
         protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
@@ -70,8 +70,11 @@ namespace Umbraco.Cms.Core.Models
                     .Select(group =>
                     {
                         group = (PropertyGroup) group.DeepClone();
-                        foreach (var property in group.PropertyTypes)
-                            AcquireProperty(property);
+                        if (group.PropertyTypes is not null)
+                        {
+                            foreach (var property in group.PropertyTypes)
+                                AcquireProperty(property);
+                        }
                         return group;
                     }));
             }
@@ -123,8 +126,12 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="contentType">The content type to add.</param>
         /// <returns>True if the content type was added, otherwise false.</returns>
-        public bool AddContentType(IContentTypeComposition contentType)
+        public bool AddContentType(IContentTypeComposition? contentType)
         {
+            if (contentType is null)
+            {
+                return false;
+            }
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
                 return false;
 
@@ -202,12 +209,12 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        public override bool PropertyTypeExists(string alias) => CompositionPropertyTypes.Any(x => x.Alias == alias);
+        public override bool PropertyTypeExists(string? alias) => CompositionPropertyTypes.Any(x => x.Alias == alias);
 
         /// <inheritdoc />
         public override bool AddPropertyGroup(string alias, string name) => AddAndReturnPropertyGroup(alias, name) != null;
 
-        private PropertyGroup AddAndReturnPropertyGroup(string alias, string name)
+        private PropertyGroup? AddAndReturnPropertyGroup(string alias, string name)
         {
             // Ensure we don't have it already
             if (PropertyGroups.Contains(alias))
@@ -244,14 +251,14 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string propertyGroupName = null)
+        public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string? propertyGroupName = null)
         {
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
                 return false;
 
             // get and ensure a group local to this content type
-            PropertyGroup group;
+            PropertyGroup? group;
             var index = PropertyGroups.IndexOfKey(propertyGroupAlias);
             if (index != -1)
             {
@@ -261,7 +268,9 @@ namespace Umbraco.Cms.Core.Models
             {
                 group = AddAndReturnPropertyGroup(propertyGroupAlias, propertyGroupName);
                 if (group == null)
+                {
                     return false;
+                }
             }
             else
             {
@@ -271,7 +280,7 @@ namespace Umbraco.Cms.Core.Models
 
             // add property to group
             propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);
-            group.PropertyTypes.Add(propertyType);
+            group.PropertyTypes?.Add(propertyType);
 
             return true;
         }

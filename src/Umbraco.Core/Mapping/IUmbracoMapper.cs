@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Mapping
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TTarget>(object source);
+        TTarget? Map<TTarget>(object? source);
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TTarget>(object source, Action<MapperContext> f);
+        TTarget? Map<TTarget>(object? source, Action<MapperContext> f);
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TTarget>(object source, MapperContext context);
+        TTarget? Map<TTarget>(object? source, MapperContext context);
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <typeparam name="TTarget">The target type.</typeparam>
         /// <param name="source">The source object.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TSource, TTarget>(TSource source);
+        TTarget? Map<TSource, TTarget>(TSource? source);
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="f">A mapper context preparation method.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TSource, TTarget>(TSource source, Action<MapperContext> f);
+        TTarget? Map<TSource, TTarget>(TSource source, Action<MapperContext> f);
 
         /// <summary>
         /// Maps a source object to a new target object.
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Mapping
         /// <param name="source">The source object.</param>
         /// <param name="context">A mapper context.</param>
         /// <returns>The target object.</returns>
-        TTarget Map<TSource, TTarget>(TSource source, MapperContext context);
+        TTarget? Map<TSource, TTarget>(TSource? source, MapperContext context);
 
         /// <summary>
         /// Maps a source object to an existing target object.

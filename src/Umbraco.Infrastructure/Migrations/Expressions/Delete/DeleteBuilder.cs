@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete
         }
 
         /// <inheritdoc />
-        public IExecutableBuilder KeysAndIndexes(string tableName, bool local = true, bool foreign = true)
+        public IExecutableBuilder KeysAndIndexes(string? tableName, bool local = true, bool foreign = true)
         {
             if (tableName == null) throw new ArgumentNullException(nameof(tableName));
             if (string.IsNullOrWhiteSpace(tableName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(tableName));

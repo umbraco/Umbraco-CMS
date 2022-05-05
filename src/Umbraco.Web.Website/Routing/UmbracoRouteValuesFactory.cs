@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             _defaultControllerName = new Lazy<string>(() => ControllerExtensions.GetControllerName(renderingDefaults.Value.DefaultControllerType));
             _defaultControllerDescriptor = new Lazy<ControllerActionDescriptor>(() =>
             {
-                ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(
+                ControllerActionDescriptor? descriptor = _controllerActionSearcher.Find<IRenderController>(
                     new DefaultHttpContext(), // this actually makes no difference for this method
                     DefaultControllerName,
                     UmbracoRouteValues.DefaultActionName);
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 throw new ArgumentNullException(nameof(request));
             }
 
-            string customActionName = null;
+            string? customActionName = null;
 
             // check that a template is defined), if it doesn't and there is a hijacked route it will just route
             // to the index Action
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             var customControllerName = request.PublishedContent?.ContentType?.Alias;
             if (customControllerName != null)
             {
-                ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(httpContext, customControllerName, def.TemplateName);
+                ControllerActionDescriptor? descriptor = _controllerActionSearcher.Find<IRenderController>(httpContext, customControllerName, def.TemplateName);
                 if (descriptor != null)
                 {
                     hasHijackedRoute = true;
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 && !_umbracoFeatures.Disabled.DisableTemplates
                 && !hasHijackedRoute)
             {
-                IPublishedContent content = request.PublishedContent;
+                IPublishedContent? content = request.PublishedContent;
 
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last

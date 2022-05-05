@@ -25,12 +25,12 @@ namespace Umbraco.Cms.Web.Common.Localization
         public UmbracoPublishedContentCultureProvider(RequestLocalizationOptions localizationOptions) => _localizationOptions = localizationOptions;
 
         /// <inheritdoc/>
-        public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
+        public override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
-            UmbracoRouteValues routeValues = httpContext.Features.Get<UmbracoRouteValues>();
+            UmbracoRouteValues? routeValues = httpContext.Features.Get<UmbracoRouteValues>();
             if (routeValues != null)
             {
-                string culture = routeValues.PublishedRequest?.Culture;
+                string? culture = routeValues.PublishedRequest?.Culture;
                 if (culture != null)
                 {
                     lock (_locker)
@@ -39,28 +39,28 @@ namespace Umbraco.Cms.Web.Common.Localization
                         // they are dynamic within Umbraco. We have to handle this for both UI and Region cultures, in case people run different region and UI languages
                         // This code to check existence is borrowed from aspnetcore to avoid creating a CultureInfo
                         // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Middleware/Localization/src/RequestLocalizationMiddleware.cs#L165
-                        CultureInfo existingCulture = _localizationOptions.SupportedCultures.FirstOrDefault(supportedCulture =>
+                        CultureInfo? existingCulture = _localizationOptions.SupportedCultures?.FirstOrDefault(supportedCulture =>
                             StringSegment.Equals(supportedCulture.Name, culture, StringComparison.OrdinalIgnoreCase));
 
                         if (existingCulture == null)
                         {
                             // add this as a supporting culture
                             var ci = CultureInfo.GetCultureInfo(culture);
-                            _localizationOptions.SupportedCultures.Add(ci);
+                            _localizationOptions.SupportedCultures?.Add(ci);
                         }
 
-                        CultureInfo existingUICulture = _localizationOptions.SupportedUICultures.FirstOrDefault(supportedCulture =>
+                        CultureInfo? existingUICulture = _localizationOptions.SupportedUICultures?.FirstOrDefault(supportedCulture =>
                             StringSegment.Equals(supportedCulture.Name, culture, StringComparison.OrdinalIgnoreCase));
 
                         if (existingUICulture == null)
                         {
                             // add this as a supporting culture
                             var ci = CultureInfo.GetCultureInfo(culture);
-                            _localizationOptions.SupportedUICultures.Add(ci);
+                            _localizationOptions.SupportedUICultures?.Add(ci);
                         }
                     }
 
-                    return Task.FromResult(new ProviderCultureResult(culture));
+                    return Task.FromResult<ProviderCultureResult?>(new ProviderCultureResult(culture));
                 }
             }
 

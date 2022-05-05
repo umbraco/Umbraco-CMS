@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -36,7 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAllTypes() =>
             _memberTypeService.GetAll()
-                .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>);
+                .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>).WhereNotNull();
 
     }
 }

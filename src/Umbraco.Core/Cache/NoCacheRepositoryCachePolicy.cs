@@ -12,17 +12,17 @@ namespace Umbraco.Cms.Core.Cache
 
         public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new NoCacheRepositoryCachePolicy<TEntity, TId>();
 
-        public TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
             return performGet(id);
         }
 
-        public TEntity GetCached(TId id)
+        public TEntity? GetCached(TId id)
         {
             return null;
         }
 
-        public bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             return performExists(id);
         }
@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Core.Cache
             persistDeleted(entity);
         }
 
-        public TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
-            return performGetAll(ids).ToArray();
+            return performGetAll(ids)?.ToArray() ?? Array.Empty<TEntity>();
         }
 
         public void ClearAll()

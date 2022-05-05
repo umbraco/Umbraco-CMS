@@ -14,6 +14,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <remarks>
         /// Can be null.
         /// </remarks>
-        IServiceProvider ServiceProvider { get; }
+        IServiceProvider? ServiceProvider { get; }
     }
 }

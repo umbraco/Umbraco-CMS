@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IFileSystem _jsLibFileSystem;
 
-        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings)
+        public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             var path = globalSettings.Value.UmbracoPath + Path.DirectorySeparatorChar + "lib";
             _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment, loggerFactory.CreateLogger<PhysicalFileSystem>(), hostingEnvironment.MapPathWebRoot(path), hostingEnvironment.ToAbsolute(path));

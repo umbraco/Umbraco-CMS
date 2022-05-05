@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Mapping;
@@ -19,32 +19,37 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
-        public IEnumerable<ContentVariantDisplay> Map(IContent source, MapperContext context)
+        public IEnumerable<TVariant>? Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
         {
             var variesByCulture = source.ContentType.VariesByCulture();
             var variesBySegment = source.ContentType.VariesBySegment();
 
-            IList<ContentVariantDisplay> variants = new List<ContentVariantDisplay>();
+            IList<TVariant>? variants = new List<TVariant>();
 
             if (!variesByCulture && !variesBySegment)
             {
                 // this is invariant so just map the IContent instance to ContentVariationDisplay
-                var variantDisplay = context.Map<ContentVariantDisplay>(source);
-                variants.Add(variantDisplay);
+                var variantDisplay = context.Map<TVariant>(source);
+                if (variantDisplay is not null)
+                {
+                    variants.Add(variantDisplay);
+                }
             }
             else if (variesByCulture && !variesBySegment)
             {
                 var languages = GetLanguages(context);
-                variants = languages
-                    .Select(language => CreateVariantDisplay(context, source, language, null))
+                variants = languages?
+                    .Select(language => CreateVariantDisplay<TVariant>(context, source, language, null))
+                    .WhereNotNull()
                     .ToList();
             }
             else if (variesBySegment && !variesByCulture)
             {
                 // Segment only
                 var segments = GetSegments(source);
-                variants = segments
-                    .Select(segment => CreateVariantDisplay(context, source, null, segment))
+                variants = segments?
+                    .Select(segment => CreateVariantDisplay<TVariant>(context, source, null, segment))
+                    .WhereNotNull()
                     .ToList();
             }
             else
@@ -59,16 +64,19 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     throw new InvalidOperationException("No languages or segments available");
                 }
 
-                variants = languages
+                variants = languages?
                     .SelectMany(language => segments
-                        .Select(segment => CreateVariantDisplay(context, source, language, segment)))
+                        .Select(segment => CreateVariantDisplay<TVariant>(context, source, language, segment)))
+                    .WhereNotNull()
                     .ToList();
             }
 
             return SortVariants(variants);
         }
 
-        private IList<ContentVariantDisplay> SortVariants(IList<ContentVariantDisplay> variants)
+
+
+        private IList<TVariant>? SortVariants<TVariant>(IList<TVariant>? variants) where TVariant : ContentVariantDisplay
         {
             if (variants == null || variants.Count <= 1)
             {
@@ -104,7 +112,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
             else
             {
-                return context.MapEnumerable<ILanguage, ContentEditing.Language>(allLanguages).ToList();
+                return context.MapEnumerable<ILanguage, ContentEditing.Language>(allLanguages).WhereNotNull().ToList();
             }
         }
 
@@ -115,11 +123,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <returns>
         /// Returns all segments assigned to the content including the default `null` segment.
         /// </returns>
-        private IEnumerable<string> GetSegments(IContent content)
+        private IEnumerable<string?> GetSegments(IContent content)
         {
             // The default segment (null) is always there,
             // even when there is no property data at all yet
-            var segments = new List<string> { null };
+            var segments = new List<string?> { null };
 
             // Add actual segments based on the property values
             segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
@@ -128,13 +136,17 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return segments.Distinct();
         }
 
-        private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, ContentEditing.Language language, string segment)
+        private TVariant? CreateVariantDisplay<TVariant>(MapperContext context, IContent content, ContentEditing.Language? language, string? segment) where TVariant : ContentVariantDisplay
         {
             context.SetCulture(language?.IsoCode);
             context.SetSegment(segment);
 
-            var variantDisplay = context.Map<ContentVariantDisplay>(content);
+            var variantDisplay = context.Map<TVariant>(content);
 
+            if (variantDisplay is null)
+            {
+                return null;
+            }
             variantDisplay.Segment = segment;
             variantDisplay.Language = language;
             variantDisplay.Name = content.GetCultureName(language?.IsoCode);
@@ -143,9 +155,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return variantDisplay;
         }
 
-        private string GetDisplayName(ContentEditing.Language language, string segment)
+        private string GetDisplayName(ContentEditing.Language? language, string? segment)
         {
-            var isCultureVariant = language != null;
+            var isCultureVariant = language is not null;
             var isSegmentVariant = !segment.IsNullOrWhiteSpace();
 
             if(!isCultureVariant && !isSegmentVariant)
@@ -156,10 +168,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var parts = new List<string>();
 
             if (isSegmentVariant)
-                parts.Add(segment);
+                parts.Add(segment!);
 
             if (isCultureVariant)
-                parts.Add(language.Name);
+                parts.Add(language?.Name!);
 
             return string.Join(" — ", parts);
 

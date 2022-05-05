@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
             _linkGenerator = linkGenerator;
         }
 
-        public string GetUrl() =>
+        public string? GetUrl() =>
             _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller =>
                 controller.BuildModels());
     }

@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
                     filter = typeFilterAttribute.CreateInstance(serviceProvider);
                 }
 
-                T match = filter as T;
+                T? match = filter as T;
                 if (match != null)
                 {
                     list.Add(match);

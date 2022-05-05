@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
     internal class NavigableContent : INavigableContent
     {
         private readonly PublishedContent _content;
-        private readonly string[] _builtInValues;
+        private readonly string?[] _builtInValues;
 
         public NavigableContent(IPublishedContent content)
         {
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
                 };
         }
 
-        private string XmlString(int index, object value)
+        private string? XmlString(int index, object? value)
         {
             if (value == null) return string.Empty;
             var field = Type.FieldTypes[index];
@@ -51,9 +51,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
         public INavigableContentType Type => NavigableContentType.GetContentType(_content.ContentType);
 
         // returns all child ids, will be filtered by the source
-        public IList<int> ChildIds => _content.ChildIds;
+        public IList<int>? ChildIds => _content.ChildIds;
 
-        public object Value(int index)
+        public object? Value(int index)
         {
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index));

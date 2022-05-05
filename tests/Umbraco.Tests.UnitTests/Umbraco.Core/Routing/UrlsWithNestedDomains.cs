@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -42,7 +43,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
             var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
+                Mock.Of<IOptionsMonitor<RequestHandlerSettings>>(x=>x.CurrentValue == requestHandlerSettings),
                 Mock.Of<ILogger<DefaultUrlProvider>>(),
                 new SiteDomainMapper(),
                 umbracoContextAccessor,
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             // check that it's been routed
             var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
-            var result = lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);
 

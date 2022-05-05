@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [CoreTree]
     public class PartialViewsTreeController : FileSystemTreeController
     {
-        protected override IFileSystem FileSystem { get; }
+        protected override IFileSystem? FileSystem { get; }
 
         private static readonly string[] ExtensionsStatic = {"cshtml"};
 

@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Strings
         /// <remarks>
         /// <para>Url segments are Ascii only (no accents...).</para>
         /// </remarks>
-        public virtual string CleanStringForUrlSegment(string text, string culture)
+        public virtual string CleanStringForUrlSegment(string text, string? culture)
         {
             return CleanString(text, CleanStringType.UrlSegment, culture);
         }
@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Core.Strings
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public string CleanString(string text, CleanStringType stringType, string culture)
+        public string CleanString(string text, CleanStringType stringType, string? culture)
         {
             return CleanString(text, stringType, culture, null);
         }
@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Core.Strings
             return CleanString(text, stringType, culture, separator);
         }
 
-        protected virtual string CleanString(string text, CleanStringType stringType, string culture, char? separator)
+        protected virtual string CleanString(string text, CleanStringType stringType, string? culture, char? separator)
         {
             // be safe
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -345,11 +345,14 @@ namespace Umbraco.Cms.Core.Strings
                 var isUpper = char.IsUpper(c); // false for digits, symbols...
                 //var isLower = char.IsLower(c); // false for digits, symbols...
 
-                // what should I do with surrogates?
-                // no idea, really, so they are not supported at the moment
+                // what should I do with surrogates? - E.g emojis like 🎈
+                // no idea, really, so they are not supported at the moment and we just continue
                 var isPair = char.IsSurrogate(c);
                 if (isPair)
-                    throw new NotSupportedException("Surrogate pairs are not supported.");
+                {
+                    continue;
+                }
+
 
                 switch (state)
                 {

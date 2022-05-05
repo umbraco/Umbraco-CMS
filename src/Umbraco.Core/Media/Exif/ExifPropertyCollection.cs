@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif
@@ -146,10 +147,13 @@ namespace Umbraco.Cms.Core.Media.Exif
             Type type = value.GetType ();
             if (type.IsEnum) {
                 Type etype = typeof(ExifEnumProperty<>).MakeGenericType (new Type[] { type });
-                object prop = Activator.CreateInstance (etype, new object[] { key, value });
+                object? prop = Activator.CreateInstance (etype, new object[] { key, value });
                 if (items.ContainsKey (key))
                     items.Remove (key);
-                items.Add (key, (ExifProperty)prop);
+                if (prop is ExifProperty exifProperty)
+                {
+                    items.Add (key, exifProperty);
+                }
             } else
                 throw new ArgumentException ("No exif property exists for this tag.", "value");
         }
@@ -198,7 +202,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <param name="item">The <see cref="ExifProperty"/> to add to the collection.</param>
         public void Add (ExifProperty item)
         {
-            ExifProperty oldItem = null;
+            ExifProperty? oldItem = null;
             if (items.TryGetValue (item.Tag, out oldItem))
                 items[item.Tag] = item;
             else
@@ -261,7 +265,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">
         ///    <paramref name="key"/> is null.</exception>
-        public bool TryGetValue (ExifTag key, out ExifProperty value)
+        public bool TryGetValue (ExifTag key, [MaybeNullWhen(false)] out ExifProperty value)
         {
             return items.TryGetValue (key, out value);
         }

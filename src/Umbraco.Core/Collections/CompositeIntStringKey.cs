@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Collections
         public bool Equals(CompositeIntStringKey other)
             => _key2 == other._key2 && _key1 == other._key1;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is CompositeIntStringKey other && _key2 == other._key2 && _key1 == other._key1;
 
         public override int GetHashCode()

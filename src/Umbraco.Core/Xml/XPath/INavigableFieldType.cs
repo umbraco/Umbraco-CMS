@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Core.Xml.XPath
         /// </summary>
         /// <remarks>This is for built-in properties, ie attributes. User-defined properties have their
         /// own way to convert their value for XPath.</remarks>
-        Func<object, string> XmlStringConverter { get; }
+        Func<object, string>? XmlStringConverter { get; }
     }
 }

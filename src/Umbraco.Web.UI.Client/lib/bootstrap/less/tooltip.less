@@ -42,28 +42,28 @@
   &.top .tooltip-arrow {
     bottom: 0;
     left: 50%;
-    margin-left: -@tooltipArrowWidth;
+    margin-left: (@tooltipArrowWidth * -1);
     border-width: @tooltipArrowWidth @tooltipArrowWidth 0;
     border-top-color: @tooltipArrowColor;
   }
   &.right .tooltip-arrow {
     top: 50%;
     left: 0;
-    margin-top: -@tooltipArrowWidth;
+    margin-top: (@tooltipArrowWidth * -1);
     border-width: @tooltipArrowWidth @tooltipArrowWidth @tooltipArrowWidth 0;
     border-right-color: @tooltipArrowColor;
   }
   &.left .tooltip-arrow {
     top: 50%;
     right: 0;
-    margin-top: -@tooltipArrowWidth;
+    margin-top: (@tooltipArrowWidth * -1);
     border-width: @tooltipArrowWidth 0 @tooltipArrowWidth @tooltipArrowWidth;
     border-left-color: @tooltipArrowColor;
   }
   &.bottom .tooltip-arrow {
     top: 0;
     left: 50%;
-    margin-left: -@tooltipArrowWidth;
+    margin-left: (@tooltipArrowWidth * -1);
     border-width: 0 @tooltipArrowWidth @tooltipArrowWidth;
     border-bottom-color: @tooltipArrowColor;
   }

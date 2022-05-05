@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Install
     public class PackageMigrationRunner
     {
         private readonly IProfilingLogger _profilingLogger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly PendingPackageMigrations _pendingPackageMigrations;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly IKeyValueService _keyValueService;
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
         public PackageMigrationRunner(
             IProfilingLogger profilingLogger,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             PendingPackageMigrations pendingPackageMigrations,
             PackageMigrationPlanCollection packageMigrationPlans,
             IMigrationPlanExecutor migrationPlanExecutor,
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _migrationPlanExecutor = migrationPlanExecutor;
             _keyValueService = keyValueService;
             _eventAggregator = eventAggregator;
-            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);            
+            _packageMigrationPlans = packageMigrationPlans.ToDictionary(x => x.Name);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// <returns></returns>
         public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyDictionary<string, string?>? keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
             IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
             IEnumerable<string> packagePlans = _packageMigrationPlans.Values
@@ -79,11 +79,11 @@ namespace Umbraco.Cms.Infrastructure.Install
             // all executed in a single transaction. If one package migration fails,
             // none of them will be committed. This is intended behavior so we can
             // ensure when we publish the success notification that is is done when they all succeed.
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 foreach (var migrationName in plansToRun)
                 {
-                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan plan))
+                    if (!_packageMigrationPlans.TryGetValue(migrationName, out PackageMigrationPlan? plan))
                     {
                         throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
                     }

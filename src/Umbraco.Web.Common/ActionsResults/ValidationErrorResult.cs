@@ -40,12 +40,12 @@ namespace Umbraco.Cms.Web.Common.ActionsResults
         public ValidationErrorResult(ModelStateDictionary modelState)
             : this(new SimpleValidationModel(modelState.ToErrorDictionary())) { }
 
-        public ValidationErrorResult(object value, int statusCode) : base(value)
+        public ValidationErrorResult(object? value, int statusCode) : base(value)
         {
             StatusCode = statusCode;
         }
 
-        public ValidationErrorResult(object value) : this(value, StatusCodes.Status400BadRequest)
+        public ValidationErrorResult(object? value) : this(value, StatusCodes.Status400BadRequest)
         {
         }
 

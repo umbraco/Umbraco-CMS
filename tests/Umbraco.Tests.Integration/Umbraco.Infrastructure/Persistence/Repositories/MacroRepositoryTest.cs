@@ -2,8 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -11,8 +12,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -40,7 +45,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
 
-                Assert.Throws<SqlException>(() => repository.Save(macro));
+                Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
             }
         }
 
@@ -56,7 +61,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMacro macro = repository.Get(1);
                 macro.Alias = "test2";
 
-                Assert.Throws<SqlException>(() => repository.Save(macro));
+                Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
             }
         }
 
@@ -127,7 +132,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                IQuery<IMacro> query = scope.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
+                IQuery<IMacro> query = ScopeAccessor.AmbientScope.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
                 IEnumerable<IMacro> result = repository.Get((IQuery<IMacro>)query);
 
                 // Assert
@@ -145,7 +150,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 // Act
-                IQuery<IMacro> query = scope.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
+                IQuery<IMacro> query = ScopeAccessor.AmbientScope.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert

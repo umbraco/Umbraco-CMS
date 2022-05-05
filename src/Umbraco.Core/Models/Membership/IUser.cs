@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Models.Membership
     {
         UserState UserState { get; }
 
-        string Name { get; set; }
+        string? Name { get; set; }
         int SessionTimeout { get; set; }
-        int[] StartContentIds { get; set; }
-        int[] StartMediaIds { get; set; }
-        string Language { get; set; }
+        int[]? StartContentIds { get; set; }
+        int[]? StartMediaIds { get; set; }
+        string? Language { get; set; }
 
         DateTime? InvitedDate { get; set; }
 
@@ -40,11 +40,11 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// <summary>
         /// Will hold the media file system relative path of the users custom avatar if they uploaded one
         /// </summary>
-        string Avatar { get; set; }
+        string? Avatar { get; set; }
 
         /// <summary>
         /// A Json blob stored for recording tour data for a user
         /// </summary>
-        string TourData { get; set; }
+        string? TourData { get; set; }
     }
 }

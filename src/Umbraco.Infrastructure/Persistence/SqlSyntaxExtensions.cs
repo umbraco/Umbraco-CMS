@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
@@ -12,15 +12,6 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class SqlSyntaxExtensions
     {
-        private static string GetTableName(this Type type)
-        {
-            // TODO: returning string.Empty for now
-            // BUT the code bits that calls this method cannot deal with string.Empty so we
-            // should either throw, or fix these code bits...
-            var attr = type.FirstAttribute<TableNameAttribute>();
-            return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
-        }
-
         private static string GetColumnName(this PropertyInfo column)
         {
             var attr = column.FirstAttribute<ColumnAttribute>();
@@ -35,10 +26,10 @@ namespace Umbraco.Extensions
         /// <param name="fieldSelector">An expression specifying the field.</param>
         /// <param name="tableAlias">An optional table alias.</param>
         /// <returns></returns>
-        public static string GetFieldName<TDto>(this ISqlSyntaxProvider sqlSyntax, Expression<Func<TDto, object>> fieldSelector, string tableAlias = null)
+        public static string GetFieldName<TDto>(this ISqlSyntaxProvider sqlSyntax, Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
         {
             var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
-            var fieldName = field.GetColumnName();
+            var fieldName = field?.GetColumnName();
 
             var type = typeof(TDto);
             var tableName = tableAlias ?? type.GetTableName();

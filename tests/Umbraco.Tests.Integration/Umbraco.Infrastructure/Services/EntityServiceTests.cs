@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -51,9 +51,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             if (_langFr == null && _langEs == null)
             {
-                var globalSettings = new GlobalSettings();
-                _langFr = new Language(globalSettings, "fr-FR");
-                _langEs = new Language(globalSettings, "es-ES");
+                _langFr = new Language("fr-FR", "French (France)");
+                _langEs = new Language("es-ES", "Spanish (Spain)");
                 LocalizationService.Save(_langFr);
                 LocalizationService.Save(_langEs);
             }
@@ -809,8 +808,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 // Create and Save Content "Text Page 1" based on "umbTextpage" -> 1054
                 _subpage = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 1", _textpage.Id);
-                _subpage.ContentSchedule.Add(DateTime.Now.AddMinutes(-5), null);
-                ContentService.Save(_subpage, 0);
+                var contentSchedule = ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddMinutes(-5), null);
+                ContentService.Save(_subpage, 0, contentSchedule);
 
                 // Create and Save Content "Text Page 2" based on "umbTextpage" -> 1055
                 _subpage2 = ContentBuilder.CreateSimpleContent(_contentType, "Text Page 2", _textpage.Id);

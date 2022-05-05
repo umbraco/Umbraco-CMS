@@ -29,6 +29,6 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// Will be null if there is no parent
         /// </remarks>
-        public TemplateNode Parent { get; set; }
+        public TemplateNode? Parent { get; set; }
     }
 }

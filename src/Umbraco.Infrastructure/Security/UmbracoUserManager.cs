@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Security
         where TUser : UmbracoIdentityUser
         where TPasswordConfig : class, IPasswordConfiguration, new()
     {
-        private PasswordGenerator _passwordGenerator;
+        private PasswordGenerator? _passwordGenerator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoUserManager{T, TPasswordConfig}"/> class.
@@ -49,10 +49,10 @@ namespace Umbraco.Cms.Core.Security
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
 
         /// <summary>
-        /// Developers will need to override this to support custom 2 factor auth
+        /// Both users and members supports 2FA
         /// </summary>
         /// <inheritdoc />
-        public override bool SupportsUserTwoFactor => false;
+        public override bool SupportsUserTwoFactor => true;
 
         /// <inheritdoc />
         public override bool SupportsUserPhoneNumber => false; // We haven't needed to support this yet, though might be necessary for 2FA
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets the password configuration
         /// </summary>
-        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordConfiguration PasswordConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the IP resolver
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="userId">The user id</param>
         /// <param name="sessionId">The session id</param>
         /// <returns>True if the session is valid, else false</returns>
-        public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
+        public virtual async Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
         {
             // if this is not set, for backwards compat (which would be super rare), we'll just approve it
             // TODO: This should be removed after members supports this
@@ -104,13 +104,13 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <param name="password">The password.</param>
         /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
-        public async Task<IdentityResult> ValidatePasswordAsync(string password)
+        public async Task<IdentityResult> ValidatePasswordAsync(string? password)
         {
             var errors = new List<IdentityError>();
             var isValid = true;
             foreach (IPasswordValidator<TUser> v in PasswordValidators)
             {
-                IdentityResult result = await v.ValidateAsync(this, null, password);
+                IdentityResult result = await v.ValidateAsync(this, null!, password);
                 if (!result.Succeeded)
                 {
                     if (result.Errors.Any())
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override async Task<bool> CheckPasswordAsync(TUser user, string password)
+        public override async Task<bool> CheckPasswordAsync(TUser user, string? password)
         {
             // we cannot proceed if the user passed in does not have an identity
             if (user.HasIdentity == false)
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword)
+        public virtual async Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword)
         {
             TUser user = await FindByIdAsync(userId);
             if (user == null)

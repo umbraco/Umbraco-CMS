@@ -22,13 +22,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         public string ValidationName => "Required";
 
         /// <inheritdoc cref="IValueValidator.Validate"/>
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             return ValidateRequired(value, valueType);
         }
 
         /// <inheritdoc cref="IValueRequiredValidator.ValidateRequired"/>
-        public IEnumerable<ValidationResult> ValidateRequired(object value, string valueType)
+        public IEnumerable<ValidationResult> ValidateRequired(object? value, string? valueType)
         {
             if (value == null)
             {
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
 
             if (valueType.InvariantEquals(ValueTypes.Json))
             {
-                if (value.ToString().DetectIsEmptyJson())
+                if (value.ToString()?.DetectIsEmptyJson() ?? false)
                 {
 
                     yield return new ValidationResult(_textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });

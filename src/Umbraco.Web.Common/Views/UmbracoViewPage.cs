@@ -27,8 +27,8 @@ namespace Umbraco.Cms.Web.Common.Views
 
     public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     {
-        private IUmbracoContext _umbracoContext;
-        private UmbracoHelper _helper;
+        private IUmbracoContext? _umbracoContext;
+        private UmbracoHelper? _helper;
 
         private IUmbracoContextAccessor UmbracoContextAccessor => Context.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
 
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.Common.Views
                     return _helper;
                 }
 
-                TModel model = ViewData.Model;
+                TModel? model = ViewData.Model;
                 var content = model as IPublishedContent;
                 if (content is null && model is IContentModel contentModel)
                 {
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.Common.Views
         /// <summary>
         /// Gets the <see cref="IUmbracoContext"/>
         /// </summary>
-        protected IUmbracoContext UmbracoContext
+        protected IUmbracoContext? UmbracoContext
         {
             get
             {
@@ -86,6 +86,7 @@ namespace Umbraco.Cms.Web.Common.Views
                 {
                     return null;
                 }
+
                 return umbracoContext;
             }
         }
@@ -104,7 +105,7 @@ namespace Umbraco.Cms.Web.Common.Views
         }
 
         /// <inheritdoc/>
-        public override void Write(object value)
+        public override void Write(object? value)
         {
             if (value is IHtmlEncodedString htmlEncodedString)
             {
@@ -128,7 +129,7 @@ namespace Umbraco.Cms.Web.Common.Views
             // ASP.NET default value is text/html
             if (Context.Response?.ContentType?.InvariantContains("text/html") ?? false)
             {
-                if ((UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
+                if (((UmbracoContext?.IsDebug ?? false) || (UmbracoContext?.InPreviewMode ?? false))
                     && tagHelperOutput.TagName != null
                     && tagHelperOutput.TagName.Equals("body", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -142,7 +143,7 @@ namespace Umbraco.Cms.Web.Common.Views
                                 ContentSettings.PreviewBadge,
                                 IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
                                 Context.Request.GetEncodedUrl(),
-                                UmbracoContext.PublishedRequest.PublishedContent.Id);
+                                UmbracoContext.PublishedRequest?.PublishedContent?.Id);
                     }
                     else
                     {
@@ -163,7 +164,7 @@ namespace Umbraco.Cms.Web.Common.Views
         /// <see cref="IContentModel"/> or <see cref="IPublishedContent"/>. This will use the <see cref="ContentModelBinder"/> to bind the models
         /// to the correct output type.
         /// </remarks>
-        protected ViewDataDictionary BindViewData(ContentModelBinder contentModelBinder, ViewDataDictionary viewData)
+        protected ViewDataDictionary BindViewData(ContentModelBinder contentModelBinder, ViewDataDictionary? viewData)
         {
             if (contentModelBinder is null)
             {
@@ -187,8 +188,8 @@ namespace Umbraco.Cms.Web.Common.Views
             if (viewData.ModelMetadata.ModelType == typeof(ContentModel)
                 && typeof(TModel) == typeof(IPublishedContent))
             {
-                var contentModel = (ContentModel)viewData.Model;
-                viewData.Model = contentModel.Content;
+                var contentModel = (ContentModel?)viewData.Model;
+                viewData.Model = contentModel?.Content;
                 return viewData;
             }
 
@@ -202,7 +203,7 @@ namespace Umbraco.Cms.Web.Common.Views
             var bindingContext = new DefaultModelBindingContext();
             contentModelBinder.BindModel(bindingContext, viewDataModel, typeof(TModel));
 
-            viewData.Model = bindingContext.Result.Model;
+            viewData!.Model = bindingContext.Result.Model;
 
             // return the new view data
             return (ViewDataDictionary<TModel>)viewData;
@@ -211,7 +212,7 @@ namespace Umbraco.Cms.Web.Common.Views
         // viewData is the ViewDataDictionary (maybe <TModel>) that we have
         // modelType is the type of the model that we need to bind to
         // figure out whether viewData can accept modelType else replace it
-        private static ViewDataDictionary MapViewDataDictionary(ViewDataDictionary viewData, Type modelType)
+        private static ViewDataDictionary? MapViewDataDictionary(ViewDataDictionary viewData, Type modelType)
         {
             Type viewDataType = viewData.GetType();
 
@@ -239,19 +240,19 @@ namespace Umbraco.Cms.Web.Common.Views
             // if not possible or it is not generic then we need to create a new ViewDataDictionary
             Type nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
             var tViewData = new ViewDataDictionary(viewData) { Model = default(TModel) }; // temp view data to copy values
-            var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
+            var nViewData = (ViewDataDictionary?)Activator.CreateInstance(nViewDataType, tViewData);
             return nViewData;
         }
 
         /// <summary>
         /// Renders a section with default content if the section isn't defined
         /// </summary>
-        public HtmlString RenderSection(string name, HtmlString defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
+        public HtmlString? RenderSection(string name, HtmlString defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
 
         /// <summary>
         /// Renders a section with default content if the section isn't defined
         /// </summary>
-        public HtmlString RenderSection(string name, string defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
+        public HtmlString? RenderSection(string name, string defaultContents) => RazorPageExtensions.RenderSection(this, name, defaultContents);
 
     }
 }

@@ -17,11 +17,11 @@ namespace Umbraco.Cms.Core
     public abstract class HybridAccessorBase<T>
         where T : class
     {
-        private static readonly AsyncLocal<T> s_ambientContext = new AsyncLocal<T>();
+        private static readonly AsyncLocal<T?> s_ambientContext = new AsyncLocal<T?>();
 
         private readonly IRequestCache _requestCache;
-        private string _itemKey;
-        protected string ItemKey => _itemKey ??= GetType().FullName;
+        private string? _itemKey;
+        protected string ItemKey => _itemKey ??= GetType().FullName!;
 
         // read
         // http://blog.stephencleary.com/2013/04/implicit-async-context-asynclocal.html
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core
         //private static T _value;
 
         // yes! flows with async!
-        private T NonContextValue
+        private T? NonContextValue
         {
             get => s_ambientContext.Value ?? default;
             set => s_ambientContext.Value = value;
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core
         protected HybridAccessorBase(IRequestCache requestCache)
             => _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
-        protected T Value
+        protected T? Value
         {
             get
             {
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core
                 {
                     return NonContextValue;
                 }
-                return (T) _requestCache.Get(ItemKey);
+                return (T?) _requestCache.Get(ItemKey);
             }
 
             set

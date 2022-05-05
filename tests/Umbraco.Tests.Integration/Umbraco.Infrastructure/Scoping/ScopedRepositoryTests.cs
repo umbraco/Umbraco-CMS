@@ -16,10 +16,14 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
@@ -31,15 +35,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override AppCaches GetAppCaches()
+        protected override void ConfigureTestServices(IServiceCollection services)
         {
             // this is what's created core web runtime
-            var result = new AppCaches(
+            var appCaches = new AppCaches(
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 NoAppCache.Instance,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
 
-            return result;
+            services.AddUnique(appCaches);
         }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -145,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ILocalizationService service = LocalizationService;
             IAppPolicyCache globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(ILanguage));
 
-            var lang = (ILanguage)new Language(GlobalSettings, "fr-FR");
+            ILanguage lang = new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             // global cache has been flushed, reload
@@ -238,7 +242,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ILocalizationService service = LocalizationService;
             IAppPolicyCache globalCache = AppCaches.IsolatedCaches.GetOrCreate(typeof(IDictionaryItem));
 
-            var lang = (ILanguage)new Language(GlobalSettings, "fr-FR");
+            var lang = new Language("fr-FR", "French (France)");
             service.Save(lang);
 
             var item = (IDictionaryItem)new DictionaryItem("item-key");
@@ -318,20 +322,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public static string GetCacheIdKey<T>(object id) => $"{GetCacheTypeKey<T>()}{id}";
 
         public static string GetCacheTypeKey<T>() => $"uRepo_{typeof(T).Name}_";
-
-        public class PassiveEventDispatcher : QueuingEventDispatcherBase
-        {
-            public PassiveEventDispatcher()
-                : base(false)
-            {
-            }
-
-            protected override void ScopeExitCompleted()
-            {
-                // do nothing
-            }
-        }
-
+        
         public class LocalServerMessenger : ServerMessengerBase
         {
             public LocalServerMessenger()

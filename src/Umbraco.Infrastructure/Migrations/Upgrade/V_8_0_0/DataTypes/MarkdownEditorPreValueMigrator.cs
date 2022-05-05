@@ -5,7 +5,7 @@
         public override bool CanMigrate(string editorAlias)
             => editorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor;
 
-        protected override object GetPreValueValue(PreValueDto preValue)
+        protected override object? GetPreValueValue(PreValueDto preValue)
         {
             if (preValue.Alias == "preview")
                 return preValue.Value == "1";

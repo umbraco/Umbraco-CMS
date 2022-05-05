@@ -68,7 +68,7 @@ namespace Umbraco.Extensions
         /// <param name="items"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T GetValue<T>(this FormCollection items, string key)
+        public static T? GetValue<T>(this FormCollection items, string key)
         {
             if (items.TryGetValue(key, out var val) == false || string.IsNullOrEmpty(val))
             {
@@ -97,7 +97,7 @@ namespace Umbraco.Extensions
 
             var converted = val.TryConvertTo<T>();
             return converted.Success
-                ? converted.Result
+                ? converted.Result!
                 : throw new InvalidOperationException($"The required query string parameter {key} cannot be converted to type {typeof(T)}");
         }
     }

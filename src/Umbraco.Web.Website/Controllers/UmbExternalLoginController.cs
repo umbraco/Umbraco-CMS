@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly IOptions<SecuritySettings> _securitySettings;
         private readonly ILogger<UmbExternalLoginController> _logger;
-        private readonly IMemberSignInManagerExternalLogins _memberSignInManager;
+        private readonly IMemberSignInManager _memberSignInManager;
 
         public UmbExternalLoginController(
             ILogger<UmbExternalLoginController> logger,
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
-            IMemberSignInManagerExternalLogins memberSignInManager,
+            IMemberSignInManager memberSignInManager,
             IMemberManager memberManager,
             ITwoFactorLoginService twoFactorLoginService,
             IOptions<SecuritySettings> securitySettings)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult ExternalLogin(string provider, string returnUrl = null)
+        public ActionResult ExternalLogin(string provider, string? returnUrl = null)
         {
             if (returnUrl.IsNullOrWhiteSpace())
             {
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         {
             var errors = new List<string>();
 
-            ExternalLoginInfo loginInfo = await _memberSignInManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo? loginInfo = await _memberSignInManager.GetExternalLoginInfoAsync();
             if (loginInfo is null)
             {
                 errors.Add("Invalid response from the login provider");
@@ -131,14 +131,14 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 if (result == SignInResult.LockedOut)
                 {
                     errors.Add(
-                        $"The local member {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
+                        $"The local member {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
                 }
                 else if (result == SignInResult.NotAllowed)
                 {
                     // This occurs when SignInManager.CanSignInAsync fails which is when RequireConfirmedEmail , RequireConfirmedPhoneNumber or RequireConfirmedAccount fails
                     // however since we don't enforce those rules (yet) this shouldn't happen.
                     errors.Add(
-                        $"The member {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
+                        $"The member {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
                 }
                 else if (result == SignInResult.Failed)
                 {
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 {
                     // This occurs when the external provider has approved the login but custom logic in OnExternalLogin has denined it.
                     errors.Add(
-                        $"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
+                        $"The user {loginInfo.Principal.Identity?.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
                 }
                 else if (result == MemberSignInManager.AutoLinkSignInResult.FailedNotLinked)
                 {
@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult LinkLogin(string provider, string returnUrl = null)
+        public IActionResult LinkLogin(string provider, string? returnUrl = null)
         {
             if (returnUrl.IsNullOrWhiteSpace())
             {
@@ -219,7 +219,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         public async Task<IActionResult> ExternalLinkLoginCallback(string returnUrl)
         {
             MemberIdentityUser user = await _memberManager.GetUserAsync(User);
-            string loginProvider = null;
+            string? loginProvider = null;
             var errors = new List<string>();
             if (user == null)
             {
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
             else
             {
-                ExternalLoginInfo info =
+                ExternalLoginInfo? info =
                     await _memberSignInManager.GetExternalLoginInfoAsync(await _memberManager.GetUserIdAsync(user));
 
                 if (info == null)
@@ -265,21 +265,21 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Disassociate(string provider, string providerKey, string returnUrl = null)
+        public async Task<IActionResult> Disassociate(string provider, string providerKey, string? returnUrl = null)
         {
             if (returnUrl.IsNullOrWhiteSpace())
             {
                 returnUrl = Request.GetEncodedPathAndQuery();
             }
 
-            MemberIdentityUser user = await _memberManager.FindByIdAsync(User.Identity.GetUserId());
+            MemberIdentityUser user = await _memberManager.FindByIdAsync(User.Identity?.GetUserId());
 
             IdentityResult result = await _memberManager.RemoveLoginAsync(user, provider, providerKey);
 
             if (result.Succeeded)
             {
                 await _memberSignInManager.SignInAsync(user, false);
-                return RedirectToLocal(returnUrl);
+                return RedirectToLocal(returnUrl!);
             }
 
             AddModelErrors(result);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Core.Scoping
 {
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <remarks>
         /// <para></para>
         /// </remarks>
-        public static T Get<T>(IScopeProvider scopeProvider, string key, Func<bool, T> ctor)
+        public static T? Get<T>(ICoreScopeProvider scopeProvider, string key, Func<bool, T> ctor)
             where T : ScopeContextualBase
         {
             // no scope context = create a non-scoped object
@@ -36,9 +36,12 @@ namespace Umbraco.Cms.Core.Scoping
             // create & enlist the scoped object
             var w = scopeContext.Enlist("ScopeContextualBase_" + key,
                 () => ctor(true),
-                (completed, item) => { item.Release(completed); });
+                (completed, item) => { item?.Release(completed); });
 
-            w._scoped = true;
+            if (w is not null)
+            {
+                w._scoped = true;
+            }
 
             return w;
         }

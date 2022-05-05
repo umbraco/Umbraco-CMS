@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Notifications
 {
     public abstract class UserNotification : INotification
     {
-        protected UserNotification(string ipAddress, string affectedUserId, string performingUserId)
+        protected UserNotification(string ipAddress, string? affectedUserId, string performingUserId)
         {
             DateTimeUtc = DateTime.UtcNow;
             IpAddress = ipAddress;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Notifications
         /// <summary>
         /// The user affected by the event raised
         /// </summary>
-        public string AffectedUserId { get; }
+        public string? AffectedUserId { get; }
 
         /// <summary>
         /// If a user is performing an action on a different user, then this will be set. Otherwise it will be -1

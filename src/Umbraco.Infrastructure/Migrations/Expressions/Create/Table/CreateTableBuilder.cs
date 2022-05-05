@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         /// <inheritdoc />
         public void Do() => Expression.Execute();
 
-        public ColumnDefinition CurrentColumn { get; set; }
+        public ColumnDefinition CurrentColumn { get; set; } = null!;
 
-        public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ForeignKeyDefinition CurrentForeignKey { get; set; } = null!;
 
         public override ColumnDefinition GetColumnForType()
         {
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         }
 
         /// <inheritdoc />
-        public ICreateTableColumnOptionBuilder Indexed(string indexName)
+        public ICreateTableColumnOptionBuilder Indexed(string? indexName)
         {
             CurrentColumn.IsIndexed = true;
 
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         }
 
         /// <inheritdoc />
-        public ICreateTableColumnOptionBuilder Unique(string indexName)
+        public ICreateTableColumnOptionBuilder Unique(string? indexName)
         {
             CurrentColumn.IsUnique = true;
 
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         }
 
         /// <inheritdoc />
-        public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableSchema,
+        public ICreateTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string? foreignKeyName, string? primaryTableSchema,
                                                                           string primaryTableName, string primaryColumnName)
         {
             CurrentColumn.IsForeignKey = true;
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         }
 
         /// <inheritdoc />
-        public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
+        public ICreateTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName, string? foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition

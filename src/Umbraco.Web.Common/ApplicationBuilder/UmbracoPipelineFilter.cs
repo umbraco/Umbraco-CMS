@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 
         public UmbracoPipelineFilter(
             string name,
-            Action<IApplicationBuilder> prePipeline,
-            Action<IApplicationBuilder> postPipeline,
-            Action<IApplicationBuilder> endpointCallback)
+            Action<IApplicationBuilder>? prePipeline,
+            Action<IApplicationBuilder>? postPipeline,
+            Action<IApplicationBuilder>? endpointCallback)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             PrePipeline = prePipeline;
@@ -25,9 +25,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             Endpoints = endpointCallback;
         }
 
-        public Action<IApplicationBuilder> PrePipeline { get; set; }
-        public Action<IApplicationBuilder> PostPipeline { get; set; }
-        public Action<IApplicationBuilder> Endpoints { get; set; }
+        public Action<IApplicationBuilder>? PrePipeline { get; set; }
+        public Action<IApplicationBuilder>? PostPipeline { get; set; }
+        public Action<IApplicationBuilder>? Endpoints { get; set; }
         public string Name { get; }
 
         public void OnPrePipeline(IApplicationBuilder app) => PrePipeline?.Invoke(app);

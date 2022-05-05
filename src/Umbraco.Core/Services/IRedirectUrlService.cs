@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="contentKey">The content unique key.</param>
         /// <param name="culture">The culture.</param>
         /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
-        void Register(string url, Guid contentKey, string culture = null);
+        void Register(string url, Guid contentKey, string? culture = null);
 
         /// <summary>
         /// Deletes all redirect URLs for a given content.
@@ -46,7 +47,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="url">The Umbraco redirect URL route.</param>
         /// <returns>The most recent redirect URLs corresponding to the route.</returns>
-        IRedirectUrl GetMostRecentRedirectUrl(string url);
+        IRedirectUrl? GetMostRecentRedirectUrl(string url);
 
         /// <summary>
         /// Gets the most recent redirect URLs corresponding to an Umbraco redirect URL route.
@@ -54,7 +55,15 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="url">The Umbraco redirect URL route.</param>
         /// <param name="culture">The culture of the request.</param>
         /// <returns>The most recent redirect URLs corresponding to the route.</returns>
-        IRedirectUrl GetMostRecentRedirectUrl(string url, string culture);
+        IRedirectUrl? GetMostRecentRedirectUrl(string url, string? culture);
+
+        /// <summary>
+        /// Gets the most recent redirect URLs corresponding to an Umbraco redirect URL route.
+        /// </summary>
+        /// <param name="url">The Umbraco redirect URL route.</param>
+        /// <param name="culture">The culture of the request.</param>
+        /// <returns>The most recent redirect URLs corresponding to the route.</returns>
+        Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture);
 
         /// <summary>
         /// Gets all redirect URLs for a content item.

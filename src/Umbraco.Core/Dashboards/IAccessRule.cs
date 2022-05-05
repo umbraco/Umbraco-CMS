@@ -13,6 +13,6 @@
         /// <summary>
         /// Gets or sets the value for the rule.
         /// </summary>
-        string Value { get; set; }
+        string? Value { get; set; }
     }
 }

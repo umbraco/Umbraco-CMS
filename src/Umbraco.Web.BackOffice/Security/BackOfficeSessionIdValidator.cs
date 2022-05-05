@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeSessionIdValidator"/> class.
         /// </summary>
-        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptions<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
+        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptionsSnapshot<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
         {
             _systemClock = systemClock;
             _globalSettings = globalSettings.Value;
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return;
             }
 
-            var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _systemClock, context.Properties.IssuedUtc, context.Principal.Identity as ClaimsIdentity);
+            var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _systemClock, context.Properties.IssuedUtc, context.Principal?.Identity as ClaimsIdentity);
 
             if (valid == false)
             {
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             Microsoft.AspNetCore.Authentication.Cookies.ICookieManager cookieManager,
             ISystemClock systemClock,
             DateTimeOffset? authTicketIssueDate,
-            ClaimsIdentity currentIdentity)
+            ClaimsIdentity? currentIdentity)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (cookieManager == null) throw new ArgumentNullException(nameof(cookieManager));

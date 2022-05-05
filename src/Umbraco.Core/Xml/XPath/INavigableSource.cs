@@ -11,7 +11,7 @@
         /// <param name="id">The unique identifier.</param>
         /// <returns>The content identified by the unique identifier, or null.</returns>
         /// <remarks>When <c>id</c> is <c>-1</c> (root content) implementations should return <c>null</c>.</remarks>
-        INavigableContent Get(int id);
+        INavigableContent? Get(int id);
 
         /// <summary>
         /// Gets the index of the last attribute in the fields collections.

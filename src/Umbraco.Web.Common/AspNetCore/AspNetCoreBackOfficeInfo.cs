@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
     {
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private string _getAbsoluteUrl;
+        private string? _getAbsoluteUrl;
         public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
         {
             _globalSettings = globalSettings;

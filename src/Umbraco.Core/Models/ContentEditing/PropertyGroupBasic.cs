@@ -41,11 +41,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [Required]
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Required]
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }

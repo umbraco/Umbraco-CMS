@@ -4,7 +4,7 @@
     {
         object Sender { get; }
         object Args { get; }
-        string EventName { get; }
+        string? EventName { get; }
 
         void RaiseEvent();
     }

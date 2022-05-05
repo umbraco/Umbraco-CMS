@@ -38,6 +38,6 @@ namespace Umbraco.Cms.Core.Composing
         /// <summary>
         /// Gets the disabled type, or null if it is the composer marked with the attribute.
         /// </summary>
-        public Type DisabledType { get; }
+        public Type? DisabledType { get; }
     }
 }

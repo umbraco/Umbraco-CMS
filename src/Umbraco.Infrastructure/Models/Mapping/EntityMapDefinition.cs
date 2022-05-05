@@ -24,8 +24,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             mapper.Define<IContentTypeComposition, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IEntitySlim, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
             mapper.Define<ISearchResult, SearchResultEntity>((source, context) => new SearchResultEntity(), Map);
-            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
-            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source));
+            mapper.Define<ISearchResults, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
+            mapper.Define<IEnumerable<ISearchResult>, IEnumerable<SearchResultEntity>>((source, context) => context.MapEnumerable<ISearchResult, SearchResultEntity>(source).WhereNotNull());
         }
 
         // Umbraco.Code.MapAll -Alias
@@ -42,26 +42,35 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (source is IContentEntitySlim contentSlim)
             {
-                source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
+                source.AdditionalData!["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
             }
 
             if (source is IDocumentEntitySlim documentSlim)
             {
-                source.AdditionalData["IsPublished"] = documentSlim.Published;
+                source.AdditionalData!["IsPublished"] = documentSlim.Published;
             }
 
             if (source is IMediaEntitySlim mediaSlim)
             {
-                //pass UpdateDate for MediaPicker ListView ordering
-                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
-                source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+                if (source.AdditionalData is not null)
+                {
+                    //pass UpdateDate for MediaPicker ListView ordering
+                    source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
+                    source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
+                }
             }
 
-            // NOTE: we're mapping the objects in AdditionalData by object reference here.
-            // it works fine for now, but it's something to keep in mind in the future
-            foreach(var kvp in source.AdditionalData)
+            if (source.AdditionalData is not null)
             {
-                target.AdditionalData[kvp.Key] = kvp.Value;
+                // NOTE: we're mapping the objects in AdditionalData by object reference here.
+                // it works fine for now, but it's something to keep in mind in the future
+                foreach(var kvp in source.AdditionalData)
+                {
+                    if (kvp.Value is not null)
+                    {
+                        target.AdditionalData[kvp.Key] = kvp.Value;
+                    }
+                }
             }
 
             target.AdditionalData.Add("IsContainer", source.IsContainer);
@@ -243,7 +252,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
         }
 
-        private static string MapContentTypeIcon(IEntitySlim entity)
+        private static string? MapContentTypeIcon(IEntitySlim entity)
         {
             switch (entity)
             {
@@ -260,10 +269,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private static string MapName(IEntitySlim source, MapperContext context)
         {
             if (!(source is DocumentEntitySlim doc))
-                return source.Name;
+                return source.Name!;
 
             // invariant = only 1 name
-            if (!doc.Variations.VariesByCulture()) return source.Name;
+            if (!doc.Variations.VariesByCulture()) return source.Name!;
 
             // variant = depends on culture
             var culture = context.GetCulture();
@@ -272,7 +281,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (culture == null)
                 //throw new InvalidOperationException("Missing culture in mapping options.");
                 // TODO: we should throw, but this is used in various places that won't set a culture yet
-                return source.Name;
+                return source.Name!;
 
             // if we don't have a name for a culture, it means the culture is not available, and
             // hey we should probably not be mapping it, but it's too late, return a fallback name

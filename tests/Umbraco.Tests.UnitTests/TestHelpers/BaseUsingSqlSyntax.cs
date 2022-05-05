@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
             {
                 new NullableDateMapper()
             };
-            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
+            var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(), pocoMappers);
             var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, factory.GetRequiredService<IMapperCollection>());
             Mappers = factory.GetRequiredService<IMapperCollection>();

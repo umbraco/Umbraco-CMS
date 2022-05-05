@@ -8,7 +8,7 @@ namespace Umbraco.Extensions
 {
     public static class CookieManagerExtensions
     {
-        public static string GetPreviewCookieValue(this ICookieManager cookieManager)
+        public static string? GetPreviewCookieValue(this ICookieManager cookieManager)
         {
             return cookieManager.GetCookieValue(Constants.Web.PreviewCookieName);
         }

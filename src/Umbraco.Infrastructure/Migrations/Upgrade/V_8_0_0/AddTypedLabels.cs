@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             if (SqlSyntax.SupportsIdentityInsert())
                 Database.Execute(new Sql($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(Cms.Core.Constants.DatabaseSchema.Tables.Node)} OFF "));
 
-            void InsertDataTypeDto(int id, string dbType, string configuration = null)
+            void InsertDataTypeDto(int id, string dbType, string? configuration = null)
             {
                 var dataTypeDto = new DataTypeDto
                 {
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         private class PropertyDataValue
         {
             public int Id { get; set; }
-            public string VarcharValue { get;set; }
+            public string? VarcharValue { get;set; }
         }
         // ReSharper restore UnusedAutoPropertyAccessor.Local
     }

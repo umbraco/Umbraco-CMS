@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
 
             var result = StackExchange.Profiling.Internal.Render.Includes(
                 profiler,
-                path: context.Request.PathBase + path,
+                path: context is not null ? context.Request.PathBase + path : null,
                 isAuthorized: true,
                 requestIDs: new List<Guid> { profiler.Id },
                 position: RenderPosition.Right,

@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Core.Routing
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             Mode = routingSettings.Value.UrlProviderMode;
+
         }
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -48,20 +49,20 @@ namespace Umbraco.Cms.Core.Routing
 
         #region GetUrl
 
-        private IPublishedContent GetDocument(int id)
+        private IPublishedContent? GetDocument(int id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetDocument(Guid id)
+        private IPublishedContent? GetDocument(Guid id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetMedia(Guid id)
+        private IPublishedContent? GetMedia(Guid id)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Media.GetById(id);
+            return umbracoContext.Media?.GetById(id);
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(int id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(int id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
         {
             if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                 return "#";
@@ -122,14 +123,14 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-            
+
 
             var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
-                .FirstOrDefault(u => u != null);
+                .FirstOrDefault(u => u is not null);
             return url?.Text ?? "#"; // legacy wants this
         }
 
-        public string GetUrlFromRoute(int id, string route, string culture)
+        public string GetUrlFromRoute(int id, string? route, string? culture)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
@@ -187,8 +188,8 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="propertyAlias"></param>
         /// <param name="current"></param>
         /// <returns></returns>
-        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
-            => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
+        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
+            => GetMediaUrl( GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
         /// Gets the URL of a media item.
@@ -205,7 +206,7 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
+        public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
         {
             if (propertyAlias == null)
                 throw new ArgumentNullException(nameof(propertyAlias));
@@ -230,11 +231,11 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-                
+
 
             var url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))
-                .FirstOrDefault(u => u != null);
+                .FirstOrDefault(u => u is not null);
 
             return url?.Text ?? "";
         }

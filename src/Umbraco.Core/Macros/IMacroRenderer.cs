@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Core.Macros
     /// </summary>
     public interface IMacroRenderer
     {
-        Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams);
+        Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent? content, IDictionary<string, object?>? macroParams);
     }
 }

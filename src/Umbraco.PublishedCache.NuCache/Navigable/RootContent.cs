@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
 
         public IList<int> ChildIds => _childIds;
 
-        public object Value(int index)
+        public object? Value(int index)
         {
             // only id has a value
             return index == 0 ? "-1" : null;

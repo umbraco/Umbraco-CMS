@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             ICacheInstructionService cacheInstructionService,
             IJsonSerializer jsonSerializer,
             LastSyncedFileManager lastSyncedFileManager,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsMonitor<GlobalSettings> globalSettings)
             : base(distributedEnabled)
         {
             _cancellationToken = _cancellationTokenSource.Token;
@@ -70,9 +70,11 @@ namespace Umbraco.Cms.Infrastructure.Sync
             CacheInstructionService = cacheInstructionService;
             JsonSerializer = jsonSerializer;
             _lastSyncedFileManager = lastSyncedFileManager;
-            GlobalSettings = globalSettings.Value;
+            GlobalSettings = globalSettings.CurrentValue;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
+
+            globalSettings.OnChange(x => GlobalSettings = x);
             using (var process = Process.GetCurrentProcess())
             {
                 // See notes on _localIdentity
@@ -86,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
         }
 
-        public GlobalSettings GlobalSettings { get; }
+        public GlobalSettings GlobalSettings { get; private set; }
 
         protected ILogger<DatabaseServerMessenger> Logger { get; }
 
@@ -121,12 +123,12 @@ namespace Umbraco.Cms.Infrastructure.Sync
         protected override void DeliverRemote(
             ICacheRefresher refresher,
             MessageType messageType,
-            IEnumerable<object> ids = null,
-            string json = null)
+            IEnumerable<object>? ids = null,
+            string? json = null)
         {
             var idsA = ids?.ToArray();
 
-            if (GetArrayType(idsA, out Type idType) == false)
+            if (GetArrayType(idsA, out Type? idType) == false)
             {
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
             }

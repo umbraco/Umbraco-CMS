@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Gets the document type a given id
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public ActionResult<DocumentTypeDisplay> GetById(int id)
+        public ActionResult<DocumentTypeDisplay?> GetById(int id)
         {
             var ct = _contentTypeService.Get(id);
             if (ct == null)
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Gets the document type a given guid
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public ActionResult<DocumentTypeDisplay> GetById(Guid id)
+        public ActionResult<DocumentTypeDisplay?> GetById(Guid id)
         {
             var contentType = _contentTypeService.Get(id);
             if (contentType == null)
@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Gets the document type a given udi
         /// </summary>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public ActionResult<DocumentTypeDisplay> GetById(Udi id)
+        public ActionResult<DocumentTypeDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _contentTypeService.Delete(foundType, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             return Ok();
         }
 
@@ -219,7 +219,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return actionResult.Result;
             }
 
-            var result = actionResult.Value
+            var result = actionResult.Value?
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType).Value
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType).Value?
                 .Select(x => new
                 {
                     contentType = x
@@ -265,15 +265,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var configuration = _dataTypeService.GetDataType(id).Configuration;
+            var configuration = _dataTypeService.GetDataType(id)?.Configuration;
             var editor = _propertyEditors[dataTypeDiff.EditorAlias];
 
             return new ContentPropertyDisplay()
             {
                 Editor = dataTypeDiff.EditorAlias,
                 Validation = new PropertyTypeValidation(),
-                View = editor.GetValueEditor().View,
-                Config = editor.GetConfigurationEditor().ToConfigurationEditor(configuration)
+                View = editor?.GetValueEditor().View,
+                Config = editor?.GetConfigurationEditor().ToConfigurationEditor(configuration)
             };
         }
 
@@ -285,7 +285,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult DeleteContainer(int id)
         {
-            _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _contentTypeService.DeleteContainer(id, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             return Ok();
         }
@@ -293,27 +293,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _contentTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var result = _contentTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public IActionResult PostRenameContainer(int id, string name)
         {
-            var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var result = _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationProblem(result.Exception.Message);
+                return ValidationProblem(result.Exception?.Message);
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public ActionResult<DocumentTypeDisplay> PostSave(DocumentTypeSave contentTypeSave)
+        public ActionResult<DocumentTypeDisplay?> PostSave(DocumentTypeSave contentTypeSave)
         {
             //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
             //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
@@ -337,22 +337,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     {
                         var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
 
-                        // If the alias has been manually updated before the first save,
-                        // make sure to also update the first allowed template, as the
-                        // name will come back as a SafeAlias of the document type name,
-                        // not as the actual document type alias.
-                        // For more info: http://issues.umbraco.org/issue/U4-11059
-                        if (ctSave.DefaultTemplate != template.Alias)
+                        if (template is not null)
                         {
-                            var allowedTemplates = ctSave.AllowedTemplates.ToArray();
-                            if (allowedTemplates.Any())
-                                allowedTemplates[0] = template.Alias;
-                            ctSave.AllowedTemplates = allowedTemplates;
+                            // If the alias has been manually updated before the first save,
+                            // make sure to also update the first allowed template, as the
+                            // name will come back as a SafeAlias of the document type name,
+                            // not as the actual document type alias.
+                            // For more info: http://issues.umbraco.org/issue/U4-11059
+                            if (ctSave.DefaultTemplate != template.Alias)
+                            {
+                                var allowedTemplates = ctSave.AllowedTemplates?.ToArray();
+                                if (allowedTemplates?.Any() ?? false)
+                                    allowedTemplates[0] = template.Alias;
+                                ctSave.AllowedTemplates = allowedTemplates;
+                            }
+
+                            //make sure the template alias is set on the default and allowed template so we can map it back
+                            ctSave.DefaultTemplate = template.Alias;
                         }
-
-                        //make sure the template alias is set on the default and allowed template so we can map it back
-                        ctSave.DefaultTemplate = template.Alias;
-
                     }
                 });
 
@@ -364,7 +366,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<DocumentTypeDisplay>(savedCt.Value);
 
 
-            display.AddSuccessNotification(
+            display?.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles","contentTypeSavedHeader"),
                             string.Empty);
 
@@ -372,7 +374,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public ActionResult<TemplateDisplay> PostCreateDefaultTemplate(int id)
+        public ActionResult<TemplateDisplay?> PostCreateDefaultTemplate(int id)
         {
             var contentType = _contentTypeService.Get(id);
             if (contentType == null)
@@ -389,7 +391,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<TemplateDisplay>(template);
         }
 
-        private ITemplate CreateTemplateForContentType(string contentTypeAlias, string contentTypeName)
+        private ITemplate? CreateTemplateForContentType(string contentTypeAlias, string? contentTypeName)
         {
             var template = _fileService.GetTemplate(contentTypeAlias);
             if (template == null)
@@ -398,10 +400,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (tryCreateTemplate == false)
                 {
                     _logger.LogWarning("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
-                        contentTypeAlias, tryCreateTemplate.Result.Result);
+                        contentTypeAlias, tryCreateTemplate.Result?.Result);
                 }
 
-                template = tryCreateTemplate.Result.Entity;
+                template = tryCreateTemplate.Result?.Entity;
             }
 
             return template;
@@ -413,7 +415,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="parentId"></param>
         /// <returns></returns>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public DocumentTypeDisplay GetEmpty(int parentId)
+        public DocumentTypeDisplay? GetEmpty(int parentId)
         {
             IContentType ct;
             if (parentId != Constants.System.Root)
@@ -438,7 +440,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<ContentTypeBasic> GetAll()
         {
             var types = _contentTypeService.GetAll();
-            var basics = types.Select(_umbracoMapper.Map<IContentType, ContentTypeBasic>);
+            var basics = types.Select(_umbracoMapper.Map<IContentType, ContentTypeBasic>).WhereNotNull();
 
             return basics.Select(basic =>
             {
@@ -473,14 +475,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(contentItem);
-                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
+                var ids = contentType?.AllowedContentTypes?.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
-                if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
+                if (ids is null || ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
                 types = _contentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
-            var basics = types.Where(type => type.IsElement == false).Select(_umbracoMapper.Map<IContentType, ContentTypeBasic>).ToList();
+            var basics = types.Where(type => type.IsElement == false).Select(_umbracoMapper.Map<IContentType, ContentTypeBasic>).WhereNotNull().ToList();
 
             var localizedTextService = _localizedTextService;
             foreach (var basic in basics)
@@ -490,13 +492,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //map the blueprints
-            var blueprints = _contentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            var blueprints = _contentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray())?.ToArray();
             foreach (var basic in basics)
             {
-                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
-                foreach (var blueprint in docTypeBluePrints)
+                var docTypeBluePrints = blueprints?.Where(x => x.ContentTypeId == (int?) basic.Id).ToArray();
+                if (docTypeBluePrints is not null)
                 {
-                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                    foreach (var blueprint in docTypeBluePrints)
+                    {
+                        basic.Blueprints[blueprint.Id] = blueprint.Name ?? string.Empty;
+                    }
                 }
             }
 
@@ -562,9 +567,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
 
-            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0);
             var element = XElement.Parse(xd.InnerXml);
-            _packageDataInstallation.ImportDocumentType(element, userId);
+            if (userId is not null)
+            {
+                _packageDataInstallation.ImportDocumentType(element, userId.Value);
+            }
 
             // Try to clean up the temporary file.
             try
@@ -609,8 +617,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         };
                         xd.Load(model.TempFileName);
 
-                        model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
-                        model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+                        model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild?.Value;
+                        model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild?.Value;
                     }
                     else
                     {

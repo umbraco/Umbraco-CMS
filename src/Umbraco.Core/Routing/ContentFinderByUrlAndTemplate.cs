@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IFileService _fileService;
 
         private readonly IContentTypeService _contentTypeService;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByUrlAndTemplate"/> class.
@@ -33,13 +34,14 @@ namespace Umbraco.Cms.Core.Routing
             IFileService fileService,
             IContentTypeService contentTypeService,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
             : base(logger, umbracoContextAccessor)
         {
             _logger = logger;
             _fileService = fileService;
             _contentTypeService = contentTypeService;
-            _webRoutingSettings = webRoutingSettings.Value;
+            _webRoutingSettings = webRoutingSettings.CurrentValue;
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         /// <summary>
@@ -48,7 +50,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
-        public override bool TryFindContent(IPublishedRequestBuilder frequest)
+        public override async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             var path = frequest.AbsolutePathDecoded;
 
@@ -60,7 +62,10 @@ namespace Umbraco.Cms.Core.Routing
             // no template if "/"
             if (path == "/")
             {
-                _logger.LogDebug("No template in path '/'");
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("No template in path '/'");
+                }
                 return false;
             }
 
@@ -69,23 +74,31 @@ namespace Umbraco.Cms.Core.Routing
             var templateAlias = path.Substring(pos + 1);
             path = pos == 0 ? "/" : path.Substring(0, pos);
 
-            ITemplate template = _fileService.GetTemplate(templateAlias);
+            ITemplate? template = _fileService.GetTemplate(templateAlias);
 
             if (template == null)
             {
-                _logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
+                }
                 return false;
             }
-
-            _logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
+            }
 
             // look for node corresponding to the rest of the route
             var route = frequest.Domain != null ? (frequest.Domain.ContentId + path) : path;
-            IPublishedContent node = FindContent(frequest, route);
+            IPublishedContent? node = FindContent(frequest, route);
 
             if (node == null)
             {
-                _logger.LogDebug("Not a valid route to node: '{Route}'", route);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Not a valid route to node: '{Route}'", route);
+                }
                 return false;
             }
 

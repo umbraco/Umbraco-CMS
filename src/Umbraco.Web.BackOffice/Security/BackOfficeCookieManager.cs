@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IRuntimeState _runtime;
-        private readonly string[] _explicitPaths;
+        private readonly string[]? _explicitPaths;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly IBasicAuthService _basicAuthService;
 
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public BackOfficeCookieManager(
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
-            IEnumerable<string> explicitPaths,
+            IEnumerable<string>? explicitPaths,
             UmbracoRequestPaths umbracoRequestPaths,
             IBasicAuthService basicAuthService)
         {
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// Explicitly implement this so that we filter the request
         /// </summary>
         /// <inheritdoc/>
-        string Microsoft.AspNetCore.Authentication.Cookies.ICookieManager.GetRequestCookie(HttpContext context, string key)
+        string? Microsoft.AspNetCore.Authentication.Cookies.ICookieManager.GetRequestCookie(HttpContext context, string key)
         {
             var absPath = context.Request.Path;
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out _) || _umbracoRequestPaths.IsClientSideRequest(absPath))

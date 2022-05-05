@@ -111,9 +111,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
-            var mockScopeProvider = new Mock<IScopeProvider>();
+            var mockScopeProvider = new Mock<ICoreScopeProvider>();
             mockScopeProvider
-                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Setup(x => x.CreateCoreScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(Mock.Of<IScope>());
 
             return new ScheduledPublishing(

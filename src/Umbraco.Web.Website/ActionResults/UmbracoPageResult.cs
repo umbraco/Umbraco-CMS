@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.Website.ActionResults
         /// <inheritdoc/>
         public async Task ExecuteResultAsync(ActionContext context)
         {
-            UmbracoRouteValues umbracoRouteValues = context.HttpContext.Features.Get<UmbracoRouteValues>();
+            UmbracoRouteValues? umbracoRouteValues = context.HttpContext.Features.Get<UmbracoRouteValues>();
             if (umbracoRouteValues == null)
             {
                 throw new InvalidOperationException($"Can only use {nameof(UmbracoPageResult)} in the context of an Http POST when using a {nameof(SurfaceController)} form");
@@ -49,18 +49,21 @@ namespace Umbraco.Cms.Web.Website.ActionResults
                 ActionDescriptor = umbracoRouteValues.ControllerActionDescriptor
             };
             IActionInvokerFactory actionInvokerFactory = context.HttpContext.RequestServices.GetRequiredService<IActionInvokerFactory>();
-            IActionInvoker actionInvoker = actionInvokerFactory.CreateInvoker(renderActionContext);
+            IActionInvoker? actionInvoker = actionInvokerFactory.CreateInvoker(renderActionContext);
             await ExecuteControllerAction(actionInvoker);
         }
 
         /// <summary>
         /// Executes the controller action
         /// </summary>
-        private async Task ExecuteControllerAction(IActionInvoker actionInvoker)
+        private async Task ExecuteControllerAction(IActionInvoker? actionInvoker)
         {
             using (_profilingLogger.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
             {
-                await actionInvoker.InvokeAsync();
+                if (actionInvoker is not null)
+                {
+                    await actionInvoker.InvokeAsync();
+                }
             }
         }
     }

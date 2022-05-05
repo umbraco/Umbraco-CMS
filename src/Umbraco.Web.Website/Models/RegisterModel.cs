@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.Website.Models
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         /// <summary>
         /// Returns the member properties
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Web.Website.Models
         /// <summary>
         /// The members real name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The members password
@@ -44,17 +44,17 @@ namespace Umbraco.Cms.Web.Website.Models
         [StringLength(256)]
         [DataType(System.ComponentModel.DataAnnotations.DataType.Password)]
         [Display(Name = "Password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [DataType(System.ComponentModel.DataAnnotations.DataType.Password)]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
+        public string ConfirmPassword { get; set; } = null!;
 
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         /// <summary>
         /// Flag to determine if the username should be the email address, if true then the Username property is ignored

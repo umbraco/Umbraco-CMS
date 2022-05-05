@@ -1,4 +1,4 @@
-﻿/**
+/**
     * @ngdoc service
     * @name umbraco.resources.dictionaryResource
     * @description Loads in data for dictionary items
@@ -96,6 +96,48 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
             "Failed to get item " + id);
     }
 
+  /**
+      * @ngdoc method
+      * @name umbraco.resources.dictionaryResource#move
+      * @methodOf umbraco.resources.dictionaryResource
+      *
+      * @description
+      * Moves a dictionary item underneath a new parentId
+      *
+      * ##usage
+      * <pre>
+      * dictionaryResource.move({ parentId: 1244, id: 123 })
+      *    .then(function() {
+      *        alert("node was moved");
+      *    }, function(err){
+      *      alert("node didnt move:" + err.data.Message);
+      *    });
+      * </pre>
+      * @param {Object} args arguments object
+      * @param {int} args.id the int of the dictionary item to move
+      * @param {int} args.parentId the int of the parent dictionary item to move to
+      * @returns {Promise} resourcePromise object.
+      *
+      */
+    function move (args) {
+        if (!args) {
+          throw "args cannot be null";
+        }
+        if (!args.parentId) {
+          throw "args.parentId cannot be null";
+        }
+        if (!args.id) {
+          throw "args.id cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+          $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "PostMove"),
+            {
+              parentId: args.parentId,
+              id: args.id
+            }, { responseType: 'text' }));
+    }
+
     /**
         * @ngdoc method
         * @name umbraco.resources.dictionaryResource#save
@@ -151,6 +193,7 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
     create: create,
     getById: getById,
     save: save,
+    move: move,
     getList : getList
   };
 

@@ -8,7 +8,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="VariationContext"/> class.
         /// </summary>
-        public VariationContext(string culture = null, string segment = null)
+        public VariationContext(string? culture = null, string? segment = null)
         {
             Culture = culture ?? ""; // cannot be null, default to invariant
             Segment = segment ?? ""; // cannot be null, default to neutral

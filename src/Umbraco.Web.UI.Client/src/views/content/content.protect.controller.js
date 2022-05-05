@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentProtectController($scope, $q, contentResource, memberResource, memberGroupResource, navigationService, localizationService, editorService) {
+    function ContentProtectController($scope, $q,  publicAccessResource, memberResource, memberGroupResource, navigationService, localizationService, editorService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -30,7 +30,7 @@
             vm.loading = true;
 
             // get the current public access protection
-            contentResource.getPublicAccess(id).then(function (publicAccess) {
+            publicAccessResource.getPublicAccess(id).then(function (publicAccess) {
                 vm.loading = false;
 
                 // init the current settings for public access (if any)
@@ -94,7 +94,7 @@
             vm.buttonState = "busy";
             var groups = _.map(vm.groups, function (group) { return encodeURIComponent(group.name); });
             var usernames = _.map(vm.members, function (member) { return member.username; });
-            contentResource.updatePublicAccess(id, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
+            publicAccessResource.updatePublicAccess(id, groups, usernames, vm.loginPage.id, vm.errorPage.id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsProtected", [$scope.currentNode.name]).then(function (value) {
                         vm.success = {
@@ -181,11 +181,11 @@
                                             vm.members.push(newMember);
                                         }
                                     })
-                                );                                
+                                );
                             });
                         editorService.close();
                         navigationService.allowHideDialog(true);
-                        // wait for all the member lookups to complete 
+                        // wait for all the member lookups to complete
                         vm.loading = true;
                         $q.all(promises).then(function() {
                             vm.loading = false;
@@ -239,7 +239,7 @@
 
         function removeProtectionConfirm() {
             vm.buttonState = "busy";
-            contentResource.removePublicAccess(id).then(
+            publicAccessResource.removePublicAccess(id).then(
                 function () {
                     localizationService.localize("publicAccess_paIsRemoved", [$scope.currentNode.name]).then(function(value) {
                         vm.success = {

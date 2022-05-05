@@ -26,8 +26,8 @@ namespace Umbraco.Cms.Core.Collections
         // c# events are weird, they do not behave the same way as other c# things that are 'virtual',
         // a good article is here: https://medium.com/@unicorn_dev/virtual-events-in-c-something-went-wrong-c6f6f5fbe252
         // and https://stackoverflow.com/questions/2268065/c-sharp-language-design-explicit-interface-implementation-of-an-event
-        private NotifyCollectionChangedEventHandler _changed;
-        event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
+        private NotifyCollectionChangedEventHandler? _changed;
+        event NotifyCollectionChangedEventHandler? INotifyCollectionChanged.CollectionChanged
         {
             add { _changed += value; }
             remove { _changed -= value; }

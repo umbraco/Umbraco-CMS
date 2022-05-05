@@ -42,15 +42,15 @@ namespace Umbraco.Cms.Web.Common.Authorization
             {
                 case DefaultHttpContext defaultHttpContext:
                 {
-                    IEndpointFeature endpointFeature = defaultHttpContext.Features.Get<IEndpointFeature>();
-                    endpoint = endpointFeature.Endpoint;
+                    IEndpointFeature? endpointFeature = defaultHttpContext.Features.Get<IEndpointFeature>();
+                    endpoint = endpointFeature?.Endpoint;
                     break;
                 }
 
                 case Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext authorizationFilterContext:
                 {
-                    IEndpointFeature endpointFeature = authorizationFilterContext.HttpContext.Features.Get<IEndpointFeature>();
-                    endpoint = endpointFeature.Endpoint;
+                    IEndpointFeature? endpointFeature = authorizationFilterContext.HttpContext.Features.Get<IEndpointFeature>();
+                    endpoint = endpointFeature?.Endpoint;
                     break;
                 }
 
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.Common.Authorization
             }
 
             var actionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-            var controllerType = actionDescriptor.ControllerTypeInfo.AsType();
+            var controllerType = actionDescriptor?.ControllerTypeInfo.AsType();
             return _umbracoFeatures.IsControllerEnabled(controllerType);
         }
     }

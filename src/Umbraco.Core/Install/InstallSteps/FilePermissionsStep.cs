@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
         }
 
         /// <inheritdoc/>
-        public override Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             // validate file permissions
             var permissionsOk = _filePermissionHelper.RunFilePermissionTestSuite(out Dictionary<FilePermissionTest, IEnumerable<string>> report);
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
                 throw new InstallException("Permission check failed", "permissionsreport", new { errors = translatedErrors });
             }
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult<InstallSetupResult?>(null);
         }
 
         /// <inheritdoc/>

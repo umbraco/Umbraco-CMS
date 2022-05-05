@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -23,15 +24,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [SetUp]
         public void SetUp() => CreateTestData();
 
-        private RelationTypeRepository CreateRepository(IScopeProvider provider) =>
+        private RelationTypeRepository CreateRepository(ICoreScopeProvider provider) =>
             new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
         [Test]
         public void Can_Perform_Add_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -50,8 +51,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Update_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -75,8 +76,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Delete_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -95,8 +96,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Get_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -119,8 +120,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetAll_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -139,8 +140,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetAll_With_Params_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -159,8 +160,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Exists_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -178,13 +179,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Count_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
+                IQuery<IRelationType> query = provider.CreateQuery<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -196,14 +197,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_GetByQuery_On_RelationTypeRepository()
         {
             // Arrange
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
                 // Act
                 System.Guid childObjType = Constants.ObjectTypes.DocumentType;
-                IQuery<IRelationType> query = scope.SqlContext.Query<IRelationType>().Where(x => x.ChildObjectType == childObjType);
+                IQuery<IRelationType> query = provider.CreateQuery<IRelationType>().Where(x => x.ChildObjectType == childObjType);
                 IEnumerable<IRelationType> result = repository.Get(query);
 
                 // Assert
@@ -220,8 +221,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true, Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentType, false);
             var relateContentMedia = new RelationType("Relate Content to Media", "relateContentToMedia", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, true);
 
-            IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            ICoreScopeProvider provider = ScopeProvider;
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 

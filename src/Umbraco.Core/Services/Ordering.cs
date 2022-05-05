@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Services
         /// <para>The <paramref name="orderBy"/> can be null, meaning: not sorting. If it is the empty string, it becomes null.</para>
         /// <para>The <paramref name="culture"/> can be the empty string, meaning: invariant. If it is null, it becomes the empty string.</para>
         /// </remarks>
-        public Ordering(string orderBy, Direction direction = Direction.Ascending, string culture = null, bool isCustomField = false)
+        public Ordering(string? orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
         {
             OrderBy = orderBy.IfNullOrWhiteSpace(null); // empty is null and means, not sorting
             Direction = direction;
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// <para>The <paramref name="orderBy"/> can be null, meaning: not sorting. If it is the empty string, it becomes null.</para>
         /// <para>The <paramref name="culture"/> can be the empty string, meaning: invariant. If it is null, it becomes the empty string.</para>
         /// </remarks>
-        public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string culture = null, bool isCustomField = false)
+        public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
             => new Ordering(orderBy, direction, culture, isCustomField);
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the name of the ordering field.
         /// </summary>
-        public string OrderBy { get; }
+        public string? OrderBy { get; }
 
         /// <summary>
         /// Gets the ordering direction.
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets (ISO) culture to consider when sorting multi-lingual fields.
         /// </summary>
-        public string Culture { get; }
+        public string? Culture { get; }
 
         /// <summary>
         /// Gets a value indicating whether the ordering field is a custom user property.

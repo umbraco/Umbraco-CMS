@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             // data is (both in database and xml):
             // <keyFeatureList>
@@ -58,18 +58,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 : values.ToArray();
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             var d = new XmlDocument();
             var e = d.CreateElement("values");
             d.AppendChild(e);
 
-            var values = (IEnumerable<string>) inter;
-            foreach (var value in values)
+            var values = (IEnumerable<string>?) inter;
+            if (values is not null)
             {
-                var ee = d.CreateElement("value");
-                ee.InnerText = value;
-                e.AppendChild(ee);
+                foreach (var value in values)
+                {
+                    var ee = d.CreateElement("value");
+                    ee.InnerText = value;
+                    e.AppendChild(ee);
+                }
             }
 
             return d.CreateNavigator();

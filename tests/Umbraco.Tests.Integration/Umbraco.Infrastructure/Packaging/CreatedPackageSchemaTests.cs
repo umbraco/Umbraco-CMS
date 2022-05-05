@@ -53,10 +53,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 
             packageDefinition.Name = "UpdatedName";
             CreatedPackageSchemaRepository.SavePackage(packageDefinition);
-            var result = CreatedPackageSchemaRepository.GetAll().ToList();
+            var results = CreatedPackageSchemaRepository.GetAll().ToList();
 
-            Assert.AreEqual(result.Count, 1);
-            Assert.AreEqual(result.FirstOrDefault()?.Name, "UpdatedName");
+            Assert.AreEqual(expected: 1, actual: results.Count);
+            Assert.AreEqual(expected: "UpdatedName", actual: results.FirstOrDefault()?.Name);
         }
     }
 }

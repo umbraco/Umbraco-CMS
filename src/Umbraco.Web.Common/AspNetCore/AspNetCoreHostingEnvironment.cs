@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -17,21 +17,39 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
     public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {
         private readonly ConcurrentHashSet<Uri> _applicationUrls = new ConcurrentHashSet<Uri>();
-        private readonly IServiceProvider _serviceProvider;
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private string _applicationId;
-        private string _localTempPath;
+        private readonly IApplicationDiscriminator? _applicationDiscriminator;
+
+        private string? _applicationId;
+        private string? _localTempPath;
+
         private UrlMode _urlProviderMode;
 
+        [Obsolete("Please use an alternative constructor.")]
         public AspNetCoreHostingEnvironment(
             IServiceProvider serviceProvider,
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
+        : this(hostingSettings, webRoutingSettings, webHostEnvironment, serviceProvider.GetService<IApplicationDiscriminator>()!)
         {
-            _serviceProvider = serviceProvider;
+        }
+
+        public AspNetCoreHostingEnvironment(
+            IOptionsMonitor<HostingSettings> hostingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IWebHostEnvironment webHostEnvironment,
+            IApplicationDiscriminator applicationDiscriminator)
+            : this(hostingSettings, webRoutingSettings, webHostEnvironment) =>
+            _applicationDiscriminator = applicationDiscriminator;
+
+        public AspNetCoreHostingEnvironment(
+            IOptionsMonitor<HostingSettings> hostingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IWebHostEnvironment webHostEnvironment)
+        {
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
@@ -59,10 +77,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         public bool IsHosted { get; } = true;
 
         /// <inheritdoc/>
-        public Uri ApplicationMainUrl { get; private set; }
+        public Uri ApplicationMainUrl { get; private set; } = null!;
 
         /// <inheritdoc/>
-        public string SiteName { get; private set; }
+        public string SiteName { get; private set; } = null!;
 
         /// <inheritdoc/>
         public string ApplicationId
@@ -74,16 +92,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                     return _applicationId;
                 }
 
-                var appId = _serviceProvider.GetApplicationUniqueIdentifier();
-                if (appId == null)
-                {
-                    throw new InvalidOperationException("Could not acquire an ApplicationId, ensure DataProtection services and an IHostEnvironment are registered");
-                }
-
-                // Hash this value because it can really be anything. By default this will be the application's path.
-                // TODO: Test on IIS, hopefully this would be equivalent to the IIS unique ID.
-                // This could also contain sensitive information (i.e. like the physical path) which we don't want to expose in logs.
-                _applicationId = appId.GenerateHash();
+                _applicationId =  _applicationDiscriminator?.GetApplicationId() ?? _webHostEnvironment.GetTemporaryApplicationId();
 
                 return _applicationId;
             }
@@ -98,7 +107,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// <inheritdoc/>
         public bool IsDebugMode => _hostingSettings.CurrentValue.Debug;
 
-        public Version IISVersion { get; }
+        public Version? IISVersion { get; }
 
         public string LocalTempPath
         {
@@ -136,27 +145,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         }
 
         /// <inheritdoc/>
-        public string MapPathWebRoot(string path) => MapPath(_webHostEnvironment.WebRootPath, path);
+        public string MapPathWebRoot(string path) => _webHostEnvironment.MapPathWebRoot(path);
 
         /// <inheritdoc/>
-        public string MapPathContentRoot(string path) => MapPath(_webHostEnvironment.ContentRootPath, path);
-
-        private string MapPath(string root, string path)
-        {
-            var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-
-            // TODO: This is a temporary error because we switched from IOHelper.MapPath to HostingEnvironment.MapPathXXX
-            // IOHelper would check if the path passed in started with the root, and not prepend the root again if it did,
-            // however if you are requesting a path be mapped, it should always assume the path is relative to the root, not
-            // absolute in the file system.  This error will help us find and fix improper uses, and should be removed once
-            // all those uses have been found and fixed
-            if (newPath.StartsWith(root))
-            {
-                throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPath");
-            }
-
-            return Path.Combine(root, newPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlashBackSlash));
-        }
+        public string MapPathContentRoot(string path) => _webHostEnvironment.MapPathContentRoot(path);
 
         /// <inheritdoc/>
         public string ToAbsolute(string virtualPath)
@@ -177,7 +169,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             return fullPath;
         }
 
-        public void EnsureApplicationMainUrl(Uri currentApplicationUrl)
+        public void EnsureApplicationMainUrl(Uri? currentApplicationUrl)
         {
             // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
             // it changes the URL to `localhost:80` which actually doesn't work for pinging itself, it only works internally in Azure. The ironic part
@@ -208,7 +200,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             }
         }
 
-        private void SetSiteName(string siteName) =>
+        private void SetSiteName(string? siteName) =>
             SiteName = string.IsNullOrWhiteSpace(siteName)
                 ? _webHostEnvironment.ApplicationName
                 : siteName;

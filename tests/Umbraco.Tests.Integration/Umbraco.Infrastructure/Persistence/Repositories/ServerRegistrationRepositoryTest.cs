@@ -3,16 +3,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -43,7 +48,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
 
-                Assert.Throws<SqlException>(() => repository.Save(server));
+                Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
             }
         }
 
@@ -59,7 +64,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IServerRegistration server = repository.Get(1);
                 server.ServerIdentity = "COMPUTER2";
 
-                Assert.Throws<SqlException>(() => repository.Save(server));
+                Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
             }
         }
 

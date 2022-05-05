@@ -17,12 +17,16 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 using Content = Umbraco.Cms.Core.Models.Content;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -552,7 +556,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ContentTypeRepository repository = ContentTypeRepository;
 
                 // Act
-                IEnumerable<IContentType> contentTypes = repository.Get(scope.SqlContext.Query<IContentType>().Where(x => x.ParentId == contentType.Id));
+                IEnumerable<IContentType> contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id));
 
                 // Assert
                 Assert.That(contentTypes.Count(), Is.EqualTo(3));
@@ -630,7 +634,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IEnumerable<IContentType> contentTypes = repository.GetMany();
                 int count =
-                    scope.Database.ExecuteScalar<int>(
+                    ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.DocumentType });
 
@@ -653,7 +657,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IEnumerable<IContentType> contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetMany(allGuidIds);
                 int count =
-                    scope.Database.ExecuteScalar<int>(
+                    ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new { NodeObjectType = Constants.ObjectTypes.DocumentType });
 

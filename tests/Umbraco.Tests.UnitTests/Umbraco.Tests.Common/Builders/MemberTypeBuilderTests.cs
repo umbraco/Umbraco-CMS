@@ -100,11 +100,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
             Assert.AreEqual(testThumbnail, memberType.Thumbnail);
             Assert.AreEqual(testTrashed, memberType.Trashed);
             Assert.IsFalse(memberType.IsContainer);
-            Assert.AreEqual(9, memberType.PropertyTypes.Count());   // 7 from membership properties group, 2 custom
+            Assert.AreEqual(3, memberType.PropertyTypes.Count());   // 1 from membership properties group, 2 custom
 
             IOrderedEnumerable<int> propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
             Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
-            Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 9, propertyTypeIds.Max());
+            Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 3, propertyTypeIds.Max());
 
             Assert.IsTrue(memberType.MemberCanEditProperty(testPropertyType1.Alias));
             Assert.IsFalse(memberType.MemberCanViewProperty(testPropertyType1.Alias));
