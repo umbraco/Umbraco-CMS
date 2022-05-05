@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="dependencies">A list of dependencies.</param>
         /// <returns>The parsed value.</returns>
         /// <remarks>Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the dependencies.</remarks>
-        string ToArtifact(string? value, ICollection<Udi> dependencies);
+        string ToArtifact(string value, ICollection<Udi> dependencies);
 
         /// <summary>
         /// Parses an artifact property value and produces an Umbraco property value.
