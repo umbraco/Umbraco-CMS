@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Services
         public IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias) => GetByChildId(child.Id, relationTypeAlias);
 
         /// <inheritdoc />
-        public IEnumerable<IRelation>? GetByParentOrChildId(int id)
+        public IEnumerable<IRelation> GetByParentOrChildId(int id)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<IRelation>? GetByParentOrChildId(int id, string relationTypeAlias)
+        public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {

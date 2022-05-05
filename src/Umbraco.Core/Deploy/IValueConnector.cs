@@ -32,6 +32,6 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="propertyType">The value property type<</param>
         /// <param name="currentValue">The current content property value.</param>
         /// <returns>The content property value.</returns>
-        object? FromArtifact(string? value, IPropertyType propertyType, object currentValue);
+        object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue);
     }
 }
