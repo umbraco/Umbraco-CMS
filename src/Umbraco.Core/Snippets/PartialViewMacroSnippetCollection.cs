@@ -17,7 +17,16 @@ namespace Umbraco.Cms.Core.Snippets
         /// Gets the partial view macro snippet names.
         /// </summary>
         /// <returns>The names of all partial view macro snippets.</returns>
-        public IEnumerable<string> GetNames() => this.Select(x => Path.GetFileNameWithoutExtension(x.Name));
+        public IEnumerable<string> GetNames()
+        {
+            var snippetNames = this.Select(x => Path.GetFileNameWithoutExtension(x.Name)).ToArray();
+
+            // Ensure the ones that are called 'Empty' are at the top
+            var empty = snippetNames.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
+                .OrderBy(x => x?.Length).ToArray();
+
+            return empty.Union(snippetNames.Except(empty)).WhereNotNull();
+        }
 
         /// <summary>
         /// Gets the content of a partial view macro snippet as a string.
