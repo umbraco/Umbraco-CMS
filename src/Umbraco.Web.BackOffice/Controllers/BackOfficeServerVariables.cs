@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
-                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged}
+                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()}
                     }
                 },
                 {
