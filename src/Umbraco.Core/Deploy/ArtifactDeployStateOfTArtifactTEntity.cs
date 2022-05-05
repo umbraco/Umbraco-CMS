@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Represent the state of an artifact being deployed.
@@ -8,12 +8,6 @@
     public class ArtifactDeployState<TArtifact, TEntity> : ArtifactDeployState
         where TArtifact : IArtifact
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArtifactDeployState{TArtifact,TEntity}"/> class.
-        /// </summary>
-        public ArtifactDeployState()
-        { }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ArtifactDeployState{TArtifact,TEntity}"/> class.
         /// </summary>
@@ -32,15 +26,15 @@
         /// <summary>
         /// Gets or sets the artifact.
         /// </summary>
-        public new TArtifact? Artifact { get; set; }
+        public new TArtifact Artifact { get; set; }
 
         /// <summary>
         /// Gets or sets the entity.
         /// </summary>
-        public TEntity? Entity { get; set; }
+        public TEntity Entity { get; set; }
 
         /// <inheritdoc/>
-        protected sealed override IArtifact? GetArtifactAsIArtifact()
+        protected sealed override IArtifact GetArtifactAsIArtifact()
         {
             return Artifact;
         }
