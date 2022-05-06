@@ -2,11 +2,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models;
 
-[UmbracoOptions("ConnectionStrings")]
+/// <summary>
+/// Represents a single connection string.
+/// </summary>
 public class ConnectionStrings
 {
-    private string? _connectionString;
-
     /// <summary>
     /// The default provider name when not present in configuration.
     /// </summary>
@@ -15,20 +15,34 @@ public class ConnectionStrings
     /// <summary>
     /// The DataDirectory placeholder.
     /// </summary>
-    public const string DataDirectoryPlaceholder = "|DataDirectory|";
+    public const string DataDirectoryPlaceholder = ConfigurationExtensions.DataDirectoryPlaceholder;
 
     /// <summary>
     /// The postfix used to identify a connection strings provider setting.
     /// </summary>
-    public const string ProviderNamePostfix = "_ProviderName";
+    public const string ProviderNamePostfix = ConfigurationExtensions.ProviderNamePostfix;
 
+    /// <summary>
+    /// Gets or sets the name.
+    /// </summary>
+    /// <value>
+    /// The name.
+    /// </value>
     public string? Name { get; set; }
 
-    public string? ConnectionString
-    {
-        get => _connectionString;
-        set => _connectionString = value?.ReplaceDataDirectoryPlaceholder();
-    }
+    /// <summary>
+    /// Gets or sets the connection string.
+    /// </summary>
+    /// <value>
+    /// The connection string.
+    /// </value>
+    public string? ConnectionString { get; set; }
 
-    public string? ProviderName { get; set; } = DefaultProviderName;
+    /// <summary>
+    /// Gets or sets the name of the provider.
+    /// </summary>
+    /// <value>
+    /// The name of the provider.
+    /// </value>
+    public string? ProviderName { get; set; }
 }

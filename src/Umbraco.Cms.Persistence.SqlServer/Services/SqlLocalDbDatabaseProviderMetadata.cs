@@ -56,7 +56,7 @@ public class SqlLocalDbDatabaseProviderMetadata : IDatabaseProviderMetadata
     {
         var builder = new SqlConnectionStringBuilder
         {
-            DataSource = @"(localdb)\MSSQLLocalDB",
+            DataSource = @"(LocalDb)\MSSQLLocalDB",
             AttachDBFilename = @$"{ConnectionStrings.DataDirectoryPlaceholder}\{databaseModel.DatabaseName}.mdf",
             IntegratedSecurity = true
         };
