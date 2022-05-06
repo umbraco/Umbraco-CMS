@@ -199,13 +199,13 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        IEnumerable<ITemplate>? GetTemplates(params string[] aliases);
+        IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
         /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        IEnumerable<ITemplate>? GetTemplates(int masterTemplateId);
+        IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its alias.
