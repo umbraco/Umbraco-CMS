@@ -9,8 +9,7 @@ using Umbraco.Cms.Web.Common.Formatters;
 namespace Umbraco.Cms.Web.Common.Filters;
 
 /// <summary>
-///     Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the
-///     angular json vulnerability prevention.
+/// Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
 /// </summary>
 public sealed class JsonDateTimeFormatAttribute : TypeFilterAttribute
 {
