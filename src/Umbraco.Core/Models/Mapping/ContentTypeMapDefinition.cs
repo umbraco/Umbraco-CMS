@@ -130,11 +130,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
-
-            if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
-            {
-                MapHistoryCleanup(source, targetWithHistoryCleanup);
-            }
+            MapHistoryCleanup(source, target);
 
             target.AllowedTemplates = source.AllowedTemplates?
                 .Where(x => x != null)
@@ -147,7 +143,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 : _fileService.GetTemplate(source.DefaultTemplate));
         }
 
-        private static void MapHistoryCleanup(DocumentTypeSave source, IContentTypeWithHistoryCleanup target)
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
         {
             // If source history cleanup is null we don't have to map all properties
             if (source.HistoryCleanup is null)
@@ -209,18 +205,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
-            if (source is IContentTypeWithHistoryCleanup sourceWithHistoryCleanup)
+            target.HistoryCleanup = new HistoryCleanupViewModel
             {
-                target.HistoryCleanup = new HistoryCleanupViewModel
-                {
-                    PreventCleanup = sourceWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
-                    KeepAllVersionsNewerThanDays = sourceWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
-                    KeepLatestVersionPerDayForDays = sourceWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays,
-                    GlobalKeepAllVersionsNewerThanDays = _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
-                    GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
-                    GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
-                };
-            }
+                PreventCleanup = source.HistoryCleanup?.PreventCleanup ?? false,
+                KeepAllVersionsNewerThanDays = source.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = source.HistoryCleanup?.KeepLatestVersionPerDayForDays,
+                GlobalKeepAllVersionsNewerThanDays = _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
+                GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
+                GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
+            };
 
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();

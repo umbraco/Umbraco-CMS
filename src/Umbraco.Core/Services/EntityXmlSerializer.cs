@@ -511,9 +511,9 @@ namespace Umbraco.Cms.Core.Services
                 genericProperties,
                 tabs);
 
-            if (contentType is IContentTypeWithHistoryCleanup withCleanup && withCleanup.HistoryCleanup is not null)
+            if (contentType.HistoryCleanup is not null)
             {
-                xml.Add(SerializeCleanupPolicy(withCleanup.HistoryCleanup));
+                xml.Add(SerializeCleanupPolicy(contentType.HistoryCleanup));
             }
 
             var folderNames = string.Empty;

@@ -885,49 +885,46 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 UpdateContentTypesAllowedTemplates(contentTypex, infoElement.Element("AllowedTemplates"),
                     defaultTemplateElement);
+
+                UpdateHistoryCleanupPolicy(contentTypex, documentType.Element("HistoryCleanupPolicy"));
             }
 
             UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
-            if (contentType is IContentTypeWithHistoryCleanup withCleanup)
-            {
-                UpdateHistoryCleanupPolicy(withCleanup, documentType.Element("HistoryCleanupPolicy"));
-            }
-
             return contentType;
         }
 
-        private void UpdateHistoryCleanupPolicy(IContentTypeWithHistoryCleanup withCleanup, XElement? element)
+        private void UpdateHistoryCleanupPolicy(IContentType contentType, XElement? element)
         {
             if (element == null)
             {
                 return;
             }
 
-            withCleanup.HistoryCleanup ??= new Core.Models.ContentEditing.HistoryCleanup();
+            contentType.HistoryCleanup ??= new Core.Models.ContentEditing.HistoryCleanup();
 
             if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
             {
-                withCleanup.HistoryCleanup.PreventCleanup = preventCleanup;
+                contentType.HistoryCleanup.PreventCleanup = preventCleanup;
             }
 
             if (int.TryParse(element.Attribute("keepAllVersionsNewerThanDays")?.Value, out var keepAll))
             {
-                withCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays = keepAll;
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = keepAll;
             }
             else
             {
-                withCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays = null;
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = null;
             }
 
             if (int.TryParse(element.Attribute("keepLatestVersionPerDayForDays")?.Value, out var keepLatest))
             {
-                withCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays = keepLatest;
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = keepLatest;
             }
             else
             {
-                withCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays = null;
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = null;
             }
         }
 
