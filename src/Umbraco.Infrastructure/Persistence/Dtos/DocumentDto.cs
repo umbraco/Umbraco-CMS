@@ -1,4 +1,4 @@
-using NPoco;
+﻿using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -52,5 +52,5 @@ public class DocumentDto
     // same
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public DocumentVersionDto PublishedVersionDto { get; set; } = null!;
+    public DocumentVersionDto? PublishedVersionDto { get; set; }
 }

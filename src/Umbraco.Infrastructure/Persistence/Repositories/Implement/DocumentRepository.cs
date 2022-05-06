@@ -242,7 +242,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
                 if (dto.Published)
                 {
-                    templateId = dto.PublishedVersionDto.TemplateId;
+                    templateId = dto.PublishedVersionDto?.TemplateId;
                     if (templateId.HasValue)
                     {
                         templateIds.Add(templateId.Value);
@@ -252,14 +252,14 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // need temps, for properties, templates and variations
             var versionId = dto.DocumentVersionDto.Id;
-            var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+            var publishedVersionId = dto.Published ? dto.PublishedVersionDto?.Id ?? 0 : 0;
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
             {
                 Template1Id = dto.DocumentVersionDto.TemplateId
             };
             if (dto.Published)
             {
-                temp.Template2Id = dto.PublishedVersionDto.TemplateId;
+                temp.Template2Id = dto.PublishedVersionDto?.TemplateId;
             }
 
             temps.Add(temp);
@@ -356,7 +356,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // TODO: shall we get published properties or not?
             //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            var publishedVersionId = dto.PublishedVersionDto.Id;
+            var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
             var ltemp = new List<TempContent<Content>> {temp};
@@ -649,7 +649,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                             .Select(documentDto => documentDto.DocumentVersionDto, r1 =>
                                 r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto))
                             .Select(documentDto => documentDto.PublishedVersionDto, "pdv", r1 =>
-                                r1.Select(documentVersionDto => documentVersionDto.ContentVersionDto, "pcv")))
+                                r1.Select(documentVersionDto => documentVersionDto!.ContentVersionDto, "pcv")))
 
                     // select the variant name, coalesce to the invariant name, as "variantName"
                     .AndSelect(VariantNameSqlExpression + " AS variantName");

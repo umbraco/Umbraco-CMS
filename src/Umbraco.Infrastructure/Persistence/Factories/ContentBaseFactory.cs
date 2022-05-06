@@ -17,7 +17,7 @@ internal class ContentBaseFactory
         NodeDto nodeDto = contentDto.NodeDto;
         DocumentVersionDto documentVersionDto = dto.DocumentVersionDto;
         ContentVersionDto contentVersionDto = documentVersionDto.ContentVersionDto;
-        DocumentVersionDto publishedVersionDto = dto.PublishedVersionDto;
+        DocumentVersionDto? publishedVersionDto = dto.PublishedVersionDto;
 
         var content = new Content(nodeDto.Text, nodeDto.ParentId, contentType);
 
@@ -47,10 +47,13 @@ internal class ContentBaseFactory
 
             // TODO: shall we get published infos or not?
             // if (dto.Published)
-            content.PublishedVersionId = publishedVersionDto.Id;
-            content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-            content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-            content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+            if (publishedVersionDto != null)
+            {
+                content.PublishedVersionId = publishedVersionDto.Id;
+                content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
+                content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+            }
 
             // templates = ignored, managed by the repository
 

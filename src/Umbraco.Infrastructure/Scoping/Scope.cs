@@ -807,9 +807,9 @@ internal class Scope :
     /// <param name="dict">Lock dictionary to report on.</param>
     /// <param name="builder">String builder to write to.</param>
     /// <param name="dictName">The name to report the dictionary as.</param>
-    private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
+    private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>>? dict, StringBuilder builder, string dictName)
     {
-        if (dict.Count > 0)
+        if (dict?.Count > 0)
         {
             builder.AppendLine($"Remaining {dictName}:");
             foreach (KeyValuePair<Guid, Dictionary<int, int>> instance in dict)
