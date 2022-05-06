@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Services
 
             foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+                using (ICoreScope scope = _scopeProvider.CreateCoreScope())
                 {
                     scope.WriteLock(Constants.Locks.ContentTree);
                     var groupEnumerated = group.ToList();
@@ -127,12 +127,15 @@ namespace Umbraco.Cms.Core.Services
 
                         scope.Notifications.Publish(new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
                     }
+
+                    scope.Complete();
                 }
             }
 
-            using (_scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
+                scope.Complete();
             }
 
             return versionsToDelete;
@@ -162,7 +165,7 @@ namespace Umbraco.Cms.Core.Services
         /// <inheritdoc />
         public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
         {
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
@@ -171,6 +174,7 @@ namespace Umbraco.Cms.Core.Services
 
                 if (version is null)
                 {
+                    scope.Complete();
                     return;
                 }
 
@@ -181,6 +185,7 @@ namespace Umbraco.Cms.Core.Services
                 var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
 
                 Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
+                scope.Complete();
             }
         }
 
