@@ -180,8 +180,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return string.Join(" || ", args.AsEnumerable());
     }
 
-    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string? referenceName = null, bool forInsert = false)
+    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {
