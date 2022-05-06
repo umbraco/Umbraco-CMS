@@ -67,15 +67,15 @@ angular.module("umbraco")
                     width: 800
                 };
 
-                if ($scope.control.editor.config && $scope.control.editor.config.size) {
-                    if ($scope.control.value.coordinates) {
-                        // Use crop
-                        options.crop = $scope.control.value.coordinates;
-                    } else {
-                        // Otherwise use focal point
-                        options.focalPoint = $scope.control.value.focalPoint;
-                    }
+                if ($scope.control.value.coordinates) {
+                    // Use crop
+                    options.crop = $scope.control.value.coordinates;
+                } else if ($scope.control.value.focalPoint) {
+                    // Otherwise use focal point
+                    options.focalPoint = $scope.control.value.focalPoint;
+                }
 
+                if ($scope.control.editor.config && $scope.control.editor.config.size) {
                     options.width = $scope.control.editor.config.size.width;
                     options.height = $scope.control.editor.config.size.height;
                 }
