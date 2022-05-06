@@ -7,10 +7,10 @@ namespace Umbraco.Cms.Core.Models.Membership
         public string? Name { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }
-        public List<string> Groups { get; set; } = new List<string>();
+        public List<string> Groups { get; set; } = new ();
         public string? ContentTypeAlias { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
-        public List<MemberExportProperty> Properties { get; set; } = new List<MemberExportProperty>();
+        public List<MemberExportProperty> Properties { get; set; } = new ();
     }
 }

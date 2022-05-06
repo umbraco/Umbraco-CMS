@@ -900,7 +900,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
-                return result.Where(x => x.Name is not null).Select(x => x.Name!).Distinct();
+                return result..Select(x => x.Name).WhereNotNull().Distinct();
             }
         }
 

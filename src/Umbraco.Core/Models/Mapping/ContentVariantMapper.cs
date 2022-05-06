@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var variesByCulture = source.ContentType.VariesByCulture();
             var variesBySegment = source.ContentType.VariesBySegment();
 
-            var variants = new List<TVariant>();
+            List<TVariant> variants = new ();
 
             if (!variesByCulture && !variesBySegment)
             {
