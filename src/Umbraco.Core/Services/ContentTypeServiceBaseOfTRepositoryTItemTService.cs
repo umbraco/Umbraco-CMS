@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -20,12 +17,12 @@ namespace Umbraco.Cms.Core.Services
         where TItem : class, IContentTypeComposition
     {
         private readonly IAuditRepository _auditRepository;
-        private readonly IEntityContainerRepository? _containerRepository;
+        private readonly IEntityContainerRepository _containerRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IEventAggregator _eventAggregator;
 
         protected ContentTypeServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository? containerRepository, IEntityRepository entityRepository,
+            TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository, IEntityRepository entityRepository,
             IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
@@ -304,7 +301,7 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<TItem>();
             }
 
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
 
             {
                 scope.ReadLock(ReadLockIds);
@@ -312,7 +309,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem>? GetChildren(int id)
+        public IEnumerable<TItem> GetChildren(int id)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -322,7 +319,7 @@ namespace Umbraco.Cms.Core.Services
             }
         }
 
-        public IEnumerable<TItem>? GetChildren(Guid id)
+        public IEnumerable<TItem> GetChildren(Guid id)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -403,7 +400,7 @@ namespace Umbraco.Cms.Core.Services
                 {
                     var i = ids.Pop();
                     var query = Query<TItem>().Where(x => x.ParentId == i);
-                    var result = Repository.Get(query)?.ToArray();
+                    var result = Repository.Get(query).ToArray();
 
                     if (result is not null)
                     {
@@ -943,7 +940,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
-                return _containerRepository?.Get(containerId);
+                return _containerRepository.Get(containerId);
             }
         }
 
@@ -953,42 +950,37 @@ namespace Umbraco.Cms.Core.Services
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
-                return _containerRepository?.Get(containerId);
+                return _containerRepository.Get(containerId);
             }
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
+        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
-                return _containerRepository?.GetMany(containerIds);
+                return _containerRepository.GetMany(containerIds);
             }
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(TItem? item)
+        public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
-            var ancestorIds = item?.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
                 .Where(x => x != int.MinValue && x != item.Id)
                 .ToArray();
 
-            if (ancestorIds is null)
-            {
-                return null;
-            }
-
             return GetContainers(ancestorIds);
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(string name, int level)
+        public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds); // also for containers
 
-                return _containerRepository?.Get(name, level);
+                return _containerRepository.Get(name, level);
             }
         }
 

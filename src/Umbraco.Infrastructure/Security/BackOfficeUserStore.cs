@@ -487,8 +487,8 @@ public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, Iden
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
 
-        var logins = _externalLoginService.Find(loginProvider, providerKey)?.ToList();
-        if (logins is null || logins.Count == 0)
+        var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
+        if (logins.Count == 0)
         {
             return Task.FromResult((IdentityUserLogin<string>)null!);
         }

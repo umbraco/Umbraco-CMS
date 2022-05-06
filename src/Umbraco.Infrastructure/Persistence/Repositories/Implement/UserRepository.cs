@@ -21,19 +21,19 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-
 /// <summary>
-///     Represents the UserRepository for doing CRUD operations for <see cref="IUser" />
+/// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
 /// </summary>
 internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepository
 {
-    private readonly GlobalSettings _globalSettings;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IMapperCollection _mapperCollection;
+    private readonly GlobalSettings _globalSettings;
     private readonly UserPasswordConfigurationSettings _passwordConfiguration;
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly IRuntimeState _runtimeState;
-    private bool _passwordConfigInitialized;
     private string? _passwordConfigJson;
+    private bool _passwordConfigInitialized;
+    private readonly object _sqliteValidateSessionLock = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -225,7 +225,24 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
     public bool ValidateLoginSession(int userId, Guid sessionId)
     {
-        // with RepeatableRead transaction mode, read-then-update operations can
+        // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
+            // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
+            // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
+            // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
+            if (Database.DatabaseType.IsSqlite())
+            {
+                lock (_sqliteValidateSessionLock)
+                {
+                    return ValidateLoginSessionInternal(userId, sessionId);
+                }
+            }
+
+            return ValidateLoginSessionInternal(userId, sessionId);
+        }
+
+        private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
+        {
+            // with RepeatableRead transaction mode, read-then-update operations can
         // cause deadlocks, and the ForUpdate() hint is required to tell the database
         // to acquire an exclusive lock when reading
 
@@ -249,12 +266,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
-            ClearLoginSession(sessionId);
+            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);ClearLoginSession(sessionId);
             return false;
         }
 
         //update the validate date
-        found.LastValidatedUtc = DateTime.UtcNow;
+        Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);found.LastValidatedUtc = DateTime.UtcNow;
         Database.Update(found);
         return true;
     }
