@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// If a content item is invariant, this collection will only contain one item, else it will contain all culture variants
         /// </remarks>
         [DataMember(Name = "variants")]
-        public IEnumerable<TVariant>? Variants { get; set; }
+        public IEnumerable<TVariant> Variants { get; set; }
 
         [DataMember(Name = "owner")]
         public UserProfile? Owner { get; set; }
