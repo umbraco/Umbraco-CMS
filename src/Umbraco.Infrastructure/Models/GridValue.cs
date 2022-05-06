@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Models
         public class GridControl
         {
             [JsonProperty("value")]
-            public JToken? Value { get; set; } = null!;
+            public JToken? Value { get; set; }
 
             [JsonProperty("editor")]
             public GridEditor Editor { get; set; } = null!;
