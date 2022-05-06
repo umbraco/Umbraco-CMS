@@ -24,14 +24,14 @@ public static class HttpContextExtensions
             if (authHeader is not null && authHeader.StartsWith("Basic"))
             {
                 // Extract credentials.
-                var encodedUsernamePassword = authHeader[6..].Trim();
+                var encodedUsernamePassword = authHeader.Substring(6).Trim();
                 Encoding encoding = Encoding.UTF8;
                 var usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
                 var seperatorIndex = usernamePassword.IndexOf(':');
 
-                username = usernamePassword[..seperatorIndex];
-                password = usernamePassword[(seperatorIndex + 1)..];
+                username = usernamePassword.Substring(0, seperatorIndex);
+                password = usernamePassword.Substring(seperatorIndex + 1);
             }
 
             return true;
