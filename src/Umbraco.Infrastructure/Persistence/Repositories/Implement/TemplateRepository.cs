@@ -504,7 +504,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public ITemplate? Get(string? alias) => GetAll(alias)?.FirstOrDefault();
 
-        public IEnumerable<ITemplate>? GetAll(params string?[] aliases)
+        public IEnumerable<ITemplate> GetAll(params string?[] aliases)
         {
             //We must call the base (normal) GetAll method
             // which is cached. This is a specialized method and unfortunately with the params[] it
@@ -515,26 +515,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //return from base.GetAll, this is all cached
-            return base.GetMany()?.Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
+            return base.GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
         }
 
-        public IEnumerable<ITemplate>? GetChildren(int masterTemplateId)
+        public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
-            ITemplate[]? all = base.GetMany()?.ToArray();
+            ITemplate[] all = base.GetMany().ToArray();
 
             if (masterTemplateId <= 0)
             {
-                return all?.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+                return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
             }
 
-            ITemplate? parent = all?.FirstOrDefault(x => x.Id == masterTemplateId);
+            ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
             }
 
-            IEnumerable<ITemplate>? children = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+            IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
             return children;
         }
 

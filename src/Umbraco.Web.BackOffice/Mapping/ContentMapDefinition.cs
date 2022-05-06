@@ -160,8 +160,10 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Urls = GetUrls(source);
             target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
 
-            target.ContentDto = new ContentPropertyCollectionDto();
-            target.ContentDto.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
+            target.ContentDto = new ContentPropertyCollectionDto
+            {
+                Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull()
+            };
         }
 
         // Umbraco.Code.MapAll -Segment -Language -DisplayName
