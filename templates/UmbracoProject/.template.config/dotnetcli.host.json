@@ -13,10 +13,6 @@
       "longName": "use-https-redirect",
       "shortName": ""
     },
-    "UseSqlCe": {
-      "longName": "SqlCe",
-      "shortName": "ce"
-    },
     "SkipRestore": {
       "longName": "no-restore",
       "shortName": ""

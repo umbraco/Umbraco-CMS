@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="parentId">Id of the parent</param>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        IEnumerable<IDictionaryItem>? GetDictionaryItemChildren(Guid parentId);
+        IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId);
 
         /// <summary>
         /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the root/top <see cref="IDictionaryItem"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        IEnumerable<IDictionaryItem>? GetRootDictionaryItems();
+        IEnumerable<IDictionaryItem> GetRootDictionaryItems();
 
         /// <summary>
         /// Checks if a <see cref="IDictionaryItem"/> with given key exists

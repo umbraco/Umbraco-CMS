@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Core.Collections;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Scoping

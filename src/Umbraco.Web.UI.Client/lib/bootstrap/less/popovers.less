@@ -72,42 +72,42 @@
 .popover {
   &.top .arrow {
     left: 50%;
-    margin-left: -@popoverArrowOuterWidth;
+    margin-left: (@popoverArrowOuterWidth * -1);
     border-bottom-width: 0;
     border-top-color: #999; // IE8 fallback
     border-top-color: @popoverArrowOuterColor;
-    bottom: -@popoverArrowOuterWidth;
+    bottom: (@popoverArrowOuterWidth * -1);
     &:after {
       bottom: 1px;
-      margin-left: -@popoverArrowWidth;
+      margin-left: (@popoverArrowWidth * -1);
       border-bottom-width: 0;
       border-top-color: @popoverArrowColor;
     }
   }
   &.right .arrow {
     top: 50%;
-    left: -@popoverArrowOuterWidth;
-    margin-top: -@popoverArrowOuterWidth;
+    left: (@popoverArrowOuterWidth * -1);
+    margin-top: (@popoverArrowOuterWidth * -1);
     border-left-width: 0;
     border-right-color: #999; // IE8 fallback
     border-right-color: @popoverArrowOuterColor;
     &:after {
       left: 1px;
-      bottom: -@popoverArrowWidth;
+      bottom: (@popoverArrowWidth * -1);
       border-left-width: 0;
       border-right-color: @popoverArrowColor;
     }
   }
   &.bottom .arrow {
     left: 50%;
-    margin-left: -@popoverArrowOuterWidth;
+    margin-left: (@popoverArrowOuterWidth * -1);
     border-top-width: 0;
     border-bottom-color: #999; // IE8 fallback
     border-bottom-color: @popoverArrowOuterColor;
-    top: -@popoverArrowOuterWidth;
+    top: (@popoverArrowOuterWidth * -1);
     &:after {
       top: 1px;
-      margin-left: -@popoverArrowWidth;
+      margin-left: (@popoverArrowWidth * -1);
       border-top-width: 0;
       border-bottom-color: @popoverArrowColor;
     }
@@ -115,8 +115,8 @@
 
   &.left .arrow {
     top: 50%;
-    right: -@popoverArrowOuterWidth;
-    margin-top: -@popoverArrowOuterWidth;
+    right: (@popoverArrowOuterWidth * -1);
+    margin-top: (@popoverArrowOuterWidth * -1);
     border-right-width: 0;
     border-left-color: #999; // IE8 fallback
     border-left-color: @popoverArrowOuterColor;
@@ -124,7 +124,7 @@
       right: 1px;
       border-right-width: 0;
       border-left-color: @popoverArrowColor;
-      bottom: -@popoverArrowWidth;
+      bottom: (@popoverArrowWidth * -1);
     }
   }
 

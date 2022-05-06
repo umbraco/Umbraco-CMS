@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Represent the state of an artifact being deployed.
@@ -15,7 +15,7 @@
         /// <param name="connector">The service connector deploying the artifact.</param>
         /// <param name="nextPass">The next pass number.</param>
         /// <returns>A deploying artifact.</returns>
-        public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity entity, IServiceConnector connector, int nextPass)
+        public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity? entity, IServiceConnector connector, int nextPass)
             where TArtifact : IArtifact
         {
             return new ArtifactDeployState<TArtifact, TEntity>(art, entity, connector, nextPass);
@@ -24,10 +24,7 @@
         /// <summary>
         /// Gets the artifact.
         /// </summary>
-        public IArtifact? Artifact
-        {
-            get { return GetArtifactAsIArtifact(); }
-        }
+        public IArtifact Artifact => GetArtifactAsIArtifact();
 
         /// <summary>
         /// Gets the artifact as an <see cref="IArtifact"/>.
@@ -35,7 +32,7 @@
         /// <returns>The artifact, as an <see cref="IArtifact"/>.</returns>
         /// <remarks>This is because classes that inherit from this class cannot override the Artifact property
         /// with a property that specializes the return type, and so they need to 'new' the property.</remarks>
-        protected abstract IArtifact? GetArtifactAsIArtifact();
+        protected abstract IArtifact GetArtifactAsIArtifact();
 
         /// <summary>
         /// Gets or sets the service connector in charge of deploying the artifact.

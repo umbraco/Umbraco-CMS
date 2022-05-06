@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets blueprints for a content type.
         /// </summary>
-        IEnumerable<IContent>? GetBlueprintsForContentTypes(params int[] documentTypeId);
+        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeId);
 
         /// <summary>
         /// Saves a blueprint.
@@ -89,12 +89,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets documents.
         /// </summary>
-        IEnumerable<IContent>? GetByIds(IEnumerable<Guid> ids);
+        IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
         /// <summary>
         /// Gets documents at a given level.
         /// </summary>
-        IEnumerable<IContent>? GetByLevel(int level);
+        IEnumerable<IContent> GetByLevel(int level);
 
         /// <summary>
         /// Gets the parent of a document.
@@ -109,12 +109,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets ancestor documents of a document.
         /// </summary>
-        IEnumerable<IContent>? GetAncestors(int id);
+        IEnumerable<IContent> GetAncestors(int id);
 
         /// <summary>
         /// Gets ancestor documents of a document.
         /// </summary>
-        IEnumerable<IContent>? GetAncestors(IContent content);
+        IEnumerable<IContent> GetAncestors(IContent content);
 
         /// <summary>
         /// Gets all versions of a document.

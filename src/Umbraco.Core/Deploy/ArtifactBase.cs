@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
@@ -15,13 +11,13 @@ namespace Umbraco.Cms.Core.Deploy
             Udi = udi ?? throw new ArgumentNullException("udi");
             Name = Udi.ToString();
 
-            Dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
+            _dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
             _checksum = new Lazy<string>(GetChecksum);
         }
 
         private readonly Lazy<string> _checksum;
 
-        private IEnumerable<ArtifactDependency>? _dependencies;
+        private IEnumerable<ArtifactDependency> _dependencies;
 
         protected abstract string GetChecksum();
 
@@ -43,16 +39,16 @@ namespace Umbraco.Cms.Core.Deploy
         /// </remarks>
         public bool ShouldSerializeChecksum() => false;
 
-        public IEnumerable<ArtifactDependency>? Dependencies
+        public IEnumerable<ArtifactDependency> Dependencies
         {
             get => _dependencies;
-            set => _dependencies = value?.OrderBy(x => x.Udi);
+            set => _dependencies = value.OrderBy(x => x.Udi);
         }
 
         #endregion
 
         public string Name { get; set; }
 
-        public string? Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
     }
 }

@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Core.Services
         EntityContainer? GetContainer(int containerId);
         EntityContainer? GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
-        IEnumerable<EntityContainer>? GetContainers(IDataType dataType);
-        IEnumerable<EntityContainer>? GetContainers(int[] containerIds);
+        IEnumerable<EntityContainer> GetContainers(IDataType dataType);
+        IEnumerable<EntityContainer> GetContainers(int[] containerIds);
         Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        IEnumerable<IDataType>? GetAll(params int[] ids);
+        IEnumerable<IDataType> GetAll(params int[] ids);
 
         /// <summary>
         /// Saves an <see cref="IDataType"/>
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
-        IEnumerable<IDataType>? GetByEditorAlias(string propertyEditorAlias);
+        IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
         Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
     }

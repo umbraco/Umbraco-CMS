@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(IDataType dataType)
+        public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
             var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
@@ -178,7 +178,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return GetContainers(ancestorIds);
         }
 
-        public IEnumerable<EntityContainer>? GetContainers(int[] containerIds)
+        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -333,7 +333,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.Key == id);
-                var dataType = _dataTypeRepository.Get(query)?.FirstOrDefault();
+                var dataType = _dataTypeRepository.Get(query).FirstOrDefault();
                 ConvertMissingEditorOfDataTypeToLabel(dataType);
                 return dataType;
             }
@@ -344,16 +344,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
-        public IEnumerable<IDataType>? GetByEditorAlias(string propertyEditorAlias)
+        public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
                 var dataType = _dataTypeRepository.Get(query);
-                if (dataType is null)
-                {
-                    return null;
-                }
                 ConvertMissingEditorsOfDataTypesToLabels(dataType);
                 return dataType;
             }
@@ -364,15 +360,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="ids">Optional array of Ids</param>
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        public IEnumerable<IDataType>? GetAll(params int[] ids)
+        public IEnumerable<IDataType> GetAll(params int[] ids)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var dataTypes = _dataTypeRepository.GetMany(ids);
-                if (dataTypes is null)
-                {
-                    return null;
-                }
 
                 ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
                 return dataTypes;
