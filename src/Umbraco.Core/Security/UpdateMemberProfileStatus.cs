@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Security
+﻿namespace Umbraco.Cms.Core.Security;
+
+public enum UpdateMemberProfileStatus
 {
-    public enum UpdateMemberProfileStatus
-    {
-        Success,
-        Error,
-    }
+    Success,
+    Error
 }

@@ -1,12 +1,11 @@
-﻿namespace Umbraco.Cms.Core
+﻿namespace Umbraco.Cms.Core;
+
+/// <summary>
+///     Defines Udi types.
+/// </summary>
+public enum UdiType
 {
-    /// <summary>
-    /// Defines Udi types.
-    /// </summary>
-    public enum UdiType
-    {
-        Unknown,
-        GuidUdi,
-        StringUdi
-    }
+    Unknown,
+    GuidUdi,
+    StringUdi
 }

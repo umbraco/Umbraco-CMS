@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks
+﻿namespace Umbraco.Cms.Core.HealthChecks;
+
+public enum ValueComparisonType
 {
-    public enum ValueComparisonType
-    {
-        ShouldEqual,
-        ShouldNotEqual,
-    }
+    ShouldEqual,
+    ShouldNotEqual
 }

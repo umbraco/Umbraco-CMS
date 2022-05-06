@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IMediaTypeRepository : IContentTypeRepositoryBase<IMediaType>
 {
-    public interface IMediaTypeRepository : IContentTypeRepositoryBase<IMediaType>
-    { }
 }

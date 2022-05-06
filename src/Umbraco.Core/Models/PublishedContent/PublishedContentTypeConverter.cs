@@ -1,28 +1,26 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 
-namespace Umbraco.Cms.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent;
+
+internal class PublishedContentTypeConverter : TypeConverter
 {
-    internal class PublishedContentTypeConverter : TypeConverter
+    private static readonly Type[] ConvertingTypes = {typeof(int)};
+
+    public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) =>
+        ConvertingTypes.Any(x => x.IsAssignableFrom(destinationType))
+        || (destinationType is not null && CanConvertFrom(context, destinationType));
+
+    public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value,
+        Type destinationType)
     {
-        private static readonly Type[] ConvertingTypes = { typeof(int) };
-
-        public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
+        if (!(value is IPublishedContent publishedContent))
         {
-            return ConvertingTypes.Any(x => x.IsAssignableFrom(destinationType))
-                   || (destinationType is not null && CanConvertFrom(context, destinationType));
+            return null;
         }
 
-        public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType)
-        {
-            if (!(value is IPublishedContent publishedContent))
-                return null;
-
-            return typeof(int).IsAssignableFrom(destinationType)
-                ? publishedContent.Id
-                : base.ConvertTo(context, culture, value, destinationType);
-        }
+        return typeof(int).IsAssignableFrom(destinationType)
+            ? publishedContent.Id
+            : base.ConvertTo(context, culture, value, destinationType);
     }
 }

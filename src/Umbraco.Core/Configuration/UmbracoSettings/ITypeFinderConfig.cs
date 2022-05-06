@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
-namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
+public interface ITypeFinderConfig
 {
-    public interface ITypeFinderConfig
-    {
-        IEnumerable<string> AssembliesAcceptingLoadExceptions { get; }
-    }
+    IEnumerable<string> AssembliesAcceptingLoadExceptions { get; }
 }

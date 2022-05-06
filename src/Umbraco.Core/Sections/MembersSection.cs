@@ -1,14 +1,13 @@
-﻿namespace Umbraco.Cms.Core.Sections
-{
-    /// <summary>
-    /// Defines the back office members section
-    /// </summary>
-    public class MembersSection : ISection
-    {
-        /// <inheritdoc />
-        public string Alias => Constants.Applications.Members;
+﻿namespace Umbraco.Cms.Core.Sections;
 
-        /// <inheritdoc />
-        public string Name => "Members";
-    }
+/// <summary>
+///     Defines the back office members section
+/// </summary>
+public class MembersSection : ISection
+{
+    /// <inheritdoc />
+    public string Alias => Constants.Applications.Members;
+
+    /// <inheritdoc />
+    public string Name => "Members";
 }

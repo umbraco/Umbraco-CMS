@@ -1,8 +1,7 @@
-namespace Umbraco.Cms.Core.Hosting
+namespace Umbraco.Cms.Core.Hosting;
+
+public interface IApplicationShutdownRegistry
 {
-    public interface IApplicationShutdownRegistry
-    {
-        void RegisterObject(IRegisteredObject registeredObject);
-        void UnregisterObject(IRegisteredObject registeredObject);
-    }
+    void RegisterObject(IRegisteredObject registeredObject);
+    void UnregisterObject(IRegisteredObject registeredObject);
 }

@@ -1,17 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+/// <summary>
+///     Typed configuration options for active directory settings.
+/// </summary>
+[UmbracoOptions(Constants.Configuration.ConfigActiveDirectory)]
+public class ActiveDirectorySettings
 {
     /// <summary>
-    /// Typed configuration options for active directory settings.
+    ///     Gets or sets a value for the Active Directory domain.
     /// </summary>
-    [UmbracoOptions(Constants.Configuration.ConfigActiveDirectory)]
-    public class ActiveDirectorySettings
-    {
-        /// <summary>
-        /// Gets or sets a value for the Active Directory domain.
-        /// </summary>
-        public string? Domain { get; set; }
-    }
+    public string? Domain { get; set; }
 }

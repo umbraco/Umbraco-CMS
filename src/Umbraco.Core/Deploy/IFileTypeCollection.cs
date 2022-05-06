@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Deploy
-{
-    public interface IFileTypeCollection
-    {
-        IFileType this[string entityType] { get; }
+﻿namespace Umbraco.Cms.Core.Deploy;
 
-        bool Contains(string entityType);
-    }
+public interface IFileTypeCollection
+{
+    IFileType this[string entityType] { get; }
+
+    bool Contains(string entityType);
 }

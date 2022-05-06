@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Editors
+namespace Umbraco.Cms.Core.Editors;
+
+public class EditorValidatorCollectionBuilder : LazyCollectionBuilderBase<EditorValidatorCollectionBuilder,
+    EditorValidatorCollection, IEditorValidator>
 {
-    public class EditorValidatorCollectionBuilder : LazyCollectionBuilderBase<EditorValidatorCollectionBuilder, EditorValidatorCollection, IEditorValidator>
-    {
-        protected override EditorValidatorCollectionBuilder This => this;
-    }
+    protected override EditorValidatorCollectionBuilder This => this;
 }

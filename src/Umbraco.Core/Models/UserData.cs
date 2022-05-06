@@ -1,19 +1,17 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models
-{
-    [DataContract]
-    public class UserData
-    {
-        [DataMember(Name = "name")]
-        public string Name { get; }
-        [DataMember(Name = "data")]
-        public string Data { get; }
+namespace Umbraco.Cms.Core.Models;
 
-        public UserData(string name, string data)
-        {
-            Name = name;
-            Data = data;
-        }
+[DataContract]
+public class UserData
+{
+    public UserData(string name, string data)
+    {
+        Name = name;
+        Data = data;
     }
+
+    [DataMember(Name = "name")] public string Name { get; }
+
+    [DataMember(Name = "data")] public string Data { get; }
 }

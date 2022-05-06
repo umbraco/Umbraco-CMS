@@ -1,17 +1,15 @@
-﻿using System;
-using Umbraco.Cms.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards;
+
+[Weight(10)]
+public class SettingsDashboard : IDashboard
 {
-    [Weight(10)]
-    public class SettingsDashboard : IDashboard
-    {
-        public string Alias => "settingsWelcome";
+    public string Alias => "settingsWelcome";
 
-        public string[] Sections => new [] { "settings" };
+    public string[] Sections => new[] {"settings"};
 
-        public string View => "views/dashboard/settings/settingsdashboardintro.html";
+    public string View => "views/dashboard/settings/settingsdashboardintro.html";
 
-        public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
-    }
+    public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
 }

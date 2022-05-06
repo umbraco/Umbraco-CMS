@@ -1,18 +1,17 @@
-﻿namespace Umbraco.Cms.Core.Models
+﻿namespace Umbraco.Cms.Core.Models;
+
+/// <summary>
+///     Defines scheduled actions for documents.
+/// </summary>
+public enum ContentScheduleAction
 {
     /// <summary>
-    /// Defines scheduled actions for documents.
+    ///     Release the document.
     /// </summary>
-    public enum ContentScheduleAction
-    {
-        /// <summary>
-        /// Release the document.
-        /// </summary>
-        Release,
+    Release,
 
-        /// <summary>
-        /// Expire the document.
-        /// </summary>
-        Expire
-    }
+    /// <summary>
+    ///     Expire the document.
+    /// </summary>
+    Expire
 }

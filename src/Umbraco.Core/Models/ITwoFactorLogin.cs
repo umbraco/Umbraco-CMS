@@ -1,12 +1,10 @@
-﻿using System;
-using Umbraco.Cms.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+public interface ITwoFactorLogin : IEntity, IRememberBeingDirty
 {
-    public interface ITwoFactorLogin: IEntity, IRememberBeingDirty
-    {
-        string ProviderName { get; }
-        string Secret { get; }
-        Guid UserOrMemberKey { get; }
-    }
+    string ProviderName { get; }
+    string Secret { get; }
+    Guid UserOrMemberKey { get; }
 }

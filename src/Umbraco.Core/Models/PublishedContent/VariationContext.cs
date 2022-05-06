@@ -1,34 +1,33 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent
+﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+
+/// <summary>
+///     Represents the variation context.
+/// </summary>
+public class VariationContext
 {
     /// <summary>
-    /// Represents the variation context.
+    ///     Initializes a new instance of the <see cref="VariationContext" /> class.
     /// </summary>
-    public class VariationContext
+    public VariationContext(string? culture = null, string? segment = null)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="VariationContext"/> class.
-        /// </summary>
-        public VariationContext(string? culture = null, string? segment = null)
-        {
-            Culture = culture ?? ""; // cannot be null, default to invariant
-            Segment = segment ?? ""; // cannot be null, default to neutral
-        }
-
-        /// <summary>
-        /// Gets the culture.
-        /// </summary>
-        public string Culture { get; }
-
-        /// <summary>
-        /// Gets the segment.
-        /// </summary>
-        public string Segment { get; }
-
-        /// <summary>
-        /// Gets the segment for the content item
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        public virtual string GetSegment(int contentId) => Segment;
+        Culture = culture ?? ""; // cannot be null, default to invariant
+        Segment = segment ?? ""; // cannot be null, default to neutral
     }
+
+    /// <summary>
+    ///     Gets the culture.
+    /// </summary>
+    public string Culture { get; }
+
+    /// <summary>
+    ///     Gets the segment.
+    /// </summary>
+    public string Segment { get; }
+
+    /// <summary>
+    ///     Gets the segment for the content item
+    /// </summary>
+    /// <param name="contentId"></param>
+    /// <returns></returns>
+    public virtual string GetSegment(int contentId) => Segment;
 }

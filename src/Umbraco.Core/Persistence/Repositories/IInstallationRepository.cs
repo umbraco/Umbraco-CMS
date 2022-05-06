@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+public interface IInstallationRepository
 {
-    public interface IInstallationRepository
-    {
-        Task SaveInstallLogAsync(InstallLog installLog);
-    }
+    Task SaveInstallLogAsync(InstallLog installLog);
 }

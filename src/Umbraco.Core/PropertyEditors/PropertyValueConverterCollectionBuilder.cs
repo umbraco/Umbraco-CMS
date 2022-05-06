@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+public class PropertyValueConverterCollectionBuilder : OrderedCollectionBuilderBase<
+    PropertyValueConverterCollectionBuilder, PropertyValueConverterCollection, IPropertyValueConverter>
 {
-    public class PropertyValueConverterCollectionBuilder : OrderedCollectionBuilderBase<PropertyValueConverterCollectionBuilder, PropertyValueConverterCollection, IPropertyValueConverter>
-    {
-        protected override PropertyValueConverterCollectionBuilder This => this;
-    }
+    protected override PropertyValueConverterCollectionBuilder This => this;
 }

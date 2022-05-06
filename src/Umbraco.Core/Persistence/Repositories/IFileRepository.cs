@@ -1,13 +1,10 @@
-using System.IO;
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+public interface IFileRepository
 {
-    public interface IFileRepository
-    {
-        Stream GetFileContentStream(string filepath);
+    Stream GetFileContentStream(string filepath);
 
-        void SetFileContent(string filepath, Stream content);
+    void SetFileContent(string filepath, Stream content);
 
-        long GetFileSize(string filepath);
-    }
+    long GetFileSize(string filepath);
 }

@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Dictionary
+﻿namespace Umbraco.Cms.Core.Dictionary;
+
+public interface ICultureDictionaryFactory
 {
-    public interface ICultureDictionaryFactory
-    {
-        ICultureDictionary CreateDictionary();
-    }
+    ICultureDictionary CreateDictionary();
 }

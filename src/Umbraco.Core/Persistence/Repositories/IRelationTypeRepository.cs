@@ -1,8 +1,8 @@
-﻿using System;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IRelationTypeRepository : IReadWriteQueryRepository<int, IRelationType>,
+    IReadRepository<Guid, IRelationType>
 {
-    public interface IRelationTypeRepository : IReadWriteQueryRepository<int, IRelationType>, IReadRepository<Guid, IRelationType>
-    { }
 }

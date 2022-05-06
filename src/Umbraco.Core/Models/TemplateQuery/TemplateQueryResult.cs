@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.TemplateQuery
-{
-    public class TemplateQueryResult
-    {
-        public string? Icon { get; set; }
+﻿namespace Umbraco.Cms.Core.Models.TemplateQuery;
 
-        public string? Name { get; set; }
-    }
+public class TemplateQueryResult
+{
+    public string? Icon { get; set; }
+
+    public string? Name { get; set; }
 }

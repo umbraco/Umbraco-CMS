@@ -1,5 +1,5 @@
-﻿namespace Umbraco.Cms.Core.PublishedCache
+﻿namespace Umbraco.Cms.Core.PublishedCache;
+
+public interface IPublishedMediaCache : IPublishedCache
 {
-    public interface IPublishedMediaCache : IPublishedCache
-    { }
 }

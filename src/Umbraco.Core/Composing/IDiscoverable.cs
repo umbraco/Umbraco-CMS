@@ -1,5 +1,5 @@
-﻿namespace Umbraco.Cms.Core.Composing
+﻿namespace Umbraco.Cms.Core.Composing;
+
+public interface IDiscoverable
 {
-    public interface IDiscoverable
-    { }
 }

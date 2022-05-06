@@ -4,12 +4,11 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class StylesheetDeletedNotification : DeletedNotification<IStylesheet>
 {
-    public class StylesheetDeletedNotification : DeletedNotification<IStylesheet>
+    public StylesheetDeletedNotification(IStylesheet target, EventMessages messages) : base(target, messages)
     {
-        public StylesheetDeletedNotification(IStylesheet target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }

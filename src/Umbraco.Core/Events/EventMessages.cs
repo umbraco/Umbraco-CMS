@@ -1,29 +1,17 @@
-﻿using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Core.Events
+/// <summary>
+///     Event messages collection
+/// </summary>
+public sealed class EventMessages : DisposableObjectSlim
 {
-    /// <summary>
-    /// Event messages collection
-    /// </summary>
-    public sealed class EventMessages : DisposableObjectSlim
-    {
-        private readonly List<EventMessage> _msgs = new List<EventMessage>();
+    private readonly List<EventMessage> _msgs = new();
 
-        public void Add(EventMessage msg)
-        {
-            _msgs.Add(msg);
-        }
+    public int Count => _msgs.Count;
 
-        public int Count => _msgs.Count;
+    public void Add(EventMessage msg) => _msgs.Add(msg);
 
-        public IEnumerable<EventMessage> GetAll()
-        {
-            return _msgs;
-        }
+    public IEnumerable<EventMessage> GetAll() => _msgs;
 
-        protected override void DisposeResources()
-        {
-            _msgs.Clear();
-        }
-    }
+    protected override void DisposeResources() => _msgs.Clear();
 }

@@ -1,13 +1,9 @@
-﻿namespace Umbraco.Cms.Core.Models
-{
-    public class ContentDataIntegrityReportEntry
-    {
-        public ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType issueType)
-        {
-            IssueType = issueType;
-        }
+﻿namespace Umbraco.Cms.Core.Models;
 
-        public ContentDataIntegrityReport.IssueType IssueType { get; }
-        public bool Fixed { get; set; }
-    }
+public class ContentDataIntegrityReportEntry
+{
+    public ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType issueType) => IssueType = issueType;
+
+    public ContentDataIntegrityReport.IssueType IssueType { get; }
+    public bool Fixed { get; set; }
 }

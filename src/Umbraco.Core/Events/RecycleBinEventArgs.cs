@@ -1,77 +1,84 @@
-﻿using System;
+﻿namespace Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Core.Events
+public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>
 {
-    public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>
+    public RecycleBinEventArgs(Guid nodeObjectType, EventMessages eventMessages)
+        : base(true, eventMessages) =>
+        NodeObjectType = nodeObjectType;
+
+    public RecycleBinEventArgs(Guid nodeObjectType)
+        : base(true) =>
+        NodeObjectType = nodeObjectType;
+
+    /// <summary>
+    ///     Gets the Id of the node object type of the items
+    ///     being deleted from the Recycle Bin.
+    /// </summary>
+    public Guid NodeObjectType { get; }
+
+    /// <summary>
+    ///     Boolean indicating whether the Recycle Bin was emptied successfully
+    /// </summary>
+    public bool RecycleBinEmptiedSuccessfully { get; set; }
+
+    /// <summary>
+    ///     Boolean indicating whether this event was fired for the Content's Recycle Bin.
+    /// </summary>
+    public bool IsContentRecycleBin => NodeObjectType == Constants.ObjectTypes.Document;
+
+    /// <summary>
+    ///     Boolean indicating whether this event was fired for the Media's Recycle Bin.
+    /// </summary>
+    public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
+
+    public bool Equals(RecycleBinEventArgs? other)
     {
-        public RecycleBinEventArgs(Guid nodeObjectType, EventMessages eventMessages)
-            : base(true, eventMessages)
+        if (ReferenceEquals(null, other))
         {
-            NodeObjectType = nodeObjectType;
+            return false;
         }
 
-        public RecycleBinEventArgs(Guid nodeObjectType)
-            : base(true)
+        if (ReferenceEquals(this, other))
         {
-            NodeObjectType = nodeObjectType;
-
+            return true;
         }
 
-        /// <summary>
-        /// Gets the Id of the node object type of the items
-        /// being deleted from the Recycle Bin.
-        /// </summary>
-        public Guid NodeObjectType { get; }
+        return base.Equals(other) && NodeObjectType.Equals(other.NodeObjectType) &&
+               RecycleBinEmptiedSuccessfully == other.RecycleBinEmptiedSuccessfully;
+    }
 
-        /// <summary>
-        /// Boolean indicating whether the Recycle Bin was emptied successfully
-        /// </summary>
-        public bool RecycleBinEmptiedSuccessfully { get; set; }
-
-        /// <summary>
-        /// Boolean indicating whether this event was fired for the Content's Recycle Bin.
-        /// </summary>
-        public bool IsContentRecycleBin => NodeObjectType == Constants.ObjectTypes.Document;
-
-        /// <summary>
-        /// Boolean indicating whether this event was fired for the Media's Recycle Bin.
-        /// </summary>
-        public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
-
-        public bool Equals(RecycleBinEventArgs? other)
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return base.Equals(other) && NodeObjectType.Equals(other.NodeObjectType) && RecycleBinEmptiedSuccessfully == other.RecycleBinEmptiedSuccessfully;
+            return false;
         }
 
-        public override bool Equals(object? obj)
+        if (ReferenceEquals(this, obj))
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((RecycleBinEventArgs) obj);
+            return true;
         }
 
-        public override int GetHashCode()
+        if (obj.GetType() != GetType())
         {
-            unchecked
-            {
-                int hashCode = base.GetHashCode();
-                hashCode = (hashCode * 397) ^ NodeObjectType.GetHashCode();
-                hashCode = (hashCode * 397) ^ RecycleBinEmptiedSuccessfully.GetHashCode();
-                return hashCode;
-            }
+            return false;
         }
 
-        public static bool operator ==(RecycleBinEventArgs left, RecycleBinEventArgs right)
-        {
-            return Equals(left, right);
-        }
+        return Equals((RecycleBinEventArgs)obj);
+    }
 
-        public static bool operator !=(RecycleBinEventArgs left, RecycleBinEventArgs right)
+    public override int GetHashCode()
+    {
+        unchecked
         {
-            return !Equals(left, right);
+            var hashCode = base.GetHashCode();
+            hashCode = (hashCode * 397) ^ NodeObjectType.GetHashCode();
+            hashCode = (hashCode * 397) ^ RecycleBinEmptiedSuccessfully.GetHashCode();
+            return hashCode;
         }
     }
+
+    public static bool operator ==(RecycleBinEventArgs left, RecycleBinEventArgs right) => Equals(left, right);
+
+    public static bool operator !=(RecycleBinEventArgs left, RecycleBinEventArgs right) => !Equals(left, right);
 }

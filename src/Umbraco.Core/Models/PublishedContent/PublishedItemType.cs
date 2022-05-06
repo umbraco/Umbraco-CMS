@@ -1,34 +1,33 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent
+﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+
+/// <summary>
+///     The type of published element.
+/// </summary>
+/// <remarks>Can be a simple element, or a document, a media, a member.</remarks>
+public enum PublishedItemType
 {
     /// <summary>
-    /// The type of published element.
+    ///     Unknown.
     /// </summary>
-    /// <remarks>Can be a simple element, or a document, a media, a member.</remarks>
-    public enum PublishedItemType
-    {
-        /// <summary>
-        /// Unknown.
-        /// </summary>
-        Unknown = 0,
+    Unknown = 0,
 
-        /// <summary>
-        /// An element.
-        /// </summary>
-        Element,
+    /// <summary>
+    ///     An element.
+    /// </summary>
+    Element,
 
-        /// <summary>
-        /// A document.
-        /// </summary>
-        Content,
+    /// <summary>
+    ///     A document.
+    /// </summary>
+    Content,
 
-        /// <summary>
-        /// A media.
-        /// </summary>
-        Media,
+    /// <summary>
+    ///     A media.
+    /// </summary>
+    Media,
 
-        /// <summary>
-        /// A member.
-        /// </summary>
-        Member
-    }
+    /// <summary>
+    ///     A member.
+    /// </summary>
+    Member
 }

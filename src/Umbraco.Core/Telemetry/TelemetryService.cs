@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
@@ -10,88 +8,86 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Telemetry
+namespace Umbraco.Cms.Core.Telemetry;
+
+/// <inheritdoc />
+internal class TelemetryService : ITelemetryService
 {
-    /// <inheritdoc/>
-    internal class TelemetryService : ITelemetryService
+    private readonly IManifestParser _manifestParser;
+    private readonly IMetricsConsentService _metricsConsentService;
+    private readonly ISiteIdentifierService _siteIdentifierService;
+    private readonly IUmbracoVersion _umbracoVersion;
+    private readonly IUsageInformationService _usageInformationService;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TelemetryService" /> class.
+    /// </summary>
+    public TelemetryService(
+        IManifestParser manifestParser,
+        IUmbracoVersion umbracoVersion,
+        ISiteIdentifierService siteIdentifierService,
+        IUsageInformationService usageInformationService,
+        IMetricsConsentService metricsConsentService)
     {
-        private readonly IManifestParser _manifestParser;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly ISiteIdentifierService _siteIdentifierService;
-        private readonly IUsageInformationService _usageInformationService;
-        private readonly IMetricsConsentService _metricsConsentService;
+        _manifestParser = manifestParser;
+        _umbracoVersion = umbracoVersion;
+        _siteIdentifierService = siteIdentifierService;
+        _usageInformationService = usageInformationService;
+        _metricsConsentService = metricsConsentService;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TelemetryService"/> class.
-        /// </summary>
-        public TelemetryService(
-            IManifestParser manifestParser,
-            IUmbracoVersion umbracoVersion,
-            ISiteIdentifierService siteIdentifierService,
-            IUsageInformationService usageInformationService,
-            IMetricsConsentService metricsConsentService)
+    /// <inheritdoc />
+    public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
+    {
+        if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
         {
-            _manifestParser = manifestParser;
-            _umbracoVersion = umbracoVersion;
-            _siteIdentifierService = siteIdentifierService;
-            _usageInformationService = usageInformationService;
-            _metricsConsentService = metricsConsentService;
+            telemetryReportData = null;
+            return false;
         }
 
-        /// <inheritdoc/>
-        public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
+        telemetryReportData = new TelemetryReportData
         {
-            if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
-            {
-                telemetryReportData = null;
-                return false;
-            }
+            Id = telemetryId,
+            Version = GetVersion(),
+            Packages = GetPackageTelemetry(),
+            Detailed = _usageInformationService.GetDetailed()
+        };
+        return true;
+    }
 
-            telemetryReportData = new TelemetryReportData
-            {
-                Id = telemetryId,
-                Version = GetVersion(),
-                Packages = GetPackageTelemetry(),
-                Detailed = _usageInformationService.GetDetailed(),
-            };
-            return true;
+    private string? GetVersion()
+    {
+        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        {
+            return null;
         }
 
-        private string? GetVersion()
-        {
-            if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
-            {
-                return null;
-            }
+        return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+    }
 
-            return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
+    private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
+    {
+        if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+        {
+            return null;
         }
 
-        private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
+        List<PackageTelemetry> packages = new();
+        IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
+
+        foreach (PackageManifest manifest in manifests)
         {
-            if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
+            if (manifest.AllowPackageTelemetry is false)
             {
-                return null;
+                continue;
             }
 
-            List<PackageTelemetry> packages = new();
-            IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
-
-            foreach (PackageManifest manifest in manifests)
+            packages.Add(new PackageTelemetry
             {
-                if (manifest.AllowPackageTelemetry is false)
-                {
-                    continue;
-                }
-
-                packages.Add(new PackageTelemetry
-                {
-                    Name = manifest.PackageName,
-                    Version = manifest.Version ?? string.Empty,
-                });
-            }
-
-            return packages;
+                Name = manifest.PackageName, Version = manifest.Version ?? string.Empty
+            });
         }
+
+        return packages;
     }
 }

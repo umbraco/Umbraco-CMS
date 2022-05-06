@@ -1,9 +1,8 @@
-namespace Umbraco.Cms.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration;
+
+public enum LocalTempStorage
 {
-    public enum LocalTempStorage
-    {
-        Unknown = 0,
-        Default,
-        EnvironmentTemp
-    }
+    Unknown = 0,
+    Default,
+    EnvironmentTemp
 }

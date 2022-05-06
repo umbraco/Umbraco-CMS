@@ -1,31 +1,30 @@
-﻿using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+/// <summary>
+///     Represents a tagged entity.
+/// </summary>
+/// <remarks>
+///     Note that it is the properties of an entity (like Content, Media, Members, etc.) that are tagged,
+///     which is why this class is composed of a list of tagged properties and the identifier the actual entity.
+/// </remarks>
+public class TaggedEntity
 {
     /// <summary>
-    /// Represents a tagged entity.
+    ///     Initializes a new instance of the <see cref="TaggedEntity" /> class.
     /// </summary>
-    /// <remarks>Note that it is the properties of an entity (like Content, Media, Members, etc.) that are tagged,
-    /// which is why this class is composed of a list of tagged properties and the identifier the actual entity.</remarks>
-    public class TaggedEntity
+    public TaggedEntity(int entityId, IEnumerable<TaggedProperty> taggedProperties)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TaggedEntity"/> class.
-        /// </summary>
-        public TaggedEntity(int entityId, IEnumerable<TaggedProperty> taggedProperties)
-        {
-            EntityId = entityId;
-            TaggedProperties = taggedProperties;
-        }
-
-        /// <summary>
-        /// Gets the identifier of the entity.
-        /// </summary>
-        public int EntityId { get; }
-
-        /// <summary>
-        /// Gets the tagged properties.
-        /// </summary>
-        public IEnumerable<TaggedProperty> TaggedProperties { get; }
+        EntityId = entityId;
+        TaggedProperties = taggedProperties;
     }
+
+    /// <summary>
+    ///     Gets the identifier of the entity.
+    /// </summary>
+    public int EntityId { get; }
+
+    /// <summary>
+    ///     Gets the tagged properties.
+    /// </summary>
+    public IEnumerable<TaggedProperty> TaggedProperties { get; }
 }

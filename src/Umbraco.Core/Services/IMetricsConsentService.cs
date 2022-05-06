@@ -1,11 +1,10 @@
 ﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Services
-{
-    public interface IMetricsConsentService
-    {
-        TelemetryLevel GetConsentLevel();
+namespace Umbraco.Cms.Core.Services;
 
-        void SetConsentLevel(TelemetryLevel telemetryLevel);
-    }
+public interface IMetricsConsentService
+{
+    TelemetryLevel GetConsentLevel();
+
+    void SetConsentLevel(TelemetryLevel telemetryLevel);
 }

@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.WebAssets
+﻿namespace Umbraco.Cms.Core.WebAssets;
+
+public interface IAssetFile
 {
-    public interface IAssetFile
-    {
-        string? FilePath { get; set; }
-        AssetType DependencyType { get; }
-    }
+    string? FilePath { get; set; }
+    AssetType DependencyType { get; }
 }

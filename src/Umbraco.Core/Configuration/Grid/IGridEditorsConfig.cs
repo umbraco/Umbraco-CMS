@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Core.Configuration.Grid;
 
-namespace Umbraco.Cms.Core.Configuration.Grid
+public interface IGridEditorsConfig
 {
-    public interface IGridEditorsConfig
-    {
-        IEnumerable<IGridEditorConfig> Editors { get; }
-    }
+    IEnumerable<IGridEditorConfig> Editors { get; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Configuration
+﻿namespace Umbraco.Cms.Core.Configuration;
+
+public interface ITypeFinderSettings
 {
-    public interface ITypeFinderSettings
-    {
-        string AssembliesAcceptingLoadExceptions { get; }
-    }
+    string AssembliesAcceptingLoadExceptions { get; }
 }

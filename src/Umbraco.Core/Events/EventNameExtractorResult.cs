@@ -1,18 +1,11 @@
-﻿namespace Umbraco.Cms.Core.Events
+﻿namespace Umbraco.Cms.Core.Events;
+
+public class EventNameExtractorResult
 {
-    public class EventNameExtractorResult
-    {
-        public EventNameExtractorError? Error { get; private set; }
-        public string? Name { get; private set; }
+    public EventNameExtractorResult(string? name) => Name = name;
 
-        public EventNameExtractorResult(string? name)
-        {
-            Name = name;
-        }
+    public EventNameExtractorResult(EventNameExtractorError? error) => Error = error;
 
-        public EventNameExtractorResult(EventNameExtractorError? error)
-        {
-            Error = error;
-        }
-    }
+    public EventNameExtractorError? Error { get; }
+    public string? Name { get; }
 }

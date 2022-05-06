@@ -4,12 +4,11 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class DictionaryItemDeletedNotification : DeletedNotification<IDictionaryItem>
 {
-    public class DictionaryItemDeletedNotification : DeletedNotification<IDictionaryItem>
+    public DictionaryItemDeletedNotification(IDictionaryItem target, EventMessages messages) : base(target, messages)
     {
-        public DictionaryItemDeletedNotification(IDictionaryItem target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }

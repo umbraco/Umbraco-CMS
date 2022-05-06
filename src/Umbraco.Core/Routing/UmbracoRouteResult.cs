@@ -1,20 +1,19 @@
-﻿namespace Umbraco.Cms.Core.Routing
+﻿namespace Umbraco.Cms.Core.Routing;
+
+public enum UmbracoRouteResult
 {
-    public enum UmbracoRouteResult
-    {
-        /// <summary>
-        /// Routing was successful and a content item was matched
-        /// </summary>
-        Success,
+    /// <summary>
+    ///     Routing was successful and a content item was matched
+    /// </summary>
+    Success,
 
-        /// <summary>
-        /// A redirection took place
-        /// </summary>
-        Redirect,
+    /// <summary>
+    ///     A redirection took place
+    /// </summary>
+    Redirect,
 
-        /// <summary>
-        /// Nothing matched
-        /// </summary>
-        NotFound
-    }
+    /// <summary>
+    ///     Nothing matched
+    /// </summary>
+    NotFound
 }

@@ -1,16 +1,10 @@
-﻿using System;
+﻿namespace Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.Configuration.Models
+[AttributeUsage(AttributeTargets.Class)]
+public class UmbracoOptionsAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class UmbracoOptionsAttribute : Attribute
-    {
-        public string ConfigurationKey { get; }
-        public bool BindNonPublicProperties { get; set; }
+    public UmbracoOptionsAttribute(string configurationKey) => ConfigurationKey = configurationKey;
 
-        public UmbracoOptionsAttribute(string configurationKey)
-        {
-            ConfigurationKey = configurationKey;
-        }
-    }
+    public string ConfigurationKey { get; }
+    public bool BindNonPublicProperties { get; set; }
 }

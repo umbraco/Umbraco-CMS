@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Services
+﻿namespace Umbraco.Cms.Core.Services;
+
+public interface IExamineIndexCountService
 {
-    public interface IExamineIndexCountService
-    {
-        public int GetCount();
-    }
+    public int GetCount();
 }

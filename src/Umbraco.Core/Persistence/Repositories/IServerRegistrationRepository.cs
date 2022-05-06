@@ -1,12 +1,10 @@
-﻿using System;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IServerRegistrationRepository : IReadWriteQueryRepository<int, IServerRegistration>
 {
-    public interface IServerRegistrationRepository : IReadWriteQueryRepository<int, IServerRegistration>
-    {
-        void DeactiveStaleServers(TimeSpan staleTimeout);
+    void DeactiveStaleServers(TimeSpan staleTimeout);
 
-        void ClearCache();
-    }
+    void ClearCache();
 }

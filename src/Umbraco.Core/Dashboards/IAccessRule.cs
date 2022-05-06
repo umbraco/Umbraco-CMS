@@ -1,18 +1,17 @@
-﻿namespace Umbraco.Cms.Core.Dashboards
+﻿namespace Umbraco.Cms.Core.Dashboards;
+
+/// <summary>
+///     Represents an access rule.
+/// </summary>
+public interface IAccessRule
 {
     /// <summary>
-    /// Represents an access rule.
+    ///     Gets or sets the rule type.
     /// </summary>
-    public interface IAccessRule
-    {
-        /// <summary>
-        /// Gets or sets the rule type.
-        /// </summary>
-        AccessRuleType Type { get; set; }
+    AccessRuleType Type { get; set; }
 
-        /// <summary>
-        /// Gets or sets the value for the rule.
-        /// </summary>
-        string? Value { get; set; }
-    }
+    /// <summary>
+    ///     Gets or sets the value for the rule.
+    /// </summary>
+    string? Value { get; set; }
 }

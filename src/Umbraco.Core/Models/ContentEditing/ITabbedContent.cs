@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
+﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+public interface ITabbedContent<T>
+    where T : ContentPropertyBasic
 {
-
-    public interface ITabbedContent<T>
-        where T : ContentPropertyBasic
-    {
-        IEnumerable<Tab<T>> Tabs { get; }
-    }
+    IEnumerable<Tab<T>> Tabs { get; }
 }

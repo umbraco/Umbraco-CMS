@@ -1,43 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Represents a temporary representation of an editor for cases where a data type is created but not editor is
+///     available.
+/// </summary>
+public class MissingPropertyEditor : IDataEditor
 {
-    /// <summary>
-    /// Represents a temporary representation of an editor for cases where a data type is created but not editor is available.
-    /// </summary>
-    public class MissingPropertyEditor : IDataEditor
-    {
-        public string Alias => "Umbraco.Missing";
+    public string Alias => "Umbraco.Missing";
 
-        public EditorType Type => EditorType.Nothing;
+    public EditorType Type => EditorType.Nothing;
 
-        public string Name => "Missing property editor";
+    public string Name => "Missing property editor";
 
-        public string Icon => string.Empty;
+    public string Icon => string.Empty;
 
-        public string Group => string.Empty;
+    public string Group => string.Empty;
 
-        public bool IsDeprecated => false;
+    public bool IsDeprecated => false;
 
-        public IDictionary<string, object> DefaultConfiguration => throw new NotImplementedException();
+    public IDictionary<string, object> DefaultConfiguration => throw new NotImplementedException();
 
-        public IPropertyIndexValueFactory PropertyIndexValueFactory => throw new NotImplementedException();
+    public IPropertyIndexValueFactory PropertyIndexValueFactory => throw new NotImplementedException();
 
-        public IConfigurationEditor GetConfigurationEditor()
-        {
-            return new ConfigurationEditor();
-        }
+    public IConfigurationEditor GetConfigurationEditor() => new ConfigurationEditor();
 
-        public IDataValueEditor GetValueEditor()
-        {
-            throw new NotImplementedException();
-        }
+    public IDataValueEditor GetValueEditor() => throw new NotImplementedException();
 
-        public IDataValueEditor GetValueEditor(object? configuration)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    public IDataValueEditor GetValueEditor(object? configuration) => throw new NotImplementedException();
 }

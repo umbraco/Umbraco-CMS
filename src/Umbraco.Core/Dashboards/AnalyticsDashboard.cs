@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace Umbraco.Cms.Core.Dashboards;
 
-namespace Umbraco.Cms.Core.Dashboards
+public class AnalyticsDashboard : IDashboard
 {
-    public class AnalyticsDashboard : IDashboard
-    {
-        public string Alias => "settingsAnalytics";
+    public string Alias => "settingsAnalytics";
 
-        public string[] Sections => new [] { "settings" };
+    public string[] Sections => new[] {"settings"};
 
-        public string View => "views/dashboard/settings/analytics.html";
+    public string View => "views/dashboard/settings/analytics.html";
 
-        public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
-    }
+    public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
 }

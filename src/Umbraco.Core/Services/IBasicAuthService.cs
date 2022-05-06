@@ -1,10 +1,9 @@
 using System.Net;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services;
+
+public interface IBasicAuthService
 {
-    public interface IBasicAuthService
-    {
-        bool IsBasicAuthEnabled();
-        bool IsIpAllowListed(IPAddress clientIpAddress);
-    }
+    bool IsBasicAuthEnabled();
+    bool IsIpAllowListed(IPAddress clientIpAddress);
 }

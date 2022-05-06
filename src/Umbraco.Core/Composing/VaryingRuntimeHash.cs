@@ -1,19 +1,13 @@
-﻿using System;
+﻿namespace Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Composing
+/// <summary>
+///     A runtime hash this is always different on each app startup
+/// </summary>
+public sealed class VaryingRuntimeHash : IRuntimeHash
 {
-    /// <summary>
-    /// A runtime hash this is always different on each app startup
-    /// </summary>
-    public sealed class VaryingRuntimeHash : IRuntimeHash
-    {
-        private readonly string _hash;
+    private readonly string _hash;
 
-        public VaryingRuntimeHash()
-        {
-            _hash = DateTime.Now.Ticks.ToString();
-        }
+    public VaryingRuntimeHash() => _hash = DateTime.Now.Ticks.ToString();
 
-        public string GetHashValue() => _hash;
-    }
+    public string GetHashValue() => _hash;
 }

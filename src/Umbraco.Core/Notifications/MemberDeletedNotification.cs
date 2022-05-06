@@ -4,12 +4,11 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public sealed class MemberDeletedNotification : DeletedNotification<IMember>
 {
-    public sealed class MemberDeletedNotification : DeletedNotification<IMember>
+    public MemberDeletedNotification(IMember target, EventMessages messages) : base(target, messages)
     {
-        public MemberDeletedNotification(IMember target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }

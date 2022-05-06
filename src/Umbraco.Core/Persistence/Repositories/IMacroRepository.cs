@@ -1,12 +1,8 @@
-﻿using System;
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IMacroRepository : IReadWriteQueryRepository<int, IMacro>, IReadRepository<Guid, IMacro>
 {
-    public interface IMacroRepository : IReadWriteQueryRepository<int, IMacro>, IReadRepository<Guid, IMacro>
-    {
-
-        //IEnumerable<IMacro> GetAll(params string[] aliases);
-
-    }
+    //IEnumerable<IMacro> GetAll(params string[] aliases);
 }

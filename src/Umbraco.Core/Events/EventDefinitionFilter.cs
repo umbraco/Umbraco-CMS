@@ -1,24 +1,23 @@
-﻿namespace Umbraco.Cms.Core.Events
+﻿namespace Umbraco.Cms.Core.Events;
+
+/// <summary>
+///     The filter used in the <see cref="IEventDispatcher" /> GetEvents method which determines
+///     how the result list is filtered
+/// </summary>
+public enum EventDefinitionFilter
 {
     /// <summary>
-    /// The filter used in the <see cref="IEventDispatcher"/> GetEvents method which determines
-    /// how the result list is filtered
+    ///     Returns all events tracked
     /// </summary>
-    public enum EventDefinitionFilter
-    {
-        /// <summary>
-        /// Returns all events tracked
-        /// </summary>
-        All,
+    All,
 
-        /// <summary>
-        /// Deduplicates events and only returns the first duplicate instance tracked
-        /// </summary>
-        FirstIn,
+    /// <summary>
+    ///     Deduplicates events and only returns the first duplicate instance tracked
+    /// </summary>
+    FirstIn,
 
-        /// <summary>
-        /// Deduplicates events and only returns the last duplicate instance tracked
-        /// </summary>
-        LastIn
-    }
+    /// <summary>
+    ///     Deduplicates events and only returns the last duplicate instance tracked
+    /// </summary>
+    LastIn
 }

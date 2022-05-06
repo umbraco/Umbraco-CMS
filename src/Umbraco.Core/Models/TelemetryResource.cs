@@ -1,11 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+[DataContract]
+public class TelemetryResource
 {
-    [DataContract]
-    public class TelemetryResource
-    {
-        [DataMember]
-        public TelemetryLevel TelemetryLevel { get; set; }
-    }
+    [DataMember] public TelemetryLevel TelemetryLevel { get; set; }
 }

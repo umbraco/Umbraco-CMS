@@ -1,35 +1,32 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions;
+
+/// <summary>
+///     The action collection builder
+/// </summary>
+public class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>
 {
-    /// <summary>
-    /// The action collection builder
-    /// </summary>
-    public class ActionCollectionBuilder : LazyCollectionBuilderBase<ActionCollectionBuilder, ActionCollection, IAction>
+    /// <inheritdoc />
+    protected override ActionCollectionBuilder This => this;
+
+    /// <inheritdoc />
+    protected override IEnumerable<IAction> CreateItems(IServiceProvider factory)
     {
-        /// <inheritdoc/>
-        protected override ActionCollectionBuilder This => this;
+        var items = base.CreateItems(factory).ToList();
 
-        /// <inheritdoc/>
-        protected override IEnumerable<IAction> CreateItems(IServiceProvider factory)
+        // Validate the items, no actions should exist that do not either expose notifications or permissions
+        var invalidItems = items.Where(x => !x.CanBePermissionAssigned && !x.ShowInNotifier).ToList();
+        if (invalidItems.Count == 0)
         {
-            var items = base.CreateItems(factory).ToList();
-
-            // Validate the items, no actions should exist that do not either expose notifications or permissions
-            var invalidItems = items.Where(x => !x.CanBePermissionAssigned && !x.ShowInNotifier).ToList();
-            if (invalidItems.Count == 0)
-            {
-                return items;
-            }
-
-            var invalidActions = string.Join(", ", invalidItems.Select(x => "'" + x.Alias + "'"));
-            throw new InvalidOperationException($"Invalid actions {invalidActions}'. All {typeof(IAction)} implementations must be true for either {nameof(IAction.CanBePermissionAssigned)} or {nameof(IAction.ShowInNotifier)}.");
+            return items;
         }
+
+        var invalidActions = string.Join(", ", invalidItems.Select(x => "'" + x.Alias + "'"));
+        throw new InvalidOperationException(
+            $"Invalid actions {invalidActions}'. All {typeof(IAction)} implementations must be true for either {nameof(IAction.CanBePermissionAssigned)} or {nameof(IAction.ShowInNotifier)}.");
     }
 }

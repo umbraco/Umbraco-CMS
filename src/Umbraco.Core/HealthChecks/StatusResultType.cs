@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks
+﻿namespace Umbraco.Cms.Core.HealthChecks;
+
+public enum StatusResultType
 {
-    public enum StatusResultType
-    {
-        Success,
-        Warning,
-        Error,
-        Info
-    }
+    Success,
+    Warning,
+    Error,
+    Info
 }

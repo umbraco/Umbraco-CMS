@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.WebAssets
+namespace Umbraco.Cms.Core.WebAssets;
+
+public class CustomBackOfficeAssetsCollection : BuilderCollectionBase<IAssetFile>
 {
-    public class CustomBackOfficeAssetsCollection : BuilderCollectionBase<IAssetFile>
+    public CustomBackOfficeAssetsCollection(Func<IEnumerable<IAssetFile>> items) : base(items)
     {
-        public CustomBackOfficeAssetsCollection(Func<IEnumerable<IAssetFile>> items) : base(items)
-        {
-        }
     }
 }

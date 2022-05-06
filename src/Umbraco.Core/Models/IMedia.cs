@@ -1,5 +1,5 @@
-﻿namespace Umbraco.Cms.Core.Models
+﻿namespace Umbraco.Cms.Core.Models;
+
+public interface IMedia : IContentBase
 {
-    public interface IMedia : IContentBase
-    { }
 }

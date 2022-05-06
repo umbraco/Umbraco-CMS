@@ -1,77 +1,84 @@
-﻿using System;
-using Umbraco.Cms.Core.Cache;
+﻿using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+/// <summary>
+///     Checks user access to media
+/// </summary>
+public class MediaPermissions
 {
-    /// <summary>
-    /// Checks user access to media
-    /// </summary>
-    public class MediaPermissions
+    public enum MediaAccess
     {
-        private readonly IMediaService _mediaService;
-        private readonly IEntityService _entityService;
-        private readonly AppCaches _appCaches;
+        Granted,
+        Denied,
+        NotFound
+    }
 
-        public enum MediaAccess
+    private readonly AppCaches _appCaches;
+    private readonly IEntityService _entityService;
+    private readonly IMediaService _mediaService;
+
+    public MediaPermissions(IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
+    {
+        _mediaService = mediaService;
+        _entityService = entityService;
+        _appCaches = appCaches;
+    }
+
+    /// <summary>
+    ///     Performs a permissions check for the user to check if it has access to the node based on
+    ///     start node and/or permissions for the node
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="mediaService"></param>
+    /// <param name="entityService"></param>
+    /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
+    /// <returns></returns>
+    public MediaAccess CheckPermissions(IUser? user, int nodeId, out IMedia? media)
+    {
+        if (user == null)
         {
-            Granted,
-            Denied,
-            NotFound
+            throw new ArgumentNullException(nameof(user));
         }
 
-        public MediaPermissions(IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
+        media = null;
+
+        if (nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
         {
-            _mediaService = mediaService;
-            _entityService = entityService;
-            _appCaches = appCaches;
+            media = _mediaService.GetById(nodeId);
         }
 
-        /// <summary>
-        /// Performs a permissions check for the user to check if it has access to the node based on
-        /// start node and/or permissions for the node
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="mediaService"></param>
-        /// <param name="entityService"></param>
-        /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
-        /// <returns></returns>
-        public MediaAccess CheckPermissions(IUser? user, int nodeId, out IMedia? media)
+        if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            media = null;
-
-            if (nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
-            {
-                media = _mediaService.GetById(nodeId);
-            }
-
-            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
-            {
-                return MediaAccess.NotFound;
-            }
-
-            var hasPathAccess = (nodeId == Constants.System.Root)
-                ? user.HasMediaRootAccess(_entityService, _appCaches)
-                : (nodeId == Constants.System.RecycleBinMedia)
-                    ? user.HasMediaBinAccess(_entityService, _appCaches)
-                    : user.HasPathAccess(media, _entityService, _appCaches);
-
-            return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
+            return MediaAccess.NotFound;
         }
 
-        public MediaAccess CheckPermissions(IMedia? media, IUser? user)
+        var hasPathAccess = nodeId == Constants.System.Root
+            ? user.HasMediaRootAccess(_entityService, _appCaches)
+            : nodeId == Constants.System.RecycleBinMedia
+                ? user.HasMediaBinAccess(_entityService, _appCaches)
+                : user.HasPathAccess(media, _entityService, _appCaches);
+
+        return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
+    }
+
+    public MediaAccess CheckPermissions(IMedia? media, IUser? user)
+    {
+        if (user == null)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            if (media == null) return MediaAccess.NotFound;
-
-            var hasPathAccess = user.HasPathAccess(media, _entityService, _appCaches);
-
-            return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
+            throw new ArgumentNullException(nameof(user));
         }
+
+        if (media == null)
+        {
+            return MediaAccess.NotFound;
+        }
+
+        var hasPathAccess = user.HasPathAccess(media, _entityService, _appCaches);
+
+        return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
     }
 }

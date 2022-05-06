@@ -5,22 +5,22 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions("ConnectionStrings")]
 public class ConnectionStrings
 {
-    private string? _connectionString;
-
     /// <summary>
-    /// The default provider name when not present in configuration.
+    ///     The default provider name when not present in configuration.
     /// </summary>
     public const string DefaultProviderName = "Microsoft.Data.SqlClient";
 
     /// <summary>
-    /// The DataDirectory placeholder.
+    ///     The DataDirectory placeholder.
     /// </summary>
     public const string DataDirectoryPlaceholder = "|DataDirectory|";
 
     /// <summary>
-    /// The postfix used to identify a connection strings provider setting.
+    ///     The postfix used to identify a connection strings provider setting.
     /// </summary>
     public const string ProviderNamePostfix = "_ProviderName";
+
+    private string? _connectionString;
 
     public string? Name { get; set; }
 

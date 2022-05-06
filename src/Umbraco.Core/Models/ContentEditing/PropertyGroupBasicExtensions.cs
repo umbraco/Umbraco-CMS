@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing
+﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+internal static class PropertyGroupBasicExtensions
 {
-    internal static class PropertyGroupBasicExtensions
-    {
-        public static string? GetParentAlias(this PropertyGroupBasic propertyGroup)
-            => PropertyGroupExtensions.GetParentAlias(propertyGroup.Alias);
-    }
+    public static string? GetParentAlias(this PropertyGroupBasic propertyGroup)
+        => PropertyGroupExtensions.GetParentAlias(propertyGroup.Alias);
 }

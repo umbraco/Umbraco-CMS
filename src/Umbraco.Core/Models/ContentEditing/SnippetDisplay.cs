@@ -1,14 +1,13 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
-{
-    [DataContract(Name = "scriptFile", Namespace = "")]
-    public class SnippetDisplay
-    {
-        [DataMember(Name = "name", IsRequired = true)]
-        public string? Name { get; set; }
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
-        [DataMember(Name = "fileName", IsRequired = true)]
-        public string? FileName { get; set; }
-    }
+[DataContract(Name = "scriptFile", Namespace = "")]
+public class SnippetDisplay
+{
+    [DataMember(Name = "name", IsRequired = true)]
+    public string? Name { get; set; }
+
+    [DataMember(Name = "fileName", IsRequired = true)]
+    public string? FileName { get; set; }
 }

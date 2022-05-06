@@ -9,25 +9,25 @@ namespace Umbraco.Cms.Core.Actions;
 public class ActionAssignDomain : IAction
 {
     /// <summary>
-    /// The unique action letter
+    ///     The unique action letter
     /// </summary>
     public const char ActionLetter = 'I';
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public char Letter => ActionLetter;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public string Alias => "assignDomain";
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public string Icon => "home";
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool ShowInNotifier => false;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool CanBePermissionAssigned => true;
 }
