@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IUserService _userService;
 
         // Scheduled for removal in V12
-        [Obsolete("Please use the constructor that takes and ILogger and IBackOfficeSecurity instead")]
+        [Obsolete("Please use the constructor that takes an ILogger and IBackOfficeSecurity instead")]
         public MetricsConsentService(IKeyValueService keyValueService)
         : this(
             keyValueService,
@@ -27,11 +27,14 @@ namespace Umbraco.Cms.Core.Services
         {
         }
 
+        // Scheduled for removal in V12
+        [Obsolete("Please use the constructor that takes an IUserService instead")]
         public MetricsConsentService(
             IKeyValueService keyValueService,
             ILogger<MetricsConsentService> logger,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(keyValueService,
+        : this(
+            keyValueService,
             logger,
             backOfficeSecurityAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IUserService>())

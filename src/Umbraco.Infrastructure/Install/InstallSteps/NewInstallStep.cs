@@ -69,7 +69,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _metricsConsentService = metricsConsentService;
         }
 
-        [Obsolete("Please use constructor that takes an IMetricsConsentService instead")]
+        // Scheduled for removal in V12
+        [Obsolete("Please use constructor that takes an IMetricsConsentService and ILocalizedTextService instead")]
         public NewInstallStep(
             IUserService userService,
             DatabaseBuilder databaseBuilder,
@@ -80,8 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ICookieManager cookieManager,
             IBackOfficeUserManager userManager,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-            ILocalizedTextService localizedTextService)
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
         : this(
             userService,
             databaseBuilder,
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             userManager,
             dbProviderFactoryCreator,
             databaseProviderMetadata,
-            localizedTextService,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
             StaticServiceProvider.Instance.GetRequiredService<IMetricsConsentService>())
         {
         }
