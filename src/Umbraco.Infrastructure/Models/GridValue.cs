@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Models
         public class GridControl
         {
             [JsonProperty("value")]
-            public JToken Value { get; set; } = null!;
+            public JToken? Value { get; set; } = null!;
 
             [JsonProperty("editor")]
             public GridEditor Editor { get; set; } = null!;
