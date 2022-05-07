@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
-    // TODO(V10) : change base class to OEmbedProviderBase
-    public class YouTube : EmbedProviderBase
+    public class YouTube : OEmbedProviderBase
     {
         public override string ApiEndpoint => "https://www.youtube.com/oembed";
 

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
-    // TODO(V10) : change base class to OEmbedProviderBase
-    public class Issuu : EmbedProviderBase
+    public class Issuu : OEmbedProviderBase
     {
         public override string ApiEndpoint => "https://issuu.com/oembed";
 

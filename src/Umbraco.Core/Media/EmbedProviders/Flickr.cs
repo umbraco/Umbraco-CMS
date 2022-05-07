@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Net;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
-    // TODO(V10) : change base class to OEmbedProviderBase
-    public class Flickr : EmbedProviderBase
+    public class Flickr : OEmbedProviderBase
     {
         public override string ApiEndpoint => "http://www.flickr.com/services/oembed/";
 
