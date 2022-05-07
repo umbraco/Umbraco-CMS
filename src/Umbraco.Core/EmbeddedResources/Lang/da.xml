@@ -2181,7 +2181,7 @@ Mange hilsner fra Umbraco robotten
       være muligt. Indholdet vil blive vist som ikke understøttet indhold.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
-    <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer</key>
+    <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer.</key>
     <key alias="thumbnail">Billede</key>
     <key alias="addThumbnail">Tilføj billede</key>
     <key alias="tabCreateEmpty">Opret ny</key>
