@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
 
             var queryString = new Dictionary<string, string?>
             {
-                { "url", WebUtility.UrlEncode(url) }
+                { "url", url }
             };
 
             foreach (var param in RequestParams)
