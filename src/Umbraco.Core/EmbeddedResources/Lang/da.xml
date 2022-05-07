@@ -2188,7 +2188,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="tabClipboard">Udklipsholder</key>
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
-    <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
