@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Xml;
+using Microsoft.AspNetCore.WebUtilities;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
@@ -30,23 +32,31 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
         {
             if (Uri.IsWellFormedUriString(url, UriKind.RelativeOrAbsolute) == false)
+            {
                 throw new ArgumentException("Not a valid URL.", nameof(url));
+            }
 
-            var fullUrl = new StringBuilder();
-
-            fullUrl.Append(ApiEndpoint);
-            fullUrl.Append("?url=" + WebUtility.UrlEncode(url));
+            var queryString = new Dictionary<string, string>
+            {
+                { "url", WebUtility.UrlEncode(url) }
+            };
 
             foreach (var param in RequestParams)
-                fullUrl.Append($"&{param.Key}={param.Value}");
+            {
+                queryString.Add(param.Key, param.Value);
+            }
 
             if (maxWidth > 0)
-                fullUrl.Append("&maxwidth=" + maxWidth);
+            {
+                queryString.Add("maxwidth", maxWidth.ToString());
+            }
 
             if (maxHeight > 0)
-                fullUrl.Append("&maxheight=" + maxHeight);
+            {
+                queryString.Add("maxheight", maxHeight.ToString());
+            }
 
-            return fullUrl.ToString();
+            return QueryHelpers.AddQueryString(ApiEndpoint, queryString);
         }
 
         public virtual string DownloadResponse(string url)
