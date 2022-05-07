@@ -579,9 +579,14 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      To import a dictionary item, find the ".udt" file on your computer by clicking the
+      "Import" button (you'll be asked for confirmation on the next screen)
+    </key>
     <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="noItemsInFile">There are no dictionary items in this file.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -1629,6 +1634,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document Type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the Document Type</key>
+    <key alias="dictionaryItemExportedSuccess">Dictionary item(s) was exported to file</key>
+    <key alias="dictionaryItemExportedError">An error occurred while exporting the dictionary item(s)</key>
+    <key alias="dictionaryItemImported">The following dictionary item(s) has been imported!</key>
     <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
     <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not
       published
