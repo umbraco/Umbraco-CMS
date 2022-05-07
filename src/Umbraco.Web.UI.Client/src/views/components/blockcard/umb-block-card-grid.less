@@ -6,15 +6,4 @@
 
     // Avoid grid layout to re-arrange when opening overlay and scrollbar is hidden.
     max-width: 99.9%;
-
-    @supports not (display: grid) {
-      /* FlexBox Fallback */
-      display: flex;
-      flex-wrap: wrap;
-
-      > * {
-          flex: 1 1 240px;
-      }
-    }
-    
 }
