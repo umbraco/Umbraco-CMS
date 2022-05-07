@@ -191,41 +191,44 @@
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
             if (elementType) {
+                
+                let clonedBlockData = Utilities.copy(block);
+                vm.openBlock = block;
+
+                const overlayModel = {
+                    block: clonedBlockData,
+                      
+                    view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
+                    size: "small",
+                    submit: function(overlayModel) {
+                        loadElementTypes()// lets load elementType again, to ensure we are up to date.
+                        TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
+                        overlayModel.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                        vm.openBlock = null;
+                    }
+                };
+
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(data => {
-
-                    var clonedBlockData = Utilities.copy(block);
-                    vm.openBlock = block;
-
-                    const overlayModel = {
-                        block: clonedBlockData,
-                        title: data,
-                        view: "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.overlay.html",
-                        size: "small",
-                        submit: function(overlayModel) {
-                            loadElementTypes()// lets load elementType again, to ensure we are up to date.
-                            TransferProperties(overlayModel.block, block);// transfer properties back to block object. (Doing this cause we dont know if block object is added to model jet, therefor we cant use index or replace the object.)
-                            overlayModel.close();
-                        },
-                        close: function() {
-                            editorService.close();
-                            vm.openBlock = null;
-                        }
-                    };
-
+                    overlayModel.title = data,
+                    
                     // open property settings editor
                     editorService.open(overlayModel);
-
                 });
             } else {
 
-                const overlay = {
-                  content: "Cannot be edited cause ElementType does not exist.",
-                  close: () => {
-                    overlayService.close()
-                  }
-                };
-                
+              const overlay = {
+                close: () => {
+                  overlayService.close()
+                }
+              };
+
+              localizationService.localize("blockEditor_elementTypeDoesNotExist").then(data => {
+                overlay.content = data;
                 overlayService.open(overlay);
+              });
             }
 
         };
