@@ -36,6 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IRuntimeState _runtimeState;
         private string? _passwordConfigJson;
         private bool _passwordConfigInitialized;
+        private readonly object _sqliteValidateSessionLock = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -218,6 +219,23 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         public bool ValidateLoginSession(int userId, Guid sessionId)
         {
+            // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
+            // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
+            // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
+            // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
+            if (Database.DatabaseType.IsSqlite())
+            {
+                lock (_sqliteValidateSessionLock)
+                {
+                    return ValidateLoginSessionInternal(userId, sessionId);
+                }
+            }
+
+            return ValidateLoginSessionInternal(userId, sessionId);
+        }
+
+        private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
+        {
             // with RepeatableRead transaction mode, read-then-update operations can
             // cause deadlocks, and the ForUpdate() hint is required to tell the database
             // to acquire an exclusive lock when reading
@@ -236,15 +254,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 
-            //now detect if there's been a timeout
+            // now detect if there's been a timeout
             if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
             {
-                //timeout detected, update the record
+                // timeout detected, update the record
+                Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
                 ClearLoginSession(sessionId);
                 return false;
             }
 
-            //update the validate date
+            // update the validate date
+            Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
             found.LastValidatedUtc = DateTime.UtcNow;
             Database.Update(found);
             return true;

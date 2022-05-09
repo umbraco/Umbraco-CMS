@@ -18,27 +18,45 @@ internal class UmbracoHostBuilderDecorator : IHostBuilder
     public IDictionary<object, object> Properties => _inner.Properties;
 
     public IHostBuilder
-        ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate) =>
+        ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate)
+    {
         _inner.ConfigureAppConfiguration(configureDelegate);
+        return this;
+    }
 
     public IHostBuilder ConfigureContainer<TContainerBuilder>(
-        Action<HostBuilderContext, TContainerBuilder> configureDelegate) =>
+        Action<HostBuilderContext, TContainerBuilder> configureDelegate)
+    {
         _inner.ConfigureContainer(configureDelegate);
+        return this;
+    }
 
-    public IHostBuilder ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate) =>
+    public IHostBuilder ConfigureHostConfiguration(Action<IConfigurationBuilder> configureDelegate)
+    {
         _inner.ConfigureHostConfiguration(configureDelegate);
+        return this;
+    }
 
-    public IHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate) =>
+    public IHostBuilder ConfigureServices(Action<HostBuilderContext, IServiceCollection> configureDelegate)
+    {
         _inner.ConfigureServices(configureDelegate);
+        return this;
+    }
 
     public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(IServiceProviderFactory<TContainerBuilder> factory)
-        where TContainerBuilder : notnull =>
+        where TContainerBuilder : notnull
+    {
         _inner.UseServiceProviderFactory(factory);
+        return this;
+    }
 
     public IHostBuilder UseServiceProviderFactory<TContainerBuilder>(
         Func<HostBuilderContext, IServiceProviderFactory<TContainerBuilder>> factory)
-        where TContainerBuilder : notnull =>
+        where TContainerBuilder : notnull
+    {
         _inner.UseServiceProviderFactory(factory);
+        return this;
+    }
 
     public IHost Build()
     {

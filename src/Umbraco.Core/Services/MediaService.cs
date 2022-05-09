@@ -590,7 +590,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        public IEnumerable<IMedia>? GetRootMedia()
+        public IEnumerable<IMedia> GetRootMedia()
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {

@@ -165,9 +165,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     IContentTypeComposition? contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1?.Key);
-                    EntityContainer[]? containers = GetEntityContainers(contentType, type)?.ToArray();
+                    EntityContainer[] containers = GetEntityContainers(contentType, type).ToArray();
                     var containerPath =
-                        $"/{(containers != null && containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
+                        $"/{(containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
                     if (x.Item1 is not null)
                     {
                         x.Item1.AdditionalData["containerPath"] = containerPath;
@@ -178,22 +178,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 .ToList();
         }
 
-        private IEnumerable<EntityContainer>? GetEntityContainers(IContentTypeComposition? contentType,
+        private IEnumerable<EntityContainer> GetEntityContainers(IContentTypeComposition? contentType,
             UmbracoObjectTypes type)
         {
             if (contentType == null)
             {
-                return null;
+                return Enumerable.Empty<EntityContainer>();
             }
 
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
-                    return ContentTypeService.GetContainers(contentType as IContentType);
+                    if (contentType is IContentType documentContentType)
+                    {
+                        return ContentTypeService.GetContainers(documentContentType);
+                    }
+
+                    return Enumerable.Empty<EntityContainer>();
                 case UmbracoObjectTypes.MediaType:
-                    return MediaTypeService.GetContainers(contentType as IMediaType);
+                    if (contentType is IMediaType mediaContentType)
+                    {
+                        return MediaTypeService.GetContainers(mediaContentType);
+                    }
+
+                    return Enumerable.Empty<EntityContainer>();
                 case UmbracoObjectTypes.MemberType:
-                    return new EntityContainer[0];
+                    return Enumerable.Empty<EntityContainer>();
                 default:
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }

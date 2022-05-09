@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
-        public IEnumerable<TVariant>? Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
+        public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
         {
             var variesByCulture = source.ContentType.VariesByCulture();
             var variesBySegment = source.ContentType.VariesBySegment();
 
-            IList<TVariant>? variants = new List<TVariant>();
+            List<TVariant> variants = new ();
 
             if (!variesByCulture && !variesBySegment)
             {
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             else if (variesByCulture && !variesBySegment)
             {
                 var languages = GetLanguages(context);
-                variants = languages?
+                variants = languages
                     .Select(language => CreateVariantDisplay<TVariant>(context, source, language, null))
                     .WhereNotNull()
                     .ToList();
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             {
                 // Segment only
                 var segments = GetSegments(source);
-                variants = segments?
+                variants = segments
                     .Select(segment => CreateVariantDisplay<TVariant>(context, source, null, segment))
                     .WhereNotNull()
                     .ToList();
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     throw new InvalidOperationException("No languages or segments available");
                 }
 
-                variants = languages?
+                variants = languages
                     .SelectMany(language => segments
                         .Select(segment => CreateVariantDisplay<TVariant>(context, source, language, segment)))
                     .WhereNotNull()
@@ -74,11 +74,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return SortVariants(variants);
         }
 
-
-
-        private IList<TVariant>? SortVariants<TVariant>(IList<TVariant>? variants) where TVariant : ContentVariantDisplay
+        private IList<TVariant> SortVariants<TVariant>(IList<TVariant> variants) where TVariant : ContentVariantDisplay
         {
-            if (variants == null || variants.Count <= 1)
+            if (variants.Count <= 1)
             {
                 return variants;
             }

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<IAuditItem>? GetLogs(int objectId)
+        public IEnumerable<IAuditItem> GetLogs(int objectId)
         {
             using (var scope = ScopeProvider.CreateCoreScope())
             {

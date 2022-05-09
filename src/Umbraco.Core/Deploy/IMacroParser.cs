@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Deploy
 {
@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="value">Property value.</param>
         /// <param name="dependencies">A list of dependencies.</param>
         /// <returns>Parsed value.</returns>
-        string ToArtifact(string value, ICollection<Udi> dependencies);
+        string? ToArtifact(string? value, ICollection<Udi> dependencies);
 
         /// <summary>
         /// Parses an artifact property value and produces an Umbraco property value.
         /// </summary>
         /// <param name="value">Artifact property value.</param>
         /// <returns>Parsed value.</returns>
-        string FromArtifact(string value);
+        string? FromArtifact(string? value);
 
         /// <summary>
         /// Tries to replace the value of the attribute/parameter with a value containing a converted identifier.

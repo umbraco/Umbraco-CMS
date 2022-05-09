@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Services
         }
 
         /// <inheritdoc />
-        public IEnumerable<IConsent>? LookupConsent(string? source = null, string? context = null, string? action = null,
+        public IEnumerable<IConsent> LookupConsent(string? source = null, string? context = null, string? action = null,
             bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
             bool includeHistory = false)
         {

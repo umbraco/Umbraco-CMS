@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Persistence
         /// <summary>
         /// Gets entities.
         /// </summary>
-        IEnumerable<TEntity>? Get(IQuery<TEntity> query);
+        IEnumerable<TEntity> Get(IQuery<TEntity> query);
 
         /// <summary>
         /// Counts entities.
