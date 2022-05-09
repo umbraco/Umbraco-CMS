@@ -1,32 +1,37 @@
 
 //Pre-values:
-{
-    blocktype: 123,
-    columnSpanOptions: [4, 6, 12],
-    areas: [
-        {
-            key: "ABD1",
-            alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
-            columnSpan: 6,
-            minAllowed: 1,
-            maxAllowed: 2,
-            allowAll: false,
-            allowedTypes: [{
-                    elementTypeUdi: 345; //image
-                    max: 1,
-                    min: 1,
-                },
-                .. ,..
-            ]
-        },
-        {
-            key: "ABD2",
-            alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
-            columnSpan: 6,
-            allowedTypes: [.. ,.. ,..]
-        }
-    ]
-}
+gridColumns: 12, 
+blocks: [
+    {
+        contentElementTypeKey: 123,
+        columnSpanOptions: [4, 6, 12],
+        areas: [
+            {
+                key: "ABD1",
+                alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
+                columnSpan: 6,
+                // different spanning on different devices?
+                rowSpan: 1, // row spanning, also different on devices.
+                minAllowed: 1,
+                maxAllowed: 2,
+                allowAll: false,
+                allowedTypes: [{
+                        elementTypeKey: 345; //image
+                        max: 1,
+                        min: 1,
+                    },
+                    .. ,..
+                ]
+            },
+            {
+                key: "ABD2",
+                alias/class: "", // Some name to target through CSS, if empty it gets col-6 ?
+                columnSpan: 6,
+                allowedTypes: [.. ,.. ,..]
+            }
+        ]
+    }
+]
 
 // property value (model.value):
 // grid 12 column
@@ -90,6 +95,6 @@ layout: [
 content: [
    {
         UID: 867587685
-        elementTypeUID; sdfds
+        elementTypeKey; sdfds
    }
 ]
