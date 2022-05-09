@@ -222,7 +222,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
                                                       !ImpactsAllCultures &&
-                                                      ImpactsOnlyDefaultCulture;
+                                                      (ImpactsOnlyDefaultCulture || true /* TODO: If setting is set to true return true here as well, since it then also impacts invariant properties...*/);
 
         public Behavior CultureBehavior
         {
