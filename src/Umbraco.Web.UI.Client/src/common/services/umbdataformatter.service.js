@@ -263,6 +263,9 @@
                     saveModel[props[m]] = startId.id;
                 }
 
+                // make sure the allowed languages are just an array of id's
+                saveModel.allowedLanguages = saveModel.allowedLanguages && saveModel.allowedLanguages.length > 0 ? saveModel.allowedLanguages.map(language => language.id) : [];
+
                 saveModel.parentId = -1;
                 return saveModel;
             },
