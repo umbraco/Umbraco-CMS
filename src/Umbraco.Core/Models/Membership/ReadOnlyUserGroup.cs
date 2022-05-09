@@ -6,8 +6,16 @@ namespace Umbraco.Cms.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
-        public ReadOnlyUserGroup(int id, string? name, string? icon, int? startContentId, int? startMediaId, string? @alias,
-            IEnumerable<int> allowedLanguages, IEnumerable<string> allowedSections, IEnumerable<string>? permissions)
+        public ReadOnlyUserGroup(
+            int id,
+            string? name,
+            string? icon,
+            int? startContentId,
+            int? startMediaId,
+            string? @alias,
+            IEnumerable<int> allowedLanguages,
+            IEnumerable<string> allowedSections,
+            IEnumerable<string>? permissions)
         {
             Name = name ?? string.Empty;
             Icon = icon;
