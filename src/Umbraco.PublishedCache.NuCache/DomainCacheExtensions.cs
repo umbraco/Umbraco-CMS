@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var assigned = domainCache.GetAssigned(documentId, includeWildcards);
 
             // It's super important that we always compare cultures with ignore case, since we can't be sure of the casing!
-            return culture is null ? assigned.Any() : assigned.Any(x => x.Culture.Equals(culture, StringComparison.InvariantCultureIgnoreCase));
+           return string.IsNullOrEmpty( culture) ? assigned.Any() : assigned.Any(x => x.Culture.Equals(culture, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }
