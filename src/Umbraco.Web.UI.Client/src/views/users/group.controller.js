@@ -113,11 +113,11 @@
 
     function openLanguagePicker() {
       var currentSelection = [];
-      Utilities.copy(vm.userGroup.languages, currentSelection);
+      Utilities.copy(vm.userGroup.allowedLanguages, currentSelection);
       var languagePicker = {
         selection: currentSelection,
         submit: function (model) {
-          vm.userGroup.languages = model.selection;
+          vm.userGroup.allowedLanguages = model.selection;
           editorService.close();
         },
         close: function () {
