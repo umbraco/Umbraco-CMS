@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-
 namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
@@ -14,7 +12,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="dependencies">A list of dependencies.</param>
         /// <returns>The parsed value.</returns>
         /// <remarks>Turns src="/media/..." into src="umb://media/..." and adds the corresponding udi to the dependencies.</remarks>
-        string ToArtifact(string value, ICollection<Udi> dependencies);
+        string? ToArtifact(string? value, ICollection<Udi> dependencies);
 
         /// <summary>
         /// Parses an artifact property value and produces an Umbraco property value.
@@ -22,6 +20,6 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="value">The artifact property value.</param>
         /// <returns>The parsed value.</returns>
         /// <remarks>Turns umb://media/... into /media/....</remarks>
-        string FromArtifact(string value);
+        string? FromArtifact(string? value);
     }
 }

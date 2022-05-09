@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
@@ -16,12 +19,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
     {
         private readonly IIOHelper _ioHelper;
         private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
         public DropDownPropertyEditorsMigration(IMigrationContext context, IIOHelper ioHelper, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+            : this(context, ioHelper, configurationEditorJsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public DropDownPropertyEditorsMigration(
+            IMigrationContext context,
+            IIOHelper ioHelper,
+            IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(context)
         {
             _ioHelper = ioHelper;
             _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         protected override void Migrate()
@@ -47,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                 {
                     // parse configuration, and update everything accordingly
                     if (configurationEditor == null)
-                        configurationEditor = new ValueListConfigurationEditor(_ioHelper);
+                        configurationEditor = new ValueListConfigurationEditor(_ioHelper, _editorConfigurationParser);
                     try
                     {
                         config = (ValueListConfiguration) configurationEditor.FromDatabase(dataType.Configuration, _configurationEditorJsonSerializer);

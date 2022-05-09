@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Deploy
 {
@@ -36,6 +36,6 @@ namespace Umbraco.Cms.Core.Deploy
         /// <summary>
         /// Gets the dependencies of this artifact.
         /// </summary>
-        IEnumerable<ArtifactDependency>? Dependencies { get; }
+        IEnumerable<ArtifactDependency> Dependencies { get; }
     }
 }

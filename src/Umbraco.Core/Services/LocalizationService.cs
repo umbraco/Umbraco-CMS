@@ -179,18 +179,15 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="parentId">Id of the parent</param>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem>? GetDictionaryItemChildren(Guid parentId)
+        public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = _dictionaryRepository.Get(query)?.ToArray();
-                if (items is not null)
-                {
-                    //ensure the lazy Language callback is assigned
-                    foreach (var item in items)
-                        EnsureDictionaryItemLanguageCallback(item);
-                }
+                var items = _dictionaryRepository.Get(query).ToArray();
+                //ensure the lazy Language callback is assigned
+                foreach (var item in items)
+                    EnsureDictionaryItemLanguageCallback(item);
 
                 return items;
             }
@@ -217,18 +214,15 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the root/top <see cref="IDictionaryItem"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem>? GetRootDictionaryItems()
+        public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = _dictionaryRepository.Get(query)?.ToArray();
-                if (items is not null)
-                {
-                    //ensure the lazy Language callback is assigned
-                    foreach (var item in items)
-                        EnsureDictionaryItemLanguageCallback(item);
-                }
+                var items = _dictionaryRepository.Get(query).ToArray();
+                //ensure the lazy Language callback is assigned
+                foreach (var item in items)
+                    EnsureDictionaryItemLanguageCallback(item);
                 return items;
             }
         }

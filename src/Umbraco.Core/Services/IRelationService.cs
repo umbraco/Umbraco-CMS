@@ -129,9 +129,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the child or parent to retrieve relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation>? GetByParentOrChildId(int id);
+        IEnumerable<IRelation> GetByParentOrChildId(int id);
 
-        IEnumerable<IRelation>? GetByParentOrChildId(int id, string relationTypeAlias);
+        IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
 
         /// <summary>
         /// Gets a relation by the unique combination of parentId, childId and relationType.

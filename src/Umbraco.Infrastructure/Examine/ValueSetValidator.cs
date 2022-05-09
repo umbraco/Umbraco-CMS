@@ -60,18 +60,19 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public virtual ValueSetValidationResult Validate(ValueSet valueSet)
         {
             if (ValidIndexCategories != null && !ValidIndexCategories.InvariantContains(valueSet.Category))
-                return ValueSetValidationResult.Failed;
+                return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
 
             //check if this document is of a correct type of node type alias
             if (IncludeItemTypes != null && !IncludeItemTypes.InvariantContains(valueSet.ItemType))
-                return ValueSetValidationResult.Failed;
+                return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
 
             //if this node type is part of our exclusion list
             if (ExcludeItemTypes != null && ExcludeItemTypes.InvariantContains(valueSet.ItemType))
-                return ValueSetValidationResult.Failed;
+                return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
 
             var isFiltered = false;
 
+            var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
             //filter based on the fields provided (if any)
             if (IncludeFields != null || ExcludeFields != null)
             {
@@ -79,20 +80,21 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 {
                     if (IncludeFields != null && !IncludeFields.InvariantContains(key))
                     {
-                        valueSet.Values.Remove(key); //remove any value with a key that doesn't match the inclusion list
+                        filteredValues.Remove(key); //remove any value with a key that doesn't match the inclusion list
                         isFiltered = true;
                     }
 
                     if (ExcludeFields != null && ExcludeFields.InvariantContains(key))
                     {
-                        valueSet.Values.Remove(key); //remove any value with a key that matches the exclusion list
+                        filteredValues.Remove(key); //remove any value with a key that matches the exclusion list
                         isFiltered = true;
                     }
 
                 }
             }
 
-            return isFiltered ? ValueSetValidationResult.Filtered : ValueSetValidationResult.Valid;
+            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+            return new ValueSetValidationResult(isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
         }
     }
 }

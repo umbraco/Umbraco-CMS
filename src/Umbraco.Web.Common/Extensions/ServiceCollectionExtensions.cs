@@ -176,7 +176,7 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
-            Assembly entryAssembly,
+            Assembly? entryAssembly,
             ILoggerFactory loggerFactory,
             IConfiguration configuration)
         {

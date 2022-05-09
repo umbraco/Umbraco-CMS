@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Extensions
     /// </summary>
     public static class HostEnvironmentExtensions
     {
-        private static string s_temporaryApplicationId;
+        private static string? s_temporaryApplicationId;
 
         /// <summary>
         /// Maps a virtual path to a physical path to the application's content root.

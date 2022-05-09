@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -47,7 +46,6 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
-using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -102,7 +100,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<Infrastructure.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
-
 
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
@@ -200,16 +197,12 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // Add default ImageSharp configuration and service implementations
             builder.Services.AddSingleton(SixLabors.ImageSharp.Configuration.Default);
             builder.Services.AddSingleton<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
-            builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
-
-            builder.Services.AddSingleton<PackageDataInstallation>();
 
             builder.Services.AddTransient<INodeCountService, NodeCountService>();
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-
             return builder;
         }
 

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -127,14 +127,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeAlias">Alias of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias);
+        IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
 
         /// <summary>
         /// Gets all Members for the MemberType id
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId);
+        IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
 
         /// <summary>
         /// Gets all Members within the specified MemberGroup name
