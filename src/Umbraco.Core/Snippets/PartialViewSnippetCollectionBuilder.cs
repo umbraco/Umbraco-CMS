@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Snippets
 
         protected override IEnumerable<ISnippet> CreateItems(IServiceProvider factory)
         {
-            var embeddedSnippets = new List<ISnippet>();
+            var embeddedSnippets = new List<ISnippet>(base.CreateItems(factory));
 
             // Ignore these
             var filterNames = new List<string>

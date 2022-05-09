@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Snippets
         {
             var hostEnvironment = factory.GetRequiredService<IHostEnvironment>();
 
-            var embeddedSnippets = new List<ISnippet>();
+            var embeddedSnippets = new List<ISnippet>(base.CreateItems(factory));
             var snippetProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
             var embeddedFiles = snippetProvider.GetDirectoryContents(string.Empty)
                                     .Where(x => !x.IsDirectory && x.Name.EndsWith(".cshtml"));

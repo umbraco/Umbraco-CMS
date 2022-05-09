@@ -5,12 +5,6 @@ namespace Umbraco.Cms.Core.Snippets
         public string Name { get; }
         public string Content { get; }
 
-        public Snippet()
-        {
-            Name = string.Empty;
-            Content = string.Empty;
-        }
-
         public Snippet(string name, string content)
         {
             Name = name;
