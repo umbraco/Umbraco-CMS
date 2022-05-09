@@ -27,7 +27,7 @@
 
                   <umb-control-group style="margin-bottom: 20px;" label="@treeHeaders_languages"
                     description="@user_languagesHelp">
-                    <umb-node-preview style="max-width: 100%;" ng-repeat="language in vm.userGroup.languages"
+                    <umb-node-preview style="max-width: 100%;" ng-repeat="language in vm.userGroup.allowedLanguages"
                       icon="language.icon" name="language.name" allow-remove="true"
                       on-remove="vm.removeLanguage($index)">
                     </umb-node-preview>
