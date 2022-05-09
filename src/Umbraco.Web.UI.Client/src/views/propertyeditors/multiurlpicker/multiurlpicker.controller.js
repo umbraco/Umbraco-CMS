@@ -6,6 +6,10 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         }
     };
 
+    $scope.allowAdd = !$scope.readonly;
+    $scope.allowEdit = !$scope.readonly;
+    $scope.allowRemove = !$scope.readonly;
+
     $scope.renderModel = [];
 
     if ($scope.preview) {
@@ -24,6 +28,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
+        disabled: $scope.readonly,
         update: function () {
             setDirty();
         }
@@ -57,19 +62,23 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
-            $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+            $scope.sortableOptions.disabled = $scope.renderModel.length === 1 || $scope.readonly;
             //Update value
             $scope.model.value = $scope.renderModel;
         }
     );
 
     $scope.remove = function ($index) {
+        if (!$scope.allowRemove) return;
+
         $scope.renderModel.splice($index, 1);
 
         setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
+        if (!$scope.allowAdd || !$scope.allowEdit) return;
+
         var target = link ? {
             name: link.name,
             anchor: link.queryString,
