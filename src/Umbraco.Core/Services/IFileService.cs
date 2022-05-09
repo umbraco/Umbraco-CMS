@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
@@ -10,6 +7,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]
         IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
         void CreatePartialViewFolder(string folderPath);
         void CreatePartialViewMacroFolder(string folderPath);
@@ -295,6 +293,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns></returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewMacroSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewMacroSnippetContent(string snippetName);
 
         /// <summary>
@@ -302,6 +301,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns>The content of the partial view.</returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewSnippetContent(string snippetName);
     }
 }
