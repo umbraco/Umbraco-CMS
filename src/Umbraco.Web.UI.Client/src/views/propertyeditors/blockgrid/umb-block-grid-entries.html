@@ -7,7 +7,7 @@
 
         <button type="button"
                 class="btn-reset umb-block-grid__block--create-button"
-                ng-click="vm.blockEditorApi.requestShowCreate(vm.containerLayoutEntry, $index, $event)"
+                ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)"
                 ng-controller="Umbraco.PropertyEditors.BlockGridPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                 ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
             <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
@@ -18,7 +18,6 @@
         <umb-block-grid-entry 
             block-editor-api="vm.blockEditorApi"
             layout-entry="layoutEntry"
-            container-layout-entry="vm.containerLayoutEntry"
             index="$index">
         </umb-block-grid-entry>
 
@@ -30,7 +29,7 @@
                 type="button"
                 class="btn-reset umb-block-grid__create-button umb-outline"
                 ng-disabled="vm.blockEditorApi.internal.availableBlockTypes.length === 0"
-                ng-click="vm.blockEditorApi.requestShowCreate(vm.containerLayoutEntry, vm.entries.length, $event)">
+                ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
             <localize ng-if="vm.blockEditorApi.internal.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
             <localize ng-if="vm.blockEditorApi.internal.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.blockEditorApi.internal.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
         </button>
@@ -38,7 +37,7 @@
                 class="btn-reset umb-block-grid__clipboard-button umb-outline"
                 ng-class="{'--jump': vm.jumpClipboardButton}"
                 ng-disabled="vm.clipboardItems.length === 0"
-                ng-click="vm.blockEditorApi.requestShowClipboard(vm.containerLayoutEntry, vm.entries.length, $event)"
+                ng-click="vm.blockEditorApi.requestShowClipboard(vm.parentBlock, vm.areaKey, vm.entries.length, $event)"
                 localize="title"
                 title="@blockEditor_tabClipboard">
             <umb-icon icon="icon-paste-in" class="icon"></umb-icon>

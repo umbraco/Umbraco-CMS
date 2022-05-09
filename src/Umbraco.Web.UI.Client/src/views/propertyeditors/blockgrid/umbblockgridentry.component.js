@@ -17,7 +17,6 @@
             bindings: {
                 blockEditorApi: "<",
                 layoutEntry: "<",
-                containerLayoutEntry: "<?", 
                 index: "<"
             },
             require: {

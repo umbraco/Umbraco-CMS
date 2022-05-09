@@ -8,13 +8,16 @@
                               block="vm.layoutEntry.$block"
                               index="vm.index"
                               parent-form="vm.blockRowForm">
-            <h2 slot="test">Slotted element test</h2>
+
             <umb-block-grid-entries 
+                ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
                 slot="areas"
                 block-editor-api="vm.blockEditorApi"
-                entries="vm.layoutEntry.$block.layout.children"
-                container-layout-entry="vm.layoutEntry.$block.layout">
+                entries="areaEntry.items"
+                area-key="areaEntry.key"
+                parent-block="vm.layoutEntry.$block">
             </umb-block-grid-entries>
+
         </umb-block-grid-block>
 
         <div class="umb-block-grid__block--actions">
