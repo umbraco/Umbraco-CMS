@@ -173,12 +173,25 @@
 
             // Append the blockObjects to our layout.
             layoutList.forEach(entry => {
+
                 // each layout entry should have a child array,
-                entry.children = entry.children || [];
+                entry.areas = entry.areas || [];
 
                 // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
                 if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
                     var block = getBlockObject(entry);
+
+                    block.config.areas.forEach(areaConfig => {
+                        const areaIndex = entry.areas.findIndex(x => x.key === areaConfig.key);
+                        if(areaIndex === -1) {
+                            entry.areas.push({
+                                key: areaConfig.key,
+                                items: []
+                            })
+                        } else {
+                            initializeLayout(entry.areas[areaIndex].items);
+                        }
+                    });
 
                     // If this entry was not supported by our property-editor it would return 'null'.
                     if (block !== null) {
@@ -270,8 +283,6 @@
 
             if (block === null) return null;
 
-            initializeLayout(entry.children);
-
             if (!block.config.view) {
                 applyDefaultViewForBlock(block);
             } else {
@@ -292,6 +303,18 @@
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
             };
+
+            // TODO: temporary hack to get areas:
+            block.config.areas = [
+                {
+                    key: 'test1',
+                    columnSpan: '6'
+                },
+                {
+                    key: 'test2',
+                    columnSpan: '6'
+                }
+            ]
 
             /** decorator methods, to enable switching out methods without loosing references that would have been made in Block Views codes */
             block.activate = function() {
@@ -339,7 +362,7 @@
             block._copy = copyBlock.bind(null, block);
         }
 
-        function addNewBlock(parentLayoutEntry, index, contentElementTypeKey) {
+        function addNewBlock(parentBlock, areaKey, index, contentElementTypeKey) {
 
             // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.create(contentElementTypeKey);
@@ -347,8 +370,8 @@
                 return false;
             }
 
-            // create array for children.
-            layoutEntry.children = [];
+            // create array for areas.
+            layoutEntry.areas = [];
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
@@ -356,14 +379,33 @@
                 return false;
             }
 
+            blockObject.config.areas.forEach(areaConfig => {
+                //if(layoutEntry.areas.findIndex(x => x.key === areaConfig.key) === -1) {
+                    layoutEntry.areas.push({
+                        key: areaConfig.key,
+                        items: []
+                    })
+                    //initializeLayout(area.items);
+                //}
+            });
+            /*
+            layoutEntry.areas.forEach(area => {
+                initializeLayout(area.items);
+            })
+            */
+
             // If we reach this line, we are good to add the layoutEntry and blockObject to our models.
 
             // Add the Block Object to our layout entry.
             layoutEntry.$block = blockObject;
 
             // add layout entry at the decided location in layout.
-            if(parentLayoutEntry != null) {
-                parentLayoutEntry.children.splice(index, 0, layoutEntry);
+            if(parentBlock != null) {
+                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                if(!area) {
+                    console.error("Could not find area in block creation");
+                }
+                area.items.splice(index, 0, layoutEntry);
             } else {
                 vm.layout.splice(index, 0, layoutEntry);
             }
@@ -379,9 +421,11 @@
                 if(entry.contentUdi === contentUdi) {
                     return {entry: entry, layoutList: layoutList};
                 }
-                const result = getLayoutEntryByContentID(entry.children, contentUdi);
-                if(result !== null) {
-                    return result;
+                for(const area of entry.areas) {
+                    const result = getLayoutEntryByContentID(area.items, contentUdi);
+                    if(result !== null) {
+                        return result;
+                    }
                 }
             }
             return null;
@@ -504,9 +548,7 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        function requestShowCreate(parentLayoutEntry, createIndex, mouseEvent) {
-
-            console.log("requestShowCreate", parentLayoutEntry, createIndex)
+        function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent) {
 
             if (vm.blockTypePicker) {
                 return;
@@ -516,23 +558,23 @@
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
-                wasAdded = addNewBlock(parentLayoutEntry, createIndex, blockType.blockConfigModel.contentElementTypeKey);
+                wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockType.blockConfigModel.contentElementTypeKey);
 
                 if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                    userFlowWhenBlockWasCreated(createIndex);
+                    userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
                 }
             } else {
-                showCreateDialog(parentLayoutEntry, createIndex);
+                showCreateDialog(parentBlock, areaKey, createIndex);
             }
 
         }
         vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(parentLayoutEntry, createIndex, mouseEvent) {
-            showCreateDialog(parentLayoutEntry, createIndex, true);
+        function requestShowClipboard(parentBlock, areaKey, createIndex, mouseEvent) {
+            showCreateDialog(parentBlock, areaKey, createIndex, true);
         }
 
         vm.showCreateDialog = showCreateDialog;
-        function showCreateDialog(parentLayoutEntry, createIndex, openClipboard) {
+        function showCreateDialog(parentBlock, areaKey, createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
                 return;
@@ -557,12 +599,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(parentLayoutEntry, createIndex + indexIncrementor, entry, item.type)) {
+                            if (requestPasteFromClipboard(parentBlock, createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(parentLayoutEntry, createIndex, item.pasteData, item.type);
+                        requestPasteFromClipboard(parentBlock, createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -571,19 +613,20 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var wasAdded = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        wasAdded = addNewBlock(parentLayoutEntry, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
                         if (wasAdded) {
-                            userFlowWhenBlockWasCreated(parentLayoutEntry, createIndex);
+                            userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
                         }
                     }
                 },
                 close: function() {
                     // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
+                        // TODO: handle areas:
                         const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.children[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
                         vm.setBlockFocus(blockOfInterest);
                     }
@@ -603,9 +646,19 @@
             editorService.open(blockPickerModel);
 
         };
-        function userFlowWhenBlockWasCreated(parentLayoutEntry, createIndex) {
+        function userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex) {
             if (vm.layout.length > createIndex) {
-                var blockObject = parentLayoutEntry ? parentLayoutEntry.children[createIndex].$block : vm.layout[createIndex].$block;
+                var blockObject;
+                
+                if (parentBlock) {
+                    var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                    if (!area) {
+                        console.error("Area could not be found...", parentBlock, areaKey)
+                    }
+                    blockObject = area.items[createIndex].$block;
+                } else {
+                    blockObject = vm.layout[createIndex].$block;
+                }
                 if (inlineEditing === true) {
                     blockObject.activate();
                 } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
@@ -743,7 +796,9 @@
                 return false;
             }
 
-            layoutEntry.children = layoutEntry.children || [];
+            layoutEntry.areas = layoutEntry.areas || [];
+
+            // TODO: create areas based on config.
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
@@ -752,11 +807,28 @@
                 return false;
             }
 
+            
+            blockObject.config.areas.forEach(areaConfig => {
+                const areaIndex = entry.areas.findIndex(x => x.key === areaConfig.key)
+                if(areaIndex === -1) {
+                    entry.areas.push({
+                        key: areaConfig.key,
+                        items: []
+                    })
+                } else {
+                    // TODO: Figure how to handle block that contains sub blocks. Maybe they re not copy-able(not included in the copy)
+                    // TODO: move initialization till after pasting is done, so clipboardEntries containint multiple nested blocks can create the blocks before initilizing them..
+                    initializeLayout(entry.areas[areaIndex].items);
+                }
+            });
+
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
 
             // insert layout entry at the decided location in layout.
             if(parentLayoutEntry != null) {
+                // TODO: find right area
+                console.error("TODO: find area...")
                 parentLayoutEntry.children.splice(index, 0, layoutEntry);
             } else {
                 vm.layout.splice(index, 0, layoutEntry);

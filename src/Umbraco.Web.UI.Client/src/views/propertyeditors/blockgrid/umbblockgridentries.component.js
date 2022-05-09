@@ -17,7 +17,8 @@
             bindings: {
                 blockEditorApi: "<",
                 entries: "<",
-                containerLayoutEntry: "<?"
+                areaKey: "<?",
+                parentBlock: "<?"
             },
             require: {
                 valFormManager: "^^valFormManager"

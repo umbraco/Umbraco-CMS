@@ -5,7 +5,7 @@
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridBlock
      * @description
-     * The component to render the view for a block.
+     * The component to render the view for a block in the Block Grid Editor.
      * If a stylesheet is used then this uses a ShadowDom to make a scoped element.
      * This way the backoffice styling does not collide with the block style.
      */
