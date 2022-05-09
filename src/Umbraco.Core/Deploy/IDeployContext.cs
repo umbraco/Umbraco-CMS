@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Deploy
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <typeparam name="T">The type of the item.</typeparam>
         /// <param name="key">The key of the item.</param>
         /// <returns>The item with the specified key and type, if any, else null.</returns>
-        T Item<T>(string key) where T : class;
+        T? Item<T>(string key) where T : class;
 
         ///// <summary>
         ///// Gets the global deployment cancellation token.

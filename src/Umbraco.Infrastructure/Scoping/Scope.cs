@@ -130,6 +130,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     _fscope = fileSystems.Shadow();
                 }
 
+                _acquiredLocks = new Queue<IDistributedLock>();
+
                 return;
             }
 
@@ -1204,7 +1206,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+        {
+            if (_acquiredLocks == null)
+            {
+                throw new InvalidOperationException($"Cannot obtain a read lock as the {nameof(_acquiredLocks)} queue is null.");
+            }
+
+            _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+        }
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1212,6 +1221,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+        {
+            if (_acquiredLocks == null)
+            {
+                throw new InvalidOperationException($"Cannot obtain a write lock as the {nameof(_acquiredLocks)} queue is null.");
+            }
+
+            _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+        }
     }
 }

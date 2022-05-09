@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     {
         ITemplate? Get(string? alias);
 
-        IEnumerable<ITemplate>? GetAll(params string[] aliases);
+        IEnumerable<ITemplate> GetAll(params string[] aliases);
 
-        IEnumerable<ITemplate>? GetChildren(int masterTemplateId);
+        IEnumerable<ITemplate> GetChildren(int masterTemplateId);
 
         IEnumerable<ITemplate> GetDescendants(int masterTemplateId);
     }

@@ -43,6 +43,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
             builder.Services.AddUnique<IMemberGroupRepository, MemberGroupRepository>();
             builder.Services.AddUnique<IMemberRepository, MemberRepository>();
+            builder.Services.AddUnique<IMemberTypeContainerRepository, MemberTypeContainerRepository>();
             builder.Services.AddUnique<IMemberTypeRepository, MemberTypeRepository>();
             builder.Services.AddUnique<INotificationsRepository, NotificationsRepository>();
             builder.Services.AddUnique<IPublicAccessRepository, PublicAccessRepository>();
