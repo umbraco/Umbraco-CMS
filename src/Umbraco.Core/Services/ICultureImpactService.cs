@@ -31,7 +31,7 @@ public interface ICultureImpactService
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    CultureImpact CreateExplicit(string? culture, bool isDefault);
+    CultureImpact CreateImpactExplicit(string? culture, bool isDefault);
 
     /// <summary>
     /// Utility method to return the culture used for invariant property errors based on what cultures are being actively saved,

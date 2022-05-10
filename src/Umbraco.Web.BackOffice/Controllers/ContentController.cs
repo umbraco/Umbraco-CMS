@@ -1669,7 +1669,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             foreach (var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
-                var valid = persistentContent.PublishCulture(_cultureImpactService.CreateExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
+                var valid = persistentContent.PublishCulture(_cultureImpactService.CreateImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
                 if (!valid)
                 {
                     AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");

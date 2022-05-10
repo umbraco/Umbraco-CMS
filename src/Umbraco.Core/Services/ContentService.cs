@@ -1232,7 +1232,7 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IEnumerable<CultureImpact> impacts =
-                    cultures.Select(x => _cultureImpactService.CreateExplicit(x, IsDefaultCulture(allLangs, x)));
+                    cultures.Select(x => _cultureImpactService.CreateImpactExplicit(x, IsDefaultCulture(allLangs, x)));
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1865,7 +1865,7 @@ namespace Umbraco.Cms.Core.Services
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             IProperty[]? invalidProperties = null;
-                            var impact = _cultureImpactService.CreateExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                            var impact = _cultureImpactService.CreateImpactExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                             var tryPublish = d.PublishCulture(impact) &&
                                              _propertyValidationService.Value.IsPropertyDataValid(d,
                                                  out invalidProperties, impact);
@@ -3093,7 +3093,7 @@ namespace Umbraco.Cms.Core.Services
             CultureImpact[] impactsToPublish = culturesPublishing == null
                 ? new[] { _cultureImpactService.CreateImpactInvariant() } // if it's null it's invariant
                 : culturesPublishing.Select(x =>
-                    _cultureImpactService.CreateExplicit(
+                    _cultureImpactService.CreateImpactExplicit(
                         x,
                         allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
                     .ToArray();

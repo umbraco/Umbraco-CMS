@@ -31,7 +31,7 @@ public class CultureImpactService : ICultureImpactService
     public CultureImpact CreateImpactInvariant() => new CultureImpact(null);
 
     /// <inheritdoc/>
-    public CultureImpact CreateExplicit(string? culture, bool isDefault)
+    public CultureImpact CreateImpactExplicit(string? culture, bool isDefault)
     {
         if (culture == null)
         {
