@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -141,8 +138,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             {
                 providerMeta = _databaseProviderMetadata
                     .OrderBy(x => x.SortOrder)
-                    .Where(x => x.SupportsQuickInstall)
-                    .FirstOrDefault(x => x.IsAvailable);
+                    .FirstOrDefault(x => x.SupportsQuickInstall && x.IsAvailable);
 
                 databaseSettings = new DatabaseModel
                 {
@@ -176,7 +172,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             return true;
         }
-
 
         private void Configure(string connectionString, string? providerName, bool installMissingDatabase)
         {

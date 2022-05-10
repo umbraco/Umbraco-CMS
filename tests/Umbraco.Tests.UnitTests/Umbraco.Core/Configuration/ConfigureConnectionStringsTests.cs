@@ -27,7 +27,6 @@ public class ConfigureConnectionStringsTests
         var configuration = configurationBuilder.Build();
 
         var services = new ServiceCollection();
-        services.AddOptions<ConnectionStrings>().Bind(configuration.GetSection("ConnectionStrings"));
         services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
         services.AddSingleton<IConfiguration>(configuration);
 

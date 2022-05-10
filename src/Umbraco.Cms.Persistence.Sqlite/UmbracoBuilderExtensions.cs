@@ -39,21 +39,15 @@ public static class UmbracoBuilderExtensions
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);
 
-
         builder.Services.PostConfigure<ConnectionStrings>(Core.Constants.System.UmbracoConnectionName, opt =>
         {
-            if (!opt.IsConnectionStringConfigured())
+            // SKip empty connection string and other providers
+            if (!opt.IsConnectionStringConfigured() || opt.ProviderName != Constants.ProviderName)
             {
                 return;
             }
 
-            if (opt.ProviderName != Constants.ProviderName)
-            {
-                // Not us.
-                return;
-            }
-
-            // Prevent accidental creation of database files.
+            // Prevent accidental creation of database files
             var connectionStringBuilder = new SqliteConnectionStringBuilder(opt.ConnectionString);
             if (connectionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
             {
