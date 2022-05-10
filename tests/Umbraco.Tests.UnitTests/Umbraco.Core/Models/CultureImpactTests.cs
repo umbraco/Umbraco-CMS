@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -172,19 +171,25 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreSame(BasicImpactService.ImpactInvariant(), impact);
         }
 
-        private CultureImpactService createCultureImpactService(IOptionsMonitor<SecuritySettings> securitySettings = null)
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Edit_Invariant_From_Non_Default_Impacts_Invariant_Properties(bool allowEditInvariantFromNonDefault)
         {
-            if (securitySettings is null)
+            var sut = createCultureImpactService(new SecuritySettings { AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault });
+            var impact = sut.ImpactExplicit("da", false);
+
+            Assert.AreEqual(allowEditInvariantFromNonDefault, impact.ImpactsAlsoInvariantProperties);
+        }
+
+        private CultureImpactService createCultureImpactService(SecuritySettings securitySettings = null)
+        {
+            securitySettings ??= new SecuritySettings
             {
-                var securitySettingsObject = new SecuritySettings
-                {
-                    AllowEditInvariantFromNonDefault = false,
-                };
+                AllowEditInvariantFromNonDefault = false,
+            };
 
-                securitySettings = new TestOptionsMonitor<SecuritySettings>(securitySettingsObject);
-            }
-
-            return new CultureImpactService(securitySettings);
+            return new CultureImpactService(new TestOptionsMonitor<SecuritySettings>(securitySettings));
         }
 
     }
