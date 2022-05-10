@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder? o))
             {
                 return (TBuilder)o;
             }
