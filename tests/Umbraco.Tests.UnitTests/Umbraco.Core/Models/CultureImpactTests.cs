@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_Explicit_Default_Culture()
         {
-            var success = CultureImpact.TryCreate("en-US", true, ContentVariation.Culture, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate("en-US", true, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
             Assert.AreEqual(impact.Culture, "en-US");
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_Explicit_NonDefault_Culture()
         {
-            var success = CultureImpact.TryCreate("en-US", false, ContentVariation.Culture, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate("en-US", false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
             Assert.AreEqual(impact.Culture, "en-US");
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_AllCultures_For_Invariant()
         {
-            var success = CultureImpact.TryCreate("*", false, ContentVariation.Nothing, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate("*", false, ContentVariation.Nothing, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
             Assert.AreEqual(impact.Culture, null);
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_AllCultures_For_Variant()
         {
-            var success = CultureImpact.TryCreate("*", false, ContentVariation.Culture, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate("*", false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
             Assert.AreEqual(impact.Culture, "*");
@@ -149,14 +149,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_Invariant_For_Variant()
         {
-            var success = CultureImpact.TryCreate(null, false, ContentVariation.Culture, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate(null, false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsFalse(success);
         }
 
         [Test]
         public void TryCreate_Invariant_For_Invariant()
         {
-            var success = CultureImpact.TryCreate(null, false, ContentVariation.Nothing, false, out CultureImpact impact);
+            var success = CultureImpact.TryCreate(null, false, ContentVariation.Nothing, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
             Assert.AreSame(CultureImpact.Invariant, impact);

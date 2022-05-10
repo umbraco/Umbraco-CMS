@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -14,6 +12,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
@@ -32,17 +31,24 @@ namespace Umbraco.Cms.Core.Services
         private readonly ILogger<ContentService> _logger;
         private readonly Lazy<IPropertyValidationService> _propertyValidationService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly ICultureImpactService _cultureImpactService;
         private IQuery<IContent>? _queryNotTrashed;
 
         #region Constructors
 
-        public ContentService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+        public ContentService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
-            IDocumentRepository documentRepository, IEntityRepository entityRepository,
+            IDocumentRepository documentRepository,
+            IEntityRepository entityRepository,
             IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository,
+            IContentTypeRepository contentTypeRepository,
+            IDocumentBlueprintRepository documentBlueprintRepository,
             ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper)
+            Lazy<IPropertyValidationService> propertyValidationService,
+            IShortStringHelper shortStringHelper,
+            ICultureImpactService cultureImpactService)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -53,7 +59,37 @@ namespace Umbraco.Cms.Core.Services
             _languageRepository = languageRepository;
             _propertyValidationService = propertyValidationService;
             _shortStringHelper = shortStringHelper;
+            _cultureImpactService = cultureImpactService;
             _logger = loggerFactory.CreateLogger<ContentService>();
+        }
+
+        [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
+        public ContentService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IDocumentRepository documentRepository,
+            IEntityRepository entityRepository,
+            IAuditRepository auditRepository,
+            IContentTypeRepository contentTypeRepository,
+            IDocumentBlueprintRepository documentBlueprintRepository,
+            ILanguageRepository languageRepository,
+            Lazy<IPropertyValidationService> propertyValidationService,
+            IShortStringHelper shortStringHelper)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                documentRepository,
+                entityRepository,
+                auditRepository,
+                contentTypeRepository,
+                documentBlueprintRepository,
+                languageRepository,
+                propertyValidationService,
+                shortStringHelper,
+                StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
+        {
         }
 
         #endregion
@@ -1135,7 +1171,7 @@ namespace Umbraco.Cms.Core.Services
                 // if culture is '*', then publish them all (including variants)
 
                 //this will create the correct culture impact even if culture is * or null
-                var impact = CultureImpact.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                var impact = _cultureImpactService.Create(culture, IsDefaultCulture(allLangs, culture), content);
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1196,7 +1232,7 @@ namespace Umbraco.Cms.Core.Services
                 }
 
                 IEnumerable<CultureImpact> impacts =
-                    cultures.Select(x => CultureImpact.Explicit(x, IsDefaultCulture(allLangs, x)));
+                    cultures.Select(x => _cultureImpactService.CreateExplicit(x, IsDefaultCulture(allLangs, x)));
 
                 // publish the culture(s)
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
@@ -1829,7 +1865,7 @@ namespace Umbraco.Cms.Core.Services
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             IProperty[]? invalidProperties = null;
-                            var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                            var impact = _cultureImpactService.CreateExplicit(culture, IsDefaultCulture(allLangs.Value, culture));
                             var tryPublish = d.PublishCulture(impact) &&
                                              _propertyValidationService.Value.IsPropertyDataValid(d,
                                                  out invalidProperties, impact);
@@ -1917,14 +1953,14 @@ namespace Umbraco.Cms.Core.Services
             {
                 return culturesToPublish.All(culture =>
                 {
-                    var impact = CultureImpact.Create(culture, IsDefaultCulture(allLangs, culture), content);
+                    var impact = _cultureImpactService.Create(culture, IsDefaultCulture(allLangs, culture), content);
                     return content.PublishCulture(impact) &&
                            _propertyValidationService.Value.IsPropertyDataValid(content, out _, impact);
                 });
             }
 
-            return content.PublishCulture(CultureImpact.Invariant)
-                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, CultureImpact.Invariant);
+            return content.PublishCulture(_cultureImpactService.CreateInvariant())
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactService.CreateInvariant());
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -3055,10 +3091,12 @@ namespace Umbraco.Cms.Core.Services
             var variesByCulture = content.ContentType.VariesByCulture();
 
             CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] {CultureImpact.Invariant} //if it's null it's invariant
+                ? new[] { _cultureImpactService.CreateInvariant() } // if it's null it's invariant
                 : culturesPublishing.Select(x =>
-                    CultureImpact.Explicit(x,
-                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory))).ToArray();
+                    _cultureImpactService.CreateExplicit(
+                        x,
+                        allLangs.Any(lang => lang.IsoCode.InvariantEquals(x) && lang.IsMandatory)))
+                    .ToArray();
 
             // publish the culture(s)
             if (!impactsToPublish.All(content.PublishCulture))
