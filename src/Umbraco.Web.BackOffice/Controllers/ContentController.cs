@@ -796,6 +796,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // we will continue to save if model state is invalid, however we cannot save if critical data is missing.
             if (!ModelState.IsValid)
             {
+                // Don't try and save if we do not have access
+                if (ModelState.Keys.Contains(Constants.ModelStateErrorKeys.PermissionError))
+                {
+                    var forDisplay = mapToDisplay(contentItem.PersistedContent);
+                    return ValidationProblem(forDisplay, ModelState);
+                }
+
                 // check for critical data validation issues, we can't continue saving if this data is invalid
                 if (!passesCriticalValidationRules)
                 {

@@ -393,6 +393,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
             var startNodes = Database.Fetch<UserStartNodeDto>(sql);
 
+            // get groups2languages
+
+            sql = SqlContext.Sql()
+                .Select<UserGroup2LanguageDto>()
+                .From<UserGroup2LanguageDto>()
+                .WhereIn<UserGroup2LanguageDto>(x => x.UserGroupId, groupIds);
+
+            var groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
+                .GroupBy(x => x.UserGroupId)
+                .ToDictionary(x => x.Key, x => x);
+
             // map groups
 
             foreach (var user2group in users2groups)
@@ -418,6 +429,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             {
                 if (groups2apps.TryGetValue(group.Id, out var list))
                     group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
+            }
+
+            // map languages
+
+            foreach (var group in groups.Values)
+            {
+                if (groups2languages.TryGetValue(group.Id, out var list))
+                {
+                    group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
+                }
             }
         }
 
