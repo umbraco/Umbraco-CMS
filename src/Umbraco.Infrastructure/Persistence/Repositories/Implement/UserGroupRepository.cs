@@ -202,7 +202,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             AppendGroupBy(sql);
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
-            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+            List<UserGroupDto> dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+
+            IDictionary<int, List<UserGroup2LanguageDto>> dic = GetAllUserGroupLanguageGrouped();
+
+            foreach (UserGroupDto dto in dtos)
+            {
+                dic.TryGetValue(dto.Id, out var userGroup2LanguageDtos);
+                dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new();
+            }
+
             return dtos.Select(x=>UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
@@ -369,6 +378,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<UserGroup2LanguageDto>()
                 .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
             return Database.Fetch<UserGroup2LanguageDto>(query);
+        }
+
+        private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
+        {
+            Sql<ISqlContext> query = Sql()
+                .Select<UserGroup2LanguageDto>()
+                .From<UserGroup2LanguageDto>();
+            List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
+            return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
         }
 
         #endregion
