@@ -1959,8 +1959,8 @@ namespace Umbraco.Cms.Core.Services
                 });
             }
 
-            return content.PublishCulture(_cultureImpactService.CreateInvariant())
-                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactService.CreateInvariant());
+            return content.PublishCulture(_cultureImpactService.CreateImpactInvariant())
+                   && _propertyValidationService.Value.IsPropertyDataValid(content, out _, _cultureImpactService.CreateImpactInvariant());
         }
 
         // utility 'ShouldPublish' func used by SaveAndPublishBranch
@@ -3091,7 +3091,7 @@ namespace Umbraco.Cms.Core.Services
             var variesByCulture = content.ContentType.VariesByCulture();
 
             CultureImpact[] impactsToPublish = culturesPublishing == null
-                ? new[] { _cultureImpactService.CreateInvariant() } // if it's null it's invariant
+                ? new[] { _cultureImpactService.CreateImpactInvariant() } // if it's null it's invariant
                 : culturesPublishing.Select(x =>
                     _cultureImpactService.CreateExplicit(
                         x,

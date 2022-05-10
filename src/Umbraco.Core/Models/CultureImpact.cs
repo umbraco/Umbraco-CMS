@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="savingCultures"></param>
         /// <param name="defaultCulture"></param>
         /// <returns></returns>
+        [Obsolete("Use CultureImpactService instead, scheduled for removal in v12")]
         public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures, string? defaultCulture)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
         /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
-        private CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
+        internal CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
         {
             if (culture != null && culture.IsNullOrWhiteSpace())
             {
@@ -65,11 +66,13 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the impact of 'all' cultures (including the invariant culture).
         /// </summary>
+        [Obsolete("Use ICultureImpactService.CreateImpactAll instead, scheduled for removal in V12")]
         public static CultureImpact All { get; } = new CultureImpact("*");
 
         /// <summary>
         /// Gets the impact of the invariant culture.
         /// </summary>
+        [Obsolete("Use ICultureImpactService.CreateInvariant instead, scheduled for removal in V12")]
         public static CultureImpact Invariant { get; } = new CultureImpact(null);
 
         /// <summary>
@@ -78,7 +81,8 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
         /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
-        public static CultureImpact Explicit(string? culture, bool isDefault, bool allowEditInvariantFromNonDefault)
+        [Obsolete("Use ICultureImpactService instead.")]
+        public static CultureImpact Explicit(string? culture, bool isDefault)
         {
             if (culture == null)
             {
@@ -95,12 +99,8 @@ namespace Umbraco.Cms.Core.Models
                 throw new ArgumentException("Culture \"*\" is not explicit.");
             }
 
-            return new CultureImpact(culture, isDefault, allowEditInvariantFromNonDefault);
+            return new CultureImpact(culture, isDefault);
         }
-
-        [Obsolete("Use ICultureImpactService insead.")]
-        public static CultureImpact Explicit(string? culture, bool isDefault)
-            => Explicit(culture, isDefault, false);
 
         /// <summary>
         /// Creates an impact instance representing the impact of a culture set,
@@ -113,14 +113,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
-        public static CultureImpact? Create(string culture, bool isDefault, IContent content, bool allowEditInvariantFromNonDefault)
-        {
-            // throws if not successful
-            TryCreate(culture, isDefault, content.ContentType.Variations, true, allowEditInvariantFromNonDefault, out CultureImpact? impact);
-            return impact;
-        }
-
-        [Obsolete("Use ICultureImpactService instead.")]
+        [Obsolete("Use ICultureImpactService instead, scheduled for removal in V12")]
         public static CultureImpact? Create(string culture, bool isDefault, IContent content)
         {
             // throws if not successful
@@ -142,6 +135,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
+        // TODO: Remove this once Create() can be removed (V12), this already lives in CultureImpactService
         internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, bool editInvariantFromNonDefault, out CultureImpact? impact)
         {
             impact = null;

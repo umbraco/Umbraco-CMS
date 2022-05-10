@@ -24,7 +24,7 @@ public interface ICultureImpactService
     /// <summary>
     /// Gets the impact of the invariant culture.
     /// </summary>
-    CultureImpact CreateInvariant();
+    CultureImpact CreateImpactInvariant();
 
     /// <summary>
     /// Creates an impact instance representing the impact of a specific culture.
