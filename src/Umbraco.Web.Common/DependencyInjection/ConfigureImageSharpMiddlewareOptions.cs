@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Headers;
@@ -12,94 +10,94 @@ using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
 
-namespace Umbraco.Cms.Web.Common.DependencyInjection
+namespace Umbraco.Cms.Web.Common.DependencyInjection;
+
+/// <summary>
+///     Configures the ImageSharp middleware options.
+/// </summary>
+/// <seealso cref="IConfigureOptions{ImageSharpMiddlewareOptions}" />
+public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<ImageSharpMiddlewareOptions>
 {
+    private readonly Configuration _configuration;
+    private readonly ImagingSettings _imagingSettings;
+    private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
+
     /// <summary>
-    /// Configures the ImageSharp middleware options.
+    ///     Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
     /// </summary>
-    /// <seealso cref="IConfigureOptions{ImageSharpMiddlewareOptions}" />
-    public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<ImageSharpMiddlewareOptions>
+    /// <param name="configuration">The ImageSharp configuration.</param>
+    /// <param name="imagingSettings">The Umbraco imaging settings.</param>
+    /// <param name="imageUrlTokenGenerator">The image URL token generator.</param>
+    public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings, IImageUrlTokenGenerator imageUrlTokenGenerator)
     {
-        private readonly Configuration _configuration;
-        private readonly ImagingSettings _imagingSettings;
-        private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
+        _configuration = configuration;
+        _imagingSettings = imagingSettings.Value;
+        _imageUrlTokenGenerator = imageUrlTokenGenerator;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
-        /// </summary>
-        /// <param name="configuration">The ImageSharp configuration.</param>
-        /// <param name="imagingSettings">The Umbraco imaging settings.</param>
-        public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings, IImageUrlTokenGenerator imageUrlTokenGenerator)
+    /// <inheritdoc />
+    public void Configure(ImageSharpMiddlewareOptions options)
+    {
+        options.Configuration = _configuration;
+
+        options.HMACSecretKey = _imagingSettings.HMACSecretKey;
+        options.BrowserMaxAge = _imagingSettings.Cache.BrowserMaxAge;
+        options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
+        options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
+
+        // Use the image URL token generator to compute the HMAC
+        options.OnComputeHMACAsync = (context, _) =>
         {
-            _configuration = configuration;
-            _imagingSettings = imagingSettings.Value;
-            _imageUrlTokenGenerator = imageUrlTokenGenerator;
-        }
+            string imageUrl = UriHelper.BuildRelative(context.Context.Request.PathBase, context.Context.Request.Path);
 
-        /// <inheritdoc />
-        public void Configure(ImageSharpMiddlewareOptions options)
+            return Task.FromResult(_imageUrlTokenGenerator.GetImageUrlToken(imageUrl, context.Commands));
+        };
+
+        // Use configurable maximum width and height
+        options.OnParseCommandsAsync = context =>
         {
-            options.Configuration = _configuration;
-
-            options.HMACSecretKey = _imagingSettings.HMACSecretKey;
-            options.BrowserMaxAge = _imagingSettings.Cache.BrowserMaxAge;
-            options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
-            options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
-
-            // Use the image URL token generator to compute the HMAC
-            options.OnComputeHMACAsync = (context, _) =>
+            if (context.Commands.Count == 0 || _imagingSettings.HMACSecretKey?.Length > 0)
             {
-                string imageUrl = UriHelper.BuildRelative(context.Context.Request.PathBase, context.Context.Request.Path);
-
-                return Task.FromResult(_imageUrlTokenGenerator.GetImageUrlToken(imageUrl, context.Commands));
-            };
-
-            // Use configurable maximum width and height
-            options.OnParseCommandsAsync = context =>
-            {
-                if (context.Commands.Count == 0 || _imagingSettings.HMACSecretKey?.Length > 0)
-                {
-                    // Nothing to parse or using HMAC authentication
-                    return Task.CompletedTask;
-                }
-
-                int width = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
-                if (width <= 0 || width > _imagingSettings.Resize.MaxWidth)
-                {
-                    context.Commands.Remove(ResizeWebProcessor.Width);
-                }
-
-                int height = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
-                if (height <= 0 || height > _imagingSettings.Resize.MaxHeight)
-                {
-                    context.Commands.Remove(ResizeWebProcessor.Height);
-                }
-
+                // Nothing to parse or using HMAC authentication
                 return Task.CompletedTask;
-            };
+            }
 
-            // Change Cache-Control header when cache buster value is present
-            options.OnPrepareResponseAsync = context =>
+            int width = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
+            if (width <= 0 || width > _imagingSettings.Resize.MaxWidth)
             {
-                if (context.Request.Query.ContainsKey("rnd") || context.Request.Query.ContainsKey("v"))
+                context.Commands.Remove(ResizeWebProcessor.Width);
+            }
+
+            int height = context.Parser.ParseValue<int>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
+            if (height <= 0 || height > _imagingSettings.Resize.MaxHeight)
+            {
+                context.Commands.Remove(ResizeWebProcessor.Height);
+            }
+
+            return Task.CompletedTask;
+        };
+
+        // Change Cache-Control header when cache buster value is present
+        options.OnPrepareResponseAsync = context =>
+        {
+            if (context.Request.Query.ContainsKey("rnd") || context.Request.Query.ContainsKey("v"))
+            {
+                ResponseHeaders headers = context.Response.GetTypedHeaders();
+
+                CacheControlHeaderValue cacheControl = headers.CacheControl ?? new CacheControlHeaderValue()
                 {
-                    ResponseHeaders headers = context.Response.GetTypedHeaders();
+                    Public = true
+                };
 
-                    CacheControlHeaderValue cacheControl = headers.CacheControl ?? new CacheControlHeaderValue()
-                    {
-                        Public = true
-                    };
+                // ImageSharp enables cache revalidation by default, so disable and add immutable directive
+                cacheControl.MustRevalidate = false;
+                cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
 
-                    // ImageSharp enables cache revalidation by default, so disable and add immutable directive
-                    cacheControl.MustRevalidate = false;
-                    cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+                // Set updated value
+                headers.CacheControl = cacheControl;
+            }
 
-                    // Set updated value
-                    headers.CacheControl = cacheControl;
-                }
-
-                return Task.CompletedTask;
-            };
-        }
+            return Task.CompletedTask;
+        };
     }
 }
