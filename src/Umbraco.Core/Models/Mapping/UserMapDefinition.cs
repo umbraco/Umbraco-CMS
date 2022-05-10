@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
@@ -33,9 +35,18 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly ILocalizationService _localizationService;
 
-        public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator, ILocalizationService localizationService)
+        public UserMapDefinition(
+            ILocalizedTextService textService,
+            IUserService userService,
+            IEntityService entityService,
+            ISectionService sectionService,
+            AppCaches appCaches,
+            ActionCollection actions,
+            IOptions<GlobalSettings> globalSettings,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            ILocalizationService localizationService)
         {
             _sectionService = sectionService;
             _entityService = entityService;
@@ -48,6 +59,32 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _shortStringHelper = shortStringHelper;
             _imageUrlGenerator = imageUrlGenerator;
             _localizationService = localizationService;
+        }
+        [Obsolete("Please use constructor that takes an ILocalizationService instead")]
+        public UserMapDefinition(
+            ILocalizedTextService textService,
+            IUserService userService,
+            IEntityService entityService,
+            ISectionService sectionService,
+            AppCaches appCaches,
+            ActionCollection actions,
+            IOptions<GlobalSettings> globalSettings,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IImageUrlGenerator imageUrlGenerator)
+        : this(
+            textService,
+            userService,
+            entityService,
+            sectionService,
+            appCaches,
+            actions,
+            globalSettings,
+            mediaFileManager,
+            shortStringHelper,
+            imageUrlGenerator,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+        {
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
