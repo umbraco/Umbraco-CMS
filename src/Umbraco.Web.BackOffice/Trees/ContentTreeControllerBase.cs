@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -31,6 +33,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IUserService _userService;
         private readonly IDataTypeService _dataTypeService;
         private readonly AppCaches _appCaches;
+        private readonly ILocalizationService _localizationService;
         public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
 
@@ -45,8 +48,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IUserService userService,
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator,
-            AppCaches appCaches
-            )
+            AppCaches appCaches,
+            ILocalizationService localizationService)
             : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _entityService = entityService;
@@ -56,7 +59,36 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _userService = userService;
             _dataTypeService = dataTypeService;
             _appCaches = appCaches;
+            _localizationService = localizationService;
             MenuItemCollectionFactory = menuItemCollectionFactory;
+        }
+
+        protected ContentTreeControllerBase(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEntityService entityService,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            ILogger<ContentTreeControllerBase> logger,
+            ActionCollection actionCollection,
+            IUserService userService,
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator,
+            AppCaches appCaches)
+            : this(
+                localizedTextService,
+                umbracoApiControllerTypeCollection,
+                menuItemCollectionFactory,
+                entityService,
+                backofficeSecurityAccessor,
+                logger,
+                actionCollection,
+                userService,
+                dataTypeService,
+                eventAggregator,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+        {
         }
 
 
@@ -530,8 +562,28 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <returns></returns>
         internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, string? culture)
         {
+            var userGroups = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+            if (userGroups is null)
+            {
+                return false;
+            }
+
+            bool hasAccess = false;
+            var language = _localizationService.GetLanguageByIsoCode(culture);
+
+            if (language is null)
+            {
+                return false;
+            }
+            foreach (var group in userGroups)
+            {
+                if (!group.AllowedLanguages.Any() || group.AllowedLanguages.Contains(language.Id))
+                {
+                    hasAccess = true;
+                }
+            }
             // TODO: At some stage when we implement permissions on languages we'll need to take care of culture
-            return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
+            return hasAccess && allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
         }
 
 
