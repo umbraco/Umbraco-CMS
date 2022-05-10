@@ -9,7 +9,7 @@ namespace Umbraco.Extensions
     {
         public static IUmbracoBuilder AddWebMappingProfiles(this IUmbracoBuilder builder)
         {
-            builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()?
+            builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<ContentMapDefinition>()
                 .Add<MediaMapDefinition>()
                 .Add<MemberMapDefinition>();
