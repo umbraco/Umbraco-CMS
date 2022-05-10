@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +23,6 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -48,7 +45,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
-        private readonly Dictionary<Type, ICollectionBuilder?> _builders = new Dictionary<Type, ICollectionBuilder?>();
+        private readonly Dictionary<Type, ICollectionBuilder> _builders = new Dictionary<Type, ICollectionBuilder>();
 
         public IServiceCollection Services { get; }
 
@@ -101,18 +98,17 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
         /// <returns>The collection builder.</returns>
-        public TBuilder? WithCollectionBuilder<TBuilder>()
+        public TBuilder WithCollectionBuilder<TBuilder>()
             where TBuilder : ICollectionBuilder
         {
             Type typeOfBuilder = typeof(TBuilder);
 
-            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder? o))
+            if (_builders.TryGetValue(typeOfBuilder, out ICollectionBuilder o))
             {
-                return (TBuilder?)o;
+                return (TBuilder)o;
             }
 
-            TBuilder? builder;
-
+            TBuilder builder;
             if (typeof(TBuilder).GetConstructor(Type.EmptyTypes) != null)
             {
                 builder = Activator.CreateInstance<TBuilder>();
@@ -120,7 +116,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             else if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
             {
                 // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
-                builder = (TBuilder?)Activator.CreateInstance(typeof(TBuilder), this);
+                builder = (TBuilder)Activator.CreateInstance(typeof(TBuilder), this)!;
             }
             else
             {
@@ -133,9 +129,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         public void Build()
         {
-            foreach (ICollectionBuilder? builder in _builders.Values)
+            foreach (ICollectionBuilder builder in _builders.Values)
             {
-                builder?.RegisterWith(Services);
+                builder.RegisterWith(Services);
             }
 
             _builders.Clear();
