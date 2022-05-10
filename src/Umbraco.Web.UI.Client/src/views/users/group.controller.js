@@ -14,6 +14,8 @@
     vm.page.rootIcon = "icon-folder";
     vm.page.submitButtonLabelKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
 
+    vm.languageIcon = "icon-globe";
+
     vm.userGroup = {};
     vm.labels = {};
     vm.showBackButton = !infiniteMode;
