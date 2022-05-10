@@ -291,7 +291,8 @@ namespace Umbraco.Extensions
 
                 // maybe the specified culture did not impact the invariant culture, so PublishValues
                 // above would skip it, yet it *also* impacts invariant properties
-                if (impact.ImpactsAlsoInvariantProperties)
+                if (impact.ImpactsAlsoInvariantProperties &&
+                    (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
                 {
                     property.PublishValues(null);
                 }
