@@ -155,9 +155,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return prop;
         }
 
-        internal IDictionary<string, bool> GetMemberGroupValue(string? username)
+        internal IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            IEnumerable<string>? userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
+            IEnumerable<string> userRoles = _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
             var result = _memberGroupService.GetAll()

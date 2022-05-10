@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a collection of <see cref="IMedia"/> objects, which reside at the first level / root
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
-        IEnumerable<IMedia>? GetRootMedia();
+        IEnumerable<IMedia> GetRootMedia();
 
         /// <summary>
         /// Gets a collection of an <see cref="IMedia"/> objects, which resides in the Recycle Bin
@@ -338,7 +338,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the media.</param>
         /// <returns>The content of the media.</returns>
-        Stream? GetMediaFileContentStream(string filepath);
+        Stream GetMediaFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a media.

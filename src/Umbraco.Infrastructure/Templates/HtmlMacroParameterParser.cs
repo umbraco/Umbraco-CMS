@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
             foreach (var macroGridControl in macroGridControls)
             {
                 // Deserialise JSON of Macro Grid Control to a class
-                var gridMacro = macroGridControl.Value.ToObject<GridMacro>();
+                var gridMacro = macroGridControl.Value?.ToObject<GridMacro>();
                 // Collect any macro parameters that contain the media udi format
                 if (gridMacro is not null && gridMacro.MacroParameters is not null && gridMacro.MacroParameters.Any())
                 {

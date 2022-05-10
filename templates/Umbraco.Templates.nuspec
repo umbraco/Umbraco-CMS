@@ -27,5 +27,6 @@
       <file src="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**" target="UmbracoProject\Views\Partials\blocklist" />
       <file src="..\src\Umbraco.Web.UI\Views\Partials\grid\**" target="UmbracoProject\Views\Partials\grid" />
       <file src="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml" target="UmbracoProject\Views\_ViewImports.cshtml" />
+      <file src="..\src\Umbraco.Web.UI\wwwroot\favicon.ico" target="UmbracoProject\wwwroot" />
   </files>
 </package>
