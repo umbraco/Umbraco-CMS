@@ -1,0 +1,23 @@
+
+
+
+.umb-block-grid__layout-container {
+    display: grid;
+    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
+    grid-gap: 10px;
+    grid-auto-flow: row;
+}
+
+.umb-block-grid__layout-item {
+    grid-column: span var(--umb-block-grid--item-column-span, var(--umb-block-grid--grid-columns, 1));
+}
+
+.umb-block-grid__layout-item[data-new-line] {
+    grid-column-start: 1;
+}
+
+/*
+.umb-block-grid__layout-item[data-col-span='4'] {
+    grid-column: span 4;
+}
+*/

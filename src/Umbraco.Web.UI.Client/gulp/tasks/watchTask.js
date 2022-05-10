@@ -8,6 +8,7 @@ var MergeStream = require('merge-stream');
 
 var processJs = require('../util/processJs');
 var processLess = require('../util/processLess');
+var processCss = require('../util/processCss');
 
 var {js} = require('./js');
 
@@ -19,6 +20,13 @@ function watchTask(cb) {
     _.forEach(config.sources.js, function (group) {
         if(group.watch !== false) {
             watch(group.files, { ignoreInitial: true, interval: watchInterval }, function JS_Group_Compile() { return processJs(group.files, group.out);});
+        }
+    });
+
+    //Setup a watcher for all groups of CSS files
+    _.forEach(config.sources.css, function (group) {
+        if(group.watch !== false) {
+            watch(group.watch, { ignoreInitial: true, interval: watchInterval }, function Css_Group_Compile() { return processCss(group.files, group.out); });
         }
     });
 

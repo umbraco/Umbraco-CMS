@@ -19,9 +19,6 @@
                 entries: "<",
                 areaKey: "<?",
                 parentBlock: "<?"
-            },
-            require: {
-                valFormManager: "^^valFormManager"
             }
         }
     );

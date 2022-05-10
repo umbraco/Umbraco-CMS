@@ -19,6 +19,10 @@ module.exports = {
         }
     },
     sources: {
+        // css files used in backoffice
+        css: {
+            blockgridlayout: { files: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", watch: "./src/views/propertyeditors/blockgrid/blockgridlayout.css", out: "blockgridlayout.css" }
+        },
 
         // less files used by backoffice and preview
         // processed in the less task
@@ -27,7 +31,8 @@ module.exports = {
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.min.css" },
             umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.min.css" },
-            rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
+            rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" },
+            blockgridui: { files: "./src/views/propertyeditors/blockgrid/blockgridui.less", watch: "./src/views/propertyeditors/blockgrid/blockgridui.less", out: "blockgridui.css" }
         },
 
         // js files for backoffice

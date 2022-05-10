@@ -43,6 +43,8 @@
 
         var vm = this;
 
+        vm.layoutStylesheet = "assets/css/blockgridlayout.css";
+
         vm.loading = true;
         vm.currentBlockInFocus = null;
         vm.setBlockFocus = function (block) {
@@ -172,38 +174,12 @@
             var invalidLayoutItems = [];
 
             // Append the blockObjects to our layout.
-            layoutList.forEach(entry => {
+            layoutList.forEach(layoutEntry => {
 
-                // each layout entry should have a child array,
-                entry.areas = entry.areas || [];
-
-                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
-                if (entry.$block === undefined || entry.$block === null || entry.$block.data === undefined) {
-                    var block = getBlockObject(entry);
-
-                    block.config.areas.forEach(areaConfig => {
-                        const areaIndex = entry.areas.findIndex(x => x.key === areaConfig.key);
-                        if(areaIndex === -1) {
-                            entry.areas.push({
-                                key: areaConfig.key,
-                                items: []
-                            })
-                        } else {
-                            initializeLayout(entry.areas[areaIndex].items);
-                        }
-                    });
-
-                    // If this entry was not supported by our property-editor it would return 'null'.
-                    if (block !== null) {
-                        entry.$block = block;
-                    }
-                    else {
-                        // then we need to filter this out and also update the underlying model. This could happen if the data
-                        // is invalid for some reason or the data structure has changed.
-                        invalidLayoutItems.push(entry);
-                    }
-                } else {
-                    updateBlockObject(entry.$block);
+                var block = initializeLayoutEntry(layoutEntry);
+                if(!block) {
+                    // then we need to filter this out and also update the underlying model. This could happen if the data is invalid.
+                    invalidLayoutItems.push(layoutEntry);
                 }
             });
 
@@ -214,6 +190,51 @@
                     layoutList.splice(index, 1);
                 }
             });
+        }
+
+        function initializeLayoutEntry(layoutEntry) {
+
+            // each layoutEntry should have a child array,
+            layoutEntry.areas = layoutEntry.areas || [];
+
+            // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
+            if (layoutEntry.$block === undefined || layoutEntry.$block === null || layoutEntry.$block.data === undefined) {
+                var block = getBlockObject(layoutEntry);
+
+                // If this entry was not supported by our property-editor it would return 'null'.
+                if (block !== null) {
+                    layoutEntry.$block = block;
+                } else {
+                    return null;
+                }
+                
+                block.config.areas.forEach(areaConfig => {
+                    const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
+                    if(areaIndex === -1) {
+                        layoutEntry.areas.push({
+                            key: areaConfig.key,
+                            items: []
+                        })
+                    } else {
+                        initializeLayout(layoutEntry.areas[areaIndex].items);
+                    }
+                });
+
+                // if no columnSpan, then we set one:
+                if (!layoutEntry.columnSpan) {
+                    layoutEntry.columnSpan = 4;
+                }
+                // if no rowSpan, then we set one:
+                if (!layoutEntry.rowSpan) {
+                    layoutEntry.rowSpan = 1;
+                }
+
+                
+            } else {
+                updateBlockObject(layoutEntry.$block);
+            }
+
+            return layoutEntry.$block;
         }
 
         function onLoaded() {
@@ -549,6 +570,8 @@
 
         vm.requestShowCreate = requestShowCreate;
         function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent) {
+
+            console.log("requestShowCreate")
 
             if (vm.blockTypePicker) {
                 return;
@@ -894,14 +917,14 @@
             cursor: "grabbing",
             cancel: "input,textarea,select,option",
 
-            //appendTo: ".umb-block-grid__wrapper",
-            containment: ".umb-el-wrap",
+            //appendTo: ".umb-block-grid__layout-container",
+            //containment: ".umb-el-wrap",
 
             connectWith: ".umb-block-grid__layout-container",
             handle: ".blockelement__draggable-element",
             classes: ".blockelement--dragging",
             items: '.umb-block-grid__layout-item',
-            placeholder: "umb-block-grid__layout-sort-placeholder",
+            placeholder: "umb-block-grid__layout-item-placeholder umb-block-grid__layout-item",
             //forcePlaceholderSize: true,
 
             //connectWith: ".umb-group-builder__tabs",
@@ -913,7 +936,12 @@
             tolerance: "pointer",
             scroll: true,
             start: function(event, ui) {
-                ui.placeholder.css("grid-column", "span 4");// TODO: get right width.
+                const layoutEntry = ui.item.sortable.model.$block.layout;
+                ui.placeholder.css("--umb-block-grid--item-column-span", layoutEntry.columnSpan);
+                ui.placeholder.css("--umb-block-grid--item-row-span", layoutEntry.rowSpan);
+
+                console.log(ui.item.sortable.model.$block.layout);
+                console.log(ui.placeholder[0]);
             },
             accept: function (sourceItemHandleScope, destSortableScope) {
                 return true;
