@@ -12,7 +12,9 @@ function umbPropEditor(umbPropEditorHelper) {
             scope: {
                 model: "=",
                 isPreValue: "@",
-                preview: "<"
+                preview: "<",
+                locked: "<?",
+                onUnlock: "&?"
             },
             
             require: ["^^form", "?^umbProperty"],
@@ -40,6 +42,12 @@ function umbPropEditor(umbPropEditorHelper) {
                         scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
                     }
                 );
+
+                scope.unlock = function () {
+                    if (scope.onUnlock) {
+                        scope.onUnlock();
+                    }
+                };
 
                 attrs.$observe('readonly', (value) => {
                     scope.readonly = value !== undefined;

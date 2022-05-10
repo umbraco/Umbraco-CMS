@@ -14,14 +14,14 @@
                     show-inherit="propertyEditorDisabled(property)"
                     inherits-from="defaultVariant.displayName">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
-                        <umb-property-editor
-                            model="property"
-                            preview="propertyEditorDisabled(property)"
-                            ng-attr-readonly="{{content.language.culture === 'da-DK' || undefined}}">
-                            <!-- TODO: Update with correct check for readonly -->
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        locked="propertyEditorDisabled(property)"
+                        on-unlock="unlockInvariantValue(property)"
+                        ng-attr-readonly="{{ propertyEditorDisabled(property) || undefined}}">
+                        <!--TODO: Update with language permission check for readonly -->
+                    </umb-property-editor>
+                    
                 </umb-property>
             </umb-box-content>
         </umb-box>
@@ -46,14 +46,13 @@
                     show-inherit="propertyEditorDisabled(property)"
                     inherits-from="defaultVariant.displayName">
 
-                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
-                        <umb-property-editor
-                            model="property"
-                            preview="propertyEditorDisabled(property)"
-                            ng-attr-readonly="{{content.language.culture === 'da-DK' || undefined}}">
-                            <!--TODO: Update with correct check for readonly -->
-                        </umb-property-editor>
-                    </div>
+                    <umb-property-editor
+                        model="property"
+                        locked="propertyEditorDisabled(property)"
+                        on-unlock="unlockInvariantValue(property)"
+                        ng-attr-readonly="{{propertyEditorDisabled(property) || undefined}}">
+                        <!--TODO: Update with language permission check for readonly -->
+                    </umb-property-editor>
 
                 </umb-property>
             </div>
