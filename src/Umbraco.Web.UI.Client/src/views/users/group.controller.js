@@ -20,6 +20,7 @@
 
     vm.goToPage = goToPage;
     vm.openLanguagePicker = openLanguagePicker;
+    vm.removeLanguage = removeLanguage;
     vm.openSectionPicker = openSectionPicker;
     vm.openContentPicker = openContentPicker;
     vm.openMediaPicker = openMediaPicker;
@@ -125,6 +126,10 @@
         }
       };
       editorService.languagePicker(languagePicker);
+    }
+
+    function removeLanguage (index) {
+      vm.userGroup.languages.splice(index, 1);
     }
 
     function openSectionPicker() {
