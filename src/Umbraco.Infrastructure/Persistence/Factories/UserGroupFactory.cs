@@ -12,7 +12,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto)
         {
-            var userGroup = new UserGroup(shortStringHelper, dto.UserCount, dto.Alias, dto.Name,
+            var userGroup = new UserGroup(
+                shortStringHelper,
+                dto.UserCount,
+                dto.Alias,
+                dto.Name,
                 dto.DefaultPermissions.IsNullOrWhiteSpace()
                     ? Enumerable.Empty<string>()
                     : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
@@ -32,6 +36,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                     {
                         userGroup.AddAllowedSection(app.AppAlias);
                     }
+                }
+
+                foreach (UserGroup2LanguageDto language in dto.UserGroup2LanguageDtos)
+                {
+                    userGroup.AddAllowedLanguage(language.LanguageId);
                 }
 
                 userGroup.ResetDirtyProperties(false);

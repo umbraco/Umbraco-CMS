@@ -184,6 +184,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (dto == null)
                 return null;
+            dto.UserGroup2LanguageDtos = GetUserGroupLanguages(id);
 
             var userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
             return userGroup;
@@ -303,6 +304,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Id = id;
 
             PersistAllowedSections(entity);
+            PersistAllowedLanguages(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -316,6 +318,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.Update(userGroupDto);
 
             PersistAllowedSections(entity);
+            PersistAllowedLanguages(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -337,6 +340,35 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 };
                 Database.Insert(dto);
             }
+        }
+
+        private void PersistAllowedLanguages(IUserGroup entity)
+        {
+            var userGroup = entity;
+
+            // First delete all
+            Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+
+            // Then re-add any associated with the group
+            foreach (var language in userGroup.AllowedLanguages)
+            {
+                var dto = new UserGroup2LanguageDto
+                {
+                    UserGroupId = userGroup.Id,
+                    LanguageId = language,
+                };
+
+                Database.Insert(dto);
+            }
+        }
+
+        private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
+        {
+            Sql<ISqlContext> query = Sql()
+                .Select<UserGroup2LanguageDto>()
+                .From<UserGroup2LanguageDto>()
+                .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
+            return Database.Fetch<UserGroup2LanguageDto>(query);
         }
 
         #endregion

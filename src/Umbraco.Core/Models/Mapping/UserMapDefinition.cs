@@ -104,6 +104,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 }
             }
 
+            target.ClearAllowedLanguages();
+            if (source.AllowedLanguages is not null)
+            {
+                foreach (var language in source.AllowedLanguages)
+                {
+                    target.AddAllowedLanguage(language);
+                }
+            }
+
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -366,6 +375,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             var allLanguages = _localizationService.GetAllLanguages();
             var applicableLanguages = Enumerable.Empty<ILanguage>();
+
 
             if (sourceAllowedLanguages.Any())
             {
