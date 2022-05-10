@@ -1,31 +1,37 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class CultureImpactTests
     {
+        private CultureImpactService BasicImpactService => createCultureImpactService();
+
         [Test]
         public void Get_Culture_For_Invariant_Errors()
         {
-            var result = CultureImpact.GetCultureForInvariantErrors(
+            var result = BasicImpactService.GetCultureForInvariantErrors(
                 Mock.Of<IContent>(x => x.Published == true),
                 new[] { "en-US", "fr-FR" },
                 "en-US");
             Assert.AreEqual("en-US", result); // default culture is being saved so use it
 
-            result = CultureImpact.GetCultureForInvariantErrors(
+            result = BasicImpactService.GetCultureForInvariantErrors(
                 Mock.Of<IContent>(x => x.Published == false),
                 new[] { "fr-FR" },
                 "en-US");
             Assert.AreEqual("fr-FR", result); // default culture not being saved with not published version, use the first culture being saved
 
-            result = CultureImpact.GetCultureForInvariantErrors(
+            result = BasicImpactService.GetCultureForInvariantErrors(
                 Mock.Of<IContent>(x => x.Published == true),
                 new[] { "fr-FR" },
                 "en-US");
@@ -35,7 +41,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void All_Cultures()
         {
-            CultureImpact impact = CultureImpact.All;
+            CultureImpact impact = BasicImpactService.ImpactAll();
 
             Assert.AreEqual(impact.Culture, "*");
 
@@ -50,7 +56,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Invariant_Culture()
         {
-            CultureImpact impact = CultureImpact.Invariant;
+            CultureImpact impact = BasicImpactService.ImpactInvariant();
 
             Assert.AreEqual(impact.Culture, null);
 
@@ -65,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Explicit_Default_Culture()
         {
-            var impact = CultureImpact.Explicit("en-US", true);
+            var impact = BasicImpactService.ImpactExplicit("en-US", true);
 
             Assert.AreEqual(impact.Culture, "en-US");
 
@@ -80,7 +86,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void Explicit_NonDefault_Culture()
         {
-            var impact = CultureImpact.Explicit("en-US", false);
+            var impact = BasicImpactService.ImpactExplicit("en-US", false);
 
             Assert.AreEqual(impact.Culture, "en-US");
 
@@ -95,9 +101,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_Explicit_Default_Culture()
         {
-            var success = CultureImpact.TryCreate("en-US", true, ContentVariation.Culture, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate("en-US", true, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
+            Assert.IsNotNull(impact);
             Assert.AreEqual(impact.Culture, "en-US");
 
             Assert.IsTrue(impact.ImpactsInvariantProperties);
@@ -111,9 +118,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_Explicit_NonDefault_Culture()
         {
-            var success = CultureImpact.TryCreate("en-US", false, ContentVariation.Culture, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate("en-US", false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
+            Assert.IsNotNull(impact);
             Assert.AreEqual(impact.Culture, "en-US");
 
             Assert.IsFalse(impact.ImpactsInvariantProperties);
@@ -127,39 +135,57 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
         [Test]
         public void TryCreate_AllCultures_For_Invariant()
         {
-            var success = CultureImpact.TryCreate("*", false, ContentVariation.Nothing, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate("*", false, ContentVariation.Nothing, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
+            Assert.IsNotNull(impact);
             Assert.AreEqual(impact.Culture, null);
 
-            Assert.AreSame(CultureImpact.Invariant, impact);
+            Assert.AreSame(BasicImpactService.ImpactInvariant(), impact);
         }
 
         [Test]
         public void TryCreate_AllCultures_For_Variant()
         {
-            var success = CultureImpact.TryCreate("*", false, ContentVariation.Culture, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate("*", false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
+            Assert.IsNotNull(impact);
             Assert.AreEqual(impact.Culture, "*");
 
-            Assert.AreSame(CultureImpact.All, impact);
+            Assert.AreSame(BasicImpactService.ImpactAll(), impact);
         }
 
         [Test]
         public void TryCreate_Invariant_For_Variant()
         {
-            var success = CultureImpact.TryCreate(null, false, ContentVariation.Culture, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate(null, false, ContentVariation.Culture, false, false, out CultureImpact impact);
             Assert.IsFalse(success);
         }
 
         [Test]
         public void TryCreate_Invariant_For_Invariant()
         {
-            var success = CultureImpact.TryCreate(null, false, ContentVariation.Nothing, false, false, out CultureImpact impact);
+            var success = BasicImpactService.TryCreate(null, false, ContentVariation.Nothing, false, false, out CultureImpact impact);
             Assert.IsTrue(success);
 
-            Assert.AreSame(CultureImpact.Invariant, impact);
+            Assert.AreSame(BasicImpactService.ImpactInvariant(), impact);
         }
+
+        private CultureImpactService createCultureImpactService(IOptionsMonitor<SecuritySettings> securitySettings = null)
+        {
+            if (securitySettings is null)
+            {
+                var securitySettingsObject = new SecuritySettings
+                {
+                    AllowEditInvariantFromNonDefault = false,
+                };
+
+                securitySettings = new TestOptionsMonitor<SecuritySettings>(securitySettingsObject);
+            }
+
+            return new CultureImpactService(securitySettings);
+        }
+
     }
 }

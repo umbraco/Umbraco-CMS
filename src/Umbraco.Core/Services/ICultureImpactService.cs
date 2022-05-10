@@ -19,19 +19,19 @@ public interface ICultureImpactService
     /// <summary>
     /// Gets the impact of 'all' cultures (including the invariant culture).
     /// </summary>
-    CultureImpact CreateImpactAll();
+    CultureImpact ImpactAll();
 
     /// <summary>
     /// Gets the impact of the invariant culture.
     /// </summary>
-    CultureImpact CreateImpactInvariant();
+    CultureImpact ImpactInvariant();
 
     /// <summary>
     /// Creates an impact instance representing the impact of a specific culture.
     /// </summary>
     /// <param name="culture">The culture code.</param>
     /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-    CultureImpact CreateImpactExplicit(string? culture, bool isDefault);
+    CultureImpact ImpactExplicit(string? culture, bool isDefault);
 
     /// <summary>
     /// Utility method to return the culture used for invariant property errors based on what cultures are being actively saved,

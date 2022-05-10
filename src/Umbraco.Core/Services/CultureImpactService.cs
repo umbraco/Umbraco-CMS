@@ -25,13 +25,13 @@ public class CultureImpactService : ICultureImpactService
     }
 
     /// <inheritdoc/>
-    public CultureImpact CreateImpactAll() => new CultureImpact("*");
+    public CultureImpact ImpactAll() => CultureImpact.All;
 
     /// <inheritdoc/>
-    public CultureImpact CreateImpactInvariant() => new CultureImpact(null);
+    public CultureImpact ImpactInvariant() => CultureImpact.Invariant;
 
     /// <inheritdoc/>
-    public CultureImpact CreateImpactExplicit(string? culture, bool isDefault)
+    public CultureImpact ImpactExplicit(string? culture, bool isDefault)
     {
         if (culture == null)
         {
@@ -122,7 +122,7 @@ public class CultureImpactService : ICultureImpactService
                 return false;
             }
 
-            impact = CreateImpactInvariant();
+            impact = ImpactInvariant();
             return true;
         }
 
@@ -138,7 +138,7 @@ public class CultureImpactService : ICultureImpactService
             }
 
             // if variation does not vary by culture, then impact is invariant
-            impact = variation.VariesByCulture() ? CreateImpactAll() : CreateImpactInvariant();
+            impact = variation.VariesByCulture() ? ImpactAll() : ImpactInvariant();
             return true;
         }
 

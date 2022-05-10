@@ -64,13 +64,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the impact of 'all' cultures (including the invariant culture).
         /// </summary>
-        [Obsolete("Use ICultureImpactService.CreateImpactAll instead, scheduled for removal in V12")]
         public static CultureImpact All { get; } = new CultureImpact("*");
 
         /// <summary>
         /// Gets the impact of the invariant culture.
         /// </summary>
-        [Obsolete("Use ICultureImpactService.CreateInvariant instead, scheduled for removal in V12")]
         public static CultureImpact Invariant { get; } = new CultureImpact(null);
 
         /// <summary>
