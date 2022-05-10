@@ -381,10 +381,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
             {
                 applicableLanguages = allLanguages.Where(x => sourceAllowedLanguages.Contains(x.Id));
             }
-            else if (allLanguages.Any())
-            {
-                applicableLanguages = allLanguages;
-            }
 
             target.Languages = context.MapEnumerable<ILanguage, ContentEditing.Language>(applicableLanguages).WhereNotNull();
 
