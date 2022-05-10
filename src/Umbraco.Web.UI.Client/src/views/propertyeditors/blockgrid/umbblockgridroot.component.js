@@ -15,7 +15,6 @@
             controller: umbBlockGridRootController,
             controllerAs: "vm",
             bindings: {
-                gridColumns: "@",
                 stylesheet: "@",
                 blockEditorApi: "<",
                 entries: "<"
@@ -34,18 +33,16 @@
             shadowRoot.innerHTML = 
             `
                 <style>
-                    {{vm.stylesheet ? "@import '"+vm.stylesheet+"';" : ""}}
+                    @import '{{vm.stylesheet}}';
                     @import 'assets/css/blockgridui.css';
                     :host {
-                        --umb-block-grid--grid-columns: ${vm.gridColumns};
+                        --umb-block-grid--grid-columns: 12;
                     }
                 </style>
-                <div class="umb-block-grid__root-container">
-                    <umb-block-grid-entries
-                        block-editor-api="vm.blockEditorApi"
-                        entries="vm.entries">
-                    </umb-block-grid-entries>
-                </div>
+                <umb-block-grid-entries
+                    block-editor-api="vm.blockEditorApi"
+                    entries="vm.entries">
+                </umb-block-grid-entries>
             `;
             $compile(shadowRoot)($scope);
             

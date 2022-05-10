@@ -1,7 +1,6 @@
 @import "../../../less/variables.less";
 @import "../../../less/mixins.less";
 @import "../../../less/buttons.less";
-@import "../../../less/accessibility/sr-only.less";
 @import "../../../less/components/umb-icon.less";
 
 @umb-block-grid__item_minimum_height: 48px;
@@ -18,50 +17,19 @@
     position: relative;
     .umb-property-editor--limit-width();
     /*
-    > .ui-sortable > .ui-sortable-helper > .umb-block-grid__block > umb-block-grid-block > * {
+    > .ui-sortable > .ui-sortable-helper > .umb-block-grid__block > .umb-block-grid__block--content > * {
         box-shadow: 0px 5px 10px 0 rgba(0,0,0,.2);
     }
     */
 }
 
-.umb-block-grid__layout-item {
-    position: relative;
-}
-
 .umb-block-grid__block {
     position: relative;
     width: 100%;
-    height: 100%;
-
-    &::after {
-        content: '';
-        position: absolute;
-        pointer-events: none;
-        inset: 0;
-        border: 1px solid transparent;
-        border-radius: 3px;
-    }
 
     > .umb-block-grid__block--actions {
         opacity: 0;
         transition: opacity 120ms;
-    }
-    > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__actions {
-        opacity: 0;
-        transition: opacity 120ms;
-    }
-
-    &:hover,
-    &:focus,
-    &:focus-within {
-        &::after {
-            border-color: @blueDark;
-        }
-    }
-    &.--active {
-        &::after {
-            border-color: @pinkLight;
-        }
     }
 
     &:hover,
@@ -70,10 +38,6 @@
     &.--active {
 
         > .umb-block-grid__block--actions {
-            opacity: 1;
-        }
-
-        > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__actions {
             opacity: 1;
         }
     }
@@ -103,9 +67,9 @@
     
                 animation-duration: 1.4s;
                 animation-iteration-count: infinite;
-                animation-name: umb-block-grid__block--badge-bounce;
+                animation-name: umb-block-grid__block--content--badge-bounce;
                 animation-timing-function: ease;
-                @keyframes umb-block-grid__block--badge-bounce {
+                @keyframes umb-block-grid__block--content--badge-bounce {
                     0%   { transform: translateY(0); }
                     20%  { transform: translateY(-6px); }
                     40%  { transform: translateY(0); }
@@ -117,7 +81,6 @@
         }
     }
 }
-
 ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--actions {
     opacity: 1;
 }
@@ -185,8 +148,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     }
 }
 
-/*
-umb-block-grid-block {
+.umb-block-grid__block--content {
 
     > div {
         position: relative;
@@ -198,62 +160,93 @@ umb-block-grid-block {
     }
 
 }
-*/
 
-/*
 .blockelement__draggable-element {
     cursor: grab;
 }
-*/
 
 
-.umb-block-grid__scale-handler {
-    cursor: nwse-resize;
+.umb-block-grid__block--create-button {
     position: absolute;
-    Z-index:10;
-    bottom: -4px;
-    right: -4px;
-    width:8px;
-    height:8px;
-    padding: 0;
-    background-color: white;
-    border: @blueDark solid 1px;
+    height: 100%;
+    z-index: 1;
     opacity: 0;
-    transition: opacity 120ms;
-}
+    outline: none;
+    width: 12px;
+    margin-left: -9px;
+    padding-left: 6px;
+    margin-right: -6px;
+    transition: opacity 240ms;
 
-.umb-block-grid__scale-handler::after {
-    content: '';
-    position: absolute;
-    inset: -10px;
-    background-color: rgba(0,0,0,0);
-}
-.umb-block-grid__block:focus-within, 
-.umb-block-grid__block:hover {
-    > .umb-block-grid__scale-handler {
+    &::before {
+        content: '';
+        position: absolute;
+        background-color: @blueMid;
+        border-left: 1px solid white;
+        border-bottom: 1px solid white;
+        border-radius: 2px;
+        left: 5px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        animation: umb-block-grid__block--create-button_before 400ms ease-in-out alternate infinite;
+        transform: scaleX(.99);
+        transition: transform 240ms ease-out;
+
+        @keyframes umb-block-grid__block--create-button_before {
+            0%   { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    }
+
+    > .__plus {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -16px - 8px;
+        margin-top: -16px;
+        border-radius: 3em;
+        font-size: 14px;
+        border: 2px solid @blueMid;
+        color: @blueMid;
+        background-color: rgba(255, 255, 255, .96);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
+        transform: scale(0);
+        transition: transform 240ms ease-in;
+        
+        animation: umb-block-grid__block--create-button__plus 400ms ease-in-out alternate infinite;
+
+        @keyframes umb-block-grid__block--create-button__plus {
+            0%   { color: rgba(@blueMid, 1); }
+            100% { color: rgba(@blueMid, 0.8); }
+        }
+        
+    }
+
+    &:focus {
+        > .__plus {
+            border-color: @ui-outline;
+        }
+    }
+
+    &:hover, &:focus {
         opacity: 1;
+
+        &::before {
+            transform: scaleX(1);
+        }
+        > .__plus {
+            transform: scale(1);
+            transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+        }
     }
 }
-.umb-block-grid__scale-handler:focus {
-    opacity: 1;
-}
-/* When inside scalebox its always visible: */
-.umb-block-grid__scalebox .umb-block-grid__scale-handler {
-    opacity: 1;
-}
-
-
-.umb-block-grid__block--inline-create-button {
-    top: 0px;
-    position: absolute;
-}
-.umb-block-grid__block--inline-create-button.__above {
-    left: 0;
-}
-.umb-block-grid__block--inline-create-button.__after {
-    right: 0;
-}
-
 
 
 .umb-block-grid__actions {
@@ -351,89 +344,10 @@ umb-block-grid-block {
     }
 }
 
-
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
+    border: 1px dashed grey;
     border-radius: 3px;
-
-    border: @blueDark solid 1px;
-    border-radius: 3px;
-}
-.umb-block-grid__layout-item-placeholder::before {
-    content: '';
-    position:absolute;
-    z-index:1;
-    inset: 0;
-    border-radius: 3px;
-    background-color: white;
-}
-.umb-block-grid__layout-item-placeholder::after {
-    content: '';
-    position:absolute;
-    z-index:1;
-    inset: 0;
-    border-radius: 3px;
-
-    transition: background-color 240ms ease-in;
-    animation: umb-block-grid__placeholder__pulse 400ms ease-in-out alternate infinite;
-    @keyframes umb-block-grid__placeholder__pulse {
-        0%   { background-color: rgba(@blueMidLight, 0.33); }
-        100% { background-color: rgba(@blueMidLight, 0.22); }
-    }
-}
-
-
-.umb-block-grid__block-area {
-    position: relative;
-}
-.umb-block-grid__block-area::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 3px;
-    border: 1px solid rgba(125,125,125,0.5);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 120ms;
-}
-.umb-block-grid__block-area:focus::after,
-.umb-block-grid__block-area:focus-within::after,
-.umb-block-grid__block-area:hover::after {
-    opacity: 1;
-}
-.umb-block-grid__block-area > .umb-block-grid__actions {
-    opacity: var(--umb-block-grid--show-area-ui, 0);
-    transition: opacity 120ms;
-}
-.umb-block-grid__block-area > .umb-block-grid__actions:focus, 
-.umb-block-grid__block-area > .umb-block-grid__actions:focus-within {
-    opacity: 1;
-}
-
-.umb-block-grid__scalebox-backdrop {
-    background-color: rgba(255, 255, 255, 0.1);
-    position: absolute;
-    top:0;
-    left:0;
-    bottom:0;
-    right:0;
-    z-index: 1;
-    cursor: nwse-resize;
-}
-.umb-block-grid__scalebox {
-    position: absolute;
-    top:0;
-    left:0;
-    z-index: 10;
-    cursor: nwse-resize;
-
-    border: @blueDark solid 1px;
-    border-radius: 3px;
-
-    transition: background-color 240ms ease-in;
-    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
-    @keyframes umb-block-grid__scalebox__pulse {
-        0%   { background-color: rgba(@blueMidLight, 0.33); }
-        100% { background-color: rgba(@blueMidLight, 0.22); }
-    }
+    min-height: 100px;
+    min-width: 100px;
 }
