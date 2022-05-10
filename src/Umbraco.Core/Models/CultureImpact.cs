@@ -42,17 +42,24 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-        private CultureImpact(string? culture, bool isDefault = false)
+        /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
+        private CultureImpact(string? culture, bool isDefault = false, bool allowEditInvariantFromNonDefault = false)
         {
             if (culture != null && culture.IsNullOrWhiteSpace())
+            {
                 throw new ArgumentException("Culture \"\" is not valid here.");
+            }
 
             Culture = culture;
 
             if ((culture == null || culture == "*") && isDefault)
+            {
                 throw new ArgumentException("The invariant or 'all' culture can not be the default culture.");
+            }
 
             ImpactsOnlyDefaultCulture = isDefault;
+
+            AllowEditInvariantFromNonDefault = allowEditInvariantFromNonDefault;
         }
 
         /// <summary>
@@ -70,17 +77,30 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
-        public static CultureImpact Explicit(string? culture, bool isDefault)
+        /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
+        public static CultureImpact Explicit(string? culture, bool isDefault, bool allowEditInvariantFromNonDefault)
         {
             if (culture == null)
+            {
                 throw new ArgumentException("Culture <null> is not explicit.");
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentException("Culture \"\" is not explicit.");
-            if (culture == "*")
-                throw new ArgumentException("Culture \"*\" is not explicit.");
+            }
 
-            return new CultureImpact(culture, isDefault);
+            if (culture.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentException("Culture \"\" is not explicit.");
+            }
+
+            if (culture == "*")
+            {
+                throw new ArgumentException("Culture \"*\" is not explicit.");
+            }
+
+            return new CultureImpact(culture, isDefault, allowEditInvariantFromNonDefault);
         }
+
+        [Obsolete("Use ICultureImpactService insead.")]
+        public static CultureImpact Explicit(string? culture, bool isDefault)
+            => Explicit(culture, isDefault, false);
 
         /// <summary>
         /// Creates an impact instance representing the impact of a culture set,
@@ -89,13 +109,22 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture">The culture code.</param>
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
         /// <param name="content">The content item.</param>
+        /// <param name="allowEditInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
+        public static CultureImpact? Create(string culture, bool isDefault, IContent content, bool allowEditInvariantFromNonDefault)
+        {
+            // throws if not successful
+            TryCreate(culture, isDefault, content.ContentType.Variations, true, allowEditInvariantFromNonDefault, out CultureImpact? impact);
+            return impact;
+        }
+
+        [Obsolete("Use ICultureImpactService instead.")]
         public static CultureImpact? Create(string culture, bool isDefault, IContent content)
         {
             // throws if not successful
-            TryCreate(culture, isDefault, content.ContentType.Variations, true, out var impact);
+            TryCreate(culture, isDefault, content.ContentType.Variations, true, false, out CultureImpact? impact);
             return impact;
         }
 
@@ -107,12 +136,13 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="isDefault">A value indicating whether the culture is the default culture.</param>
         /// <param name="variation">A content variation.</param>
         /// <param name="throwOnFail">A value indicating whether to throw if the impact cannot be created.</param>
+        /// <param name="editInvariantFromNonDefault">A value indicating if publishing invariant properties from non-default language.</param>
         /// <param name="impact">The impact if it could be created, otherwise null.</param>
         /// <returns>A value indicating whether the impact could be created.</returns>
         /// <remarks>
         /// <para>Validates that the culture is compatible with the variation.</para>
         /// </remarks>
-        internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, out CultureImpact? impact)
+        internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, bool editInvariantFromNonDefault, out CultureImpact? impact)
         {
             impact = null;
 
@@ -172,7 +202,7 @@ namespace Umbraco.Cms.Core.Models
             }
 
             // return specific impact
-            impact = new CultureImpact(culture, isDefault);
+            impact = new CultureImpact(culture, isDefault, editInvariantFromNonDefault);
             return true;
         }
 
@@ -183,6 +213,8 @@ namespace Umbraco.Cms.Core.Models
         /// <para>Can be null (invariant) or * (all cultures) or a specific culture code.</para>
         /// </remarks>
         public string? Culture { get; }
+
+        public bool AllowEditInvariantFromNonDefault { get; }
 
         /// <summary>
         /// Gets a value indicating whether this impact impacts all cultures, including,
@@ -222,7 +254,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
                                                       !ImpactsAllCultures &&
-                                                      (ImpactsOnlyDefaultCulture || true /* TODO: If setting is set to true return true here as well, since it then also impacts invariant properties...*/);
+                                                      (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
 
         public Behavior CultureBehavior
         {
