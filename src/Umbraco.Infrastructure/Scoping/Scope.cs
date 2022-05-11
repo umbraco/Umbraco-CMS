@@ -44,6 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private bool? _completed;
         private IUmbracoDatabase? _database;
 
+        private bool _rollbacked;
         private bool _disposed;
         private IEventDispatcher? _eventDispatcher;
         private ICompletable? _fscope;
@@ -496,12 +497,31 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <inheritdoc />
         public bool Complete()
         {
+            // Can't complete if rollbacked
+            if (_rollbacked)
+            {
+                _completed = false;
+                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already rollbacked, so can't complete");
+            }
+
             if (_completed.HasValue == false)
             {
                 _completed = true;
             }
 
             return _completed.Value;
+        }
+
+        public void Rollback()
+        {
+            // Can't rollback if completed
+            if (_completed.HasValue && _completed.Value)
+            {
+                _rollbacked = false;
+                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already completed, so can't rollback");
+            }
+
+            _rollbacked = true;
         }
 
         public void Dispose()
@@ -808,9 +828,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     {
                         _database.CompleteTransaction();
                     }
-                    else
+                    else if (_rollbacked)
                     {
                         _database.AbortTransaction();
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"The {nameof(Scope)} hasn't been completed nor rollbacked");
                     }
                 }
                 catch

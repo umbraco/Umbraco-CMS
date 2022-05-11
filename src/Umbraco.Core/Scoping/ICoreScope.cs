@@ -32,6 +32,11 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     bool Complete();
 
     /// <summary>
+    /// Rollbacks the scope.
+    /// </summary>
+    void Rollback();
+
+    /// <summary>
     /// Read-locks some lock objects.
     /// </summary>
     /// <param name="lockIds">Array of lock object identifiers.</param>
