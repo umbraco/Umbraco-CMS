@@ -42,7 +42,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber;
 
-                if (inter == null)
+                if (string.IsNullOrWhiteSpace(inter?.ToString()))
                 {
                     return maxNumber == 1 ? null : Enumerable.Empty<Link>();
                 }
