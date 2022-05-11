@@ -9,7 +9,7 @@
 
     function propertyEditorReadonly () {
       // check for permission to update
-      return !$scope.variantContent.allowedActions.includes('U');
+      return !$scope.variantContent.allowedActions.includes('A');
     }
       
   }

@@ -184,7 +184,7 @@
 
             $scope.propertyEditorReadonly = function(property) {
                 // check for permission to update
-                return !$scope.content.allowedActions.includes('U');
+                return !$scope.content.allowedActions.includes('A');
             };
 
             $scope.propertyEditorDisabled = function (property) {
