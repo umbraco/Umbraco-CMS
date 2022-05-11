@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
             AllowedActions = Enumerable.Empty<string>();
         }
 
-        [DataMember(Name = "AllowedActions", IsRequired = true)]
+        [DataMember(Name = "allowedActions", IsRequired = true)]
         public IEnumerable<string> AllowedActions { get; set; }
 
         [DataMember(Name = "name", IsRequired = true)]
