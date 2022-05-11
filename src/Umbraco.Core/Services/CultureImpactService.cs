@@ -33,7 +33,7 @@ public class CultureImpactService : ICultureImpactService
     /// <inheritdoc/>
     public CultureImpact ImpactExplicit(string? culture, bool isDefault)
     {
-        if (culture == null)
+        if (culture is null)
         {
             throw new ArgumentException("Culture <null> is not explicit.");
         }
@@ -54,12 +54,12 @@ public class CultureImpactService : ICultureImpactService
     /// <inheritdoc/>
     public string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures, string? defaultCulture)
     {
-        if (content == null)
+        if (content is null)
         {
             throw new ArgumentNullException(nameof(content));
         }
 
-        if (savingCultures == null)
+        if (savingCultures is null)
         {
             throw new ArgumentNullException(nameof(savingCultures));
         }
@@ -154,7 +154,7 @@ public class CultureImpactService : ICultureImpactService
         }
 
         // if culture is specific, then variation must vary
-        if (!variation.VariesByCulture())
+        if (variation.VariesByCulture() is false)
         {
             if (throwOnFail)
             {
