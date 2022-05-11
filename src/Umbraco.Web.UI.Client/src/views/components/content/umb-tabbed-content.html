@@ -18,8 +18,7 @@
                         <umb-property-editor
                             model="property"
                             preview="propertyEditorDisabled(property)"
-                            ng-attr-readonly="{{content.language.culture === 'da-DK' || undefined}}">
-                            <!-- TODO: Update with correct check for readonly -->
+                            ng-attr-readonly="{{propertyEditorReadonly(property) || undefined}}">
                         </umb-property-editor>
                     </div>
                 </umb-property>
@@ -50,8 +49,7 @@
                         <umb-property-editor
                             model="property"
                             preview="propertyEditorDisabled(property)"
-                            ng-attr-readonly="{{content.language.culture === 'da-DK' || undefined}}">
-                            <!--TODO: Update with correct check for readonly -->
+                            ng-attr-readonly="{{propertyEditorReadonly(property) || undefined}}">
                         </umb-property-editor>
                     </div>
 

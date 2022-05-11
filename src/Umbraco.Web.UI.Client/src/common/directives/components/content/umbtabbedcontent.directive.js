@@ -182,6 +182,11 @@
                 }
             );
 
+            $scope.propertyEditorReadonly = function(property) {
+                const allowBrowse = $scope.content.allowedActions.includes('F');
+                return allowBrowse && $scope.content.allowedActions.length === 1;
+            };
+
             $scope.propertyEditorDisabled = function (property) {
                 if (property.unlockInvariantValue) {
                     return false;
