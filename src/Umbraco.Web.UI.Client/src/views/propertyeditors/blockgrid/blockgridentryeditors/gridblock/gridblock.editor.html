@@ -1,9 +1,14 @@
 <style>
+
+    .umb-block-grid__block--view {
+        height:100%;/* Add this to fill the cell fully */
+    }
+
     .blockelement-gridblock-editor {
-        
         position: relative;
         border: 1px solid gray;
         border-radius: 3px;
+        height: 100%;/* Add this to fill the cell fully */
     }
 
     .blockelement-gridblock-editor > button {
@@ -106,8 +111,9 @@
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
         <span>{{block.label}}</span>
     </button>
-    
+
     <input ng-model="block.layout.columnSpan" type="text"/>
+    <input ng-model="block.layout.rowSpan" type="text"/>
 
     <slot name="areas"></slot>
 
