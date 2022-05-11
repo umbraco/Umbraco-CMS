@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Configuration;
@@ -36,7 +39,7 @@ namespace Umbraco.Cms.Core.Telemetry
         }
 
         /// <inheritdoc/>
-        public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
+        public bool TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData)
         {
             if (_siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid telemetryId) is false)
             {
@@ -54,7 +57,7 @@ namespace Umbraco.Cms.Core.Telemetry
             return true;
         }
 
-        private string GetVersion()
+        private string? GetVersion()
         {
             if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
             {
@@ -64,7 +67,7 @@ namespace Umbraco.Cms.Core.Telemetry
             return _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
         }
 
-        private IEnumerable<PackageTelemetry> GetPackageTelemetry()
+        private IEnumerable<PackageTelemetry>? GetPackageTelemetry()
         {
             if (_metricsConsentService.GetConsentLevel() == TelemetryLevel.Minimal)
             {

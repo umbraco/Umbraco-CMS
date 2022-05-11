@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
             var userGroup = new UserGroup(shortStringHelper, dto.UserCount, dto.Alias, dto.Name,
                 dto.DefaultPermissions.IsNullOrWhiteSpace()
                     ? Enumerable.Empty<string>()
-                    : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
+                    : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
                 dto.Icon);
 
             try

@@ -1,11 +1,15 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -14,7 +18,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public class GridConfigurationEditor : ConfigurationEditor<GridConfiguration>
     {
-        public GridConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public GridConfigurationEditor(IIOHelper ioHelper)
+            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public GridConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
             var items = Fields.First(x => x.Key == "items");
 
@@ -24,14 +36,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
     public class GridValidator : IValueValidator
     {
-        public IEnumerable<ValidationResult> Validate(object rawValue, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? rawValue, string? valueType, object? dataTypeConfiguration)
         {
             if (rawValue == null)
                 yield break;
 
-            var model = JsonConvert.DeserializeObject<GridEditorModel>(rawValue.ToString());
+            var model = JsonConvert.DeserializeObject<GridEditorModel>(rawValue.ToString()!);
 
-            if (model.Templates.Any(t => t.Sections.Sum(s => s.Grid) > model.Columns))
+            if (model?.Templates?.Any(t => t.Sections?.Sum(s => s.Grid) > model.Columns) ?? false)
             {
                 yield return new ValidationResult("Columns must be at least the same size as the largest layout", new[] { nameof(model.Columns) });
             }
@@ -41,13 +53,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
     public class GridEditorModel
     {
-        public GridEditorTemplateModel[] Templates { get; set; }
+        public GridEditorTemplateModel[]? Templates { get; set; }
         public int Columns { get; set; }
     }
 
     public class GridEditorTemplateModel
     {
-        public GridEditorSectionModel[] Sections { get; set; }
+        public GridEditorSectionModel[]? Sections { get; set; }
     }
 
     public class GridEditorSectionModel

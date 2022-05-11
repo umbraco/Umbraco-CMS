@@ -16,6 +16,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
@@ -279,7 +282,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 // Act
-                IQuery<IDataType> query = scope.SqlContext.Query<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.Aliases.RadioButtonList);
+                IQuery<IDataType> query = ScopeProvider.CreateQuery<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.Aliases.RadioButtonList);
                 IDataType[] result = DataTypeRepository.Get(query).ToArray();
 
                 // Assert
@@ -295,7 +298,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 // Act
-                IQuery<IDataType> query = scope.SqlContext.Query<IDataType>().Where(x => x.Name.StartsWith("D"));
+                IQuery<IDataType> query = ScopeProvider.CreateQuery<IDataType>().Where(x => x.Name.StartsWith("D"));
                 int count = DataTypeRepository.Count(query);
 
                 // Assert

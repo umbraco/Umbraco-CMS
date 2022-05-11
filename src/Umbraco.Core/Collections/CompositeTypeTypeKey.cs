@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Collections
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var other = obj is CompositeTypeTypeKey key ? key : default;
             return Type1 == other.Type1 && Type2 == other.Type2;

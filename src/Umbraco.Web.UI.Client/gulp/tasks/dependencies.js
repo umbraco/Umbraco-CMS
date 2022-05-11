@@ -142,8 +142,8 @@ function dependencies() {
         },
         {
             "name": "animejs",
-            "src":  ["./node_modules/animejs/anime.min.js"],
-            "base": "./node_modules/animejs"
+            "src":  ["./node_modules/animejs/lib/anime.min.js"],
+            "base": "./node_modules/animejs/lib"
         },
         {
             "name": "bootstrap-social",
@@ -171,7 +171,7 @@ function dependencies() {
         },
         {
             "name": "jsdiff",
-            "src":  ["./node_modules/diff/dist/diff.min.js"],
+            "src":  ["./node_modules/diff/dist/diff.js"],
             "base": "./node_modules/diff/dist"
         },
         {

@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Security
                 return Task.FromResult(IdentityResult.Failed(_intParseError));
             }
 
-            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
             if (memberGroup != null)
             {
                 if (MapToMemberGroup(role, memberGroup))
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentException("The Id of the role is not an integer");
             }
 
-            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
             if (memberGroup != null)
             {
                 _memberGroupService.Delete(memberGroup);
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(role));
             }
 
-            return Task.FromResult(role.Id);
+            return Task.FromResult(role.Id)!;
         }
 
         /// <inheritdoc />
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(role));
             }
 
-            return Task.FromResult(role.Name);
+            return Task.FromResult(role.Name)!;
         }
 
         /// <inheritdoc />
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(roleId));
             }
 
-            IMemberGroup memberGroup;
+            IMemberGroup? memberGroup;
 
             // member group can be found by int or Guid, so try both
             if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id))
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Core.Security
                 memberGroup = _memberGroupService.GetById(id);
             }
 
-            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
+            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
         }
 
         /// <inheritdoc />
@@ -214,8 +214,8 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            IMemberGroup memberGroup = _memberGroupService.GetByName(name);
-            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
+            IMemberGroup? memberGroup = _memberGroupService.GetByName(name);
+            return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup))!;
         }
 
         /// <summary>

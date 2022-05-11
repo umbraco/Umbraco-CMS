@@ -12,14 +12,14 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a value.
         /// </summary>
         /// <remarks>Returns <c>null</c> if no value was found for the key.</remarks>
-        string GetValue(string key);
+        string? GetValue(string key);
 
         /// <summary>
         /// Returns key/value pairs for all keys with the specified prefix.
         /// </summary>
         /// <param name="keyPrefix"></param>
         /// <returns></returns>
-        IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix);
+        IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix);
 
         /// <summary>
         /// Sets a value.

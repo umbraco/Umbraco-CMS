@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -18,10 +19,15 @@ namespace Umbraco.Cms.Core.Runtime
         // release the lock because a new domain wants to be the main domain
         private readonly EventWaitHandle _signal;
         private readonly ILogger<MainDomSemaphoreLock> _logger;
-        private IDisposable _lockRelease;
+        private IDisposable? _lockRelease;
 
         public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new PlatformNotSupportedException("MainDomSemaphoreLock is only supported on Windows.");
+            }
+
             var mainDomId = MainDom.GetMainDomId(hostingEnvironment);
             var lockName = "UMBRACO-" + mainDomId + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);

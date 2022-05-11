@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -56,21 +57,25 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets an individual tree node
         /// </summary>
-        public ActionResult<TreeNode> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode?> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection? queryStrings)
         {
-            ActionResult<TreeNode> node = GetSingleTreeNode(id, queryStrings);
+            ActionResult<TreeNode?> node = GetSingleTreeNode(id, queryStrings);
 
             if (!(node.Result is null))
             {
                 return node.Result;
             }
 
-            //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
-            node.Value.AdditionalData["treeAlias"] = TreeAlias;
+            if (node.Value is not null)
+            {
+                // Add the tree alias to the node since it is standalone (has no root for which this normally belongs)
+                node.Value.AdditionalData["treeAlias"] = TreeAlias;
+            }
+
             return node;
         }
 
-        protected ActionResult<TreeNode> GetSingleTreeNode(string id, FormCollection queryStrings)
+        protected ActionResult<TreeNode?> GetSingleTreeNode(string id, FormCollection? queryStrings)
         {
             Guid asGuid;
             if (Guid.TryParse(id, out asGuid) == false)
@@ -144,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             //add delete option for all members
             menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? false)
             {
                 menu.Items.Add(new ExportMember(LocalizedTextService));
             }
@@ -152,9 +157,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
         {
-            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member, pageSize, pageIndex, out totalFound, searchFrom);
+            var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
         }
     }
 }

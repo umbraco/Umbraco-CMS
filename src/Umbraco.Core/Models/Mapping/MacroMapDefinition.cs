@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IMacro, MacroDisplay>((source, context) => new MacroDisplay(), Map);
-            mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => context.MapEnumerable<IMacroProperty, MacroParameter>(source.Properties.Values));
+            mapper.Define<IMacro, IEnumerable<MacroParameter>>((source, context) => context.MapEnumerable<IMacroProperty, MacroParameter>(source.Properties.Values).WhereNotNull());
             mapper.Define<IMacroProperty, MacroParameter>((source, context) => new MacroParameter(), Map);
         }
 
@@ -72,7 +73,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 _logger.LogWarning("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", source.EditorAlias);
             }
 
-            target.View = paramEditor.GetValueEditor().View;
+            target.View = paramEditor?.GetValueEditor().View;
 
             // sets the parameter configuration to be the default configuration editor's configuration,
             // ie configurationEditor.DefaultConfigurationObject, prepared for the value editor, ie
@@ -80,8 +81,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // on editors, ToValueEditor expects the actual strongly typed configuration - not the
             // dictionary thing returned by DefaultConfiguration
 
-            var configurationEditor = paramEditor.GetConfigurationEditor();
-            target.Configuration = configurationEditor.ToValueEditor(configurationEditor.DefaultConfigurationObject);
+            var configurationEditor = paramEditor?.GetConfigurationEditor();
+            target.Configuration = configurationEditor?.ToValueEditor(configurationEditor.DefaultConfigurationObject);
         }
     }
 }

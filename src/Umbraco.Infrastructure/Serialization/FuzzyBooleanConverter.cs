@@ -7,19 +7,19 @@ namespace Umbraco.Cms.Infrastructure.Serialization
     {
         public override bool CanWrite => false;
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             throw new NotSupportedException();
         }
 
         public override bool CanRead => true;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var value = reader.Value;
             if (value is bool) return value;
 
-            switch (value.ToString().ToLower().Trim())
+            switch (value?.ToString()?.ToLower().Trim())
             {
                 case "true":
                 case "yes":

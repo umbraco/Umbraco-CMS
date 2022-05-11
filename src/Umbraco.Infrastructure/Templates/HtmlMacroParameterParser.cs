@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Templates
 {
@@ -33,11 +34,11 @@ namespace Umbraco.Cms.Infrastructure.Templates
         public IEnumerable<UmbracoEntityReference> FindUmbracoEntityReferencesFromEmbeddedMacros(string text)
         {
             // There may be more than one macro with the same alias on the page so using a tuple
-            var foundMacros = new List<Tuple<string, Dictionary<string, string>>>();
+            var foundMacros = new List<Tuple<string?, Dictionary<string, string>>>();
 
             // This legacy ParseMacros() already finds the macros within a Rich Text Editor using regexes
             // It seems to lowercase the macro parameter alias - so making the dictionary case insensitive
-            MacroTagParser.ParseMacros(text, textblock => { }, (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string, Dictionary<string, string>>(macroAlias, new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
+            MacroTagParser.ParseMacros(text, textblock => { }, (macroAlias, macroAttributes) => foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(macroAlias, new Dictionary<string, string>(macroAttributes, StringComparer.OrdinalIgnoreCase))));
             foreach (var umbracoEntityReference in GetUmbracoEntityReferencesFromMacros(foundMacros))
             {
                 yield return umbracoEntityReference;
@@ -51,16 +52,16 @@ namespace Umbraco.Cms.Infrastructure.Templates
         /// <returns></returns>
         public IEnumerable<UmbracoEntityReference> FindUmbracoEntityReferencesFromGridControlMacros(IEnumerable<GridValue.GridControl> macroGridControls)
         {
-            var foundMacros = new List<Tuple<string, Dictionary<string, string>>>();
+            var foundMacros = new List<Tuple<string?, Dictionary<string, string>>>();
 
             foreach (var macroGridControl in macroGridControls)
             {
                 // Deserialise JSON of Macro Grid Control to a class
-                var gridMacro = macroGridControl.Value.ToObject<GridMacro>();
+                var gridMacro = macroGridControl.Value?.ToObject<GridMacro>();
                 // Collect any macro parameters that contain the media udi format
                 if (gridMacro is not null && gridMacro.MacroParameters is not null && gridMacro.MacroParameters.Any())
                 {
-                    foundMacros.Add(new Tuple<string, Dictionary<string, string>>(gridMacro.MacroAlias, gridMacro.MacroParameters));
+                    foundMacros.Add(new Tuple<string?, Dictionary<string, string>>(gridMacro.MacroAlias, gridMacro.MacroParameters));
                 }
             }
 
@@ -70,7 +71,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
             }
         }
 
-        private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(List<Tuple<string, Dictionary<string, string>>> macros)
+        private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(List<Tuple<string?, Dictionary<string, string>>> macros)
         {
 
             if (_macroService is not IMacroWithAliasService macroWithAliasService)
@@ -83,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
             // Here we are finding the used macros' Udis (there should be a Related Macro relation type - but Relations don't accept 'Macro' as an option)
             var foundMacroUmbracoEntityReferences = new List<UmbracoEntityReference>();
             // Get all the macro configs in one hit for these unique macro aliases - this is now cached with a custom cache policy
-            var macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.ToArray());
+            var macroConfigs = macroWithAliasService.GetAll(uniqueMacroAliases.WhereNotNull().ToArray());
 
             foreach (var macro in macros)
             {
@@ -116,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
             var foundUmbracoEntityReferences = new List<UmbracoEntityReference>();
             foreach (var parameter in macroConfig.Properties)
             {
-                if (macroParameters.TryGetValue(parameter.Alias, out string parameterValue))
+                if (macroParameters.TryGetValue(parameter.Alias, out string? parameterValue))
                 {
                     var parameterEditorAlias = parameter.EditorAlias;
                     // Lookup propertyEditor from the registered ParameterEditors with the implmementation to avoid looking up for each parameter
@@ -146,10 +147,10 @@ namespace Umbraco.Cms.Infrastructure.Templates
         private class GridMacro
         {
             [JsonProperty("macroAlias")]
-            public string MacroAlias { get; set; }
+            public string? MacroAlias { get; set; }
 
             [JsonProperty("macroParamsDictionary")]
-            public Dictionary<string, string> MacroParameters { get; set; }
+            public Dictionary<string, string>? MacroParameters { get; set; }
         }
     }
 }

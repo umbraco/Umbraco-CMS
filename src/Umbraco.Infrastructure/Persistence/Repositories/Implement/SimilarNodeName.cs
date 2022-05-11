@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     internal class SimilarNodeName
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public static string GetUniqueName(IEnumerable<SimilarNodeName> names, int nodeId, string nodeName)
+        public static string? GetUniqueName(IEnumerable<SimilarNodeName> names, int nodeId, string? nodeName)
         {
             var items = names
                     .Where(x => x.Id != nodeId) // ignore same node
@@ -23,11 +23,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return uniqueName;
         }
 
-        public static string GetUniqueName(IEnumerable<string> names, string name)
+        public static string? GetUniqueName(IEnumerable<string?> names, string? name)
         {
             var model = new StructuredName(name);
             var items = names
-                    .Where(x => x.InvariantStartsWith(model.Text)) // ignore non-matching names
+                    .Where(x => x?.InvariantStartsWith(model.Text) ?? false) // ignore non-matching names
                     .Select(x => new StructuredName(x));
 
             // name is empty, and there are no other names with suffixes, so just return " (1)"
@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             }
 
-            internal StructuredName(string name)
+            internal StructuredName(string? name)
             {
                 if (string.IsNullOrWhiteSpace(name))
                 {

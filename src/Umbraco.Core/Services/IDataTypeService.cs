@@ -17,36 +17,36 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
-        Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
-        EntityContainer GetContainer(int containerId);
-        EntityContainer GetContainer(Guid containerId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
+        EntityContainer? GetContainer(int containerId);
+        EntityContainer? GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetContainers(IDataType dataType);
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-        Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
-        Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its Name
         /// </summary>
         /// <param name="name">Name of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataType(string name);
+        IDataType? GetDataType(string name);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IDataType"/></param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataType(int id);
+        IDataType? GetDataType(int id);
 
         /// <summary>
         /// Gets a <see cref="IDataType"/> by its unique guid Id
         /// </summary>
         /// <param name="id">Unique guid Id of the DataType</param>
         /// <returns><see cref="IDataType"/></returns>
-        IDataType GetDataType(Guid id);
+        IDataType? GetDataType(Guid id);
 
         /// <summary>
         /// Gets all <see cref="IDataType"/> objects or those with the ids passed in
@@ -87,6 +87,6 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
-        Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);
+        Attempt<OperationResult<MoveOperationStatusType>?> Move(IDataType toMove, int parentId);
     }
 }

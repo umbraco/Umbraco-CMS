@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     MacroSource = string.Empty
                 };
 
-                _macroService.Save(macro, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
                 return macro.Id;
             }
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<MacroDisplay> GetById(int id)
+        public ActionResult<MacroDisplay?> GetById(int id)
         {
             var macro = _macroService.GetById(id);
 
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<MacroDisplay> GetById(Guid id)
+        public ActionResult<MacroDisplay?> GetById(Guid id)
         {
             var macro = _macroService.GetById(id);
 
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<MacroDisplay> GetById(Udi id)
+        public ActionResult<MacroDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -185,7 +185,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem("Name cannnot be more than 255 characters in length.");
             }
 
-            var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString(), CultureInfo.InvariantCulture));
+            var macro = macroDisplay.Id is null ? null : _macroService.GetById(int.Parse(macroDisplay.Id.ToString()!, CultureInfo.InvariantCulture));
 
             if (macro == null)
             {
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             try
             {
-                _macroService.Save(macro, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                _macroService.Save(macro, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
                 macroDisplay.Notifications.Clear();
 
@@ -280,7 +280,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="HttpResponseMessage"/>.
         /// </returns>
-        public IDataEditor GetParameterEditorByAlias(string alias)
+        public IDataEditor? GetParameterEditorByAlias(string alias)
         {
             var parameterEditors = _parameterEditorCollection.ToArray();
 
@@ -404,7 +404,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="macro"></param>
         /// <returns></returns>
-        private MacroDisplay MapToDisplay(IMacro macro)
+        private MacroDisplay? MapToDisplay(IMacro macro)
         {
             var display = _umbracoMapper.Map<MacroDisplay>(macro);
 
@@ -418,7 +418,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                     Id = x.Id
                                 });
 
-            display.Parameters = parameters;
+            if (display is not null)
+            {
+                display.Parameters = parameters;
+            }
 
             return display;
         }

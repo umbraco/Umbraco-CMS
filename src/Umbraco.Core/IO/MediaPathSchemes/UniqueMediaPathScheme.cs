@@ -32,6 +32,6 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
         /// race conditions. We'd need to implement locks in <see cref="MediaFileSystem"/> for
         /// this.</para>
         /// </remarks>
-        public string GetDeleteDirectory(MediaFileManager fileManager, string filepath) => null;
+        public string? GetDeleteDirectory(MediaFileManager fileManager, string filepath) => null;
     }
 }

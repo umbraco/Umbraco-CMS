@@ -6,12 +6,12 @@
     public class ContentEntitySlim : EntitySlim, IContentEntitySlim
     {
         /// <inheritdoc />
-        public string ContentTypeAlias { get; set; }
+        public string ContentTypeAlias { get; set; } = string.Empty;
 
         /// <inheritdoc />
-        public string ContentTypeIcon { get; set; }
+        public string? ContentTypeIcon { get; set; }
 
         /// <inheritdoc />
-        public string ContentTypeThumbnail { get; set; }
+        public string? ContentTypeThumbnail { get; set; }
     }
 }

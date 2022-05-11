@@ -35,11 +35,11 @@ namespace Umbraco.Extensions
             builder.BuildUmbracoBackOfficeIdentity()
                 .AddDefaultTokenProviders()
                 .AddUserStore<IUserStore<BackOfficeIdentityUser>, BackOfficeUserStore>(factory => new BackOfficeUserStore(
-                    factory.GetRequiredService<IScopeProvider>(),
+                    factory.GetRequiredService<ICoreScopeProvider>(),
                     factory.GetRequiredService<IUserService>(),
                     factory.GetRequiredService<IEntityService>(),
                     factory.GetRequiredService<IExternalLoginWithKeyService>(),
-                    factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                    factory.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
                     factory.GetRequiredService<IUmbracoMapper>(),
                     factory.GetRequiredService<BackOfficeErrorDescriber>(),
                     factory.GetRequiredService<AppCaches>(),

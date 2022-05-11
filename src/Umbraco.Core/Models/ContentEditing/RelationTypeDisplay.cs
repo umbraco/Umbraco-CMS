@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "parentObjectTypeName")]
         [ReadOnly(true)]
-        public string ParentObjectTypeName { get; set; }
+        public string? ParentObjectTypeName { get; set; }
 
         /// <summary>
         /// Gets or sets the Child's object type id
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "childObjectTypeName")]
         [ReadOnly(true)]
-        public string ChildObjectTypeName { get; set; }
+        public string? ChildObjectTypeName { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

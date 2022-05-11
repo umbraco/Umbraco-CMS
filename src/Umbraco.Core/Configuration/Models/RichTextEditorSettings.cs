@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Configuration.Models
@@ -97,8 +98,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         public class RichTextEditorCommand
         {
-            public string Alias { get; set; }
-            public string Name { get; set; }
+            [Required]
+            public string Alias { get; set; } = null!;
+
+            [Required]
+            public string Name { get; set; } = null!;
+
+            [Required]
             public RichTextEditorCommandMode Mode { get; set; }
         }
     }

@@ -20,6 +20,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("action")]
         [SpecialDbType(SpecialDbTypes.NCHAR)]
         [Length(1)]
-        public string Action { get; set; }
+        public string? Action { get; set; }
     }
 }

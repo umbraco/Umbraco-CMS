@@ -17,14 +17,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         protected void AddColumn<T>(string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName);
+            AddColumn(table, table.Name!, columnName);
         }
 
         protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             if (columns.Any(x => x.TableName.InvariantEquals(table.Name) && !x.ColumnName.InvariantEquals(columnName)))
-                AddColumn(table, table.Name, columnName);
+                AddColumn(table, table.Name!, columnName);
         }
 
         protected void AddColumn<T>(string tableName, string columnName)
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName, out sqls);
+            AddColumn(table, table.Name!, columnName, out sqls);
         }
 
         protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
@@ -86,18 +86,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
         protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
-            if (DatabaseType.IsSqlCe())
-            {
-                AddColumn<T>(tableName, newName, out var sqls);
-                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
-                foreach (var sql in sqls) Execute.Sql(sql).Do();
-                Delete.Column(currentName).FromTable(tableName).Do();
-            }
-            else
-            {
-                Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
-                AlterColumn<T>(tableName, newName);
-            }
+            Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
+            AlterColumn<T>(tableName, newName);
         }
 
         protected bool TableExists(string tableName)
@@ -118,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
         }
 
-        protected string ColumnType(string tableName, string columnName)
+        protected string? ColumnType(string tableName, string columnName)
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
             var column = columns.FirstOrDefault(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));

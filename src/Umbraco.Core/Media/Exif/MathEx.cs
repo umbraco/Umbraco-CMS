@@ -472,7 +472,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// <param name="obj">Another object to compare to.</param>
             /// <returns>true if obj and this instance are the same type and represent
             /// the same value; otherwise, false.</returns>
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (obj == null)
                     return false;
@@ -518,7 +518,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// <exception cref="System.FormatException">
             /// format is invalid or not supported.
             /// </exception>
-            public string ToString(string format, IFormatProvider formatProvider)
+            public string ToString(string? format, IFormatProvider? formatProvider)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(((mIsNegative ? -1 : 1) * mNumerator).ToString(format, formatProvider));
@@ -592,7 +592,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             /// <exception cref="System.ArgumentException">obj is not a Fraction.</exception>
-            public int CompareTo(object obj)
+            public int CompareTo(object? obj)
             {
                 if (!(obj is Fraction32))
                     throw new ArgumentException("obj must be of type Fraction", "obj");
@@ -1100,7 +1100,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// <param name="obj">Another object to compare to.</param>
             /// <returns>true if obj and this instance are the same type and represent
             /// the same value; otherwise, false.</returns>
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (obj == null)
                     return false;
@@ -1146,7 +1146,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// <exception cref="System.FormatException">
             /// format is invalid or not supported.
             /// </exception>
-            public string ToString(string format, IFormatProvider formatProvider)
+            public string ToString(string? format, IFormatProvider? formatProvider)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(mNumerator.ToString(format, formatProvider));
@@ -1220,7 +1220,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             /// Greater than zero: This instance is greater than obj or obj is null.
             /// </returns>
             /// <exception cref="System.ArgumentException">obj is not a Fraction.</exception>
-            public int CompareTo(object obj)
+            public int CompareTo(object? obj)
             {
                 if (!(obj is UFraction32))
                     throw new ArgumentException("obj must be of type UFraction32", "obj");

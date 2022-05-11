@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Notifications
         /// <summary>
         /// Gets the id of the node rendered
         /// </summary>
-        public string Id { get; }
+        public string? Id { get; }
 
     }
 }

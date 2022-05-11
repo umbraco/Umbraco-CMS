@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Core
 
         public PublishedContentQueryAccessor(IScopedServiceProvider scopedServiceProvider) => _scopedServiceProvider = scopedServiceProvider;
 
-        public bool TryGetValue(out IPublishedContentQuery publishedContentQuery)
+        public bool TryGetValue([MaybeNullWhen(false)] out IPublishedContentQuery publishedContentQuery)
         {
             publishedContentQuery = _scopedServiceProvider.ServiceProvider?.GetService<IPublishedContentQuery>();
 

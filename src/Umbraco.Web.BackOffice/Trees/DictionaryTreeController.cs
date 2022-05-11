@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _localizationService = localizationService;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -51,8 +51,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (!queryStrings["application"].ToString().IsNullOrWhiteSpace())
                 section = queryStrings["application"];
 
-            // this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
+            if (root is not null)
+            {
+                // this will load in a custom UI instead of the dashboard for the root node
+                root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
+            }
 
             return root;
         }
@@ -82,14 +85,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
-                    _localizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
+                    _localizationService.GetRootDictionaryItems()?.OrderBy(ItemSort()).Select(
                         x => CreateTreeNode(
                             x.Id.ToInvariantString(),
                             id,
                             queryStrings,
                             x.ItemKey,
                             Constants.Icons.Dictionary,
-                            _localizationService.GetDictionaryItemChildren(x.Key).Any())));
+                            _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ?? Enumerable.Empty<TreeNode>());
             }
             else
             {
@@ -98,14 +101,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 if (parentDictionary == null)
                     return nodes;
 
-                nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderBy(ItemSort()).Select(
+                nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key)?.ToList().OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
                         queryStrings,
                         x.ItemKey,
                         Constants.Icons.Dictionary,
-                        _localizationService.GetDictionaryItemChildren(x.Key).Any())));
+                        _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ?? Enumerable.Empty<TreeNode>());
             }
 
             return nodes;

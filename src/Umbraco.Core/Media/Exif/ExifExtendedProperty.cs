@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Media.Exif
     /// Represents an enumerated value.
     /// </summary>
     internal class ExifEnumProperty<T> : ExifProperty
+    where T : notnull
     {
         protected T mValue;
         protected bool mIsBitField;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Core.Media.Exif
 
         static public implicit operator T(ExifEnumProperty<T> obj) { return (T)obj.mValue; }
 
-        public override string ToString() { return mValue.ToString(); }
+        public override string? ToString() { return mValue.ToString(); }
 
         public ExifEnumProperty(ExifTag tag, T value, bool isbitfield)
             : base(tag)

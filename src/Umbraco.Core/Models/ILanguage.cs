@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets the <see cref="CultureInfo"/> object for the language.
         /// </summary>
         [IgnoreDataMember]
-        CultureInfo CultureInfo { get; }
+        CultureInfo? CultureInfo { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the language is the default language.

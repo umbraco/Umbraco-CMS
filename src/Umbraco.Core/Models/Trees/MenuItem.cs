@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Models.Trees
 
         #region Properties
         [IgnoreDataMember]
-        public IAction Action { get; set; }
+        public IAction? Action { get; set; }
 
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is
@@ -70,14 +70,14 @@ namespace Umbraco.Cms.Core.Models.Trees
 
         [DataMember(Name = "name", IsRequired = true)]
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [DataMember(Name = "textDescription")]
-        public string TextDescription { get; set; }
+        public string? TextDescription { get; set; }
 
         /// <summary>
         /// Ensures a menu separator will exist before this menu item.

@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the tags configuration attribute of an editor.
         /// </summary>
-        public static TagsPropertyEditorAttribute GetTagAttribute(this IDataEditor editor)
+        public static TagsPropertyEditorAttribute? GetTagAttribute(this IDataEditor? editor)
             => editor?.GetType().GetCustomAttribute<TagsPropertyEditorAttribute>(false);
     }
 }

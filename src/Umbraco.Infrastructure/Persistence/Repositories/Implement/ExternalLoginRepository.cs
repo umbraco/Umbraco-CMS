@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.InsertBulk(toInsert.Select(i => ExternalLoginFactory.BuildDto(userOrMemberKey, i)));
         }
 
-        protected override IIdentityUserLogin PerformGet(int id)
+        protected override IIdentityUserLogin? PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { id = id });
@@ -105,9 +105,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
-        protected override IEnumerable<IIdentityUserLogin> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IIdentityUserLogin> PerformGetAll(params int[]? ids)
         {
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 return PerformGetAllOnIds(ids);
             }
@@ -123,7 +123,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (ids.Any() == false) yield break;
             foreach (var id in ids)
             {
-                yield return Get(id);
+                IIdentityUserLogin? identityUserLogin = Get(id);
+                if (identityUserLogin is not null)
+                {
+                    yield return identityUserLogin;
+                }
             }
         }
 
@@ -202,7 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken> query)
+        public IEnumerable<IIdentityUserToken> Get(IQuery<IIdentityUserToken>? query)
         {
             Sql<ISqlContext> sqlClause = GetBaseTokenQuery(false);
 
@@ -253,7 +257,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (ExternalLoginTokenDto existing in existingTokens)
             {
-                IExternalLoginToken found = tokens.FirstOrDefault(x =>
+                IExternalLoginToken? found = tokens.FirstOrDefault(x =>
                         x.LoginProvider.InvariantEquals(existing.ExternalLoginDto.LoginProvider)
                         && x.Name.InvariantEquals(existing.Name));
 
@@ -296,7 +300,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             => forUpdate ? Sql()
                 .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
                 .From<ExternalLoginTokenDto>()
-                .Append(" WITH (UPDLOCK)") // ensure these table values are locked for updates, the ForUpdate ext method does not work here
+                .AppendForUpdateHint() // ensure these table values are locked for updates, the ForUpdate ext method does not work here
                 .InnerJoin<ExternalLoginDto>()
                 .On<ExternalLoginTokenDto, ExternalLoginDto>(x => x.ExternalLoginId, x => x.Id)
             : Sql()

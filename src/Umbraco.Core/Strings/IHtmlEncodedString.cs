@@ -9,6 +9,6 @@ namespace Umbraco.Cms.Core.Strings
         ///     Returns an HTML-encoded string.
         /// </summary>
         /// <returns>An HTML-encoded string.</returns>
-        string ToHtmlString();
+        string? ToHtmlString();
     }
 }

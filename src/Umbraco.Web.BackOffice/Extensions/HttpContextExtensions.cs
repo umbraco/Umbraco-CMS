@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
         public static void SetExternalLoginProviderErrors(this HttpContext httpContext, BackOfficeExternalLoginProviderErrors errors)
             => httpContext.Items[nameof(BackOfficeExternalLoginProviderErrors)] = errors;
 
-        public static BackOfficeExternalLoginProviderErrors GetExternalLoginProviderErrors(this HttpContext httpContext)
+        public static BackOfficeExternalLoginProviderErrors? GetExternalLoginProviderErrors(this HttpContext httpContext)
             => httpContext.Items[nameof(BackOfficeExternalLoginProviderErrors)] as BackOfficeExternalLoginProviderErrors;
 
     }

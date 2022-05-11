@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 CreateLogViewerQueryData();
             }
 
-            _logger.LogInformation("Done creating table {TableName} data.", tableName);
+            _logger.LogInformation("Completed creating data in {TableName}", tableName);
         }
 
         private void CreateNodeData()
@@ -638,13 +638,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             // Membership property types.
             if (_database.Exists<PropertyTypeGroupDto>(11))
             {
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 28, UniqueId = 28.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Textarea, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.Comments, Name = Cms.Core.Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 29, UniqueId = 29.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelInt, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.FailedPasswordAttempts, Name = Cms.Core.Constants.Conventions.Member.FailedPasswordAttemptsLabel, SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 30, UniqueId = 30.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Boolean, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.IsApproved, Name = Cms.Core.Constants.Conventions.Member.IsApprovedLabel, SortOrder = 2, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 31, UniqueId = 31.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Boolean, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.IsLockedOut, Name = Cms.Core.Constants.Conventions.Member.IsLockedOutLabel, SortOrder = 3, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 32, UniqueId = 32.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelDateTime, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.LastLockoutDate, Name = Cms.Core.Constants.Conventions.Member.LastLockoutDateLabel, SortOrder = 4, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 33, UniqueId = 33.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelDateTime, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.LastLoginDate, Name = Cms.Core.Constants.Conventions.Member.LastLoginDateLabel, SortOrder = 5, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
-                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 34, UniqueId = 34.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelDateTime, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.LastPasswordChangeDate, Name = Cms.Core.Constants.Conventions.Member.LastPasswordChangeDateLabel, SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing });
+                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false,
+                    new PropertyTypeDto
+                    {
+                        Id = 28, UniqueId = 28.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Textarea,
+                        ContentTypeId = 1044, PropertyTypeGroupId = 11,
+                        Alias = Cms.Core.Constants.Conventions.Member.Comments,
+                        Name = Cms.Core.Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false,
+                        ValidationRegExp = null, Description = null, Variations = (byte)ContentVariation.Nothing
+                    });
             }
         }
 
@@ -678,7 +680,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreateDataTypeData()
         {
-            void InsertDataTypeDto(int id, string editorAlias, string dbType, string configuration = null)
+            void InsertDataTypeDto(int id, string editorAlias, string dbType, string? configuration = null)
             {
                 var dataTypeDto = new DataTypeDto
                 {
@@ -1034,17 +1036,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 alwaysInsert = true;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.None)
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.None)
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.Values && !installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }
 
-            if (!alwaysInsert && installDefaultDataSettings.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
+            if (!alwaysInsert && installDefaultDataSettings?.InstallData == InstallDefaultDataOption.ExceptValues && installDefaultDataSettings.Values.InvariantContains(id))
             {
                 return;
             }

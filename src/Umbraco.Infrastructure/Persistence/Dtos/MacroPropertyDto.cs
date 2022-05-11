@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public Guid UniqueId { get; set; }
 
         [Column("editorAlias")]
-        public string EditorAlias { get; set; }
+        public string EditorAlias { get; set; } = null!;
 
         [Column("macro")]
         [ForeignKey(typeof(MacroDto))]
@@ -32,9 +32,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("macroPropertyAlias")]
         [Length(50)]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [Column("macroPropertyName")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="valueType"></param>
         /// <param name="dataTypeConfiguration"></param>
         /// <returns></returns>
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             var elementTypeValues = GetElementTypeValidation(value).ToList();
             var rowResults = GetNestedValidationResults(elementTypeValues).ToList();
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
 
-        protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value);
+        protected abstract IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value);
 
         /// <summary>
         /// Return a nested validation result per row (Element Type)
@@ -88,13 +88,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public class PropertyTypeValidationModel
         {
-            public PropertyTypeValidationModel(IPropertyType propertyType, object postedValue)
+            public PropertyTypeValidationModel(IPropertyType propertyType, object? postedValue)
             {
                 PostedValue = postedValue;
                 PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             }
 
-            public object PostedValue { get; }
+            public object? PostedValue { get; }
             public IPropertyType PropertyType { get; }
         }
 

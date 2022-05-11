@@ -20,16 +20,16 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public class ContentTypeReferences : EntityBasic
         {
             [DataMember(Name = "properties")]
-            public object Properties { get; set; }
+            public object? Properties { get; set; }
 
             [DataContract(Name = "property", Namespace = "")]
             public class PropertyTypeReferences
             {
                 [DataMember(Name = "name")]
-                public string Name { get; set; }
+                public string? Name { get; set; }
 
                 [DataMember(Name = "alias")]
-                public string Alias { get; set; }
+                public string? Alias { get; set; }
             }
         }
     }

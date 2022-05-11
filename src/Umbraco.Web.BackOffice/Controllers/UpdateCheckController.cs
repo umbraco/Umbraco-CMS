@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
@@ -41,11 +41,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [UpdateCheckResponseFilter]
-        public async Task<UpgradeCheckResponse> GetCheck()
+        public async Task<UpgradeCheckResponse?> GetCheck()
         {
             var updChkCookie = _cookieManager.GetCookieValue("UMB_UPDCHK");
             var updateCheckCookie = updChkCookie ?? string.Empty;
-            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin())
+            if (_globalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false))
             {
                 try
                 {
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 private readonly GlobalSettings _globalSettings;
 
-                public UpdateCheckResponseFilter(IOptions<GlobalSettings> globalSettings)
+                public UpdateCheckResponseFilter(IOptionsSnapshot<GlobalSettings> globalSettings)
                 {
                     _globalSettings = globalSettings.Value;
                 }

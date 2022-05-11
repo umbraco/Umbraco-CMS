@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -20,12 +21,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _scopeAccessor = scopeAccessor;
         }
 
-        private IScope AmbientScope => _scopeAccessor.AmbientScope;
+        private Scoping.IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
-        public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string action, IEnumerable<int> nodeIds, Guid objectType)
+        public IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
         {
             var nodeIdsA = nodeIds.ToArray();
-            var sql = AmbientScope.SqlContext.Sql()
+            var sql = AmbientScope?.SqlContext.Sql()
                     .Select("DISTINCT umbracoNode.id nodeId, umbracoUser.id userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                     .From<User2NodeNotifyDto>()
                     .InnerJoin<NodeDto>().On<User2NodeNotifyDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -34,17 +35,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .Where<UserDto>(x => x.Disabled == false) // only approved users
                     .Where<User2NodeNotifyDto>(x => x.Action == action); // on the specified action
             if (nodeIdsA.Length > 0)
-                sql
+                sql?
                     .WhereIn<NodeDto>(x => x.NodeId, nodeIdsA); // for the specified nodes
-            sql
+            sql?
                 .OrderBy<UserDto>(x => x.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
-            return AmbientScope.Database.Fetch<UserNotificationDto>(sql).Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
+            return AmbientScope?.Database.Fetch<UserNotificationDto>(sql).Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
         }
 
-        public IEnumerable<Notification> GetUserNotifications(IUser user)
+        public IEnumerable<Notification>? GetUserNotifications(IUser user)
         {
-            var sql = AmbientScope.SqlContext.Sql()
+            var sql = AmbientScope?.SqlContext.Sql()
                 .Select("DISTINCT umbracoNode.id AS nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -52,9 +53,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<User2NodeNotifyDto>(dto => dto.UserId == (int)user.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
 
-            var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
+            var dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
+            return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
@@ -63,9 +64,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return actions.Select(action => CreateNotification(user, entity, action)).ToList();
         }
 
-        public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
+        public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
         {
-            var sql = AmbientScope.SqlContext.Sql()
+            var sql = AmbientScope?.SqlContext.Sql()
                 .Select("DISTINCT umbracoNode.id as nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
@@ -73,34 +74,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<User2NodeNotifyDto>(dto => dto.NodeId == entity.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
 
-            var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
+            var dtos = AmbientScope?.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
+            return dtos?.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public int DeleteNotifications(IEntity entity)
         {
-            return AmbientScope.Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @nodeId", new { nodeId = entity.Id });
+            return AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @nodeId", new { nodeId = entity.Id }) ?? 0;
         }
 
         public int DeleteNotifications(IUser user)
         {
-            return AmbientScope.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId", new { userId = user.Id });
+            return AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId", new { userId = user.Id }) ?? 0;
         }
 
         public int DeleteNotifications(IUser user, IEntity entity)
         {
             // delete all settings on the node for this user
-            return AmbientScope.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId AND nodeId = @nodeId", new { userId = user.Id, nodeId = entity.Id });
+            return AmbientScope?.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId AND nodeId = @nodeId", new { userId = user.Id, nodeId = entity.Id }) ?? 0;
         }
 
         public Notification CreateNotification(IUser user, IEntity entity, string action)
         {
-            var sql = AmbientScope.SqlContext.Sql()
+            var sql = AmbientScope?.SqlContext.Sql()
                 .Select("DISTINCT nodeObjectType")
                 .From<NodeDto>()
                 .Where<NodeDto>(nodeDto => nodeDto.NodeId == entity.Id);
-            var nodeType = AmbientScope.Database.ExecuteScalar<Guid>(sql);
+            var nodeType = AmbientScope?.Database.ExecuteScalar<Guid>(sql);
 
             var dto = new User2NodeNotifyDto
                 {
@@ -108,7 +109,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     NodeId = entity.Id,
                     UserId = user.Id
                 };
-            AmbientScope.Database.Insert(dto);
+            AmbientScope?.Database.Insert(dto);
             return new Notification(dto.NodeId, dto.UserId, dto.Action, nodeType);
         }
     }

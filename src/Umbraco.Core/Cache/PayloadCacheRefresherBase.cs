@@ -31,7 +31,10 @@ namespace Umbraco.Cms.Core.Cache
         public override void Refresh(string json)
         {
             var payload = Deserialize(json);
-            Refresh(payload);
+            if (payload is not null)
+            {
+                Refresh(payload);
+            }
         }
 
         /// <summary>

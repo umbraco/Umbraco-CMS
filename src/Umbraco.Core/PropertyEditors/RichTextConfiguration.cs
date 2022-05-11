@@ -7,10 +7,10 @@
     {
         // TODO: Make these strongly typed, for now this works though
         [ConfigurationField("editor", "Editor", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
-        public object Editor { get; set; }
+        public object? Editor { get; set; }
 
         [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
-        public string OverlaySize { get; set; }
+        public string? OverlaySize { get; set; }
 
         [ConfigurationField("hideLabel", "Hide Label", "boolean")]
         public bool HideLabel { get; set; }
@@ -22,6 +22,6 @@
 
         [ConfigurationField("mediaParentId", "Image Upload Folder", "mediafolderpicker",
             Description = "Choose the upload location of pasted images")]
-        public GuidUdi MediaParentId { get; set; }
+        public GuidUdi? MediaParentId { get; set; }
     }
 }

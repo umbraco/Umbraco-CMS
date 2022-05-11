@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Core.Models
         public int Id { get; set; }
 
         [DataMember(Name = "text", IsRequired = true)]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [DataMember(Name = "group")]
-        public string Group { get; set; }
+        public string? Group { get; set; }
 
         [DataMember(Name = "nodeCount")]
         public int NodeCount { get; set; }

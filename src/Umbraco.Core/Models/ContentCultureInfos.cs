@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models
     public class ContentCultureInfos : BeingDirtyBase, IDeepCloneable, IEquatable<ContentCultureInfos>
     {
         private DateTime _date;
-        private string _name;
+        private string? _name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentCultureInfos"/> class.
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the name.
         /// </summary>
-        public string Name
+        public string? Name
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
@@ -64,13 +64,13 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ContentCultureInfos other && Equals(other);
         }
 
         /// <inheritdoc />
-        public bool Equals(ContentCultureInfos other)
+        public bool Equals(ContentCultureInfos? other)
         {
             return other != null && Culture == other.Culture && Name == other.Name;
         }
@@ -80,14 +80,18 @@ namespace Umbraco.Cms.Core.Models
         {
             var hashCode = 479558943;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Culture);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            if (Name is not null)
+            {
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
+            }
+
             return hashCode;
         }
 
         /// <summary>
         /// Deconstructs into culture and name.
         /// </summary>
-        public void Deconstruct(out string culture, out string name)
+        public void Deconstruct(out string culture, out string? name)
         {
             culture = Culture;
             name = Name;
@@ -96,7 +100,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Deconstructs into culture, name and date.
         /// </summary>
-        public void Deconstruct(out string culture, out string name, out DateTime date)
+        public void Deconstruct(out string culture, out string? name, out DateTime date)
         {
             Deconstruct(out culture, out name);
             date = Date;

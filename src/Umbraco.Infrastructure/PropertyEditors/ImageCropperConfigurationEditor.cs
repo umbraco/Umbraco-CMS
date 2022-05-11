@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -12,7 +16,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class ImageCropperConfigurationEditor : ConfigurationEditor<ImageCropperConfiguration>
     {
         /// <inheritdoc />
-        public override IDictionary<string, object> ToValueEditor(object configuration)
+        public override IDictionary<string, object> ToValueEditor(object? configuration)
         {
             var d = base.ToValueEditor(configuration);
             if (!d.ContainsKey("focalPoint")) d["focalPoint"] = new { left = 0.5, top = 0.5 };
@@ -20,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return d;
         }
 
-        public ImageCropperConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+        public ImageCropperConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
         }
     }

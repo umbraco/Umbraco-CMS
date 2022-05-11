@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         {
             uriUtility = new UriUtility(Mock.Of<IHostingEnvironment>());
             var urlProvider = new DefaultUrlProvider(
-                Options.Create(requestHandlerSettings),
+                Mock.Of<IOptionsMonitor<RequestHandlerSettings>>(x=> x.CurrentValue == requestHandlerSettings),
                 Mock.Of<ILogger<DefaultUrlProvider>>(),
                 new SiteDomainMapper(),
                 umbracoContextAccessor,
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         protected static PublishedRouter CreatePublishedRouter(
             IUmbracoContextAccessor umbracoContextAccessor,
             IEnumerable<IContentFinder> contentFinders = null,
-            IPublishedUrlProvider publishedUrlProvider = null) => new(Options.Create(new WebRoutingSettings()),
+            IPublishedUrlProvider publishedUrlProvider = null) => new(Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x=> x.CurrentValue == new WebRoutingSettings()),
             new ContentFinderCollection(() => contentFinders ?? Enumerable.Empty<IContentFinder>()),
             new TestLastChanceFinder(), new TestVariationContextAccessor(), Mock.Of<IProfilingLogger>(),
             Mock.Of<ILogger<PublishedRouter>>(), publishedUrlProvider ?? Mock.Of<IPublishedUrlProvider>(),

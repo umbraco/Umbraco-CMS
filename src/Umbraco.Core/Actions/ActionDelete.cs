@@ -1,3 +1,6 @@
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
@@ -5,14 +8,32 @@ namespace Umbraco.Cms.Core.Actions
     /// </summary>
     public class ActionDelete : IAction
     {
-        public const string ActionAlias = "delete";
+        /// <summary>
+        /// The unique action alias
+        /// </summary>
+        private const string ActionAlias = "delete";
+
+        /// <summary>
+        /// The unique action letter
+        /// </summary>
         public const char ActionLetter = 'D';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => ActionAlias;
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
+
+        /// <inheritdoc/>
         public string Icon => "icon-delete";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,8 +18,8 @@ namespace Umbraco.Cms.Core.PublishedCache
     {
         // initializes a new instance of the PublishedElement class
         // within the context of a published snapshot service (eg a published content property value)
-        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing,
-            PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing,
+            PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
         {
             if (key == Guid.Empty) throw new ArgumentException("Empty guid.");
             if (values == null) throw new ArgumentNullException(nameof(values));
@@ -32,13 +32,14 @@ namespace Umbraco.Cms.Core.PublishedCache
             values = GetCaseInsensitiveValueDictionary(values);
 
             _propertiesArray = contentType
-                .PropertyTypes
+                .PropertyTypes?
                 .Select(propertyType =>
                 {
                     values.TryGetValue(propertyType.Alias, out var value);
-                    return (IPublishedProperty) new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
+                    return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
                 })
-                .ToArray();
+                .ToArray()
+                ?? new IPublishedProperty[0];
         }
 
         // initializes a new instance of the PublishedElement class
@@ -46,16 +47,16 @@ namespace Umbraco.Cms.Core.PublishedCache
         // + using an initial reference cache level of .None ensures that everything will be
         // cached at .Content level - and that reference cache level will propagate to all
         // properties
-        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object> values, bool previewing)
+        public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values, bool previewing)
             : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
         { }
 
-        private static Dictionary<string, object> GetCaseInsensitiveValueDictionary(Dictionary<string, object> values)
+        private static Dictionary<string, object?> GetCaseInsensitiveValueDictionary(Dictionary<string, object?> values)
         {
             // ensure we ignore case for property aliases
             var comparer = values.Comparer;
             var ignoreCase = Equals(comparer, StringComparer.OrdinalIgnoreCase) || Equals(comparer, StringComparer.InvariantCultureIgnoreCase) || Equals(comparer, StringComparer.CurrentCultureIgnoreCase);
-            return ignoreCase ? values :  new Dictionary<string, object>(values, StringComparer.OrdinalIgnoreCase);
+            return ignoreCase ? values : new Dictionary<string, object?>(values, StringComparer.OrdinalIgnoreCase);
         }
 
         #region ContentType
@@ -76,10 +77,10 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         public IEnumerable<IPublishedProperty> Properties => _propertiesArray;
 
-        public IPublishedProperty GetProperty(string alias)
+        public IPublishedProperty? GetProperty(string alias)
         {
             var index = ContentType.GetPropertyIndex(alias);
-            var property = index < 0 ? null : _propertiesArray[index];
+            var property = index < 0 ? null : _propertiesArray?[index];
             return property;
         }
 

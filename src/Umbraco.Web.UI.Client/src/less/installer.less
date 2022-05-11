@@ -25,7 +25,7 @@
 
 
 html {
-    background: url('../img/installer.jpg') no-repeat center center fixed;
+    background: url('../img/installer.svg') no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -53,17 +53,17 @@ body {
     opacity: 0.8;
     z-index: 777;
 }
-
 #installer {
     margin: auto;
     background: @white;
     width: 80%;
     max-width: 750px;
-    height: 600px;
+    height: 640px;
     text-align: left;
     padding: 30px;
-    overflow: hidden;
     z-index: 667;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.16);
 }
 
 #overlay {
@@ -157,6 +157,14 @@ input.ng-dirty.ng-invalid {
         display: block;
         color: @gray-3;
     }
+}
+
+#installer .input-readonly-text {
+  padding: 4px 6px;
+}
+
+#installer legend {
+  clear: both;
 }
 
 .absolute-center {

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.IO
         bool ViewExists(ITemplate t);
         string GetFileContents(ITemplate t);
         string CreateView(ITemplate t, bool overWrite = false);
-        string UpdateViewFile(ITemplate t, string currentAlias = null);
+        string? UpdateViewFile(ITemplate t, string? currentAlias = null);
         string ViewPath(string alias);
     }
 }

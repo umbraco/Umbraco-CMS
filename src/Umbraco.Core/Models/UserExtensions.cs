@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Models
 
             if (user.Avatar.IsNullOrWhiteSpace())
             {
-                var gravatarHash = user.Email.GenerateHash<MD5>();
+                var gravatarHash = user.Email?.GenerateHash<MD5>();
                 var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
                 //try Gravatar
@@ -83,8 +83,8 @@ namespace Umbraco.Cms.Core.Models
                 imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 60, Height = 60 }),
                 imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 90, Height = 90 }),
                 imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 150, Height = 150 }),
-                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300 })
-            };
+                imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300 }),
+            }.WhereNotNull().ToArray();
 
         }
 
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Core.Models
             return ContentPermissions.HasPathAccess(content.Path, user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
         }
 
-        public static bool HasPathAccess(this IUser user, IMedia media, IEntityService entityService, AppCaches appCaches)
+        public static bool HasPathAccess(this IUser user, IMedia? media, IEntityService entityService, AppCaches appCaches)
         {
             if (media == null) throw new ArgumentNullException(nameof(media));
             return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
@@ -147,16 +147,23 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Calculate start nodes, combining groups' and user's, and excluding what's in the bin
         /// </summary>
-        public static int[] CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
             var result = runtimeCache.GetCacheItem(cacheKey, () =>
             {
-                var gsn = user.Groups.Where(x => x.StartContentId.HasValue).Select(x => x.StartContentId.Value).Distinct().ToArray();
+                // This returns a nullable array even though we're checking if items have value and there cannot be null
+                // We use Cast<int> to recast into non-nullable array
+                var gsn = user.Groups.Where(x => x.StartContentId is not null).Select(x => x.StartContentId).Distinct().Cast<int>().ToArray();
                 var usn = user.StartContentIds;
-                var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
-                return vals;
+                if (usn is not null)
+                {
+                    var vals = CombineStartNodes(UmbracoObjectTypes.Document, gsn, usn, entityService);
+                    return vals;
+                }
+
+                return null;
             }, TimeSpan.FromMinutes(2), true);
 
             return result;
@@ -169,22 +176,27 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="entityService"></param>
         /// <param name="runtimeCache"></param>
         /// <returns></returns>
-        public static int[] CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
             var result = runtimeCache.GetCacheItem(cacheKey, () =>
             {
-                var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId.Value).Distinct().ToArray();
+                var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId!.Value).Distinct().ToArray();
                 var usn = user.StartMediaIds;
-                var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
-                return vals;
+                if (usn is not null)
+                {
+                    var vals = CombineStartNodes(UmbracoObjectTypes.Media, gsn, usn, entityService);
+                    return vals;
+                }
+
+                return null;
             }, TimeSpan.FromMinutes(2), true);
 
             return result;
         }
 
-        public static string[] GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static string[]? GetMediaStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
@@ -198,7 +210,7 @@ namespace Umbraco.Cms.Core.Models
             return result;
         }
 
-        public static string[] GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
+        public static string[]? GetContentStartNodePaths(this IUser user, IEntityService entityService, AppCaches appCaches)
         {
             var cacheKey = CacheKeys.UserContentStartNodePathsPrefix + user.Id;
             var runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();

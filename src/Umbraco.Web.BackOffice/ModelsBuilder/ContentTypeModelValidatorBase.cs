@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
                 var groupIndex = model.Groups.IndexOf(propertyGroup);
                 var propertyIndex = propertyGroup.Properties.IndexOf(prop);
 
-                ValidationResult validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
+                ValidationResult? validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
                 if (validationResult != null)
                 {
                     yield return validationResult;
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
             }
         }
 
-        private ValidationResult ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
+        private ValidationResult? ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
         {
             // don't let them match any properties or methods in IPublishedContent
             // TODO: There are probably more!

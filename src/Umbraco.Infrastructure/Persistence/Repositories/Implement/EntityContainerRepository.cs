@@ -8,8 +8,8 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -41,21 +41,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IRepositoryCachePolicy<EntityContainer, int> CreateCachePolicy() =>
             NoCacheRepositoryCachePolicy<EntityContainer, int>.Instance;
 
-        protected override EntityContainer PerformGet(int id)
+        protected override EntityContainer? PerformGet(int id)
         {
             Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new { id, NodeObjectType = NodeObjectTypeId });
 
-            NodeDto nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            NodeDto? nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
         // temp - so we don't have to implement GetByQuery
-        public EntityContainer Get(Guid id)
+        public EntityContainer? Get(Guid id)
         {
             Sql<ISqlContext> sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new { uniqueId = id });
 
-            NodeDto nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
@@ -67,9 +67,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
 
-        protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
+        protected override IEnumerable<EntityContainer> PerformGetAll(params int[]? ids)
         {
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                         GetBaseQuery(false)

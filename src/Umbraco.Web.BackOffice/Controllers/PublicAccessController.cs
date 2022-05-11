@@ -50,13 +50,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public ActionResult<PublicAccess> GetPublicAccess(int contentId)
         {
-            IContent content = _contentService.GetById(contentId);
+            IContent? content = _contentService.GetById(contentId);
             if (content == null)
             {
                 return NotFound();
             }
 
-            PublicAccessEntry entry = _publicAccessService.GetEntryForContent(content);
+            PublicAccessEntry? entry = _publicAccessService.GetEntryForContent(content);
             if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Ok();
@@ -66,12 +66,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 .GetAll(UmbracoObjectTypes.Document, entry.LoginNodeId, entry.NoAccessNodeId)
                 .ToDictionary(x => x.Id);
 
-            if (!nodes.TryGetValue(entry.LoginNodeId, out IEntitySlim loginPageEntity))
+            if (!nodes.TryGetValue(entry.LoginNodeId, out IEntitySlim? loginPageEntity))
             {
                 throw new InvalidOperationException($"Login node with id ${entry.LoginNodeId} was not found");
             }
 
-            if (!nodes.TryGetValue(entry.NoAccessNodeId, out IEntitySlim errorPageEntity))
+            if (!nodes.TryGetValue(entry.NoAccessNodeId, out IEntitySlim? errorPageEntity))
             {
                 throw new InvalidOperationException($"Error node with id ${entry.LoginNodeId} was not found");
             }
@@ -85,16 +85,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             MemberDisplay[] members = usernames
                 .Select(username => _memberService.GetByUsername(username))
-                .Where(member => member != null)
                 .Select(_umbracoMapper.Map<MemberDisplay>)
+                .WhereNotNull()
                 .ToArray();
 
-            var allGroups = _memberRoleManager.Roles.ToDictionary(x => x.Name);
+            var allGroups = _memberRoleManager.Roles.Where(x => x.Name != null).ToDictionary(x => x.Name!);
             MemberGroupDisplay[] groups = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                .Select(rule => allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole memberRole) ? memberRole : null)
-                .Where(x => x != null)
+                .Select(rule => rule.RuleValue is not null && allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole? memberRole) ? memberRole : null)
                 .Select(_umbracoMapper.Map<MemberGroupDisplay>)
+                .WhereNotNull()
                 .ToArray();
 
             return new PublicAccess
@@ -138,9 +138,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 
-                foreach (var ruleValue in candidateRuleValues)
+                if (candidateRuleValues is not null)
                 {
-                    entry.AddRule(ruleValue, newRuleType);
+                    foreach (var ruleValue in candidateRuleValues)
+                    {
+                        entry.AddRule(ruleValue, newRuleType);
+                    }
                 }
             }
             else
@@ -151,9 +154,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var currentRules = entry.Rules.ToArray();
                 var obsoleteRules = currentRules.Where(rule =>
                     rule.RuleType != newRuleType
-                    || candidateRuleValues.Contains(rule.RuleValue) == false
+                    || candidateRuleValues?.Contains(rule.RuleValue) == false
                 );
-                var newRuleValues = candidateRuleValues.Where(group =>
+                var newRuleValues = candidateRuleValues?.Where(group =>
                     currentRules.Any(rule =>
                         rule.RuleType == newRuleType
                         && rule.RuleValue == group
@@ -163,9 +166,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     entry.RemoveRule(rule);
                 }
-                foreach (var ruleValue in newRuleValues)
+
+                if (newRuleValues is not null)
                 {
-                    entry.AddRule(ruleValue, newRuleType);
+                    foreach (var ruleValue in newRuleValues)
+                    {
+                        entry.AddRule(ruleValue, newRuleType);
+                    }
                 }
             }
 

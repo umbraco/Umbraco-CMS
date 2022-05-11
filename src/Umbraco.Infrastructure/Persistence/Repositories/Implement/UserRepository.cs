@@ -13,13 +13,13 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -34,8 +34,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IRuntimeState _runtimeState;
-        private string _passwordConfigJson;
+        private string? _passwordConfigJson;
         private bool _passwordConfigInitialized;
+        private readonly object _sqliteValidateSessionLock = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserRepository" /> class.
@@ -74,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Returns a serialized dictionary of the password configuration that is stored against the user in the database
         /// </summary>
-        private string DefaultPasswordConfigJson
+        private string? DefaultPasswordConfigJson
         {
             get
             {
@@ -96,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,IUser>
 
-        protected override IUser PerformGet(int id)
+        protected override IUser? PerformGet(int id)
         {
             // This will never resolve to a user, yet this is asked
             // for all of the time (especially in cases of members).
@@ -141,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
         /// </returns>
-        public IUser GetByUsername(string username, bool includeSecurityData)
+        public IUser? GetByUsername(string username, bool includeSecurityData)
         {
             return GetWith(sql => sql.Where<UserDto>(x => x.Login == username), includeSecurityData);
         }
@@ -157,18 +158,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <returns>
         /// A non cached <see cref="IUser"/> instance
         /// </returns>
-        public IUser Get(int id, bool includeSecurityData)
+        public IUser? Get(int? id, bool includeSecurityData)
         {
             return GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
         }
 
-        public IProfile GetProfile(string username)
+        public IProfile? GetProfile(string username)
         {
             var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Login == username), false);
             return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
         }
 
-        public IProfile GetProfile(int id)
+        public IProfile? GetProfile(int id)
         {
             var dto = GetDtoWith(sql => sql.Where<UserDto>(x => x.Id == id), false);
             return dto == null ? null : new UserProfile(dto.Id, dto.UserName);
@@ -194,7 +195,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
         }
 
-        public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
+        public Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true)
         {
             var now = DateTime.UtcNow;
             var dto = new UserLoginDto
@@ -218,6 +219,23 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         public bool ValidateLoginSession(int userId, Guid sessionId)
         {
+            // HACK: Avoid a deadlock - BackOfficeCookieOptions OnValidatePrincipal
+            // After existing session times out and user logs in again ~ 4 requests come in at once that hit the
+            // "update the validate date" code path, check up the call stack there are a few variables that can make this not occur.
+            // TODO: more generic fix, do something with ForUpdate? wait on a mutex? add a distributed lock? etc.
+            if (Database.DatabaseType.IsSqlite())
+            {
+                lock (_sqliteValidateSessionLock)
+                {
+                    return ValidateLoginSessionInternal(userId, sessionId);
+                }
+            }
+
+            return ValidateLoginSessionInternal(userId, sessionId);
+        }
+
+        private bool ValidateLoginSessionInternal(int userId, Guid sessionId)
+        {
             // with RepeatableRead transaction mode, read-then-update operations can
             // cause deadlocks, and the ForUpdate() hint is required to tell the database
             // to acquire an exclusive lock when reading
@@ -225,10 +243,10 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()
-                .SelectTop(1)
                 .From<UserLoginDto>()
                 .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
-                .ForUpdate());
+                .ForUpdate()
+                .SelectTop(1)); // Stick at end, SQL server syntax provider will insert at start of query after "select ", but sqlite will append limit to end.
 
             var sql = t.Sql(sessionId);
 
@@ -236,15 +254,17 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 
-            //now detect if there's been a timeout
+            // now detect if there's been a timeout
             if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
             {
-                //timeout detected, update the record
+                // timeout detected, update the record
+                Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
                 ClearLoginSession(sessionId);
                 return false;
             }
 
-            //update the validate date
+            // update the validate date
+            Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
             found.LastValidatedUtc = DateTime.UtcNow;
             Database.Update(found);
             return true;
@@ -269,9 +289,9 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                 .Where<UserLoginDto>(x => x.SessionId == sessionId));
         }
 
-        protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IUser> PerformGetAll(params int[]? ids)
         {
-            var dtos = ids.Length == 0
+            var dtos = ids?.Length == 0
                 ? GetDtosWith(null, true)
                 : GetDtosWith(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
             var users = new IUser[dtos.Count];
@@ -294,19 +314,19 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return users;
         }
 
-        private IUser GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
+        private IUser? GetWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var dto = GetDtoWith(with, includeReferences);
             return dto == null ? null : UserFactory.BuildEntity(_globalSettings, dto);
         }
 
-        private UserDto GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
+        private UserDto? GetDtoWith(Action<Sql<ISqlContext>> with, bool includeReferences)
         {
             var dtos = GetDtosWith(with, includeReferences);
             return dtos.FirstOrDefault();
         }
 
-        private List<UserDto> GetDtosWith(Action<Sql<ISqlContext>> with, bool includeReferences)
+        private List<UserDto> GetDtosWith(Action<Sql<ISqlContext>>? with, bool includeReferences)
         {
             var sql = SqlContext.Sql()
                 .Select<UserDto>()
@@ -630,8 +650,12 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             entity.ResetDirtyProperties();
         }
 
-        private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current, UserStartNodeDto.StartNodeTypeValue startNodeType, int[] entityStartIds)
+        private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current, UserStartNodeDto.StartNodeTypeValue startNodeType, int[]? entityStartIds)
         {
+            if (entityStartIds is null)
+            {
+                return;
+            }
             var assignedIds = current.Where(x => x.StartNodeType == (int)startNodeType).Select(x => x.StartNode).ToArray();
 
             //remove the ones not assigned to the entity
@@ -656,7 +680,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         #region Implementation of IUserRepository
 
-        public int GetCountByQuery(IQuery<IUser> query)
+        public int GetCountByQuery(IQuery<IUser>? query)
         {
             var sqlClause = GetBaseQuery("umbracoUser.id");
             var translator = new SqlTranslator<IUser>(sqlClause, query);
@@ -757,13 +781,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         /// <remarks>
         /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using NPoco paging (SQL paging)
         /// </remarks>
-        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, long pageIndex, int pageSize, out long totalRecords,
-            Expression<Func<IUser, object>> orderBy, Direction orderDirection = Direction.Ascending,
-            string[] includeUserGroups = null, string[] excludeUserGroups = null, UserState[] userState = null, IQuery<IUser> filter = null)
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser>? query, long pageIndex, int pageSize, out long totalRecords,
+            Expression<Func<IUser, object?>> orderBy, Direction orderDirection = Direction.Ascending,
+            string[]? includeUserGroups = null, string[]? excludeUserGroups = null, UserState[]? userState = null, IQuery<IUser>? filter = null)
         {
             if (orderBy == null) throw new ArgumentNullException(nameof(orderBy));
 
-            Sql<ISqlContext> filterSql = null;
+            Sql<ISqlContext>? filterSql = null;
             var customFilterWheres = filter?.GetWhereClauses().ToArray();
             var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
             if (hasCustomFilter
@@ -774,8 +798,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
             if (hasCustomFilter)
             {
-                foreach (var clause in customFilterWheres)
-                    filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+                foreach (var clause in customFilterWheres!)
+                    filterSql?.Append($"AND ({clause.Item1})", clause.Item2);
             }
 
             if (includeUserGroups != null && includeUserGroups.Length > 0)
@@ -785,7 +809,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new { userGroups = includeUserGroups });
+                filterSql?.Append(subQuery, new { userGroups = includeUserGroups });
             }
 
             if (excludeUserGroups != null && excludeUserGroups.Length > 0)
@@ -795,7 +819,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     INNER JOIN umbracoUser2UserGroup ON umbracoUser2UserGroup.userId = umbracoUser.id
                     INNER JOIN umbracoUserGroup ON umbracoUserGroup.id = umbracoUser2UserGroup.userGroupId
                     WHERE umbracoUserGroup.userGroupAlias IN (@userGroups)))";
-                filterSql.Append(subQuery, new { userGroups = excludeUserGroups });
+                filterSql?.Append(subQuery, new { userGroups = excludeUserGroups });
             }
 
             if (userState != null && userState.Length > 0)
@@ -837,7 +861,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                     }
 
                     sb.Append(")");
-                    filterSql.Append("AND " + sb);
+                    filterSql?.Append("AND " + sb);
                 }
             }
 
@@ -862,7 +886,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return pagedResult.Items.Select(x => UserFactory.BuildEntity(_globalSettings, x));
         }
 
-        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql, bool hasWhereClause)
+        private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext>? filterSql, bool hasWhereClause)
         {
             if (filterSql == null) return sql;
 
@@ -877,13 +901,13 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return sql;
         }
 
-        private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object>> orderBy, Direction orderDirection)
+        private Sql<ISqlContext> ApplySort(Sql<ISqlContext> sql, Expression<Func<IUser, object?>> orderBy, Direction orderDirection)
         {
             if (orderBy == null) return sql;
 
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             var mapper = _mapperCollection[typeof(IUser)];
-            var mappedField = mapper.Map(expressionMember.Name);
+            var mappedField = mapper.Map(expressionMember?.Name);
 
             if (mappedField.IsNullOrWhiteSpace())
                 throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
@@ -911,7 +935,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return sql;
         }
 
-        internal IEnumerable<IUser> GetNextUsers(int id, int count)
+        public IEnumerable<IUser> GetNextUsers(int id, int count)
         {
             var idsQuery = SqlContext.Sql()
                 .Select<UserDto>(x => x.Id)
@@ -923,7 +947,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             var ids = Database.Page<int>(1, count, idsQuery).Items.ToArray();
 
             // now get the actual users and ensure they are ordered properly (same clause)
-            return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetMany(ids).OrderBy(x => x.Id);
+            return ids.Length == 0 ? Enumerable.Empty<IUser>() : GetMany(ids)?.OrderBy(x => x.Id) ?? Enumerable.Empty<IUser>();
         }
 
         #endregion

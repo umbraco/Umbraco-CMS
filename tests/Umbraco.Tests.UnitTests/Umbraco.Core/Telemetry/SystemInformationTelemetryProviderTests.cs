@@ -5,6 +5,7 @@ using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -111,11 +112,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             return new SystemInformationTelemetryProvider(
                 Mock.Of<IUmbracoVersion>(),
                 Mock.Of<ILocalizationService>(),
-                Mock.Of<IOptions<ModelsBuilderSettings>>(x => x.Value == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
-                Mock.Of<IOptions<HostingSettings>>(x => x.Value == new HostingSettings { Debug = isDebug }),
-                Mock.Of<IOptions<GlobalSettings>>(x => x.Value == new GlobalSettings{ UmbracoPath = umbracoPath }),
+                Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
+                Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
+                Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings{ UmbracoPath = umbracoPath }),
                 hostEnvironment.Object,
-                new Lazy<IUmbracoDatabase>(databaseMock.Object));
+                Mock.Of<IUmbracoDatabaseFactory>(x=>x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y=>y.DatabaseType == DatabaseType.SQLite)));
         }
     }
 }

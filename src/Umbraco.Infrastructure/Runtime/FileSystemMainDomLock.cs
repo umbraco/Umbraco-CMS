@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly string _lockFilePath;
         private readonly string _releaseSignalFilePath;
 
-        private FileStream _lockFileStream;
-        private Task _listenForReleaseSignalFileTask;
+        private FileStream? _lockFileStream;
+        private Task? _listenForReleaseSignalFileTask;
 
         public FileSystemMainDomLock(
             ILogger<FileSystemMainDomLock> logger,

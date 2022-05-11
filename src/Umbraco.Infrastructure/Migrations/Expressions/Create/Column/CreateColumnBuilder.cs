@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
 
         public void Do() => Expression.Execute();
 
-        public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ForeignKeyDefinition? CurrentForeignKey { get; set; }
 
         public override ColumnDefinition GetColumnForType()
         {
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
             return Indexed(null);
         }
 
-        public ICreateColumnOptionBuilder Indexed(string indexName)
+        public ICreateColumnOptionBuilder Indexed(string? indexName)
         {
             Expression.Column.IsIndexed = true;
 
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
             return Unique(null);
         }
 
-        public ICreateColumnOptionBuilder Unique(string indexName)
+        public ICreateColumnOptionBuilder Unique(string? indexName)
         {
             Expression.Column.IsUnique = true;
 
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableSchema,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ForeignKey(string? foreignKeyName, string? primaryTableSchema,
                                                                      string primaryTableName, string primaryColumnName)
         {
             Expression.Column.IsForeignKey = true;
@@ -175,7 +175,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
+        public ICreateColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName, string? foreignTableSchema,
                                                                        string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition
@@ -196,13 +196,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Column
 
         public ICreateColumnOptionForeignKeyCascadeBuilder OnDelete(Rule rule)
         {
-            CurrentForeignKey.OnDelete = rule;
+            if (CurrentForeignKey is not null)
+            {
+                CurrentForeignKey.OnDelete = rule;
+            }
+
             return this;
         }
 
         public ICreateColumnOptionForeignKeyCascadeBuilder OnUpdate(Rule rule)
         {
-            CurrentForeignKey.OnUpdate = rule;
+            if (CurrentForeignKey is not null)
+            {
+                CurrentForeignKey.OnUpdate = rule;
+            }
+
             return this;
         }
 

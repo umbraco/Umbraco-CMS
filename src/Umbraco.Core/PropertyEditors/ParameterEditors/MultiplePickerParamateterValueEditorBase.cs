@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
 
         public abstract  string UdiEntityType { get; }
         public abstract UmbracoObjectTypes UmbracoObjectType { get; }
-        public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value is string str ? str : value?.ToString();
 
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
 
             foreach (var udiStr in asString.Split(','))
             {
-                if (UdiParser.TryParse(udiStr, out Udi udi))
+                if (UdiParser.TryParse(udiStr, out Udi? udi))
                 {
                     yield return new UmbracoEntityReference(udi);
                 }

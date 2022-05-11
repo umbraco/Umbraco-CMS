@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using Transaction = System.Transactions.Transaction;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
-    class RetryDbConnection : DbConnection
+    public class RetryDbConnection : DbConnection
     {
         private DbConnection _inner;
         private readonly RetryPolicy _conRetryPolicy;
-        private readonly RetryPolicy _cmdRetryPolicy;
+        private readonly RetryPolicy? _cmdRetryPolicy;
 
-        public RetryDbConnection(DbConnection connection, RetryPolicy conRetryPolicy, RetryPolicy cmdRetryPolicy)
+        public RetryDbConnection(DbConnection connection, RetryPolicy? conRetryPolicy, RetryPolicy? cmdRetryPolicy)
         {
             _inner = connection;
             _inner.StateChange += StateChangeHandler;
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 
         public DbConnection Inner { get { return _inner; } }
 
+        [AllowNull]
         public override string ConnectionString { get { return _inner.ConnectionString; } set { _inner.ConnectionString = value; } }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
@@ -71,11 +73,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
                 _inner.StateChange -= StateChangeHandler;
                 _inner.Dispose();
             }
-            _inner = null;
             base.Dispose(disposing);
         }
 
-        public override void EnlistTransaction(Transaction transaction)
+        public override void EnlistTransaction(Transaction? transaction)
         {
             _inner.EnlistTransaction(transaction);
         }
@@ -90,7 +91,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             return _inner.GetSchema(collectionName);
         }
 
-        public override DataTable GetSchema(string collectionName, string[] restrictionValues)
+        public override DataTable GetSchema(string collectionName, string?[] restrictionValues)
         {
             return _inner.GetSchema(collectionName, restrictionValues);
         }
@@ -130,7 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
         private DbCommand _inner;
         private readonly RetryPolicy _cmdRetryPolicy;
 
-        public FaultHandlingDbCommand(RetryDbConnection connection, DbCommand command, RetryPolicy cmdRetryPolicy)
+        public FaultHandlingDbCommand(RetryDbConnection connection, DbCommand command, RetryPolicy? cmdRetryPolicy)
         {
             _connection = connection;
             _inner = command;
@@ -142,8 +143,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                _inner?.Dispose();
-            _inner = null;
+                _inner.Dispose();
+            _inner = null!;
             base.Dispose(disposing);
         }
 
@@ -152,6 +153,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             _inner.Cancel();
         }
 
+        [AllowNull]
         public override string CommandText
         {
             get => _inner.CommandText;
@@ -170,6 +172,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             set => _inner.CommandType = value;
         }
 
+        [AllowNull]
         protected override DbConnection DbConnection
         {
             get => _connection;
@@ -190,7 +193,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 
         protected override DbParameterCollection DbParameterCollection => _inner.Parameters;
 
-        protected override DbTransaction DbTransaction
+        protected override DbTransaction? DbTransaction
         {
             get => _inner.Transaction;
             set => _inner.Transaction = value;
@@ -208,7 +211,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             return Execute(() => _inner.ExecuteNonQuery());
         }
 
-        public override object ExecuteScalar()
+        public override object? ExecuteScalar()
         {
             return Execute(() => _inner.ExecuteScalar());
         }
@@ -219,7 +222,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
             {
                 _connection.Ensure();
                 return f();
-            });
+            })!;
         }
 
         public override void Prepare()

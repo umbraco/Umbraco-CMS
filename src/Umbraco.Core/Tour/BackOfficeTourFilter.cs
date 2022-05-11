@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Tour
         /// Example, pluginName = "hello", tourFileName="stuff", tourAlias=NULL = we will filter out the tour file "stuff" from the plugin "hello" but not from other plugins if the same file name exists.
         /// Example, tourAlias="test.*" = we will filter out all tour aliases that start with the word "test" regardless of the plugin or file name
         /// </remarks>
-        public BackOfficeTourFilter(Regex pluginName, Regex tourFileName, Regex tourAlias)
+        public BackOfficeTourFilter(Regex? pluginName, Regex? tourFileName, Regex? tourAlias)
         {
             PluginName = pluginName;
             TourFileName = tourFileName;
@@ -30,17 +30,17 @@ namespace Umbraco.Cms.Core.Tour
         /// <summary>
         /// Gets the plugin name filtering regex.
         /// </summary>
-        public Regex PluginName { get; }
+        public Regex? PluginName { get; }
 
         /// <summary>
         /// Gets the tour filename filtering regex.
         /// </summary>
-        public Regex TourFileName { get; }
+        public Regex? TourFileName { get; }
 
         /// <summary>
         /// Gets the tour alias filtering regex.
         /// </summary>
-        public Regex TourAlias { get; }
+        public Regex? TourAlias { get; }
 
         /// <summary>
         /// Creates a filter to filter on the plugin name.

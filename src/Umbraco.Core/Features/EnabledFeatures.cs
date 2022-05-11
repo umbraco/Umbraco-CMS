@@ -11,6 +11,6 @@ namespace Umbraco.Cms.Core.Features
         /// <remarks>
         /// This is set to a virtual path of a razor view file
         /// </remarks>
-        public string PreviewExtendedView { get; set; }
+        public string? PreviewExtendedView { get; set; }
     }
 }

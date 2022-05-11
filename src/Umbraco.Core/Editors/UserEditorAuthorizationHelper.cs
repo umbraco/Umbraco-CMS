@@ -36,12 +36,12 @@ namespace Umbraco.Cms.Core.Editors
         /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
         /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
         /// <returns></returns>
-        public Attempt<string> IsAuthorized(IUser currentUser,
-            IUser savingUser,
-            IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds,
-            IEnumerable<string> userGroupAliases)
+        public Attempt<string?> IsAuthorized(IUser? currentUser,
+            IUser? savingUser,
+            IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds,
+            IEnumerable<string>? userGroupAliases)
         {
-            var currentIsAdmin = currentUser.IsAdmin();
+            var currentIsAdmin = currentUser?.IsAdmin() ?? false;
 
             // a) A non-admin cannot save an admin
 
@@ -59,22 +59,22 @@ namespace Umbraco.Cms.Core.Editors
 
             var changedStartContentIds = savingUser == null
                 ? startContentIds
-                : startContentIds == null
+                : startContentIds == null || savingUser.StartContentIds is null
                     ? null
                     : startContentIds.Except(savingUser.StartContentIds).ToArray();
             var changedStartMediaIds = savingUser == null
                 ? startMediaIds
-                : startMediaIds == null
+                : startMediaIds == null || savingUser.StartMediaIds is null
                     ? null
                     : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
-            var pathResult = AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
+            var pathResult = currentUser is null ? Attempt<string?>.Fail() : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
             if (pathResult == false)
                 return pathResult;
 
             // c) an admin can manage any group or section access
 
             if (currentIsAdmin)
-                return Attempt<string>.Succeed();
+                return Attempt<string?>.Succeed();
 
             if (userGroupAliases != null)
             {
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Editors
                 var addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);
 
                 // As we know the current user is not admin, it is only allowed to use groups that the user do have themselves.
-                var savingGroupAliasesNotAllowed = addedGroupAliases.Except(currentUser.Groups.Select(x=>x.Alias)).ToArray();
+                var savingGroupAliasesNotAllowed = addedGroupAliases.Except(currentUser?.Groups.Select(x=> x.Alias) ?? Enumerable.Empty<string>()).ToArray();
                 if (savingGroupAliasesNotAllowed.Any())
                 {
                     return Attempt.Fail("Cannot assign the group(s) '" + string.Join(", ", savingGroupAliasesNotAllowed) + "', the current user is not part of them or admin");
@@ -106,10 +106,10 @@ namespace Umbraco.Cms.Core.Editors
                 if (userGroupsChanged)
                 {
                     // d) A user cannot assign a group to another user that they do not belong to
-                    var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
+                    var currentUserGroups = currentUser?.Groups.Select(x => x.Alias).ToArray();
                     foreach (var group in newGroups)
                     {
-                        if (currentUserGroups.Contains(group) == false)
+                        if (currentUserGroups?.Contains(group) == false)
                         {
                             return Attempt.Fail("Cannot assign the group " + group + ", the current user is not a member");
                         }
@@ -117,10 +117,10 @@ namespace Umbraco.Cms.Core.Editors
                 }
             }
 
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
 
-        private Attempt<string> AuthorizePath(IUser currentUser, IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds)
+        private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
         {
             if (startContentIds != null)
             {
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Editors
                 }
             }
 
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
     }
 }

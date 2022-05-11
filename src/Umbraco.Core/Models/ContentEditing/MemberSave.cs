@@ -13,40 +13,36 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "username", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string Username { get; set; }
+        public string Username { get; set; } = null!;
 
         [DataMember(Name = "email", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [DataMember(Name = "password")]
-        public ChangingPasswordModel Password { get; set; }
+        public ChangingPasswordModel? Password { get; set; }
 
         [DataMember(Name = "memberGroups")]
-        public IEnumerable<string> Groups { get; set; }
+        public IEnumerable<string>? Groups { get; set; }
 
         /// <summary>
         /// Returns the value from the Comments property
         /// </summary>
-        public string Comments => GetPropertyValue<string>(Constants.Conventions.Member.Comments);
+        public string? Comments => GetPropertyValue<string>(Constants.Conventions.Member.Comments);
 
-        /// <summary>
-        /// Returns the value from the IsLockedOut property
-        /// </summary>
-        public bool IsLockedOut => GetPropertyValue<bool>(Constants.Conventions.Member.IsLockedOut);
+        [DataMember(Name = "isLockedOut")]
+        public bool IsLockedOut { get; set; }
 
-        /// <summary>
-        /// Returns the value from the IsApproved property
-        /// </summary>
-        public bool IsApproved => GetPropertyValue<bool>(Constants.Conventions.Member.IsApproved);
+        [DataMember(Name = "isApproved")]
+        public bool IsApproved { get; set; }
 
-        private T GetPropertyValue<T>(string alias)
+        private T? GetPropertyValue<T>(string alias)
         {
             var prop = Properties.FirstOrDefault(x => x.Alias == alias);
             if (prop == null) return default;
             var converted = prop.Value.TryConvertTo<T>();
-            return converted.ResultOr(default);
+            return converted.Result ?? default;
         }
     }
 }

@@ -12,28 +12,28 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelation"/></param>
         /// <returns>A <see cref="IRelation"/> object</returns>
-        IRelation GetById(int id);
+        IRelation? GetById(int id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeById(int id);
+        IRelationType? GetRelationTypeById(int id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Id
         /// </summary>
         /// <param name="id">Id of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeById(Guid id);
+        IRelationType? GetRelationTypeById(Guid id);
 
         /// <summary>
         /// Gets a <see cref="IRelationType"/> by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="IRelationType"/></param>
         /// <returns>A <see cref="IRelationType"/> object</returns>
-        IRelationType GetRelationTypeByAlias(string alias);
+        IRelationType? GetRelationTypeByAlias(string alias);
 
         /// <summary>
         /// Gets all <see cref="IRelation"/> objects
@@ -47,14 +47,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="relationType"><see cref="IRelation"/> to retrieve Relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetAllRelationsByRelationType(IRelationType relationType);
+        IEnumerable<IRelation>? GetAllRelationsByRelationType(IRelationType relationType);
 
         /// <summary>
         /// Gets all <see cref="IRelation"/> objects by their <see cref="IRelationType"/>'s Id
         /// </summary>
         /// <param name="relationTypeId">Id of the <see cref="IRelationType"/> to retrieve Relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId);
+        IEnumerable<IRelation>? GetAllRelationsByRelationType(int relationTypeId);
 
         /// <summary>
         /// Gets all <see cref="IRelation"/> objects
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the parent to retrieve relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetByParentId(int id);
+        IEnumerable<IRelation>? GetByParentId(int id);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by their parent Id
@@ -76,14 +76,14 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="id">Id of the parent to retrieve relations for</param>
         /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetByParentId(int id, string relationTypeAlias);
+        IEnumerable<IRelation>? GetByParentId(int id, string relationTypeAlias);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by their parent entity
         /// </summary>
         /// <param name="parent">Parent Entity to retrieve relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetByParent(IUmbracoEntity parent);
+        IEnumerable<IRelation>? GetByParent(IUmbracoEntity parent);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by their parent entity
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="childId">The id of the child item.</param>
         /// <param name="relationType">The RelationType.</param>
         /// <returns>The relation or null</returns>
-        IRelation GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
+        IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
 
         /// <summary>
         /// Gets a list of <see cref="IRelation"/> objects by the Name of the <see cref="IRelationType"/>
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="relationTypeId">Id of the <see cref="IRelationType"/> to retrieve Relations for</param>
         /// <returns>An enumerable list of <see cref="IRelation"/> objects</returns>
-        IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId);
+        IEnumerable<IRelation>? GetByRelationTypeId(int relationTypeId);
 
         /// <summary>
         /// Gets a paged result of <see cref="IRelation"/>
@@ -171,28 +171,28 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalChildren"></param>
         /// <returns></returns>
-        IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering ordering = null);
+        IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 
         /// <summary>
         /// Gets the Child object from a Relation as an <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="relation">Relation to retrieve child object from</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetChildEntityFromRelation(IRelation relation);
+        IUmbracoEntity? GetChildEntityFromRelation(IRelation relation);
 
         /// <summary>
         /// Gets the Parent object from a Relation as an <see cref="IUmbracoEntity"/>
         /// </summary>
         /// <param name="relation">Relation to retrieve parent object from</param>
         /// <returns>An <see cref="IUmbracoEntity"/></returns>
-        IUmbracoEntity GetParentEntityFromRelation(IRelation relation);
+        IUmbracoEntity? GetParentEntityFromRelation(IRelation relation);
 
         /// <summary>
         /// Gets the Parent and Child objects from a Relation as a <see cref="Tuple"/>"/> with <see cref="IUmbracoEntity"/>.
         /// </summary>
         /// <param name="relation">Relation to retrieve parent and child object from</param>
         /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
-        Tuple<IUmbracoEntity, IUmbracoEntity> GetEntitiesFromRelation(IRelation relation);
+        Tuple<IUmbracoEntity, IUmbracoEntity>? GetEntitiesFromRelation(IRelation relation);
 
         /// <summary>
         /// Gets the Child objects from a list of Relations as a list of <see cref="IUmbracoEntity"/> objects.

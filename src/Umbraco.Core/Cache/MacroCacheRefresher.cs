@@ -46,7 +46,10 @@ namespace Umbraco.Cms.Core.Cache
         {
             var payloads = Deserialize(json);
 
-            Refresh(payloads);
+            if (payloads is not null)
+            {
+                Refresh(payloads);
+            }
         }
 
         public override void Refresh(JsonPayload[] payloads)
@@ -54,13 +57,15 @@ namespace Umbraco.Cms.Core.Cache
             foreach (var payload in payloads)
             {
                 foreach (var alias in GetCacheKeysForAlias(payload.Alias))
+                {
                     AppCaches.RuntimeCache.ClearByKey(alias);
+                }
 
-                var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
+                Attempt<IAppPolicyCache?> macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
-                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, string>(payload.Alias)); // Repository caching of macro definition by alias
+                    macroRepoCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
+                    macroRepoCache.Result?.Clear(RepositoryCacheKeys.GetKey<IMacro, string>(payload.Alias)); // Repository caching of macro definition by alias
                 }
             }
 

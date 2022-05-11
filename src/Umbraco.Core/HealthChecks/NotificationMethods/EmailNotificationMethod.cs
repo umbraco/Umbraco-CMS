@@ -13,19 +13,18 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
     [HealthCheckNotificationMethod("email")]
     public class EmailNotificationMethod : NotificationMethodBase
     {
-        private readonly ILocalizedTextService _textService;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IEmailSender _emailSender;
-        private readonly IMarkdownToHtmlConverter _markdownToHtmlConverter;
-
-        private readonly ContentSettings _contentSettings;
+        private readonly ILocalizedTextService? _textService;
+        private readonly IHostingEnvironment? _hostingEnvironment;
+        private readonly IEmailSender? _emailSender;
+        private readonly IMarkdownToHtmlConverter? _markdownToHtmlConverter;
+        private ContentSettings? _contentSettings;
 
         public EmailNotificationMethod(
             ILocalizedTextService textService,
             IHostingEnvironment hostingEnvironment,
             IEmailSender emailSender,
-            IOptions<HealthChecksSettings> healthChecksSettings,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IMarkdownToHtmlConverter markdownToHtmlConverter)
             : base(healthChecksSettings)
         {
@@ -42,10 +41,12 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
             _hostingEnvironment = hostingEnvironment;
             _emailSender = emailSender;
             _markdownToHtmlConverter = markdownToHtmlConverter;
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
-        public string RecipientEmail { get; }
+        public string? RecipientEmail { get; }
 
         public override async Task SendAsync(HealthCheckResults results)
         {
@@ -59,32 +60,36 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
                 return;
             }
 
-            var message = _textService.Localize("healthcheck","scheduledHealthCheckEmailBody", new[]
+            var message = _textService?.Localize("healthcheck","scheduledHealthCheckEmailBody", new[]
             {
                 DateTime.Now.ToShortDateString(),
                 DateTime.Now.ToShortTimeString(),
-                _markdownToHtmlConverter.ToHtml(results, Verbosity)
+                _markdownToHtmlConverter?.ToHtml(results, Verbosity)
             });
 
             // Include the umbraco Application URL host in the message subject so that
             // you can identify the site that these results are for.
-            var host = _hostingEnvironment.ApplicationMainUrl?.ToString();
+            var host = _hostingEnvironment?.ApplicationMainUrl?.ToString();
 
-            var subject = _textService.Localize("healthcheck","scheduledHealthCheckEmailSubject", new[] { host });
+            var subject = _textService?.Localize("healthcheck","scheduledHealthCheckEmailSubject", new[] { host });
 
 
             var mailMessage = CreateMailMessage(subject, message);
-            await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck);
+            Task? task = _emailSender?.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck);
+            if (task is not null)
+            {
+                await task;
+            }
         }
 
-        private EmailMessage CreateMailMessage(string subject, string message)
+        private EmailMessage CreateMailMessage(string? subject, string? message)
         {
-            var to = _contentSettings.Notifications.Email;
+            var to = _contentSettings?.Notifications.Email;
 
             if (string.IsNullOrWhiteSpace(subject))
                 subject = "Umbraco Health Check Status";
 
-            var isBodyHtml = message.IsNullOrWhiteSpace() == false && message.Contains("<") && message.Contains("</");
+            var isBodyHtml = message.IsNullOrWhiteSpace() == false && message!.Contains("<") && message.Contains("</");
             return new EmailMessage(to, RecipientEmail, subject, message, isBodyHtml);
         }
     }

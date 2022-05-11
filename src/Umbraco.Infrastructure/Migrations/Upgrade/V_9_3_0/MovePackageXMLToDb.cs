@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0
         private void MigrateCreatedPackageFilesToDb()
         {
             // Load data from file
-            IEnumerable<PackageDefinition> packages = _packagesRepository.GetAll();
+            IEnumerable<PackageDefinition> packages = _packagesRepository.GetAll().WhereNotNull();
             var createdPackageDtos = new List<CreatedPackageSchemaDto>();
             foreach (PackageDefinition package in packages)
             {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _fileService = fileService;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -54,8 +55,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //check if there are any templates
-            root.HasChildren = _fileService.GetTemplates(-1).Any();
+            if (root is not null)
+            {
+                //check if there are any templates
+                root.HasChildren = _fileService.GetTemplates(-1)?.Any() ?? false;
+            }
+
             return root;
         }
 
@@ -78,17 +83,20 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 ? _fileService.GetTemplates(-1)
                 : _fileService.GetTemplates(int.Parse(id, CultureInfo.InvariantCulture));
 
-            nodes.AddRange(found.Select(template => CreateTreeNode(
-                template.Id.ToString(CultureInfo.InvariantCulture),
-                // TODO: Fix parent ID stuff for templates
-                "-1",
-                queryStrings,
-                template.Name,
-                template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
-                template.IsMasterTemplate,
-                null,
-                Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
-            )));
+            if (found is not null)
+            {
+                nodes.AddRange(found.Select(template => CreateTreeNode(
+                    template.Id.ToString(CultureInfo.InvariantCulture),
+                    // TODO: Fix parent ID stuff for templates
+                    "-1",
+                    queryStrings,
+                    template.Name,
+                    template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
+                    template.IsMasterTemplate,
+                    null,
+                    Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
+                )));
+            }
 
             return nodes;
         }
@@ -105,7 +113,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             // Create the normal create action
             var item = menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
-            item.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
+            item?.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.RootString)
             {
@@ -148,7 +156,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             };
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.Template, query, pageSize, pageIndex, out totalFound, searchFrom);
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.Template, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
     }
 }

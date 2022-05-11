@@ -76,14 +76,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="contentTypeId"></param>
         /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
-        protected ActionResult<IEnumerable<Tuple<EntityBasic, bool>>> PerformGetAvailableCompositeContentTypes(
+        protected ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> PerformGetAvailableCompositeContentTypes(
             int contentTypeId,
             UmbracoObjectTypes type,
-            string[] filterContentTypes,
-            string[] filterPropertyTypes,
+            string[]? filterContentTypes,
+            string[]? filterPropertyTypes,
             bool isElement)
         {
-            IContentTypeComposition source = null;
+            IContentTypeComposition? source = null;
 
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
@@ -146,48 +146,64 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return availableCompositions.Results
                 .Select(x =>
-                    new Tuple<EntityBasic, bool>(UmbracoMapper.Map<IContentTypeComposition, EntityBasic>(x.Composition),
+                    new Tuple<EntityBasic?, bool>(UmbracoMapper.Map<IContentTypeComposition, EntityBasic>(x.Composition),
                         x.Allowed))
                 .Select(x =>
                 {
                     //we need to ensure that the item is enabled if it is already selected
                     // but do not allow it if it is any of the ancestors
-                    if (compAliases.Contains(x.Item1.Alias) && ancestors.Contains(x.Item1.Alias) == false)
+                    if (compAliases.Contains(x.Item1?.Alias) && ancestors.Contains(x.Item1?.Alias) == false)
                     {
                         //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
-                        x = new Tuple<EntityBasic, bool>(x.Item1, true);
+                        x = new Tuple<EntityBasic?, bool>(x.Item1, true);
                     }
 
                     //translate the name
-                    x.Item1.Name = TranslateItem(x.Item1.Name);
+                    if (x.Item1 is not null)
+                    {
+                        x.Item1.Name = TranslateItem(x.Item1.Name);
+                    }
 
-                    IContentTypeComposition contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1.Key);
-                    EntityContainer[] containers = GetEntityContainers(contentType, type)?.ToArray();
+                    IContentTypeComposition? contentType = allContentTypes.FirstOrDefault(c => c.Key == x.Item1?.Key);
+                    EntityContainer[] containers = GetEntityContainers(contentType, type).ToArray();
                     var containerPath =
-                        $"/{(containers != null && containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
-                    x.Item1.AdditionalData["containerPath"] = containerPath;
+                        $"/{(containers.Any() ? $"{string.Join("/", containers.Select(c => c.Name))}/" : null)}";
+                    if (x.Item1 is not null)
+                    {
+                        x.Item1.AdditionalData["containerPath"] = containerPath;
+                    }
 
                     return x;
                 })
                 .ToList();
         }
 
-        private IEnumerable<EntityContainer> GetEntityContainers(IContentTypeComposition contentType,
+        private IEnumerable<EntityContainer> GetEntityContainers(IContentTypeComposition? contentType,
             UmbracoObjectTypes type)
         {
             if (contentType == null)
             {
-                return null;
+                return Enumerable.Empty<EntityContainer>();
             }
 
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
-                    return ContentTypeService.GetContainers(contentType as IContentType);
+                    if (contentType is IContentType documentContentType)
+                    {
+                        return ContentTypeService.GetContainers(documentContentType);
+                    }
+
+                    return Enumerable.Empty<EntityContainer>();
                 case UmbracoObjectTypes.MediaType:
-                    return MediaTypeService.GetContainers(contentType as IMediaType);
+                    if (contentType is IMediaType mediaContentType)
+                    {
+                        return MediaTypeService.GetContainers(mediaContentType);
+                    }
+
+                    return Enumerable.Empty<EntityContainer>();
                 case UmbracoObjectTypes.MemberType:
-                    return new EntityContainer[0];
+                    return Enumerable.Empty<EntityContainer>();
                 default:
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
@@ -206,7 +222,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (contentTypeId > 0)
             {
-                IContentTypeComposition source;
+                IContentTypeComposition? source;
 
                 switch (type)
                 {
@@ -262,11 +278,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return composedOf
                 .Select(UmbracoMapper.Map<IContentTypeComposition, EntityBasic>)
+                .WhereNotNull()
                 .Select(TranslateName)
                 .ToList();
         }
 
-        protected string TranslateItem(string text)
+        protected string? TranslateItem(string? text)
         {
             if (text == null)
             {
@@ -282,17 +299,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected ActionResult<TContentType> PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+        protected ActionResult<TContentType?> PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             TContentTypeSave contentTypeSave,
-            Func<int, TContentType> getContentType,
-            Action<TContentType> saveContentType,
-            Action<TContentTypeSave> beforeCreateNew = null)
+            Func<int, TContentType?> getContentType,
+            Action<TContentType?> saveContentType,
+            Action<TContentTypeSave>? beforeCreateNew = null)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
-            TContentType ct = ctId > 0 ? getContentType(ctId) : null;
+            TContentType? ct = ctId > 0 ? getContentType(ctId) : null;
             if (ctId > 0 && ct == null)
             {
                 return NotFound();
@@ -304,7 +321,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // works since that is based on aliases.
             IEnumerable<string> allAliases = ContentTypeService.GetAllContentTypeAliases();
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
-            if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
+            if (exists && (ctId == 0 || (!ct?.Alias.InvariantEquals(contentTypeSave.Alias) ?? false)))
             {
                 ModelState.AddModelError("Alias",
                     LocalizedTextService.Localize("editcontenttype", "aliasAlreadyExists"));
@@ -315,7 +332,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                TContentTypeDisplay err =
+                TContentTypeDisplay? err =
                     CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
                 return ValidationProblem(err);
             }
@@ -338,7 +355,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
                 catch (Exception ex)
                 {
-                    TContentTypeDisplay responseEx =
+                    TContentTypeDisplay? responseEx =
                         CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
                             ex, contentTypeSave, ct, ctId);
                     if (responseEx != null)
@@ -347,7 +364,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                TContentTypeDisplay exResult =
+                TContentTypeDisplay? exResult =
                     CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(
                         contentTypeSave, ct);
                 if (exResult != null)
@@ -381,7 +398,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 //save as new
 
-                TContentType newCt = null;
+                TContentType? newCt = null;
                 try
                 {
                     //This mapping will cause a lot of content type validation to occur which we need to deal with
@@ -389,7 +406,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
                 catch (Exception ex)
                 {
-                    TContentTypeDisplay responseEx =
+                    TContentTypeDisplay? responseEx =
                         CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
                             ex, contentTypeSave, ct, ctId);
                     if (responseEx is null)
@@ -400,7 +417,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return ValidationProblem(responseEx);
                 }
 
-                TContentTypeDisplay exResult =
+                TContentTypeDisplay? exResult =
                     CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(
                         contentTypeSave, newCt);
                 if (exResult != null)
@@ -419,7 +436,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (allowItselfAsChild && newCt != null)
                 {
                     newCt.AllowedContentTypes =
-                        newCt.AllowedContentTypes.Union(
+                        newCt.AllowedContentTypes?.Union(
                             new[] { new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
                         );
                     saveContentType(newCt);
@@ -441,7 +458,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             foreach (ValidationResult r in validationResults)
             foreach (var m in r.MemberNames)
             {
-                modelState.AddModelError(m, r.ErrorMessage);
+                modelState.AddModelError(m, r.ErrorMessage ?? string.Empty);
             }
         }
 
@@ -454,22 +471,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         protected IActionResult PerformMove(
             MoveOrCopy move,
-            Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>>> doMove)
+            Func<int, TContentType?> getContentType,
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>?>> doMove)
         {
-            TContentType toMove = getContentType(move.Id);
+            TContentType? toMove = getContentType(move.Id);
             if (toMove == null)
             {
                 return NotFound();
             }
 
-            Attempt<OperationResult<MoveOperationStatusType>> result = doMove(toMove, move.ParentId);
+            Attempt<OperationResult<MoveOperationStatusType>?> result = doMove(toMove, move.ParentId);
             if (result.Success)
             {
                 return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
-            switch (result.Result.Result)
+            switch (result.Result?.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
@@ -491,22 +508,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         protected IActionResult PerformCopy(
             MoveOrCopy move,
-            Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>>> doCopy)
+            Func<int, TContentType?> getContentType,
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>?>> doCopy)
         {
-            TContentType toMove = getContentType(move.Id);
+            TContentType? toMove = getContentType(move.Id);
             if (toMove == null)
             {
                 return NotFound();
             }
 
-            Attempt<OperationResult<MoveOperationStatusType, TContentType>> result = doCopy(toMove, move.ParentId);
+            Attempt<OperationResult<MoveOperationStatusType, TContentType>?> result = doCopy(toMove, move.ParentId);
             if (result.Success)
             {
                 return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
-            switch (result.Result.Result)
+            switch (result.Result?.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
@@ -526,19 +543,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        private TContentTypeDisplay CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType,
-            TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType composition)
+        private TContentTypeDisplay? CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType,
+            TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType? composition)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
-            IContentTypeBaseService<TContentType> service = GetContentTypeService<TContentType>();
-            Attempt<string[]> validateAttempt = service.ValidateComposition(composition);
+            IContentTypeBaseService<TContentType>? service = GetContentTypeService<TContentType>();
+            Attempt<string[]?> validateAttempt = service?.ValidateComposition(composition) ?? Attempt.Fail<string[]?>();
             if (validateAttempt == false)
             {
                 // if it's not successful then we need to return some model state for the property type and property group
                 // aliases that are duplicated
-                IEnumerable<string> duplicatePropertyTypeAliases = validateAttempt.Result.Distinct();
+                IEnumerable<string>? duplicatePropertyTypeAliases = validateAttempt.Result?.Distinct();
                 var invalidPropertyGroupAliases =
                     (validateAttempt.Exception as InvalidCompositionException)?.PropertyGroupAliases ??
                     Array.Empty<string>();
@@ -546,17 +563,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave,
                     duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
 
-                TContentTypeDisplay display = UmbracoMapper.Map<TContentTypeDisplay>(composition);
+                TContentTypeDisplay? display = UmbracoMapper.Map<TContentTypeDisplay>(composition);
                 //map the 'save' data on top
                 display = UmbracoMapper.Map(contentTypeSave, display);
-                display.Errors = ModelState.ToErrorDictionary();
+                if (display is not null)
+                {
+                    display.Errors = ModelState.ToErrorDictionary();
+                }
+
                 return display;
             }
 
             return null;
         }
 
-        public IContentTypeBaseService<T> GetContentTypeService<T>()
+        public IContentTypeBaseService<T>? GetContentTypeService<T>()
             where T : IContentTypeComposition
         {
             if (typeof(T).Implements<IContentType>())
@@ -585,32 +606,38 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="invalidPropertyGroupAliases"></param>
         /// <returns></returns>
         private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave,
-            IEnumerable<string> duplicatePropertyTypeAliases, IEnumerable<string> invalidPropertyGroupAliases)
+            IEnumerable<string>? duplicatePropertyTypeAliases, IEnumerable<string>? invalidPropertyGroupAliases)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
-            foreach (var propertyTypeAlias in duplicatePropertyTypeAliases)
+            if (duplicatePropertyTypeAliases is not null)
             {
-                // Find the property type relating to these
-                TPropertyType property = contentTypeSave.Groups.SelectMany(x => x.Properties)
-                    .Single(x => x.Alias == propertyTypeAlias);
-                PropertyGroupBasic<TPropertyType> group =
-                    contentTypeSave.Groups.Single(x => x.Properties.Contains(property));
-                var propertyIndex = group.Properties.IndexOf(property);
-                var groupIndex = contentTypeSave.Groups.IndexOf(group);
+                foreach (var propertyTypeAlias in duplicatePropertyTypeAliases)
+                {
+                    // Find the property type relating to these
+                    TPropertyType property = contentTypeSave.Groups.SelectMany(x => x.Properties)
+                        .Single(x => x.Alias == propertyTypeAlias);
+                    PropertyGroupBasic<TPropertyType> group =
+                        contentTypeSave.Groups.Single(x => x.Properties.Contains(property));
+                    var propertyIndex = group.Properties.IndexOf(property);
+                    var groupIndex = contentTypeSave.Groups.IndexOf(group);
 
-                var key = $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias";
-                ModelState.AddModelError(key, "Duplicate property aliases aren't allowed between compositions");
+                    var key = $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias";
+                    ModelState.AddModelError(key, "Duplicate property aliases aren't allowed between compositions");
+                }
             }
 
-            foreach (var propertyGroupAlias in invalidPropertyGroupAliases)
+            if (invalidPropertyGroupAliases is not null)
             {
-                // Find the property group relating to these
-                PropertyGroupBasic<TPropertyType> group =
-                    contentTypeSave.Groups.Single(x => x.Alias == propertyGroupAlias);
-                var groupIndex = contentTypeSave.Groups.IndexOf(group);
-                var key = $"Groups[{groupIndex}].Name";
-                ModelState.AddModelError(key, "Different group types aren't allowed between compositions");
+                foreach (var propertyGroupAlias in invalidPropertyGroupAliases)
+                {
+                    // Find the property group relating to these
+                    PropertyGroupBasic<TPropertyType> group =
+                        contentTypeSave.Groups.Single(x => x.Alias == propertyGroupAlias);
+                    var groupIndex = contentTypeSave.Groups.IndexOf(group);
+                    var key = $"Groups[{groupIndex}].Name";
+                    ModelState.AddModelError(key, "Different group types aren't allowed between compositions");
+                }
             }
         }
 
@@ -625,14 +652,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="ct"></param>
         /// <param name="ctId"></param>
         /// <returns></returns>
-        private TContentTypeDisplay CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave,
+        private TContentTypeDisplay? CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave,
             TPropertyType>(
-            Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
+            Exception ex, TContentTypeSave contentTypeSave, TContentType? ct, int ctId)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
-            InvalidCompositionException invalidCompositionException = null;
+            InvalidCompositionException? invalidCompositionException = null;
             if (ex is InvalidCompositionException)
             {
                 invalidCompositionException = (InvalidCompositionException)ex;
@@ -660,12 +687,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="ctId"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
-        private TContentTypeDisplay CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(int ctId,
-            TContentTypeSave contentTypeSave, TContentType ct)
+        private TContentTypeDisplay? CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(int ctId,
+            TContentTypeSave contentTypeSave, TContentType? ct)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave
         {
-            TContentTypeDisplay forDisplay;
+            TContentTypeDisplay? forDisplay;
             if (ctId > 0)
             {
                 //Required data is invalid so we cannot continue
@@ -679,7 +706,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 forDisplay = UmbracoMapper.Map<TContentTypeDisplay>(contentTypeSave);
             }
 
-            forDisplay.Errors = ModelState.ToErrorDictionary();
+            if (forDisplay is not null)
+            {
+                forDisplay.Errors = ModelState.ToErrorDictionary();
+            }
+
             return forDisplay;
         }
     }

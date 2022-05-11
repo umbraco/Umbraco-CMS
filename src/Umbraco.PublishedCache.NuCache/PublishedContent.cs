@@ -13,18 +13,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     internal class PublishedContent : PublishedContentBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly IPublishedModelFactory _publishedModelFactory;
+        private readonly IPublishedModelFactory? _publishedModelFactory;
         private readonly ContentNode _contentNode;
-        private readonly string _urlSegment;
+        private readonly string? _urlSegment;
 
         #region Constructors
 
         public PublishedContent(
             ContentNode contentNode,
             ContentData contentData,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IVariationContextAccessor variationContextAccessor,
-            IPublishedModelFactory publishedModelFactory) : base(variationContextAccessor)
+            IPublishedSnapshotAccessor? publishedSnapshotAccessor,
+            IVariationContextAccessor? variationContextAccessor,
+            IPublishedModelFactory? publishedModelFactory) : base(variationContextAccessor)
         {
             _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
             ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
@@ -90,13 +90,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // this is for tests purposes
         // args are: current published snapshot (may be null), previewing, content id - returns: content
 
-        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
-            = (publishedShapshot, previewing, id) => publishedShapshot.Content.GetById(previewing, id);
+        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent?> GetContentByIdFunc { get; set; }
+            = (publishedShapshot, previewing, id) => publishedShapshot.Content?.GetById(previewing, id);
 
-        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
-            = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
+        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent?> GetMediaByIdFunc { get; set; }
+            = (publishedShapshot, previewing, id) => publishedShapshot.Media?.GetById(previewing, id);
 
-        private Func<IPublishedSnapshot, bool, int, IPublishedContent> GetGetterById()
+        private Func<IPublishedSnapshot, bool, int, IPublishedContent?> GetGetterById()
         {
             switch (ContentType.ItemType)
             {
@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> EmptyCultures = new Dictionary<string, PublishedCultureInfo>();
-        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultures;
+        private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
 
         /// <inheritdoc />
         public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -185,7 +185,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
         /// <inheritdoc />
-        public override bool IsDraft(string culture = null)
+        public override bool IsDraft(string? culture = null)
         {
             // if this is the 'published' published content, nothing can be draft
             if (ContentData.Published)
@@ -201,11 +201,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             // not the 'published' published content, and varies
             // = depends on the culture
-            return ContentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
+            return ContentData.CultureInfos is not null && ContentData.CultureInfos.TryGetValue(culture, out var cvar) && cvar.IsDraft;
         }
 
         /// <inheritdoc />
-        public override bool IsPublished(string culture = null)
+        public override bool IsPublished(string? culture = null)
         {
             // whether we are the 'draft' or 'published' content, need to determine whether
             // there is a 'published' version for the specified culture (or at all, for
@@ -233,7 +233,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         #region Tree
 
         /// <inheritdoc />
-        public override IPublishedContent Parent
+        public override IPublishedContent? Parent
         {
             get
             {
@@ -299,7 +299,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public override IEnumerable<IPublishedProperty> Properties => PropertiesArray;
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public override IPublishedProperty GetProperty(string alias)
+        public override IPublishedProperty? GetProperty(string alias)
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
             if (index < 0) return null; // happens when 'alias' does not match a content type property alias
@@ -314,7 +314,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         #region Caching
 
         // beware what you use that one for - you don't want to cache its result
-        private IAppCache GetAppropriateCache()
+        private IAppCache? GetAppropriateCache()
         {
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             var cache = publishedSnapshot == null
@@ -325,7 +325,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return cache;
         }
 
-        private IAppCache GetCurrentSnapshotCache()
+        private IAppCache? GetCurrentSnapshotCache()
         {
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             return publishedSnapshot?.SnapshotCache;
@@ -348,7 +348,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // includes all children, published or unpublished
         // NavigableNavigator takes care of selecting those it wants
         // note: this is not efficient - we do not try to be (would require a double-linked list)
-        internal IList<int> ChildIds => Children.Select(x => x.Id).ToList();
+        internal IList<int>? ChildIds => Children?.Select(x => x.Id).ToList();
 
         // used by Property
         // gets a value indicating whether the content or media exists in
@@ -356,19 +356,19 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // properties should refer to published, or draft content
         internal bool IsPreviewing { get; }
 
-        private string _asPreviewingCacheKey;
+        private string? _asPreviewingCacheKey;
 
         private string AsPreviewingCacheKey => _asPreviewingCacheKey ?? (_asPreviewingCacheKey = CacheKeys.PublishedContentAsPreviewing(Key));
 
         // used by ContentCache
-        internal IPublishedContent AsDraft()
+        internal IPublishedContent? AsDraft()
         {
             if (IsPreviewing)
                 return this;
 
             var cache = GetAppropriateCache();
             if (cache == null) return new PublishedContent(this).CreateModel(_publishedModelFactory);
-            return (IPublishedContent)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel(_publishedModelFactory));
+            return (IPublishedContent?)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel(_publishedModelFactory));
         }
 
         // used by Navigable.Source,...

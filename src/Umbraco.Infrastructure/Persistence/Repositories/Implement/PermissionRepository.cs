@@ -9,8 +9,8 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <remarks>
         ///     This will first clear the permissions for this user and entities and recreate them
         /// </remarks>
-        public void ReplacePermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplacePermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
         {
             if (entityIds.Length == 0)
             {
@@ -328,7 +328,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                     // perms can contain null if there are no permissions assigned, but the node is chosen in the UI.
                     permissions.Add(new EntityPermission(permission.Key, np.Key,
-                        perms.Where(x => x is not null).ToArray()));
+                        perms.WhereNotNull().ToArray()));
                 }
             }
 
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override ContentPermissionSet PerformGet(int id) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
-        protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[] ids) =>
+        protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[]? ids) =>
             throw new InvalidOperationException("This method won't be implemented.");
 
         protected override IEnumerable<ContentPermissionSet> PerformGetByQuery(IQuery<ContentPermissionSet> query) =>

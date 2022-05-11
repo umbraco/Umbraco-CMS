@@ -86,11 +86,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<object>> SetupInfo(string providerName)
+        public async Task<ActionResult<object?>> SetupInfo(string providerName)
         {
-            var user = _backOfficeSecurityAccessor?.BackOfficeSecurity.CurrentUser;
+            var user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
-            var setupInfo = await _twoFactorLoginService.GetSetupInfoAsync(user.Key, providerName);
+            var setupInfo = await _twoFactorLoginService.GetSetupInfoAsync(user!.Key, providerName);
 
             return setupInfo;
         }
@@ -99,9 +99,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public async Task<ActionResult<bool>> ValidateAndSave(string providerName, string secret, string code)
         {
-            var user = _backOfficeSecurityAccessor?.BackOfficeSecurity.CurrentUser;
+            var user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
-            return await _twoFactorLoginService.ValidateAndSaveAsync(providerName, user.Key, secret, code);
+            return await _twoFactorLoginService.ValidateAndSaveAsync(providerName, user!.Key, secret, code);
         }
 
         [HttpPost]
@@ -114,13 +114,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public async Task<ActionResult<bool>> DisableWithCode(string providerName, string code)
         {
-            Guid key =  _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Key;
+            Guid? key =  _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key;
 
-            return await _twoFactorLoginService.DisableWithCodeAsync(providerName, key, code);
+            return await _twoFactorLoginService.DisableWithCodeAsync(providerName, key!.Value, code);
         }
 
         [HttpGet]
-        public ActionResult<string> ViewPathForProviderName(string providerName)
+        public ActionResult<string?> ViewPathForProviderName(string providerName)
         {
             var options = _twoFactorLoginViewOptions.Get(providerName);
             return options.SetupViewPath;
