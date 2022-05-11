@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
@@ -175,7 +176,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.State = _stateMapper.Map(source, context);
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.UpdateDate = source.UpdateDate;
-            target.AllowedActions = new[] {"F"};
+            target.AllowedActions = new[] { ActionBrowse.ActionLetter.ToString() };
         }
 
         private void Map(IContent source, ContentVariantScheduleDisplay target, MapperContext context)

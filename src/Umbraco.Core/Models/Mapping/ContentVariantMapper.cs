@@ -17,15 +17,29 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly IContentService _contentService;
+        private readonly IUserService _userService;
 
-        public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public ContentVariantMapper(
+            ILocalizationService localizationService,
+            ILocalizedTextService localizedTextService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IContentService contentService,
+            IUserService userService)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _contentService = contentService;
+            _userService = userService;
         }
         public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
-        : this(localizationService, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
+        : this(
+            localizationService,
+            localizedTextService,
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
         {
         }
 
@@ -174,10 +188,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 if (hasAccess)
                 {
-                    variantDisplay.AllowedActions = new[]
-                    {
-                        "C", "A", "D", "M", "O", "S", "K", "T", "P", "I", "U", "R", "Z", ":", "7", "ï", "N"
-                    };
+                    variantDisplay.AllowedActions = GetLanguagePermissions(content, context);
                 }
             }
             variantDisplay.Name = content.GetCultureName(language?.IsoCode);
@@ -206,6 +217,59 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             return string.Join(" — ", parts);
 
+        }
+
+        // This is a bit ugly, but when languages get granular permissions this will be really useful
+        // For now we just return the exact same permissions as you had on the node, if you have access via language
+        private IEnumerable<string> GetLanguagePermissions(IContent content, MapperContext context)
+        {
+            var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
+
+            //cannot check permissions without a context
+            if (backOfficeSecurity is null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            IContent? parent;
+            if (context.Items.TryGetValue("Parent", out var parentObj) &&
+                parentObj is IContent typedParent)
+            {
+                parent = typedParent;
+            }
+            else
+            {
+                parent = _contentService.GetParent(content);
+            }
+
+            string path;
+            if (content.HasIdentity)
+                path = content.Path;
+            else
+            {
+                path = parent == null ? "-1" : parent.Path;
+            }
+
+            // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
+            if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
+                context.Items.TryGetValue("Permissions", out var permissionsObject) &&
+                userObject is IUser currentUser &&
+                permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
+            {
+                // If we already have permissions for a given path,
+                // and the current user is the same as was used to generate the permissions, return the stored permissions.
+                if (backOfficeSecurity.CurrentUser?.Id == currentUser.Id &&
+                    permissionsDict.TryGetValue(path, out var permissions))
+                {
+                    return permissions.GetAllPermissions();
+                }
+            }
+
+            // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+            // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
+            // reference exception :(
+
+            return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
         }
     }
 }
