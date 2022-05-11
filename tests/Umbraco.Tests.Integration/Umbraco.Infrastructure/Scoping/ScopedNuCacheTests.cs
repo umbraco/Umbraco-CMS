@@ -102,6 +102,10 @@ namespace Umbraco.Tests.Scoping
                 {
                     scope.Complete();
                 }
+                else
+                {
+                    scope.Rollback();
+                }
             }
 
             // only 1 event occuring because we are publishing twice for the same event for
