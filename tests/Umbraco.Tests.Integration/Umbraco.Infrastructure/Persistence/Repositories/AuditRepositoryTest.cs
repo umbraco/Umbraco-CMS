@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -40,6 +39,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
 
                 List<LogDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
+                scope.Rollback();
 
                 Assert.That(dtos.Any(), Is.True);
                 Assert.That(dtos.First().Comment, Is.EqualTo("This is a System audit trail"));
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 scope.Complete();
             }
 
-            using (IScope scope = sp.CreateScope())
+            using (IScope scope = sp.CreateScope(autoComplete: true))
             {
                 var repo = new AuditRepository((IScopeAccessor)sp, _logger);
 
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 scope.Complete();
             }
 
-            using (IScope scope = sp.CreateScope())
+            using (IScope scope = sp.CreateScope(autoComplete: true))
             {
                 var repo = new AuditRepository((IScopeAccessor)sp, _logger);
 
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 scope.Complete();
             }
 
-            using (IScope scope = sp.CreateScope())
+            using (IScope scope = sp.CreateScope(autoComplete: true))
             {
                 var repo = new AuditRepository((IScopeAccessor)sp, _logger);
 
@@ -177,7 +177,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 scope.Complete();
             }
 
-            using (IScope scope = sp.CreateScope())
+            using (IScope scope = sp.CreateScope(autoComplete: true))
             {
                 var repo = new AuditRepository((IScopeAccessor)sp, _logger);
 
@@ -191,6 +191,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         sp.CreateQuery<IAuditItem>()
                     .Where(item => item.Comment == "Content created"))
                     .ToArray();
+
 
                 Assert.AreEqual(8, page.Length);
                 Assert.IsTrue(page.All(x => x.Comment == "Content created"));

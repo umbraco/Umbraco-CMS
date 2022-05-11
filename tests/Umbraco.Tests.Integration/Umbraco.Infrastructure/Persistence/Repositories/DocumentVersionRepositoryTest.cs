@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             ContentService.SaveAndPublish(content);
             // At this point content has 3 versions, a historic version, a draft version and a published version.
 
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var sut = new DocumentVersionRepository(ScopeAccessor);
                 var results = sut.GetDocumentVersionsEligibleForCleanup();
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             var allVersions = ContentService.GetVersions(content.Id);
             Debug.Assert(allVersions.Count() == 5); // Sanity check
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
@@ -124,6 +124,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var after = ScopeAccessor.AmbientScope.Database.Fetch<ContentVersionDto>(query);
 
+                scope.Rollback();
+
                 Assert.Multiple(() =>
                 {
                     Assert.AreEqual(2, after.Count);
@@ -147,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             ContentService.SaveAndPublish(content); // Draft + Published
             ContentService.SaveAndPublish(content); // New Draft
 
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var sut = new DocumentVersionRepository((IScopeAccessor)ScopeProvider);
                 var page1 = sut.GetPagedItemsByContentId(content.Id, 0, 2, out var page1Total);
@@ -185,7 +187,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             ContentService.SaveAndPublish(content, "en-US"); // Draft + Published
             ContentService.SaveAndPublish(content, "en-US"); // New Draft
 
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 var sut = new DocumentVersionRepository((IScopeAccessor)ScopeProvider);
                 var page1 = sut.GetPagedItemsByContentId(content.Id, 0, 2, out var page1Total, 1);

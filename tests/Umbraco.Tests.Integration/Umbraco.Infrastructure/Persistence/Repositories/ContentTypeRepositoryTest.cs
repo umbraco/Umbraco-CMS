@@ -99,6 +99,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 IContentType result = repository.Get(contentType.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, result.AllowedTemplates.Count());
                 Assert.AreEqual(templates[0].Id, result.DefaultTemplate.Id);
             }
@@ -137,6 +139,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 contentType = repository.Get(contentType.Id);
                 contentType2 = repository.Get(contentType2.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(container1.Id, contentType.ParentId);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
@@ -156,6 +160,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 EntityContainer found = DocumentTypeContainerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
+
+                scope.Rollback();
             }
         }
 
@@ -186,6 +192,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.IsNotNull(found3);
                 IEnumerable<EntityContainer> allContainers = DocumentTypeContainerRepository.GetMany();
                 Assert.AreEqual(3, allContainers.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -203,6 +211,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 EntityContainer found = DocumentTypeContainerRepository.Get(container.Id);
                 Assert.IsNull(found);
+
+                scope.Rollback();
             }
         }
 
@@ -219,6 +229,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup", defaultTemplateId: 0);
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
+
+                scope.Rollback();
 
                 Assert.AreEqual(container.Id, contentType.ParentId);
             }
@@ -246,6 +258,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 contentType = MediaTypeRepository.Get(contentType.Id);
                 Assert.IsNotNull(contentType);
                 Assert.AreEqual(-1, contentType.ParentId);
+
+                scope.Rollback();
             }
         }
 
@@ -261,6 +275,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ContentTypeRepository.Save(contentType);
 
                 IContentType fetched = ContentTypeRepository.Get(contentType.Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
@@ -314,6 +330,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 contentType = repository.Get(mapped.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
                 // Assert
@@ -357,6 +375,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     LabelOnTop = true
                 });
                 repository.Save(contentType);
+
+                scope.Rollback();
 
                 bool dirty = contentType.IsDirty();
 
@@ -464,6 +484,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 contentType = repository.Get(_textpageContentType.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(dirty, Is.False);
@@ -498,6 +520,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool exists = repository.Exists(contentType.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(exists, Is.False);
             }
@@ -522,6 +546,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IContentType resolvedParent = repository.Get(ctMain.Id);
                 repository.Delete(resolvedParent);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(repository.Exists(ctMain.Id), Is.False);
@@ -551,7 +577,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 scope.Complete();
             }
 
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -571,7 +597,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -599,6 +625,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IContentType result = repository.Get(childContentType.Key);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Id, Is.EqualTo(childContentType.Id));
@@ -610,7 +638,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -627,7 +655,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = (ContentTypeRepository)ContentTypeRepository;
 
@@ -649,7 +677,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = (ContentTypeRepository)ContentTypeRepository;
                 Guid[] allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
@@ -672,7 +700,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -700,6 +728,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IContentType result = repository.Get(_textpageContentType.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(result.PropertyTypes.Any(x => x.Alias == "description"), Is.False);
                 Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(result.PropertyGroups.Count));
@@ -712,7 +742,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -730,7 +760,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -780,6 +810,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(updated.PropertyTypes.Count(), Is.EqualTo(5));
                 Assert.That(updated.PropertyTypes.Any(x => x.Alias == "urlAlias"), Is.True);
                 Assert.That(updated.PropertyTypes.First(x => x.Alias == "urlAlias").PropertyGroupId, Is.Null);
+
+                scope.Rollback();
             }
         }
 
@@ -808,10 +840,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Assert
                 IContentType updated = repository.Get(_simpleContentType.Id);
-
                 Assert.That(updated.AllowedContentTypes.Any(), Is.True);
                 Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == subpageContentType.Alias), Is.True);
                 Assert.That(updated.AllowedContentTypes.Any(x => x.Alias == simpleSubpageContentType.Alias), Is.True);
+
+                scope.Rollback();
             }
         }
 
@@ -831,6 +864,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 contentType.RemovePropertyType("keywords");
                 repository.Save(contentType);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
@@ -856,6 +891,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 PropertyGroup propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
                 propertyGroup.PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "metaAuthor") { Name = "Meta Author", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88 });
                 repository.Save(contentType);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
@@ -891,6 +928,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(5));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
+
+                scope.Rollback();
             }
         }
 
@@ -929,6 +968,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
+
+                scope.Rollback();
             }
         }
 
@@ -937,7 +978,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ContentTypeRepository repository = ContentTypeRepository;
 
@@ -1032,6 +1073,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Update variation on doc type
                 docType.Variations = ContentVariation.Culture;
                 repository.Save(docType);
+
+                scope.Rollback();
 
                 // Re fetch renewedContent and make sure that the culture has been set.
                 var renewedContent = ContentService.GetById(content.Id);

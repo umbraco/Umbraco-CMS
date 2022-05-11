@@ -120,6 +120,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // retrieve again, this should use cache now
                 found = repository.Get(media.Key);
                 Assert.AreEqual(sqlCount, udb.SqlCount);
+
+                scope.Rollback();
             }
         }
 
@@ -140,6 +142,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(image);
 
                 IMedia fetched = repository.Get(image.Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(mediaType.HasIdentity, Is.True);
@@ -167,6 +171,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Media image = MediaBuilder.CreateMediaImage(mediaType, -1);
                 repository.Save(image);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(file.HasIdentity, Is.True);
                 Assert.That(image.HasIdentity, Is.True);
@@ -182,7 +188,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -211,6 +217,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IMedia updatedContent = repository.Get(_testFile.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
                 Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
@@ -233,6 +241,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMedia deleted = repository.Get(_testFile.Id);
                 bool exists = repository.Exists(_testFile.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(deleted, Is.Null);
                 Assert.That(exists, Is.False);
@@ -244,7 +254,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -270,7 +280,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -303,6 +313,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 int[] types = new[] { 1031 };
                 IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentTypeId));
                 IEnumerable<IMedia> result = repository.Get(query);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(11));
@@ -344,7 +356,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -364,7 +376,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -384,7 +396,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -404,7 +416,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -424,7 +436,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -444,7 +456,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -466,7 +478,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out _);
 
@@ -488,7 +500,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -507,7 +519,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -536,7 +548,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
@@ -557,7 +569,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 

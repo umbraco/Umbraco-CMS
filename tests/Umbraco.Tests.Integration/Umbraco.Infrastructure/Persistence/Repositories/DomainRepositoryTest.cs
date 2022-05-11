@@ -74,6 +74,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 domain = repo.Get(domain.Id);
 
+                scope.Rollback();
+
                 Assert.NotNull(domain);
                 Assert.IsTrue(domain.HasIdentity);
                 Assert.Greater(domain.Id, 0);
@@ -101,6 +103,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 domain = repo.Get(domain.Id);
+
+                scope.Rollback();
 
                 Assert.NotNull(domain);
                 Assert.IsTrue(domain.HasIdentity);
@@ -130,6 +134,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
 
                 Assert.Throws<DuplicateNameException>(() => repo.Save(domain2));
+
+                scope.Rollback();
             }
         }
 
@@ -153,6 +159,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 domain = repo.Get(domain.Id);
+
+                scope.Rollback();
 
                 Assert.IsNull(domain);
             }
@@ -192,6 +200,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 domain = repo.Get(domain.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual("blah.com", domain.DomainName);
                 Assert.AreEqual(content2.Id, domain.RootContentId);
                 Assert.AreEqual(lang2.Id, domain.LanguageId);
@@ -220,6 +230,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool found = repo.Exists("test1.com");
 
+                scope.Rollback();
+
                 Assert.IsTrue(found);
             }
         }
@@ -245,6 +257,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IDomain found = repo.GetByName("test1.com");
 
+                scope.Rollback();
+
                 Assert.IsNotNull(found);
             }
         }
@@ -269,6 +283,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 IEnumerable<IDomain> all = repo.GetMany();
+
+                scope.Rollback();
 
                 Assert.AreEqual(10, all.Count());
             }
@@ -296,6 +312,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 IEnumerable<IDomain> all = repo.GetMany(ids.Take(8).ToArray());
+
+                scope.Rollback();
 
                 Assert.AreEqual(8, all.Count());
             }
@@ -325,6 +343,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 IEnumerable<IDomain> all = repo.GetAll(false);
+
+                scope.Rollback();
 
                 Assert.AreEqual(5, all.Count());
             }
@@ -371,6 +391,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<IDomain> all3 = repo.GetAssignedDomains(contentItems[2].Id, true);
                 Assert.AreEqual(0, all3.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -412,6 +434,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<IDomain> all2 = repo.GetAssignedDomains(contentItems[1].Id, false);
                 Assert.AreEqual(0, all2.Count());
+
+                scope.Rollback();
             }
         }
     }

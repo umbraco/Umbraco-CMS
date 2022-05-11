@@ -47,6 +47,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var count = repo.CountAll();
 
+                scope.Rollback();
+
                 Assert.That(count, Is.EqualTo(Count));
             }
         }
@@ -64,6 +66,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 var count = repo.CountPendingInstructions(2);
+                scope.Rollback();
 
                 Assert.That(count, Is.EqualTo(3));
             }
@@ -82,6 +85,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repo.Add(new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
 
                 var existsAfter = repo.Exists(1);
+
+                scope.Rollback();
 
                 Assert.That(existsBefore, Is.False);
                 Assert.That(existsAfter, Is.True);
@@ -103,6 +108,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repo.Add(new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
 
                 List<CacheInstructionDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<CacheInstructionDto>("WHERE id > -1");
+                scope.Rollback();
 
                 Assert.That(dtos.Any(), Is.True);
 
@@ -128,8 +134,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<CacheInstruction> instructions = repo.GetPendingInstructions(2, 2);
 
-                Assert.That(instructions.Count(), Is.EqualTo(2));
+                scope.Rollback();
 
+                Assert.That(instructions.Count(), Is.EqualTo(2));
                 Assert.That(string.Join(",", instructions.Select(x => x.Id)), Is.EqualTo("3,4"));
             }
         }
@@ -148,8 +155,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 repo.DeleteInstructionsOlderThan(DateTime.UtcNow.AddDays(-1));
-
                 var count = repo.CountAll();
+
+                scope.Rollback();
+
                 Assert.That(count, Is.EqualTo(4));  // 5 have been added, 1 is older and deleted.
             }
         }

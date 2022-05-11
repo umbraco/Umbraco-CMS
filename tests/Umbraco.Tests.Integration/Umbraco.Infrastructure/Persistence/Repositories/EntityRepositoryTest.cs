@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             memberService.Save(createdMembers);
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 EntityRepository repo = CreateRepository((IScopeAccessor)provider);
 

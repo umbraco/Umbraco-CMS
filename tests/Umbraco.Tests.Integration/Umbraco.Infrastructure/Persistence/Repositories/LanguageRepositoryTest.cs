@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 LanguageRepository repository = CreateRepository(provider);
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Get_By_Iso_Code_On_LanguageRepository()
         {
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -71,6 +71,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 language = repository.GetByIsoCode(au.Name);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(language, Is.Not.Null);
@@ -86,7 +88,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -103,7 +105,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -123,7 +125,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -143,7 +145,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -163,7 +165,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -181,13 +183,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
                 var languageBR = new Language("pt-BR", "Portuguese (Brazil)");
                 repository.Save(languageBR);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -203,7 +207,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -214,6 +218,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     IsMandatory = true
                 };
                 repository.Save(languageBR);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -229,7 +235,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -239,6 +245,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     FallbackLanguageId = 1
                 };
                 repository.Save(languageBR);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
@@ -252,7 +260,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -277,6 +285,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(languageNZ);
                 languageBR = repository.Get(languageBR.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.IsFalse(languageBR.IsDefault);
                 Assert.IsTrue(languageNZ.IsDefault);
@@ -288,7 +298,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -301,6 +311,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(language);
 
                 ILanguage languageUpdated = repository.Get(5);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(languageUpdated, Is.Not.Null);
@@ -315,7 +327,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -325,6 +337,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 language.CultureName = "Danish (Denmark)";
 
                 Assert.Throws<InvalidOperationException>(() => repository.Save(language));
+
+                scope.Rollback();
             }
         }
 
@@ -333,7 +347,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 LanguageRepository repository = CreateRepository(provider);
 
@@ -342,6 +356,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(language);
 
                 bool exists = repository.Exists(3);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -353,7 +369,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // Add language to delete as a fall-back language to another one
                 LanguageRepository repository = CreateRepository(provider);
@@ -367,6 +383,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool exists = repository.Exists(2);
 
+                scope.Rollback();
+
                 // has been deleted
                 Assert.That(exists, Is.False);
             }
@@ -377,7 +395,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 LanguageRepository repository = CreateRepository(provider);
 

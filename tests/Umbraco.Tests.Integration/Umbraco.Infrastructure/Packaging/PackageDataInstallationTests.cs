@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 
             // Assert
             IContentType mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
-            using IScope scope = ScopeProvider.CreateScope();
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
             foreach (IPropertyType propertyType in mRBasePage.PropertyTypes)
             {
                 PropertyTypeDto propertyTypeDto = ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
@@ -423,7 +423,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
                                 select doc).Count();
 
             string configuration;
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 List<DataTypeDto> dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;

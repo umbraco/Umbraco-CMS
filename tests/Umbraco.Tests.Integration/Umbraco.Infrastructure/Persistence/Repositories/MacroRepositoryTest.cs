@@ -39,13 +39,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
                 var macro = new Macro(ShortStringHelper, "test1", "Test", "~/views/macropartials/test.cshtml");
 
                 Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
+
+                scope.Rollback();
             }
         }
 
@@ -54,7 +56,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -62,6 +64,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 macro.Alias = "test2";
 
                 Assert.That(() => repository.Save(macro), Throws.InstanceOf<DbException>());
+
+                scope.Rollback();
             }
         }
 
@@ -84,7 +88,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -110,7 +114,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -127,7 +131,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -145,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -163,7 +167,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -171,6 +175,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var macro = new Macro(ShortStringHelper, "test", "Test", "~/views/macropartials/test.cshtml");
                 macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
                 repository.Save(macro);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
@@ -184,7 +190,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -201,6 +207,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(macro);
 
                 IMacro macroUpdated = repository.Get(2);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(macroUpdated, Is.Not.Null);
@@ -219,7 +227,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -229,6 +237,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(macro);
 
                 bool exists = repository.Exists(3);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -240,7 +250,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -259,7 +269,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -276,6 +286,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("new1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("New1", result.Properties.Values.First().Name);
                 Assert.AreEqual(3, result.Properties.Values.First().SortOrder);
+
+                scope.Rollback();
             }
         }
 
@@ -284,7 +296,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -299,6 +311,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("blah1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("New1", result.Properties.Values.First().Name);
                 Assert.AreEqual(4, result.Properties.Values.First().SortOrder);
+
+                scope.Rollback();
             }
         }
 
@@ -307,7 +321,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -322,6 +336,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 result = repository.Get(macro.Id);
                 Assert.AreEqual(0, result.Properties.Values.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -330,7 +346,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -350,6 +366,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 IMacro result = repository.Get(macro.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(1, result.Properties.Values.Count());
                 Assert.AreEqual("blah2", result.Properties.Values.Single().Alias);
             }
@@ -360,7 +378,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -377,6 +395,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMacro result = repository.Get(1);
                 Assert.AreEqual("new1", result.Properties.Values.First().Alias);
                 Assert.AreEqual("this is a new name", result.Properties.Values.First().Name);
+
+                scope.Rollback();
             }
         }
 
@@ -385,7 +405,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 var repository = new MacroRepository((IScopeAccessor)provider, AppCaches.Disabled, _logger, ShortStringHelper);
 
@@ -401,6 +421,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 IMacro result = repository.Get(1);
                 Assert.AreEqual("newAlias", result.Properties.Values.First().Alias);
+
+                scope.Rollback();
             }
         }
 

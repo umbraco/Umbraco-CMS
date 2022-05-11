@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Find_Usages()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer) { Name = "dt1" };
                 DataTypeRepository.Save(dataType1);
@@ -94,6 +94,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 usages = DataTypeRepository.FindUsages(dataType2.Id);
 
+                scope.Rollback();
+
                 key = usages.First().Key;
                 Assert.AreEqual(ct.Key, ((GuidUdi)key).Guid);
                 Assert.AreEqual(1, usages[key].Count());
@@ -104,7 +106,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Move()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var container1 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah1" };
                 DataTypeContainerRepository.Save(container1);
@@ -133,6 +135,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 dataType = DataTypeRepository.Get(dataType.Id);
                 dataType2 = DataTypeRepository.Get(dataType2.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(container1.Id, dataType.ParentId);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath, dataType.Path);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath, dataType2.Path);
@@ -142,7 +146,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Create_Container()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
@@ -151,13 +155,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 EntityContainer found = DataTypeContainerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
+
+                scope.Rollback();
             }
         }
 
         [Test]
         public void Can_Delete_Container()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
@@ -167,19 +173,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 EntityContainer found = DataTypeContainerRepository.Get(container.Id);
                 Assert.IsNull(found);
+
+                scope.Rollback();
             }
         }
 
         [Test]
         public void Can_Create_Container_Containing_Data_Types()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
 
                 var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container.Id) { Name = "test" };
                 DataTypeRepository.Save(dataTypeDefinition);
+
+                scope.Rollback();
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
             }
@@ -188,7 +198,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Delete_Container_Containing_Data_Types()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
@@ -205,13 +215,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 dataType = DataTypeRepository.Get(dataType.Id);
                 Assert.IsNotNull(dataType);
                 Assert.AreEqual(-1, dataType.ParentId);
+
+                scope.Rollback();
             }
         }
 
         [Test]
         public void Can_Create()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IDataType dataType = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer) { Name = "test" };
 
@@ -223,6 +235,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 dataType = DataTypeRepository.Get(id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(dataType, Is.Not.Null);
                 Assert.That(dataType.HasIdentity, Is.True);
@@ -232,7 +246,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 IDataType dataTypeDefinition = DataTypeRepository.Get(Constants.DataTypes.DropDownSingle);
@@ -247,7 +261,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_GetAll_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 IDataType[] dataTypeDefinitions = DataTypeRepository.GetMany().ToArray();
@@ -263,7 +277,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_GetAll_With_Params_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 IDataType[] dataTypeDefinitions = DataTypeRepository.GetMany(-40, -41, -42).ToArray();
@@ -279,7 +293,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_GetByQuery_On_DataTypeDefinitionRepository()
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 IQuery<IDataType> query = ScopeProvider.CreateQuery<IDataType>().Where(x => x.EditorAlias == Constants.PropertyEditors.Aliases.RadioButtonList);
@@ -295,7 +309,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Count_On_DataTypeDefinitionRepository()
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 IQuery<IDataType> query = ScopeProvider.CreateQuery<IDataType>().Where(x => x.Name.StartsWith("D"));
@@ -309,7 +323,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Add_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var dataTypeDefinition = new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
@@ -324,6 +338,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool exists = DataTypeRepository.Exists(dataTypeDefinition.Id);
                 IDataType fetched = DataTypeRepository.Get(dataTypeDefinition.Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dataTypeDefinition.HasIdentity, Is.True);
@@ -344,7 +360,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Update_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var dataTypeDefinition = new DataType(new IntegerPropertyEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
                 {
@@ -362,6 +378,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IDataType definitionUpdated = DataTypeRepository.Get(dataTypeDefinition.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(definitionUpdated, Is.Not.Null);
                 Assert.That(definitionUpdated.Name, Is.EqualTo("AgeDataType Updated"));
@@ -372,7 +390,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Delete_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var dataTypeDefinition = new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
@@ -390,6 +408,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool existsAfter = DataTypeRepository.Exists(dataTypeDefinition.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(existsBefore, Is.True);
                 Assert.That(existsAfter, Is.False);
@@ -399,7 +419,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Perform_Exists_On_DataTypeDefinitionRepository()
         {
-            using (ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 // Act
                 bool exists = DataTypeRepository.Exists(1046); // Content picker

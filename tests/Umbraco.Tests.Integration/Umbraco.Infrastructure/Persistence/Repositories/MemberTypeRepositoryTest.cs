@@ -49,6 +49,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IMemberType sut = repository.Get(memberType.Id);
 
+                scope.Rollback();
+
                 Dictionary<string, PropertyType> standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
                 Assert.That(sut, Is.Not.Null);
@@ -120,6 +122,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<IMemberType> result = repository.GetMany();
 
+                scope.Rollback();
+
                 // there are 3 because of the Member type created for init data
                 Assert.AreEqual(3, result.Count());
             }
@@ -142,6 +146,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(memberType2);
 
                 IEnumerable<IMemberType> result = ((IReadRepository<Guid, IMemberType>)repository).GetMany(memberType1.Key, memberType2.Key);
+                scope.Rollback();
 
                 // there are 3 because of the Member type created for init data
                 Assert.AreEqual(2, result.Count());
@@ -165,6 +170,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(memberType2);
 
                 IMemberType result = repository.Get(memberType1.Key);
+
+                scope.Rollback();
 
                 // there are 3 because of the Member type created for init data
                 Assert.IsNotNull(result);
@@ -193,6 +200,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<IMemberType> result = repository.GetMany();
 
+                scope.Rollback();
+
                 // there are 3 because of the Member type created for init data
                 Assert.AreEqual(3, result.Count());
             }
@@ -211,6 +220,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 memberType = repository.Get(memberType.Id);
                 Assert.That(memberType, Is.Not.Null);
+
+                scope.Rollback();
             }
         }
 
@@ -227,6 +238,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 memberType = repository.Get(memberType.Key);
                 Assert.That(memberType, Is.Not.Null);
+
+                scope.Rollback();
             }
         }
 
@@ -237,7 +250,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             Dictionary<string, PropertyType> stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 MemberTypeRepository repository = CreateRepository(provider);
 
@@ -271,6 +284,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 memberType = repository.Get("mtype");
                 Assert.IsNotNull(memberType);
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, memberType.PropertyGroups.Count);
                 Assert.AreEqual(3 + (stubs.Count * 2), memberType.PropertyTypes.Count());
             }
@@ -282,7 +297,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             Dictionary<string, PropertyType> stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 MemberTypeRepository repository = CreateRepository(provider);
 
@@ -302,6 +317,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // getting with stub properties
                 memberType = repository.Get(memberType.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, memberType.PropertyGroups.Count);
                 Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
             }
@@ -313,7 +330,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             Dictionary<string, PropertyType> stubs = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 MemberTypeRepository repository = CreateRepository(provider);
 
@@ -336,6 +353,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // getting with stub properties
                 memberType = repository.Get(memberType.Id);
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, memberType.PropertyGroups.Count);
                 Assert.AreEqual(3 + stubs.Count, memberType.PropertyTypes.Count());
             }
@@ -355,6 +374,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMemberType memberType2 = MemberTypeBuilder.CreateSimpleMemberType("test2");
                 repository.Save(memberType1);
                 repository.Save(memberType2);
+
+                scope.Rollback();
 
                 int[] m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
                 int[] m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
@@ -380,6 +401,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(contentType2);
 
                 bool exists = repository.Exists(memberType.Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);

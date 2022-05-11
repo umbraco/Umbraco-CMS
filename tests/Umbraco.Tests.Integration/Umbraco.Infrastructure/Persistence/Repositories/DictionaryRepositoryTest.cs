@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -48,6 +48,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 dictionaryItem = repository.Get("Testing1235");
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -64,7 +66,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -79,6 +81,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Key);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -95,7 +99,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235")
@@ -111,6 +115,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
                 Assert.That(dictionaryItem.ItemKey, Is.EqualTo("Testing1235"));
@@ -125,7 +131,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
                 var dictionaryItem = (IDictionaryItem)new DictionaryItem("Testing1235");
@@ -134,6 +140,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 dictionaryItem = repository.Get(dictionaryItem.Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -147,7 +155,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -168,7 +176,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -188,7 +196,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -208,7 +216,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -226,7 +234,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ILanguageRepository languageRepository = GetRequiredService<ILanguageRepository>();
                 IDictionaryRepository repository = CreateRepository();
@@ -245,6 +253,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 bool exists = repository.Exists(read.Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(read.HasIdentity, Is.True);
                 Assert.That(exists, Is.True);
@@ -256,7 +266,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -269,6 +279,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(item);
 
                 IDictionaryItem dictionaryItem = repository.Get(1);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
@@ -283,7 +295,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -300,6 +312,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var dictionaryItem = (DictionaryItem)repository.Get(1);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(dictionaryItem, Is.Not.Null);
                 Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
@@ -312,7 +326,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -321,6 +335,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(item);
 
                 bool exists = repository.Exists(1);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -332,7 +348,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
 
@@ -350,7 +366,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             Dictionary<string, Guid> keyMap;
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IDictionaryRepository repository = CreateRepository();
                 keyMap = repository.GetDictionaryItemKeyMap();

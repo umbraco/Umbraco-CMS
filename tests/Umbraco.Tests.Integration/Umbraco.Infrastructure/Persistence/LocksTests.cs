@@ -147,6 +147,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 finally
                 {
                     db.EnableSqlCount = false;
+                    scope.Rollback();
                 }
             }
 

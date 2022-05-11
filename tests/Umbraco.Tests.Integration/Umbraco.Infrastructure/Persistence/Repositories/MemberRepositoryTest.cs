@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void GetMember()
         {
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MemberRepository repository = CreateRepository(provider);
 
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void GetMembers()
         {
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MemberRepository repository = CreateRepository(provider);
 
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void GetAllMembers()
         {
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MemberRepository repository = CreateRepository(provider);
 
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MemberRepository repository = CreateRepository(provider);
 
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void SaveMember()
         {
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = provider.CreateScope())
+            using (IScope scope = provider.CreateScope(autoComplete: true))
             {
                 MemberRepository repository = CreateRepository(provider);
 
@@ -202,6 +202,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(member);
 
                 IMember sut = repository.Get(member.Id);
+
+                scope.Rollback();
 
                 Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
@@ -239,6 +241,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 sut = repository.Get(member.Id);
 
+                scope.Rollback();
+
                 Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
             }
         }
@@ -264,6 +268,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(sut);
 
                 sut = repository.Get(member.Id);
+
+                scope.Rollback();
 
                 Assert.That(sut.Email, Is.EqualTo("thisisnew@hello.com"));
                 Assert.That(sut.Username, Is.EqualTo("This is new"));
