@@ -207,7 +207,7 @@
                 } else {
                     return null;
                 }
-                
+
                 block.config.areas.forEach(areaConfig => {
                     const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
                     if(areaIndex === -1) {
@@ -329,11 +329,13 @@
             block.config.areas = [
                 {
                     key: 'test1',
-                    columnSpan: '6'
+                    columnSpan: 6,
+                    rowSpan: 1
                 },
                 {
                     key: 'test2',
-                    columnSpan: '6'
+                    columnSpan: 6,
+                    rowSpan: 2
                 }
             ]
 
@@ -403,6 +405,7 @@
             blockObject.config.areas.forEach(areaConfig => {
                 //if(layoutEntry.areas.findIndex(x => x.key === areaConfig.key) === -1) {
                     layoutEntry.areas.push({
+                        $config: areaConfig, 
                         key: areaConfig.key,
                         items: []
                     })
@@ -830,11 +833,12 @@
                 return false;
             }
 
-            
+            // TODO: this should be using initializeLayoutEntry...
             blockObject.config.areas.forEach(areaConfig => {
                 const areaIndex = entry.areas.findIndex(x => x.key === areaConfig.key)
                 if(areaIndex === -1) {
                     entry.areas.push({
+                        // missing $config, but this should be using initializeLayoutEntry...
                         key: areaConfig.key,
                         items: []
                     })
@@ -921,8 +925,7 @@
             //containment: ".umb-el-wrap",
 
             connectWith: ".umb-block-grid__layout-container",
-            handle: ".blockelement__draggable-element",
-            classes: ".blockelement--dragging",
+            handle: "umb-block-grid-block",
             items: '.umb-block-grid__layout-item',
             placeholder: "umb-block-grid__layout-item-placeholder umb-block-grid__layout-item",
             //forcePlaceholderSize: true,
@@ -932,27 +935,45 @@
             //handle: ".umb-group-builder__tab-handle",
             //items: ".umb-group-builder__tab-sortable",
             
+            delay: 120,
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            /*sort: function(event, ui) {
+                var $target = $(event.target);
+                if (!/html|body/i.test($target.offsetParent()[0].tagName)) {
+                    var top = event.pageY - $target.offsetParent().offset().top - (ui.helper.outerHeight(true) / 2);
+                    ui.helper.css({'top' : top + 'px'});
+                    var left = event.pageX - $target.offsetParent().offset().left - (ui.helper.outerWidth(true) / 2);
+                    ui.helper.css({'left' : left + 'px'});
+                }
+            },*/
             start: function(event, ui) {
-                const layoutEntry = ui.item.sortable.model.$block.layout;
-                ui.placeholder.css("--umb-block-grid--item-column-span", layoutEntry.columnSpan);
-                ui.placeholder.css("--umb-block-grid--item-row-span", layoutEntry.rowSpan);
+                const element = ui.item[0];
+                ui.placeholder.css("--umb-block-grid--item-column-span", element.dataset.colSpan);
+                ui.placeholder.css("--umb-block-grid--item-row-span", element.dataset.rowSpan);
 
-                console.log(ui.item.sortable.model.$block.layout);
-                console.log(ui.placeholder[0]);
+                //vm.sortableOptions.sort(event, ui);
+            },
+            beforeStop: function(event, ui) {
+                var newIndex = ui.placeholder.index();
+                console.log("beforeStop index", newIndex);
+                // this got the right index..
             },
             accept: function (sourceItemHandleScope, destSortableScope) {
                 return true;
                 //sourceItemHandleScope.itemScope.sortableScope.$id === destSortableScope.$id;
             },
             update: function (ev, ui) {
-                console.log("sort update")
+                console.log("sort update", ui.item.index())
                 setDirty();
             },
             itemMoved: function (ev) {
                 console.log("itemMoved", ev)
+            },
+            change: function (event, ui) {
+                var newIndex = ui.item.index();
+                console.log("new index", newIndex)// This is wrong index.
             }
         };
         // see https://github.com/a5hik/ng-sortable/issues/13 for scrolling while dragging.

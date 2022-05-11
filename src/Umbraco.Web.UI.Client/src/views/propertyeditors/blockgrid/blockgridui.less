@@ -1,6 +1,7 @@
 @import "../../../less/variables.less";
 @import "../../../less/mixins.less";
 @import "../../../less/buttons.less";
+@import "../../../less/accessibility/sr-only.less";
 @import "../../../less/components/umb-icon.less";
 
 @umb-block-grid__item_minimum_height: 48px;
@@ -17,15 +18,20 @@
     position: relative;
     .umb-property-editor--limit-width();
     /*
-    > .ui-sortable > .ui-sortable-helper > .umb-block-grid__block > .umb-block-grid__block--content > * {
+    > .ui-sortable > .ui-sortable-helper > .umb-block-grid__block > umb-block-grid-block > * {
         box-shadow: 0px 5px 10px 0 rgba(0,0,0,.2);
     }
     */
 }
 
+.umb-block-grid__layout-item {
+    position: relative;
+}
+
 .umb-block-grid__block {
     position: relative;
     width: 100%;
+    height: 100%;
 
     > .umb-block-grid__block--actions {
         opacity: 0;
@@ -67,9 +73,9 @@
     
                 animation-duration: 1.4s;
                 animation-iteration-count: infinite;
-                animation-name: umb-block-grid__block--content--badge-bounce;
+                animation-name: umb-block-grid__block--badge-bounce;
                 animation-timing-function: ease;
-                @keyframes umb-block-grid__block--content--badge-bounce {
+                @keyframes umb-block-grid__block--badge-bounce {
                     0%   { transform: translateY(0); }
                     20%  { transform: translateY(-6px); }
                     40%  { transform: translateY(0); }
@@ -81,6 +87,7 @@
         }
     }
 }
+
 ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-block-grid__block--actions {
     opacity: 1;
 }
@@ -148,7 +155,8 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     }
 }
 
-.umb-block-grid__block--content {
+/*
+umb-block-grid-block {
 
     > div {
         position: relative;
@@ -160,10 +168,13 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-grid__block > .umb-blo
     }
 
 }
+*/
 
+/*
 .blockelement__draggable-element {
     cursor: grab;
 }
+*/
 
 
 .umb-block-grid__block--create-button {

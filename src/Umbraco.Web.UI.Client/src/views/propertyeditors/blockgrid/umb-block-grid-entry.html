@@ -2,14 +2,19 @@
     <div class="umb-block-grid__block" ng-class="{'--active':vm.layoutEntry.$block.active, '--show-validation': vm.layoutEntry.$block.showValidation === true}">
 
         <umb-block-grid-block stylesheet="{{::vm.layoutEntry.$block.stylesheet}}"
-                              class="umb-block-grid__block--content blockelement__draggable-element"
                               view="{{::vm.layoutEntry.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layoutEntry.$block"
                               index="vm.index"
                               parent-form="vm.blockRowForm">
 
-            <umb-block-grid-entries 
+            <umb-block-grid-entries
+                data-col-span="{{areaEntry.$config.columnSpan}}"
+                data-row-span="{{areaEntry.$config.rowSpan}}"
+                style="
+                --umb-block-grid--item-column-span: {{areaEntry.$config.columnSpan}};
+                --umb-block-grid--item-row-span: {{areaEntry.$config.rowSpan}};
+                "
                 ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
                 slot="areas"
                 block-editor-api="vm.blockEditorApi"
