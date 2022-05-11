@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public UserGroupDto()
         {
             UserGroup2AppDtos = new List<UserGroup2AppDto>();
+            UserGroup2LanguageDtos = new List<UserGroup2LanguageDto>();
         }
 
         [Column("id")]
@@ -62,6 +63,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
         public List<UserGroup2AppDto> UserGroup2AppDtos { get; set; }
+
+        [ResultColumn]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "UserGroupId")]
+        public List<UserGroup2LanguageDto> UserGroup2LanguageDtos { get; set; }
 
         /// <summary>
         /// This is only relevant when this column is included in the results (i.e. GetUserGroupsWithUserCounts)

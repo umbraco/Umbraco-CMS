@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
         {
             var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
             {
-                new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new string[0], new string[0])
+                new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new int[0], new string[0], new string[0])
             });
             IUser savingUser = null; // This means it is a new created user
 

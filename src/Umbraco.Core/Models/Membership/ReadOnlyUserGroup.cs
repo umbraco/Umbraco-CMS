@@ -6,13 +6,22 @@ namespace Umbraco.Cms.Core.Models.Membership
 {
     public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
     {
-        public ReadOnlyUserGroup(int id, string? name, string? icon, int? startContentId, int? startMediaId, string? @alias,
-            IEnumerable<string> allowedSections, IEnumerable<string>? permissions)
+        public ReadOnlyUserGroup(
+            int id,
+            string? name,
+            string? icon,
+            int? startContentId,
+            int? startMediaId,
+            string? @alias,
+            IEnumerable<int> allowedLanguages,
+            IEnumerable<string> allowedSections,
+            IEnumerable<string>? permissions)
         {
             Name = name ?? string.Empty;
             Icon = icon;
             Id = id;
             Alias = alias ?? string.Empty;
+            AllowedLanguages = allowedLanguages.ToArray();
             AllowedSections = allowedSections.ToArray();
             Permissions = permissions?.ToArray();
 
@@ -35,6 +44,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
         /// </remarks>
         public IEnumerable<string>? Permissions { get; set; }
+        public IEnumerable<int> AllowedLanguages { get; private set; }
         public IEnumerable<string> AllowedSections { get; private set; }
 
         public bool Equals(ReadOnlyUserGroup? other)

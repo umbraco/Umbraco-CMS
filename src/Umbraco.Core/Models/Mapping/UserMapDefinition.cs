@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
@@ -31,10 +33,20 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly MediaFileManager _mediaFileManager;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IImageUrlGenerator _imageUrlGenerator;
+        private readonly ILocalizationService _localizationService;
 
-        public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-            AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator)
+        public UserMapDefinition(
+            ILocalizedTextService textService,
+            IUserService userService,
+            IEntityService entityService,
+            ISectionService sectionService,
+            AppCaches appCaches,
+            ActionCollection actions,
+            IOptions<GlobalSettings> globalSettings,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IImageUrlGenerator imageUrlGenerator,
+            ILocalizationService localizationService)
         {
             _sectionService = sectionService;
             _entityService = entityService;
@@ -46,6 +58,33 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _mediaFileManager = mediaFileManager;
             _shortStringHelper = shortStringHelper;
             _imageUrlGenerator = imageUrlGenerator;
+            _localizationService = localizationService;
+        }
+        [Obsolete("Please use constructor that takes an ILocalizationService instead")]
+        public UserMapDefinition(
+            ILocalizedTextService textService,
+            IUserService userService,
+            IEntityService entityService,
+            ISectionService sectionService,
+            AppCaches appCaches,
+            ActionCollection actions,
+            IOptions<GlobalSettings> globalSettings,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IImageUrlGenerator imageUrlGenerator)
+        : this(
+            textService,
+            userService,
+            entityService,
+            sectionService,
+            appCaches,
+            actions,
+            globalSettings,
+            mediaFileManager,
+            shortStringHelper,
+            imageUrlGenerator,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+        {
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
@@ -102,6 +141,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 }
             }
 
+            target.ClearAllowedLanguages();
+            if (source.AllowedLanguages is not null)
+            {
+                foreach (var language in source.AllowedLanguages)
+                {
+                    target.AddAllowedLanguage(language);
+                }
+            }
+
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -154,7 +202,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.UserId = source.Id;
         }
 
-        // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Sections
+        // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Languages -Sections
         // Umbraco.Code.MapAll -Notifications -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IReadOnlyUserGroup source, UserGroupBasic target, MapperContext context)
         {
@@ -166,10 +214,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Path = "-1," + source.Id;
             target.IsSystemUserGroup = source.IsSystemUserGroup();
 
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
-        // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications
+        // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Languages -Sections -Notifications
         // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -IsSystemUserGroup
         private void Map(IUserGroup source, UserGroupBasic target, MapperContext context)
         {
@@ -183,7 +231,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.UserCount = source.UserCount;
             target.IsSystemUserGroup = source.IsSystemUserGroup();
 
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
         }
 
         // Umbraco.Code.MapAll -Udi -Trashed -AdditionalData -AssignedPermissions
@@ -218,7 +266,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.Icon = Constants.Icons.Member;
         }
 
-        // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
+        // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Languages -Sections -Notifications -Udi
         // Umbraco.Code.MapAll -Trashed -AdditionalData -Users -AssignedPermissions
         private void Map(IUserGroup source, UserGroupDisplay target, MapperContext context)
         {
@@ -233,7 +281,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.UserCount = source.UserCount;
             target.IsSystemUserGroup = source.IsSystemUserGroup();
 
-            MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
+            MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
@@ -360,8 +408,19 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         // helpers
 
-        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
+        private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<int> sourceAllowedLanguages, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
+            var allLanguages = _localizationService.GetAllLanguages();
+            var applicableLanguages = Enumerable.Empty<ILanguage>();
+
+
+            if (sourceAllowedLanguages.Any())
+            {
+                applicableLanguages = allLanguages.Where(x => sourceAllowedLanguages.Contains(x.Id));
+            }
+
+            target.Languages = context.MapEnumerable<ILanguage, ContentEditing.Language>(applicableLanguages).WhereNotNull();
+
             var allSections = _sectionService.GetSections();
             target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias))).WhereNotNull();
 

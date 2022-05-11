@@ -1441,7 +1441,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             // Then we need to add an event listener to the editor
             // That will update native browser drag & drop events
             // To update the icon to show you can NOT drop something into the editor
-            var toolbarItems = args.editor.settings.toolbar.split(" ");
+            
+            var toolbarItems = args.editor.settings.toolbar === false ? [] : args.editor.settings.toolbar.split(" ");
             if(isMediaPickerEnabled(toolbarItems) === false){
                 // Wire up the event listener
                 args.editor.on('dragend dragover draggesture dragdrop drop drag', function (e) {

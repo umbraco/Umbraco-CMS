@@ -21,6 +21,8 @@ function umbPropEditor(umbPropEditorHelper) {
             templateUrl: 'views/components/property/umb-property-editor.html',
             link: function (scope, element, attrs, ctrl) {
 
+                scope.readonly = false;
+
                 //we need to copy the form controller val to our isolated scope so that
                 //it get's carried down to the child scopes of this!
                 //we'll also maintain the current form name.
@@ -38,6 +40,10 @@ function umbPropEditor(umbPropEditorHelper) {
                         scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
                     }
                 );
+
+                attrs.$observe('readonly', (value) => {
+                    scope.readonly = value !== undefined;
+                });
 
                 scope.$on("$destroy", function () {
                     unbindWatcher();

@@ -86,7 +86,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(LogViewerQueryDto),
             typeof(ContentVersionCleanupPolicyDto),
             typeof(UserGroup2NodeDto),
-            typeof(CreatedPackageSchemaDto)
+            typeof(CreatedPackageSchemaDto),
+            typeof(UserGroup2LanguageDto)
         };
 
         private readonly IUmbracoDatabase _database;

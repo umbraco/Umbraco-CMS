@@ -1,7 +1,11 @@
 <div>
 
     <umb-property ng-repeat="property in model.viewModel track by property.alias" property="property">
-        <umb-property-editor model="property"></umb-property-editor>
+        <umb-property-editor 
+            model="property"
+            ng-attr-readonly="{{variantContent.language.culture === 'da-DK' || undefined}}">
+            <!-- TODO: Update with correct check for readonly -->
+        </umb-property-editor>
     </umb-property>
 
 </div>

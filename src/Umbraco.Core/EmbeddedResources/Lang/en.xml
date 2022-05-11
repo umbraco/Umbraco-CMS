@@ -544,6 +544,7 @@
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
+    <key alias="selectLanguages">Select languages</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
@@ -2080,6 +2081,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
+    <key alias="languagesHelp">Limit the languages users have access to edit</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
     <key alias="selectUserGroups">Select user groups</key>
     <key alias="noStartNode">No start node selected</key>

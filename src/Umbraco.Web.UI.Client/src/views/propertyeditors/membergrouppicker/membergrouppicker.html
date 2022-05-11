@@ -10,9 +10,12 @@
 		</umb-node-preview>
 	</div>
 
-	<button type="button"
-            class="umb-node-preview-add"
-            ng-click="vm.openMemberGroupPicker()">
+	<button
+		type="button"
+		class="umb-node-preview-add"
+		ng-click="vm.openMemberGroupPicker($event)"
+		ng-disabled="readonly">
+
 		<localize key="general_add">Add</localize>
 	</button>
 

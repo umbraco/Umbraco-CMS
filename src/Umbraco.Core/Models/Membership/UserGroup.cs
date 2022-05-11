@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         private string _name;
         private IEnumerable<string>? _permissions;
         private List<string> _sectionCollection;
+        private List<int> _languageCollection;
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
@@ -38,6 +39,7 @@ namespace Umbraco.Cms.Core.Models.Membership
             _name = string.Empty;
             _shortStringHelper = shortStringHelper;
             _sectionCollection = new List<string>();
+            _languageCollection = new List<int>();
         }
 
         /// <summary>
@@ -126,6 +128,28 @@ namespace Umbraco.Cms.Core.Models.Membership
         public void ClearAllowedSections()
         {
             _sectionCollection.Clear();
+        }
+
+        public IEnumerable<int> AllowedLanguages
+        {
+            get => _languageCollection;
+        }
+
+        public void RemoveAllowedLanguage(int languageId)
+        {
+            if (_languageCollection.Contains(languageId))
+                _languageCollection.Remove(languageId);
+        }
+
+        public void AddAllowedLanguage(int languageId)
+        {
+            if (_languageCollection.Contains(languageId) == false)
+                _languageCollection.Add(languageId);
+        }
+
+        public void ClearAllowedLanguages()
+        {
+            _languageCollection.Clear();
         }
 
         public int UserCount { get; }

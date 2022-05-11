@@ -12,7 +12,7 @@ namespace Umbraco.Extensions
             if (readonlyGroup != null) return readonlyGroup;
 
             //otherwise create one
-            return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedSections, group.Permissions);
+            return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedLanguages, group.AllowedSections, group.Permissions);
         }
 
         public static bool IsSystemUserGroup(this IUserGroup group) =>

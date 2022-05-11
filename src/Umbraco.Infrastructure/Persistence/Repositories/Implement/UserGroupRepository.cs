@@ -184,6 +184,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (dto == null)
                 return null;
+            dto.UserGroup2LanguageDtos = GetUserGroupLanguages(id);
 
             var userGroup = UserGroupFactory.BuildEntity(_shortStringHelper, dto);
             return userGroup;
@@ -201,7 +202,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             AppendGroupBy(sql);
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
 
-            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+            List<UserGroupDto> dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+
+            IDictionary<int, List<UserGroup2LanguageDto>> dic = GetAllUserGroupLanguageGrouped();
+
+            foreach (UserGroupDto dto in dtos)
+            {
+                dic.TryGetValue(dto.Id, out var userGroup2LanguageDtos);
+                dto.UserGroup2LanguageDtos = userGroup2LanguageDtos ?? new();
+            }
+
             return dtos.Select(x=>UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
@@ -303,6 +313,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Id = id;
 
             PersistAllowedSections(entity);
+            PersistAllowedLanguages(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -316,6 +327,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.Update(userGroupDto);
 
             PersistAllowedSections(entity);
+            PersistAllowedLanguages(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -337,6 +349,44 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 };
                 Database.Insert(dto);
             }
+        }
+
+        private void PersistAllowedLanguages(IUserGroup entity)
+        {
+            var userGroup = entity;
+
+            // First delete all
+            Database.Delete<UserGroup2LanguageDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
+
+            // Then re-add any associated with the group
+            foreach (var language in userGroup.AllowedLanguages)
+            {
+                var dto = new UserGroup2LanguageDto
+                {
+                    UserGroupId = userGroup.Id,
+                    LanguageId = language,
+                };
+
+                Database.Insert(dto);
+            }
+        }
+
+        private List<UserGroup2LanguageDto> GetUserGroupLanguages(int userGroupId)
+        {
+            Sql<ISqlContext> query = Sql()
+                .Select<UserGroup2LanguageDto>()
+                .From<UserGroup2LanguageDto>()
+                .Where<UserGroup2LanguageDto>(x => x.UserGroupId == userGroupId);
+            return Database.Fetch<UserGroup2LanguageDto>(query);
+        }
+
+        private IDictionary<int, List<UserGroup2LanguageDto>> GetAllUserGroupLanguageGrouped()
+        {
+            Sql<ISqlContext> query = Sql()
+                .Select<UserGroup2LanguageDto>()
+                .From<UserGroup2LanguageDto>();
+            List<UserGroup2LanguageDto> userGroupLanguages = Database.Fetch<UserGroup2LanguageDto>(query);
+            return userGroupLanguages.GroupBy(x => x.UserGroupId).ToDictionary(x => x.Key, x => x.ToList());
         }
 
         #endregion

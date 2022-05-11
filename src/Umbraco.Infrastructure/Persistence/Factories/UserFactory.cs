@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
         private static IReadOnlyUserGroup ToReadOnlyGroup(UserGroupDto group)
         {
             return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon,
-                group.StartContentId, group.StartMediaId, group.Alias,
+                group.StartContentId, group.StartMediaId, group.Alias, group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
                 group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
                 group.DefaultPermissions == null ? Enumerable.Empty<string>() : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
         }

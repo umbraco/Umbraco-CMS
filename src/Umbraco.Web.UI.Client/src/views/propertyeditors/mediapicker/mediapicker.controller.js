@@ -24,6 +24,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.allowEditMedia = false;
         $scope.allowAddMedia = false;
+        $scope.allowRemoveMedia = !$scope.readonly;
 
         function setupViewModel() {
             $scope.isMultiPicker = multiPicker;
@@ -96,8 +97,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         function sync() {
             $scope.model.value = selectedIds.join();
-            removeAllEntriesAction.isDisabled = selectedIds.length === 0;
-            copyAllEntriesAction.isDisabled = removeAllEntriesAction.isDisabled;
+            removeAllEntriesAction.isDisabled = selectedIds.length === 0 || !$scope.allowRemoveMedia;
+            copyAllEntriesAction.isDisabled = selectedIds.length === 0;
         }
 
         function setDirty() {
@@ -152,8 +153,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                         // only allow users to add and edit media if they have access to the media section
                         var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
-                        $scope.allowEditMedia = hasAccessToMedia;
-                        $scope.allowAddMedia = hasAccessToMedia;
+                        $scope.allowEditMedia = hasAccessToMedia && !$scope.readonly;
+                        $scope.allowAddMedia = hasAccessToMedia && !$scope.readonly;
 
                         setupViewModel();
                     });
@@ -161,6 +162,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function remove(index) {
+            if (!$scope.allowRemoveMedia) return;
+            
             vm.mediaItems.splice(index, 1);
             selectedIds.splice(index, 1);
             sync();
@@ -193,6 +196,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function pasteFromClipboard(pasteEntry, pasteType) {
+            if (!$scope.readonly) return;
 
             if (pasteEntry === undefined) {
                 return;
@@ -212,6 +216,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function editItem(item) {
+            if (!$scope.allowEditMedia) return;
+
             var mediaEditor = {
                 id: item.id,
                 submit: function (model) {
@@ -241,6 +247,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function add() {
+            if (!$scope.allowAddMedia) return;
+
             var mediaPicker = {
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
@@ -323,6 +331,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function removeAllEntries() {
+            if (!$scope.allowRemoveMedia) return;
+
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
                 overlayService.confirmDelete({
                     title: data[1],
@@ -372,7 +382,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             containment: 'parent',
             cursor: 'move',
             tolerance: 'pointer',
-            disabled: !multiPicker,
+            disabled: !multiPicker || $scope.readonly,
             items: "li:not(.add-wrapper)",
             cancel: ".unsortable",
             update: function () {

@@ -36,6 +36,14 @@ namespace Umbraco.Cms.Core.Models.Membership
 
         void ClearAllowedSections();
 
+        IEnumerable<int> AllowedLanguages { get; }
+
+        void RemoveAllowedLanguage(int languageId);
+
+        void AddAllowedLanguage(int languageId);
+
+        void ClearAllowedLanguages();
+
         /// <summary>
         /// Specifies the number of users assigned to this group
         /// </summary>

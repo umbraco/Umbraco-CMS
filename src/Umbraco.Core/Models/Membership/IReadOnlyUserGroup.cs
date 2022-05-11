@@ -27,5 +27,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         IEnumerable<string>? Permissions { get; set; }
 
         IEnumerable<string> AllowedSections { get; }
+
+        IEnumerable<int> AllowedLanguages { get; }
     }
 }

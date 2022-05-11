@@ -52,6 +52,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public IDictionary<int, IEnumerable<string>>? AssignedPermissions { get; set; }
 
         /// <summary>
+        /// The ids of allowed languages
+        /// </summary>
+        [DataMember(Name = "allowedLanguages")]
+        public IEnumerable<int>? AllowedLanguages { get; set; }
+
+        /// <summary>
         /// The real persisted user group
         /// </summary>
         [IgnoreDataMember]
