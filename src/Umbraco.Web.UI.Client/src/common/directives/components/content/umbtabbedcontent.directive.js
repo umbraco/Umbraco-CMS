@@ -183,8 +183,8 @@
             );
 
             $scope.propertyEditorReadonly = function(property) {
-                const allowBrowse = $scope.content.allowedActions.includes('F');
-                return allowBrowse && $scope.content.allowedActions.length === 1;
+                // check for permission to update
+                return !$scope.content.allowedActions.includes('U');
             };
 
             $scope.propertyEditorDisabled = function (property) {

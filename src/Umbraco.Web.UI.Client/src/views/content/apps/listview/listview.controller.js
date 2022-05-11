@@ -8,8 +8,8 @@
     vm.propertyEditorReadonly = propertyEditorReadonly;
 
     function propertyEditorReadonly () {
-      const allowBrowse = $scope.variantContent.allowedActions.includes('F');
-      return allowBrowse && $scope.variantContent.allowedActions.length === 1;
+      // check for permission to update
+      return !$scope.variantContent.allowedActions.includes('U');
     }
       
   }
