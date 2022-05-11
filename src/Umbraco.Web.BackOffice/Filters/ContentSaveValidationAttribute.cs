@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
-                if (!await ValidateUserAccessAsync(model, context))
+                if (!await ValidateUserAccessAsync(model, context)) return;
 
                 if (model is not null)
                 {
