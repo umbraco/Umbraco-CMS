@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing
@@ -16,7 +13,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         {
             Tabs = new List<Tab<ContentPropertyDisplay>>();
             Notifications = new List<BackOfficeNotification>();
+            AllowedActions = Enumerable.Empty<string>();
         }
+
+        [DataMember(Name = "AllowedActions", IsRequired = true)]
+        public IEnumerable<string> AllowedActions { get; set; }
 
         [DataMember(Name = "name", IsRequired = true)]
         public string? Name { get; set; }

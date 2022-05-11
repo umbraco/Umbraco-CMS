@@ -175,6 +175,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.State = _stateMapper.Map(source, context);
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.UpdateDate = source.UpdateDate;
+            target.AllowedActions = new[] {"F"};
         }
 
         private void Map(IContent source, ContentVariantScheduleDisplay target, MapperContext context)

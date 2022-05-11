@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping
@@ -12,11 +16,17 @@ namespace Umbraco.Cms.Core.Models.Mapping
     {
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
+        public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        }
+        public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
+        : this(localizationService, localizedTextService, StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>())
+        {
         }
 
         public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
@@ -147,6 +157,29 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
             variantDisplay.Segment = segment;
             variantDisplay.Language = language;
+
+            // Map allowed actions
+            IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+            bool hasAccess = false;
+            if (userGroups is not null)
+            {
+                foreach (var group in userGroups)
+                {
+                    if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
+                    {
+                        hasAccess = true;
+                        break;
+                    }
+                }
+
+                if (hasAccess)
+                {
+                    variantDisplay.AllowedActions = new[]
+                    {
+                        "C", "A", "D", "M", "O", "S", "K", "T", "P", "I", "U", "R", "Z", ":", "7", "ï", "N"
+                    };
+                }
+            }
             variantDisplay.Name = content.GetCultureName(language?.IsoCode);
             variantDisplay.DisplayName = GetDisplayName(language, segment);
 
