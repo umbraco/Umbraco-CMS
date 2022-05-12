@@ -1,13 +1,13 @@
 <div class="umb-property-editor db">
     
-    <div ng-if="locked" class="umb-property-editor__lock-overlay-container">
+    <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
         <div class="umb-property-editor__lock-overlay">
             {{ model.label }} is shared across all languages.
             <umb-button button-style="warning" type="button" action="unlock()" label="Edit" size="xxs"></umb-button>
         </div>
     </div>
 
-    <div ng-class="{'umb-property-editor--preview': preview || locked}" disable-tabindex="preview || locked">
+    <div ng-class="{'umb-property-editor--preview': preview}" disable-tabindex="preview">
         <div ng-include="propertyEditorView"></div>
     </div>
 </div>

@@ -13,7 +13,7 @@ function umbPropEditor(umbPropEditorHelper) {
                 model: "=",
                 isPreValue: "@",
                 preview: "<",
-                locked: "<?",
+                allowUnlock: "<?",
                 onUnlock: "&?"
             },
             
