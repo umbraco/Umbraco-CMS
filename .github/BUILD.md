@@ -27,21 +27,21 @@ If you want to run a build without debugging, see [Building from source](#buildi
 In order to build the Umbraco source code locally with Visual Studio Code, first make sure you have the following installed.
 
   * [Visual Studio Code](https://code.visualstudio.com/)
-  * [dotnet SDK v5.0](https://dotnet.microsoft.com/en-us/download)
+  * [dotnet SDK v6.0](https://dotnet.microsoft.com/en-us/download)
   * [Node.js v10+](https://nodejs.org/en/download/)
   * npm v6.4.1+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
 
-Open the root folder of the repository in Code.
+Open the root folder of the repository in Visual Studio Code.
 
-To build the front end you'll need to open the command pallet (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and run `>Tasks: Run Task` followed by `Client Install` and then run the `Client Build` task in the same way.
+To build the front end you'll need to open the command pallet (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>) and run `>Tasks: Run Task` followed by `Client Watch` and then run the `Client Build` task in the same way.
 
 You can also run the tasks manually on the command line:
 
 ```
 cd src\Umbraco.Web.UI.Client
 npm install
-npm run watch
+npm run dev
 ```
 
 or
@@ -49,7 +49,7 @@ or
 ```
 cd src\Umbraco.Web.UI.Client
 npm install
-gulp watch
+gulp dev
 ```
 
 **The initial Gulp build might take a long time - don't worry, this will be faster on subsequent runs.**
