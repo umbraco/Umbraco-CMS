@@ -2104,6 +2104,7 @@ namespace Umbraco.Cms.Core.Services
                     results.Add(result);
                     if (!result.Success)
                     {
+                        scope.Rollback();
                         return results;
                     }
                 }

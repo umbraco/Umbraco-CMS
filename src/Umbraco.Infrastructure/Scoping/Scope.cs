@@ -1220,6 +1220,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
                 // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
                 locksSet.Remove(lockId);
+
+                Rollback();
                 throw;
             }
         }

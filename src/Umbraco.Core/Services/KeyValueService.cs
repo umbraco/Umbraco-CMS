@@ -81,6 +81,7 @@ namespace Umbraco.Cms.Core.Services
                 var keyValue = _repository.Get(key);
                 if (keyValue == null || keyValue.Value != originalValue)
                 {
+                    scope.Rollback();
                     return false;
                 }
 

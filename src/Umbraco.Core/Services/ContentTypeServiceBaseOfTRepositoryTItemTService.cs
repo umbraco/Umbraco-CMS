@@ -147,7 +147,6 @@ namespace Umbraco.Cms.Core.Services
             }
 
             if (duplicatePropertyTypeAliases.Count > 0 || invalidPropertyGroupAliases.Count > 0)
-
             {
                 throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
             }
@@ -472,18 +471,28 @@ namespace Umbraco.Cms.Core.Services
 
                 if (string.IsNullOrWhiteSpace(item.Name))
                 {
+                    scope.Rollback();
                     throw new ArgumentException("Cannot save item with empty name.");
                 }
 
                 if (item.Name != null && item.Name.Length > 255)
                 {
+                    scope.Rollback();
                     throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 }
 
                 scope.WriteLock(WriteLockIds);
 
-                // validate the DAG transform, within the lock
-                ValidateLocked(item); // throws if invalid
+                try
+                {
+                    // validate the DAG transform, within the lock
+                    ValidateLocked(item); // throws if invalid
+                }
+                catch
+                {
+                    scope?.Rollback();
+                    throw;
+                }
 
                 item.CreatorId = userId;
                 if (item.Description == string.Empty)
