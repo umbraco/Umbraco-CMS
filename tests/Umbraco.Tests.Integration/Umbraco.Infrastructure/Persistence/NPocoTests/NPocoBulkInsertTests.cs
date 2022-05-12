@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             }
 
             // Assert
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
             }
@@ -141,12 +141,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
                 {
                     ScopeAccessor.AmbientScope.Database.BulkInsertRecords(servers);
 
-                    // Don't call complete here - the transaction will be rolled back.
+                    scope.Rollback();
                 }
             }
 
             // Assert
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
             }

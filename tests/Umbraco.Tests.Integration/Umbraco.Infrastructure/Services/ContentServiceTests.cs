@@ -2561,6 +2561,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     repository.Save(content.Value);
                 }
 
+                scope.Rollback();
+
                 Assert.That(c.Value.HasIdentity, Is.True);
                 Assert.That(c2.Value.HasIdentity, Is.True);
 

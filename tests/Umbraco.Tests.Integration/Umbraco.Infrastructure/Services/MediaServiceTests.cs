@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
 
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 IEnumerable<IMedia> result = MediaService.GetPagedChildren(
                     -1,

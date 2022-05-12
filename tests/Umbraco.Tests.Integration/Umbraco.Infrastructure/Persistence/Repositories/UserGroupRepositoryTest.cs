@@ -187,6 +187,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IQuery<IUserGroup> query = provider.CreateQuery<IUserGroup>().Where(x => x.Alias == "testGroup1");
                 IEnumerable<IUserGroup> result = repository.Get(query);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
             }
@@ -197,7 +199,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 UserGroupRepository repository = CreateRepository(provider);
 
@@ -205,6 +207,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<IUserGroup> result = repository.GetMany(userGroups[0].Id, userGroups[1].Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -218,7 +222,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 UserGroupRepository repository = CreateRepository(provider);
 
@@ -226,6 +230,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<IUserGroup> result = repository.GetMany();
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -239,7 +245,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 UserGroupRepository repository = CreateRepository(provider);
 
@@ -247,6 +253,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 bool exists = repository.Exists(userGroups[0].Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -267,6 +275,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IQuery<IUserGroup> query = provider.CreateQuery<IUserGroup>().Where(x => x.Alias == "testGroup1" || x.Alias == "testGroup2");
                 int result = repository.Count(query);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(result, Is.GreaterThanOrEqualTo(2));

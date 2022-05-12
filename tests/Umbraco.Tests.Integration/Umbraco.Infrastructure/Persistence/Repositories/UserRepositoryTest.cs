@@ -80,6 +80,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 repository.Save(user);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(user.HasIdentity, Is.True);
             }
@@ -102,6 +104,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 repository.Save(use2);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(user1.HasIdentity, Is.True);
                 Assert.That(use2.HasIdentity, Is.True);
@@ -123,6 +127,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IUser resolved = repository.Get((int)user.Id);
                 bool dirty = ((User)resolved).IsDirty();
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(dirty, Is.False);
@@ -153,6 +159,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IUser resolved = repository2.Get((int)id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(resolved, Is.Null);
             }
@@ -172,6 +180,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IUser updatedItem = repository.Get(user.Id);
+
+                scope.Rollback();
 
                 // FIXME: this test cannot work, user has 2 sections but the way it's created,
                 // they don't show, so the comparison with updatedItem fails - fix!
@@ -196,6 +206,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1");
                 IEnumerable<IUser> result = repository.Get(query);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(1));
             }
@@ -214,6 +226,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<IUser> result = repository.GetMany((int)users[0].Id, (int)users[1].Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
@@ -236,6 +250,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IEnumerable<IUser> result = repository.GetMany();
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Any(), Is.True);
@@ -257,6 +273,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 bool exists = repository.Exists(users[0].Id);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(exists, Is.True);
             }
@@ -276,6 +294,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IQuery<IUser> query = ScopeProvider.CreateQuery<IUser>().Where(x => x.Username == "TestUser1" || x.Username == "TestUser2");
                 int result = repository.Count(query);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual(2, result);
@@ -308,6 +328,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         Direction.Ascending,
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
                         filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
+
+                    scope.Rollback();
 
                     // Assert
                     Assert.AreEqual(2, totalRecs);
@@ -347,6 +369,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
                         filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
+                    scope.Rollback();
+
                     // Assert
                     Assert.AreEqual(1, totalRecs);
                 }
@@ -381,6 +405,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Get the user
                 IUser updatedUser = repository.Get(user.Id);
+
+                scope.Rollback();
 
                 // Ensure the Security Stamp is invalidated & no longer the same
                 Assert.AreNotEqual(originalSecurityStamp, updatedUser.SecurityStamp);

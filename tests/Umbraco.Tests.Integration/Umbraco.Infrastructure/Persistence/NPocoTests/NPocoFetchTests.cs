@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
         public void TestSimple()
         {
             // Fetching a simple POCO
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var sql = @"
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
         {
             // Fetching a POCO that contains the ID of another POCO,
             // and fetching that other POCO at the same time.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var sql = @"
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             // and fetching these POCOs at the same time,
             // with a pk/fk relationship
             // for one single POCO.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var dtos = scope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, x => x.Id, @"
@@ -252,7 +252,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             //
             // The ORDER BY clause (matching x => x.Id) is required
             // for proper aggregation to take place.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var sql = @"
@@ -299,6 +299,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
 
                 List<Thing3Dto> dtos = ScopeAccessor.AmbientScope.Database.FetchOneToMany<Thing3Dto>(x => x.Things, /*x => x.Id,*/ sql);
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, dtos.Count);
                 Thing3Dto dto1 = dtos.FirstOrDefault(x => x.Id == 1);
                 Assert.IsNotNull(dto1);
@@ -320,7 +322,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
             //
             // The ORDER BY clause (matching x => x.Id) is required
             // for proper aggregation to take place.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var sql = @"
@@ -355,7 +357,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
         {
             // Fetching a POCO that has a countof other POCOs,
             // with an n-to-n intermediate table.
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // This is the raw SQL, but it's better to use expressions and no magic strings!
                 // var sql = @"
@@ -391,7 +393,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
         [Test]
         public void TestSql()
         {
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 Sql<ISqlContext> sql = ScopeAccessor.AmbientScope.SqlContext.Sql()
                     .SelectAll()

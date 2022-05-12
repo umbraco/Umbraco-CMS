@@ -114,6 +114,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 {
                     scope.Complete();
                 }
+                else
+                {
+                    scope.Rollback();
+                }
             }
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -205,6 +209,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 {
                     scope.Complete();
                 }
+                else
+                {
+                    scope.Rollback();
+                }
             }
 
             Assert.IsNull(scopeProvider.AmbientScope);
@@ -291,6 +299,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 if (complete)
                 {
                     scope.Complete();
+                }
+                else
+                {
+                    scope.Rollback();
                 }
             }
 

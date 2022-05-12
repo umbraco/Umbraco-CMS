@@ -156,6 +156,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 // There's a call or two to get languages, so apart from that there should only be one call per level.
                 Assert.Less(ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().SqlCount, 30);
+
+                scope.Rollback();
             }
         }
 
