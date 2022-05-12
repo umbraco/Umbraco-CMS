@@ -42,13 +42,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
 
                 Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
+
+                scope.Rollback();
             }
         }
 
@@ -57,7 +59,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
@@ -65,6 +67,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 server.ServerIdentity = "COMPUTER2";
 
                 Assert.That(() => repository.Save(server), Throws.InstanceOf<DbException>());
+
+                scope.Rollback();
             }
         }
 
@@ -87,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
@@ -106,7 +110,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
@@ -158,13 +162,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
                 // Act
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
                 repository.Save(server);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(server.HasIdentity, Is.True);
@@ -177,7 +183,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
@@ -189,6 +195,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(server);
 
                 IServerRegistration serverUpdated = repository.Get(2);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(serverUpdated, Is.Not.Null);
@@ -202,7 +210,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 
@@ -212,6 +220,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(server);
 
                 bool exists = repository.Exists(3);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -223,7 +233,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             IScopeProvider provider = ScopeProvider;
-            using (provider.CreateScope())
+            using (provider.CreateScope(autoComplete: true))
             {
                 ServerRegistrationRepository repository = CreateRepository(provider);
 

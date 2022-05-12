@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Add_On_Repository()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 TagRepository repository = CreateRepository(provider);
 
@@ -51,6 +51,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 repository.Save(tag);
 
+                scope.Rollback();
+
                 Assert.That(tag.HasIdentity, Is.True);
             }
         }
@@ -59,7 +61,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Perform_Multiple_Adds_On_Repository()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 TagRepository repository = CreateRepository(provider);
 
@@ -79,6 +81,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 repository.Save(tag2);
 
+                scope.Rollback();
+
                 Assert.That(tag.HasIdentity, Is.True);
                 Assert.That(tag2.HasIdentity, Is.True);
                 Assert.AreNotEqual(tag.Id, tag2.Id);
@@ -89,7 +93,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Create_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -115,6 +119,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     false);
 
                 Assert.AreEqual(2, repository.GetTagsForEntity(content.Id).Count());
+
+                scope.Rollback();
             }
         }
 
@@ -122,7 +128,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Append_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -159,6 +165,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     false);
 
                 Assert.AreEqual(4, repository.GetTagsForEntity(content.Id).Count());
+
+                scope.Rollback();
             }
         }
 
@@ -166,7 +174,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Replace_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -206,6 +214,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(2, result.Length);
                 Assert.AreEqual("tag3", result[0].Text);
                 Assert.AreEqual("tag4", result[1].Text);
+
+                scope.Rollback();
             }
         }
 
@@ -213,7 +223,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Merge_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -251,6 +261,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetTagsForEntity(content.Id);
                 Assert.AreEqual(3, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -258,7 +270,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Clear_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -291,6 +303,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetTagsForEntity(content.Id);
                 Assert.AreEqual(0, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -298,7 +312,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Remove_Specific_Tags_From_Property()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -339,6 +353,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(2, result.Length);
                 Assert.AreEqual("tag1", result[0].Text);
                 Assert.AreEqual("tag4", result[1].Text);
+
+                scope.Rollback();
             }
         }
 
@@ -346,7 +362,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Content_By_Id()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -388,6 +404,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetTagsForEntity(content2.Id);
                 Assert.AreEqual(2, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -395,7 +413,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Content_By_Key()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -438,6 +456,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // get by key
                 IEnumerable<ITag> result = repository.GetTagsForEntity(content2.Key);
                 Assert.AreEqual(2, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -445,7 +465,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_All()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -476,6 +496,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetMany();
                 Assert.AreEqual(4, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -483,7 +505,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_All_With_Ids()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -518,6 +540,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetMany(all[0].Id, all[1].Id, all[2].Id);
                 Assert.AreEqual(3, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -525,7 +549,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Content_For_Group()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -567,6 +591,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<ITag> result = repository.GetTagsForEntity(content1.Id, "test1");
                 Assert.AreEqual(2, result.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -574,7 +600,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Property_By_Id()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -616,6 +642,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ITag[] result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
                 Assert.AreEqual(4, result1.Length);
                 Assert.AreEqual(2, result2.Length);
+
+                scope.Rollback();
             }
         }
 
@@ -623,7 +651,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Property_By_Key()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -665,6 +693,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ITag[] result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
                 Assert.AreEqual(4, result1.Length);
                 Assert.AreEqual(2, result2.Length);
+
+                scope.Rollback();
             }
         }
 
@@ -672,7 +702,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Property_For_Group()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -713,6 +743,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ITag[] result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias, "test1").ToArray();
                 ITag[] result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias, "test1").ToArray();
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, result1.Length);
                 Assert.AreEqual(1, result2.Length);
             }
@@ -722,7 +754,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Entity_Type()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -769,6 +801,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ITag[] result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
                 ITag[] result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
 
+                scope.Rollback();
+
                 Assert.AreEqual(3, result1.Length);
                 Assert.AreEqual(2, result2.Length);
                 Assert.AreEqual(4, result3.Length);
@@ -783,7 +817,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tags_For_Entity_Type_For_Group()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -830,6 +864,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ITag[] result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content,  "test1").ToArray();
                 ITag[] result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media, "test1").ToArray();
 
+                scope.Rollback();
+
                 Assert.AreEqual(2, result1.Length);
                 Assert.AreEqual(1, result2.Length);
             }
@@ -839,7 +875,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Cascade_Deletes_Tag_Relations()
         {
             IScopeProvider provider = ScopeProvider;
-            using (IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -868,6 +904,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 DocumentRepository.Delete(content1);
 
+                scope.Rollback();
+
                 Assert.AreEqual(0, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
                     new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
@@ -878,7 +916,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tagged_Entities_For_Tag_Group()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -963,6 +1001,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<TaggedEntity> mediaTest1Ids = repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, "test1");
                 Assert.AreEqual(1, mediaTest1Ids.Count());
+
+                scope.Rollback();
             }
         }
 
@@ -970,7 +1010,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void Can_Get_Tagged_Entities_For_Tag()
         {
             IScopeProvider provider = ScopeProvider;
-            using (ScopeProvider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 // create data to relate to
                 // We have to create and save a template, otherwise we get an FK violation on contentType.
@@ -1051,6 +1091,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<TaggedEntity> mediaTestIds = repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, "tag1");
                 Assert.AreEqual(1, mediaTestIds.Count());
+
+                scope.Rollback();
             }
         }
 

@@ -54,6 +54,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 Notification notification = repo.CreateNotification(user, entity, "A");
 
+                scope.Rollback();
+
                 Assert.AreEqual("A", notification.Action);
                 Assert.AreEqual(node.NodeId, notification.EntityId);
                 Assert.AreEqual(node.NodeObjectType, notification.EntityType);
@@ -85,6 +87,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 IEnumerable<Notification> notifications = repo.GetUserNotifications(userAdmin);
 
+                scope.Rollback();
+
                 Assert.AreEqual(5, notifications.Count());
             }
         }
@@ -113,6 +117,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 IEnumerable<Notification> notifications = repo.GetEntityNotifications(entity1);
+
+                scope.Rollback();
 
                 Assert.AreEqual(5, notifications.Count());
             }
@@ -143,6 +149,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 int delCount = repo.DeleteNotifications(entity1);
 
+                scope.Rollback();
+
                 Assert.AreEqual(5, delCount);
             }
         }
@@ -170,6 +178,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 int delCount = repo.DeleteNotifications(userAdmin);
+
+                scope.Rollback();
 
                 Assert.AreEqual(5, delCount);
             }

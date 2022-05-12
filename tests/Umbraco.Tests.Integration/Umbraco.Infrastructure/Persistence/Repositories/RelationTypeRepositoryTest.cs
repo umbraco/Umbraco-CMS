@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -44,6 +44,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 Assert.That(relateMemberToContent.HasIdentity, Is.True);
                 Assert.That(repository.Exists(relateMemberToContent.Id), Is.True);
+
+                scope.Rollback();
             }
         }
 
@@ -52,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -63,6 +65,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(relationType);
 
                 IRelationType relationTypeUpdated = repository.Get(3);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(relationTypeUpdated, Is.Not.Null);
@@ -77,7 +81,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -86,6 +90,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Delete(relationType);
 
                 bool exists = repository.Exists(3);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.That(exists, Is.False);
@@ -97,7 +103,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -121,7 +127,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -141,7 +147,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -161,7 +167,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (provider.CreateCoreScope())
+            using (provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -180,7 +186,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (ICoreScope scope = provider.CreateCoreScope())
+            using (ICoreScope scope = provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 
@@ -198,7 +204,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             // Arrange
             ICoreScopeProvider provider = ScopeProvider;
-            using (ICoreScope scope = provider.CreateCoreScope())
+            using (ICoreScope scope = provider.CreateCoreScope(autoComplete: true))
             {
                 RelationTypeRepository repository = CreateRepository(provider);
 

@@ -55,6 +55,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 entry = repo.Get(entry.Key);
                 Assert.IsNull(entry);
+
+                scope.Rollback();
             }
         }
 
@@ -81,6 +83,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repo.Save(entry);
 
                 PublicAccessEntry[] found = repo.GetMany().ToArray();
+
+                scope.Rollback();
 
                 Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
@@ -127,6 +131,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 PublicAccessEntry[] found = repo.GetMany().ToArray();
 
+                scope.Rollback();
+
                 Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
                 Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
@@ -172,6 +178,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // re-get
                 entry = repo.Get(entry.Key);
 
+                scope.Rollback();
+
                 Assert.AreEqual("blah", entry.Rules.First().RuleValue);
                 Assert.AreEqual("asdf", entry.Rules.First().RuleType);
             }
@@ -200,6 +208,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // re-get
                 entry = repo.Get(entry.Key);
+
+                scope.Rollback();
 
                 Assert.IsNotNull(entry);
             }
@@ -260,6 +270,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 PublicAccessEntry[] found = repo.GetMany().ToArray();
                 Assert.AreEqual(10, found.Length);
 
+                scope.Rollback();
+
                 foreach (PublicAccessEntry publicAccessEntry in found)
                 {
                     PublicAccessEntry matched = allEntries.First(x => x.Key == publicAccessEntry.Key);
@@ -303,6 +315,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 PublicAccessEntry[] found = repo.GetMany(entry1.Key).ToArray();
                 Assert.AreEqual(1, found.Count());
+
+                scope.Rollback();
             }
         }
 

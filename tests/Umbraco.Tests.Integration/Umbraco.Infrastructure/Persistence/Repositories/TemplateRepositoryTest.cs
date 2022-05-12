@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -79,6 +79,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
+
+                scope.Rollback();
             }
         }
 
@@ -88,7 +90,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -103,6 +105,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual("mock-content", template.Content.StripWhitespace());
+
+                scope.Rollback();
             }
         }
 
@@ -112,7 +116,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -131,6 +135,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(
                     "@usingUmbraco.Cms.Web.Common.PublishedModels;@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
                     template2.Content.StripWhitespace());
+
+                scope.Rollback();
             }
         }
 
@@ -140,7 +146,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -157,6 +163,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 };
                 repository.Save(template2);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.AreEqual("test1", template2.Alias);
             }
@@ -168,7 +176,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -188,6 +196,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 template.Alias = "test1";
                 repository.Save(template);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.AreEqual("test11", template.Alias);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test11.cshtml"), Is.True);
@@ -201,7 +211,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -217,6 +227,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 ITemplate updated = repository.Get("test");
 
+                scope.Rollback();
+
                 // Assert
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.That(updated.Content, Is.EqualTo("mock-content" + "<html></html>"));
@@ -229,7 +241,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -247,6 +259,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 Assert.IsNull(repository.Get("test"));
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.False);
+
+                scope.Rollback();
             }
         }
 
@@ -259,7 +273,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
             IFileService fileService = GetRequiredService<IFileService>();
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository templateRepository = CreateRepository(provider);
                 var globalSettings = new GlobalSettings();
@@ -293,6 +307,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Assert
                 Assert.IsNull(templateRepository.Get("textPage"));
+
+                scope.Rollback();
             }
         }
 
@@ -302,7 +318,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -332,6 +348,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Assert
                 Assert.IsNull(repository.Get("test"));
+
+                scope.Rollback();
             }
         }
 
@@ -341,7 +359,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -351,6 +369,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IEnumerable<ITemplate> all = repository.GetAll();
                 IEnumerable<ITemplate> allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
                 IEnumerable<ITemplate> allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual(9, all.Count());
@@ -370,7 +390,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -378,6 +398,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> childrenById = repository.GetChildren(created[1].Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual(2, childrenById.Count());
@@ -391,7 +413,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -399,6 +421,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> children = repository.GetChildren(-1);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual(1, children.Count());
@@ -412,13 +436,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
                 ITemplate[] created = CreateHierarchy(repository).ToArray();
 
                 // Act
                 IEnumerable<ITemplate> descendantsById = repository.GetDescendants(created[1].Id);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual(3, descendantsById.Count());
@@ -432,7 +458,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -474,6 +500,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(baby1);
                 repository.Save(baby2);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.AreEqual(string.Format("-1,{0}", parent.Id), parent.Path);
                 Assert.AreEqual(string.Format("-1,{0},{1}", parent.Id, child1.Id), child1.Path);
@@ -494,7 +522,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -523,6 +551,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 toddler2.SetMasterTemplate(child2);
                 repository.Save(toddler2);
 
+                scope.Rollback();
+
                 // Assert
                 Assert.AreEqual($"-1,{parent.Id},{child2.Id},{toddler2.Id}", toddler2.Path);
             }
@@ -534,7 +564,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             // Arrange
             IScopeProvider provider = ScopeProvider;
 
-            using (provider.CreateScope())
+            using (IScope scope = provider.CreateScope())
             {
                 ITemplateRepository repository = CreateRepository(provider);
 
@@ -551,6 +581,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 child1.SetMasterTemplate(null);
                 repository.Save(child1);
+
+                scope.Rollback();
 
                 // Assert
                 Assert.AreEqual($"-1,{child1.Id}", child1.Path);
