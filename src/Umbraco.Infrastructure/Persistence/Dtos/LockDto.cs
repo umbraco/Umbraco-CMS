@@ -19,6 +19,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("name")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Length(64)]
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

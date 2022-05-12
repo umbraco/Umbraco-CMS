@@ -18,10 +18,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         }
 
         [DataMember(Name = "header")]
-        public string Header { get; set; }
+        public string? Header { get; set; }
 
         [DataMember(Name = "message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         [DataMember(Name = "type")]
         public NotificationStyle NotificationType { get; set; }

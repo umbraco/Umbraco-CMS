@@ -9,17 +9,17 @@ namespace Umbraco.Cms.Core.PublishedCache
     internal class PublishedElementPropertyBase : PublishedPropertyBase
     {
         private readonly object _locko = new object();
-        private readonly object _sourceValue;
-        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly object? _sourceValue;
+        private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
 
         protected readonly IPublishedElement Element;
         protected readonly bool IsPreviewing;
         protected readonly bool IsMember;
 
         private bool _interInitialized;
-        private object _interValue;
-        private CacheValues _cacheValues;
-        private string _valuesCacheKey;
+        private object? _interValue;
+        private CacheValues? _cacheValues;
+        private string? _valuesCacheKey;
 
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
@@ -27,17 +27,17 @@ namespace Umbraco.Cms.Core.PublishedCache
         // so making it configurable.
         private const bool FullCacheWhenPreviewing = true;
 
-        public PublishedElementPropertyBase(IPublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IPublishedSnapshotAccessor publishedSnapshotAccessor = null)
+        public PublishedElementPropertyBase(IPublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object? sourceValue = null, IPublishedSnapshotAccessor? publishedSnapshotAccessor = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             Element = element;
             IsPreviewing = previewing;
-            IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
+            IsMember = propertyType.ContentType?.ItemType == PublishedItemType.Member;
         }
 
-        public override bool HasValue(string culture = null, string segment = null)
+        public override bool HasValue(string? culture = null, string? segment = null)
         {
             var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
             if (hasValue.HasValue) return hasValue.Value;
@@ -70,9 +70,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         protected class CacheValues
         {
             public bool ObjectInitialized;
-            public object ObjectValue;
+            public object? ObjectValue;
             public bool XPathInitialized;
-            public object XPathValue;
+            public object? XPathValue;
         }
 
         public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) => "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
@@ -104,19 +104,25 @@ namespace Umbraco.Cms.Core.PublishedCache
             }
         }
 
-        private IAppCache GetSnapshotCache()
+        private IAppCache? GetSnapshotCache()
         {
             // cache within the snapshot cache, unless previewing, then use the snapshot or
             // elements cache (if we don't want to pollute the elements cache with short-lived
             // data) depending on settings
             // for members, always cache in the snapshot cache - never pollute elements cache
+            if (_publishedSnapshotAccessor is null)
+            {
+                return null;
+            }
+
             if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
             {
                 return null;
             }
+
             return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
-                ? publishedSnapshot.ElementsCache
-                : publishedSnapshot.SnapshotCache;
+                ? publishedSnapshot!.ElementsCache
+                : publishedSnapshot!.SnapshotCache;
         }
 
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
@@ -135,13 +141,13 @@ namespace Umbraco.Cms.Core.PublishedCache
                 case PropertyCacheLevel.Elements:
                     // cache within the elements  cache, depending...
                     var snapshotCache = GetSnapshotCache();
-                    cacheValues = (CacheValues) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
+                    cacheValues = (CacheValues?) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 case PropertyCacheLevel.Snapshot:
-                    var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                    var publishedSnapshot = _publishedSnapshotAccessor?.GetRequiredPublishedSnapshot();
                     // cache within the snapshot cache
-                    var facadeCache = publishedSnapshot.SnapshotCache;
-                    cacheValues = (CacheValues) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
+                    var facadeCache = publishedSnapshot?.SnapshotCache;
+                    cacheValues = (CacheValues?) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 default:
                     throw new InvalidOperationException("Invalid cache level.");
@@ -149,7 +155,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             return cacheValues;
         }
 
-        private object GetInterValue()
+        private object? GetInterValue()
         {
             if (_interInitialized) return _interValue;
 
@@ -158,9 +164,9 @@ namespace Umbraco.Cms.Core.PublishedCache
             return _interValue;
         }
 
-        public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+        public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
 
-        public override object GetValue(string culture = null, string segment = null)
+        public override object? GetValue(string? culture = null, string? segment = null)
         {
             GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
 
@@ -174,7 +180,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             }
         }
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+        public override object? GetXPathValue(string? culture = null, string? segment = null)
         {
             GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
 

@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.MediaPicker3);
 
-        public override bool? IsValue(object value, PropertyValueLevel level)
+        public override bool? IsValue(object? value, PropertyValueLevel level)
         {
             var isValue = base.IsValue(value, level);
             if (isValue != false && level == PropertyValueLevel.Source)
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             var isMultiple = IsMultipleDataType(propertyType.DataType);
             if (string.IsNullOrEmpty(inter?.ToString()))
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             foreach (var dto in dtos)
             {
-                var mediaItem = publishedSnapshot.Media.GetById(preview, dto.MediaKey);
+                var mediaItem = publishedSnapshot.Media?.GetById(preview, dto.MediaKey);
                 if (mediaItem != null)
                 {
                     var localCrops = new ImageCropperValue
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
-                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, _publishedValueFallback, localCrops);
+                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, _publishedValueFallback, localCrops)!;
 
                     mediaItems.Add(mediaWithCrops);
 
@@ -95,6 +95,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
         }
 
-        private bool IsMultipleDataType(PublishedDataType dataType) => dataType.ConfigurationAs<MediaPicker3Configuration>().Multiple;
+        private bool IsMultipleDataType(PublishedDataType dataType) => dataType.ConfigurationAs<MediaPicker3Configuration>()?.Multiple ?? false;
     }
 }

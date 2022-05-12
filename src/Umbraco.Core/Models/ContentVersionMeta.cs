@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models
         public bool CurrentPublishedVersion { get; }
         public bool CurrentDraftVersion { get; }
         public bool PreventCleanup { get; }
-        public string Username { get; }
+        public string? Username { get; }
 
         public ContentVersionMeta() { }
 

@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "parentName")]
         [ReadOnly(true)]
-        public string ParentName { get; set; }
+        public string? ParentName { get; set; }
 
         /// <summary>
         /// Gets or sets the Child Id of the Relation (Destination).
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "childName")]
         [ReadOnly(true)]
-        public string ChildName { get; set; }
+        public string? ChildName { get; set; }
 
         /// <summary>
         /// Gets or sets the date when the Relation was created.
@@ -47,6 +47,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "comment")]
         [ReadOnly(true)]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<ExamineIndexModel> GetIndexerDetails()
             => _examineManager.Indexes
                 .Select(index => CreateModel(index))
-                .OrderBy(examineIndexModel => examineIndexModel.Name.TrimEnd("Indexer"));
+                .OrderBy(examineIndexModel => examineIndexModel.Name?.TrimEnd("Indexer"));
 
         /// <summary>
         /// Get the details for searchers
@@ -58,11 +58,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var model = new List<ExamineSearcherModel>(
                 _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel { Name = searcher.Name })
-                    .OrderBy(x => x.Name.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
+                    .OrderBy(x => x.Name?.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
             return model;
         }
 
-        public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
+        public ActionResult<SearchResults> GetSearchResults(string searcherName, string? query, int pageIndex = 0, int pageSize = 20)
         {
             query = query?.Trim();
 
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public ActionResult<ExamineIndexModel> PostCheckRebuildIndex(string indexName)
+        public ActionResult<ExamineIndexModel?> PostCheckRebuildIndex(string indexName)
         {
             var validate = ValidateIndex(indexName, out var index);
 
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return validate;
             }
 
-            validate = ValidatePopulator(index);
+            validate = ValidatePopulator(index!);
             if (!validate.IsSuccessStatusCode())
             {
                 return validate;
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if its still there then it's not done
             return found != null
                 ? null
-                : CreateModel(index);
+                : CreateModel(index!);
         }
 
         /// <summary>
@@ -147,14 +147,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (!validate.IsSuccessStatusCode())
                 return validate;
 
-            validate = ValidatePopulator(index);
+            validate = ValidatePopulator(index!);
             if (!validate.IsSuccessStatusCode())
                 return validate;
 
             _logger.LogInformation("Rebuilding index '{IndexName}'", indexName);
 
             //remove it in case there's a handler there already
-            index.IndexOperationComplete -= Indexer_IndexOperationComplete;
+            index!.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
             //now add a single handler
             index.IndexOperationComplete += Indexer_IndexOperationComplete;
@@ -189,13 +189,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var isHealth = indexDiag.IsHealthy();
 
-            var properties = new Dictionary<string, object>
+            var properties = new Dictionary<string, object?>
             {
                 ["DocumentCount"] = indexDiag.GetDocumentCount(),
                 ["FieldCount"] = indexDiag.GetFieldNames().Count(),
             };
 
-            foreach (KeyValuePair<string, object> p in indexDiag.Metadata)
+            foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)
             {
                 properties[p.Key] = p.Value;
             }
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return response;
         }
 
-        private ActionResult ValidateIndex(string indexName, out IIndex index)
+        private ActionResult ValidateIndex(string indexName, out IIndex? index)
         {
             index = null;
 
@@ -258,18 +258,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return response;
         }
 
-        private void Indexer_IndexOperationComplete(object sender, EventArgs e)
+        private void Indexer_IndexOperationComplete(object? sender, EventArgs e)
         {
-            var indexer = (IIndex)sender;
+            var indexer = (IIndex?)sender;
 
-            _logger.LogDebug("Logging operation completed for index {IndexName}", indexer.Name);
+            _logger.LogDebug("Logging operation completed for index {IndexName}", indexer?.Name);
 
-            //ensure it's not listening anymore
-            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+            if (indexer is not null)
+            {
+                //ensure it's not listening anymore
+                indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+            }
 
-            _logger.LogInformation($"Rebuilding index '{indexer.Name}' done.");
+            _logger.LogInformation($"Rebuilding index '{indexer?.Name}' done.");
 
-            var cacheKey = "temp_indexing_op_" + indexer.Name;
+            var cacheKey = "temp_indexing_op_" + indexer?.Name;
             _runtimeCache.Clear(cacheKey);
         }
     }

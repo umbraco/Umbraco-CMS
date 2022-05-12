@@ -66,9 +66,12 @@ namespace Umbraco.Cms.Core.Install
             {
                 var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                     File.ReadAllText(file));
-                foreach (var item in deserialized)
+                if (deserialized is not null)
                 {
-                    _steps.Add(item);
+                    foreach (var item in deserialized)
+                    {
+                        _steps.Add(item);
+                    }
                 }
             }
             else
@@ -89,9 +92,12 @@ namespace Umbraco.Cms.Core.Install
                 {
                     var deserialized = _jsonSerializer.Deserialize<IEnumerable<InstallTrackingItem>>(
                         File.ReadAllText(file));
-                    foreach (var item in deserialized)
+                    if (deserialized is not null)
                     {
-                        _steps.Add(item);
+                        foreach (var item in deserialized)
+                        {
+                            _steps.Add(item);
+                        }
                     }
                 }
                 else
@@ -105,7 +111,7 @@ namespace Umbraco.Cms.Core.Install
                     }
                     //save the file
                     var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file)!);
                     File.WriteAllText(file, serialized);
                 }
             }
@@ -119,7 +125,7 @@ namespace Umbraco.Cms.Core.Install
 
                     //save the correct file
                     var serialized = _jsonSerializer.Serialize(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file)!);
                     File.WriteAllText(file, serialized);
                 }
             }
@@ -127,7 +133,7 @@ namespace Umbraco.Cms.Core.Install
             return new List<InstallTrackingItem>(_steps);
         }
 
-        public void SetComplete(Guid installId, string name, IDictionary<string, object> additionalData = null)
+        public void SetComplete(Guid installId, string name, IDictionary<string, object>? additionalData = null)
         {
             var trackingItem = _steps.Single(x => x.Name == name);
             if (additionalData != null)

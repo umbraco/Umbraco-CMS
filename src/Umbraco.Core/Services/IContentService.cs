@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a blueprint.
         /// </summary>
-        IContent GetBlueprintById(int id);
+        IContent? GetBlueprintById(int id);
 
         /// <summary>
         /// Gets a blueprint.
         /// </summary>
-        IContent GetBlueprintById(Guid id);
+        IContent? GetBlueprintById(Guid id);
 
         /// <summary>
         /// Gets blueprints for a content type.
@@ -60,12 +60,26 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a document.
         /// </summary>
-        IContent GetById(int id);
+        IContent? GetById(int id);
 
         /// <summary>
         /// Gets a document.
         /// </summary>
-        IContent GetById(Guid key);
+        IContent? GetById(Guid key);
+
+        /// <summary>
+        /// Gets publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="contentId">Id of the Content to load schedule for</param>
+        /// <returns><see cref="ContentScheduleCollection"/></returns>
+        ContentScheduleCollection GetContentScheduleByContentId(int contentId);
+
+        /// <summary>
+        /// Persists publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="contentSchedule"></param>
+        void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
 
         /// <summary>
         /// Gets documents.
@@ -85,12 +99,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
-        IContent GetParent(int id);
+        IContent? GetParent(int id);
 
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
-        IContent GetParent(IContent content);
+        IContent? GetParent(IContent content);
 
         /// <summary>
         /// Gets ancestor documents of a document.
@@ -123,7 +137,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets a version of a document.
         /// </summary>
-        IContent GetVersion(int versionId);
+        IContent? GetVersion(int versionId);
 
         /// <summary>
         /// Gets root-level documents.
@@ -154,7 +168,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets documents in the recycle bin.
         /// </summary>
         IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets child documents of a parent.
@@ -166,7 +180,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets descendant documents of a given parent.
@@ -178,7 +192,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter = null, Ordering ordering = null);
+            IQuery<IContent>? filter = null, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents of a content
@@ -190,7 +204,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+            IQuery<IContent> filter, Ordering? ordering = null);
 
         /// <summary>
         /// Gets paged documents for specified content types
@@ -202,27 +216,27 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filter">Search text filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IContent> filter, Ordering ordering = null);
+            IQuery<IContent>? filter, Ordering? ordering = null);
 
         /// <summary>
         /// Counts documents of a given document type.
         /// </summary>
-        int Count(string documentTypeAlias = null);
+        int Count(string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts published documents of a given document type.
         /// </summary>
-        int CountPublished(string documentTypeAlias = null);
+        int CountPublished(string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts child documents of a given parent, of a given document type.
         /// </summary>
-        int CountChildren(int parentId, string documentTypeAlias = null);
+        int CountChildren(int parentId, string? documentTypeAlias = null);
 
         /// <summary>
         /// Counts descendant documents of a given parent, of a given document type.
         /// </summary>
-        int CountDescendants(int parentId, string documentTypeAlias = null);
+        int CountDescendants(int parentId, string? documentTypeAlias = null);
 
         /// <summary>
         /// Gets a value indicating whether a document has children.
@@ -236,7 +250,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId);
+        OperationResult Save(IContent content, int? userId = null, ContentScheduleCollection? contentSchedule = null);
 
         /// <summary>
         /// Saves documents.
@@ -296,7 +310,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>Recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
+        IContent? Copy(IContent content, int parentId, bool relateToOriginal, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Copies a document.
@@ -304,7 +318,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>Optionally recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
+        IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Moves a document to the recycle bin.
@@ -330,7 +344,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId);
+        OperationResult Sort(IEnumerable<int>? ids, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -446,7 +460,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document and raises the "sent to publication" events.
         /// </summary>
-        bool SendToPublication(IContent content, int userId = Constants.Security.SuperUserId);
+        bool SendToPublication(IContent? content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Publishes and unpublishes scheduled documents.
@@ -496,7 +510,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
+        IContent Create(string name, IContent? parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Creates and saves a document.

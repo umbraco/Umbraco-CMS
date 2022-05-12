@@ -29,10 +29,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("key")]
         [Length(450)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_key")]
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ColumnName = "UniqueId", ReferenceMemberName = "UniqueId")]
-        public List<LanguageTextDto> LanguageTextDtos { get; set; }
+        public List<LanguageTextDto>? LanguageTextDtos { get; set; }
     }
 }

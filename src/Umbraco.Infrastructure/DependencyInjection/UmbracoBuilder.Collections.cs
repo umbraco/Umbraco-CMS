@@ -14,10 +14,10 @@ namespace Umbraco.Extensions
         /// Gets the mappers collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        public static MapperCollectionBuilder Mappers(this IUmbracoBuilder builder)
+        public static MapperCollectionBuilder? Mappers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<MapperCollectionBuilder>();
 
-        public static NPocoMapperCollectionBuilder NPocoMappers(this IUmbracoBuilder builder)
+        public static NPocoMapperCollectionBuilder? NPocoMappers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<NPocoMapperCollectionBuilder>();
 
 
@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// Gets the package migration plans collection builder.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        public static PackageMigrationPlanCollectionBuilder PackageMigrationPlans(this IUmbracoBuilder builder)
+        public static PackageMigrationPlanCollectionBuilder? PackageMigrationPlans(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<PackageMigrationPlanCollectionBuilder>();
 
     }

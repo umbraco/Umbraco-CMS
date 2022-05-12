@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Benchmarks
@@ -33,8 +34,8 @@ namespace Umbraco.Tests.Benchmarks
 
         public SqlTemplatesBenchmark()
         {
-            var mappers = new NPoco.MapperCollection( );
-            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
+            var mappers = new NPoco.MapperCollection();
+            var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(), mappers);
 
             SqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);
             SqlTemplates = new SqlTemplates(SqlContext);

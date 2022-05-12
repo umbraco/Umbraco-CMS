@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class EnumerableExtensions
     {
-        public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;
+        public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? list) => list == null || list.Count == 0;
 
         internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
         {
@@ -39,7 +39,7 @@ namespace Umbraco.Extensions
             yield return item;
         }
 
-        public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
+        public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T>? source, int groupSize)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -49,7 +49,7 @@ namespace Umbraco.Extensions
 
             // following code derived from MoreLinq and does not allocate bazillions of tuples
 
-            T[] temp = null;
+            T[]? temp = null;
             var count = 0;
 
             foreach (var item in source)
@@ -73,18 +73,6 @@ namespace Umbraco.Extensions
             foreach (var resultGroup in source.InGroupsOf(groupSize).Select(selector))
                 foreach (var result in resultGroup)
                     yield return result;
-        }
-
-        /// <summary>The distinct by.</summary>
-        /// <param name="source">The source.</param>
-        /// <param name="keySelector">The key selector.</param>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TKey">Key type</typeparam>
-        /// <returns>the unique list</returns>
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-            where TKey : IEquatable<TKey>
-        {
-            return source.Distinct(DelegateEqualityComparer<TSource>.CompareMember(keySelector));
         }
 
         /// <summary>
@@ -223,9 +211,9 @@ namespace Umbraco.Extensions
         /// <param name="coll">The coll.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> coll) where T : class
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> coll) where T : class
         {
-            return coll.Where(x => x != null);
+            return coll.Where(x => x != null)!;
         }
 
         public static IEnumerable<TBase> ForAllThatAre<TBase, TActual>(this IEnumerable<TBase> sequence, Action<TActual> projection)
@@ -234,9 +222,8 @@ namespace Umbraco.Extensions
             return sequence.Select(
                 x =>
                 {
-                    if (x is TActual)
+                    if (x is TActual casted)
                     {
-                        var casted = x as TActual;
                         projection.Invoke(casted);
                     }
                     return x;
@@ -304,7 +291,7 @@ namespace Umbraco.Extensions
         ///
         /// There's a few answers, this one seems the best for it's simplicity and based on the comment of Eamon
         /// </remarks>
-        public static bool UnsortedSequenceEqual<T>(this IEnumerable<T> source, IEnumerable<T> other)
+        public static bool UnsortedSequenceEqual<T>(this IEnumerable<T>? source, IEnumerable<T>? other)
         {
             if (source == null && other == null) return true;
             if (source == null || other == null) return false;
@@ -333,7 +320,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T> items)
+        public static IEnumerable<T> EmptyNull<T>(this IEnumerable<T>? items)
         {
             return items ?? Enumerable.Empty<T>();
         }
@@ -342,7 +329,7 @@ namespace Umbraco.Extensions
         // this is to support filtering with multiple types
         public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params Type[] types)
         {
-            return contents.Where(x => types.Contains(x.GetType()));
+            return contents.Where(x => types.Contains(x?.GetType()));
         }
 
         public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)

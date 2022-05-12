@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the application virtual path.
         /// </summary>
-        public string ApplicationVirtualPath { get; set; }
+        public string? ApplicationVirtualPath { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the location of temporary files.
@@ -35,6 +35,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value specifying the name of the site.
         /// </summary>
-        public string SiteName { get; set; }
+        public string? SiteName { get; set; }
     }
 }

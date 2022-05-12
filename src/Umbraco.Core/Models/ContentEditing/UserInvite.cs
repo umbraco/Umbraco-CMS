@@ -17,25 +17,25 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     {
         [DataMember(Name = "userGroups")]
         [Required]
-        public IEnumerable<string> UserGroups { get; set; }
+        public IEnumerable<string> UserGroups { get; set; } = null!;
 
         [DataMember(Name = "email", IsRequired = true)]
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         [DataMember(Name = "message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (UserGroups.Any() == false)
                 yield return new ValidationResult("A user must be assigned to at least one group", new[] { nameof(UserGroups) });
 
-            var securitySettings = validationContext.GetRequiredService<IOptions<SecuritySettings>>();
+            var securitySettings = validationContext.GetRequiredService<IOptionsSnapshot<SecuritySettings>>();
 
             if (securitySettings.Value.UsernameIsEmail == false && Username.IsNullOrWhiteSpace())
                 yield return new ValidationResult("A username cannot be empty", new[] { nameof(Username) });

@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
-    internal static class DefinitionFactory
+    public static class DefinitionFactory
     {
         public static TableDefinition GetTableDefinition(Type modelType, ISqlSyntaxProvider sqlSyntax)
         {
@@ -123,18 +123,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
             var referencedPrimaryKey = attribute.Type.FirstAttribute<PrimaryKeyAttribute>();
 
             string referencedColumn = string.IsNullOrEmpty(attribute.Column)
-                                          ? referencedPrimaryKey.Value
+                                          ? referencedPrimaryKey!.Value
                                           : attribute.Column;
 
             string foreignKeyName = string.IsNullOrEmpty(attribute.Name)
-                                        ? string.Format("FK_{0}_{1}_{2}", tableName, referencedTable.Value, referencedColumn)
+                                        ? string.Format("FK_{0}_{1}_{2}", tableName, referencedTable!.Value, referencedColumn)
                                         : attribute.Name;
 
             var definition = new ForeignKeyDefinition
                                  {
                                      Name = foreignKeyName,
                                      ForeignTable = tableName,
-                                     PrimaryTable = referencedTable.Value,
+                                     PrimaryTable = referencedTable!.Value,
                                      OnDelete = attribute.OnDelete,
                                      OnUpdate = attribute.OnUpdate
                                  };

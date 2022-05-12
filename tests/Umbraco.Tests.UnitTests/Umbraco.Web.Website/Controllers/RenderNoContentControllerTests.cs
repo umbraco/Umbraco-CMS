@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
@@ -22,8 +23,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
         {
             var mockUmbracoContext = new Mock<IUmbracoContext>();
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(true);
-            var mockIOHelper = new Mock<IIOHelper>();
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, Options.Create(new GlobalSettings()));
+            var mockHostingEnvironment = new Mock<IHostingEnvironment>();
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()), mockHostingEnvironment.Object);
 
             var result = controller.Index() as RedirectResult;
 
@@ -41,13 +42,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
             mockUmbracoContext.Setup(x => x.Content.HasContent()).Returns(false);
             var mockIOHelper = new Mock<IIOHelper>();
             mockIOHelper.Setup(x => x.ResolveUrl(It.Is<string>(y => y == UmbracoPathSetting))).Returns(UmbracoPath);
+            var mockHostingEnvironment = new Mock<IHostingEnvironment>();
+            mockHostingEnvironment.Setup(x => x.ToAbsolute(It.Is<string>(y => y == UmbracoPathSetting)))
+                .Returns(UmbracoPath);
 
-            IOptions<GlobalSettings> globalSettings = Options.Create(new GlobalSettings()
+
+            var globalSettings = new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()
             {
                 UmbracoPath = UmbracoPathSetting,
                 NoNodesViewPath = ViewPath,
             });
-            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), mockIOHelper.Object, globalSettings);
+            var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object), globalSettings, mockHostingEnvironment.Object);
 
             var result = controller.Index() as ViewResult;
             Assert.IsNotNull(result);

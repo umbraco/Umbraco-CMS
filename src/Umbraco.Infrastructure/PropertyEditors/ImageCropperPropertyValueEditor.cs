@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
 
         public ImageCropperPropertyValueEditor(
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             MediaFileManager mediaFileSystem,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IDataTypeService dataTypeService)
@@ -44,23 +44,24 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _dataTypeService = dataTypeService;
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>
         /// This is called to merge in the prevalue crops with the value that is saved - similar to the property value converter for the front-end
         /// </summary>
 
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return null;
 
-            ImageCropperValue value;
+            ImageCropperValue? value;
             try
             {
-                value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString());
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(val.ToString()!);
             }
             catch
             {
@@ -69,7 +70,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             var dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
             if (dataType?.Configuration != null)
-                value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
+                value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
             return value;
         }
@@ -84,7 +85,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>editorValue.Value is used to figure out editorFile and, if it has been cleared, remove the old file - but
         /// it is editorValue.AdditionalData["files"] that is used to determine the actual file that has been uploaded.</para>
         /// </remarks>
-        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             // Get the current path
             var currentPath = string.Empty;
@@ -108,12 +109,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // Get the new JSON and file path
             var editorFile = string.Empty;
-            if (editorValue.Value is JObject editorJson)
+            var editorJson = (JObject?)editorValue.Value;
+            if (editorJson is not null)
             {
                 // Populate current file
                 if (editorJson["src"] != null)
                 {
-                    editorFile = editorJson["src"].Value<string>();
+                    editorFile = editorJson["src"]?.Value<string>();
                 }
 
                 // Clean up redundant/default data
@@ -173,7 +175,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return editorJson.ToString(Formatting.None);
         }
 
-        private string ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+        private string? ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
@@ -197,18 +199,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return filepath;
         }
 
-        public override string ConvertDbToString(IPropertyType propertyType,  object value)
+        public override string ConvertDbToString(IPropertyType propertyType,  object? value)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
-                return null;
+                return string.Empty;
 
             // if we don't have a json structure, we will get it from the property type
             var val = value.ToString();
-            if (val.DetectIsJson())
+            if (val?.DetectIsJson() ?? false)
                 return val;
 
             // more magic here ;-(
-            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId)?.ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
             return JsonConvert.SerializeObject(new

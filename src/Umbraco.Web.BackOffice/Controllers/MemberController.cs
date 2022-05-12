@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer,
             IPasswordChanger<MemberIdentityUser> passwordChanger,
-            IScopeProvider scopeProvider)
+            ICoreScopeProvider scopeProvider)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
             _propertyEditors = propertyEditors;
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             Direction orderDirection = Direction.Ascending,
             bool orderBySystemField = true,
             string filter = "",
-            string memberTypeAlias = null)
+            string? memberTypeAlias = null)
         {
 
             if (pageNumber <= 0 || pageSize <= 0)
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize)
             {
-                Items = members.Select(x => _umbracoMapper.Map<MemberBasic>(x))
+                Items = members.Select(x => _umbracoMapper.Map<MemberBasic>(x)).WhereNotNull()
             };
             return pagedResult;
         }
@@ -162,8 +162,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>The member list for display</returns>
         public MemberListDisplay GetListNodeDisplay(string listName)
         {
-            IMemberType foundType = _memberTypeService.Get(listName);
-            string name = foundType != null ? foundType.Name : listName;
+            IMemberType? foundType = _memberTypeService.Get(listName);
+            string? name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
             apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
@@ -190,9 +190,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="key">The Guid key of the member</param>
         /// <returns>The member for display</returns>
         [OutgoingEditorModelEvent]
-        public MemberDisplay GetByKey(Guid key)
+        public MemberDisplay? GetByKey(Guid key)
         {
-            IMember foundMember = _memberService.GetByKey(key);
+            IMember? foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
                 HandleContentNotFound(key);
@@ -207,14 +207,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias">The content type</param>
         /// <returns>The empty member for display</returns>
         [OutgoingEditorModelEvent]
-        public ActionResult<MemberDisplay> GetEmpty(string contentTypeAlias = null)
+        public ActionResult<MemberDisplay?> GetEmpty(string? contentTypeAlias = null)
         {
             if (contentTypeAlias == null)
             {
                 return NotFound();
             }
 
-            IMemberType contentType = _memberTypeService.Get(contentTypeAlias);
+            IMemberType? contentType = _memberTypeService.Get(contentTypeAlias);
             if (contentType == null)
             {
                 return NotFound();
@@ -223,7 +223,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             string newPassword = _memberManager.GeneratePassword();
 
             IMember emptyContent = new Member(contentType);
-            emptyContent.AdditionalData["NewPassword"] = newPassword;
+            if (emptyContent.AdditionalData is not null)
+            {
+                emptyContent.AdditionalData["NewPassword"] = newPassword;
+            }
+
             return _umbracoMapper.Map<MemberDisplay>(emptyContent);
         }
 
@@ -235,7 +239,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [OutgoingEditorModelEvent]
         [MemberSaveValidation]
-        public async Task<ActionResult<MemberDisplay>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)
+        public async Task<ActionResult<MemberDisplay?>> PostSave([ModelBinder(typeof(MemberBinder))] MemberSave contentItem)
         {
             if (contentItem == null)
             {
@@ -257,14 +261,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (ModelState.IsValid == false)
             {
-                MemberDisplay forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
+                MemberDisplay? forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
                 return ValidationProblem(forDisplay, ModelState);
             }
 
             // Create a scope here which will wrap all child data operations in a single transaction.
             // We'll complete this at the end of this method if everything succeeeds, else
             // all data operations will roll back.
-            using IScope scope = _scopeProvider.CreateScope();
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // Depending on the action we need to first do a create or update using the membership manager
             // this ensures that passwords are formatted correctly and also performs the validation on the provider itself.
@@ -292,7 +296,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // return the updated model
-            MemberDisplay display = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
+            MemberDisplay? display = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
 
             // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             if (!ModelState.IsValid)
@@ -305,7 +309,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    display.AddSuccessNotification(
+                    display?.AddSuccessNotification(
                         _localizedTextService.Localize("speechBubbles","editMemberSaved"),
                         _localizedTextService.Localize("speechBubbles","editMemberSaved"));
                     break;
@@ -323,23 +327,26 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="contentItem">The member content item to map properties from</param>
         private void MapPropertyValues(MemberSave contentItem)
         {
-            // Don't update the name if it is empty
-            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            if (contentItem.PersistedContent is not null)
             {
-                contentItem.PersistedContent.Name = contentItem.Name;
-            }
+                // Don't update the name if it is empty
+                if (contentItem.Name.IsNullOrWhiteSpace() == false)
+                {
+                    contentItem.PersistedContent.Name = contentItem.Name;
+                }
 
-            // map the custom properties - this will already be set for new entities in our member binder
-            contentItem.PersistedContent.IsApproved = contentItem.IsApproved;
-            contentItem.PersistedContent.Email = contentItem.Email.Trim();
-            contentItem.PersistedContent.Username = contentItem.Username;
+                // map the custom properties - this will already be set for new entities in our member binder
+                contentItem.PersistedContent.IsApproved = contentItem.IsApproved;
+                contentItem.PersistedContent.Email = contentItem.Email.Trim();
+                contentItem.PersistedContent.Username = contentItem.Username;
+            }
 
             // use the base method to map the rest of the properties
             MapPropertyValuesForPersistence<IMember, MemberSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
-                (save, property) => property.GetValue(), // get prop val
-                (save, property, v) => property.SetValue(v), // set prop val
+                (save, property) => property?.GetValue(), // get prop val
+                (save, property, v) => property?.SetValue(v), // set prop val
                 null); // member are all invariant
         }
 
@@ -352,7 +359,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>The identity result of the created member</returns>
         private async Task<ActionResult<bool>> CreateMemberAsync(MemberSave contentItem)
         {
-            IMemberType memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
+            IMemberType? memberType = _memberTypeService.Get(contentItem.ContentTypeAlias);
             if (memberType == null)
             {
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
@@ -365,11 +372,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem.IsApproved,
                 contentItem.Name);
 
-            IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
+            IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password?.NewPassword);
 
             if (created.Succeeded == false)
             {
-                MemberDisplay forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
+                MemberDisplay? forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
                 foreach (IdentityError error in created.Errors)
                 {
                     switch (error.Code)
@@ -411,12 +418,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // now re-look up the member, which will now exist
-            IMember member = _memberService.GetByEmail(contentItem.Email);
+            IMember? member = _memberService.GetByEmail(contentItem.Email);
+
+            if (member is null)
+            {
+                return false;
+            }
 
             // map the save info over onto the user
             member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
 
-            int creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+            int creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1;
             member.CreatorId = creatorId;
 
             // assign the mapped property values that are not part of the identity properties
@@ -425,7 +437,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 if (builtInAliases.Contains(property.Alias) == false)
                 {
-                    member.Properties[property.Alias].SetValue(property.Value);
+                    member.Properties[property.Alias]?.SetValue(property.Value);
                 }
             }
 
@@ -458,40 +470,49 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         private async Task<ActionResult<bool>> UpdateMemberAsync(MemberSave contentItem)
         {
-            contentItem.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
+            if (contentItem.PersistedContent is not null)
+            {
+                contentItem.PersistedContent.WriterId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1;
+            }
 
             // If the user doesn't have access to sensitive values, then we need to check if any of the built in member property types
             // have been marked as sensitive. If that is the case we cannot change these persisted values no matter what value has been posted.
             // There's only 3 special ones we need to deal with that are part of the MemberSave instance: Comments, IsApproved, IsLockedOut
             // but we will take care of this in a generic way below so that it works for all props.
-            if (!_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData())
+            if (!_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? true)
             {
-                IMemberType memberType = _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
-                var sensitiveProperties = memberType
+                IMemberType? memberType = contentItem.PersistedContent is null ? null : _memberTypeService.Get(contentItem.PersistedContent.ContentTypeId);
+                var sensitiveProperties = memberType?
                     .PropertyTypes.Where(x => memberType.IsSensitiveProperty(x.Alias))
                     .ToList();
 
-                foreach (IPropertyType sensitiveProperty in sensitiveProperties)
+                if (sensitiveProperties is not null)
                 {
-                    // TODO: This logic seems to deviate from the logic that is in v8 where we are explitly checking
-                    // against 3 properties: Comments, IsApproved, IsLockedOut, is the v8 version incorrect?
-
-                    ContentPropertyBasic destProp = contentItem.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
-                    if (destProp != null)
+                    foreach (IPropertyType sensitiveProperty in sensitiveProperties)
                     {
-                        // if found, change the value of the contentItem model to the persisted value so it remains unchanged
-                        object origValue = contentItem.PersistedContent.GetValue(sensitiveProperty.Alias);
-                        destProp.Value = origValue;
+                        // TODO: This logic seems to deviate from the logic that is in v8 where we are explitly checking
+                        // against 3 properties: Comments, IsApproved, IsLockedOut, is the v8 version incorrect?
+
+                        ContentPropertyBasic? destProp = contentItem.Properties.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+                        if (destProp != null)
+                        {
+                            // if found, change the value of the contentItem model to the persisted value so it remains unchanged
+                            object? origValue = contentItem.PersistedContent?.GetValue(sensitiveProperty.Alias);
+                            destProp.Value = origValue;
+                        }
                     }
                 }
             }
 
-            // First save the IMember with mapped values before we start updating data with aspnet identity
-            _memberService.Save(contentItem.PersistedContent);
+            if (contentItem.PersistedContent is not null)
+            {
+                // First save the IMember with mapped values before we start updating data with aspnet identity
+                _memberService.Save(contentItem.PersistedContent);
+            }
 
             bool needsResync = false;
 
-            MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+            MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id?.ToString());
             if (identityMember == null)
             {
                 return ValidationProblem("Member was not found");
@@ -538,13 +559,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 };
 
                 // Change and persist the password
-                Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
+                Attempt<PasswordChangedModel?> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
 
                 if (!passwordChangeResult.Success)
                 {
                     foreach (string memberName in passwordChangeResult.Result?.ChangeError?.MemberNames ?? Enumerable.Empty<string>())
                     {
-                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError?.ErrorMessage ?? string.Empty);
+                        ModelState.AddModelError(memberName, passwordChangeResult.Result?.ChangeError?.ErrorMessage ?? string.Empty);
                     }
                     return ValidationProblem(ModelState);
                 }
@@ -565,9 +586,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // If there have been underlying changes made by ASP.NET Identity, then we need to resync the
             // IMember on the PersistedContent with what is stored since it will be mapped to display.
-            if (needsResync)
+            if (needsResync && contentItem.PersistedContent is not null)
             {
-                contentItem.PersistedContent = _memberService.GetById(contentItem.PersistedContent.Id);
+                contentItem.PersistedContent = _memberService.GetById(contentItem.PersistedContent.Id)!;
             }
 
             return true;
@@ -595,7 +616,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            IMember byUsername = _memberService.GetByUsername(contentItem.Username);
+            IMember? byUsername = _memberService.GetByUsername(contentItem.Username);
             if (byUsername != null && byUsername.Key != contentItem.Key)
             {
                 ModelState.AddPropertyError(
@@ -604,7 +625,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return false;
             }
 
-            IMember byEmail = _memberService.GetByEmail(contentItem.Email);
+            IMember? byEmail = _memberService.GetByEmail(contentItem.Email);
             if (byEmail != null && byEmail.Key != contentItem.Key)
             {
                 ModelState.AddPropertyError(
@@ -634,7 +655,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="groups">The groups to updates</param>
         /// <param name="identityMember">The member as an identity user</param>
-        private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string> groups, MemberIdentityUser identityMember)
+        private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string>? groups, MemberIdentityUser identityMember)
         {
             var hasChanges = false;
 
@@ -646,7 +667,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // find the ones to remove and remove them
             IEnumerable<string> roles = currentRoles.ToList();
-            string[] rolesToRemove = roles.Except(groups).ToArray();
+            string[] rolesToRemove = roles.Except(groups ?? Enumerable.Empty<string>()).ToArray();
 
             // Now let's do the role provider stuff - now that we've saved the content item (that is important since
             // if we are changing the username, it must be persisted before looking up the member roles).
@@ -661,8 +682,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // find the ones to add and add them
-            string[] toAdd = groups.Except(roles).ToArray();
-            if (toAdd.Any())
+            string[]? toAdd = groups?.Except(roles).ToArray();
+            if (toAdd?.Any() ?? false)
             {
                 // add the ones submitted
                 IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, toAdd);
@@ -685,7 +706,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteByKey(Guid key)
         {
-            IMember foundMember = _memberService.GetByKey(key);
+            IMember? foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
                 return HandleContentNotFound(key);
@@ -704,14 +725,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult ExportMemberData(Guid key)
         {
-            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
-            if (currentUser.HasAccessToSensitiveData() == false)
+            if (currentUser?.HasAccessToSensitiveData() == false)
             {
                 return Forbid();
             }
 
-            MemberExportModel member = ((MemberService)_memberService).ExportMember(key);
+            MemberExportModel? member = ((MemberService)_memberService).ExportMember(key);
             if (member is null)
             {
                 throw new NullReferenceException("No member found with key " + key);

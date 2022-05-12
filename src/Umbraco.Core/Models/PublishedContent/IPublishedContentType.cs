@@ -59,11 +59,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets a property type.
         /// </summary>
-        IPublishedPropertyType GetPropertyType(string alias);
+        IPublishedPropertyType? GetPropertyType(string alias);
 
         /// <summary>
         /// Gets a property type.
         /// </summary>
-        IPublishedPropertyType GetPropertyType(int index);
+        IPublishedPropertyType? GetPropertyType(int index);
     }
 }

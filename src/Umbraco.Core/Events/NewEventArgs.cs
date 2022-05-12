@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Events
             ParentId = parentId;
         }
 
-        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, TEntity parent, EventMessages eventMessages)
+        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, TEntity? parent, EventMessages eventMessages)
             : base(eventObject, canCancel, eventMessages)
         {
             Alias = alias;
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Events
             ParentId = parentId;
         }
 
-        public NewEventArgs(TEntity eventObject, string @alias, TEntity parent, EventMessages eventMessages)
+        public NewEventArgs(TEntity eventObject, string @alias, TEntity? parent, EventMessages eventMessages)
             : base(eventObject, eventMessages)
         {
             Alias = alias;
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Events
             ParentId = parentId;
         }
 
-        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, TEntity parent)
+        public NewEventArgs(TEntity eventObject, bool canCancel, string @alias, TEntity? parent)
             : base(eventObject, canCancel)
         {
             Alias = alias;
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Events
             ParentId = parentId;
         }
 
-        public NewEventArgs(TEntity eventObject, string @alias, TEntity parent)
+        public NewEventArgs(TEntity eventObject, string @alias, TEntity? parent)
             : base(eventObject)
         {
             Alias = alias;
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// The entity being created
         /// </summary>
-        public TEntity Entity
+        public TEntity? Entity
         {
             get { return EventObject; }
         }
@@ -84,21 +84,21 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Gets or Sets the parent IContent object.
         /// </summary>
-        public TEntity Parent { get; private set; }
+        public TEntity? Parent { get; private set; }
 
-        public bool Equals(NewEventArgs<TEntity> other)
+        public bool Equals(NewEventArgs<TEntity>? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && string.Equals(Alias, other.Alias) && EqualityComparer<TEntity>.Default.Equals(Parent, other.Parent) && ParentId == other.ParentId;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((NewEventArgs<TEntity>) obj);
+            return Equals((NewEventArgs<TEntity>?) obj);
         }
 
         public override int GetHashCode()
@@ -107,7 +107,11 @@ namespace Umbraco.Cms.Core.Events
             {
                 int hashCode = base.GetHashCode();
                 hashCode = (hashCode * 397) ^ Alias.GetHashCode();
-                hashCode = (hashCode * 397) ^ EqualityComparer<TEntity>.Default.GetHashCode(Parent);
+                if (Parent is not null)
+                {
+                    hashCode = (hashCode * 397) ^ EqualityComparer<TEntity>.Default.GetHashCode(Parent);
+                }
+
                 hashCode = (hashCode * 397) ^ ParentId;
                 return hashCode;
             }

@@ -29,12 +29,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
         /// Overrides the default naming of a foreign key reference:
         /// FK_thisTableName_refTableName
         /// </remarks>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the Column that this foreign key should reference.
         /// </summary>
         /// <remarks>PrimaryKey column is used by default</remarks>
-        public string Column { get; set; }
+        public string? Column { get; set; }
     }
 }

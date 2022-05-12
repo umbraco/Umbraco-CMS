@@ -99,24 +99,28 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         public void DefineMaps(IUmbracoMapper mapper)
         {
-            mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
-            mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
-            mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
             mapper.Define<IContent, ContentItemBasic<ContentPropertyBasic>>((source, context) => new ContentItemBasic<ContentPropertyBasic>(), Map);
+            mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
+
+            mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
+            mapper.Define<IContent, ContentItemDisplayWithSchedule>((source, context) => new ContentItemDisplayWithSchedule(), Map);
+
+            mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
+            mapper.Define<IContent, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(), Map);
         }
 
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
-        private void Map(IContent source, ContentItemDisplay target, MapperContext context)
+        private void Map<TVariant>(IContent source, ContentItemDisplay<TVariant> target, MapperContext context) where TVariant : ContentVariantDisplay
         {
             // Both GetActions and DetermineIsChildOfListView use parent, so get it once here
             // Parent might already be in context, so check there before using content service
-            IContent parent;
+            IContent? parent;
             if (context.Items.TryGetValue("Parent", out var parentObj) &&
                 parentObj is IContent typedParent)
             {
@@ -154,23 +158,30 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.UpdateDate = source.UpdateDate;
             target.Updater = _commonMapper.GetCreator(source, context);
             target.Urls = GetUrls(source);
-            target.Variants = _contentVariantMapper.Map(source, context);
+            target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
 
-            target.ContentDto = new ContentPropertyCollectionDto();
-            target.ContentDto.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+            target.ContentDto = new ContentPropertyCollectionDto
+            {
+                Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull()
+            };
         }
 
         // Umbraco.Code.MapAll -Segment -Language -DisplayName
         private void Map(IContent source, ContentVariantDisplay target, MapperContext context)
         {
             target.CreateDate = source.CreateDate;
-            target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
             target.Name = source.Name;
             target.PublishDate = source.PublishDate;
-            target.ReleaseDate = GetScheduledDate(source, ContentScheduleAction.Release, context);
             target.State = _stateMapper.Map(source, context);
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.UpdateDate = source.UpdateDate;
+        }
+
+        private void Map(IContent source, ContentVariantScheduleDisplay target, MapperContext context)
+        {
+            Map(source, (ContentVariantDisplay)target, context);
+            target.ReleaseDate = GetScheduledDate(source, ContentScheduleAction.Release, context);
+            target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
         }
 
         // Umbraco.Code.MapAll -Alias
@@ -187,7 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties).WhereNotNull();
             target.SortOrder = source.SortOrder;
             target.State = _basicStateMapper.Map(source, context);
             target.Trashed = source.Trashed;
@@ -197,7 +208,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private IEnumerable<string> GetActions(IContent source, IContent parent, MapperContext context)
+        private IEnumerable<string> GetActions(IContent source, IContent? parent, MapperContext context)
         {
             var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
 
@@ -221,7 +232,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             {
                 // If we already have permissions for a given path,
                 // and the current user is the same as was used to generate the permissions, return the stored permissions.
-                if (backOfficeSecurity.CurrentUser.Id == currentUser.Id &&
+                if (backOfficeSecurity.CurrentUser?.Id == currentUser.Id &&
                     permissionsDict.TryGetValue(path, out var permissions))
                 {
                     return permissions.GetAllPermissions();
@@ -275,7 +286,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             return date ?? source.UpdateDate;
         }
 
-        private string GetName(IContent source, MapperContext context)
+        private string? GetName(IContent source, MapperContext context)
         {
             // invariant = only 1 name
             if (!source.ContentType.VariesByCulture())
@@ -290,7 +301,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
             // if we don't have a name for a culture, it means the culture is not available, and
             // hey we should probably not be mapping it, but it's too late, return a fallback name
-            return source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
+            return source.CultureInfos is not null && source.CultureInfos.TryGetValue(culture, out var name) && !name.Name.IsNullOrWhiteSpace() ? name.Name : $"({source.Name})";
         }
 
         /// <summary>
@@ -309,7 +320,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         /// false because the item is technically not being rendered as part of a list view but instead as a
         /// real tree node. If we didn't perform this check then tree syncing wouldn't work correctly.
         /// </remarks>
-        private bool DetermineIsChildOfListView(IContent source, IContent parent, MapperContext context)
+        private bool DetermineIsChildOfListView(IContent source, IContent? parent, MapperContext context)
         {
             var userStartNodes = Array.Empty<int>();
 
@@ -319,11 +330,11 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             if (context.HasItems && context.Items.TryGetValue("CurrentUser", out var usr) && usr is IUser currentUser)
             {
                 userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
-                if (!userStartNodes.Contains(Constants.System.Root))
+                if (!userStartNodes?.Contains(Constants.System.Root) ?? false)
                 {
                     // return false if this is the user's actual start node, the node will be rendered in the tree
                     // regardless of if it's a list view or not
-                    if (userStartNodes.Contains(source.Id))
+                    if (userStartNodes?.Contains(source.Id) ?? false)
                         return false;
                 }
             }
@@ -333,17 +344,20 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
             var pathParts = parent.Path.Split(Constants.CharArrays.Comma).Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : 0).ToList();
 
-            // reduce the path parts so we exclude top level content items that
-            // are higher up than a user's start nodes
-            foreach (var n in userStartNodes)
+            if (userStartNodes is not null)
             {
-                var index = pathParts.IndexOf(n);
-                if (index != -1)
+                // reduce the path parts so we exclude top level content items that
+                // are higher up than a user's start nodes
+                foreach (var n in userStartNodes)
                 {
-                    // now trim all top level start nodes to the found index
-                    for (var i = 0; i < index; i++)
+                    var index = pathParts.IndexOf(n);
+                    if (index != -1)
                     {
-                        pathParts.RemoveAt(0);
+                        // now trim all top level start nodes to the found index
+                        for (var i = 0; i < index; i++)
+                        {
+                            pathParts.RemoveAt(0);
+                        }
                     }
                 }
             }
@@ -354,27 +368,34 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         private DateTime? GetScheduledDate(IContent source, ContentScheduleAction action, MapperContext context)
         {
+            _ = context.Items.TryGetValue("Schedule", out var untypedSchedule);
+
+            if (untypedSchedule is not ContentScheduleCollection scheduleCollection)
+            {
+                throw new ApplicationException("GetScheduledDate requires a ContentScheduleCollection in the MapperContext for Key: Schedule");
+            }
+
             var culture = context.GetCulture() ?? string.Empty;
-            var schedule = source.ContentSchedule.GetSchedule(culture, action);
+            IEnumerable<ContentSchedule> schedule = scheduleCollection.GetSchedule(culture, action);
             return schedule.FirstOrDefault()?.Date; // take the first, it's ordered by date
         }
 
-        private IDictionary<string, string> GetAllowedTemplates(IContent source)
+        private IDictionary<string, string?>? GetAllowedTemplates(IContent source)
         {
             // Element types can't have templates, so no need to query to get the content type
             if (source.ContentType.IsElement)
             {
-                return new Dictionary<string, string>();
+                return new Dictionary<string, string?>();
             }
 
             var contentType = _contentTypeService.Get(source.ContentTypeId);
 
-            return contentType.AllowedTemplates
+            return contentType?.AllowedTemplates?
                 .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
                 .ToDictionary(t => t.Alias, t => _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, t.Name));
         }
 
-        private string GetDefaultTemplate(IContent source)
+        private string? GetDefaultTemplate(IContent source)
         {
             if (source == null)
                 return null;
@@ -390,7 +411,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             }
 
             var template = _fileService.GetTemplate(source.TemplateId.Value);
-            return template.Alias;
+            return template?.Alias;
         }
     }
 }

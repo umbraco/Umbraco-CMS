@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -34,14 +35,11 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations
                 .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
                 .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
                 .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
-                .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
+                .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()))
+                .Customize(new ConstructorCustomization(typeof(DatabaseSchemaCreatorFactory), new GreedyConstructorQuery()));
 
             // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
             fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>));
-
-            fixture.Customize<ConfigConnectionString>(
-                u => u.FromFactory<string, string, string>(
-                    (a, b, c) => new ConfigConnectionString(a, b, c)));
 
             fixture.Customize<IUmbracoVersion>(
                 u => u.FromFactory(
@@ -62,11 +60,6 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture.Customizations
                     Options.Create(new GlobalSettings()),
                     Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                     Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
-
-            var configConnectionString = new ConfigConnectionString(
-                "ss",
-                "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Umbraco.mdf;Integrated Security=True");
-            fixture.Customize<ConfigConnectionString>(x => x.FromFactory(() => configConnectionString));
 
             var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
             fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));

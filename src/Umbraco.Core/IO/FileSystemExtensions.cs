@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -61,7 +62,7 @@ namespace Umbraco.Extensions
 
         public static void CopyFile(this IFileSystem fs, string path, string newPath)
         {
-            using (var stream = fs.OpenFile(path))
+            using (Stream stream = fs.OpenFile(path))
             {
                 fs.AddFile(newPath, stream);
             }
@@ -97,7 +98,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// <c>true</c> if the <see cref="IFileProvider" /> was successfully created; otherwise, <c>false</c>.
         /// </returns>
-        public static bool TryCreateFileProvider(this IFileSystem fileSystem, out IFileProvider fileProvider)
+        public static bool TryCreateFileProvider(this IFileSystem fileSystem, [MaybeNullWhen(false)] out IFileProvider fileProvider)
         {
             fileProvider = fileSystem switch
             {

@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.Media.Exif
     internal class JPEGFile : ImageFile
     {
         #region Member Variables
-        private JPEGSection jfifApp0;
-        private JPEGSection jfxxApp0;
-        private JPEGSection exifApp1;
+        private JPEGSection? jfifApp0;
+        private JPEGSection? jfxxApp0;
+        private JPEGSection? exifApp1;
         private uint makerNoteOffset;
         private long exifIFDFieldOffset, gpsIFDFieldOffset, interopIFDFieldOffset, firstIFDFieldOffset;
         private long thumbOffsetLocation, thumbSizeLocation;
@@ -344,9 +344,15 @@ namespace Umbraco.Cms.Core.Media.Exif
             ms.Close();
 
             // Return APP0 header
-            jfifApp0.Header = ms.ToArray();
-            return true;
+            if (jfifApp0 is not null)
+            {
+                jfifApp0.Header = ms.ToArray();
+                return true;
+            }
+
+            return false;
         }
+
         /// <summary>
         /// Reads the APP0 section containing JFIF extension metadata.
         /// </summary>
@@ -436,9 +442,14 @@ namespace Umbraco.Cms.Core.Media.Exif
 
             ms.Close();
 
-            // Return APP0 header
-            jfxxApp0.Header = ms.ToArray();
-            return true;
+            if (jfxxApp0 is not null)
+            {
+                // Return APP0 header
+                jfxxApp0.Header = ms.ToArray();
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -758,9 +769,14 @@ namespace Umbraco.Cms.Core.Media.Exif
 
             ms.Close();
 
-            // Return APP1 header
-            exifApp1.Header = ms.ToArray();
-            return true;
+            if (exifApp1 is not null)
+            {
+                // Return APP1 header
+                exifApp1.Header = ms.ToArray();
+                return true;
+            }
+
+            return false;
         }
 
         private void WriteIFD(MemoryStream stream, Dictionary<ExifTag, ExifProperty> ifd, IFD ifdtype, long tiffoffset, bool preserveMakerNote)

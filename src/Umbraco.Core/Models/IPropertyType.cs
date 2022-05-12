@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets of sets the description of the property type.
         /// </summary>
-        string Description { get; set; }
+        string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the datatype for this property type.
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the identifier of the property group this property type belongs to.
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
-        Lazy<int> PropertyGroupId { get; set; }
+        Lazy<int>? PropertyGroupId { get; set; }
 
         /// <summary>
         /// Gets of sets a value indicating whether a value for this property type is required.
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the regular expression validating the property values.
         /// </summary>
-        string ValidationRegExp { get; set; }
+        string? ValidationRegExp { get; set; }
 
         bool SupportsPublishing { get; set;  }
 
@@ -76,16 +76,16 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="culture">The culture.</param>
         /// <param name="segment">The segment.</param>
         /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
-        bool SupportsVariation(string culture, string segment, bool wildcards = false);
+        bool SupportsVariation(string? culture, string? segment, bool wildcards = false);
 
         /// <summary>
         /// Gets or sets the custom validation message used when a value for this PropertyType is required
         /// </summary>
-        string MandatoryMessage { get; set; }
+        string? MandatoryMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
         /// </summary>
-        string ValidationRegExpMessage { get; set; }
+        string? ValidationRegExpMessage { get; set; }
     }
 }

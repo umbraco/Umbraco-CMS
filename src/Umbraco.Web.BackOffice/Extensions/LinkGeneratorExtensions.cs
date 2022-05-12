@@ -8,17 +8,17 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Returns the URL for the installer
         /// </summary>
-        public static string GetInstallerUrl(this LinkGenerator linkGenerator)
+        public static string? GetInstallerUrl(this LinkGenerator linkGenerator)
             => linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea });
 
         /// <summary>
         /// Returns the URL for the installer api
         /// </summary>
-        public static string GetInstallerApiUrl(this LinkGenerator linkGenerator)
+        public static string? GetInstallerApiUrl(this LinkGenerator linkGenerator)
             => linkGenerator.GetPathByAction(
                 nameof(InstallApiController.GetSetup),
                 ControllerExtensions.GetControllerName<InstallApiController>(),
-                new { area = Cms.Core.Constants.Web.Mvc.InstallArea }).TrimEnd(nameof(InstallApiController.GetSetup));
+                new { area = Cms.Core.Constants.Web.Mvc.InstallArea })?.TrimEnd(nameof(InstallApiController.GetSetup));
 
 
     }

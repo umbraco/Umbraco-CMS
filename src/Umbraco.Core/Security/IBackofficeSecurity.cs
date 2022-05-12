@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Security
         // needed in most cases. Where an IUser is required this could be an ext method on the ClaimsIdentity/ClaimsPrincipal that passes in
         // an IUserService, like HttpContext.User.GetUmbracoUser(_userService);
         // This one isn't as easy to remove as the others below.
-        IUser CurrentUser { get; }
+        IUser? CurrentUser { get; }
 
         /// <summary>
         /// Gets the current user's id.
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The current user's Id that has been authenticated for the request.</returns>
         /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
         // TODO: This should just be an extension method on ClaimsIdentity
-        Attempt<int> GetUserId();
+        Attempt<int?> GetUserId();
 
         /// <summary>
         /// Checks if the specified user as access to the app

@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task OnActionExecutingAsync(ActionExecutingContext context)
             {
-                var model = (ContentItemSave) context.ActionArguments["contentItem"];
+                var model = (ContentItemSave?) context.ActionArguments["contentItem"];
                 var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _propertyValidationService);
 
                 if (context.ModelState.ContainsKey("contentItem"))
@@ -78,12 +78,17 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
                 if (!await ValidateUserAccessAsync(model, context)) return;
 
-                //validate for each variant that is being updated
-                foreach (var variant in model.Variants.Where(x => x.Save))
+                if (model is not null)
                 {
-                    if (contentItemValidator.ValidateProperties(model, variant, context))
-                        contentItemValidator.ValidatePropertiesData(model, variant, variant.PropertyCollectionDto,
-                            context.ModelState);
+                    //validate for each variant that is being updated
+                    foreach (var variant in model.Variants.Where(x => x.Save))
+                    {
+                        if (contentItemValidator.ValidateProperties(model, variant, context))
+                        {
+                            contentItemValidator.ValidatePropertiesData(model, variant, variant.PropertyCollectionDto,
+                                context.ModelState);
+                        }
+                    }
                 }
             }
 
@@ -95,10 +100,10 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             /// <param name="actionContext"></param>
             /// <returns></returns>
             private bool ValidateAtLeastOneVariantIsBeingSaved(
-                ContentItemSave contentItem,
+                ContentItemSave? contentItem,
                 ActionExecutingContext actionContext)
             {
-                if (!contentItem.Variants.Any(x => x.Save))
+                if (!contentItem?.Variants.Any(x => x.Save) ?? true)
                 {
                     actionContext.Result = new NotFoundObjectResult(new {Message = "No variants flagged for saving"});
                     return false;
@@ -114,7 +119,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             /// <param name="contentItem"></param>
             /// <param name="backofficeSecurity"></param>
             private async Task<bool> ValidateUserAccessAsync(
-                ContentItemSave contentItem,
+                ContentItemSave? contentItem,
                 ActionExecutingContext actionContext)
             {
                 // We now need to validate that the user is allowed to be doing what they are doing.
@@ -122,32 +127,32 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 // Then if it is new, we need to lookup those permissions on the parent!
 
                 var permissionToCheck = new List<char>();
-                IContent contentToCheck = null;
+                IContent? contentToCheck = null;
                 int contentIdToCheck;
-                switch (contentItem.Action)
+                switch (contentItem?.Action)
                 {
                     case ContentSaveAction.Save:
                         permissionToCheck.Add(ActionUpdate.ActionLetter);
                         contentToCheck = contentItem.PersistedContent;
-                        contentIdToCheck = contentToCheck.Id;
+                        contentIdToCheck = contentToCheck?.Id ?? default;
                         break;
                     case ContentSaveAction.Publish:
                     case ContentSaveAction.PublishWithDescendants:
                     case ContentSaveAction.PublishWithDescendantsForce:
                         permissionToCheck.Add(ActionPublish.ActionLetter);
                         contentToCheck = contentItem.PersistedContent;
-                        contentIdToCheck = contentToCheck.Id;
+                        contentIdToCheck = contentToCheck?.Id ?? default;
                         break;
                     case ContentSaveAction.SendPublish:
                         permissionToCheck.Add(ActionToPublish.ActionLetter);
                         contentToCheck = contentItem.PersistedContent;
-                        contentIdToCheck = contentToCheck.Id;
+                        contentIdToCheck = contentToCheck?.Id ?? default;
                         break;
                     case ContentSaveAction.Schedule:
                         permissionToCheck.Add(ActionUpdate.ActionLetter);
                         permissionToCheck.Add(ActionToPublish.ActionLetter);
                         contentToCheck = contentItem.PersistedContent;
-                        contentIdToCheck = contentToCheck.Id;
+                        contentIdToCheck = contentToCheck?.Id ?? default;
                         break;
                     case ContentSaveAction.SaveNew:
                         //Save new requires ActionNew
@@ -157,7 +162,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (contentItem.ParentId != Constants.System.Root)
                         {
                             contentToCheck = _contentService.GetById(contentItem.ParentId);
-                            contentIdToCheck = contentToCheck.Id;
+                            contentIdToCheck = contentToCheck?.Id ?? default;
                         }
                         else
                         {
@@ -173,7 +178,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (contentItem.ParentId != Constants.System.Root)
                         {
                             contentToCheck = _contentService.GetById(contentItem.ParentId);
-                            contentIdToCheck = contentToCheck.Id;
+                            contentIdToCheck = contentToCheck?.Id ?? default;
                         }
                         else
                         {
@@ -193,7 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (contentItem.ParentId != Constants.System.Root)
                         {
                             contentToCheck = _contentService.GetById(contentItem.ParentId);
-                            contentIdToCheck = contentToCheck.Id;
+                            contentIdToCheck = contentToCheck?.Id ?? default;
                         }
                         else
                         {
@@ -210,7 +215,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (contentItem.ParentId != Constants.System.Root)
                         {
                             contentToCheck = _contentService.GetById(contentItem.ParentId);
-                            contentIdToCheck = contentToCheck.Id;
+                            contentIdToCheck = contentToCheck?.Id ?? default;
                         }
                         else
                         {

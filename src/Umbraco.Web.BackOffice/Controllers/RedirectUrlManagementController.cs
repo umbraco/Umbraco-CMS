@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Linq;
 using System.Security;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult GetEnableState()
         {
             var enabled = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking == false;
-            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false;
             return Ok(new { enabled, userIsAdmin });
         }
 
@@ -70,7 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ? _redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : _redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
-            searchResult.SearchResults = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
+            searchResult.SearchResults = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects).WhereNotNull();
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
@@ -88,11 +89,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public RedirectUrlSearchResult RedirectUrlsForContentItem(string contentUdi)
         {
             var redirectsResult = new RedirectUrlSearchResult();
-            if (UdiParser.TryParse(contentUdi, out GuidUdi guidIdi))
+            if (UdiParser.TryParse(contentUdi, out GuidUdi? guidIdi))
             {
 
-                var redirects = _redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
-                var mapped = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects);
+                var redirects = _redirectUrlService.GetContentRedirectUrls(guidIdi!.Guid);
+                var mapped = _umbracoMapper.MapEnumerable<IRedirectUrl, ContentRedirectUrl>(redirects).WhereNotNull().ToList();
                 redirectsResult.SearchResults = mapped;
                 //not doing paging 'yet'
                 redirectsResult.TotalCount = mapped.Count;
@@ -111,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult ToggleUrlTracker(bool disable)
         {
-            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
+            var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin();
             if (userIsAdmin == false)
             {
                 var errorMessage = "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";

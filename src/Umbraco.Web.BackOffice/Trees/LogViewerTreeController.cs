@@ -17,12 +17,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [CoreTree]
     public class LogViewerTreeController : TreeController
     {
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
         public LogViewerTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
             : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
@@ -34,14 +38,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
         {
             //We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
-            return null;
+            return _menuItemCollectionFactory.Create();
         }
 
         /// <summary>
         /// Helper method to create a root model for a tree
         /// </summary>
         /// <returns></returns>
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -50,11 +54,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.LogViewer}/overview";
-            root.Icon = Constants.Icons.LogViewer;
-            root.HasChildren = false;
-            root.MenuUrl = null;
+            if (root is not null)
+            {
+                // This will load in a custom UI instead of the dashboard for the root node
+                root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.LogViewer}/overview";
+                root.Icon = Constants.Icons.LogViewer;
+                root.HasChildren = false;
+                root.MenuUrl = null;
+            }
 
             return root;
         }

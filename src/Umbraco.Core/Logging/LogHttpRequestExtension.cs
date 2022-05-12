@@ -13,10 +13,10 @@ namespace Umbraco.Extensions
         /// <param name="requestId">The request id.</param>
         /// <param name="requestCache"></param>
         /// <returns><c>true</c> if there is a request in progress; <c>false</c> otherwise.</returns>
-        public static bool TryGetCurrentHttpRequestId(out Guid requestId, IRequestCache requestCache)
+        public static bool TryGetCurrentHttpRequestId(out Guid? requestId, IRequestCache requestCache)
         {
             var requestIdItem = requestCache.Get(RequestIdItemName, () => Guid.NewGuid());
-            requestId = (Guid)requestIdItem;
+            requestId = (Guid?)requestIdItem;
 
             return true;
         }

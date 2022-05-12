@@ -1,16 +1,16 @@
 angular.module("umbraco.install").controller("Umbraco.Install.UserController", function($scope, installerService) {
-    
+
     $scope.majorVersion = Umbraco.Sys.ServerVariables.application.version;
     $scope.passwordPattern = /.*/;
     $scope.installer.current.model.subscribeToNewsLetter = false;
-    
+
     if ($scope.installer.current.model.minNonAlphaNumericLength > 0) {
         var exp = "";
         for (var i = 0; i < $scope.installer.current.model.minNonAlphaNumericLength; i++) {
             exp += ".*[\\W].*";
         }
         //replace duplicates
-        exp = exp.replace(".*.*", ".*");            
+        exp = exp.replace(".*.*", ".*");
         $scope.passwordPattern = new RegExp(exp);
     }
 
@@ -23,5 +23,5 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 			installerService.forward();
 		}
 	};
-	
+
 });

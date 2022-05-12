@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Exceptions
         /// <remarks>
         /// The exception can be null, in which case a default message is used.
         /// </remarks>
-        public static void Rethrow(BootFailedException bootFailedException)
+        public static void Rethrow(BootFailedException? bootFailedException)
         {
             if (bootFailedException == null)
                 throw new BootFailedException(DefaultMessage);
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.Exceptions
             // would that be the correct way to do it?
             //ExceptionDispatchInfo.Capture(bootFailedException).Throw();
 
-            Exception e = bootFailedException;
+            Exception? e = bootFailedException;
             var m = new StringBuilder();
             m.Append(DefaultMessage);
             while (e != null)

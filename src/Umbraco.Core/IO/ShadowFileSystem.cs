@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,8 +37,10 @@ namespace Umbraco.Cms.Core.IO
                             }
                             else
                             {
-                                using (var stream = _sfs.OpenFile(kvp.Key))
+                                using (Stream stream = _sfs.OpenFile(kvp.Key))
+                                {
                                     _fs.AddFile(kvp.Key, stream, true);
+                                }
                             }
                         }
                         catch (Exception e)
@@ -68,7 +70,7 @@ namespace Umbraco.Cms.Core.IO
             throw new AggregateException("Failed to apply all changes (see exceptions).", exceptions);
         }
 
-        private Dictionary<string, ShadowNode> _nodes;
+        private Dictionary<string, ShadowNode>? _nodes;
 
         private Dictionary<string, ShadowNode> Nodes => _nodes ?? (_nodes = new Dictionary<string, ShadowNode>());
 
@@ -164,7 +166,7 @@ namespace Umbraco.Cms.Core.IO
 
         public bool DirectoryExists(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf))
                 return sf.IsDir && sf.IsExist;
             return _fs.DirectoryExists(path);
@@ -177,7 +179,7 @@ namespace Umbraco.Cms.Core.IO
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             var normPath = NormPath(path);
             if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
@@ -186,7 +188,7 @@ namespace Umbraco.Cms.Core.IO
             for (var i = 0; i < parts.Length - 1; i++)
             {
                 var dirPath = string.Join("/", parts.Take(i + 1));
-                ShadowNode sd;
+                ShadowNode? sd;
                 if (Nodes.TryGetValue(dirPath, out sd))
                 {
                     if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
@@ -209,7 +211,7 @@ namespace Umbraco.Cms.Core.IO
             return GetFiles(path, null);
         }
 
-        public IEnumerable<string> GetFiles(string path, string filter)
+        public IEnumerable<string> GetFiles(string path, string? filter)
         {
             var normPath = NormPath(path);
             var shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
@@ -224,9 +226,11 @@ namespace Umbraco.Cms.Core.IO
 
         public Stream OpenFile(string path)
         {
-            ShadowNode sf;
-            if (Nodes.TryGetValue(NormPath(path), out sf))
-                return sf.IsDir || sf.IsDelete ? null : _sfs.OpenFile(path);
+            if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
+            {
+                return sf.IsDir || sf.IsDelete ? Stream.Null : _sfs.OpenFile(path);
+            }
+
             return _fs.OpenFile(path);
         }
 
@@ -238,7 +242,7 @@ namespace Umbraco.Cms.Core.IO
 
         public bool FileExists(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf))
                 return sf.IsFile && sf.IsExist;
             return _fs.FileExists(path);
@@ -251,20 +255,20 @@ namespace Umbraco.Cms.Core.IO
 
         public string GetFullPath(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf))
-                return sf.IsDir || sf.IsDelete ? null : _sfs.GetFullPath(path);
+                return sf.IsDir || sf.IsDelete ? string.Empty : _sfs.GetFullPath(path);
             return _fs.GetFullPath(path);
         }
 
-        public string GetUrl(string path)
+        public string GetUrl(string? path)
         {
             return _fs.GetUrl(path);
         }
 
         public DateTimeOffset GetLastModified(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf) == false) return _fs.GetLastModified(path);
             if (sf.IsDelete) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetLastModified(path);
@@ -272,7 +276,7 @@ namespace Umbraco.Cms.Core.IO
 
         public DateTimeOffset GetCreated(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf) == false) return _fs.GetCreated(path);
             if (sf.IsDelete) throw new InvalidOperationException("Invalid path.");
             return _sfs.GetCreated(path);
@@ -280,7 +284,7 @@ namespace Umbraco.Cms.Core.IO
 
         public long GetSize(string path)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             if (Nodes.TryGetValue(NormPath(path), out sf) == false)
                 return _fs.GetSize(path);
 
@@ -292,7 +296,7 @@ namespace Umbraco.Cms.Core.IO
 
         public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
         {
-            ShadowNode sf;
+            ShadowNode? sf;
             var normPath = NormPath(path);
             if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
@@ -301,7 +305,7 @@ namespace Umbraco.Cms.Core.IO
             for (var i = 0; i < parts.Length - 1; i++)
             {
                 var dirPath = string.Join("/", parts.Take(i + 1));
-                ShadowNode sd;
+                ShadowNode? sd;
                 if (Nodes.TryGetValue(dirPath, out sd))
                 {
                     if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
@@ -324,7 +328,7 @@ namespace Umbraco.Cms.Core.IO
         {
             private readonly string _pattern;
             private readonly bool _caseInsensitive;
-            private Regex _regex;
+            private Regex? _regex;
 
             private static Regex metaRegex = new Regex("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
             private static Regex questRegex = new Regex("\\?");
@@ -375,7 +379,7 @@ namespace Umbraco.Cms.Core.IO
             public bool IsMatch(string input)
             {
                 EnsureRegex(_pattern);
-                return _regex.IsMatch(input);
+                return _regex?.IsMatch(input) ?? false;
             }
         }
     }

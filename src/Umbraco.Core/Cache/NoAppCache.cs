@@ -21,18 +21,18 @@ namespace Umbraco.Cms.Core.Cache
         public bool IsAvailable => false;
 
         /// <inheritdoc />
-        public virtual object Get(string cacheKey)
+        public virtual object? Get(string cacheKey)
         {
             return null;
         }
 
         /// <inheritdoc />
-        public virtual object Get(string cacheKey, Func<object> factory)
+        public virtual object? Get(string cacheKey, Func<object?> factory)
         {
             return factory();
         }
 
-        public bool Set(string key, object value) => false;
+        public bool Set(string key, object? value) => false;
 
         public bool Remove(string key) => false;
 
@@ -49,13 +49,13 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
+        public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
         {
             return factory();
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
+        public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
         { }
 
         /// <inheritdoc />
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Cache
         public virtual void ClearByRegex(string regex)
         { }
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => new Dictionary<string, object>().GetEnumerator();
+        public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => new Dictionary<string, object?>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

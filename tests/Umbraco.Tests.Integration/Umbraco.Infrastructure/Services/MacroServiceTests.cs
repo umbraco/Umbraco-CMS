@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -13,10 +12,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -24,7 +27,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class MacroServiceTests : UmbracoIntegrationTest
     {
-        private IMacroService MacroService => GetRequiredService<IMacroService>();
+        [Obsolete("After merging IMacroWithAliasService interface with IMacroService in Umbraco 11, this should go back to just being GetRequiredService<IMacroService>()")]
+        private IMacroWithAliasService MacroService => GetRequiredService<IMacroService>() as IMacroWithAliasService;
 
         [SetUp]
         public void SetupTest()
@@ -50,6 +54,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Assert
             Assert.IsNotNull(macro);
             Assert.AreEqual("Test1", macro.Name);
+        }
+
+        [Test]
+        public void Can_Get_By_Aliases()
+        {
+            // Act
+            IEnumerable<IMacro> macros = MacroService.GetAll("test1", "test2");
+
+            // Assert
+            Assert.IsNotNull(macros);
+            Assert.AreEqual(2, macros.Count());
+            Assert.AreEqual("Test1", macros.ToArray()[0].Name);
+            Assert.AreEqual("Test2", macros.ToArray()[1].Name);
         }
 
         [Test]

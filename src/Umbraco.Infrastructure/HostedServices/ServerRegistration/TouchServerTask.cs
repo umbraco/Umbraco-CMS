@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<TouchServerTask> _logger;
         private readonly IServerRoleAccessor _serverRoleAccessor;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchServerTask"/> class.
@@ -42,36 +42,24 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             IServerRegistrationService serverRegistrationService,
             IHostingEnvironment hostingEnvironment,
             ILogger<TouchServerTask> logger,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IServerRoleAccessor serverRoleAccessor)
-            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
+            : base(logger, globalSettings.CurrentValue.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
         {
             _runtimeState = runtimeState;
             _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
+            globalSettings.OnChange(x =>
+            {
+                _globalSettings = x;
+                ChangePeriod(x.DatabaseServerRegistrar.WaitTimeBetweenCalls);
+            });
             _serverRoleAccessor = serverRoleAccessor;
         }
 
-        [Obsolete("Use constructor that takes an IServerRoleAccessor")]
-        public TouchServerTask(
-            IRuntimeState runtimeState,
-            IServerRegistrationService serverRegistrationService,
-            IHostingEnvironment hostingEnvironment,
-            ILogger<TouchServerTask> logger,
-            IOptions<GlobalSettings> globalSettings)
-            : this(
-                runtimeState,
-                serverRegistrationService,
-                hostingEnvironment,
-                logger,
-                globalSettings,
-                StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
-        {
-        }
-
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
@@ -95,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 
             try
             {
-                _serverRegistrationService.TouchServer(serverAddress, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
+                _serverRegistrationService.TouchServer(serverAddress!, _globalSettings.DatabaseServerRegistrar.StaleServerTimeout);
             }
             catch (Exception ex)
             {

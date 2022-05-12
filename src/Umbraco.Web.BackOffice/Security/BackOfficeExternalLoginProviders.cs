@@ -22,15 +22,15 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         }
 
         /// <inheritdoc />
-        public async Task<BackOfficeExternaLoginProviderScheme> GetAsync(string authenticationType)
+        public async Task<BackOfficeExternaLoginProviderScheme?> GetAsync(string authenticationType)
         {
-            if (!_externalLogins.TryGetValue(authenticationType, out BackOfficeExternalLoginProvider provider))
+            if (!_externalLogins.TryGetValue(authenticationType, out BackOfficeExternalLoginProvider? provider))
             {
                 return null;
             }
 
             // get the associated scheme
-            AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(provider.AuthenticationType);
+            AuthenticationScheme? associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(provider.AuthenticationType);
 
             if (associatedScheme == null)
             {
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         }
 
         /// <inheritdoc />
-        public string GetAutoLoginProvider()
+        public string? GetAutoLoginProvider()
         {
             var found = _externalLogins.Values.Where(x => x.Options.AutoRedirectLoginToExternalProvider).ToList();
             return found.Count > 0 ? found[0].AuthenticationType : null;
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             foreach (BackOfficeExternalLoginProvider login in _externalLogins.Values)
             {
                 // get the associated scheme
-                AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(login.AuthenticationType);
+                AuthenticationScheme? associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(login.AuthenticationType);
 
                 providersWithSchemes.Add(new BackOfficeExternaLoginProviderScheme(login, associatedScheme));
             }

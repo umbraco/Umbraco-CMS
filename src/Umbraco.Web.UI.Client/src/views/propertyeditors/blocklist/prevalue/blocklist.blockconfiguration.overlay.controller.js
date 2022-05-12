@@ -174,13 +174,13 @@
                     filterCssClass: "not-allowed",
                     select: node => {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.view = "~/" + filepath;
+                        block.view = "~/" + filepath.replace("wwwroot/", "");
                         editorService.close();
                     },
                     close: () => editorService.close()
                 };
 
-                editorService.filePicker(filePicker);
+                editorService.staticFilePicker(filePicker);
 
             });
         };

@@ -16,17 +16,16 @@
 
         function onInit() {
 
-            vm.referencesTitle = this.hideNoneDependencies ? "The following items depends on this" : "Referenced by the following items";
-            vm.referencedDescendantsTitle = this.hideNoneDependencies ? "The following descending items has dependencies" : "The following descending items are referenced";
-    
+            vm.referencesTitle = this.hideNoneDependencies ? "The following items depend on this" : "Referenced by the following items";
+            vm.referencedDescendantsTitle = this.hideNoneDependencies ? "The following descending items have dependencies" : "The following descendant items have dependencies";
             localizationService.localize(this.hideNoneDependencies ? "references_labelDependsOnThis" : "references_labelUsedByItems").then(function (value) {
                 vm.referencesTitle = value;
             });
-    
+
             localizationService.localize(this.hideNoneDependencies ? "references_labelDependentDescendants" : "references_labelUsedDescendants").then(function (value) {
                 vm.referencedDescendantsTitle = value;
             });
-    
+
             vm.descendantsOptions = {};
             vm.descendantsOptions.filterMustBeIsDependency = this.hideNoneDependencies;
             vm.hasReferencesInDescendants = false;

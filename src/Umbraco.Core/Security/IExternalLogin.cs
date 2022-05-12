@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets the user data
         /// </summary>
-        string UserData { get; }
+        string? UserData { get; }
     }
 }

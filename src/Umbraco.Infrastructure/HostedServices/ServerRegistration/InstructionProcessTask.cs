@@ -30,14 +30,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         /// <param name="logger">The typed logger.</param>
         /// <param name="globalSettings">The configuration for global settings.</param>
         public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
-            : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
+            : base(logger, globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
         {
             _runtimeState = runtimeState;
             _messenger = messenger;
             _logger = logger;
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {

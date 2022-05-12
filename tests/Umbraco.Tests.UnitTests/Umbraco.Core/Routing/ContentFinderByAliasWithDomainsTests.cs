@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             }
 
             var finder = new ContentFinderByUrlAlias(Mock.Of<ILogger<ContentFinderByUrlAlias>>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, umbracoContextAccessor);
-            var result = finder.TryFindContent(request);
+            var result = await finder.TryFindContent(request);
 
             if (expectedNode > 0)
             {

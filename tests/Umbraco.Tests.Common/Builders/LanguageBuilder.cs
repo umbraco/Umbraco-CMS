@@ -70,7 +70,6 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             CultureInfo cultureInfo = _cultureInfo ?? CultureInfo.GetCultureInfo("en-US");
             var cultureName = _cultureName ?? cultureInfo.EnglishName;
-            var globalSettings = new GlobalSettings { DefaultUILanguage = cultureInfo.Name };
             Guid key = _key ?? Guid.NewGuid();
             DateTime createDate = _createDate ?? DateTime.Now;
             DateTime updateDate = _updateDate ?? DateTime.Now;
@@ -79,11 +78,9 @@ namespace Umbraco.Cms.Tests.Common.Builders
             var isDefault = _isDefault ?? false;
             var isMandatory = _isMandatory ?? false;
 
-            return new Language(globalSettings, cultureInfo.Name)
+            return new Language(cultureInfo.Name, cultureName)
             {
                 Id = _id ?? 0,
-                CultureName = cultureName,
-                IsoCode = cultureInfo.Name,
                 Key = key,
                 CreateDate = createDate,
                 UpdateDate = updateDate,

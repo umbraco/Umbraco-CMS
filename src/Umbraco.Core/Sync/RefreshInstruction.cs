@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Sync
         /// When the refresh method is <see cref="RefreshMethodType.RefreshByIds"/> we know how many Ids are being refreshed so we know the instruction
         /// count which will be taken into account when we store this count in the database.
         /// </param>
-        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json, int idCount = 1)
+        private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string? json, int idCount = 1)
             : this(refresher, refreshType)
         {
             JsonIdCount = idCount;
@@ -85,9 +85,9 @@ namespace Umbraco.Cms.Core.Sync
             ICacheRefresher refresher,
             IJsonSerializer jsonSerializer,
             MessageType messageType,
-            IEnumerable<object> ids,
-            Type idType,
-            string json)
+            IEnumerable<object>? ids,
+            Type? idType,
+            string? json)
         {
             switch (messageType)
             {
@@ -106,12 +106,12 @@ namespace Umbraco.Cms.Core.Sync
                     if (idType == typeof(int))
                     {
                         // Bulk of ints is supported
-                        var intIds = ids.Cast<int>().ToArray();
-                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, jsonSerializer.Serialize(intIds), intIds.Length) };
+                        var intIds = ids?.Cast<int>().ToArray();
+                        return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, jsonSerializer.Serialize(intIds), intIds?.Length ?? 0) };
                     }
 
                     // Else must be guids, bulk of guids is not supported, so iterate.
-                    return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RefreshByGuid, (Guid) x));
+                    return ids?.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RefreshByGuid, (Guid) x)) ?? Enumerable.Empty<RefreshInstruction>();
 
                 case MessageType.RemoveById:
                     if (idType == null)
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.Sync
                     }
 
                     // Must be ints, bulk-remove is not supported, so iterate.
-                    return ids.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int) x));
+                    return ids?.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int) x)) ?? Enumerable.Empty<RefreshInstruction>();
                     //return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
 
                 default:
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Sync
         /// <summary>
         /// Gets or sets the ids data value.
         /// </summary>
-        public string JsonIds { get; set; }
+        public string? JsonIds { get; set; }
 
         /// <summary>
         /// Gets or sets the number of Ids contained in the JsonIds json value.
@@ -166,7 +166,7 @@ namespace Umbraco.Cms.Core.Sync
         /// <summary>
         /// Gets or sets the payload data value.
         /// </summary>
-        public string JsonPayload { get; set; }
+        public string? JsonPayload { get; set; }
 
         protected bool Equals(RefreshInstruction other) =>
             RefreshType == other.RefreshType
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Core.Sync
                 && string.Equals(JsonIds, other.JsonIds)
                 && string.Equals(JsonPayload, other.JsonPayload);
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is null)
             {

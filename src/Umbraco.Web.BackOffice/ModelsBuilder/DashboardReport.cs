@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
 
         public bool AreModelsOutOfDate() => _outOfDateModels.IsOutOfDate;
 
-        public string LastError() => _mbErrors.GetLastError();
+        public string? LastError() => _mbErrors.GetLastError();
 
         public string Text()
         {

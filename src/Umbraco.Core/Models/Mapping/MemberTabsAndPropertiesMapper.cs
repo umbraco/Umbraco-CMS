@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Schema;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dictionary;
@@ -58,19 +59,16 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var memberType = _memberTypeService.Get(source.ContentTypeId);
 
-            IgnoreProperties = memberType.CompositionPropertyTypes
-                .Where(x => x.HasIdentity == false)
-                .Select(x => x.Alias)
-                .ToArray();
+            if (memberType is not null)
+            {
+
+                IgnoreProperties = memberType.CompositionPropertyTypes
+                    .Where(x => x.HasIdentity == false)
+                    .Select(x => x.Alias)
+                    .ToArray();
+            }
 
             var resolved = base.Map(source, context);
-
-            // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
-            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-            if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-            {
-                isLockedOutProperty.Readonly = true;
-            }
 
             return resolved;
         }
@@ -114,9 +112,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var prop in result)
             {
                 // check if this property is flagged as sensitive
-                var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
+                var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
                 // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasAccessToSensitiveData() == false))
+                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false))
                 {
                     // mark this property as sensitive
                     prop.IsSensitive = true;
@@ -159,13 +157,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         internal IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            IEnumerable<string> userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
+            IEnumerable<string> userRoles = _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
             var result = _memberGroupService.GetAll()
-                .Select(x => x.Name)
+                .Select(x => x.Name!)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                .Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x, x => false);
 
@@ -176,7 +174,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             }
 
             // else update the dictionary to "true" for the user roles (except internal roles)
-            foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+            foreach (var userRole in userRoles.Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
             {
                 result[userRole] = true;
             }
@@ -184,12 +182,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return result;
         }
 
-        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext context)
+        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext? context)
         {
             var properties = new List<ContentPropertyDisplay>
             {
                 GetLoginProperty(member, _localizedTextService),
-                new ContentPropertyDisplay
+                new()
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
                     Label = _localizedTextService.Localize("general","email"),
@@ -197,11 +195,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     View = "email",
                     Validation = { Mandatory = true }
                 },
-                new ContentPropertyDisplay
+                new()
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                     Label = _localizedTextService.Localize(null,"password"),
-                    Value = new Dictionary<string, object>
+                    Value = new Dictionary<string, object?>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
                         { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
@@ -209,7 +207,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     View = "changepassword",
                     Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
                 },
-                new ContentPropertyDisplay
+                new()
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
                     Label = _localizedTextService.Localize("content","membergroup"),
@@ -218,9 +216,80 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Config = new Dictionary<string, object>
                     {
                         { "IsRequired", true }
+                    },
+                },
+
+                // These properties used to live on the member as property data, defaulting to sensitive, so we set them to sensitive here too
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts",
+                    Label = _localizedTextService.Localize("user", "failedPasswordAttempts"),
+                    Value = member.FailedPasswordAttempts,
+                    View = "readonlyvalue",
+                    IsSensitive = true,
+                },
+
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
+                    Label = _localizedTextService.Localize("user", "stateApproved"),
+                    Value = member.IsApproved,
+                    View = "boolean",
+                    IsSensitive = true,
+                    Readonly = false,
+                },
+
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
+                    Label = _localizedTextService.Localize("user", "stateLockedOut"),
+                    Value = member.IsLockedOut,
+                    View = "boolean",
+                    IsSensitive = true,
+                    Readonly = !member.IsLockedOut, // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
+                },
+
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate",
+                    Label = _localizedTextService.Localize("user", "lastLockoutDate"),
+                    Value = member.LastLockoutDate?.ToString(),
+                    View = "readonlyvalue",
+                    IsSensitive = true,
+                },
+
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate",
+                    Label = _localizedTextService.Localize("user", "lastLogin"),
+                    Value = member.LastLoginDate?.ToString(),
+                    View = "readonlyvalue",
+                    IsSensitive = true,
+                },
+
+                new()
+                {
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate",
+                    Label = _localizedTextService.Localize("user", "lastPasswordChangeDate"),
+                    Value = member.LastPasswordChangeDate?.ToString(),
+                    View = "readonlyvalue",
+                    IsSensitive = true,
+                },
+            };
+
+            if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() is false)
+            {
+                // Current user doesn't have access to sensitive data so explicitly set the views and remove the value from sensitive data
+                foreach (var property in properties)
+                {
+                    if (property.IsSensitive)
+                    {
+                        property.Value = null;
+                        property.View = "sensitivevalue";
+                        property.Readonly = true;
                     }
                 }
-            };
+            }
 
             return properties;
         }

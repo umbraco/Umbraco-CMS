@@ -253,8 +253,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
-            //// content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
             content.TemplateId = 88;
             content.Trashed = false;
@@ -316,7 +314,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.SortOrder = 5;
             content.TemplateId = 88;
             content.Trashed = false;
@@ -338,7 +335,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             Assert.AreEqual(clone.Key, content.Key);
             Assert.AreEqual(clone.Level, content.Level);
             Assert.AreEqual(clone.Path, content.Path);
-            Assert.IsTrue(clone.ContentSchedule.Equals(content.ContentSchedule));
             Assert.AreEqual(clone.Published, content.Published);
             Assert.AreEqual(clone.PublishedState, content.PublishedState);
             Assert.AreEqual(clone.SortOrder, content.SortOrder);
@@ -421,7 +417,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             content.Id = 10;
             content.CreateDate = DateTime.Now;
             content.CreatorId = 22;
-            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
@@ -442,7 +437,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Key)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Level)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Path)));
-            Assert.IsTrue(content.WasPropertyDirty(nameof(Content.ContentSchedule)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.SortOrder)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.TemplateId)));
             Assert.IsTrue(content.WasPropertyDirty(nameof(Content.Trashed)));
@@ -492,8 +486,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             content.Key = Guid.NewGuid();
             content.Level = 3;
             content.Path = "-1,4,10";
-            content.ContentSchedule.Add(DateTime.Now, DateTime.Now.AddDays(1));
-            //// content.ChangePublishedState(PublishedState.Publishing);
             content.SortOrder = 5;
             content.TemplateId = 88;
             content.Trashed = false;

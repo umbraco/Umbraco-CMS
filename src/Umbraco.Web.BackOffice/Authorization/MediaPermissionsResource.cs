@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     public class MediaPermissionsResource
     {
-        public MediaPermissionsResource(IMedia media)
+        public MediaPermissionsResource(IMedia? media)
         {
             Media = media;
         }
@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         }
 
         public int? NodeId { get; }
-        public IMedia Media { get; }
+        public IMedia? Media { get; }
     }
 }

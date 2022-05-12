@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int UserId { get; set; }
 
         [DataMember(Name = "userName")]
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         [DataMember(Name = "userAvatars")]
-        public string[] UserAvatars { get; set; }
+        public string[]? UserAvatars { get; set; }
 
         [DataMember(Name = "nodeId")]
         public int NodeId { get; set; }
@@ -22,15 +22,15 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public DateTime Timestamp { get; set; }
 
         [DataMember(Name = "logType")]
-        public string LogType { get; set; }
+        public string? LogType { get; set; }
 
         [DataMember(Name = "entityType")]
-        public string EntityType { get; set; }
+        public string? EntityType { get; set; }
 
         [DataMember(Name = "comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [DataMember(Name = "parameters")]
-        public string Parameters { get; set; }
+        public string? Parameters { get; set; }
     }
 }

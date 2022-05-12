@@ -1,0 +1,114 @@
+@using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core.Configuration
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Logging
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Infrastructure.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
+@using Umbraco.Extensions
+@inject IBackOfficeSignInManager SignInManager
+@inject BackOfficeServerVariables BackOfficeServerVariables
+@inject IUmbracoVersion UmbracoVersion
+@inject IHostingEnvironment HostingEnvironment
+@inject IOptions<GlobalSettings> GlobalSettings
+@inject IRuntimeMinifier RuntimeMinifier
+@inject IProfilerHtml ProfilerHtml
+@inject ILocalizedTextService LocalizedTextService
+
+@model Umbraco.Cms.Core.Editors.BackOfficePreviewModel
+@{
+    var disableDevicePreview = Model?.DisableDevicePreview.ToString().ToLowerInvariant();
+
+    var EndLabel = LocalizedTextService.Localize("preview", "endLabel");
+    var EndTitle = LocalizedTextService.Localize("preview", "endTitle");
+    var OpenWebsiteLabel = LocalizedTextService.Localize("preview", "openWebsiteLabel");
+    var OpenWebsiteTitle = LocalizedTextService.Localize("preview", "openWebsiteTitle");
+    var returnToPreviewHeadline = LocalizedTextService.Localize("preview", "returnToPreviewHeadline");
+    var returnToPreviewDescription = LocalizedTextService.Localize("preview", "returnToPreviewDescription");
+    var returnToPreviewAcceptButton = LocalizedTextService.Localize("preview", "returnToPreviewAcceptButton");
+    var returnToPreviewDeclineButton = LocalizedTextService.Localize("preview", "returnToPreviewDeclineButton");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Umbraco Preview</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="pinterest" content="nopin" />
+
+    @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoPreviewCssBundleName))
+
+    <script type="text/javascript">
+        window.umbLocalizedVars = {
+            'returnToPreviewHeadline': '@returnToPreviewHeadline',
+            'returnToPreviewDescription':'@returnToPreviewDescription',
+            'returnToPreviewAcceptButton':'@returnToPreviewAcceptButton',
+            'returnToPreviewDeclineButton':'@returnToPreviewDeclineButton'
+        };
+    </script>
+</head>
+<body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
+    <div class="wait" ng-show="!frameLoaded"></div>
+
+    @if (!string.IsNullOrWhiteSpace(Model?.PreviewExtendedHeaderView))
+    {
+        @await Html.PartialAsync(Model.PreviewExtendedHeaderView)
+    }
+
+    <div id="demo-iframe-wrapper" class="{{previewDevice.css}}">
+        <preview-i-frame src="pageUrl" on-loaded="onFrameLoaded(iframe)"></preview-i-frame>
+    </div>
+    <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
+        <div class="menu-bar selected">
+
+            <div class="menu-bar__title">Preview Mode</div>
+
+            <div class="menu-bar__right-part">
+
+                <div class="preview-menu-option" ng-class="{'--open': sizeOpen === true}" ng-click="$event.stopPropagation()">
+                    <button class="menu-bar__button umb-outline" ng-click="toggleSizeOpen()"><i class="icon {{previewDevice.icon}}"></i><span>{{previewDevice.title}}</span></button>
+                    <div class="dropdown-menu">
+                        <button ng-repeat="device in devices" class="menu-bar__button umb-outline" ng-class="{ '--active':previewDevice === device }" ng-click="updatePreviewDevice(device)">
+                            <i class="icon {{device.icon}}"></i><span>{{device.title}}</span>
+                        </button>
+                    </div>
+                </div>
+
+                @if (Model?.Languages.Any() == true)
+                {
+                    <div class="preview-menu-option" ng-class="{'--open': cultureOpen === true}" ng-click="$event.stopPropagation()">
+                        <button class="menu-bar__button umb-outline" ng-click="toggleCultureOpen()"><i class="icon icon-globe-europe---africa"></i><span>{{currentCulture.title}}</span></button>
+                        <div class="dropdown-menu">
+                            @foreach (var language in Model.Languages)
+                            {
+                                <button class="menu-bar__button umb-outline" ng-class="{ '--active': currentCultureIso === '@language.IsoCode' || (@language.IsDefault.ToString().ToLower() && currentCultureIso === null) }" ng-click="changeCulture('@language.IsoCode')" ng-init="registerCulture('@language.IsoCode', '@language.CultureName', @language.IsDefault.ToString().ToLower())">
+                                    <i class="icon icon-globe-europe---africa"></i><span>@language.CultureName</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <button ng-click="openInBrowser()" title="@OpenWebsiteTitle" class="menu-bar__button umb-outline">
+                    <i class="icon icon-out"></i><span>@OpenWebsiteLabel</span>
+                </button>
+
+                <button ng-click="exitPreview()" title="@EndTitle" class="menu-bar__button umb-outline">
+                    <i class="icon icon-power"></i><span>@EndLabel</span>
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+
+    @await Html.BareMinimumServerVariablesScriptAsync(BackOfficeServerVariables)
+
+    <script src="../lib/lazyload-js/LazyLoad.min.js"></script>
+    <script src="@Url.GetUrlWithCacheBust("Application", "Preview", null!, HostingEnvironment, UmbracoVersion, RuntimeMinifier)"></script>
+
+</body>
+</html>

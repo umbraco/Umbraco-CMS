@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
@@ -33,7 +34,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public virtual bool TryFindContent(IPublishedRequestBuilder frequest)
+        public virtual async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
         {
             if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -50,7 +51,7 @@ namespace Umbraco.Cms.Core.Routing
                 route = frequest.AbsolutePathDecoded;
             }
 
-            IPublishedContent node = FindContent(frequest, route);
+            IPublishedContent? node = FindContent(frequest, route);
             return node != null;
         }
 
@@ -58,7 +59,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
         /// </summary>
         /// <returns>The document node, or null.</returns>
-        protected IPublishedContent FindContent(IPublishedRequestBuilder docreq, string route)
+        protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route)
         {
             if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
@@ -69,18 +70,26 @@ namespace Umbraco.Cms.Core.Routing
             {
                 throw new System.ArgumentNullException(nameof(docreq));
             }
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Test route {Route}", route);
+            }
 
-            _logger.LogDebug("Test route {Route}", route);
-
-            IPublishedContent node = umbracoContext.Content.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
+            IPublishedContent? node = umbracoContext.Content?.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
             if (node != null)
             {
                 docreq.SetPublishedContent(node);
-                _logger.LogDebug("Got content, id={NodeId}", node.Id);
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("Got content, id={NodeId}", node.Id);
+                }
             }
             else
             {
-                _logger.LogDebug("No match.");
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug("No match.");
+                }
             }
 
             return node;

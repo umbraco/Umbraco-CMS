@@ -20,14 +20,14 @@ namespace Umbraco.Cms.Core.Routing
             ContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
-            string errorCulture,
+            string? errorCulture,
             int? domainContentId)
         {
             if (error404Collection.Length > 1)
             {
                 // test if a 404 page exists with current culture thread
-                ContentErrorPage cultureErr = error404Collection.FirstOrDefault(x => x.Culture.InvariantEquals(errorCulture))
-                    ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
+                ContentErrorPage? cultureErr = error404Collection.FirstOrDefault(x => x.Culture.InvariantEquals(errorCulture))
+                                               ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)
                 {
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Routing
                 // but until then we need to look it up in the db. For now we've implemented a cached service for
                 // converting Int -> Guid and vice versa.
                 Attempt<int> found = entityService.GetId(errorPage.ContentKey, UmbracoObjectTypes.Document);
-                if (found)
+                if (found.Success)
                 {
                     return found.Result;
                 }
@@ -77,17 +77,17 @@ namespace Umbraco.Cms.Core.Routing
                 {
                     // we have an xpath statement to execute
                     var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
-                        xpathExpression: errorPage.ContentXPath,
+                        xpathExpression: errorPage.ContentXPath!,
                         nodeContextId: domainContentId,
                         getPath: nodeid =>
                         {
-                            IEntitySlim ent = entityService.Get(nodeid);
-                            return ent.Path.Split(',').Reverse();
+                            IEntitySlim? ent = entityService.Get(nodeid);
+                            return ent?.Path.Split(',').Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
                     // now we'll try to execute the expression
-                    IPublishedContent nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
+                    IPublishedContent? nodeResult = publishedContentQuery.ContentSingleAtXPath(xpathResult);
                     if (nodeResult != null)
                     {
                         return nodeResult.Id;

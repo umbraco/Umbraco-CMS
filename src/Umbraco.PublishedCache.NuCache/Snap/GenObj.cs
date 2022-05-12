@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap
         public GenRef GetGenRef()
         {
             // not thread-safe but always invoked from within a lock
-            var genRef = (GenRef)WeakGenRef.Target;
+            var genRef = (GenRef?)WeakGenRef.Target;
             if (genRef == null)
                 WeakGenRef.Target = genRef = new GenRef(this);
             return genRef;
