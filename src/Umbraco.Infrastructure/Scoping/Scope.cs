@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private bool? _completed;
         private IUmbracoDatabase? _database;
 
-        private bool _rollbacked;
+        private bool _rolledback;
         private bool _disposed;
         private IEventDispatcher? _eventDispatcher;
         private ICompletable? _fscope;
@@ -497,11 +497,11 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <inheritdoc />
         public bool Complete()
         {
-            // Can't complete if rollbacked
-            if (_rollbacked)
+            // Can't complete if rolled back
+            if (_rolledback)
             {
                 _completed = false;
-                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already rollbacked, so can't complete");
+                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already rolled back, so can't complete");
             }
 
             if (_completed.HasValue == false)
@@ -514,14 +514,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         public void Rollback()
         {
-            // Can't rollback if completed
+            // Can't roll back if completed
             if (_completed.HasValue && _completed.Value)
             {
-                _rollbacked = false;
-                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already completed, so can't rollback");
+                _rolledback = false;
+                _logger.LogDebug($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already completed, so can't roll back");
             }
 
-            _rollbacked = true;
+            _rolledback = true;
         }
 
         public void Dispose()
@@ -828,13 +828,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     {
                         _database.CompleteTransaction();
                     }
-                    else if (_rollbacked)
+                    else if (_rolledback)
                     {
                         _database.AbortTransaction();
                     }
                     else
                     {
-                        throw new InvalidOperationException($"The {nameof(Scope)} hasn't been completed nor rollbacked");
+                        throw new InvalidOperationException($"The {nameof(Scope)} hasn't been completed nor rolled back");
                     }
                 }
                 catch

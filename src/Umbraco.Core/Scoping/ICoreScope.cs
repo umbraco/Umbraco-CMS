@@ -32,7 +32,7 @@ public interface ICoreScope : IDisposable, IInstanceIdentifiable
     bool Complete();
 
     /// <summary>
-    /// Rollbacks the scope.
+    /// Rolls back the scope.
     /// </summary>
     void Rollback();
 
