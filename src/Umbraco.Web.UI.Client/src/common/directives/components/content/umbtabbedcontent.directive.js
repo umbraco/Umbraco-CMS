@@ -182,6 +182,11 @@
                 }
             );
 
+            $scope.propertyEditorReadonly = function(property) {
+                // check for permission to update
+                return !$scope.content.allowedActions.includes('A');
+            };
+
             $scope.propertyEditorDisabled = function (property) {
                 if (property.unlockInvariantValue) {
                     return false;
