@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -33,6 +34,7 @@ using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -63,12 +65,65 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
         private readonly IContentVersionService _contentVersionService;
+        private readonly ICultureImpactService _cultureImpactService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
         private readonly ICoreScopeProvider _scopeProvider;
 
         public object? Domains { get; private set; }
 
+        [ActivatorUtilitiesConstructor]
+        public ContentController(
+            ICultureDictionary cultureDictionary,
+            ILoggerFactory loggerFactory,
+            IShortStringHelper shortStringHelper,
+            IEventMessagesFactory eventMessages,
+            ILocalizedTextService localizedTextService,
+            PropertyEditorCollection propertyEditors,
+            IContentService contentService,
+            IUserService userService,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IContentTypeService contentTypeService,
+            IUmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IDomainService domainService,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IFileService fileService,
+            INotificationService notificationService,
+            ActionCollection actionCollection,
+            ISqlContext sqlContext,
+            IJsonSerializer serializer,
+            ICoreScopeProvider scopeProvider,
+            IAuthorizationService authorizationService,
+            IContentVersionService contentVersionService,
+            ICultureImpactService cultureImpactService)
+            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
+        {
+            _propertyEditors = propertyEditors;
+            _contentService = contentService;
+            _localizedTextService = localizedTextService;
+            _userService = userService;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _contentTypeService = contentTypeService;
+            _umbracoMapper = umbracoMapper;
+            _publishedUrlProvider = publishedUrlProvider;
+            _domainService = domainService;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
+            _fileService = fileService;
+            _notificationService = notificationService;
+            _actionCollection = actionCollection;
+            _sqlContext = sqlContext;
+            _authorizationService = authorizationService;
+            _contentVersionService = contentVersionService;
+            _cultureImpactService = cultureImpactService;
+            _logger = loggerFactory.CreateLogger<ContentController>();
+            _scopeProvider = scopeProvider;
+            _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+        }
+
+        [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
         public ContentController(
             ICultureDictionary cultureDictionary,
             ILoggerFactory loggerFactory,
@@ -93,29 +148,33 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ICoreScopeProvider scopeProvider,
             IAuthorizationService authorizationService,
             IContentVersionService contentVersionService)
-            : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
-        {
-            _propertyEditors = propertyEditors;
-            _contentService = contentService;
-            _localizedTextService = localizedTextService;
-            _userService = userService;
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
-            _contentTypeService = contentTypeService;
-            _umbracoMapper = umbracoMapper;
-            _publishedUrlProvider = publishedUrlProvider;
-            _domainService = domainService;
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
-            _fileService = fileService;
-            _notificationService = notificationService;
-            _actionCollection = actionCollection;
-            _sqlContext = sqlContext;
-            _authorizationService = authorizationService;
-            _contentVersionService = contentVersionService;
-            _logger = loggerFactory.CreateLogger<ContentController>();
-            _scopeProvider = scopeProvider;
-            _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
-        }
+            : this(
+                cultureDictionary,
+                loggerFactory,
+                shortStringHelper,
+                eventMessages,
+                localizedTextService,
+                propertyEditors,
+                contentService,
+                userService,
+                backofficeSecurityAccessor,
+                contentTypeService,
+                umbracoMapper,
+                publishedUrlProvider,
+                domainService,
+                dataTypeService,
+                localizationService,
+                fileService,
+                notificationService,
+                actionCollection,
+                sqlContext,
+                serializer,
+                scopeProvider,
+                authorizationService,
+                contentVersionService,
+                StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
+              {
+              }
 
         /// <summary>
         /// Return content for the specified ids
@@ -848,7 +907,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
             // not marked to be saved, it will be the first culture in the list marked for saving.
             var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
-            var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
+            var cultureForInvariantErrors = _cultureImpactService.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
                 defaultCulture);
@@ -1617,7 +1676,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             foreach (var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
-                var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
+                var valid = persistentContent.PublishCulture(_cultureImpactService.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
                 if (!valid)
                 {
                     AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");
