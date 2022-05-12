@@ -43,6 +43,7 @@
             // Check for variants: if a node is invariant it will still have the default language in variants
             // so we have to check for length > 1
             if (vm.variants.length > 1) {
+                vm.displayVariants = vm.displayVariants.filter(variant => allowPublish(variant));
                 vm.displayVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.displayVariants);
 
                 vm.variants.forEach(v => {
@@ -81,6 +82,10 @@
                     }
                 });
             });
+        }
+
+        function allowPublish (variant) {
+            return variant.allowedActions.includes("U");
         }
 
         /**

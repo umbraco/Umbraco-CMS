@@ -322,6 +322,7 @@
     <key alias="variantSaveNotAllowed">Save is not allowed</key>
     <key alias="variantPublishNotAllowed">Publish is not allowed</key>
     <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
+    <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
