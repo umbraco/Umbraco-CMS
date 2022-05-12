@@ -319,6 +319,7 @@
     <key alias="createEmpty">Create new</key>
     <key alias="createFromClipboard">Paste from clipboard</key>
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
+    <key alias="variantSaveNotAllowed">Save is not allowed</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
