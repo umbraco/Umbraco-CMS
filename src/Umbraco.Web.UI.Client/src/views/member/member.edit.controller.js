@@ -158,7 +158,7 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
             //it's a child item, just sync the ui node to the parent
             navigationService.syncTree({ tree: "member", path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
 
-            //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
+            //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node
             // from the server so that we can load in the actions menu.
             umbRequestHelper.resourcePromise(
                 $http.get(content.treeNodeUrl),
@@ -189,7 +189,7 @@ function MemberEditController($scope, $routeParams, $location, $http, $q, appSta
             $scope.page.saveButtonState = "busy";
 
             //anytime a user is changing a member's password without the oldPassword, we are in effect resetting it so we need to set that flag here
-            var passwordProp = _.find(contentEditingHelper.getAllProps($scope.content), function (e) { return e.alias === '_umb_password' });
+            var passwordProp = _.find($scope.content.membershipProperties, function (e) { return e.alias === '_umb_password' });
             if (passwordProp && passwordProp.value && (typeof passwordProp.value.reset !== 'undefined') && !passwordProp.value.reset) {
                 //so if the admin is not explicitly resetting the password, flag it for resetting if a new password is being entered
                 passwordProp.value.reset = !passwordProp.value.oldPassword && passwordProp.config.allowManuallyChangingPassword;
