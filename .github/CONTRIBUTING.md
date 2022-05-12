@@ -89,7 +89,7 @@ Great question! The short version goes like this:
     
 1. **Switch to the correct branch**
 
-    Switch to the `v9/contrib` branch
+    Switch to the `v10/contrib` branch
 
 1. **Build**
 
@@ -97,7 +97,7 @@ Great question! The short version goes like this:
 
 1. **Branch**
 
-    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `v9/contrib`, create a new branch first.
+    Create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-12345`. This means it's a temporary branch for the particular issue you're working on, in this case issue number `12345`.  Don't commit to `v10/contrib`, create a new branch first.
 
 1. **Change**
 
@@ -107,7 +107,7 @@ Great question! The short version goes like this:
 
     Done? Yay! 🎉
 
-    Remember to commit to your new `temp` branch, and don't commit to `v9/contrib`. Then you can push the changes up to your fork on GitHub.
+    Remember to commit to your new `temp` branch, and don't commit to `v10/contrib`. Then you can push the changes up to your fork on GitHub.
 
 #### Keeping your Umbraco fork in sync with the main repository
 [sync fork]: #keeping-your-umbraco-fork-in-sync-with-the-main-repository
@@ -124,10 +124,10 @@ Then when you want to get the changes from the main repository:
 
 ```
 git fetch upstream
-git rebase upstream/v9/contrib
+git rebase upstream/v10/contrib
 ```
 
-In this command we're syncing with the `v9/contrib` branch, but you can of course choose another one if needed.
+In this command we're syncing with the `v10/contrib` branch, but you can of course choose another one if needed.
 
 [More information on how this works can be found on the thoughtbot blog.][sync fork ext]
 
@@ -155,7 +155,7 @@ We recommend you to [sync with our repository][sync fork] before you submit your
 GitHub will have picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
 ![Create a pull request](img/createpullrequest.png)
 
-We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v9/contrib`. If you are working on v9, this is the branch you should be targeting.
+We like to use [git flow][git flow] as much as possible, but don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `v10/contrib`. If you are working on v9, this is the branch you should be targeting.
 
 Please note: we are no longer accepting features for v8 and below but will continue to merge security fixes as and when they arise.
 
