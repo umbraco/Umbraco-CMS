@@ -41,7 +41,7 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.PostConfigure<ConnectionStrings>(Core.Constants.System.UmbracoConnectionName, opt =>
         {
-            // SKip empty connection string and other providers
+            // Skip empty connection string and other providers
             if (!opt.IsConnectionStringConfigured() || opt.ProviderName != Constants.ProviderName)
             {
                 return;

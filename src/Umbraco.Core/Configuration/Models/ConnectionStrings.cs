@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// <summary>
 /// Represents a single connection string.
 /// </summary>
-public class ConnectionStrings
+public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (since v10 this only contains a single connection string)
 {
     /// <summary>
     /// The default provider name when not present in configuration.
@@ -28,7 +28,7 @@ public class ConnectionStrings
     /// <value>
     /// The name.
     /// </value>
-    public string? Name { get; set; }
+    public string? Name { get; set; } // TODO: Remove this property (since v10 this is already using named options)
 
     /// <summary>
     /// Gets or sets the connection string.

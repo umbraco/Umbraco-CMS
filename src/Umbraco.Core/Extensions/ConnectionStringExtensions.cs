@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Extensions;
 
 /// <summary>
-/// Extension methods for connection strings.
+/// Extension methods for a connection string.
 /// </summary>
-public static class ConnectionStringsExtensions
+public static class ConnectionStringExtensions
 {
     /// <summary>
     /// Determines whether the connection string is configured (set to a non-empty value).
