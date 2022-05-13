@@ -61,31 +61,10 @@
       "description": "Used to specify the name of the default admin user when using unattended install (stored as plain text).",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "UnattendedUserNameReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserName",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
@@ -95,31 +74,10 @@
       "description": "Used to specify the email of the default admin user when using unattended install (stored as plain text).",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "UnattendedUserEmailReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserEmail",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
@@ -129,31 +87,10 @@
       "description": "Used to specify the password of the default admin user when using unattended install (stored as plain text).",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "UnattendedUserPasswordReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserPassword",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
@@ -163,31 +100,10 @@
       "description": "Database connection string used by Umbraco.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "ConnectionStringReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "ConnectionString",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "CONNECTION_STRING_FROM_TEMPLATE"
@@ -197,31 +113,10 @@
       "description": "Database connection string provider name used by Umbraco.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "Microsoft.Data.SqlClient"
-    },
-    "ConnectionStringProviderNameReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "ConnectionStringProviderName",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "Microsoft.Data.SqlClient",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "CONNECTION_STRING_PROVIDER_NAME_FROM_TEMPLATE"
@@ -239,31 +134,10 @@
       "description": "Path to a custom view presented with the Umbraco installation contains no published content",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "NoNodesViewPathReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "NoNodesViewPath",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE"
@@ -280,27 +154,10 @@
       "defaultValue": "",
       "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
     },
-    "NamespaceReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": "_"
-          },
-          {
-            "regex": "-",
-            "replacement": "_"
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": "_"
-          }
-        ]
-      },
+    "Namespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
       "replaces": "Umbraco.Cms.Web.UI"
     },
     "HttpPort": {
