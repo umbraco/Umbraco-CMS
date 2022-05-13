@@ -167,14 +167,6 @@
       "type": "computed",
       "value": "(NoNodesViewPath != '')"
     },
-    "PackageProjectName": {
-      "displayName": "Umbraco package project name",
-      "description": "The name of the package project this should be a test site for.",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
-    },
     "Namespace": {
       "type": "derived",
       "valueSource": "name",

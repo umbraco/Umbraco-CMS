@@ -34,10 +34,6 @@
     {
       "id": "NoNodesViewPath",
       "isVisible": true
-    },
-    {
-      "id": "PackageProjectName",
-      "isVisible": true
     }
   ]
 }

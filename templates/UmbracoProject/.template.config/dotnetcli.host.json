@@ -32,10 +32,6 @@
     "NoNodesViewPath": {
       "longName": "no-nodes-view-path",
       "shortName": ""
-    },
-    "PackageProjectName": {
-      "longName": "PackageTestSiteName",
-      "shortName": "p"
     }
   },
   "usageExamples": [
