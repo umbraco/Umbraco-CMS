@@ -19,7 +19,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 					"Over 500 000 websites are currently powered by Umbraco",
 					"At least 2 people have named their cat 'Umbraco'",
 					"On an average day more than 1000 people download Umbraco",
-					"<a target='_blank' rel='noopener' href='https://umbraco.tv/'>umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started",
+					"<a target='_blank' rel='noopener' href='https://www.youtube.com/channel/UCbGfwSAPflebnadyhEPw-wA'>Umbraco Learning Base</a> is the premier source of Umbraco video tutorials to get you started",
 					"You can find the world's friendliest CMS community at <a target='_blank' rel='noopener' href='https://our.umbraco.com/'>our.umbraco.com</a>",
 					"You can become a certified Umbraco developer by attending one of the official courses",
 					"Umbraco works really well on tablets",
