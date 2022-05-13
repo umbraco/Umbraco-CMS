@@ -150,49 +150,6 @@
       "type": "computed",
       "value": "(DevelopmentConnectionString != '')"
     },
-    "UnattendedUserName": {
-      "displayName": "Unattended user name",
-      "description": "Used to specify the name of the default admin user when using unattended install on development (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
-    },
-    "UnattendedUserEmail": {
-      "displayName": "Unattended user email",
-      "description": "Used to specify the email of the default admin user when using unattended install on development (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
-    },
-    "UnattendedUserPassword": {
-      "displayName": "Unattended user password",
-      "description": "Used to specify the password of the default admin user when using unattended install on development (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
-    },
-    "UsingUnattenedInstall": {
-      "type": "computed",
-      "value": "(UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '' && HasDevelopmentConnectionString)"
-    },
     "NoNodesViewPath": {
       "displayName": "No nodes view path",
       "description": "Path to a custom view presented with the Umbraco installation contains no published content.",

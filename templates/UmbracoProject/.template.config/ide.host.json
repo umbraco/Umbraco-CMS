@@ -32,18 +32,6 @@
       "isVisible": true
     },
     {
-      "id": "UnattendedUserName",
-      "isVisible": true
-    },
-    {
-      "id": "UnattendedUserEmail",
-      "isVisible": true
-    },
-    {
-      "id": "UnattendedUserPassword",
-      "isVisible": true
-    },
-    {
       "id": "NoNodesViewPath",
       "isVisible": true
     },
