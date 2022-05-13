@@ -17,6 +17,18 @@
       "longName": "no-restore",
       "shortName": ""
     },
+    "ConnectionString": {
+      "longName": "connection-string",
+      "shortName": ""
+    },
+    "ConnectionStringProviderName": {
+      "longName": "connection-string-provider-name",
+      "shortName": ""
+    },
+    "DevelopmentDatabaseType": {
+      "longName": "development-database-type",
+      "shortName": "d"
+    },
     "UnattendedUserName": {
       "longName": "friendly-name",
       "shortName": ""
@@ -27,14 +39,6 @@
     },
     "UnattendedUserPassword": {
       "longName": "password",
-      "shortName": ""
-    },
-    "ConnectionString": {
-      "longName": "connection-string",
-      "shortName": ""
-    },
-    "ConnectionStringProviderName": {
-      "longName": "connection-string-provider-name",
       "shortName": ""
     },
     "NoNodesViewPath": {
@@ -49,6 +53,8 @@
   "usageExamples": [
     "dotnet new umbraco -n MyNewProject",
     "dotnet new umbraco -n MyNewProject --no-restore",
+    "dotnet new umbraco -n MyNewProject --development-database-type SQLite",
+    "dotnet new umbraco -n MyNewProject --development-database-type LocalDB",
     "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
   ]
 }

@@ -20,6 +20,18 @@
       "isVisible": true
     },
     {
+      "id": "ConnectionString",
+      "isVisible": true
+    },
+    {
+      "id": "ConnectionStringProviderName",
+      "isVisible": true
+    },
+    {
+      "id": "DevelopmentDatabaseType",
+      "isVisible": true
+    },
+    {
       "id": "UnattendedUserName",
       "isVisible": true
     },
@@ -29,14 +41,6 @@
     },
     {
       "id": "UnattendedUserPassword",
-      "isVisible": true
-    },
-    {
-      "id": "ConnectionString",
-      "isVisible": true
-    },
-    {
-      "id": "ConnectionStringProviderName",
       "isVisible": true
     },
     {

@@ -7,7 +7,7 @@
     "Umbraco"
   ],
   "name": "Umbraco Project",
-  "description": "An empty Umbraco project ready to get started",
+  "description": "An empty Umbraco project ready to get started.",
   "groupIdentity": "Umbraco.Templates.UmbracoProject",
   "identity": "Umbraco.Templates.UmbracoProject.CSharp",
   "shortName": "umbraco",
@@ -56,45 +56,6 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "UnattendedUserName": {
-      "displayName": "Unattended user name",
-      "description": "Used to specify the name of the default admin user when using unattended install (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
-    },
-    "UnattendedUserEmail": {
-      "displayName": "Unattended user email",
-      "description": "Used to specify the email of the default admin user when using unattended install (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
-    },
-    "UnattendedUserPassword": {
-      "displayName": "Unattended user password",
-      "description": "Used to specify the password of the default admin user when using unattended install (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": "",
-      "forms": {
-        "global": [
-          "jsonEncode"
-        ]
-      },
-      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
-    },
     "ConnectionString": {
       "displayName": "Connection string",
       "description": "Database connection string used by Umbraco.",
@@ -123,15 +84,118 @@
     },
     "HasConnectionString": {
       "type": "computed",
-      "value": "(ConnectionString != \"\")"
+      "value": "(ConnectionString != '')"
+    },
+    "DevelopmentDatabaseType": {
+      "displayName": "Development database type",
+      "description": "Database type used by Umbraco for development.",
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "displayName": "None",
+          "description": "Do not configure a database for development.",
+          "choice": "None"
+        },
+        {
+          "displayName": "SQLite",
+          "description": "Use embedded SQLite database.",
+          "choice": "SQLite"
+        },
+        {
+          "displayName": "SQL Server Express LocalDB",
+          "description": "Use embedded LocalDB database (requires SQL Server Express with Advanced Services).",
+          "choice": "LocalDB"
+        }
+      ],
+      "defaultValue": "None"
+    },
+    "DevelopmentConnectionString": {
+      "type": "generated",
+      "datatype": "string",
+      "generator": "switch",
+      "parameters": {
+        "cases": [
+          {
+            "condition": "(DevelopmentDatabaseType == 'SQLite')",
+            "value": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
+          },
+          {
+            "condition": "(DevelopmentDatabaseType == 'LocalDB')",
+            "value": "Data Source=(localdb)\\\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\\\Umbraco.mdf;Integrated Security=True"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_DEVELOPMENT_FROM_TEMPLATE"
+    },
+    "DevelopmentConnectionStringProviderName": {
+      "type": "generated",
+      "datatype": "string",
+      "generator": "switch",
+      "parameters": {
+        "cases": [
+          {
+            "condition": "(DevelopmentDatabaseType == 'SQLite')",
+            "value": "Microsoft.Data.SQLite"
+          },
+          {
+            "condition": "(true)",
+            "value": "Microsoft.Data.SqlClient"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_PROVIDER_NAME_DEVELOPMENT_FROM_TEMPLATE"
+    },
+    "HasDevelopmentConnectionString": {
+      "type": "computed",
+      "value": "(DevelopmentConnectionString != '')"
+    },
+    "UnattendedUserName": {
+      "displayName": "Unattended user name",
+      "description": "Used to specify the name of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
+    },
+    "UnattendedUserEmail": {
+      "displayName": "Unattended user email",
+      "description": "Used to specify the email of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
+    },
+    "UnattendedUserPassword": {
+      "displayName": "Unattended user password",
+      "description": "Used to specify the password of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
     },
     "UsingUnattenedInstall": {
       "type": "computed",
-      "value": "(UnattendedUserName != \"\" && UnattendedUserEmail != \"\" && UnattendedUserPassword != \"\" && ConnectionString != \"\")"
+      "value": "(UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '' && HasDevelopmentConnectionString)"
     },
     "NoNodesViewPath": {
       "displayName": "No nodes view path",
-      "description": "Path to a custom view presented with the Umbraco installation contains no published content",
+      "description": "Path to a custom view presented with the Umbraco installation contains no published content.",
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "",
@@ -144,7 +208,7 @@
     },
     "HasNoNodesViewPath": {
       "type": "computed",
-      "value": "(NoNodesViewPath != \"\")"
+      "value": "(NoNodesViewPath != '')"
     },
     "PackageProjectName": {
       "displayName": "Umbraco package project name",
