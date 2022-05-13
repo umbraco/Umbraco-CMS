@@ -192,6 +192,40 @@
       },
       "replaces": "CONNECTION_STRING_FROM_TEMPLATE"
     },
+    "ConnectionStringProviderName": {
+      "displayName": "Connection string provider name",
+      "description": "Database connection string provider name used by Umbraco.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Microsoft.Data.SqlClient"
+    },
+    "ConnectionStringProviderNameReplacer": {
+      "type": "generated",
+      "generator": "regex",
+      "dataType": "string",
+      "parameters": {
+        "source": "ConnectionStringProviderName",
+        "steps": [
+          {
+            "regex": "\\\\",
+            "replacement": "\\\\"
+          },
+          {
+            "regex": "\\\"",
+            "replacement": "\\\""
+          },
+          {
+            "regex": "\\\n",
+            "replacement": "\\\n"
+          },
+          {
+            "regex": "\\\t",
+            "replacement": "\\\t"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_PROVIDER_NAME_FROM_TEMPLATE"
+    },
     "HasConnectionString": {
       "type": "computed",
       "value": "(ConnectionString != \"\")"

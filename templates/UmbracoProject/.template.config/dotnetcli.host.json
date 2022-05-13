@@ -33,6 +33,10 @@
       "longName": "connection-string",
       "shortName": ""
     },
+    "ConnectionStringProviderName": {
+      "longName": "connection-string-provider-name",
+      "shortName": ""
+    },
     "NoNodesViewPath": {
       "longName": "no-nodes-view-path",
       "shortName": ""
@@ -44,7 +48,6 @@
   },
   "usageExamples": [
     "dotnet new umbraco -n MyNewProject",
-    "dotnet new umbraco -n MyNewProjectUsingSqlCE -ce",
     "dotnet new umbraco -n MyNewProject --no-restore",
     "dotnet new umbraco -n MyNewProject --friendly-name \"Friendly Admin User\" --email admin@example.com --password password1234 --connection-string \"Server=ConnectionStringHere\""
   ]
