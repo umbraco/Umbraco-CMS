@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -56,26 +57,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 var variantDisplay = context.Map<TVariant>(source);
                 if (variantDisplay is not null)
                 {
-                    // Map allowed actions
-                    IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
-                    bool hasAccess = false;
-                    if (userGroups is not null)
-                    {
-                        foreach (var group in userGroups)
-                        {
-                            if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
-                            {
-                                hasAccess = true;
-                                break;
-                            }
-                        }
-
-                        if (hasAccess)
-                        {
-                            variantDisplay.AllowedActions = GetLanguagePermissions(source, context);
-                        }
-                    }
-
+                    // Map allowed actions per language
+                    variantDisplay.AllowedActions = GetLanguagePermissions(source, context, variantDisplay);
                     variants.Add(variantDisplay);
                 }
             }
@@ -193,24 +176,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             variantDisplay.Language = language;
 
             // Map allowed actions
-            IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
-            bool hasAccess = false;
-            if (userGroups is not null)
-            {
-                foreach (var group in userGroups)
-                {
-                    if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
-                    {
-                        hasAccess = true;
-                        break;
-                    }
-                }
-
-                if (hasAccess)
-                {
-                    variantDisplay.AllowedActions = GetLanguagePermissions(content, context);
-                }
-            }
+            variantDisplay.AllowedActions = GetLanguagePermissions(content, context, variantDisplay);
             variantDisplay.Name = content.GetCultureName(language?.IsoCode);
             variantDisplay.DisplayName = GetDisplayName(language, segment);
 
@@ -241,8 +207,30 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         // This is a bit ugly, but when languages get granular permissions this will be really useful
         // For now we just return the exact same permissions as you had on the node, if you have access via language
-        private IEnumerable<string> GetLanguagePermissions(IContent content, MapperContext context)
+        private IEnumerable<string> GetLanguagePermissions<TVariant>(IContent content, MapperContext context, TVariant variantDisplay)
+            where TVariant : ContentVariantDisplay
         {
+            // Map allowed actions
+            IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+            bool hasAccess = false;
+            if (userGroups is not null)
+            {
+                foreach (var group in userGroups)
+                {
+                    if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
+                    {
+                        hasAccess = true;
+                        break;
+                    }
+                }
+
+                // If user does not have access, return only browse permission
+                if (!hasAccess)
+                {
+                    return new[] { ActionBrowse.ActionLetter.ToString() };
+                }
+            }
+
             var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
 
             //cannot check permissions without a context
