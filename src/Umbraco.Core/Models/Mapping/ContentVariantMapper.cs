@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -20,19 +22,23 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IContentService _contentService;
         private readonly IUserService _userService;
+        private SecuritySettings _securitySettings;
 
         public ContentVariantMapper(
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IContentService contentService,
-            IUserService userService)
+            IUserService userService,
+            IOptionsMonitor<SecuritySettings> securitySettings)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _contentService = contentService;
             _userService = userService;
+            _securitySettings = securitySettings.CurrentValue;
+            securitySettings.OnChange(settings => _securitySettings = settings);
         }
         public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
         : this(
@@ -40,7 +46,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
             localizedTextService,
             StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>(),
             StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
         {
         }
 
@@ -221,7 +228,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     if (variantDisplay.Language is null)
                     {
                         int? defaultLanguageId = _localizationService.GetDefaultLanguageId();
-                        if (defaultLanguageId is not null && group.AllowedLanguages.Contains(defaultLanguageId.Value))
+                        if (defaultLanguageId is not null && (group.AllowedLanguages.Contains(defaultLanguageId.Value) || _securitySettings.AllowEditInvariantFromNonDefault))
                         {
                             hasAccess = true;
                         }
