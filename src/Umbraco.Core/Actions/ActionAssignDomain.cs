@@ -23,7 +23,7 @@ public class ActionAssignDomain : IAction
     public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
 
     /// <inheritdoc/>
-    public string Icon => "home";
+    public string Icon => "icon-home";
 
     /// <inheritdoc/>
     public bool ShowInNotifier => false;

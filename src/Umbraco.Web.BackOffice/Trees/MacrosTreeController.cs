@@ -75,10 +75,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (id == Constants.System.RootString)
             {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService);
+                // Create the normal create action
+                menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
-                //refresh action
+                // refresh action
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
@@ -87,8 +87,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var macro = _macroService.GetById(int.Parse(id, CultureInfo.InvariantCulture));
             if (macro == null) return menu;
 
-            //add delete option for all macros
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            // add delete option for all macros
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             return menu;
         }

@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 member.Name,
                 Constants.Icons.Member,
                 false,
-                "",
+                string.Empty,
                 Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
 
             node.AdditionalData.Add("contentType", member.ContentTypeAlias);
@@ -121,9 +121,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
             }
 
-            //There is no menu for any of these nodes
+            // There is no menu for any of these nodes
             nodes.ForEach(x => x.MenuUrl = null);
-            //All nodes are containers
+
+            // All nodes are containers
             nodes.ForEach(x => x.AdditionalData.Add("isContainer", true));
 
             return nodes;
@@ -136,18 +137,19 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 // root actions
-                //set default
+                // set default
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                // Create the normal create action
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
                 return menu;
             }
 
-            //add delete option for all members
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            // add delete option for all members
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? false)
             {

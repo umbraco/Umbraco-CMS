@@ -53,7 +53,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         }
 
-
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
             => _memberGroupService.GetAll()
                 .OrderBy(x => x.Name)

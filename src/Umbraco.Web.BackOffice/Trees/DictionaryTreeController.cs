@@ -126,14 +126,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = _menuItemCollectionFactory.Create();
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (id != Constants.System.RootString)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
-                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
             }
-
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
