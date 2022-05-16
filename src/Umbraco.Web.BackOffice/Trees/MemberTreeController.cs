@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 member.Name,
                 Constants.Icons.Member,
                 false,
-                "",
+                string.Empty,
                 Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
 
             node.AdditionalData.Add("contentType", member.ContentTypeAlias);
@@ -136,13 +136,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 // root actions
-                //set default
+                // set default
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                // Create the normal create action
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
                 return menu;
             }
 
