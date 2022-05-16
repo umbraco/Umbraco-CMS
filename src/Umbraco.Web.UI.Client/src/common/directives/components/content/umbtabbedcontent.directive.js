@@ -16,6 +16,7 @@
             $scope.activeTabAlias = null;
             $scope.tabs = [];
             $scope.allowUpdate = $scope.content.allowedActions.includes('A');
+            $scope.allowEditInvariantFromNonDefault = Umbraco.Sys.ServerVariables.umbracoSettings.allowEditInvariantFromNonDefault;
 
             $scope.$watchCollection('content.tabs', (newValue) => {
 
