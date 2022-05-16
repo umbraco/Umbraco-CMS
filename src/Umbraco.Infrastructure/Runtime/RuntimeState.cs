@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseProviderMetadata = databaseProviderMetadata;
         }
 
-        [Obsolete("use ctor with all params")]
+        [Obsolete("Use ctor with all params. This will be removed in Umbraco 12")]
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
             IOptions<UnattendedSettings> unattendedSettings,
