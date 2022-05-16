@@ -850,6 +850,7 @@
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
+    <key alias="shared">Shared</key>
     <key alias="show">Show</key>
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
@@ -1949,6 +1950,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="invariantPropertyUnlockHelp">%0% is shared across all languages.</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>

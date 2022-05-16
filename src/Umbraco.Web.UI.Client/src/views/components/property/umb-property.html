@@ -8,9 +8,6 @@
             <div class="umb-el-wrap">
 
                 <div class="control-header" ng-hide="vm.property.hideLabel === true">
-                    <small ng-if="vm.showInherit" class="db" style="padding-top: 0; margin-bottom: 5px;">
-                        <localize key="contentTypeEditor_inheritedFrom">Inherited from</localize> {{vm.inheritsFrom}}
-                    </small>
 
                     <label class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">
 
@@ -37,6 +34,11 @@
                           <localize ng-if="vm.property.extendedDescriptionVisible" key="general_close"></localize>
                       </button>
 
+                    </div>
+
+                    <div ng-if="vm.showInherit || vm.property.culture" class="umb-property-culture-label">
+                        <span ng-if="vm.showInherit"><localize key="general_shared"></localize></span>
+                        <span ng-if="!vm.showInherit">{{ vm.property.culture }}</span>
                     </div>
                 </div>
 

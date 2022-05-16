@@ -48,6 +48,7 @@
             vm.readonly = value !== undefined;
 
             vm.sortableOptions.disabled = vm.readonly;
+            vm.blockEditorApi.readonly = vm.readonly;
 
             if (deleteAllBlocksAction) {
                 deleteAllBlocksAction.isDisabled = vm.readonly;
@@ -729,6 +730,8 @@
         }
 
         function requestDeleteBlock(block) {
+            if (vm.readonly) return;
+            
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -773,7 +776,8 @@
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock
+            openSettingsForBlock: openSettingsForBlock,
+            readonly: vm.readonly
         };
 
         vm.sortableOptions = {

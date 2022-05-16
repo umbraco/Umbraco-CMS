@@ -1,5 +1,13 @@
-<div class="umb-property-editor db" ng-class="{'umb-property-editor--preview': preview}">
-    <div disable-tabindex="preview">
+<div class="umb-property-editor db">
+    
+    <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
+        <div class="umb-property-editor__lock-overlay">
+            {{ labels.invariantPropertyUnlockHelp }}
+            <umb-button button-style="warning" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
+        </div>
+    </div>
+
+    <div ng-class="{'umb-property-editor--preview': preview}" disable-tabindex="preview">
         <div ng-include="propertyEditorView"></div>
     </div>
 </div>
