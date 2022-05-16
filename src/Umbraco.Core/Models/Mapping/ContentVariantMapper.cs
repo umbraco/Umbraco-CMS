@@ -56,6 +56,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 var variantDisplay = context.Map<TVariant>(source);
                 if (variantDisplay is not null)
                 {
+                    variantDisplay.AllowedActions = GetLanguagePermissions(source, context);
                     variants.Add(variantDisplay);
                 }
             }
