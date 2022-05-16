@@ -27,7 +27,7 @@
     },
     "DevelopmentDatabaseType": {
       "longName": "development-database-type",
-      "shortName": "d"
+      "shortName": ""
     },
     "UnattendedUserName": {
       "longName": "friendly-name",
