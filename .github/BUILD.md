@@ -28,8 +28,8 @@ In order to build the Umbraco source code locally with Visual Studio Code, first
 
   * [Visual Studio Code](https://code.visualstudio.com/)
   * [dotnet SDK v6.0](https://dotnet.microsoft.com/en-us/download)
-  * [Node.js v10+](https://nodejs.org/en/download/)
-  * npm v6.4.1+ (installed with Node.js)
+  * [Node.js v14+](https://nodejs.org/en/download/)
+  * npm v7+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
 
 Open the root folder of the repository in Visual Studio Code.
