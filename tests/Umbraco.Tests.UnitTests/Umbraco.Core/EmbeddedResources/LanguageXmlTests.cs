@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.EmbeddedResources
             var xmlDocument = new XmlDocument();
 
             var languageProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang");
-            var files = languageProvider .GetDirectoryContents(string.Empty)
+            var files = languageProvider.GetDirectoryContents(string.Empty)
                                     .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"));
 
             foreach (var languageFile in files)
