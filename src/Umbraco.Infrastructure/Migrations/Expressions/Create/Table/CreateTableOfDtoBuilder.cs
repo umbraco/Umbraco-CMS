@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public Type TypeOfDto { get; set; }
+        public Type? TypeOfDto { get; set; }
 
         public bool WithoutKeysAndIndexes { get; set; }
 
@@ -27,17 +27,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
         public void Do()
         {
             var syntax = _context.SqlContext.SqlSyntax;
+            if (TypeOfDto is null)
+            {
+                return;
+            }
             var tableDefinition = DefinitionFactory.GetTableDefinition(TypeOfDto, syntax);
 
-            ExecuteSql(syntax.Format(tableDefinition));
-            if (WithoutKeysAndIndexes)
-                return;
-
-            ExecuteSql(syntax.FormatPrimaryKey(tableDefinition));
-            foreach (var sql in syntax.Format(tableDefinition.ForeignKeys))
-                ExecuteSql(sql);
-            foreach (var sql in syntax.Format(tableDefinition.Indexes))
-                ExecuteSql(sql);
+            syntax.HandleCreateTable(_context.Database, tableDefinition, WithoutKeysAndIndexes);
+            _context.BuildingExpression = false;
         }
 
         private void ExecuteSql(string sql)

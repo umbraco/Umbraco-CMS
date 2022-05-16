@@ -17,25 +17,25 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     public class RawValueProperty : PublishedPropertyBase
     {
         private readonly object _sourceValue; //the value in the db
-        private readonly Lazy<object> _objectValue;
-        private readonly Lazy<object> _xpathValue;
+        private readonly Lazy<object?> _objectValue;
+        private readonly Lazy<object?> _xpathValue;
 
         // RawValueProperty does not (yet?) support variants,
         // only manages the current "default" value
 
-        public override object GetSourceValue(string culture = null, string segment = null)
+        public override object? GetSourceValue(string? culture = null, string? segment = null)
             => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _sourceValue : null;
 
-        public override bool HasValue(string culture = null, string segment = null)
+        public override bool HasValue(string? culture = null, string? segment = null)
         {
             var sourceValue = GetSourceValue(culture, segment);
             return sourceValue is string s ? !string.IsNullOrWhiteSpace(s) : sourceValue != null;
         }
 
-        public override object GetValue(string culture = null, string segment = null)
+        public override object? GetValue(string? culture = null, string? segment = null)
             => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _objectValue.Value : null;
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+        public override object? GetXPathValue(string? culture = null, string? segment = null)
             => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
 
         public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             _sourceValue = sourceValue;
 
-            var interValue = new Lazy<object>(() => PropertyType.ConvertSourceToInter(content, _sourceValue, isPreviewing));
-            _objectValue = new Lazy<object>(() => PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, interValue.Value, isPreviewing));
-            _xpathValue = new Lazy<object>(() => PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue.Value, isPreviewing));
+            var interValue = new Lazy<object?>(() => PropertyType.ConvertSourceToInter(content, _sourceValue, isPreviewing));
+            _objectValue = new Lazy<object?>(() => PropertyType.ConvertInterToObject(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
+            _xpathValue = new Lazy<object?>(() => PropertyType.ConvertInterToXPath(content, PropertyCacheLevel.Unknown, interValue?.Value, isPreviewing));
         }
     }
 }

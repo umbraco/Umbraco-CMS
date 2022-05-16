@@ -2,7 +2,7 @@
 {
     public class Difference
     {
-        public Difference(string title, string text = null, string category = null)
+        public Difference(string title, string? text = null, string? category = null)
         {
             Title = title;
             Text = text;
@@ -10,8 +10,8 @@
         }
 
         public string Title { get; set; }
-        public string Text { get; set; }
-        public string Category { get; set; }
+        public string? Text { get; set; }
+        public string? Category { get; set; }
 
         public override string ToString()
         {

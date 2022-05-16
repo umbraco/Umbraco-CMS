@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        string GetTwoFactorView(string username);
+        string? GetTwoFactorView(string username);
     }
 
 }

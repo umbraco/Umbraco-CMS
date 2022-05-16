@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Runtime
         #region Vars
 
         private readonly ILogger<MainDom> _logger;
-        private IApplicationShutdownRegistry _hostingEnvironment;
+        private IApplicationShutdownRegistry? _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
         // our own lock for local consistency
@@ -39,8 +39,8 @@ namespace Umbraco.Cms.Core.Runtime
 
         private const int LockTimeoutMilliseconds = 40000; // 40 seconds
 
-        private Task _listenTask;
-        private Task _listenCompleteTask;
+        private Task? _listenTask;
+        private Task? _listenCompleteTask;
 
         #endregion
 
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 hostingEnvironment.RegisterObject(this);
                 return Acquire();
-            }).Value;
+            })!.Value;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Runtime
         /// <returns>A value indicating whether it was possible to register.</returns>
         /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
-        public bool Register(Action install = null, Action release = null, int weight = 100)
+        public bool Register(Action? install = null, Action? release = null, int weight = 100)
         {
             lock (_locko)
             {
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Runtime
 
                 if (_isMainDom.HasValue == false)
                 {
-                    throw new InvalidOperationException("Register called when MainDom has not been acquired");
+                    throw new InvalidOperationException("Register called before IsMainDom has been established");
                 }
                 else if (_isMainDom == false)
                 {
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 if (!_isMainDom.HasValue)
                 {
-                    throw new InvalidOperationException("MainDom has not been acquired yet");
+                    throw new InvalidOperationException("IsMainDom has not been established yet");
                 }
                 return _isMainDom.Value;
             }

@@ -26,6 +26,6 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets any arbitrary data for the user and external provider
         /// </summary>
-        string UserData { get; set; }
+        string? UserData { get; set; }
     }
 }

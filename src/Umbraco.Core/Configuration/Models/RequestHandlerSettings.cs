@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticConvertUrlsToAscii = "try";
         internal const bool StaticEnableDefaultCharReplacements = true;
 
-        internal static readonly CharItem[] DefaultCharCollection =
+        internal static readonly Umbraco.Cms.Core.Configuration.Models.CharItem[] DefaultCharCollection =
         {
             new () { Char = " ", Replacement = "-" },
             new () { Char = "\"", Replacement = string.Empty },
@@ -84,6 +85,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Add additional character replacements, or override defaults
         /// </summary>
-        public IEnumerable<CharItem> UserDefinedCharCollection { get; set; }
+        public IEnumerable<Umbraco.Cms.Core.Configuration.Models.CharItem>? UserDefinedCharCollection { get; set; }
     }
 }

@@ -36,46 +36,48 @@
 
         <div ng-show="vm.loading === false">
 
-            <div class="umb-packages-section" ng-if="vm.searchQuery == '' && vm.popular.length > 0">
-                <h4><strong><localize key="packager_packagesPopular">Popular</localize></strong></h4>
-                <div class="umb-packages">
+            <div ng-repeat="highlightedPackageCollection in vm.highlightedPackageCollections">
+                <div class="umb-packages-section" ng-if="vm.searchQuery == '' && highlightedPackageCollection.packages.length > 0">
+                    <h4><strong>{{highlightedPackageCollection.title}}</strong></h4>
+                    <div class="umb-packages">
 
-                    <div class="umb-package" ng-repeat="package in vm.popular">
-                        <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
+                        <div class="umb-package" ng-repeat="package in highlightedPackageCollection.packages">
+                            <button type="button" class="umb-package-link" ng-click="vm.showPackageDetails(package)">
 
-                            <div class="flex flex-column">
-                                <div class="umb-package-icon">
-                                    <img ng-src="{{package.icon}}" alt="" />
-                                </div>
-
-                                <div class="umb-package-info">
-                                    <div class="umb-package-name">{{package.name}}</div>
-                                    <div class="umb-package-description">{{package.excerpt | limitTo: 40}}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
-
-                                    <div class="umb-package-numbers">
-                                        <small class="umb-package-downloads">
-                                            <umb-icon icon="icon-download-alt"></umb-icon>
-                                            <strong>{{package.downloads}}</strong>
-                                        </small>
-                                        <small class="umb-package-likes">
-                                            <umb-icon icon="icon-hearts" class="icon-hearts"></umb-icon>
-                                            <strong>{{package.likes}}</strong>
-                                        </small>
+                                <div class="flex flex-column">
+                                    <div class="umb-package-icon">
+                                        <img ng-src="{{package.icon}}" alt="" />
                                     </div>
-                                    <div class="umb-package-cloud">
-                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
-                                            <umb-icon icon="icon-cloud" class="icon-cloud"></umb-icon>
-                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+
+                                    <div class="umb-package-info">
+                                        <div class="umb-package-name">{{package.name}}</div>
+                                        <div class="umb-package-description">{{package.excerpt | limitTo: 40}}<span ng-if="package.excerpt > (package.excerpt | limitTo: 40)">...</span></div>
+
+                                        <div class="umb-package-numbers">
+                                            <small class="umb-package-downloads">
+                                                <umb-icon icon="icon-download-alt"></umb-icon>
+                                                <strong>{{package.downloads}}</strong>
+                                            </small>
+                                            <small class="umb-package-likes">
+                                                <umb-icon icon="icon-hearts" class="icon-hearts"></umb-icon>
+                                                <strong>{{package.likes}}</strong>
+                                            </small>
                                         </div>
+                                        <div class="umb-package-cloud">
+                                            <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                                <umb-icon icon="icon-cloud" class="icon-cloud"></umb-icon>
+                                                <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                            </div>
+                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
 
-                        </button>
-                    </div> <!-- end package -->
+                            </button>
+                        </div> <!-- end package -->
 
-                </div> <!-- end packages -->
+                    </div> <!-- end packages -->
+                </div>
             </div>
 
             <div class="umb-packages-section" ng-if="vm.packages.length > 0">
@@ -298,9 +300,9 @@
                             <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
-                                    <a class="umb-package-details__link" href="{{ externalSource.url }}" target="_blank" rel="noopener noreferrer">
-                                        <i class="icon-out" aria-hidden="true"></i>
-                                        {{ externalSource.name }}
+                                    <a class="umb-package-details__link" href="{{externalSource.url}}" target="_blank" rel="noopener noreferrer">
+                                        <umb-icon icon="icon-out"></umb-icon>
+                                        {{externalSource.name}}
                                     </a>
                                 </div>
                             </div>

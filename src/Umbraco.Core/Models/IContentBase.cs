@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>When <paramref name="culture"/> is not null, throws if the content
         /// type does not vary by culture.</para>
         /// </remarks>
-        void SetCultureName(string value, string culture);
+        void SetCultureName(string? value, string? culture);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>When <paramref name="culture"/> is not null, and the content type
         /// does not vary by culture, returns null.</para>
         /// </remarks>
-        string GetCultureName(string culture);
+        string? GetCultureName(string? culture);
 
         /// <summary>
         /// Gets culture infos of the content item.
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
         /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        ContentCultureInfosCollection CultureInfos { get; set; }
+        ContentCultureInfosCollection? CultureInfos { get; set; }
 
         /// <summary>
         /// Gets the available cultures.
@@ -112,19 +112,19 @@ namespace Umbraco.Cms.Core.Models
         /// Gets the value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        object? GetValue(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false);
 
         /// <summary>
         /// Gets the typed value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        TValue? GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false);
 
         /// <summary>
         /// Sets the (edited) value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
+        void SetValue(string propertyTypeAlias, object? value, string? culture = null, string? segment = null);
 
     }
 }

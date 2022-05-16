@@ -18,12 +18,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly ILogger<ReportSiteTask> _logger;
         private readonly ITelemetryService _telemetryService;
-        private static HttpClient s_httpClient;
+        private static HttpClient s_httpClient = new();
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             ITelemetryService telemetryService)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
             _telemetryService = telemetryService;
@@ -43,9 +43,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Runs the background task to send the anonymous ID
         /// to telemetry service
         /// </summary>
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
-            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData telemetryReportData) is false)
+            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
             {
                 _logger.LogWarning("No telemetry marker found");
 
@@ -58,9 +58,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 {
                     // Send data to LIVE telemetry
                     s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
-
-                    // Set a low timeout - no need to use a larger default timeout for this POST request
-                    s_httpClient.Timeout = new TimeSpan(0, 0, 1);
 
 #if DEBUG
                     // Send data to DEBUG telemetry service

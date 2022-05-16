@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services
 {
-    public interface IMembershipRoleService<out T> 
+    public interface IMembershipRoleService<out T>
         where T : class, IMembershipUser
     {
         void AddRole(string roleName);

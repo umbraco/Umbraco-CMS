@@ -26,18 +26,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
         {
             if (source == null)
                 return null;
 
             if (IsRangeDataType(propertyType.DataType.Id))
             {
-                var rangeRawValues = source.ToString().Split(Constants.CharArrays.Comma);
+                var rangeRawValues = source.ToString()!.Split(Constants.CharArrays.Comma);
                 var minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();
                 var maximumAttempt = rangeRawValues[1].TryConvertTo<decimal>();
 
-                if (minimumAttempt.Success && maximumAttempt.Success)
+                if ((minimumAttempt.Success) && (maximumAttempt.Success))
                 {
                     return new Range<decimal> { Maximum = maximumAttempt.Result, Minimum = minimumAttempt.Result };
                 }
@@ -71,8 +71,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return Storages.GetOrAdd(dataTypeId, id =>
             {
                 var dataType = _dataTypeService.GetDataType(id);
-                var configuration = dataType.ConfigurationAs<SliderConfiguration>();
-                return configuration.EnableRange;
+                var configuration = dataType?.ConfigurationAs<SliderConfiguration>();
+                return configuration?.EnableRange ?? false;
             });
         }
 

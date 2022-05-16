@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
                 return ValidateOptionsResult.Fail(message);
             }
 
-            if (!ValidateSqlWriteLockTimeOutSetting(options.SqlWriteLockTimeOut, out var message2))
+            if (!ValidateSqlWriteLockTimeOutSetting(options.DistributedLockingWriteLockDefaultTimeout, out var message2))
             {
                 return ValidateOptionsResult.Fail(message2);
             }
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
             return ValidateOptionsResult.Success;
         }
 
-        private bool ValidateSmtpSetting(SmtpSettings value, out string message) =>
+        private bool ValidateSmtpSetting(SmtpSettings? value, out string message) =>
             ValidateOptionalEntry($"{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.Smtp)}", value, "A valid From email address is required", out message);
 
         private bool ValidateSqlWriteLockTimeOutSetting(TimeSpan configuredTimeOut, out string message) {
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
             const int maximumTimeOut = 20000;
             if (configuredTimeOut.TotalMilliseconds < minimumTimeOut || configuredTimeOut.TotalMilliseconds > maximumTimeOut) // between 0.1 and 20 seconds
             {
-                message = $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.SqlWriteLockTimeOut)}` setting is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms";
+                message = $"The `{Constants.Configuration.ConfigGlobal}:{nameof(GlobalSettings.DistributedLockingWriteLockDefaultTimeout)}` setting is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms";
                 return false;
             }
 

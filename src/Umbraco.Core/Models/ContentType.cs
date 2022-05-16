@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Models
             (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
             templates => templates.GetHashCode());
 
-        private IEnumerable<ITemplate> _allowedTemplates;
+        private IEnumerable<ITemplate>? _allowedTemplates;
 
         private int _defaultTemplate;
 
@@ -64,8 +64,8 @@ namespace Umbraco.Cms.Core.Models
         ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
-        public ITemplate DefaultTemplate =>
-            AllowedTemplates.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId);
+        public ITemplate? DefaultTemplate =>
+            AllowedTemplates?.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId);
 
 
         [DataMember]
@@ -82,21 +82,27 @@ namespace Umbraco.Cms.Core.Models
         ///     we should not store direct entity
         /// </summary>
         [DataMember]
-        public IEnumerable<ITemplate> AllowedTemplates
+        public IEnumerable<ITemplate>? AllowedTemplates
         {
             get => _allowedTemplates;
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, nameof(AllowedTemplates), TemplateComparer);
 
-                if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
+                if (_allowedTemplates?.Any(x => x.Id == _defaultTemplate) == false)
                 {
                     DefaultTemplateId = 0;
                 }
             }
         }
 
-        public HistoryCleanup HistoryCleanup { get; set; }
+        private HistoryCleanup? _historyCleanup;
+
+        public HistoryCleanup? HistoryCleanup
+        {
+            get => _historyCleanup;
+            set => SetPropertyValueAndDetectChanges(value, ref _historyCleanup, nameof(HistoryCleanup));
+        }
 
         /// <summary>
         ///     Determines if AllowedTemplates contains templateId
@@ -122,7 +128,7 @@ namespace Umbraco.Cms.Core.Models
         ///     Sets the default template for the ContentType
         /// </summary>
         /// <param name="template">Default <see cref="ITemplate" /></param>
-        public void SetDefaultTemplate(ITemplate template)
+        public void SetDefaultTemplate(ITemplate? template)
         {
             if (template == null)
             {
@@ -131,10 +137,10 @@ namespace Umbraco.Cms.Core.Models
             }
 
             DefaultTemplateId = template.Id;
-            if (_allowedTemplates.Any(x => x != null && x.Id == template.Id) == false)
+            if (_allowedTemplates?.Any(x => x != null && x.Id == template.Id) == false)
             {
-                var templates = AllowedTemplates.ToList();
-                templates.Add(template);
+                var templates = AllowedTemplates?.ToList();
+                templates?.Add(template);
                 AllowedTemplates = templates;
             }
         }
@@ -151,9 +157,9 @@ namespace Umbraco.Cms.Core.Models
                 DefaultTemplateId = default;
             }
 
-            var templates = AllowedTemplates.ToList();
-            ITemplate remove = templates.FirstOrDefault(x => x.Id == template.Id);
-            var result = templates.Remove(remove);
+            var templates = AllowedTemplates?.ToList();
+            ITemplate? remove = templates?.FirstOrDefault(x => x.Id == template.Id);
+            var result = remove is not null && templates is not null && templates.Remove(remove);
             AllowedTemplates = templates;
 
             return result;
@@ -162,5 +168,8 @@ namespace Umbraco.Cms.Core.Models
         /// <inheritdoc />
         IContentType IContentType.DeepCloneWithResetIdentities(string newAlias) =>
             (IContentType)DeepCloneWithResetIdentities(newAlias);
+
+        /// <inheritdoc/>
+        public override bool IsDirty() => base.IsDirty() || (HistoryCleanup?.IsDirty() ?? false);
     }
 }

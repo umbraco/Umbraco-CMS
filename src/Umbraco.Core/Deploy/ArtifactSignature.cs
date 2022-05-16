@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Deploy
 {
     public sealed class ArtifactSignature : IArtifactSignature
     {
-        public ArtifactSignature(Udi udi, string checksum, IEnumerable<ArtifactDependency> dependencies = null)
+        public ArtifactSignature(Udi udi, string checksum, IEnumerable<ArtifactDependency>? dependencies = null)
         {
             Udi = udi;
             Checksum = checksum;

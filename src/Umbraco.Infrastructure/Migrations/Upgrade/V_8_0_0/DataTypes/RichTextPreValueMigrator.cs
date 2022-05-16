@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         public override string GetNewAlias(string editorAlias)
             => Cms.Core.Constants.PropertyEditors.Aliases.TinyMce;
 
-        protected override object GetPreValueValue(PreValueDto preValue)
+        protected override object? GetPreValueValue(PreValueDto preValue)
         {
             if (preValue.Alias == "hideLabel")
                 return preValue.Value == "1";
 
-            return preValue.Value.DetectIsJson() ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
+            return preValue.Value?.DetectIsJson() ?? false ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
         }
     }
 }

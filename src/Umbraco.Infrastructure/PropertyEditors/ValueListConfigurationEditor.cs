@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -18,7 +21,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </remarks>
     public class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
     {
-        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper) : base(ioHelper)
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper)
+         : this(textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
+
+        public ValueListConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
             var items = Fields.First(x => x.Key == "items");
 
@@ -48,7 +59,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         // the sort order that comes back makes no sense
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(ValueListConfiguration? configuration)
         {
             if (configuration == null)
                 return new Dictionary<string, object>
@@ -67,11 +78,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ValueListConfiguration configuration)
+        public override ValueListConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, ValueListConfiguration? configuration)
         {
             var output = new ValueListConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // auto-assigning our ids, get next id from existing values

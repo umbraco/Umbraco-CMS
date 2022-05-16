@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
-        protected abstract IFileSystem FileSystem { get; }
+        protected abstract IFileSystem? FileSystem { get; }
         protected IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
@@ -55,23 +55,27 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 ? WebUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
-            var directories = FileSystem.GetDirectories(path);
+            var directories = FileSystem?.GetDirectories(path);
 
             var nodes = new TreeNodeCollection();
-            foreach (var directory in directories)
+            if (directories is not null)
             {
-                var hasChildren = FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any();
+                foreach (var directory in directories)
+                {
+                    var hasChildren = FileSystem is not null && (FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any());
 
-                var name = Path.GetFileName(directory);
-                var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
-                OnRenderFolderNode(ref node);
-                if (node != null)
-                    nodes.Add(node);
+                    var name = Path.GetFileName(directory);
+                    var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
+                    OnRenderFolderNode(ref node);
+                    if (node != null)
+                        nodes.Add(node);
+                }
             }
+
 
             //this is a hack to enable file system tree to support multiple file extension look-up
             //so the pattern both support *.* *.xml and xml,js,vb for lookups
-            var files = FileSystem.GetFiles(path).Where(x =>
+            var files = FileSystem?.GetFiles(path).Where(x =>
             {
                 var extension = Path.GetExtension(x);
 
@@ -81,22 +85,25 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return extension != null && Extensions.Contains(extension.Trim(Constants.CharArrays.Period), StringComparer.InvariantCultureIgnoreCase);
             });
 
-            foreach (var file in files)
+            if (files is not null)
             {
-                var withoutExt = Path.GetFileNameWithoutExtension(file);
-                if (withoutExt.IsNullOrWhiteSpace()) continue;
+                foreach (var file in files)
+                {
+                    var withoutExt = Path.GetFileNameWithoutExtension(file);
+                    if (withoutExt.IsNullOrWhiteSpace()) continue;
 
-                var name = Path.GetFileName(file);
-                var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
-                OnRenderFileNode(ref node);
-                if (node != null)
-                    nodes.Add(node);
+                    var name = Path.GetFileName(file);
+                    var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
+                    OnRenderFileNode(ref node);
+                    if (node != null)
+                        nodes.Add(node);
+                }
             }
 
             return nodes;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -111,7 +118,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 return treeNodesResult.Result;
             }
-            root.HasChildren = treeNodesResult.Value.Any();
+
+            if (root is not null)
+            {
+                root.HasChildren = treeNodesResult.Value?.Any() ?? false;
+
+            }
+
             return root;
         }
 
@@ -138,7 +151,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             //create action
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-            var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
+            var hasChildren = FileSystem is not null && (FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any());
 
             //We can only delete folders if it doesn't have any children (folders or files)
             if (hasChildren == false)
@@ -177,8 +190,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 ? WebUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
-            var isFile = FileSystem.FileExists(path);
-            var isDirectory = FileSystem.DirectoryExists(path);
+            var isFile = FileSystem?.FileExists(path) ?? false;
+            var isDirectory = FileSystem?.DirectoryExists(path) ?? false;
 
             if (isDirectory)
             {

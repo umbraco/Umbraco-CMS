@@ -289,10 +289,10 @@ namespace Umbraco.Extensions
         /// <para>Basically, exact is for one content type, or one property type, and !exact is for "all property types" of one content type.</para>
         /// <para>Both <paramref name="culture" /> and <paramref name="segment" /> can be "*" to indicate "all of them".</para>
         /// </remarks>
-        public static bool ValidateVariation(this ContentVariation variation, string culture, string segment, bool exact, bool wildcards, bool throwIfInvalid)
+        public static bool ValidateVariation(this ContentVariation variation, string? culture, string? segment, bool exact, bool wildcards, bool throwIfInvalid)
         {
-            culture = culture.NullOrWhiteSpaceAsNull();
-            segment = segment.NullOrWhiteSpaceAsNull();
+            culture = culture?.NullOrWhiteSpaceAsNull();
+            segment = segment?.NullOrWhiteSpaceAsNull();
 
             // if wildcards are disabled, do not allow "*"
             if (!wildcards && (culture == "*" || segment == "*"))

@@ -29,21 +29,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [Column("icon")]
         [Index(IndexTypes.NonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [Column("thumbnail")]
         [Constraint(Default = "folder.png")]
-        public string Thumbnail { get; set; }
+        public string? Thumbnail { get; set; }
 
         [Column("description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(1500)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("isContainer")]
         [Constraint(Default = "0")]
@@ -58,6 +58,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
         public byte Variations { get; set; }
 
         [ResultColumn]
-        public NodeDto NodeDto { get; set; }
+        public NodeDto? NodeDto { get; set; }
     }
 }

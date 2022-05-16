@@ -8,7 +8,7 @@
 
         public UpdateMemberProfileStatus Status { get; private set; }
 
-        public string ErrorMessage { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         public static UpdateMemberProfileResult Success()
         {

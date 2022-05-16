@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content">The internal published content.</param>
         /// <returns>The strongly typed published content model.</returns>
-        public static IPublishedContent CreateModel(this IPublishedContent content, IPublishedModelFactory publishedModelFactory)
+        public static IPublishedContent? CreateModel(this IPublishedContent content, IPublishedModelFactory? publishedModelFactory)
         {
             if (publishedModelFactory == null) throw new ArgumentNullException(nameof(publishedModelFactory));
             if (content == null)

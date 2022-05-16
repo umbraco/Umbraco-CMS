@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -16,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -98,7 +101,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// <returns>
         ///     <c>true</c> when the state contains a version; otherwise, <c>false</c>.D
         /// </returns>
-        private static bool TryGetInitStateVersion(string state, out string version)
+        private static bool TryGetInitStateVersion(string state, [MaybeNullWhen(false)] out string version)
         {
             if (state.StartsWith(InitPrefix) && state.EndsWith(InitSuffix))
             {
@@ -242,6 +245,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // to 8.17.0
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
+            // Hack to support migration from 8.18
+            To<NoopMigration>("{03482BB0-CF13-475C-845E-ECB8319DBE3C}");
+
             // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
             // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
             // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
@@ -275,7 +281,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // TO 9.3.0
             To<MovePackageXMLToDb>("{A2F22F17-5870-4179-8A8D-2362AA4A0A5F}");
             To<UpdateExternalLoginToUseKeyInsteadOfId>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
+            To<AddTwoFactorLoginTable>("{0828F206-DCF7-4F73-ABBB-6792275532EB}");
 
+            // TO 9.4.0
+            To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+            To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
+
+            // TO 10.0.0
+            To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
         }
     }
 }

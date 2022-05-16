@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// Search results are skipped if it can't be fetched from the <paramref name="cache" /> by its integer id.
         /// </remarks>
-        public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<ISearchResult> results, IPublishedCache cache)
+        public static IEnumerable<PublishedSearchResult> ToPublishedSearchResults(this IEnumerable<ISearchResult> results, IPublishedCache? cache)
         {
             if (cache == null) throw new ArgumentNullException(nameof(cache));
 
@@ -66,14 +66,14 @@ namespace Umbraco.Extensions
                 if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId) &&
                     result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
                 {
-                    IPublishedContent content;
+                    IPublishedContent? content;
                     switch (indexType)
                     {
                         case IndexTypes.Content:
-                            content = snapshot.Content.GetById(contentId);
+                            content = snapshot.Content?.GetById(contentId);
                             break;
                         case IndexTypes.Media:
-                            content = snapshot.Media.GetById(contentId);
+                            content = snapshot.Media?.GetById(contentId);
                             break;
                         case IndexTypes.Member:
                             throw new NotSupportedException("Cannot convert search results to member instances");

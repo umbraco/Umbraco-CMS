@@ -154,7 +154,7 @@
             formatUserPostData: function (displayModel) {
 
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message');
+                var saveModel = _.pick(displayModel, 'id', 'parentId', 'name', 'username', 'culture', 'email', 'startContentIds', 'startMediaIds', 'userGroups', 'message', 'key');
 
                 //make sure the userGroups are just a string array
                 var currGroups = saveModel.userGroups;
@@ -289,6 +289,12 @@
                             break;
                         case '_umb_membergroup':
                             saveModel.memberGroups = _.keys(_.pick(prop.value, value => value === true));
+                            break;
+                        case '_umb_approved':
+                            saveModel.isApproved = prop.value;
+                            break;
+                        case '_umb_lockedOut':
+                            saveModel.isLockedOut = prop.value;
                             break;
                     }
                 });
@@ -461,6 +467,7 @@
                     alias: relationType.alias,
                     key: relationType.key,
                     isBidirectional: relationType.isBidirectional,
+                    isDependency: relationType.isDependency,
                     parentObjectType: relationType.parentObjectType,
                     childObjectType: relationType.childObjectType
                 };

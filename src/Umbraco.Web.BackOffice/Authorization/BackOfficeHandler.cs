@@ -34,12 +34,12 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 case var _ when _runtimeState.EnableInstaller():
                     return Task.FromResult(true);
                 default:
-                    if (!_backOfficeSecurity.BackOfficeSecurity.IsAuthenticated())
+                    if (!_backOfficeSecurity.BackOfficeSecurity?.IsAuthenticated() ?? false)
                     {
                         return Task.FromResult(false);
                     }
 
-                    var userApprovalSucceeded = !requirement.RequireApproval || (_backOfficeSecurity.BackOfficeSecurity.CurrentUser?.IsApproved ?? false);
+                    var userApprovalSucceeded = !requirement.RequireApproval || (_backOfficeSecurity.BackOfficeSecurity?.CurrentUser?.IsApproved ?? false);
                     return Task.FromResult(userApprovalSucceeded);
             }
         }

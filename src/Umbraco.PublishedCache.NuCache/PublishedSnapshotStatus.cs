@@ -8,10 +8,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// </summary>
     internal class PublishedSnapshotStatus : IPublishedSnapshotStatus
     {
-        private readonly PublishedSnapshotService _service;
+        private readonly PublishedSnapshotService? _service;
         private readonly INuCacheContentService _publishedContentService;
 
-        public PublishedSnapshotStatus(IPublishedSnapshotService service, INuCacheContentService publishedContentService)
+        public PublishedSnapshotStatus(IPublishedSnapshotService? service, INuCacheContentService publishedContentService)
         {
             _service = service as PublishedSnapshotService;
             _publishedContentService = publishedContentService;
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (_service == null)
             {
                 return $"The current {typeof(IPublishedSnapshotService)} is not the default type. A status cannot be determined.";
-            } 
+            }
 
             // TODO: This should be private
             _service.EnsureCaches();
@@ -37,15 +37,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 ? "ok"
                 : "NOT ok (rebuild?)";
 
-            ContentStore contentStore = _service.GetContentStore();
-            ContentStore mediaStore = _service.GetMediaStore();
+            ContentStore? contentStore = _service.GetContentStore();
+            ContentStore? mediaStore = _service.GetMediaStore();
 
-            var contentStoreGen = contentStore.GenCount;
-            var mediaStoreGen = mediaStore.GenCount;
-            var contentStoreSnap = contentStore.SnapCount;
-            var mediaStoreSnap = mediaStore.SnapCount;
-            var contentStoreCount = contentStore.Count;
-            var mediaStoreCount = mediaStore.Count;
+            var contentStoreGen = contentStore?.GenCount;
+            var mediaStoreGen = mediaStore?.GenCount;
+            var contentStoreSnap = contentStore?.SnapCount;
+            var mediaStoreSnap = mediaStore?.SnapCount;
+            var contentStoreCount = contentStore?.Count;
+            var mediaStoreCount = mediaStore?.Count;
 
             string contentStoreCountPlural = contentStoreCount > 1 ? "s" : string.Empty;
             string contentStoreGenPlural = contentStoreGen > 1 ? "s" : string.Empty;

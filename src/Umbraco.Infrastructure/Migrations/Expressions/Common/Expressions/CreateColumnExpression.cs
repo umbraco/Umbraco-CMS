@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
         public ColumnDefinition Column { get; set; }
 
         protected override string GetSql()

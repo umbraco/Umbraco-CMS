@@ -28,11 +28,15 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -151,7 +155,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMember member = CreateTestMember(key: key);
 
                 // Act
-                IQuery<IMember> query = scope.SqlContext.Query<IMember>().Where(x => x.Key == key);
+                IQuery<IMember> query = provider.CreateQuery<IMember>().Where(x => x.Key == key);
                 IEnumerable<IMember> result = repository.Get(query);
 
                 // Assert
@@ -271,20 +275,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             IScopeProvider provider = ScopeProvider;
 
-            IQuery<IMember> query = provider.SqlContext.Query<IMember>().Where(x =>
-                        ((Member)x).LongStringPropertyValue.Contains("1095") &&
-                        ((Member)x).PropertyTypeAlias == "headshot");
+            using (provider.CreateScope())
+            {
+                IQuery<IMember> query = provider.CreateQuery<IMember>().Where(x =>
+                    ((Member)x).LongStringPropertyValue.Contains("1095") &&
+                    ((Member)x).PropertyTypeAlias == "headshot");
 
-            Sql<ISqlContext> sqlSubquery = GetSubquery();
-            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
-            Sql<ISqlContext> subquery = translator.Translate();
-            Sql<ISqlContext> sql = GetBaseQuery(false)
-                .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                Sql<ISqlContext> sqlSubquery = GetSubquery();
+                var translator = new SqlTranslator<IMember>(sqlSubquery, query);
+                Sql<ISqlContext> subquery = translator.Translate();
+                Sql<ISqlContext> sql = GetBaseQuery(false)
+                    .Append("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments)
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                    .OrderBy<NodeDto>(x => x.SortOrder);
 
-            Debug.Print(sql.SQL);
-            Assert.That(sql.SQL, Is.Not.Empty);
+                Debug.Print(sql.SQL);
+                Assert.That(sql.SQL, Is.Not.Empty);
+            }
         }
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
@@ -327,7 +334,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             if (isCount)
             {
-                Sql<ISqlContext> sqlCount = provider.SqlContext.Sql()
+                Sql<ISqlContext> sqlCount = ScopeAccessor.AmbientScope.SqlContext.Sql()
                     .SelectCount()
                     .From<NodeDto>()
                     .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -338,7 +345,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 return sqlCount;
             }
 
-            Sql<ISqlContext> sql = provider.SqlContext.Sql();
+            Sql<ISqlContext> sql = ScopeAccessor.AmbientScope.SqlContext.Sql();
             sql.Select(
                     "umbracoNode.*",
                     $"{Constants.DatabaseSchema.Tables.Content}.contentTypeId",
@@ -381,7 +388,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private Sql<ISqlContext> GetSubquery()
         {
             IScopeProvider provider = ScopeProvider;
-            Sql<ISqlContext> sql = provider.SqlContext.Sql();
+            Sql<ISqlContext> sql = ScopeAccessor.AmbientScope.SqlContext.Sql();
             sql.Select("umbracoNode.id")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)

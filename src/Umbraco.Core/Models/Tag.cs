@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class Tag : EntityBase, ITag
     {
-        private string _group;
-        private string _text;
+        private string _group = string.Empty;
+        private string _text = string.Empty;
         private int? _languageId;
 
         /// <summary>
@@ -36,14 +36,14 @@ namespace Umbraco.Cms.Core.Models
         public string Group
         {
             get => _group;
-            set => SetPropertyValueAndDetectChanges(value, ref _group, nameof(Group));
+            set => SetPropertyValueAndDetectChanges(value, ref _group!, nameof(Group));
         }
 
         /// <inheritdoc />
         public string Text
         {
             get => _text;
-            set => SetPropertyValueAndDetectChanges(value, ref _text, nameof(Text));
+            set => SetPropertyValueAndDetectChanges(value, ref _text!, nameof(Text));
         }
 
         /// <inheritdoc />

@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex, out long totalFound, string culture = null, string searchFrom = null, bool ignoreUserStartNodes = false)
+            long pageIndex, out long totalFound, string? culture = null, string? searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
 
@@ -92,13 +92,13 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="totalFound"></param>
         /// <param name="searchFrom"></param>
         /// <returns></returns>
-        public IEnumerable<SearchResultEntity> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public IEnumerable<SearchResultEntity?> EntitySearch(UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null)
         {
             //if it's a GUID, match it
             Guid.TryParse(query, out var g);
 
             var results = _entityService.GetPagedDescendants(objectType, pageIndex, pageSize, out totalFound,
-                filter: _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(query) || x.Key == g));
+                filter: _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(query) || x.Key == g));
             return _mapper.MapEnumerable<IEntitySlim, SearchResultEntity>(results);
         }
 
@@ -114,6 +114,10 @@ namespace Umbraco.Cms.Infrastructure.Search
             {
                 var m = _mapper.Map<SearchResultEntity>(result);
 
+                if (m is null)
+                {
+                    continue;
+                }
                 //if no icon could be mapped, it will be set to document, so change it to picture
                 if (m.Icon == Constants.Icons.DefaultIcon)
                 {
@@ -142,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="results"></param>
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
-            => _mapper.Map<IEnumerable<SearchResultEntity>>(results);
+            => _mapper.Map<IEnumerable<SearchResultEntity>>(results) ?? Enumerable.Empty<SearchResultEntity>();
 
         /// <summary>
         /// Returns a collection of entities for content based on search results
@@ -150,7 +154,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="results"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string culture = null)
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string? culture = null)
         {
             var defaultLang = _languageService.GetDefaultLanguageIsoCode();
 
@@ -163,7 +167,11 @@ namespace Umbraco.Cms.Infrastructure.Search
                     }
                 );
 
-                if (int.TryParse(entity.Id.ToString(),NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+                if (entity is null)
+                {
+                    continue;
+                }
+                if (int.TryParse(entity.Id?.ToString(),NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                 {
                     //if it varies by culture, return the default language URL
                     if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) && varies == "y")

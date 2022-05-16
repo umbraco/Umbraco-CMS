@@ -59,7 +59,10 @@
             public const string RecycleBinMediaPathPrefix = "-1,-21,";
 
             public const int DefaultLabelDataTypeId = -92;
-            public const string UmbracoConnectionName = "umbracoDbDSN";            
+
+            public const string UmbracoDefaultDatabaseName = "Umbraco";
+
+            public const string UmbracoConnectionName = "umbracoDbDSN";public const string DefaultUmbracoPath = "~/umbraco";
         }
     }
 }

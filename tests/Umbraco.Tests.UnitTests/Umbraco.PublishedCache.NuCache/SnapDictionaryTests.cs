@@ -323,6 +323,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
         }
 
         [Test]
+        [Retry(5)] // TODO make this test non-flaky.
         public async Task EventuallyCollectNulls()
         {
             var d = new SnapDictionary<int, string>();
@@ -730,7 +731,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.AreEqual(0, d.CreateSnapshot().Gen);
 
             // no scope context: writers nest, last one to be disposed commits
-            IScopeProvider scopeProvider = GetScopeProvider();
+            ICoreScopeProvider scopeProvider = GetScopeProvider();
 
             using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider))
             {
@@ -769,7 +770,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
 
             // scope context: writers enlist
             var scopeContext = new ScopeContext();
-            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
+            ICoreScopeProvider scopeProvider = GetScopeProvider(scopeContext);
 
             using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider))
             {
@@ -794,8 +795,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.AreEqual(0, d.CreateSnapshot().Gen);
 
             var scopeContext = new ScopeContext();
-            IScopeProvider scopeProvider1 = GetScopeProvider();
-            IScopeProvider scopeProvider2 = GetScopeProvider(scopeContext);
+            ICoreScopeProvider scopeProvider1 = GetScopeProvider();
+            ICoreScopeProvider scopeProvider2 = GetScopeProvider(scopeContext);
 
             using (IDisposable w1 = d.GetScopedWriteLock(scopeProvider1))
             {
@@ -847,7 +848,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.IsFalse(d.Test.NextGen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            IScopeProvider scopeProvider = GetScopeProvider();
+            ICoreScopeProvider scopeProvider = GetScopeProvider();
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // gen 3
@@ -891,7 +892,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.AreEqual(2, s2.Gen);
             Assert.AreEqual("uno", s2.Get(1));
 
-            IScopeProvider scopeProvider = GetScopeProvider();
+            ICoreScopeProvider scopeProvider = GetScopeProvider();
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
@@ -930,7 +931,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.AreEqual("uno", s2.Get(1));
 
             var scopeContext = new ScopeContext();
-            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
+            ICoreScopeProvider scopeProvider = GetScopeProvider(scopeContext);
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
@@ -979,7 +980,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.IsFalse(t.NextGen);
 
             var scopeContext = new ScopeContext();
-            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
+            ICoreScopeProvider scopeProvider = GetScopeProvider(scopeContext);
             using (d.GetScopedWriteLock(scopeProvider))
             {
                 // creating a snapshot in a write-lock does NOT return the "current" content
@@ -1086,7 +1087,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.AreEqual(1, d.Test.GenObj.Gen);
 
             var scopeContext = new ScopeContext();
-            IScopeProvider scopeProvider = GetScopeProvider(scopeContext);
+            ICoreScopeProvider scopeProvider = GetScopeProvider(scopeContext);
 
             // scopeProvider.Context == scopeContext -> writer is scoped
             // writer is scope contextual and scoped
@@ -1137,9 +1138,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             Assert.IsFalse(d.Test.NextGen);
         }
 
-        private IScopeProvider GetScopeProvider(ScopeContext scopeContext = null)
+        private ICoreScopeProvider GetScopeProvider(ScopeContext scopeContext = null)
         {
-            IScopeProvider scopeProvider = Mock.Of<IScopeProvider>();
+            ICoreScopeProvider scopeProvider = Mock.Of<ICoreScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.Context).Returns(scopeContext);
             return scopeProvider;

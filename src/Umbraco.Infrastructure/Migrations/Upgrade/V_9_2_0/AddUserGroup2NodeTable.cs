@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
             var allData = Database.Fetch<UserGroup2NodePermissionDto>();
             var toInsert = allData.Select(x => new UserGroup2NodeDto() { NodeId = x.NodeId, UserGroupId = x.UserGroupId }).Distinct(
                 new DelegateEqualityComparer<UserGroup2NodeDto>(
-                (x, y) => x.NodeId == y.NodeId && x.UserGroupId == y.UserGroupId,
+                (x, y) => x?.NodeId == y?.NodeId && x?.UserGroupId == y?.UserGroupId,
                 x => x.NodeId.GetHashCode() + x.UserGroupId.GetHashCode())).ToArray();
             Database.InsertBulk(toInsert);
         }

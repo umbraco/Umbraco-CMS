@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Web.Common.Security;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
         private Mock<IMemberService> _mockMemberService;
         private Mock<IServiceProvider> _mockServiceProviders;
-        private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
+        private Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
         public MemberManager CreateSut()
         {
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new IdentityMapDefinition(
                     Mock.Of<ILocalizedTextService>(),
                     Mock.Of<IEntityService>(),
-                    Options.Create(new GlobalSettings()),
+                    new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
                     AppCaches.Disabled),
             };
 
@@ -52,7 +53,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
                 scopeProvider,
                 new IdentityErrorDescriber(),
-                Mock.Of<IPublishedSnapshotAccessor>(), Mock.Of<IExternalLoginWithKeyService>());
+                Mock.Of<IPublishedSnapshotAccessor>(), 
+                Mock.Of<IExternalLoginWithKeyService>(), 
+                Mock.Of<ITwoFactorLoginService>());
 
             _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
             var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
@@ -64,7 +67,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             userValidators.Add(validator.Object);
 
             _mockServiceProviders = new Mock<IServiceProvider>();
-            _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
+            _mockPasswordConfiguration = new Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>>();
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()
                 {

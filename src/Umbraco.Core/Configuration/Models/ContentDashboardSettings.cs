@@ -1,6 +1,7 @@
 using System.ComponentModel;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// Typed configuration options for content dashboard settings.
@@ -30,6 +31,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets the allowed addresses to retrieve data for the content dashboard.
         /// </summary>
         /// <value>The URLs.</value>
-        public string[] ContentDashboardUrlAllowlist { get; set; }
+        public string[]? ContentDashboardUrlAllowlist { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
         public bool CanMigrate(string editorAlias)
             => editorAlias == "Umbraco.DropDown.Flexible";
 
-        public virtual string GetNewAlias(string editorAlias)
+        public virtual string? GetNewAlias(string editorAlias)
             => null;
 
         public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)

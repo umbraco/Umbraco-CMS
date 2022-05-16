@@ -53,9 +53,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         private static string FormatEmail(IMembershipUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
 
-        private void WriteAudit(string performingId, string affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
+        private void WriteAudit(string performingId, string? affectedId, string ipAddress, string eventType, string eventDetails, string? affectedDetails = null)
         {
-            IUser performingUser = null;
+            IUser? performingUser = null;
             if (int.TryParse(performingId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int asInt))
             {
                 performingUser = _userService.GetUserById(asInt);
@@ -78,11 +78,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             WriteAudit(performingIdAsInt, performingDetails, affectedIdAsInt, ipAddress, eventType, eventDetails, affectedDetails);
         }
 
-        private void WriteAudit(int performingId, string performingDetails, int affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
+        private void WriteAudit(int performingId, string performingDetails, int affectedId, string ipAddress, string eventType, string eventDetails, string? affectedDetails = null)
         {
             if (affectedDetails == null)
             {
-                IUser affectedUser = _userService.GetUserById(affectedId);
+                IUser? affectedUser = _userService.GetUserById(affectedId);
                 affectedDetails = affectedUser == null
                     ? $"User UNKNOWN:{affectedId}"
                     : $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}";

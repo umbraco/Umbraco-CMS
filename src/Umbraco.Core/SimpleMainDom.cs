@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core
         public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;
 
         /// <inheritdoc />
-        public bool Register(Action install, Action release, int weight = 100)
+        public bool Register(Action? install, Action? release, int weight = 100)
         {
             lock (_locko)
             {

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// <returns>
         /// An <see cref="T:System.ComponentModel.ICustomTypeDescriptor"/> that can provide metadata for the type.
         /// </returns>
-        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object instance)
+        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object? instance)
         {
             return new ExifFileTypeDescriptor(base.GetTypeDescriptor(objectType, instance), instance);
         }
@@ -38,14 +38,14 @@ namespace Umbraco.Cms.Core.Media.Exif
     /// </summary>
     internal sealed class ExifFileTypeDescriptor : CustomTypeDescriptor
     {
-        ImageFile owner;
+        ImageFile? owner;
 
-        public ExifFileTypeDescriptor(ICustomTypeDescriptor parent, object instance)
+        public ExifFileTypeDescriptor(ICustomTypeDescriptor? parent, object? instance)
             : base(parent)
         {
-            owner = (ImageFile)instance;
+            owner = (ImageFile?)instance;
         }
-        public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        public override PropertyDescriptorCollection GetProperties(Attribute[]? attributes)
         {
             return GetProperties();
         }
@@ -60,10 +60,13 @@ namespace Umbraco.Cms.Core.Media.Exif
             // Enumerate the original set of properties and create our new set with it
             List<PropertyDescriptor> properties = new List<PropertyDescriptor>();
 
-            foreach (ExifProperty prop in owner.Properties)
+            if (owner is not null)
             {
-                ExifPropertyDescriptor pd = new ExifPropertyDescriptor(prop);
-                properties.Add(pd);
+                foreach (ExifProperty prop in owner.Properties)
+                {
+                    ExifPropertyDescriptor pd = new ExifPropertyDescriptor(prop);
+                    properties.Add(pd);
+                }
             }
 
             // Finally return the list
@@ -92,7 +95,7 @@ namespace Umbraco.Cms.Core.Media.Exif
             get { return typeof(JPEGFile); }
         }
 
-        public override object GetValue(object component)
+        public override object GetValue(object? component)
         {
             return linkedProperty.Value;
         }
@@ -112,9 +115,12 @@ namespace Umbraco.Cms.Core.Media.Exif
             linkedProperty.Value = originalValue;
         }
 
-        public override void SetValue(object component, object value)
+        public override void SetValue(object? component, object? value)
         {
-            linkedProperty.Value = value;
+            if (value is not null)
+            {
+                linkedProperty.Value = value;
+            }
         }
 
         public override bool ShouldSerializeValue(object component)

@@ -30,6 +30,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.ChildObjectType = source.ChildObjectType;
             target.Id = source.Id;
             target.IsBidirectional = source.IsBidirectional;
+
+            if (source is IRelationTypeWithIsDependency sourceWithIsDependency)
+            {
+                target.IsDependency = sourceWithIsDependency.IsDependency;
+            }
             target.Key = source.Key;
             target.Name = source.Name;
             target.Alias = source.Alias;
@@ -63,8 +68,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             var entities = _relationService.GetEntitiesFromRelation(source);
 
-            target.ParentName = entities.Item1.Name;
-            target.ChildName = entities.Item2.Name;
+            if (entities is not null)
+            {
+                target.ParentName = entities.Item1.Name;
+                target.ChildName = entities.Item2.Name;
+            }
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -74,6 +82,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.ChildObjectType = source.ChildObjectType;
             target.Id = source.Id.TryConvertTo<int>().Result;
             target.IsBidirectional = source.IsBidirectional;
+            if (target is IRelationTypeWithIsDependency targetWithIsDependency)
+            {
+                targetWithIsDependency.IsDependency = source.IsDependency;
+            }
+
             target.Key = source.Key;
             target.Name = source.Name;
             target.ParentObjectType = source.ParentObjectType;

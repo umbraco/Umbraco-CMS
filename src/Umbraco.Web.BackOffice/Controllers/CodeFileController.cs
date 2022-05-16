@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Strings.Css;
 using Umbraco.Cms.Web.BackOffice.Filters;
@@ -22,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using Stylesheet = Umbraco.Cms.Core.Models.Stylesheet;
@@ -45,7 +44,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
+        private readonly PartialViewSnippetCollection _partialViewSnippetCollection;
+        private readonly PartialViewMacroSnippetCollection _partialViewMacroSnippetCollection;
 
+        [ActivatorUtilitiesConstructor]
         public CodeFileController(
             IHostingEnvironment hostingEnvironment,
             FileSystems fileSystems,
@@ -54,7 +56,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            PartialViewSnippetCollection partialViewSnippetCollection,
+            PartialViewMacroSnippetCollection partialViewMacroSnippetCollection)
         {
             _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;
@@ -64,6 +68,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _umbracoMapper = umbracoMapper;
             _shortStringHelper = shortStringHelper;
             _globalSettings = globalSettings.Value;
+            _partialViewSnippetCollection = partialViewSnippetCollection;
+            _partialViewMacroSnippetCollection = partialViewMacroSnippetCollection;
+        }
+
+        [Obsolete("Use ctor will all params. Scheduled for removal in V12.")]
+        public CodeFileController(
+            IHostingEnvironment hostingEnvironment,
+            FileSystems fileSystems,
+            IFileService fileService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizedTextService localizedTextService,
+            IUmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper,
+            IOptionsSnapshot<GlobalSettings> globalSettings) : this(
+                hostingEnvironment,
+                fileSystems,
+                fileService,
+                backOfficeSecurityAccessor,
+                localizedTextService,
+                umbracoMapper,
+                shortStringHelper,
+                globalSettings,
+                StaticServiceProvider.Instance.GetRequiredService<PartialViewSnippetCollection>(),
+                StaticServiceProvider.Instance.GetRequiredService<PartialViewMacroSnippetCollection>())
+        {
         }
 
         /// <summary>
@@ -78,34 +107,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (display == null) throw new ArgumentNullException("display");
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
 
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             switch (type)
             {
                 case Constants.Trees.PartialViews:
-                    var view = new PartialView(PartialViewType.PartialView, display.VirtualPath);
+                    var view = new PartialView(PartialViewType.PartialView, display.VirtualPath ?? string.Empty);
                     view.Content = display.Content;
-                    var result = _fileService.CreatePartialView(view, display.Snippet, currentUser.Id);
+                    var result = _fileService.CreatePartialView(view, display.Snippet, currentUser?.Id);
                     if (result.Success)
                     {
                         return Ok();
                     }
                     else
                     {
-                        return ValidationProblem(result.Exception.Message);
+                        return ValidationProblem(result.Exception?.Message);
                     }
 
                 case Constants.Trees.PartialViewMacros:
-                    var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath);
+                    var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath ?? string.Empty);
                     viewMacro.Content = display.Content;
-                    var resultMacro = _fileService.CreatePartialViewMacro(viewMacro, display.Snippet, currentUser.Id);
+                    var resultMacro = _fileService.CreatePartialViewMacro(viewMacro, display.Snippet, currentUser?.Id);
                     if (resultMacro.Success)
                         return Ok();
                     else
-                        return ValidationProblem(resultMacro.Exception.Message);
+                        return ValidationProblem(resultMacro.Exception?.Message);
 
                 case Constants.Trees.Scripts:
-                    var script = new Script(display.VirtualPath);
-                    _fileService.SaveScript(script, currentUser.Id);
+                    var script = new Script(display.VirtualPath ?? string.Empty);
+                    _fileService.SaveScript(script, currentUser?.Id);
                     return Ok();
 
                 default:
@@ -180,7 +209,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="type">This is a string but will be 'scripts' 'partialViews', 'partialViewMacros' or 'stylesheets'</param>
         /// <param name="virtualPath">The filename or URL encoded path of the file to open</param>
         /// <returns>The file and its contents from the virtualPath</returns>
-        public ActionResult<CodeFileDisplay> GetByPath(string type, string virtualPath)
+        public ActionResult<CodeFileDisplay?> GetByPath(string type, string virtualPath)
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
             if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
@@ -194,9 +223,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (view != null)
                     {
                         var display = _umbracoMapper.Map<IPartialView, CodeFileDisplay>(view);
-                        display.FileType = Constants.Trees.PartialViews;
-                        display.Path = Url.GetTreePathFromFilePath(view.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(view.Path);
+
+                        if (display is not null)
+                        {
+                            display.FileType = Constants.Trees.PartialViews;
+                            display.Path = Url.GetTreePathFromFilePath(view.Path);
+                            display.Id = System.Web.HttpUtility.UrlEncode(view.Path);
+                        }
+
                         return display;
                     }
 
@@ -206,9 +240,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (viewMacro != null)
                     {
                         var display = _umbracoMapper.Map<IPartialView, CodeFileDisplay>(viewMacro);
-                        display.FileType = Constants.Trees.PartialViewMacros;
-                        display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(viewMacro.Path);
+
+                        if (display is not null)
+                        {
+                            display.FileType = Constants.Trees.PartialViewMacros;
+                            display.Path = Url.GetTreePathFromFilePath(viewMacro.Path);
+                            display.Id = System.Web.HttpUtility.UrlEncode(viewMacro.Path);
+                        }
+
                         return display;
                     }
                     break;
@@ -217,9 +256,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (script != null)
                     {
                         var display = _umbracoMapper.Map<IScript, CodeFileDisplay>(script);
-                        display.FileType = Constants.Trees.Scripts;
-                        display.Path = Url.GetTreePathFromFilePath(script.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
+
+                        if (display is not null)
+                        {
+                            display.FileType = Constants.Trees.Scripts;
+                            display.Path = Url.GetTreePathFromFilePath(script.Path);
+                            display.Id = System.Web.HttpUtility.UrlEncode(script.Path);
+                        }
+
                         return display;
                     }
                     break;
@@ -228,9 +272,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (stylesheet != null)
                     {
                         var display = _umbracoMapper.Map<IStylesheet, CodeFileDisplay>(stylesheet);
-                        display.FileType = Constants.Trees.Stylesheets;
-                        display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
+
+                        if (display is not null)
+                        {
+                            display.FileType = Constants.Trees.Stylesheets;
+                            display.Path = Url.GetTreePathFromFilePath(stylesheet.Path);
+                            display.Id = System.Web.HttpUtility.UrlEncode(stylesheet.Path);
+                        }
+
                         return display;
                     }
                     break;
@@ -252,15 +301,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (type)
             {
                 case Constants.Trees.PartialViews:
-                    snippets = _fileService.GetPartialViewSnippetNames(
-                        //ignore these - (this is taken from the logic in "PartialView.ascx.cs")
-                        "Gallery",
-                        "ListChildPagesFromChangeableSource",
-                        "ListChildPagesOrderedByProperty",
-                        "ListImagesFromMediaFolder");
+                    snippets = _partialViewSnippetCollection.GetNames();
                     break;
                 case Constants.Trees.PartialViewMacros:
-                    snippets = _fileService.GetPartialViewSnippetNames();
+                    snippets = _partialViewMacroSnippetCollection.GetNames();
                     break;
                 default:
                     return NotFound();
@@ -276,41 +320,65 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="snippetName"></param>
         /// <returns></returns>
-        public ActionResult<CodeFileDisplay> GetScaffold(string type, string id, string snippetName = null)
+        public ActionResult<CodeFileDisplay?> GetScaffold(string type, string id, string? snippetName = null)
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentException("Value cannot be null or whitespace.", "type");
             if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("Value cannot be null or whitespace.", "id");
 
-            CodeFileDisplay  codeFileDisplay;
+            CodeFileDisplay? codeFileDisplay;
 
             switch (type)
             {
                 case Constants.Trees.PartialViews:
                     codeFileDisplay = _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
-                    codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
-                    if (snippetName.IsNullOrWhiteSpace() == false)
-                        codeFileDisplay.Content = _fileService.GetPartialViewSnippetContent(snippetName);
+                    if (codeFileDisplay is not null)
+                    {
+                        codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
+                        if (snippetName.IsNullOrWhiteSpace() == false)
+                        {
+                            codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
+                        }
+                    }
+
                     break;
                 case Constants.Trees.PartialViewMacros:
                     codeFileDisplay = _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
-                    codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
-                    if (snippetName.IsNullOrWhiteSpace() == false)
-                        codeFileDisplay.Content = _fileService.GetPartialViewMacroSnippetContent(snippetName);
+                    if (codeFileDisplay is not null)
+                    {
+                        codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
+                        if (snippetName.IsNullOrWhiteSpace() == false)
+                        {
+                            codeFileDisplay.Content = _partialViewMacroSnippetCollection.GetContentFromName(snippetName!);
+                        }
+                    }
+
                     break;
                 case Constants.Trees.Scripts:
                     codeFileDisplay = _umbracoMapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
-                    codeFileDisplay.VirtualPath = _globalSettings.UmbracoScriptsPath;
+                    if (codeFileDisplay is not null)
+                    {
+                        codeFileDisplay.VirtualPath = _globalSettings.UmbracoScriptsPath;
+                    }
+
                     break;
                 case Constants.Trees.Stylesheets:
                     codeFileDisplay = _umbracoMapper.Map<Stylesheet, CodeFileDisplay>(new Stylesheet(string.Empty));
-                    codeFileDisplay.VirtualPath = _globalSettings.UmbracoCssPath;
+                    if (codeFileDisplay is not null)
+                    {
+                        codeFileDisplay.VirtualPath = _globalSettings.UmbracoCssPath;
+                    }
+
                     break;
                 default:
                     return new UmbracoProblemResult("Unsupported editortype", HttpStatusCode.BadRequest);
             }
 
+            if (codeFileDisplay is null)
+            {
+                return codeFileDisplay;
+            }
             // Make sure that the root virtual path ends with '/'
-            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.EnsureEndsWith("/");
+            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath?.EnsureEndsWith("/");
 
             if (id != Constants.System.RootString)
             {
@@ -319,7 +387,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
 
-            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath.TrimStart("~");
+            codeFileDisplay.VirtualPath = codeFileDisplay.VirtualPath?.TrimStart("~");
             codeFileDisplay.FileType = type;
             return codeFileDisplay;
         }
@@ -338,7 +406,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (string.IsNullOrWhiteSpace(virtualPath)) throw new ArgumentException("Value cannot be null or whitespace.", "virtualPath");
 
             virtualPath = System.Web.HttpUtility.UrlDecode(virtualPath);
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             switch (type)
             {
                 case Constants.Trees.PartialViews:
@@ -347,7 +415,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         _fileService.DeletePartialViewFolder(virtualPath);
                         return Ok();
                     }
-                    if (_fileService.DeletePartialView(virtualPath, currentUser.Id))
+                    if (_fileService.DeletePartialView(virtualPath, currentUser?.Id))
                     {
                         return Ok();
                     }
@@ -359,7 +427,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         _fileService.DeletePartialViewMacroFolder(virtualPath);
                         return Ok();
                     }
-                    if (_fileService.DeletePartialViewMacro(virtualPath, currentUser.Id))
+                    if (_fileService.DeletePartialViewMacro(virtualPath, currentUser?.Id))
                     {
                         return Ok();
                     }
@@ -373,7 +441,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     if (_fileService.GetScript(virtualPath) != null)
                     {
-                        _fileService.DeleteScript(virtualPath, currentUser.Id);
+                        _fileService.DeleteScript(virtualPath, currentUser?.Id);
                         return Ok();
                     }
                     return new UmbracoProblemResult("No Script or folder found with the specified path", HttpStatusCode.NotFound);
@@ -385,7 +453,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     if (_fileService.GetStylesheet(virtualPath) != null)
                     {
-                        _fileService.DeleteStylesheet(virtualPath, currentUser.Id);
+                        _fileService.DeleteStylesheet(virtualPath, currentUser?.Id);
                         return Ok();
                     }
                     return new UmbracoProblemResult("No Stylesheet found with the specified path", HttpStatusCode.NotFound);
@@ -416,8 +484,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (partialViewResult.Success)
                     {
                         display = _umbracoMapper.Map(partialViewResult.Result, display);
-                        display.Path = Url.GetTreePathFromFilePath(partialViewResult.Result.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewResult.Result.Path);
+                        display.Path = Url.GetTreePathFromFilePath(partialViewResult.Result?.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewResult.Result?.Path);
                         return display;
                     }
 
@@ -431,8 +499,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (partialViewMacroResult.Success)
                     {
                         display = _umbracoMapper.Map(partialViewMacroResult.Result, display);
-                        display.Path = Url.GetTreePathFromFilePath(partialViewMacroResult.Result.Path);
-                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewMacroResult.Result.Path);
+                        display.Path = Url.GetTreePathFromFilePath(partialViewMacroResult.Result?.Path);
+                        display.Id = System.Web.HttpUtility.UrlEncode(partialViewMacroResult.Result?.Path);
                         return display;
                     }
 
@@ -445,8 +513,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     var scriptResult = CreateOrUpdateScript(display);
                     display = _umbracoMapper.Map(scriptResult, display);
-                    display.Path = Url.GetTreePathFromFilePath(scriptResult.Path);
-                    display.Id = System.Web.HttpUtility.UrlEncode(scriptResult.Path);
+                    display.Path = Url.GetTreePathFromFilePath(scriptResult?.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(scriptResult?.Path);
                     return display;
 
                 //display.AddErrorNotification(
@@ -457,8 +525,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     var stylesheetResult = CreateOrUpdateStylesheet(display);
                     display = _umbracoMapper.Map(stylesheetResult, display);
-                    display.Path = Url.GetTreePathFromFilePath(stylesheetResult.Path);
-                    display.Id = System.Web.HttpUtility.UrlEncode(stylesheetResult.Path);
+                    display.Path = Url.GetTreePathFromFilePath(stylesheetResult?.Path);
+                    display.Id = System.Web.HttpUtility.UrlEncode(stylesheetResult?.Path);
                     return display;
 
                 default:
@@ -473,7 +541,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="data">The style sheet data</param>
         /// <returns>The style rules</returns>
-        public StylesheetRule[] PostExtractStylesheetRules(StylesheetData data)
+        public StylesheetRule[]? PostExtractStylesheetRules(StylesheetData data)
         {
             if (data.Content.IsNullOrWhiteSpace())
             {
@@ -496,7 +564,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// Any "umbraco style rules" in the CSS will be removed and replaced with the rules passed in <see cref="data"/>
         /// </remarks>
-        public string PostInterpolateStylesheetRules(StylesheetData data)
+        public string? PostInterpolateStylesheetRules(StylesheetData data)
         {
             // first remove all existing rules
             var existingRules = data.Content.IsNullOrWhiteSpace()
@@ -507,7 +575,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 data.Content = StylesheetHelper.ReplaceRule(data.Content, rule.Name, null);
             }
 
-            data.Content = data.Content.TrimEnd(Constants.CharArrays.LineFeedCarriageReturn);
+            data.Content = data.Content?.TrimEnd(Constants.CharArrays.LineFeedCarriageReturn);
 
             // now add all the posted rules
             if (data.Rules != null && data.Rules.Any())
@@ -537,69 +605,73 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// It's important to note that Scripts are DIFFERENT from cshtml files since scripts use IFileSystem and cshtml files
         /// use a normal file system because they must exist on a real file system for ASP.NET to work.
         /// </remarks>
-        private IScript CreateOrUpdateScript(CodeFileDisplay display)
+        private IScript? CreateOrUpdateScript(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".js", _fileSystems.ScriptsFileSystem,
                 name => _fileService.GetScript(name),
                 (script, userId) => _fileService.SaveScript(script, userId),
-                name => new Script(name));
+                name => new Script(name ?? string.Empty));
         }
 
-        private IStylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
+        private IStylesheet? CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".css", _fileSystems.StylesheetsFileSystem,
                 name => _fileService.GetStylesheet(name),
                 (stylesheet, userId) => _fileService.SaveStylesheet(stylesheet, userId),
-                name => new Stylesheet(name)
+                name => new Stylesheet(name ?? string.Empty)
             );
         }
 
-        private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem fileSystem,
-            Func<string, T> getFileByName, Action<T, int> saveFile, Func<string, T> createFile) where T : IFile
+        private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem? fileSystem,
+            Func<string?, T> getFileByName, Action<T, int?> saveFile, Func<string?, T> createFile) where T : IFile?
         {
             //must always end with the correct extension
             display.Name = EnsureCorrectFileExtension(display.Name, extension);
 
             var virtualPath = display.VirtualPath ?? string.Empty;
             // this is all weird, should be using relative paths everywhere!
-            var relPath = fileSystem.GetRelativePath(virtualPath);
+            var relPath = fileSystem?.GetRelativePath(virtualPath);
 
-            if (relPath.EndsWith(extension) == false)
+            if (relPath?.EndsWith(extension) == false)
             {
                 //this would typically mean it's new
                 relPath = relPath.IsNullOrWhiteSpace()
                     ? relPath + display.Name
                     : relPath.EnsureEndsWith('/') + display.Name;
             }
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             var file = getFileByName(relPath);
             if (file != null)
             {
                 // might need to find the path
-                var orgPath = file.OriginalPath.Substring(0, file.OriginalPath.IndexOf(file.Name));
+                var orgPath = file.Name is null ? string.Empty : file.OriginalPath.Substring(0, file.OriginalPath.IndexOf(file.Name));
                 file.Path = orgPath + display.Name;
 
                 file.Content = display.Content;
                 //try/catch? since this doesn't return an Attempt?
-                saveFile(file, currentUser.Id);
+                saveFile(file, currentUser?.Id);
             }
             else
             {
                 file = createFile(relPath);
-                file.Content = display.Content;
-                saveFile(file, currentUser.Id);
+                if (file is not null)
+                {
+                    file.Content = display.Content;
+                }
+
+                saveFile(file, currentUser?.Id);
             }
 
             return file;
         }
 
-        private Attempt<IPartialView> CreateOrUpdatePartialView(CodeFileDisplay display)
+        private Attempt<IPartialView?> CreateOrUpdatePartialView(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, Constants.SystemDirectories.PartialViews,
                 _fileService.GetPartialView, _fileService.SavePartialView, _fileService.CreatePartialView);
         }
 
-        private Attempt<IPartialView> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
+        private Attempt<IPartialView?> CreateOrUpdatePartialViewMacro(CodeFileDisplay display)
         {
             return CreateOrUpdatePartialView(display, Constants.SystemDirectories.MacroPartials,
                 _fileService.GetPartialViewMacro, _fileService.SavePartialViewMacro, _fileService.CreatePartialViewMacro);
@@ -614,56 +686,56 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="saveView"></param>
         /// <param name="createView"></param>
         /// <returns></returns>
-        private Attempt<IPartialView> CreateOrUpdatePartialView(
+        private Attempt<IPartialView?> CreateOrUpdatePartialView(
             CodeFileDisplay display, string systemDirectory,
-            Func<string, IPartialView> getView,
-            Func<IPartialView, int, Attempt<IPartialView>> saveView,
-            Func<IPartialView, string, int, Attempt<IPartialView>> createView)
+            Func<string, IPartialView?> getView,
+            Func<IPartialView, int?, Attempt<IPartialView?>> saveView,
+            Func<IPartialView, string?, int?, Attempt<IPartialView?>> createView)
         {
             //must always end with the correct extension
             display.Name = EnsureCorrectFileExtension(display.Name, ".cshtml");
 
-            Attempt<IPartialView> partialViewResult;
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            Attempt<IPartialView?> partialViewResult;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
             var virtualPath = NormalizeVirtualPath(display.VirtualPath, systemDirectory);
             var view = getView(virtualPath);
             if (view != null)
             {
                 // might need to find the path
-                var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name));
+                var orgPath = view.OriginalPath.Substring(0, view.OriginalPath.IndexOf(view.Name ?? string.Empty));
                 view.Path = orgPath + display.Name;
 
                 view.Content = display.Content;
-                partialViewResult = saveView(view, currentUser.Id);
+                partialViewResult = saveView(view, currentUser?.Id);
             }
             else
             {
                 view = new PartialView(PartialViewType.PartialView, virtualPath + display.Name);
                 view.Content = display.Content;
-                partialViewResult = createView(view, display.Snippet, currentUser.Id);
+                partialViewResult = createView(view, display.Snippet, currentUser?.Id);
             }
 
             return partialViewResult;
         }
 
-        private string NormalizeVirtualPath(string virtualPath, string systemDirectory)
+        private string NormalizeVirtualPath(string? virtualPath, string systemDirectory)
         {
             if (virtualPath.IsNullOrWhiteSpace())
                 return string.Empty;
 
             systemDirectory = systemDirectory.TrimStart("~");
             systemDirectory = systemDirectory.Replace('\\', '/');
-            virtualPath = virtualPath.TrimStart("~");
+            virtualPath = virtualPath!.TrimStart("~");
             virtualPath = virtualPath.Replace('\\', '/');
             virtualPath = virtualPath.ReplaceFirst(systemDirectory, string.Empty);
 
             return virtualPath;
         }
 
-        private string EnsureCorrectFileExtension(string value, string extension)
+        private string? EnsureCorrectFileExtension(string? value, string extension)
         {
-            if (value.EndsWith(extension) == false)
+            if (value?.EndsWith(extension) == false)
                 value += extension;
 
             return value;
@@ -681,9 +753,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         // this is an internal class for passing stylesheet data from the client to the controller while editing
         public class StylesheetData
         {
-            public string Content { get; set; }
+            public string? Content { get; set; }
 
-            public StylesheetRule[] Rules { get; set; }
+            public StylesheetRule[]? Rules { get; set; }
         }
     }
 }

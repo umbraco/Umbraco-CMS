@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,14 +33,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             UmbracoTreeSearcher treeSearcher,
             IMemberTypeService memberTypeService,
             IEventAggregator eventAggregator)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator, memberTypeService)
         {
             _treeSearcher = treeSearcher;
             _memberTypeService = memberTypeService;
         }
 
-
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -48,10 +48,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //check if there are any member types
-            root.HasChildren = _memberTypeService.GetAll().Any();
+            if (root is not null)
+            {
+                // Check if there are any member types
+                root.HasChildren = _memberTypeService.GetAll().Any();
+            }
+
             return root;
         }
+
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
         {
             return _memberTypeService.GetAll()
@@ -59,8 +64,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings, dt?.Icon ?? Constants.Icons.MemberType, false));
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.MemberType, query, pageSize, pageIndex, out totalFound, searchFrom);
-
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.MemberType, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
     }
 }

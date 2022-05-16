@@ -42,16 +42,23 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var dataType = (DataTypeSave)context.ActionArguments["dataType"];
-
-                dataType.Name = dataType.Name.CleanForXss('[', ']', '(', ')', ':');
-                dataType.Alias = dataType.Alias == null ? dataType.Name : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
+                var dataType = (DataTypeSave?)context.ActionArguments["dataType"];
+                if (dataType is not null)
+                {
+                    dataType.Name = dataType.Name?.CleanForXss('[', ']', '(', ')', ':');
+                    dataType.Alias = dataType.Alias == null ? dataType.Name! : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
+                }
 
                 // get the property editor, ensuring that it exits
-                if (!_propertyEditorCollection.TryGet(dataType.EditorAlias, out var propertyEditor))
+                if (!_propertyEditorCollection.TryGet(dataType?.EditorAlias, out var propertyEditor))
                 {
-                    var message = $"Property editor \"{dataType.EditorAlias}\" was not found.";
+                    var message = $"Property editor \"{dataType?.EditorAlias}\" was not found.";
                     context.Result = new UmbracoProblemResult(message, HttpStatusCode.NotFound);
+                    return;
+                }
+
+                if (dataType is null)
+                {
                     return;
                 }
 
@@ -59,7 +66,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 dataType.PropertyEditor = propertyEditor;
 
                 // validate that the data type exists, or create one if required
-                IDataType persisted;
+                IDataType? persisted;
                 switch (dataType.Action)
                 {
                     case ContentSaveAction.Save:
@@ -77,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                     case ContentSaveAction.SaveNew:
                         // create the persisted model from mapping the saved model
                         persisted = _umbracoMapper.Map<IDataType>(dataType);
-                        ((DataType)persisted).ResetIdentity();
+                        ((DataType?)persisted)?.ResetIdentity();
                         break;
 
                     default:
@@ -91,15 +98,19 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 // validate the configuration
                 // which is posted as a set of fields with key (string) and value (object)
                 var configurationEditor = propertyEditor.GetConfigurationEditor();
-                foreach (var field in dataType.ConfigurationFields)
-                {
-                    var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
-                    if (editorField == null) continue;
 
-                    // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
-                    foreach (var validator in editorField.Validators)
+                if (dataType.ConfigurationFields is not null)
+                {
+                    foreach (var field in dataType.ConfigurationFields)
+                    {
+                        var editorField = configurationEditor.Fields.SingleOrDefault(x => x.Key == field.Key);
+                        if (editorField == null) continue;
+
+                        // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
+                        foreach (var validator in editorField.Validators)
                         foreach (var result in validator.Validate(field.Value, null, null))
-                            context.ModelState.AddValidationError(result, "Properties", field.Key);
+                            context.ModelState.AddValidationError(result, "Properties", field.Key ?? string.Empty);
+                    }
                 }
 
                 if (context.ModelState.IsValid == false)

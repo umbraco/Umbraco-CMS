@@ -12,23 +12,25 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     {
         public EntityBasic()
         {
-            AdditionalData = new Dictionary<string, object>();
+            AdditionalData = new Dictionary<string, object?>();
+            Alias = string.Empty;
+            Path = string.Empty;
         }
 
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
-        public object Id { get; set; }
+        public object? Id { get; set; }
 
         [DataMember(Name = "udi")]
         [ReadOnly(true)]
-        public Udi Udi { get; set; }
+        public Udi? Udi { get; set; }
 
         [DataMember(Name = "icon")]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [DataMember(Name = "trashed")]
         [ReadOnly(true)]
@@ -63,6 +65,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "metaData")]
         [ReadOnly(true)]
-        public IDictionary<string, object> AdditionalData { get; private set; }
+        public IDictionary<string, object?> AdditionalData { get; private set; }
     }
 }

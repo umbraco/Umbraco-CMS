@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     var val = propertyVal.EditedValue;
 
-                    var valueEditor = editor.GetValueEditor();
+                    var valueEditor = editor?.GetValueEditor();
                     if (valueEditor is IDataValueReference reference)
                     {
                         var refs = reference.GetReferences(val);

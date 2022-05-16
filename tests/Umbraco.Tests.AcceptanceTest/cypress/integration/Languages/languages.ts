@@ -13,6 +13,8 @@ context('Languages', () => {
       cy.umbracoEnsureLanguageCultureNotExists(culture);
       cy.umbracoSection('settings');
 
+      cy.get('.umb-box-content').should('be.visible');
+      cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
       // Enter language tree and create new language
       cy.umbracoTreeItem('settings', ['Languages']).click();
       cy.umbracoButtonByLabelKey('languages_addLanguage').click();

@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     public class NotifySetting
     {
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "checked")]
         public bool Checked { get; set; }
@@ -15,6 +15,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The letter from the IAction
         /// </summary>
         [DataMember(Name = "notifyCode")]
-        public string NotifyCode { get; set; }
+        public string? NotifyCode { get; set; }
     }
 }

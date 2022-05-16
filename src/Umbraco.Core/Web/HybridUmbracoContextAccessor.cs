@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.Web
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Tries to get the <see cref="UmbracoContext"/> object.
         /// </summary>
-        public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
+        public bool TryGetUmbracoContext([MaybeNullWhen(false)] out IUmbracoContext umbracoContext)
         {
             umbracoContext = Value;
 

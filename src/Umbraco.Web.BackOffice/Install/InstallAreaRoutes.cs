@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             switch (_runtime.Level)
             {
                 case var _ when _runtime.EnableInstaller():
-                
+
                     endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
                     endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
 
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
                     endpoints.MapGet($"{installPathSegment}/{{controller?}}/{{action?}}", context =>
                     {
                         // redirect to umbraco
-                        context.Response.Redirect(_linkGenerator.GetBackOfficeUrl(_hostingEnvironment), false);
+                        context.Response.Redirect(_linkGenerator.GetBackOfficeUrl(_hostingEnvironment)!, false);
                         return Task.CompletedTask;
                     });
 

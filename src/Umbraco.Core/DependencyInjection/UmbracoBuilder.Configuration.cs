@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
 using Umbraco.Extensions;
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
     public static partial class UmbracoBuilderExtensions
     {
 
-        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>> configure = null)
+        private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
             where TOptions : class
         {
             var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
@@ -86,7 +87,23 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<RuntimeMinificationSettings>()
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>()
-                .AddUmbracoOptions<ContentDashboardSettings>();
+                .AddUmbracoOptions<ContentDashboardSettings>()
+                .AddUmbracoOptions<HelpPageSettings>();
+
+            builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
+
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.Languages}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes}"));
+            builder.Services.Configure<InstallDefaultDataSettings>(
+                Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
+                builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
             builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 

@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment)?.ToString();
 
@@ -57,30 +57,35 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             try
             {
-                var links = JsonConvert.DeserializeObject<List<MultiUrlPickerValueEditor.LinkDto>>(value);
+                var links = JsonConvert.DeserializeObject<List<LinkDto>>(value);
 
-                var documentLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
-                var mediaLinks = links.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
+                var documentLinks = links?.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
+                var mediaLinks = links?.FindAll(link => link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
 
                 var entities = new List<IEntitySlim>();
-                if (documentLinks.Count > 0)
+                if (documentLinks?.Count > 0)
                 {
                     entities.AddRange(
-                        _entityService.GetAll(UmbracoObjectTypes.Document, documentLinks.Select(link => link.Udi.Guid).ToArray())
+                        _entityService.GetAll(UmbracoObjectTypes.Document, documentLinks.Select(link => link.Udi!.Guid).ToArray())
                     );
                 }
 
-                if (mediaLinks.Count > 0)
+                if (mediaLinks?.Count > 0)
                 {
                     entities.AddRange(
-                        _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi.Guid).ToArray())
+                        _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray())
                     );
                 }
 
                 var result = new List<LinkDisplay>();
+                if (links is null)
+                {
+                    return result;
+                }
+
                 foreach (var dto in links)
                 {
-                    GuidUdi udi = null;
+                    GuidUdi? udi = null;
                     var icon = "icon-link";
                     var published = true;
                     var trashed = false;
@@ -88,7 +93,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                     if (dto.Udi != null)
                     {
-                        IUmbracoEntity entity = entities.Find(e => e.Key == dto.Udi.Guid);
+                        IUmbracoEntity? entity = entities.Find(e => e.Key == dto.Udi.Guid);
                         if (entity == null)
                         {
                             continue;
@@ -99,7 +104,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = publishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Content?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -107,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = publishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Media?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else
@@ -129,6 +134,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         Url = url ?? ""
                     });
                 }
+
                 return result;
             }
             catch (Exception ex)
@@ -141,31 +147,38 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new JsonSerializerSettings
         {
+            Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             var value = editorValue.Value?.ToString();
 
             if (string.IsNullOrEmpty(value))
             {
-                return string.Empty;
+                return null;
             }
 
             try
             {
+                var links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
+                if (links?.Count == 0)
+                {
+                    return null;
+                }
+
                 return JsonConvert.SerializeObject(
-                    from link in JsonConvert.DeserializeObject<List<LinkDisplay>>(value)
-                    select new MultiUrlPickerValueEditor.LinkDto
+                    from link in links
+                    select new LinkDto
                     {
                         Name = link.Name,
                         QueryString = link.QueryString,
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                    }, LinkDisplayJsonSerializerSettings
-                    );
+                    },
+                    LinkDisplayJsonSerializerSettings);
             }
             catch (Exception ex)
             {
@@ -179,35 +192,38 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public class LinkDto
         {
             [DataMember(Name = "name")]
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
             [DataMember(Name = "target")]
-            public string Target { get; set; }
+            public string? Target { get; set; }
 
             [DataMember(Name = "udi")]
-            public GuidUdi Udi { get; set; }
+            public GuidUdi? Udi { get; set; }
 
             [DataMember(Name = "url")]
-            public string Url { get; set; }
+            public string? Url { get; set; }
 
             [DataMember(Name = "queryString")]
-            public string QueryString { get; set; }
+            public string? QueryString { get; set; }
         }
 
-        public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
             var asString = value == null ? string.Empty : value is string str ? str : value.ToString();
 
             if (string.IsNullOrEmpty(asString)) yield break;
 
             var links = JsonConvert.DeserializeObject<List<LinkDto>>(asString);
-            foreach (var link in links)
+            if (links is not null)
             {
-                if (link.Udi != null) // Links can be absolute links without a Udi
+                foreach (var link in links)
                 {
-                    yield return new UmbracoEntityReference(link.Udi);
-                }
+                    if (link.Udi != null) // Links can be absolute links without a Udi
+                    {
+                        yield return new UmbracoEntityReference(link.Udi);
+                    }
 
+                }
             }
         }
     }

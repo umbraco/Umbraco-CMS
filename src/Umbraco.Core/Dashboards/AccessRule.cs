@@ -6,9 +6,8 @@
     public class AccessRule : IAccessRule
     {
         /// <inheritdoc />
-        public AccessRuleType Type { get; set; }
-
+        public AccessRuleType Type { get; set; } = AccessRuleType.Unknown;
         /// <inheritdoc />
-        public string Value { get; set; }
+        public string? Value { get; set; }
     }
 }

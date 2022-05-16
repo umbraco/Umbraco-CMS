@@ -8,22 +8,6 @@
             var evts = [];
 
             scope.allowChangeMediaType = false;
-            scope.loading = true;
-
-            scope.changeContentPageNumber = changeContentPageNumber;
-            scope.contentOptions = {};
-            scope.contentOptions.entityType = "DOCUMENT";
-            scope.hasContentReferences = false;
-
-            scope.changeMediaPageNumber = changeMediaPageNumber;
-            scope.mediaOptions = {};
-            scope.mediaOptions.entityType = "MEDIA";
-            scope.hasMediaReferences = false;
-
-            scope.changeMemberPageNumber = changeMemberPageNumber;
-            scope.memberOptions = {};
-            scope.memberOptions.entityType = "MEMBER";
-            scope.hasMemberReferences = false;
 
             function onInit() {
 
@@ -110,45 +94,6 @@
                 setMediaExtension();
             });
 
-            function changeContentPageNumber(pageNumber) {
-                scope.contentOptions.pageNumber = pageNumber;
-                loadContentRelations();
-            }
-
-            function changeMediaPageNumber(pageNumber) {
-                scope.mediaOptions.pageNumber = pageNumber;
-                loadMediaRelations();
-            }
-
-            function changeMemberPageNumber(pageNumber) {
-                scope.memberOptions.pageNumber = pageNumber;
-                loadMemberRelations();
-            }
-
-            function loadContentRelations() {
-                return mediaResource.getPagedReferences(scope.node.id, scope.contentOptions)
-                    .then(function (data) {
-                        scope.contentReferences = data;
-                        scope.hasContentReferences = data.items.length > 0;
-                    });
-            }
-
-            function loadMediaRelations() {
-                return mediaResource.getPagedReferences(scope.node.id, scope.mediaOptions)
-                    .then(data => {
-                        scope.mediaReferences = data;
-                        scope.hasMediaReferences = data.items.length > 0;
-                    });
-            }
-
-            function loadMemberRelations() {
-                return mediaResource.getPagedReferences(scope.node.id, scope.memberOptions)
-                    .then(data => {
-                        scope.memberReferences = data;
-                        scope.hasMemberReferences = data.items.length > 0;
-                    });
-            }
-
             //ensure to unregister from all events!
             scope.$on('$destroy', function () {
                 for (var e in evts) {
@@ -157,18 +102,6 @@
             });
 
             onInit();
-
-            // load media type references when the 'info' tab is first activated/switched to
-            evts.push(eventsService.on("app.tabChange", function (event, args) {
-                $timeout(function () {
-                    if (args.alias === "umbInfo") {
-
-                        $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
-                            scope.loading = false;
-                        });
-                    }
-                });
-            }));
         }
 
         var directive = {

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// could contain JSON, the decision could be made on the intermediate value. Or, if it is
         /// a picker, it could be made on the object value (the actual picked object).</para>
         /// </remarks>
-        bool? IsValue(object value, PropertyValueLevel level);
+        bool? IsValue(object? value, PropertyValueLevel level);
 
         /// <summary>
         /// Gets the type of values returned by the converter.
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// strings, and xml-whitespace strings appropriately, ie it should know whether to preserve
         /// white spaces.</para>
         /// </remarks>
-        object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview);
+        object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an Object value.
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
         /// <summary>
         /// Converts a property intermediate value to an XPath value.
@@ -107,6 +107,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// passed to eg a PublishedFragment constructor. It is used by the fragment and the properties to manage
         /// the cache levels of property values. It is not meant to be used by the converter.</para>
         /// </remarks>
-        object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
     }
 }

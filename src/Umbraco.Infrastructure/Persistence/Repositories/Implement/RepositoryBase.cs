@@ -3,8 +3,8 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             get
             {
-                IScope scope = ScopeAccessor.AmbientScope;
+                IScope? scope = ScopeAccessor.AmbientScope;
                 if (scope == null)
                 {
                     throw new InvalidOperationException("Cannot run a repository without an ambient scope.");

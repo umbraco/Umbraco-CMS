@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <param name="userMgr">The identity manager to use to update the password</param>
         /// Create an adapter to pass through everything - adapting the member into a user for this functionality
         /// <returns>The outcome of the password changed model</returns>
-        public async Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
+        public async Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(
             ChangingPasswordModel changingPasswordModel,
             IUmbracoUserManager<TUser> userMgr)
         {

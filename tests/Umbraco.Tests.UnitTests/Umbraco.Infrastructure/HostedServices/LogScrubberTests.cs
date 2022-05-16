@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -74,9 +75,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
             var mockScope = new Mock<IScope>();
-            var mockScopeProvider = new Mock<IScopeProvider>();
+            var mockScopeProvider = new Mock<ICoreScopeProvider>();
             mockScopeProvider
-                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Setup(x => x.CreateCoreScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(mockScope.Object);
             var mockLogger = new Mock<ILogger<LogScrubber>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockMainDom.Object,
                 mockServerRegistrar.Object,
                 _mockAuditService.Object,
-                Options.Create(settings),
+                new TestOptionsMonitor<LoggingSettings>(settings),
                 mockScopeProvider.Object,
                 mockLogger.Object,
                 mockProfilingLogger.Object);

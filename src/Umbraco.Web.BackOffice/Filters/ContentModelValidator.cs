@@ -58,9 +58,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        public virtual bool ValidateExistingContent(TModelSave postedItem, ActionExecutingContext actionContext)
+        public virtual bool ValidateExistingContent(TModelSave? postedItem, ActionExecutingContext actionContext)
         {
-            var persistedContent = postedItem.PersistedContent;
+            var persistedContent = postedItem?.PersistedContent;
             if (persistedContent == null)
             {
                 actionContext.Result = new NotFoundObjectResult("content was not found");
@@ -77,10 +77,10 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        public virtual bool ValidateProperties(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ActionExecutingContext actionContext)
+        public virtual bool ValidateProperties(TModelSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
         {
-            var persistedContent = model.PersistedContent;
-            return ValidateProperties(modelWithProperties.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
+            var persistedContent = model?.PersistedContent;
+            return ValidateProperties(modelWithProperties?.Properties.ToList() ?? new List<ContentPropertyBasic>(), persistedContent?.Properties.ToList(), actionContext);
         }
 
         /// <summary>
@@ -90,11 +90,16 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// <param name="persistedProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties, List<IProperty> persistedProperties, ActionExecutingContext actionContext)
+        protected bool ValidateProperties(List<ContentPropertyBasic>? postedProperties, List<IProperty>? persistedProperties, ActionExecutingContext actionContext)
         {
+            if (postedProperties is null)
+            {
+                return false;
+            }
+
             foreach (var p in postedProperties)
             {
-                if (persistedProperties.Any(property => property.Alias == p.Alias) == false)
+                if (persistedProperties?.Any(property => property.Alias == p.Alias) == false)
                 {
                     // TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
@@ -120,35 +125,38 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// All property data validation goes into the model state with a prefix of "Properties"
         /// </remarks>
         public virtual bool ValidatePropertiesData(
-            TModelSave model,
-            TModelWithProperties modelWithProperties,
-            ContentPropertyCollectionDto dto,
+            TModelSave? model,
+            TModelWithProperties? modelWithProperties,
+            ContentPropertyCollectionDto? dto,
             ModelStateDictionary modelState)
         {
-            var properties = modelWithProperties.Properties.ToDictionary(x => x.Alias, x => x);
+            var properties = modelWithProperties?.Properties.ToDictionary(x => x.Alias, x => x);
 
-            foreach (var p in dto.Properties)
+            if (dto is not null)
             {
-                var editor = p.PropertyEditor;
-
-                if (editor == null)
+                foreach (var p in dto.Properties)
                 {
-                    var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
+                    var editor = p.PropertyEditor;
 
-                    Logger.LogWarning(message);
-                    continue;
+                    if (editor == null)
+                    {
+                        var message = $"Could not find property editor \"{p.DataType?.EditorAlias}\" for property with id {p.Id}.";
+
+                        Logger.LogWarning(message);
+                        continue;
+                    }
+
+                    //get the posted value for this property, this may be null in cases where the property was marked as readonly which means
+                    //the angular app will not post that value.
+                    if (properties is null || !properties.TryGetValue(p.Alias, out var postedProp))
+                        continue;
+
+                    var postedValue = postedProp.Value;
+
+                    ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
                 }
-
-                //get the posted value for this property, this may be null in cases where the property was marked as readonly which means
-                //the angular app will not post that value.
-                if (!properties.TryGetValue(p.Alias, out var postedProp))
-                    continue;
-
-                var postedValue = postedProp.Value;
-
-                ValidatePropertyValue(model, modelWithProperties, editor, p, postedValue, modelState);
-
             }
+
 
             return modelState.IsValid;
         }
@@ -165,18 +173,18 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         /// <param name="requiredDefaultMessages"></param>
         /// <param name="formatDefaultMessages"></param>
         protected virtual void ValidatePropertyValue(
-            TModelSave model,
-            TModelWithProperties modelWithProperties,
+            TModelSave? model,
+            TModelWithProperties? modelWithProperties,
             IDataEditor editor,
             ContentPropertyDto property,
-            object postedValue,
+            object? postedValue,
             ModelStateDictionary modelState)
         {
             if (property is null) throw new ArgumentNullException(nameof(property));
             if (property.DataType is null) throw new InvalidOperationException($"{nameof(property)}.{nameof(property.DataType)} cannot be null");
 
             foreach (var validationResult in PropertyValidationService.ValidatePropertyValue(
-                editor, property.DataType, postedValue, property.IsRequired,
+                editor, property.DataType, postedValue, property.IsRequired ?? false,
                 property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
             {
                 AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);
@@ -184,14 +192,14 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         }
 
         protected virtual void AddPropertyError(
-            TModelSave model,
-            TModelWithProperties modelWithProperties,
+            TModelSave? model,
+            TModelWithProperties? modelWithProperties,
             IDataEditor editor,
             ContentPropertyDto property,
             ValidationResult validationResult,
             ModelStateDictionary modelState)
         {
-            modelState.AddPropertyError(validationResult, property.Alias, property.Culture, property.Segment);
+            modelState.AddPropertyError(validationResult, property.Alias, property.Culture ?? string.Empty, property.Segment ?? string.Empty);
         }
 
     }

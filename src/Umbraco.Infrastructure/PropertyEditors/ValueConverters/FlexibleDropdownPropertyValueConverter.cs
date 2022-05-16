@@ -16,20 +16,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.DropDownListFlexible);
         }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if(source == null) return Array.Empty<string>();
 
 
-            return JsonConvert.DeserializeObject<string[]>(source.ToString()) ?? Array.Empty<string>();
+            return JsonConvert.DeserializeObject<string[]>(source.ToString()!) ?? Array.Empty<string>();
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             if (inter == null)
                 return null;
 
-            var multiple = propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple;
+            var multiple = propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>()!.Multiple;
             var selectedValues = (string[]) inter;
             if (selectedValues.Length > 0)
             {
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
-            return propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple
+            return propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>()!.Multiple
                ? typeof(IEnumerable<string>)
                : typeof(string);
         }

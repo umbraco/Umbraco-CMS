@@ -74,22 +74,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly WebRoutingSettings _webRoutingSettings;
 
         // TODO: We need to review all _userManager.Raise calls since many/most should be on the usermanager or signinmanager, very few should be here
         [ActivatorUtilitiesConstructor]
-        public AuthenticationController(
+          public AuthenticationController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IBackOfficeUserManager backOfficeUserManager,
             IBackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,
             IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings,
-            IOptions<SecuritySettings> securitySettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
-            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             ISmsSender smsSender,
             IHostingEnvironment hostingEnvironment,
@@ -97,7 +98,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptions<WebRoutingSettings> webRoutingSettings,
+            ITwoFactorLoginService twoFactorLoginService)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _userManager = backOfficeUserManager;
@@ -118,48 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
             _httpContextAccessor = httpContextAccessor;
             _webRoutingSettings = webRoutingSettings.Value;
-        }
-
-        [Obsolete("Use constructor that also takes IHttpAccessor and IOptions<WebRoutingSettings>, scheduled for removal in V11")]
-        public AuthenticationController(
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IBackOfficeUserManager backOfficeUserManager,
-            IBackOfficeSignInManager signInManager,
-            IUserService userService,
-            ILocalizedTextService textService,
-            IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings,
-            IOptions<SecuritySettings> securitySettings,
-            ILogger<AuthenticationController> logger,
-            IIpResolver ipResolver,
-            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            IHostingEnvironment hostingEnvironment,
-            LinkGenerator linkGenerator,
-            IBackOfficeExternalLoginProviders externalAuthenticationOptions,
-            IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
-            : this(
-                backofficeSecurityAccessor,
-                backOfficeUserManager,
-                signInManager,
-                userService,
-                textService,
-                umbracoMapper,
-                globalSettings,
-                securitySettings,
-                logger,
-                ipResolver,
-                passwordConfiguration,
-                emailSender,
-                smsSender,
-                hostingEnvironment,
-                linkGenerator,
-                externalAuthenticationOptions,
-                backOfficeTwoFactorOptions,
-                StaticServiceProvider.Instance.GetRequiredService<IHttpContextAccessor>(),
-                StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>())
-        {
+            _twoFactorLoginService = twoFactorLoginService;
         }
 
         /// <summary>
@@ -169,7 +130,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            Attempt<int> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            Attempt<int?> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int?>.Fail();
             return _passwordConfiguration.GetConfiguration(
                 currentUserId.Success
                     ? currentUserId.Result != userId
@@ -187,7 +148,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
         [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-        public async Task<ActionResult<UserDisplay>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
+        public async Task<ActionResult<UserDisplay?>> PostVerifyInvite([FromQuery] int id, [FromQuery] string token)
         {
             if (string.IsNullOrWhiteSpace(token))
                 return NotFound();
@@ -200,7 +161,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (identityUser == null)
                 return NotFound();
 
-            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded);
+            var result = await _userManager.ConfirmEmailAsync(identityUser, decoded!);
 
             if (result.Succeeded == false)
             {
@@ -220,7 +181,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
-            var user = await _userManager.FindByIdAsync(User.Identity.GetUserId());
+            var user = await _userManager.FindByIdAsync(User.Identity?.GetUserId());
             if (user == null) throw new InvalidOperationException("Could not find user");
 
             var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
@@ -232,7 +193,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                BackOfficeExternaLoginProviderScheme opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
+                BackOfficeExternaLoginProviderScheme? opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
                 if (opt == null)
                 {
                     return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
@@ -317,13 +278,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [SetAngularAntiForgeryTokens]
         [CheckIfUserTicketDataIsStale]
-        public UserDetail GetCurrentUser()
+        public UserDetail? GetCurrentUser()
         {
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             var result = _umbracoMapper.Map<UserDetail>(user);
 
-            //set their remaining seconds
-            result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+            if (result is not null)
+            {
+                //set their remaining seconds
+                result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+            }
 
             return result;
         }
@@ -339,11 +303,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
         [SetAngularAntiForgeryTokens]
         [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-        public ActionResult<UserDetail> GetCurrentInvitedUser()
+        public ActionResult<UserDetail?> GetCurrentInvitedUser()
         {
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
-            if (user.IsApproved)
+            if (user?.IsApproved ?? false)
             {
                 // if they are approved, than they are no longer invited and we can return an error
                 return Forbid();
@@ -351,8 +315,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var result = _umbracoMapper.Map<UserDetail>(user);
 
-            // set their remaining seconds
-            result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+            if (result is not null)
+            {
+                // set their remaining seconds
+                result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+            }
 
             return result;
         }
@@ -363,7 +330,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
         [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
-        public async Task<ActionResult<UserDetail>> PostLogin(LoginModel loginModel)
+        public async Task<ActionResult<UserDetail?>> PostLogin(LoginModel loginModel)
         {
             // Sign the user in with username/password, this also gives a chance for developers to
             // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
@@ -384,13 +351,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return new ValidationErrorResult($"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
                 }
 
-                IUser attemptedUser = _userService.GetByUsername(loginModel.Username);
+                IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
 
                 // create a with information to display a custom two factor send code view
                 var verifyResponse = new ObjectResult(new
                 {
                     twoFactorView = twofactorView,
-                    userId = attemptedUser.Id
+                    userId = attemptedUser?.Id
                 })
                 {
                     StatusCode = StatusCodes.Status402PaymentRequired
@@ -430,7 +397,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var user = _userService.GetByEmail(model.Email);
                 if (user != null)
                 {
-                    var from = _globalSettings.Smtp.From;
+                    var from = _globalSettings.Smtp?.From;
                     var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
@@ -469,7 +436,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            var userFactors = await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key);
+
             return new ObjectResult(userFactors);
         }
 
@@ -487,7 +455,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            var from = _globalSettings.Smtp.From;
+            var from = _globalSettings.Smtp?.From;
             // Generate the token and send it
             var code = await _userManager.GenerateTwoFactorTokenAsync(user, provider);
             if (string.IsNullOrWhiteSpace(code))
@@ -521,7 +489,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         [SetAngularAntiForgeryTokens]
         [AllowAnonymous]
-        public async Task<ActionResult<UserDetail>> PostVerify2FACode(Verify2FACodeModel model)
+        public async Task<ActionResult<UserDetail?>> PostVerify2FACode(Verify2FACodeModel model)
         {
             if (ModelState.IsValid == false)
             {
@@ -603,7 +571,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     var user = _userService.GetByUsername(identityUser.UserName);
                     // also check InvitedDate and never logged in, otherwise this would allow a disabled user to reactivate their account with a forgot password
-                    if (user.LastLoginDate == default && user.InvitedDate != null)
+                    if (user?.LastLoginDate == default && user?.InvitedDate != null)
                     {
                         user.IsApproved = true;
                         user.InvitedDate = null;
@@ -634,7 +602,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
-            var userId = result.Principal.Identity.GetUserId();
+            var userId = result.Principal.Identity?.GetUserId();
             var args = _userManager.NotifyLogoutSuccess(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
@@ -654,13 +622,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="user"></param>
         /// <param name="principal"></param>
         /// <returns></returns>
-        private UserDetail GetUserDetail(IUser user)
+        private UserDetail? GetUserDetail(IUser? user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             var userDetail = _umbracoMapper.Map<UserDetail>(user);
-            // update the userDetail and set their remaining seconds
-            userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
+
+            if (userDetail is not null)
+            {
+                // update the userDetail and set their remaining seconds
+                userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
+            }
 
             return userDetail;
         }
@@ -678,7 +650,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     r = code
                 });
 
-            // Construct full URL using configured application URL (which will fall back to request)
+            // Construct full URL using configured application URL (which will fall back to current request)
             Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request.GetApplicationUri(_webRoutingSettings);
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();

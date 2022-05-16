@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="entityService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
         /// <returns></returns>
-        public MediaAccess CheckPermissions(IUser user, int nodeId, out IMedia media)
+        public MediaAccess CheckPermissions(IUser? user, int nodeId, out IMedia? media)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Security
             return hasPathAccess ? MediaAccess.Granted : MediaAccess.Denied;
         }
 
-        public MediaAccess CheckPermissions(IMedia media, IUser user)
+        public MediaAccess CheckPermissions(IMedia? media, IUser? user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 

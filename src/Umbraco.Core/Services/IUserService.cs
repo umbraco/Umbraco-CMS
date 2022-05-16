@@ -62,10 +62,10 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection,
-            UserState[] userState = null,
-            string[] includeUserGroups = null,
-            string[] excludeUserGroups = null,
-            IQuery<IUser> filter = null);
+            UserState[]? userState = null,
+            string[]? includeUserGroups = null,
+            string[]? excludeUserGroups = null,
+            IQuery<IUser>? filter = null);
 
         /// <summary>
         /// Get paged users
@@ -83,9 +83,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
             string orderBy, Direction orderDirection,
-            UserState[] userState = null,
-            string[] userGroups = null,
-            string filter = null);
+            UserState[]? userState = null,
+            string[]? userGroups = null,
+            string? filter = null);
 
         /// <summary>
         /// Deletes or disables a User
@@ -99,28 +99,28 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
-        IProfile GetProfileById(int id);
+        IProfile? GetProfileById(int id);
 
         /// <summary>
         /// Gets a profile by username
         /// </summary>
         /// <param name="username">Username</param>
         /// <returns><see cref="IProfile"/></returns>
-        IProfile GetProfileByUserName(string username);
+        IProfile? GetProfileByUserName(string username);
 
         /// <summary>
         /// Gets a user by Id
         /// </summary>
         /// <param name="id">Id of the user to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IUser GetUserById(int id);
+        IUser? GetUserById(int id);
 
         /// <summary>
         /// Gets a users by Id
         /// </summary>
         /// <param name="ids">Ids of the users to retrieve</param>
         /// <returns><see cref="IUser"/></returns>
-        IEnumerable<IUser> GetUsersById(params int[] ids);
+        IEnumerable<IUser> GetUsersById(params int[]? ids);
 
         /// <summary>
         /// Removes a specific section from all user groups
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This will return the default permissions for the user's groups for node ids that don't have explicitly defined permissions
         /// </remarks>
-        EntityPermissionCollection GetPermissions(IUser user, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUser? user, params int[] nodeIds);
 
         /// <summary>
         /// Get explicitly assigned permissions for groups and optional node Ids
@@ -150,14 +150,14 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        EntityPermissionCollection GetPermissions(IUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
+        EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
 
         /// <summary>
         /// Gets the implicit/inherited permissions for the user for the given path
         /// </summary>
         /// <param name="user">User to check permissions for</param>
         /// <param name="path">Path to check permissions for</param>
-        EntityPermissionSet GetPermissionsForPath(IUser user, string path);
+        EntityPermissionSet GetPermissionsForPath(IUser? user, string? path);
 
         /// <summary>
         /// Gets the permissions for the provided groups and path
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Services
         /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
         /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified group.</remarks>
-        void ReplaceUserGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceUserGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds);
 
         /// <summary>
         /// Assigns the same permission set for a single user group to any number of entities
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="groupId">Id of group</param>
         /// <returns><see cref="IEnumerable{IUser}"/></returns>
-        IEnumerable<IUser> GetAllInGroup(int groupId);
+        IEnumerable<IUser> GetAllInGroup(int? groupId);
 
         /// <summary>
         /// Gets a list of <see cref="IUser"/> objects not associated with a given group
@@ -226,14 +226,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupByAlias(string name);
+        IUserGroup? GetUserGroupByAlias(string name);
 
         /// <summary>
         /// Gets a UserGroup by its Id
         /// </summary>
         /// <param name="id">Id of the UserGroup to retrieve</param>
         /// <returns><see cref="IUserGroup"/></returns>
-        IUserGroup GetUserGroupById(int id);
+        IUserGroup? GetUserGroupById(int id);
 
         /// <summary>
         /// Saves a UserGroup
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        void Save(IUserGroup userGroup, int[] userIds = null);
+        void Save(IUserGroup userGroup, int[]? userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

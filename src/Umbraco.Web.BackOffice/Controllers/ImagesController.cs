@@ -1,9 +1,11 @@
 using System;
 using System.IO;
+using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -53,13 +55,26 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         public IActionResult GetResized(string imagePath, int width)
         {
-            var ext = Path.GetExtension(imagePath);
+            // We have to use HttpUtility to encode the path here, for non-ASCII characters
+            // We cannot use the WebUtility, as we only want to encode the path, and not the entire string
+            var encodedImagePath = HttpUtility.UrlPathEncode(imagePath);
+
+
+            var ext = Path.GetExtension(encodedImagePath);
+
+            // check if imagePath is local to prevent open redirect
+            if (!Uri.IsWellFormedUriString(encodedImagePath, UriKind.Relative))
+            {
+                return Unauthorized();
+            }
 
             // we need to check if it is an image by extension
             if (_imageUrlGenerator.IsSupportedImageFormat(ext) == false)
+            {
                 return NotFound();
+            }
 
-            //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
+            // redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             DateTimeOffset? imageLastModified = null;
             try
             {
@@ -74,14 +89,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
-            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath)
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
             {
                 Width = width,
                 ImageCropMode = ImageCropMode.Max,
                 CacheBusterValue = rnd
             });
-
-            return new RedirectResult(imageUrl, false);
+            if (Url.IsLocalUrl(imageUrl))
+            {
+                return new LocalRedirectResult(imageUrl, false);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         /// <summary>
@@ -97,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
-        public string GetProcessedImageUrl(string imagePath,
+        public string? GetProcessedImageUrl(string imagePath,
             int? width = null,
             int? height = null,
             decimal? focalPointLeft = null,
