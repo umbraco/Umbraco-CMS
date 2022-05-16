@@ -56,7 +56,26 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 var variantDisplay = context.Map<TVariant>(source);
                 if (variantDisplay is not null)
                 {
-                    variantDisplay.AllowedActions = GetLanguagePermissions(source, context);
+                    // Map allowed actions
+                    IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+                    bool hasAccess = false;
+                    if (userGroups is not null)
+                    {
+                        foreach (var group in userGroups)
+                        {
+                            if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
+                            {
+                                hasAccess = true;
+                                break;
+                            }
+                        }
+
+                        if (hasAccess)
+                        {
+                            variantDisplay.AllowedActions = GetLanguagePermissions(source, context);
+                        }
+                    }
+
                     variants.Add(variantDisplay);
                 }
             }
