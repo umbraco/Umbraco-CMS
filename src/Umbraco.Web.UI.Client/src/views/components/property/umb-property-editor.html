@@ -2,8 +2,8 @@
     
     <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
         <div class="umb-property-editor__lock-overlay">
-            {{ model.label }} is shared across all languages.
-            <umb-button button-style="warning" type="button" action="unlock()" label="Edit" size="xxs"></umb-button>
+            {{ labels.invariantPropertyUnlockHelp }}
+            <umb-button button-style="warning" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
         </div>
     </div>
 

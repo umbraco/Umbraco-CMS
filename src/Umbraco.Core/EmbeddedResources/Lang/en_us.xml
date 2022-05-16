@@ -1950,6 +1950,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="invariantPropertyUnlockHelp">%0% is shared across all languages.</key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>

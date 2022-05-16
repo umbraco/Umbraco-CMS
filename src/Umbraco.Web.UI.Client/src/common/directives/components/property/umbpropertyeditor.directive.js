@@ -7,7 +7,7 @@
 **/
 
 //share property editor directive function
-function umbPropEditor(umbPropEditorHelper) {
+function umbPropEditor(umbPropEditorHelper, localizationService) {
         return {
             scope: {
                 model: "=",
@@ -24,6 +24,7 @@ function umbPropEditor(umbPropEditorHelper) {
             link: function (scope, element, attrs, ctrl) {
 
                 scope.readonly = false;
+                scope.labels = {};
 
                 //we need to copy the form controller val to our isolated scope so that
                 //it get's carried down to the child scopes of this!
@@ -36,6 +37,11 @@ function umbPropEditor(umbPropEditorHelper) {
                 if(!scope.model.alias){
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
+
+                localizationService.localize('languages_invariantPropertyUnlockHelp',  [scope.model.label])
+                    .then(function(value) {
+                        scope.labels.invariantPropertyUnlockHelp = value;
+                    });
 
                 var unbindWatcher = scope.$watch("model.view",
                     function() {
