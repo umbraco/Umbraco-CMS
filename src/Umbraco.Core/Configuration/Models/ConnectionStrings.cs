@@ -28,7 +28,7 @@ public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (sin
     /// <value>
     /// The name.
     /// </value>
-    [Obsolete("This property will be removed in a future version, because this class is now using named options.")]
+    [Obsolete("This property will be removed in Umbraco 12, because this class is now using named options.")]
     public string? Name { get; set; }
 
     /// <summary>
