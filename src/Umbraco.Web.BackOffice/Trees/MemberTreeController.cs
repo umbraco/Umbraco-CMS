@@ -121,9 +121,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                                 queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
             }
 
-            //There is no menu for any of these nodes
+            // There is no menu for any of these nodes
             nodes.ForEach(x => x.MenuUrl = null);
-            //All nodes are containers
+
+            // All nodes are containers
             nodes.ForEach(x => x.AdditionalData.Add("isContainer", true));
 
             return nodes;
