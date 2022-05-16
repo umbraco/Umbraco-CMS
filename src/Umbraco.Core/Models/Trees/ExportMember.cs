@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <summary>
-    /// Represents the export member menu item
+    /// Represents the export member menu item.
     /// </summary>
     public sealed class ExportMember : ActionMenuItem
     {
@@ -12,6 +12,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         public ExportMember(ILocalizedTextService textService) : base("export", textService)
         {
             Icon = "download-alt";
+            UseLegacyIcon = false;
         }
     }
 }
