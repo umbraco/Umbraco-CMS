@@ -340,9 +340,6 @@
 
   $ubuild.DefineMethod("PackageNuGet",
   {
-    $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $templates = "$($this.SolutionRoot)\templates"
-
     Write-Host "Create NuGet packages"
 
     &dotnet pack "$($this.SolutionRoot)\umbraco.sln" `
@@ -350,19 +347,6 @@
         --verbosity detailed `
         -c Release `
         -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.log"
-
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
-
-    &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -NoDefaultExcludes `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.templates.log"
-    if (-not $?) { throw "Failed to pack NuGet Umbraco.Templates." }
 
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))
@@ -376,8 +360,22 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Cms.Persistence.Sqlite", "Umbraco.Cms.Persistence.SqlServer"))
+      @(),
+      (
+          "Umbraco.Cms",
+          "Umbraco.Cms.Persistence.Sqlite",
+          "Umbraco.Cms.Persistence.SqlServer",
+          "Umbraco.Cms.StaticAssets",
+          "Umbraco.Core",
+          "Umbraco.Examine.Lucene",
+          "Umbraco.Infrastructure",
+          "Umbraco.PublishedCache.NuCache",
+          "Umbraco.Templates",
+          "Umbraco.Web.BackOffice",
+          "Umbraco.Web.Common",
+          "Umbraco.Web.UI",
+          "Umbraco.Web.Website"
+      ))
     if ($this.OnError()) { return }
   })
 
