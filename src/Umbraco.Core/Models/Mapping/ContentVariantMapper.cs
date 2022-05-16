@@ -215,8 +215,17 @@ namespace Umbraco.Cms.Core.Models.Mapping
             bool hasAccess = false;
             if (userGroups is not null)
             {
-                foreach (var group in userGroups)
+                foreach (IReadOnlyUserGroup group in userGroups)
                 {
+                    // Handle invariant
+                    if (variantDisplay.Language is null)
+                    {
+                        int? defaultLanguageId = _localizationService.GetDefaultLanguageId();
+                        if (defaultLanguageId is not null && group.AllowedLanguages.Contains(defaultLanguageId.Value))
+                        {
+                            hasAccess = true;
+                        }
+                    }
                     if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
                     {
                         hasAccess = true;
