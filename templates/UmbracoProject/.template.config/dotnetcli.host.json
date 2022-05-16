@@ -27,7 +27,7 @@
     },
     "DevelopmentDatabaseType": {
       "longName": "development-database-type",
-      "shortName": "d"
+      "shortName": ""
     },
     "NoNodesViewPath": {
       "longName": "no-nodes-view-path",
