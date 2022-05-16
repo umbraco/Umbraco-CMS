@@ -37,7 +37,7 @@
                     </div>
 
                     <div ng-if="vm.showInherit || vm.property.culture" class="umb-property-culture-label">
-                        <span ng-if="vm.showInherit">Shared</span>
+                        <span ng-if="vm.showInherit"><localize key="general_shared"></localize></span>
                         <span ng-if="!vm.showInherit">{{ vm.property.culture }}</span>
                     </div>
                 </div>
