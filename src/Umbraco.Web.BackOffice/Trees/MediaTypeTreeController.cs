@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 // no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 }
 
                 menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);

@@ -147,8 +147,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            //add delete option for all members
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            // add delete option for all members
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? false)
             {

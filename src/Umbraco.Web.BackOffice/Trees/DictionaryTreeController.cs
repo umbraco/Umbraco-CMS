@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = _menuItemCollectionFactory.Create();
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (id != Constants.System.RootString)
             {
