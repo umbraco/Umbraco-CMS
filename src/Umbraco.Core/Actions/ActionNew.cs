@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Actions
         public string Alias => ActionAlias;
 
         /// <inheritdoc/>
-        public string Icon => "add";
+        public string Icon => "icon-add";
 
         /// <inheritdoc/>
         public bool ShowInNotifier => true;

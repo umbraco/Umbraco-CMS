@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Actions
         public bool CanBePermissionAssigned => true;
 
         /// <inheritdoc/>
-        public string Icon => "megaphone";
+        public string Icon => "icon-megaphone";
 
         /// <inheritdoc/>
         public string Alias => "notify";
