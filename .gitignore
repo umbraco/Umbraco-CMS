@@ -103,3 +103,4 @@ cypress.env.json
 
 # Ignore auto-generated schema
 /src/Umbraco.Web.UI/[Uu]mbraco/config/appsettings-schema.json
+/src/Umbraco.Cms/appsettings-schema.json
