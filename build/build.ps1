@@ -370,7 +370,6 @@
           "Umbraco.Examine.Lucene",
           "Umbraco.Infrastructure",
           "Umbraco.PublishedCache.NuCache",
-          "Umbraco.Templates",
           "Umbraco.Web.BackOffice",
           "Umbraco.Web.Common",
           "Umbraco.Web.UI",
