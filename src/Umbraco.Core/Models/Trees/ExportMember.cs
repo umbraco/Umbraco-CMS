@@ -9,9 +9,10 @@ namespace Umbraco.Cms.Core.Models.Trees
     {
         public override string AngularServiceName => "umbracoMenuActions";
 
-        public ExportMember(ILocalizedTextService textService) : base("export", textService)
+        public ExportMember(ILocalizedTextService textService)
+            : base("export", textService)
         {
-            Icon = "download-alt";
+            Icon = "icon-download-alt";
             UseLegacyIcon = false;
         }
     }

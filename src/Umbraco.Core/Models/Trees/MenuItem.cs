@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Alias = alias;
             Name = textService.Localize("actions", Alias);
-            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
+            TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
         }
 
         /// <summary>
@@ -91,6 +91,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
+        /// <summary>
         /// Used in the UI to indicate whether icons should be prefixed with "icon-".
         /// If not legacy icon full icon name should be specified.
         /// </summary>
