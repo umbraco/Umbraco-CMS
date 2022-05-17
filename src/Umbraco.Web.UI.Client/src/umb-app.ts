@@ -1,14 +1,14 @@
+import './auth/login/umb-login.element';
+import './auth/umb-auth-layout.element';
+import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
-import { html, css, LitElement } from 'lit';
+
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+
 import { worker } from './mocks/browser';
 
 // Import somewhere else?
-import '@umbraco-ui/uui';
-
-import './auth/login/umb-login.element';
-import './auth/umb-auth-layout.element';
-
 @customElement('umb-app')
 export class UmbApp extends LitElement {
   static styles = css`
@@ -27,15 +27,6 @@ export class UmbApp extends LitElement {
   constructor() {
     super();
     worker.start();
-  }
-
-  private _onLogout() {
-    try {
-      fetch('/logout', { method: 'POST' });
-      this._authorized = false;
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   private async _getUser() {
