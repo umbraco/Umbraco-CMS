@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
                 throw new ArgumentException("Not a valid URL.", nameof(url));
             }
 
-            var queryString = new Dictionary<string, string?>
+            var queryString = new Dictionary<string, string>
             {
                 { "url", WebUtility.UrlEncode(url) }
             };
