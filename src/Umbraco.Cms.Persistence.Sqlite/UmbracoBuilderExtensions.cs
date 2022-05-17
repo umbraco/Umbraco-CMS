@@ -44,14 +44,11 @@ public static class UmbracoBuilderExtensions
         {
             // Skip empty connection string and other providers
             if (!options.IsConnectionStringConfigured() || options.ProviderName != Constants.ProviderName)
-
             {
                 return;
             }
 
-
             var connectionStringBuilder = new SqliteConnectionStringBuilder(options.ConnectionString);
-
             if (connectionStringBuilder.Mode == SqliteOpenMode.ReadWriteCreate)
             {
                 connectionStringBuilder.Mode = SqliteOpenMode.ReadWrite;

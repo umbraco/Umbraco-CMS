@@ -32,7 +32,7 @@ public static class ConfigurationExtensions
     /// The provider name.
     /// </returns>
     /// <remarks>
-    /// This uses the same convention as the <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#connection-string-prefixes-1">Configuration API for connection string environment variables</a>.
+    /// This uses the same convention as the <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-6.0#connection-string-prefixes">Configuration API for connection string environment variables</a>.
     /// </remarks>
     public static string? GetConnectionStringProviderName(this IConfiguration configuration, string name)
         => configuration.GetConnectionString(name + ProviderNamePostfix);
