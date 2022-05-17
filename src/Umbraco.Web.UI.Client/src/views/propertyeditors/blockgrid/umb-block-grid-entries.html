@@ -1,10 +1,7 @@
-    <div 
-        ui-sortable="vm.blockEditorApi.internal.sortableOptions"
-        ng-model="vm.entries"
-        class="umb-block-grid__layout-container"
-    >
+<div class="umb-block-grid__layout-container">
     <div ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
+        data-element-udi="{{layoutEntry.contentUdi}}"
         data-col-span="{{layoutEntry.columnSpan}}"
         data-row-span="{{layoutEntry.rowSpan}}"
         style="

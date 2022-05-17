@@ -33,16 +33,19 @@
             shadowRoot.innerHTML = 
             `
                 <style>
-                    @import '{{vm.stylesheet}}';
+                    {{vm.stylesheet ? "@import '"+vm.stylesheet+"';" : ""}}
                     @import 'assets/css/blockgridui.css';
                     :host {
                         --umb-block-grid--grid-columns: 12;
                     }
                 </style>
-                <umb-block-grid-entries
-                    block-editor-api="vm.blockEditorApi"
-                    entries="vm.entries">
-                </umb-block-grid-entries>
+                <div class="umb-block-grid__root-container">
+                    <umb-block-grid-entries
+                        class="sortablejs-tester"
+                        block-editor-api="vm.blockEditorApi"
+                        entries="vm.entries">
+                    </umb-block-grid-entries>
+                </div>
             `;
             $compile(shadowRoot)($scope);
             
