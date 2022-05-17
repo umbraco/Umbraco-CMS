@@ -6,7 +6,7 @@
     <Title>Umbraco.Cms</Title>
     <Description>Installs Umbraco CMS in your ASP.NET Core project</Description>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
@@ -14,8 +14,27 @@
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
-  
+
+  <PropertyGroup>
+    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/</JsonSchemaProjectPath>
+  </PropertyGroup>
+
+
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+    <Content Include="$(JsonSchemaPath)" PackagePath="."/>
   </ItemGroup>
+
+  <Target Name="CheckPreConditions" BeforeTargets="Build">
+    <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
+
+    <Message Text="Skip JsonSchema generation because $(JsonSchemaPath) exists." Condition="Exists('$(JsonSchemaPath)')" />
+    <Message Text="Generate the appsettings json schema." Importance="high" Condition="!Exists('$(JsonSchemaPath)')" />
+    <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)')" />
+  </Target>
+
+  <Target Name="JsonSchemaBuild">
+    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -o ..\Umbraco.Cms\appsettings-schema.json" />
+  </Target>
 </Project>
