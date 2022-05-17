@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "echo 'TODO: Implement test'",
-    "lint": "echo 'TODO: Implement lint'"
+    "lint": "eslint --cache --ext .ts . --ignore-path .gitignore"
   },
   "dependencies": {
     "@umbraco-ui/uui": "^0.2.0",
