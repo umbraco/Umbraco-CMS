@@ -617,8 +617,8 @@
                 modelWasChanged = true;
             }
 
-            // If there is only one item, set it as current node
-            if (vm.singleMode || (vm.expandsOnLoad && vm.nodes.length === 1 && vm.maxItems === 1)) {
+            // If there is only one item and expandsOnLoad property is true, set it as current node
+            if (vm.singleMode || (vm.expandsOnLoad && vm.nodes.length === 1)) {
                 setCurrentNode(vm.nodes[0], false);
             }
 
