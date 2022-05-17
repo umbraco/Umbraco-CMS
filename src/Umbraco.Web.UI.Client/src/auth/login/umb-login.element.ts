@@ -46,7 +46,7 @@ export class UmbLogin extends LitElement {
       await fetch('/login', { method: 'POST' });
       this._loggingIn = false;
       // TODO: Change to redirect when router has been added.
-      this.dispatchEvent(new CustomEvent('login', { detail: { username, password, persist } }));
+      this.dispatchEvent(new CustomEvent('login', { bubbles: true, composed: true, detail: { username, password, persist } }));
     } catch (error) {
       console.log(error);
       this._loggingIn = false;
@@ -68,44 +68,46 @@ export class UmbLogin extends LitElement {
 
   render() {
     return html`
-      <div class="uui-text">
-        <h1 class="uui-h3">${this._greeting}</h1>
-        <uui-form>
-          <form id="LoginForm" name="login" @submit="${this._handleSubmit}">
-            <uui-form-layout-item>
-              <uui-label for="email" slot="label" required>Email</uui-label>
-              <uui-input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email..."
-                required
-                required-message="Email is required"></uui-input>
-            </uui-form-layout-item>
+      <umb-auth-layout>
+        <div class="uui-text">
+          <h1 class="uui-h3">${this._greeting}</h1>
+          <uui-form>
+            <form id="LoginForm" name="login" @submit="${this._handleSubmit}">
+              <uui-form-layout-item>
+                <uui-label for="email" slot="label" required>Email</uui-label>
+                <uui-input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Enter your email..."
+                  required
+                  required-message="Email is required"></uui-input>
+              </uui-form-layout-item>
 
-            <uui-form-layout-item>
-              <uui-label for="password" slot="label" required>Password</uui-label>
-              <uui-input-password
-                id="password"
-                name="password"
-                placeholder="Enter your password..."
-                required
-                required-message="Password is required"></uui-input-password>
-            </uui-form-layout-item>
+              <uui-form-layout-item>
+                <uui-label for="password" slot="label" required>Password</uui-label>
+                <uui-input-password
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password..."
+                  required
+                  required-message="Password is required"></uui-input-password>
+              </uui-form-layout-item>
 
-            <uui-form-layout-item>
-              <uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
-            </uui-form-layout-item>
+              <uui-form-layout-item>
+                <uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
+              </uui-form-layout-item>
 
-            <uui-button
-              type="submit"
-              label="Login"
-              look="positive"
-              state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
-            <uui-button type="button" label="Forgot Password?"></uui-button>
-          </form>
-        </uui-form>
-      </div>
+              <uui-button
+                type="submit"
+                label="Login"
+                look="positive"
+                state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
+              <uui-button type="button" label="Forgot Password?"></uui-button>
+            </form>
+          </uui-form>
+        </div>
+      </umb-auth-layout>
     `;
   }
 }

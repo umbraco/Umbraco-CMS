@@ -1,6 +1,8 @@
+import './installer/installer.element';
 import './auth/login/umb-login.element';
 import './auth/umb-auth-layout.element';
 import './backoffice/umb-backoffice.element';
+
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 
@@ -8,6 +10,22 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { worker } from './mocks/browser';
+import { UmbRouter, UmbRoute } from './core/router';
+
+const routes: Array<UmbRoute> = [
+  {
+    path: '/login',
+    elementName: 'umb-login'
+  },
+  {
+    path: '/install',
+    elementName: 'umb-installer'
+  },
+  {
+    path: '/content',
+    elementName: 'umb-backoffice'
+  },
+];
 
 // Import somewhere else?
 @customElement('umb-app')
@@ -22,8 +40,7 @@ export class UmbApp extends LitElement {
   @state()
   _authorized = false;
 
-  @state()
-  _user: any;
+  _router?: UmbRouter;
 
   constructor() {
     super();
@@ -31,34 +48,43 @@ export class UmbApp extends LitElement {
     this._authorized = sessionStorage.getItem('is-authenticated') === 'true';
   }
 
-  private async _getUser() {
+  connectedCallback(): void {
+    super.connectedCallback();
+    // TODO: remove when router can be injected into login element
+    this.addEventListener('login', () => {
+      this._router?.push('/content');
+    });
+  }
+
+  protected async firstUpdated(): Promise<void> {
+    const outlet = this.shadowRoot?.getElementById('outlet');
+    if (!outlet) return;
+
+    this._router = new UmbRouter(this, outlet);
+    this._router.setRoutes(routes);
+
     try {
-      const res = await fetch('/user');
-      this._user = await res.json();
+      const res = await fetch('/init', { method: 'POST' });
+      const data = await res.json();
+
+      if (!data.installed) {
+        this._router.push('/install');
+        return;
+      }
+      
+      if (!this._authorized) {
+        this._router.push('/login');
+      } else {
+        this._router.push('/content');
+      }
+
     } catch (error) {
       console.log(error);
     }
   }
 
-  private _handleLogin = () => {
-    this._authorized = true;
-    this._getUser();
-  };
-
-  private _renderBackoffice = () => html`<umb-backoffice></umb-backoffice>`;
-
-  private _renderAuth = () => html`
-    <umb-auth-layout>
-      <umb-login @login=${this._handleLogin}></umb-login>
-    </umb-auth-layout>
-  `;
-
   render() {
-    return html`
-      <uui-icon-registry-essential>
-        ${this._authorized ? this._renderBackoffice() : this._renderAuth()}
-      </uui-icon-registry-essential>
-    `;
+    return html`<div id="outlet"></div>`;
   }
 }
 
