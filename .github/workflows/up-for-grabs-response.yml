@@ -1,4 +1,4 @@
-name: pr-first-response
+name: labeled-up-for-grabs-first-comment
 
 on:
   issues:
