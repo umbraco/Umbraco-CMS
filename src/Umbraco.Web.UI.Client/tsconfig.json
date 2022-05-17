@@ -9,6 +9,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "noEmitOnError": true,
+    "outDir": "./types",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
