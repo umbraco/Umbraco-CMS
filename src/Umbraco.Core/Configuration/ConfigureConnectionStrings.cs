@@ -20,11 +20,12 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
         => _configuration = configuration;
 
     /// <inheritdoc />
-    public void Configure(ConnectionStrings options) => Configure(Constants.System.UmbracoConnectionName, options);
+    public void Configure(ConnectionStrings options) => Configure(Options.DefaultName, options);
 
     /// <inheritdoc />
     public void Configure(string name, ConnectionStrings options)
     {
+        // Default to using UmbracoConnectionName
         if (name == Options.DefaultName)
         {
             name = Constants.System.UmbracoConnectionName;
