@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Media.Exif;
 
@@ -78,7 +78,7 @@ internal sealed class ExifPropertyDescriptor : PropertyDescriptor
     private readonly object originalValue;
 
     public ExifPropertyDescriptor(ExifProperty property)
-        : base(property.Name, new Attribute[] {new BrowsableAttribute(true)})
+        : base(property.Name, new Attribute[] { new BrowsableAttribute(true) })
     {
         linkedProperty = property;
         originalValue = property.Value;

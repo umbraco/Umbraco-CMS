@@ -44,7 +44,7 @@ public class DisposableTimer : DisposableObjectSlim
         _endMessageArgs = endMessageArgs;
         _failMessageArgs = failMessageArgs;
         _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
-        _timingId = Guid.NewGuid().ToString("N").Substring(0, 7); // keep it short-ish
+        _timingId = Guid.NewGuid().ToString("N")[..7]; // keep it short-ish
 
         if (thresholdMilliseconds == 0)
         {
@@ -85,7 +85,6 @@ public class DisposableTimer : DisposableObjectSlim
 
         // else aren't logging the start message, this is output to the profiler but not the log,
         // we just want the log to contain the result if it's more than the minimum ms threshold.
-
         _profilerStep = profiler?.Step(loggerType, startMessage);
     }
 
@@ -122,8 +121,7 @@ public class DisposableTimer : DisposableObjectSlim
             {
                 if (_failMessageArgs is null)
                 {
-                    _logger.LogError(_failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage,
-                        Stopwatch.ElapsedMilliseconds, _timingId);
+                    _logger.LogError(_failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                 }
                 else
                 {
@@ -141,14 +139,17 @@ public class DisposableTimer : DisposableObjectSlim
                     case LogLevel.Debug:
                         if (_endMessageArgs == null)
                         {
-                            _logger.LogDebug("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage,
-                                Stopwatch.ElapsedMilliseconds, _timingId);
+                            _logger.LogDebug(
+                                "{EndMessage} ({Duration}ms) [Timing {TimingId}]",
+                                _endMessage,
+                                Stopwatch.ElapsedMilliseconds,
+                                _timingId);
                         }
                         else
                         {
                             var args = new object[_endMessageArgs.Length + 2];
                             _endMessageArgs.CopyTo(args, 0);
-                            args[args.Length - 1] = Stopwatch.ElapsedMilliseconds;
+                            args[^1] = Stopwatch.ElapsedMilliseconds;
                             args[args.Length] = _timingId;
                             _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                         }
@@ -157,8 +158,11 @@ public class DisposableTimer : DisposableObjectSlim
                     case LogLevel.Information:
                         if (_endMessageArgs == null)
                         {
-                            _logger.LogInformation("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage,
-                                Stopwatch.ElapsedMilliseconds, _timingId);
+                            _logger.LogInformation(
+                                "{EndMessage} ({Duration}ms) [Timing {TimingId}]",
+                                _endMessage,
+                                Stopwatch.ElapsedMilliseconds,
+                                _timingId);
                         }
                         else
                         {
@@ -170,9 +174,10 @@ public class DisposableTimer : DisposableObjectSlim
                         }
 
                         break;
-                    // filtered in the ctor
-                    //default:
-                    //    throw new Exception();
+
+                        // filtered in the ctor
+                        // default:
+                        //    throw new Exception();
                 }
             }
         }

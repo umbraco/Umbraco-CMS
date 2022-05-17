@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Manifest;
+namespace Umbraco.Cms.Core.Manifest;
 
 public class ManifestAssets
 {
@@ -9,5 +9,6 @@ public class ManifestAssets
     }
 
     public string PackageName { get; }
+
     public IReadOnlyList<string> Assets { get; }
 }

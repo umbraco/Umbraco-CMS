@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Cms.Core.Persistence;
@@ -22,7 +22,8 @@ public static class ExpressionHelper
     /// <param name="propertyLambda">The property lambda.</param>
     /// <returns></returns>
     /// <remarks></remarks>
-    public static PropertyInfo GetPropertyInfo<TSource, TProperty>(this TSource source,
+    public static PropertyInfo GetPropertyInfo<TSource, TProperty>(
+        this TSource source,
         Expression<Func<TSource, TProperty>> propertyLambda) => GetPropertyInfo(propertyLambda);
 
     /// <summary>
@@ -48,11 +49,9 @@ public static class ExpressionHelper
                     {
                         // The expression might be for some boxing, e.g. representing a value type like HiveId as an object
                         // in which case the expression will be Convert(x.MyProperty)
-                        var unary = propertyLambda.Body as UnaryExpression;
-                        if (unary != null)
+                        if (propertyLambda.Body is UnaryExpression unary)
                         {
-                            var boxedMember = unary.Operand as MemberExpression;
-                            if (boxedMember == null)
+                            if (unary.Operand is not MemberExpression boxedMember)
                             {
                                 throw new ArgumentException(
                                     "The type of property could not be inferred, try specifying the type parameters explicitly. This can happen if you have tried to access PropertyInfo where the property's return type is a value type, but the expression is trying to convert it to an object");
@@ -67,7 +66,6 @@ public static class ExpressionHelper
                             string.Format("Expression '{0}' refers to a method, not a property.", propertyLambda));
                     }
                 }
-
 
                 var propInfo = member!.Member as PropertyInfo;
                 if (propInfo == null)
@@ -148,10 +146,9 @@ public static class ExpressionHelper
             return null;
         }
 
-        var body = fromExpression.Body as MethodCallExpression;
-        if (body == null)
+        if (fromExpression.Body is not MethodCallExpression body)
         {
-            return new Dictionary<string, object>();
+            return new Dictionary<string, object?>();
         }
 
         var rVal = new Dictionary<string, object?>();
@@ -187,7 +184,7 @@ public static class ExpressionHelper
         }
 
         var body = fromExpression.Body as MethodCallExpression;
-        return body != null ? body.Method : null;
+        return body?.Method;
     }
 
     /// <summary>
@@ -204,7 +201,7 @@ public static class ExpressionHelper
         }
 
         var body = fromExpression.Body as MethodCallExpression;
-        return body != null ? body.Method : null;
+        return body?.Method;
     }
 
     /// <summary>
@@ -227,14 +224,14 @@ public static class ExpressionHelper
             case ExpressionType.Convert:
             case ExpressionType.ConvertChecked:
                 var ue = fromExpression.Body as UnaryExpression;
-                me = (ue != null ? ue.Operand : null) as MethodCallExpression;
+                me = ue?.Operand as MethodCallExpression;
                 break;
             default:
                 me = fromExpression.Body as MethodCallExpression;
                 break;
         }
 
-        return me != null ? me.Method : null;
+        return me?.Method;
     }
 
     /// <summary>
@@ -281,14 +278,14 @@ public static class ExpressionHelper
             case ExpressionType.Convert:
             case ExpressionType.ConvertChecked:
                 var ue = fromExpression.Body as UnaryExpression;
-                me = (ue != null ? ue.Operand : null) as MemberExpression;
+                me = ue?.Operand as MemberExpression;
                 break;
             default:
                 me = fromExpression.Body as MemberExpression;
                 break;
         }
 
-        return me != null ? me.Member : null;
+        return me?.Member;
     }
 
     /// <summary>
@@ -328,14 +325,14 @@ public static class ExpressionHelper
 
         for (var i = 0; i < leftParams.Length; i++)
         {
-            //if they are delegate parameters, then assume they match as they could be anything
+            // if they are delegate parameters, then assume they match as they could be anything
             if (typeof(Delegate).IsAssignableFrom(leftParams[i].ParameterType) &&
                 typeof(Delegate).IsAssignableFrom(rightParams[i].ParameterType))
             {
                 continue;
             }
 
-            //if they are not delegates, then compare the types
+            // if they are not delegates, then compare the types
             if (leftParams[i].ParameterType != rightParams[i].ParameterType)
             {
                 return false;
@@ -379,7 +376,6 @@ public static class ExpressionHelper
             throw new ArgumentNullException("fromMethodGroup");
         }
 
-
         return fromMethodGroup.Method;
     }
 
@@ -390,16 +386,15 @@ public static class ExpressionHelper
     ///// <param name="unhandledItem">The unhandled item.</param>
     ///// <returns></returns>
     ///// <remarks></remarks>
-    //public static string FormatUnhandledItem<T>(T unhandledItem) where T : class
-    //{
+    // public static string FormatUnhandledItem<T>(T unhandledItem) where T : class
+    // {
     //    if (unhandledItem == null) throw new ArgumentNullException("unhandledItem");
 
-
-    //    var itemAsExpression = unhandledItem as Expression;
+    // var itemAsExpression = unhandledItem as Expression;
     //    return itemAsExpression != null
     //               ? FormattingExpressionTreeVisitor.Format(itemAsExpression)
     //               : unhandledItem.ToString();
-    //}
+    // }
 
     /// <summary>
     ///     Determines whether the specified expression is a method.
@@ -408,7 +403,6 @@ public static class ExpressionHelper
     /// <returns><c>true</c> if the specified expression is method; otherwise, <c>false</c>.</returns>
     /// <remarks></remarks>
     public static bool IsMethod(Expression expression) => expression is MethodCallExpression;
-
 
     /// <summary>
     ///     Determines whether the specified expression is a member.

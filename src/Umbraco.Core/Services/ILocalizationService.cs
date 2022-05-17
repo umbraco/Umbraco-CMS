@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -7,17 +7,17 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface ILocalizationService : IService
 {
-    //Possible to-do list:
-    //Import DictionaryItem (?)
-    //RemoveByLanguage (translations)
-    //Add/Set Text (Insert/Update)
-    //Remove Text (in translation)
+    // Possible to-do list:
+    // Import DictionaryItem (?)
+    // RemoveByLanguage (translations)
+    // Add/Set Text (Insert/Update)
+    // Remove Text (in translation)
 
     /// <summary>
     ///     Adds or updates a translation for a dictionary item and language
     /// </summary>
     /// <param name="item"></param>
-    /// <param name="language"></param
+    /// <param name="language"></param>
     /// <param name="value"></param>
     /// <returns></returns>
     void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value);
@@ -32,7 +32,7 @@ public interface ILocalizationService : IService
     IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null);
 
     /// <summary>
-    ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="Int32" /> id
+    ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="int" /> id
     /// </summary>
     /// <param name="id">Id of the <see cref="IDictionaryItem" /></param>
     /// <returns>

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
@@ -19,8 +19,12 @@ internal class GridEditorsConfig : IGridEditorsConfig
     private readonly ILogger<GridEditorsConfig> _logger;
     private readonly IManifestParser _manifestParser;
 
-    public GridEditorsConfig(AppCaches appCaches, IHostingEnvironment hostingEnvironment,
-        IManifestParser manifestParser, IJsonSerializer jsonSerializer, ILogger<GridEditorsConfig> logger)
+    public GridEditorsConfig(
+        AppCaches appCaches,
+        IHostingEnvironment hostingEnvironment,
+        IManifestParser manifestParser,
+        IJsonSerializer jsonSerializer,
+        ILogger<GridEditorsConfig> logger)
     {
         _appCaches = appCaches;
         _hostingEnvironment = hostingEnvironment;
@@ -49,15 +53,18 @@ internal class GridEditorsConfig : IGridEditorsConfig
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex,
+                        _logger.LogError(
+                            ex,
                             "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}",
                             sourceString);
                     }
                 }
-                else // Read default from embedded file
+
+                // Read default from embedded file
+                else
                 {
                     Assembly assembly = GetType().Assembly;
-                    Stream resourceStream = assembly.GetManifestResourceStream(
+                    Stream? resourceStream = assembly.GetManifestResourceStream(
                         "Umbraco.Cms.Core.EmbeddedResources.Grid.grid.editors.config.js");
 
                     if (resourceStream is not null)
@@ -80,11 +87,10 @@ internal class GridEditorsConfig : IGridEditorsConfig
                 return editors;
             }
 
-            //cache the result if debugging is disabled
-            List<IGridEditorConfig> result = _hostingEnvironment.IsDebugMode
+            // cache the result if debugging is disabled
+            List<IGridEditorConfig>? result = _hostingEnvironment.IsDebugMode
                 ? GetResult()
-                : _appCaches.RuntimeCache.GetCacheItem(typeof(GridEditorsConfig) + ".Editors", GetResult,
-                    TimeSpan.FromMinutes(10));
+                : _appCaches.RuntimeCache.GetCacheItem(typeof(GridEditorsConfig) + ".Editors", GetResult, TimeSpan.FromMinutes(10));
 
             return result!;
         }

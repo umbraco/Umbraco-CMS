@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -8,10 +8,15 @@ namespace Umbraco.Cms.Core.Cache;
 public interface ICacheRefresher : IDiscoverable
 {
     Guid RefresherUniqueId { get; }
+
     string Name { get; }
+
     void RefreshAll();
+
     void Refresh(int id);
+
     void Remove(int id);
+
     void Refresh(Guid id);
 }
 
@@ -27,5 +32,6 @@ public interface ICacheRefresher : IDiscoverable
 public interface ICacheRefresher<T> : ICacheRefresher
 {
     void Refresh(T instance);
+
     void Remove(T instance);
 }

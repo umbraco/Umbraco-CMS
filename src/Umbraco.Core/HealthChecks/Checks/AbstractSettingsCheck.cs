@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Services;
@@ -17,15 +17,15 @@ public abstract class AbstractSettingsCheck : HealthCheck
     protected AbstractSettingsCheck(ILocalizedTextService textService) => LocalizedTextService = textService;
 
     /// <summary>
-    ///     Gets the localized text service.
-    /// </summary>
-    protected ILocalizedTextService LocalizedTextService { get; }
-
-    /// <summary>
     ///     Gets key within the JSON to check, in the colon-delimited format
     ///     https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-3.1
     /// </summary>
     public abstract string ItemPath { get; }
+
+    /// <summary>
+    ///     Gets the localized text service.
+    /// </summary>
+    protected ILocalizedTextService LocalizedTextService { get; }
 
     /// <summary>
     ///     Gets a link to an external resource with more information.
@@ -50,8 +50,7 @@ public abstract class AbstractSettingsCheck : HealthCheck
     /// <summary>
     ///     Gets the message for when the check has succeeded.
     /// </summary>
-    public virtual string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck", "checkSuccessMessage",
-        new[] {CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath});
+    public virtual string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck", "checkSuccessMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
 
     /// <summary>
     ///     Gets the message for when the check has failed.
@@ -59,11 +58,9 @@ public abstract class AbstractSettingsCheck : HealthCheck
     public virtual string CheckErrorMessage =>
         ValueComparisonType == ValueComparisonType.ShouldEqual
             ? LocalizedTextService.Localize(
-                "healthcheck", "checkErrorMessageDifferentExpectedValue",
-                new[] {CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath})
+                "healthcheck", "checkErrorMessageDifferentExpectedValue", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath })
             : LocalizedTextService.Localize(
-                "healthcheck", "checkErrorMessageUnexpectedValue",
-                new[] {CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath});
+                "healthcheck", "checkErrorMessageUnexpectedValue", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
 
     /// <inheritdoc />
     public override Task<IEnumerable<HealthCheckStatus>> GetStatus()
@@ -77,13 +74,14 @@ public abstract class AbstractSettingsCheck : HealthCheck
             || (ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false))
         {
             return Task.FromResult(
-                new HealthCheckStatus(successMessage) {ResultType = StatusResultType.Success}.Yield());
+                new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success }.Yield());
         }
 
         var resultMessage = string.Format(CheckErrorMessage, ItemPath, Values, CurrentValue);
         var healthCheckStatus = new HealthCheckStatus(resultMessage)
         {
-            ResultType = StatusResultType.Error, ReadMoreLink = ReadMoreLink
+            ResultType = StatusResultType.Error,
+            ReadMoreLink = ReadMoreLink,
         };
 
         return Task.FromResult(healthCheckStatus.Yield());

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Umbraco.Extensions;
 
@@ -14,10 +14,9 @@ public class HealthCheckResults
         AllChecksSuccessful = allChecksSuccessful;
     }
 
-    private static ILogger Logger => StaticApplicationLogging.Logger; // TODO: inject
-
-
     internal Dictionary<string, IEnumerable<HealthCheckStatus>> ResultsAsDictionary { get; }
+
+    private static ILogger Logger => StaticApplicationLogging.Logger; // TODO: inject
 
     public static async Task<HealthCheckResults> Create(IEnumerable<HealthCheck> checks)
     {
@@ -33,7 +32,7 @@ public class HealthCheckResults
                 {
                     Logger.LogError(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
                     var message = $"Health check failed with exception: {ex.Message}. See logs for details.";
-                    return new List<HealthCheckStatus> {new(message) {ResultType = StatusResultType.Error}};
+                    return new List<HealthCheckStatus> { new(message) { ResultType = StatusResultType.Error } };
                 }
             });
 
@@ -74,8 +73,10 @@ public class HealthCheckResults
             foreach (HealthCheckStatus checkResult in checkResults)
             {
                 Logger.LogInformation(
-                    "Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName,
-                    checkResult.ResultType, checkResult.Message);
+                    "Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'",
+                    checkName,
+                    checkResult.ResultType,
+                    checkResult.Message);
             }
         }
     }
@@ -100,13 +101,11 @@ public class HealthCheckResults
 
             if (checkIsSuccess)
             {
-                sb.AppendFormat("{0}Checks for '{1}' all completed successfully.{2}", newItem, checkName,
-                    Environment.NewLine);
+                sb.AppendFormat("{0}Checks for '{1}' all completed successfully.{2}", newItem, checkName, Environment.NewLine);
             }
             else
             {
-                sb.AppendFormat("{0}Checks for '{1}' completed with errors.{2}", newItem, checkName,
-                    Environment.NewLine);
+                sb.AppendFormat("{0}Checks for '{1}' completed with errors.{2}", newItem, checkName, Environment.NewLine);
             }
 
             foreach (HealthCheckStatus checkResult in checkResults)
@@ -126,12 +125,6 @@ public class HealthCheckResults
 
         return sb.ToString();
     }
-
-    private string SimpleHtmlToMarkDown(string html) =>
-        html.Replace("<strong>", "**")
-            .Replace("</strong>", "**")
-            .Replace("<em>", "*")
-            .Replace("</em>", "*");
 
     public Dictionary<string, IEnumerable<HealthCheckStatus>>? GetResultsForStatus(StatusResultType resultType)
     {
@@ -166,4 +159,10 @@ public class HealthCheckResults
 
         return null;
     }
+
+    private string SimpleHtmlToMarkDown(string html) =>
+        html.Replace("<strong>", "**")
+            .Replace("</strong>", "**")
+            .Replace("<em>", "*")
+            .Replace("</em>", "*");
 }

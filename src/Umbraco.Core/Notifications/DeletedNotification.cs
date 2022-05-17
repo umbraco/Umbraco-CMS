@@ -7,11 +7,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public abstract class DeletedNotification<T> : EnumerableObjectNotification<T>
 {
-    protected DeletedNotification(T target, EventMessages messages) : base(target, messages)
+    protected DeletedNotification(T target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    protected DeletedNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+    protected DeletedNotification(IEnumerable<T> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

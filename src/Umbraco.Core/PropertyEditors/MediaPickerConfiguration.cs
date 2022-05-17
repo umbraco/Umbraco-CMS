@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents the configuration for the media picker value editor.
@@ -19,7 +19,8 @@ public class MediaPickerConfiguration : IIgnoreUserStartNodesConfig
     [ConfigurationField("startNodeId", "Start node", "mediapicker")]
     public Udi? StartNodeId { get; set; }
 
-    [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+    [ConfigurationField(
+        Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
         "Ignore User Start Nodes", "boolean",
         Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
     public bool IgnoreUserStartNodes { get; set; }

@@ -18,15 +18,14 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 [HealthCheck(
     "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
     "HTTPS Configuration",
-    Description =
-        "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.",
+    Description = "Checks if your site is configured to work over HTTPS and if the Umbraco related configuration for that is correct.",
     Group = "Security")]
 public class HttpsCheck : HealthCheck
 {
     private const int NumberOfDaysForExpiryWarning = 14;
     private const string HttpPropertyKeyCertificateDaysToExpiry = "CertificateDaysToExpiry";
 
-    private static HttpClient? s_httpClient;
+    private static HttpClient? httpClient;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -48,9 +47,9 @@ public class HttpsCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private static HttpClient HttpClient => s_httpClient ??= new HttpClient(new HttpClientHandler
+    private static HttpClient HttpClient => httpClient ??= new HttpClient(new HttpClientHandler
     {
-        ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation
+        ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation,
     });
 
     /// <inheritdoc />
@@ -65,8 +64,11 @@ public class HttpsCheck : HealthCheck
         => throw new InvalidOperationException(
             "HttpsCheck action requested is either not executable or does not exist");
 
-    private static bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage,
-        X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslErrors)
+    private static bool ServerCertificateCustomValidation(
+        HttpRequestMessage requestMessage,
+        X509Certificate2? certificate,
+        X509Chain? chain,
+        SslPolicyErrors sslErrors)
     {
         if (certificate is not null)
         {
@@ -83,7 +85,7 @@ public class HttpsCheck : HealthCheck
         StatusResultType result;
 
         // Attempt to access the site over HTTPS to see if it HTTPS is supported and a valid certificate has been configured
-        var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl) {Scheme = Uri.UriSchemeHttps};
+        var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl) { Scheme = Uri.UriSchemeHttps };
         Uri url = urlBuilder.Uri;
 
         var request = new HttpRequestMessage(HttpMethod.Head, url);
@@ -96,8 +98,9 @@ public class HttpsCheck : HealthCheck
             {
                 // Got a valid response, check now if the certificate is expiring within the specified amount of days
                 int? daysToExpiry = 0;
-                if (request.Properties.TryGetValue(HttpPropertyKeyCertificateDaysToExpiry,
-                        out var certificateDaysToExpiry))
+                if (request.Properties.TryGetValue(
+                    HttpPropertyKeyCertificateDaysToExpiry,
+                    out var certificateDaysToExpiry))
                 {
                     daysToExpiry = (int?)certificateDaysToExpiry;
                 }
@@ -110,8 +113,7 @@ public class HttpsCheck : HealthCheck
                 else if (daysToExpiry < NumberOfDaysForExpiryWarning)
                 {
                     result = StatusResultType.Warning;
-                    message = _textService.Localize("healthcheck", "httpsCheckExpiringCertificate",
-                        new[] {daysToExpiry.ToString()});
+                    message = _textService.Localize("healthcheck", "httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
                 }
                 else
                 {
@@ -122,8 +124,7 @@ public class HttpsCheck : HealthCheck
             else
             {
                 result = StatusResultType.Error;
-                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl",
-                    new[] {url.AbsoluteUri, response.ReasonPhrase});
+                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, response.ReasonPhrase });
             }
         }
         catch (Exception ex)
@@ -131,14 +132,12 @@ public class HttpsCheck : HealthCheck
             if (ex is WebException exception)
             {
                 message = exception.Status == WebExceptionStatus.TrustFailure
-                    ? _textService.Localize("healthcheck", "httpsCheckInvalidCertificate", new[] {exception.Message})
-                    : _textService.Localize("healthcheck", "healthCheckInvalidUrl",
-                        new[] {url.AbsoluteUri, exception.Message});
+                    ? _textService.Localize("healthcheck", "httpsCheckInvalidCertificate", new[] { exception.Message })
+                    : _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, exception.Message });
             }
             else
             {
-                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl",
-                    new[] {url.AbsoluteUri, ex.Message});
+                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, ex.Message });
             }
 
             result = StatusResultType.Error;
@@ -149,7 +148,7 @@ public class HttpsCheck : HealthCheck
             ResultType = result,
             ReadMoreLink = result == StatusResultType.Success
                 ? null
-                : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckIfCurrentSchemeIsHttps
+                : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckIfCurrentSchemeIsHttps,
         };
     }
 
@@ -159,13 +158,12 @@ public class HttpsCheck : HealthCheck
         var success = uri.Scheme == Uri.UriSchemeHttps;
 
         return Task.FromResult(
-            new HealthCheckStatus(_textService.Localize("healthcheck", "httpsCheckIsCurrentSchemeHttps",
-                new[] {success ? string.Empty : "not"}))
+            new HealthCheckStatus(_textService.Localize("healthcheck", "httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
             {
                 ResultType = success ? StatusResultType.Success : StatusResultType.Error,
                 ReadMoreLink = success
                     ? null
-                    : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckIfCurrentSchemeIsHttps
+                    : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckIfCurrentSchemeIsHttps,
             });
     }
 
@@ -183,8 +181,7 @@ public class HttpsCheck : HealthCheck
         }
         else
         {
-            resultMessage = _textService.Localize("healthcheck", "httpsCheckConfigurationCheckResult",
-                new[] {httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not"});
+            resultMessage = _textService.Localize("healthcheck", "httpsCheckConfigurationCheckResult", new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
             resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
         }
 
@@ -193,7 +190,7 @@ public class HttpsCheck : HealthCheck
             ResultType = resultType,
             ReadMoreLink = resultType == StatusResultType.Success
                 ? null
-                : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckHttpsConfigurationSetting
+                : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckHttpsConfigurationSetting,
         });
     }
 }

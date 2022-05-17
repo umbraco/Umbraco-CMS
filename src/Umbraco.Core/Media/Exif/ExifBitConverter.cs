@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif;
@@ -71,7 +71,8 @@ internal class ExifBitConverter : BitConverterEx
                 // yyyy:MM:dd HH:mm:ss
                 // This is the expected format though some cameras
                 // can use single digits. See Issue 21.
-                return new DateTime(int.Parse(parts[0], CultureInfo.InvariantCulture),
+                return new DateTime(
+                    int.Parse(parts[0], CultureInfo.InvariantCulture),
                     int.Parse(parts[1], CultureInfo.InvariantCulture),
                     int.Parse(parts[2], CultureInfo.InvariantCulture),
                     int.Parse(parts[3], CultureInfo.InvariantCulture),
@@ -82,7 +83,8 @@ internal class ExifBitConverter : BitConverterEx
             if (!hastime && parts.Length == 3)
             {
                 // yyyy:MM:dd
-                return new DateTime(int.Parse(parts[0], CultureInfo.InvariantCulture),
+                return new DateTime(
+                    int.Parse(parts[0], CultureInfo.InvariantCulture),
                     int.Parse(parts[1], CultureInfo.InvariantCulture),
                     int.Parse(parts[2], CultureInfo.InvariantCulture));
             }
@@ -117,7 +119,8 @@ internal class ExifBitConverter : BitConverterEx
         var den = new byte[4];
         Array.Copy(data, 0, num, 0, 4);
         Array.Copy(data, 4, den, 0, 4);
-        return new MathEx.UFraction32(ToUInt32(num, 0, frombyteorder, SystemByteOrder),
+        return new MathEx.UFraction32(
+            ToUInt32(num, 0, frombyteorder, SystemByteOrder),
             ToUInt32(den, 0, frombyteorder, SystemByteOrder));
     }
 
@@ -134,7 +137,8 @@ internal class ExifBitConverter : BitConverterEx
         var den = new byte[4];
         Array.Copy(data, 0, num, 0, 4);
         Array.Copy(data, 4, den, 0, 4);
-        return new MathEx.Fraction32(ToInt32(num, 0, frombyteorder, SystemByteOrder),
+        return new MathEx.Fraction32(
+            ToInt32(num, 0, frombyteorder, SystemByteOrder),
             ToInt32(den, 0, frombyteorder, SystemByteOrder));
     }
 
@@ -206,7 +210,8 @@ internal class ExifBitConverter : BitConverterEx
             var den = new byte[4];
             Array.Copy(data, i * 8, num, 0, 4);
             Array.Copy(data, (i * 8) + 4, den, 0, 4);
-            numbers[i].Set(ToUInt32(num, 0, frombyteorder, SystemByteOrder),
+            numbers[i].Set(
+                ToUInt32(num, 0, frombyteorder, SystemByteOrder),
                 ToUInt32(den, 0, frombyteorder, SystemByteOrder));
         }
 
@@ -227,7 +232,8 @@ internal class ExifBitConverter : BitConverterEx
             var den = new byte[4];
             Array.Copy(data, i * 8, num, 0, 4);
             Array.Copy(data, (i * 8) + 4, den, 0, 4);
-            numbers[i].Set(ToInt32(num, 0, frombyteorder, SystemByteOrder),
+            numbers[i].Set(
+                ToInt32(num, 0, frombyteorder, SystemByteOrder),
                 ToInt32(den, 0, frombyteorder, SystemByteOrder));
         }
 
@@ -257,7 +263,7 @@ internal class ExifBitConverter : BitConverterEx
     /// </summary>
     public static byte[] GetBytes(DateTime value, bool hastime)
     {
-        var str = "";
+        var str = string.Empty;
         if (hastime)
         {
             str = value.ToString("yyyy:MM:dd HH:mm:ss", CultureInfo.InvariantCulture);

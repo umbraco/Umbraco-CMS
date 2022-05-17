@@ -36,7 +36,8 @@ public class LocalizedTextServiceFileSources
             logger,
             appCaches,
             fileSourceFolder,
-            supplementFileSources, new NotFoundDirectoryContents())
+            supplementFileSources,
+            new NotFoundDirectoryContents())
     {
     }
 
@@ -46,44 +47,28 @@ public class LocalizedTextServiceFileSources
     ///     localization files. The supplemental files will be loaded in and merged in after the primary files.
     ///     The supplemental files must be named with the 4 letter culture name with a hyphen such as : en-AU.xml
     /// </summary>
-    /// <param name="logger"></param>
-    /// <param name="cache"></param>
-    /// <param name="fileSourceFolder"></param>
-    /// <param name="supplementFileSources"></param>
     public LocalizedTextServiceFileSources(
         ILogger<LocalizedTextServiceFileSources> logger,
         AppCaches appCaches,
         DirectoryInfo fileSourceFolder,
         IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources,
-        IDirectoryContents directoryContents
-    )
+        IDirectoryContents directoryContents)
     {
-        if (logger == null)
-        {
-            throw new ArgumentNullException("logger");
-        }
-
         if (appCaches == null)
         {
-            throw new ArgumentNullException("cache");
+            throw new ArgumentNullException("appCaches");
         }
 
-        if (fileSourceFolder == null)
-        {
-            throw new ArgumentNullException("fileSourceFolder");
-        }
-
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException("logger");
         _directoryContents = directoryContents;
         _cache = appCaches.RuntimeCache;
-        _fileSourceFolder = fileSourceFolder;
+        _fileSourceFolder = fileSourceFolder ?? throw new ArgumentNullException("fileSourceFolder");
         _supplementFileSources = supplementFileSources;
 
-        //Create the lazy source for the _xmlSources
+        // Create the lazy source for the _xmlSources
         _xmlSources = new Lazy<Dictionary<CultureInfo, Lazy<XDocument>>>(() =>
         {
             var result = new Dictionary<CultureInfo, Lazy<XDocument>>();
-
 
             IEnumerable<IFileInfo> files = GetLanguageFiles();
 
@@ -105,8 +90,8 @@ public class LocalizedTextServiceFileSources
                 CultureInfo? culture = null;
                 if (filename.Length == 2)
                 {
-                    //we need to open the file to see if we can read it's 'real' culture, we'll use XmlReader since we don't
-                    //want to load in the entire doc into mem just to read a single value
+                    // we need to open the file to see if we can read it's 'real' culture, we'll use XmlReader since we don't
+                    // want to load in the entire doc into mem just to read a single value
                     using (Stream fs = fileInfo.CreateReadStream())
                     using (var reader = XmlReader.Create(fs))
                     {
@@ -120,15 +105,18 @@ public class LocalizedTextServiceFileSources
                                     try
                                     {
                                         culture = CultureInfo.GetCultureInfo(cultureVal);
-                                        //add to the tracked dictionary
+
+                                        // add to the tracked dictionary
                                         _twoLetterCultureConverter[filename] = culture;
                                     }
                                     catch (CultureNotFoundException)
                                     {
                                         _logger.LogWarning(
                                             "The culture {CultureValue} found in the file {CultureFile} is not a valid culture",
-                                            cultureVal, fileInfo.Name);
-                                        //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
+                                            cultureVal,
+                                            fileInfo.Name);
+
+                                        // If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                         // an exception will be thrown.
                                     }
                                 }
@@ -142,23 +130,27 @@ public class LocalizedTextServiceFileSources
                     culture = CultureInfo.GetCultureInfo(filename);
                 }
 
-                //get the lazy value from cache
-                result[culture] = new Lazy<XDocument>(() => _cache.GetCacheItem(
-                    string.Format("{0}-{1}", typeof(LocalizedTextServiceFileSources).Name, culture.Name), () =>
+                // get the lazy value from cache
+                result[culture] = new Lazy<XDocument>(
+                    () => _cache.GetCacheItem(
+                        string.Format("{0}-{1}", typeof(LocalizedTextServiceFileSources).Name, culture.Name),
+                        () =>
                     {
                         XDocument xdoc;
 
-                        //load in primary
+                        // load in primary
                         using (Stream fs = localCopy.CreateReadStream())
                         {
                             xdoc = XDocument.Load(fs);
                         }
 
-                        //load in supplementary
+                        // load in supplementary
                         MergeSupplementaryFiles(culture, xdoc);
 
                         return xdoc;
-                    }, isSliding: true, timeout: TimeSpan.FromMinutes(10))!);
+                    },
+                        isSliding: true,
+                        timeout: TimeSpan.FromMinutes(10))!);
             }
 
             return result;
@@ -168,11 +160,16 @@ public class LocalizedTextServiceFileSources
     /// <summary>
     ///     Constructor
     /// </summary>
-    public LocalizedTextServiceFileSources(ILogger<LocalizedTextServiceFileSources> logger, AppCaches appCaches,
-        DirectoryInfo fileSourceFolder)
+    public LocalizedTextServiceFileSources(ILogger<LocalizedTextServiceFileSources> logger, AppCaches appCaches, DirectoryInfo fileSourceFolder)
         : this(logger, appCaches, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
     {
     }
+
+    /// <summary>
+    ///     returns all xml sources for all culture files found in the folder
+    /// </summary>
+    /// <returns></returns>
+    public IDictionary<CultureInfo, Lazy<XDocument>> GetXmlSources() => _xmlSources.Value;
 
     private IEnumerable<IFileInfo> GetLanguageFiles()
     {
@@ -182,36 +179,28 @@ public class LocalizedTextServiceFileSources
         {
             result.AddRange(
                 new PhysicalDirectoryContents(_fileSourceFolder.FullName)
-                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"))
-            );
+                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml")));
         }
 
         if (_directoryContents.Exists)
         {
             result.AddRange(
                 _directoryContents
-                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"))
-            );
+                    .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml")));
         }
 
         return result;
     }
-
-    /// <summary>
-    ///     returns all xml sources for all culture files found in the folder
-    /// </summary>
-    /// <returns></returns>
-    public IDictionary<CultureInfo, Lazy<XDocument>> GetXmlSources() => _xmlSources.Value;
 
     // TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
     public Attempt<CultureInfo?> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
     {
         if (twoLetterCulture.Length != 2)
         {
-            return Attempt<CultureInfo>.Fail();
+            return Attempt<CultureInfo?>.Fail();
         }
 
-        //This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
+        // This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
         Dictionary<CultureInfo, Lazy<XDocument>> resolved = _xmlSources.Value;
 
         return _twoLetterCultureConverter.ContainsKey(twoLetterCulture)
@@ -227,11 +216,11 @@ public class LocalizedTextServiceFileSources
             throw new ArgumentNullException("culture");
         }
 
-        //This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
+        // This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
         Dictionary<CultureInfo, Lazy<XDocument>> resolved = _xmlSources.Value;
 
         return _twoLetterCultureConverter.Values.Contains(culture)
-            ? Attempt.Succeed(culture.Name.Substring(0, 2))
+            ? Attempt.Succeed(culture.Name[..2])
             : Attempt<string?>.Fail();
     }
 
@@ -244,16 +233,15 @@ public class LocalizedTextServiceFileSources
 
         if (_supplementFileSources != null)
         {
-            //now load in supplementary
+            // now load in supplementary
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> found = _supplementFileSources.Where(x =>
             {
                 var extension = Path.GetExtension(x.File.FullName);
                 var fileCultureName = Path.GetFileNameWithoutExtension(x.File.FullName).Replace("_", "-")
-                    .Replace(".user", "");
+                    .Replace(".user", string.Empty);
                 return extension.InvariantEquals(".xml") && (
                     fileCultureName.InvariantEquals(culture.Name)
-                    || fileCultureName.InvariantEquals(culture.TwoLetterISOLanguageName)
-                );
+                    || fileCultureName.InvariantEquals(culture.TwoLetterISOLanguageName));
             });
 
             foreach (LocalizedTextServiceSupplementaryFileSource supplementaryFile in found)
@@ -281,11 +269,10 @@ public class LocalizedTextServiceFileSources
                     {
                         var areaAlias = (string)xArea.Attribute("alias")!;
 
-                        XElement areaFound = xMasterDoc.Root.Elements("area")
-                            .FirstOrDefault(x => (string)x.Attribute("alias")! == areaAlias);
+                        XElement? areaFound = xMasterDoc.Root.Elements("area").FirstOrDefault(x => (string)x.Attribute("alias")! == areaAlias);
                         if (areaFound == null)
                         {
-                            //add the whole thing
+                            // add the whole thing
                             xMasterDoc.Root.Add(xArea);
                         }
                         else
@@ -310,21 +297,21 @@ public class LocalizedTextServiceFileSources
             throw new ArgumentNullException("source");
         }
 
-        //merge in the child elements
+        // merge in the child elements
         foreach (XElement key in source.Elements("key")
                      .Where(x => ((string)x.Attribute("alias")!).IsNullOrWhiteSpace() == false))
         {
             var keyAlias = (string)key.Attribute("alias")!;
-            XElement keyFound = destination.Elements("key")
+            XElement? keyFound = destination.Elements("key")
                 .FirstOrDefault(x => (string)x.Attribute("alias")! == keyAlias);
             if (keyFound == null)
             {
-                //append, it doesn't exist
+                // append, it doesn't exist
                 destination.Add(key);
             }
             else if (overwrite)
             {
-                //overwrite
+                // overwrite
                 keyFound.Value = key.Value;
             }
         }

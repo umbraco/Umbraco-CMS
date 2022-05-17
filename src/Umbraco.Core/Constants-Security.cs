@@ -42,7 +42,6 @@ public static partial class Constants
 
         public const string DefaultMemberTypeAlias = "Member";
 
-
         /// <summary>
         ///     The prefix used for external identity providers for their authentication type
         /// </summary>

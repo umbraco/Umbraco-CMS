@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Events;
@@ -14,7 +14,7 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         if (EventName.IsNullOrWhiteSpace())
         {
             // don't match "Ing" suffixed names
-            Attempt<EventNameExtractorResult> findResult =
+            Attempt<EventNameExtractorResult?> findResult =
                 EventNameExtractor.FindEvent(sender, args, EventNameExtractor.MatchIngNames);
 
             if (findResult.Success == false)
@@ -28,6 +28,8 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
             EventName = findResult.Result?.Name;
         }
     }
+
+    public object Sender { get; }
 
     public bool Equals(EventDefinitionBase? other)
     {
@@ -44,9 +46,11 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
         return Args.Equals(other.Args) && string.Equals(EventName, other.EventName) && Sender.Equals(other.Sender);
     }
 
-    public object Sender { get; }
     public object Args { get; }
+
     public string? EventName { get; }
+
+    public static bool operator ==(EventDefinitionBase left, EventDefinitionBase right) => Equals(left, right);
 
     public abstract void RaiseEvent();
 
@@ -84,8 +88,6 @@ public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDe
             return hashCode;
         }
     }
-
-    public static bool operator ==(EventDefinitionBase left, EventDefinitionBase right) => Equals(left, right);
 
     public static bool operator !=(EventDefinitionBase left, EventDefinitionBase right) => Equals(left, right) == false;
 }

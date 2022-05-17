@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -15,8 +15,12 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
     private readonly IAuditRepository _auditRepository;
     private readonly IMacroRepository _macroRepository;
 
-    public MacroService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IMacroRepository macroRepository, IAuditRepository auditRepository)
+    public MacroService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMacroRepository macroRepository,
+        IAuditRepository auditRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _macroRepository = macroRepository;
@@ -69,7 +73,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return macroWithAliasRepository.GetAllByAlias(aliases) ?? Enumerable.Empty<IMacro>();
+            return macroWithAliasRepository.GetAllByAlias(aliases);
         }
     }
 
@@ -153,21 +157,20 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
     ///// Gets a list all available <see cref="IMacroPropertyType"/> plugins
     ///// </summary>
     ///// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
-    //public IEnumerable<IMacroPropertyType> GetMacroPropertyTypes()
-    //{
+    // public IEnumerable<IMacroPropertyType> GetMacroPropertyTypes()
+    // {
     //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes;
-    //}
+    // }
 
     ///// <summary>
     ///// Gets an <see cref="IMacroPropertyType"/> by its alias
     ///// </summary>
     ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
     ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
-    //public IMacroPropertyType GetMacroPropertyTypeByAlias(string alias)
-    //{
+    // public IMacroPropertyType GetMacroPropertyTypeByAlias(string alias)
+    // {
     //    return MacroPropertyTypeResolver.Current.MacroPropertyTypes.FirstOrDefault(x => x.Alias == alias);
-    //}
-
+    // }
     private void Audit(AuditType type, int userId, int objectId) =>
         _auditRepository.Save(new AuditItem(objectId, type, userId, "Macro"));
 }

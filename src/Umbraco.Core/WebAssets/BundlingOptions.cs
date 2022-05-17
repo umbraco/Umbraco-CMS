@@ -2,16 +2,19 @@ namespace Umbraco.Cms.Core.WebAssets;
 
 public struct BundlingOptions : IEquatable<BundlingOptions>
 {
-    public static BundlingOptions OptimizedAndComposite => new(true);
-    public static BundlingOptions OptimizedNotComposite => new(true, false);
-    public static BundlingOptions NotOptimizedNotComposite => new(false, false);
-    public static BundlingOptions NotOptimizedAndComposite => new(false);
-
     public BundlingOptions(bool optimizeOutput = true, bool enabledCompositeFiles = true)
     {
         OptimizeOutput = optimizeOutput;
         EnabledCompositeFiles = enabledCompositeFiles;
     }
+
+    public static BundlingOptions OptimizedAndComposite => new(true);
+
+    public static BundlingOptions OptimizedNotComposite => new(true, false);
+
+    public static BundlingOptions NotOptimizedNotComposite => new(false, false);
+
+    public static BundlingOptions NotOptimizedAndComposite => new(false);
 
     /// <summary>
     ///     If true, the files in the bundle will be minified
@@ -23,6 +26,8 @@ public struct BundlingOptions : IEquatable<BundlingOptions>
     ///     will be served as individual files.
     /// </summary>
     public bool EnabledCompositeFiles { get; }
+
+    public static bool operator ==(BundlingOptions left, BundlingOptions right) => left.Equals(right);
 
     public override bool Equals(object? obj) => obj is BundlingOptions options && Equals(options);
 
@@ -36,8 +41,6 @@ public struct BundlingOptions : IEquatable<BundlingOptions>
         hashCode = (hashCode * -1521134295) + EnabledCompositeFiles.GetHashCode();
         return hashCode;
     }
-
-    public static bool operator ==(BundlingOptions left, BundlingOptions right) => left.Equals(right);
 
     public static bool operator !=(BundlingOptions left, BundlingOptions right) => !(left == right);
 }

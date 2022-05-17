@@ -29,6 +29,7 @@ public interface IDocumentRepository : IContentRepository<int, IContent>, IReadR
     void ClearSchedule(DateTime date, ContentScheduleAction action);
 
     bool HasContentForExpiration(DateTime date);
+
     bool HasContentForRelease(DateTime date);
 
     /// <summary>

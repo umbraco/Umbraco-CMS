@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Provides a fallback strategy for getting <see cref="IPublishedElement" /> values.
@@ -31,8 +31,7 @@ public interface IPublishedValueFallback
     ///         the web project.
     ///     </para>
     /// </remarks>
-    bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback,
-        object? defaultValue, out object? value);
+    bool TryGetValue(IPublishedProperty property, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value);
 
     /// <summary>
     ///     Tries to get a fallback value for a property.
@@ -56,8 +55,7 @@ public interface IPublishedValueFallback
     ///         get property.Value() or property.Value{T}() to trigger fallback.
     ///     </para>
     /// </remarks>
-    bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback,
-        T? defaultValue, out T? value);
+    bool TryGetValue<T>(IPublishedProperty property, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value);
 
     /// <summary>
     ///     Tries to get a fallback value for a published element property.
@@ -77,8 +75,7 @@ public interface IPublishedValueFallback
     ///     </para>
     ///     <para>It can only fallback at element level (no recurse).</para>
     /// </remarks>
-    bool TryGetValue(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback,
-        object? defaultValue, out object? value);
+    bool TryGetValue(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback, object? defaultValue, out object? value);
 
     /// <summary>
     ///     Tries to get a fallback value for a published element property.
@@ -99,8 +96,7 @@ public interface IPublishedValueFallback
     ///     </para>
     ///     <para>It can only fallback at element level (no recurse).</para>
     /// </remarks>
-    bool TryGetValue<T>(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback,
-        T? defaultValue, out T? value);
+    bool TryGetValue<T>(IPublishedElement content, string alias, string? culture, string? segment, Fallback fallback, T? defaultValue, out T? value);
 
     /// <summary>
     ///     Tries to get a fallback value for a published content property.
@@ -128,8 +124,15 @@ public interface IPublishedValueFallback
     ///         converter's interpretation of "no value".
     ///     </para>
     /// </remarks>
-    bool TryGetValue(IPublishedContent content, string alias, string? culture, string? segment, Fallback fallback,
-        object? defaultValue, out object? value, out IPublishedProperty? noValueProperty);
+    bool TryGetValue(
+        IPublishedContent content,
+        string alias,
+        string? culture,
+        string? segment,
+        Fallback fallback,
+        object? defaultValue,
+        out object? value,
+        out IPublishedProperty? noValueProperty);
 
     /// <summary>
     ///     Tries to get a fallback value for a published content property.
@@ -158,6 +161,13 @@ public interface IPublishedValueFallback
     ///         converter's interpretation of "no value".
     ///     </para>
     /// </remarks>
-    bool TryGetValue<T>(IPublishedContent content, string alias, string? culture, string? segment, Fallback fallback,
-        T defaultValue, out T? value, out IPublishedProperty? noValueProperty);
+    bool TryGetValue<T>(
+        IPublishedContent content,
+        string alias,
+        string? culture,
+        string? segment,
+        Fallback fallback,
+        T defaultValue,
+        out T? value,
+        out IPublishedProperty? noValueProperty);
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
 ///     Used to map property values when saving content/media/members

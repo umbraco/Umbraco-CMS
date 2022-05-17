@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
@@ -36,9 +36,11 @@ public class ContentTypeBasic : EntityBasic
     [ReadOnly(true)]
     public DateTime CreateDate { get; set; }
 
-    [DataMember(Name = "description")] public string? Description { get; set; }
+    [DataMember(Name = "description")]
+    public string? Description { get; set; }
 
-    [DataMember(Name = "thumbnail")] public string? Thumbnail { get; set; }
+    [DataMember(Name = "thumbnail")]
+    public string? Thumbnail { get; set; }
 
     /// <summary>
     ///     Returns true if the icon represents a CSS class instead of a file path
@@ -54,7 +56,7 @@ public class ContentTypeBasic : EntityBasic
                 return true;
             }
 
-            //if it starts with a '.' or doesn't contain a '.' at all then it is a class
+            // if it starts with a '.' or doesn't contain a '.' at all then it is a class
             return (Icon?.StartsWith(".") ?? false) || Icon?.Contains(".") == false;
         }
     }
@@ -80,7 +82,7 @@ public class ContentTypeBasic : EntityBasic
                 return true;
             }
 
-            //if it starts with a '.' or doesn't contain a '.' at all then it is a class
+            // if it starts with a '.' or doesn't contain a '.' at all then it is a class
             return (Thumbnail?.StartsWith(".") ?? false) || Thumbnail?.Contains(".") == false;
         }
     }

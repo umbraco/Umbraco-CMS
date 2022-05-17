@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -126,16 +126,15 @@ public class MacroProperty : BeingDirtyBase, IMacroProperty
 
     public object DeepClone()
     {
-        //Memberwise clone on MacroProperty will work since it doesn't have any deep elements
+        // Memberwise clone on MacroProperty will work since it doesn't have any deep elements
         // for any sub class this will work for standard properties as well that aren't complex object's themselves.
         var clone = (MacroProperty)MemberwiseClone();
-        //Automatically deep clone ref properties that are IDeepCloneable
+
+        // Automatically deep clone ref properties that are IDeepCloneable
         DeepCloneHelper.DeepCloneRefProperties(this, clone);
         clone.ResetDirtyProperties(false);
         return clone;
     }
-
-    protected bool Equals(MacroProperty other) => string.Equals(_alias, other._alias) && _id == other._id;
 
     public override bool Equals(object? obj)
     {
@@ -156,6 +155,8 @@ public class MacroProperty : BeingDirtyBase, IMacroProperty
 
         return Equals((MacroProperty)obj);
     }
+
+    protected bool Equals(MacroProperty other) => string.Equals(_alias, other._alias) && _id == other._id;
 
     public override int GetHashCode()
     {

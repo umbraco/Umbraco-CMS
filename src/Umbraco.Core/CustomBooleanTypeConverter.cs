@@ -20,9 +20,8 @@ public class CustomBooleanTypeConverter : BooleanConverter
 
     public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
     {
-        if (value is string)
+        if (value is string str)
         {
-            var str = (string)value;
             if (str == null || str.Length == 0 || str == "0")
             {
                 return false;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
@@ -51,8 +51,19 @@ public class Macro : EntityBase, IMacro
     /// <param name="cacheByMember"></param>
     /// <param name="dontRender"></param>
     /// <param name="macroSource"></param>
-    public Macro(IShortStringHelper shortStringHelper, int id, Guid key, bool useInEditor, int cacheDuration,
-        string alias, string? name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource)
+    /// <param name="shortStringHelper"></param>
+    public Macro(
+        IShortStringHelper shortStringHelper,
+        int id,
+        Guid key,
+        bool useInEditor,
+        int cacheDuration,
+        string alias,
+        string? name,
+        bool cacheByPage,
+        bool cacheByMember,
+        bool dontRender,
+        string macroSource)
         : this(shortStringHelper)
     {
         Id = id;
@@ -78,7 +89,11 @@ public class Macro : EntityBase, IMacro
     /// <param name="cacheByMember"></param>
     /// <param name="dontRender"></param>
     /// <param name="macroSource"></param>
-    public Macro(IShortStringHelper shortStringHelper, string alias, string? name,
+    /// <param name="shortStringHelper"></param>
+    public Macro(
+        IShortStringHelper shortStringHelper,
+        string alias,
+        string? name,
         string macroSource,
         bool cacheByPage = false,
         bool cacheByMember = false,
@@ -95,6 +110,19 @@ public class Macro : EntityBase, IMacro
         CacheByMember = cacheByMember;
         DontRender = dontRender;
         MacroSource = macroSource;
+    }
+
+    /// <summary>
+    ///     Gets or sets the alias of the Macro
+    /// </summary>
+    [DataMember]
+    public string Alias
+    {
+        get => _alias;
+        set => SetPropertyValueAndDetectChanges(
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias),
+            ref _alias!,
+            nameof(Alias));
     }
 
     /// <summary>
@@ -118,17 +146,6 @@ public class Macro : EntityBase, IMacro
         {
             prop.ResetDirtyProperties(rememberDirty);
         }
-    }
-
-    /// <summary>
-    ///     Gets or sets the alias of the Macro
-    /// </summary>
-    [DataMember]
-    public string Alias
-    {
-        get => _alias;
-        set => SetPropertyValueAndDetectChanges(value.ToCleanString(_shortStringHelper, CleanStringType.Alias),
-            ref _alias!, nameof(Alias));
     }
 
     /// <summary>
@@ -207,13 +224,27 @@ public class Macro : EntityBase, IMacro
     [DataMember]
     public MacroPropertyCollection Properties { get; private set; }
 
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var clonedEntity = (Macro)clone;
+
+        clonedEntity._addedProperties = new List<string>();
+        clonedEntity._removedProperties = new List<string>();
+        clonedEntity.Properties = (MacroPropertyCollection)Properties.DeepClone();
+
+        // re-assign the event handler
+        clonedEntity.Properties.CollectionChanged += clonedEntity.PropertiesChanged;
+    }
+
     private void PropertiesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Properties));
 
         if (e.Action == NotifyCollectionChangedAction.Add)
         {
-            //listen for changes
+            // listen for changes
             MacroProperty? prop = e.NewItems?.Cast<MacroProperty>().First();
             if (prop is not null)
             {
@@ -223,15 +254,15 @@ public class Macro : EntityBase, IMacro
 
                 if (_addedProperties.Contains(alias) == false)
                 {
-                    //add to the added props
+                    // add to the added props
                     _addedProperties.Add(alias);
                 }
             }
         }
         else if (e.Action == NotifyCollectionChangedAction.Remove)
         {
-            //remove listening for changes
-            MacroProperty prop = e.OldItems?.Cast<MacroProperty>().First();
+            // remove listening for changes
+            MacroProperty? prop = e.OldItems?.Cast<MacroProperty>().First();
             if (prop is not null)
             {
                 prop.PropertyChanged -= PropertyDataChanged;
@@ -253,17 +284,4 @@ public class Macro : EntityBase, IMacro
     /// <param name="e"></param>
     private void PropertyDataChanged(object? sender, PropertyChangedEventArgs e) =>
         OnPropertyChanged(nameof(Properties));
-
-    protected override void PerformDeepClone(object clone)
-    {
-        base.PerformDeepClone(clone);
-
-        var clonedEntity = (Macro)clone;
-
-        clonedEntity._addedProperties = new List<string>();
-        clonedEntity._removedProperties = new List<string>();
-        clonedEntity.Properties = (MacroPropertyCollection)Properties.DeepClone();
-        //re-assign the event handler
-        clonedEntity.Properties.CollectionChanged += clonedEntity.PropertiesChanged;
-    }
 }

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Umbraco.Cms.Core.Dictionary;
 
@@ -8,16 +8,16 @@ namespace Umbraco.Cms.Core.Dictionary;
 public interface ICultureDictionary
 {
     /// <summary>
+    ///     Returns the current culture
+    /// </summary>
+    CultureInfo Culture { get; }
+
+    /// <summary>
     ///     Returns the dictionary value based on the key supplied
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
     string? this[string key] { get; }
-
-    /// <summary>
-    ///     Returns the current culture
-    /// </summary>
-    CultureInfo Culture { get; }
 
     /// <summary>
     ///     Returns the child dictionary entries for a given key

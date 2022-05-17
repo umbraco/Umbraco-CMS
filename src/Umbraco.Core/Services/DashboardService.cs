@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
@@ -13,8 +13,8 @@ public class DashboardService : IDashboardService
     private readonly DashboardCollection _dashboardCollection;
 
     private readonly ILocalizedTextService _localizedText;
-    // TODO: Unit test all this!!! :/
 
+    // TODO: Unit test all this!!! :/
     private readonly ISectionService _sectionService;
 
     public DashboardService(ISectionService sectionService, DashboardCollection dashboardCollection,
@@ -24,7 +24,6 @@ public class DashboardService : IDashboardService
         _dashboardCollection = dashboardCollection ?? throw new ArgumentNullException(nameof(dashboardCollection));
         _localizedText = localizedText ?? throw new ArgumentNullException(nameof(localizedText));
     }
-
 
     /// <inheritdoc />
     public IEnumerable<Tab<IDashboard>> GetDashboards(string section, IUser? currentUser)
@@ -45,13 +44,13 @@ public class DashboardService : IDashboardService
                 throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
             }
 
-            var dashboards = new List<IDashboard> {dashboard};
+            var dashboards = new List<IDashboard> { dashboard };
             tabs.Add(new Tab<IDashboard>
             {
                 Id = tabId++,
                 Label = _localizedText.Localize("dashboardTabs", dashboard.Alias),
                 Alias = dashboard.Alias,
-                Properties = dashboards
+                Properties = dashboards,
             });
         }
 
@@ -61,6 +60,34 @@ public class DashboardService : IDashboardService
     /// <inheritdoc />
     public IDictionary<string, IEnumerable<Tab<IDashboard>>> GetDashboards(IUser? currentUser) => _sectionService
         .GetSections().ToDictionary(x => x.Alias, x => GetDashboards(x.Alias, currentUser));
+
+    private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
+    {
+        IAccessRule[]? denyRules = null, grantRules = null, grantBySectionRules = null;
+
+        IEnumerable<IGrouping<AccessRuleType, IAccessRule>> groupedRules = rules.GroupBy(x => x.Type);
+        foreach (IGrouping<AccessRuleType, IAccessRule> group in groupedRules)
+        {
+            IAccessRule[] a = group.ToArray();
+            switch (group.Key)
+            {
+                case AccessRuleType.Deny:
+                    denyRules = a;
+                    break;
+                case AccessRuleType.Grant:
+                    grantRules = a;
+                    break;
+                case AccessRuleType.GrantBySection:
+                    grantBySectionRules = a;
+                    break;
+                default:
+                    throw new NotSupportedException($"The '{group.Key}'-AccessRuleType is not supported.");
+            }
+        }
+
+        return (denyRules ?? Array.Empty<IAccessRule>(), grantRules ?? Array.Empty<IAccessRule>(),
+            grantBySectionRules ?? Array.Empty<IAccessRule>());
+    }
 
     private bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IEnumerable<IAccessRule> rules)
     {
@@ -119,7 +146,7 @@ public class DashboardService : IDashboardService
 
         // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
         // be denied to see it no matter what
-        assignedUserGroups = assignedUserGroups ?? user.Groups.Select(x => x.Alias).ToArray();
+        assignedUserGroups ??= user.Groups.Select(x => x.Alias).ToArray();
         var deniedUserGroups = denyRules.SelectMany(g =>
                 g.Value?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries) ??
                 Array.Empty<string>())
@@ -131,33 +158,5 @@ public class DashboardService : IDashboardService
         }
 
         return hasAccess;
-    }
-
-    private static (IAccessRule[], IAccessRule[], IAccessRule[]) GroupRules(IEnumerable<IAccessRule> rules)
-    {
-        IAccessRule[]? denyRules = null, grantRules = null, grantBySectionRules = null;
-
-        IEnumerable<IGrouping<AccessRuleType, IAccessRule>> groupedRules = rules.GroupBy(x => x.Type);
-        foreach (IGrouping<AccessRuleType, IAccessRule> group in groupedRules)
-        {
-            IAccessRule[] a = group.ToArray();
-            switch (group.Key)
-            {
-                case AccessRuleType.Deny:
-                    denyRules = a;
-                    break;
-                case AccessRuleType.Grant:
-                    grantRules = a;
-                    break;
-                case AccessRuleType.GrantBySection:
-                    grantBySectionRules = a;
-                    break;
-                default:
-                    throw new NotSupportedException($"The '{group.Key.ToString()}'-AccessRuleType is not supported.");
-            }
-        }
-
-        return (denyRules ?? Array.Empty<IAccessRule>(), grantRules ?? Array.Empty<IAccessRule>(),
-            grantBySectionRules ?? Array.Empty<IAccessRule>());
     }
 }

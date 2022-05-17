@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.Strings;
@@ -34,7 +34,6 @@ internal class Diff
     /// <returns>Returns a array of Items that describe the differences.</returns>
     public static Item[] DiffText1(string textA, string textB) =>
         DiffInt(DiffCharCodes(textA, false), DiffCharCodes(textB, false));
-
 
     /// <summary>
     ///     Find the difference in 2 text documents, comparing by text lines.
@@ -72,8 +71,10 @@ internal class Diff
         h = null; // free up Hashtable memory (maybe)
 
         var max = dataA.Length + dataB.Length + 1;
+
         // vector for the (0,0) to (x,y) search
         var downVector = new int[(2 * max) + 2];
+
         // vector for the (u,v) to (N,M) search
         var upVector = new int[(2 * max) + 2];
 
@@ -84,6 +85,31 @@ internal class Diff
         return CreateDiffs(dataA, dataB);
     } // DiffText
 
+    /// <summary>
+    ///     Find the difference in 2 arrays of integers.
+    /// </summary>
+    /// <param name="arrayA">A-version of the numbers (usually the old one)</param>
+    /// <param name="arrayB">B-version of the numbers (usually the new one)</param>
+    /// <returns>Returns a array of Items that describe the differences.</returns>
+    public static Item[] DiffInt(int[] arrayA, int[] arrayB)
+    {
+        // The A-Version of the data (original data) to be compared.
+        var dataA = new DiffData(arrayA);
+
+        // The B-Version of the data (modified data) to be compared.
+        var dataB = new DiffData(arrayB);
+
+        var max = dataA.Length + dataB.Length + 1;
+
+        // vector for the (0,0) to (x,y) search
+        var downVector = new int[(2 * max) + 2];
+
+        // vector for the (u,v) to (N,M) search
+        var upVector = new int[(2 * max) + 2];
+
+        Lcs(dataA, 0, dataA.Length, dataB, 0, dataB.Length, downVector, upVector);
+        return CreateDiffs(dataA, dataB);
+    } // Diff
 
     /// <summary>
     ///     Diffs the char codes.
@@ -143,32 +169,6 @@ internal class Diff
         } // while
     } // Optimize
 
-
-    /// <summary>
-    ///     Find the difference in 2 arrays of integers.
-    /// </summary>
-    /// <param name="arrayA">A-version of the numbers (usually the old one)</param>
-    /// <param name="arrayB">B-version of the numbers (usually the new one)</param>
-    /// <returns>Returns a array of Items that describe the differences.</returns>
-    public static Item[] DiffInt(int[] arrayA, int[] arrayB)
-    {
-        // The A-Version of the data (original data) to be compared.
-        var dataA = new DiffData(arrayA);
-
-        // The B-Version of the data (modified data) to be compared.
-        var dataB = new DiffData(arrayB);
-
-        var max = dataA.Length + dataB.Length + 1;
-        // vector for the (0,0) to (x,y) search
-        var downVector = new int[(2 * max) + 2];
-        // vector for the (u,v) to (N,M) search
-        var upVector = new int[(2 * max) + 2];
-
-        Lcs(dataA, 0, dataA.Length, dataB, 0, dataB.Length, downVector, upVector);
-        return CreateDiffs(dataA, dataB);
-    } // Diff
-
-
     /// <summary>
     ///     This function converts all text lines of the text into unique numbers for every unique text line
     ///     so further work can work only with simple numbers.
@@ -185,7 +185,7 @@ internal class Diff
         var lastUsedCode = h.Count;
 
         // strip off all cr, only use lf as text line separator.
-        aText = aText.Replace("\r", "");
+        aText = aText.Replace("\r", string.Empty);
         var lines = aText.Split(Constants.CharArrays.LineFeed);
 
         var codes = new int[lines.Length];
@@ -224,7 +224,6 @@ internal class Diff
         return codes;
     } // DiffCodes
 
-
     /// <summary>
     ///     This is the algorithm to find the Shortest Middle Snake (SMS).
     /// </summary>
@@ -237,8 +236,7 @@ internal class Diff
     /// <param name="downVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
     /// <param name="upVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
     /// <returns>a MiddleSnakeData record containing x,y and u,v</returns>
-    private static Smsrd Sms(DiffData dataA, int lowerA, int upperA, DiffData dataB, int lowerB, int upperB,
-        int[] downVector, int[] upVector)
+    private static Smsrd Sms(DiffData dataA, int lowerA, int upperA, DiffData dataB, int lowerB, int upperB, int[] downVector, int[] upVector)
     {
         var max = dataA.Length + dataB.Length + 1;
 
@@ -302,6 +300,7 @@ internal class Diff
                     {
                         ret.X = downVector[downOffset + k];
                         ret.Y = downVector[downOffset + k] - k;
+
                         // ret.u = UpVector[UpOffset + k];      // 2002.09.20: no need for 2 points
                         // ret.v = UpVector[UpOffset + k] - k;
                         return ret;
@@ -346,6 +345,7 @@ internal class Diff
                     {
                         ret.X = downVector[downOffset + k];
                         ret.Y = downVector[downOffset + k] - k;
+
                         // ret.u = UpVector[UpOffset + k];     // 2002.09.20: no need for 2 points
                         // ret.v = UpVector[UpOffset + k] - k;
                         return ret;
@@ -356,7 +356,6 @@ internal class Diff
 
         throw new ApplicationException("the algorithm should never come here.");
     } // SMS
-
 
     /// <summary>
     ///     This is the divide-and-conquer implementation of the longest common-subsequence (LCS)
@@ -372,8 +371,7 @@ internal class Diff
     /// <param name="upperB">upper bound of the actual range in DataB (exclusive)</param>
     /// <param name="downVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
     /// <param name="upVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
-    private static void Lcs(DiffData dataA, int lowerA, int upperA, DiffData dataB, int lowerB, int upperB,
-        int[] downVector, int[] upVector)
+    private static void Lcs(DiffData dataA, int lowerA, int upperA, DiffData dataB, int lowerB, int upperB, int[] downVector, int[] upVector)
     {
         // Debug.Write(2, "LCS", String.Format("Analyze the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
 
@@ -411,15 +409,14 @@ internal class Diff
         {
             // Find the middle snake and length of an optimal path for A and B
             Smsrd smsrd = Sms(dataA, lowerA, upperA, dataB, lowerB, upperB, downVector, upVector);
+
             // Debug.Write(2, "MiddleSnakeData", String.Format("{0},{1}", smsrd.x, smsrd.y));
 
             // The path is from LowerX to (x,y) and (x,y) to UpperX
             Lcs(dataA, lowerA, smsrd.X, dataB, lowerB, smsrd.Y, downVector, upVector);
-            Lcs(dataA, smsrd.X, upperA, dataB, smsrd.Y, upperB, downVector,
-                upVector); // 2002.09.20: no need for 2 points
+            Lcs(dataA, smsrd.X, upperA, dataB, smsrd.Y, upperB, downVector, upVector); // 2002.09.20: no need for 2 points
         }
     } // LCS()
-
 
     /// <summary>
     ///     Scan the tables of which lines are inserted and deleted,
@@ -450,13 +447,15 @@ internal class Diff
                 var startB = lineB;
 
                 while (lineA < dataA.Length && (lineB >= dataB.Length || dataA.Modified[lineA]))
-                    // while (LineA < DataA.Length && DataA.modified[LineA])
+
+                // while (LineA < DataA.Length && DataA.modified[LineA])
                 {
                     lineA++;
                 }
 
                 while (lineB < dataB.Length && (lineA >= dataA.Length || dataB.Modified[lineB]))
-                    // while (LineB < DataB.Length && DataB.modified[LineB])
+
+                // while (LineB < DataB.Length && DataB.modified[LineB])
                 {
                     lineB++;
                 }
@@ -464,11 +463,13 @@ internal class Diff
                 if (startA < lineA || startB < lineB)
                 {
                     // store a new difference-item
-                    aItem = new Item();
-                    aItem.StartA = startA;
-                    aItem.StartB = startB;
-                    aItem.DeletedA = lineA - startA;
-                    aItem.InsertedB = lineB - startB;
+                    aItem = new Item
+                    {
+                        StartA = startA,
+                        StartB = startB,
+                        DeletedA = lineA - startA,
+                        InsertedB = lineB - startB,
+                    };
                     a.Add(aItem);
                 } // if
             } // if
@@ -479,6 +480,22 @@ internal class Diff
 
         return result;
     }
+
+    /// <summary>details of one difference.</summary>
+    public struct Item
+    {
+        /// <summary>Start Line number in Data A.</summary>
+        public int StartA;
+
+        /// <summary>Start Line number in Data B.</summary>
+        public int StartB;
+
+        /// <summary>Number of changes in Data A.</summary>
+        public int DeletedA;
+
+        /// <summary>Number of changes in Data B.</summary>
+        public int InsertedB;
+    } // Item
 
     /// <summary>
     ///     Data on one input file being compared.
@@ -510,28 +527,14 @@ internal class Diff
         } // DiffData
     } // class DiffData
 
-    /// <summary>details of one difference.</summary>
-    public struct Item
-    {
-        /// <summary>Start Line number in Data A.</summary>
-        public int StartA;
-
-        /// <summary>Start Line number in Data B.</summary>
-        public int StartB;
-
-        /// <summary>Number of changes in Data A.</summary>
-        public int DeletedA;
-
-        /// <summary>Number of changes in Data B.</summary>
-        public int InsertedB;
-    } // Item
-
     /// <summary>
     ///     Shortest Middle Snake Return Data
     /// </summary>
     private struct Smsrd
     {
-        internal int X, Y;
+        internal int X;
+        internal int Y;
+
         // internal int u, v;  // 2002.09.20: no need for 2 points
     }
 } // class Diff

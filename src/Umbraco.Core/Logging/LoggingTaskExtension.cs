@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Logging;
+namespace Umbraco.Cms.Core.Logging;
 
 internal static class LoggingTaskExtension
 {
@@ -15,6 +15,7 @@ internal static class LoggingTaskExtension
             t => LogErrorsInner(t, logMethod),
             CancellationToken.None,
             TaskContinuationOptions.OnlyOnFaulted,
+
             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             TaskScheduler.Default);
 
@@ -30,6 +31,7 @@ internal static class LoggingTaskExtension
     public static Task LogErrorsWaitable(this Task task, Action<string, Exception> logMethod) =>
         task.ContinueWith(
             t => LogErrorsInner(t, logMethod),
+
             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             TaskScheduler.Default);
 
@@ -37,7 +39,8 @@ internal static class LoggingTaskExtension
     {
         if (task.Exception != null)
         {
-            logAction("Aggregate Exception with " + task.Exception.InnerExceptions.Count + " inner exceptions: ",
+            logAction(
+                "Aggregate Exception with " + task.Exception.InnerExceptions.Count + " inner exceptions: ",
                 task.Exception);
             foreach (Exception innerException in task.Exception.InnerExceptions)
             {

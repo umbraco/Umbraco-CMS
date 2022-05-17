@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -9,9 +9,9 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
 {
     private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new()
     {
-        {Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer},
-        {Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer},
-        {Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer}
+        { Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer },
+        { Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer },
+        { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer },
     };
 
     /// <summary>
@@ -35,8 +35,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <summary>
     ///     Initializes a new instance of an <see cref="EntityContainer" /> class.
     /// </summary>
-    public EntityContainer(int id, Guid uniqueId, int parentId, string path, int level, int sortOrder,
-        Guid containedObjectType, string? name, int userId)
+    public EntityContainer(int id, Guid uniqueId, int parentId, string path, int level, int sortOrder, Guid containedObjectType, string? name, int userId)
         : this(containedObjectType)
     {
         Id = id;

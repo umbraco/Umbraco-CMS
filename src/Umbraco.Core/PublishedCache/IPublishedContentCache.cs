@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 
@@ -10,6 +10,7 @@ public interface IPublishedContentCache : IPublishedCache
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <param name="route">The route</param>
     /// <param name="hideTopLevelNode">A value forcing the HideTopLevelNode setting.</param>
+    /// <param name="culture">the culture</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>
     ///     <para>
@@ -30,6 +31,7 @@ public interface IPublishedContentCache : IPublishedCache
     /// </summary>
     /// <param name="route">The route</param>
     /// <param name="hideTopLevelNode">A value forcing the HideTopLevelNode setting.</param>
+    /// <param name="culture">The culture</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>
     ///     <para>
@@ -50,6 +52,7 @@ public interface IPublishedContentCache : IPublishedCache
     /// </summary>
     /// <param name="preview">A value indicating whether to consider unpublished content.</param>
     /// <param name="contentId">The content unique identifier.</param>
+    /// <param name="culture">The culture</param>
     /// <returns>A special string formatted route path.</returns>
     /// <remarks>
     ///     <para>
@@ -65,6 +68,7 @@ public interface IPublishedContentCache : IPublishedCache
     ///     Gets the route for a content identified by its unique identifier.
     /// </summary>
     /// <param name="contentId">The content unique identifier.</param>
+    /// <param name="culture">The culture</param>
     /// <returns>A special string formatted route path.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
     /// <para>

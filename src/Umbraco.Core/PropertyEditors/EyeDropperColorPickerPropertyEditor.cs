@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -23,8 +23,7 @@ public class EyeDropperColorPickerPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         EditorType type = EditorType.PropertyValue)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>(), type)
     {
     }
 

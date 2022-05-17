@@ -39,13 +39,13 @@ internal class ContentVersionService : IContentVersionService
 
     /// <inheritdoc />
     public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
+
         // Media - ignored
         // Members - ignored
         CleanupDocumentVersions(asAtDate);
 
     /// <inheritdoc />
-    public IEnumerable<ContentVersionMeta>? GetPagedContentVersions(int contentId, long pageIndex, int pageSize,
-        out long totalRecords, string? culture = null)
+    public IEnumerable<ContentVersionMeta>? GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string? culture = null)
     {
         if (pageIndex < 0)
         {
@@ -61,8 +61,7 @@ internal class ContentVersionService : IContentVersionService
         {
             var languageId = _languageRepository.GetIdByIsoCode(culture, true);
             scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords,
-                languageId);
+            return _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
         }
     }
 
@@ -180,8 +179,7 @@ internal class ContentVersionService : IContentVersionService
 
         using (_scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            Audit(AuditType.Delete, Constants.Security.SuperUserId, -1,
-                $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
+            Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
         }
 
         return versionsToDelete;

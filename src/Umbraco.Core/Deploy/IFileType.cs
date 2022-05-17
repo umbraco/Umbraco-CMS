@@ -1,8 +1,9 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 public interface IFileType
 {
     bool CanSetPhysical { get; }
+
     Stream GetStream(StringUdi udi);
 
     Task<Stream> GetStreamAsync(StringUdi udi, CancellationToken token);

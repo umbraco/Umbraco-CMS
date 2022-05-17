@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     Represents an entity permission (defined on the user group and derived to retrieve permissions for a given user)
@@ -22,6 +22,7 @@ public class EntityPermission : IEquatable<EntityPermission>
     }
 
     public int EntityId { get; }
+
     public int UserGroupId { get; }
 
     /// <summary>

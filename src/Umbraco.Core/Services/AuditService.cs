@@ -49,7 +49,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         {
             IEnumerable<IAuditItem> result = sinceDate.HasValue == false
                 ? _auditRepository.Get(type, Query<IAuditItem>().Where(x => x.UserId == userId))
-                : _auditRepository.Get(type,
+                : _auditRepository.Get(
+                    type,
                     Query<IAuditItem>().Where(x => x.UserId == userId && x.CreateDate >= sinceDate.Value));
             scope.Complete();
             return result;
@@ -199,12 +200,12 @@ public sealed class AuditService : RepositoryService, IAuditService
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));
         }
 
-        //we need to truncate the data else we'll get SQL errors
+        // we need to truncate the data else we'll get SQL errors
         affectedDetails =
-            affectedDetails?.Substring(0, Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength));
-        eventDetails = eventDetails.Substring(0, Math.Min(eventDetails.Length, Constants.Audit.DetailsLength));
+            affectedDetails?[..Math.Min(affectedDetails.Length, Constants.Audit.DetailsLength)];
+        eventDetails = eventDetails[..Math.Min(eventDetails.Length, Constants.Audit.DetailsLength)];
 
-        //validate the eventType - must contain a forward slash, no spaces, no special chars
+        // validate the eventType - must contain a forward slash, no spaces, no special chars
         var eventTypeParts = eventType.ToCharArray();
         if (eventTypeParts.Contains('/') == false ||
             eventTypeParts.All(c => char.IsLetterOrDigit(c) || c == '/' || c == '-') == false)
@@ -232,7 +233,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             AffectedUserId = affectedUserId,
             AffectedDetails = affectedDetails,
             EventType = eventType,
-            EventDetails = eventDetails
+            EventDetails = eventDetails,
         };
 
         if (_isAvailable.Value == false)

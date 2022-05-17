@@ -6,6 +6,7 @@ public interface IContentServiceBase<TItem> : IContentServiceBase
     where TItem : class, IContentBase
 {
     TItem? GetById(Guid key);
+
     Attempt<OperationResult?> Save(IEnumerable<TItem> contents, int userId = Constants.Security.SuperUserId);
 }
 

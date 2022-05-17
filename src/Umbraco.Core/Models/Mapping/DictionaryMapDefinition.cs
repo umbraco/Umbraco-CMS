@@ -27,7 +27,8 @@ public class DictionaryMapDefinition : IMapDefinition
     {
         mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
         mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);
-        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>((source, context) => new DictionaryOverviewDisplay(),
+        mapper.Define<IDictionaryItem, DictionaryOverviewDisplay>(
+            (source, context) => new DictionaryOverviewDisplay(),
             Map);
     }
 
@@ -38,6 +39,22 @@ public class DictionaryMapDefinition : IMapDefinition
         target.Id = source.Id;
         target.Key = source.Key;
         target.Name = source.ItemKey;
+    }
+
+    private static void GetParentId(Guid parentId, ILocalizationService localizationService, List<int> ids)
+    {
+        IDictionaryItem? dictionary = localizationService.GetDictionaryItemById(parentId);
+        if (dictionary == null)
+        {
+            return;
+        }
+
+        ids.Add(dictionary.Id);
+
+        if (dictionary.ParentId.HasValue)
+        {
+            GetParentId(dictionary.ParentId.Value, localizationService, ids);
+        }
     }
 
     // Umbraco.Code.MapAll -Icon -Trashed -Alias
@@ -57,7 +74,7 @@ public class DictionaryMapDefinition : IMapDefinition
         // TODO: check if there is a better way
         if (source.ParentId.HasValue)
         {
-            var ids = new List<int> {-1};
+            var ids = new List<int> { -1 };
             var parentIds = new List<int>();
             GetParentId(source.ParentId.Value, _localizationService, parentIds);
             parentIds.Reverse();
@@ -74,14 +91,14 @@ public class DictionaryMapDefinition : IMapDefinition
         foreach (ILanguage lang in _localizationService.GetAllLanguages())
         {
             var langId = lang.Id;
-            IDictionaryTranslation translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
 
             target.Translations.Add(new DictionaryTranslationDisplay
             {
                 IsoCode = lang.IsoCode,
                 DisplayName = lang.CultureName,
                 Translation = translation?.Value ?? string.Empty,
-                LanguageId = lang.Id
+                LanguageId = lang.Id,
             });
         }
     }
@@ -96,30 +113,14 @@ public class DictionaryMapDefinition : IMapDefinition
         foreach (ILanguage lang in _localizationService.GetAllLanguages())
         {
             var langId = lang.Id;
-            IDictionaryTranslation translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
+            IDictionaryTranslation? translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
 
             target.Translations.Add(
                 new DictionaryOverviewTranslationDisplay
                 {
                     DisplayName = lang.CultureName,
-                    HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false
+                    HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false,
                 });
-        }
-    }
-
-    private static void GetParentId(Guid parentId, ILocalizationService localizationService, List<int> ids)
-    {
-        IDictionaryItem dictionary = localizationService.GetDictionaryItemById(parentId);
-        if (dictionary == null)
-        {
-            return;
-        }
-
-        ids.Add(dictionary.Id);
-
-        if (dictionary.ParentId.HasValue)
-        {
-            GetParentId(dictionary.ParentId.Value, localizationService, ids);
         }
     }
 }

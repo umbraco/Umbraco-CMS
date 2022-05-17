@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 
@@ -14,7 +14,8 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 
     public DeepCloneableList(ListCloneBehavior listCloneBehavior) => _listCloneBehavior = listCloneBehavior;
 
-    public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior) : base(collection) =>
+    public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior)
+        : base(collection) =>
         _listCloneBehavior = listCloneBehavior;
 
     /// <summary>
@@ -26,6 +27,8 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
     }
 
+    public event PropertyChangedEventHandler? PropertyChanged; // noop
+
     /// <summary>
     ///     Creates a new list and adds each element as a deep cloned element if it is of type IDeepCloneable
     /// </summary>
@@ -35,7 +38,7 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
         switch (_listCloneBehavior)
         {
             case ListCloneBehavior.CloneOnce:
-                //we are cloning once, so create a new list in none mode
+                // we are cloning once, so create a new list in none mode
                 // and deep clone all items into it
                 var newList = new DeepCloneableList<T>(ListCloneBehavior.None);
                 foreach (T item in this)
@@ -52,10 +55,10 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 
                 return newList;
             case ListCloneBehavior.None:
-                //we are in none mode, so just return a new list with the same items
+                // we are in none mode, so just return a new list with the same items
                 return new DeepCloneableList<T>(this, ListCloneBehavior.None);
             case ListCloneBehavior.Always:
-                //always clone to new list
+                // always clone to new list
                 var newList2 = new DeepCloneableList<T>(ListCloneBehavior.Always);
                 foreach (T item in this)
                 {
@@ -129,8 +132,6 @@ public class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
 
     /// <remarks>Always return an empty enumerable, the list has no properties that can be dirty.</remarks>
     public IEnumerable<string> GetWereDirtyProperties() => Enumerable.Empty<string>();
-
-    public event PropertyChangedEventHandler? PropertyChanged; // noop
 
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Core.Logging;
@@ -40,12 +40,7 @@ public class LogProfiler : IProfiler
 
         protected internal LightDisposableTimer(Action<long> callback)
         {
-            if (callback == null)
-            {
-                throw new ArgumentNullException(nameof(callback));
-            }
-
-            _callback = callback;
+            _callback = callback ?? throw new ArgumentNullException(nameof(callback));
         }
 
         protected override void DisposeResources()

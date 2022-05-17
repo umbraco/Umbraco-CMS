@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Sections;
 
 namespace Umbraco.Cms.Core.Services;
 

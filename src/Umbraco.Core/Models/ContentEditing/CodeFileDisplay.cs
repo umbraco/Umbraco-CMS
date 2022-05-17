@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
@@ -58,13 +58,13 @@ public class CodeFileDisplay : INotificationModel, IValidatableObject
         {
             yield return new ValidationResult(
                 "The file name cannot contain illegal characters",
-                new[] {"Name"});
+                new[] { "Name" });
         }
         else if (System.IO.Path.GetFileNameWithoutExtension(Name).IsNullOrWhiteSpace())
         {
             yield return new ValidationResult(
                 "The file name cannot be empty",
-                new[] {"Name"});
+                new[] { "Name" });
         }
     }
 }

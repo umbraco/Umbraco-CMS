@@ -1,6 +1,7 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Manifest;
+
 // contentApps: [
 //   {
 //     name: 'App Name',        // required
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Core.Manifest;
 [DataContract(Name = "appdef", Namespace = "")]
 public class ManifestContentAppDefinition
 {
-    private string? _view;
+    private readonly string? _view;
 
     /// <summary>
     ///     Gets or sets the name of the content app.

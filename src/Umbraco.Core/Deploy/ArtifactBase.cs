@@ -23,15 +23,17 @@ public abstract class ArtifactBase<TUdi> : IArtifact
 
     public string? Alias { get; set; }
 
-    protected abstract string GetChecksum();
-
-    #region Abstract implementation of IArtifactSignature
-
     Udi IArtifactSignature.Udi => Udi;
 
     public TUdi Udi { get; set; }
 
     public string Checksum => _checksum.Value;
+
+    public IEnumerable<ArtifactDependency>? Dependencies
+    {
+        get => _dependencies;
+        set => _dependencies = value?.OrderBy(x => x.Udi);
+    }
 
     /// <summary>
     ///     Prevents the <see cref="Checksum" /> property from being serialized.
@@ -45,11 +47,5 @@ public abstract class ArtifactBase<TUdi> : IArtifact
     /// </remarks>
     public bool ShouldSerializeChecksum() => false;
 
-    public IEnumerable<ArtifactDependency>? Dependencies
-    {
-        get => _dependencies;
-        set => _dependencies = value?.OrderBy(x => x.Udi);
-    }
-
-    #endregion
+    protected abstract string GetChecksum();
 }

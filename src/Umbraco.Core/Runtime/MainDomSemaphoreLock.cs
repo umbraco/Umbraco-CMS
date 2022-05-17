@@ -67,7 +67,6 @@ public class MainDomSemaphoreLock : IMainDomLock
             // only 1 instance can reach that point, but other instances may
             // have started and be trying to get the lock - they will timeout,
             // which is accepted
-
             _signal.Reset();
         }
     }
@@ -93,6 +92,7 @@ public class MainDomSemaphoreLock : IMainDomLock
 
     // This code added to correctly implement the disposable pattern.
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
         Dispose(true);
 

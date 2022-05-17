@@ -19,7 +19,8 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
     [DataMember(Name = "name", IsRequired = true)]
     public string? Name { get; set; }
 
-    [DataMember(Name = "displayName")] public string? DisplayName { get; set; }
+    [DataMember(Name = "displayName")]
+    public string? DisplayName { get; set; }
 
     /// <summary>
     ///     The language/culture assigned to this content variation
@@ -30,15 +31,20 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
     [DataMember(Name = "language")]
     public Language? Language { get; set; }
 
-    [DataMember(Name = "segment")] public string? Segment { get; set; }
+    [DataMember(Name = "segment")]
+    public string? Segment { get; set; }
 
-    [DataMember(Name = "state")] public ContentSavedState State { get; set; }
+    [DataMember(Name = "state")]
+    public ContentSavedState State { get; set; }
 
-    [DataMember(Name = "updateDate")] public DateTime UpdateDate { get; set; }
+    [DataMember(Name = "updateDate")]
+    public DateTime UpdateDate { get; set; }
 
-    [DataMember(Name = "createDate")] public DateTime CreateDate { get; set; }
+    [DataMember(Name = "createDate")]
+    public DateTime CreateDate { get; set; }
 
-    [DataMember(Name = "publishDate")] public DateTime? PublishDate { get; set; }
+    [DataMember(Name = "publishDate")]
+    public DateTime? PublishDate { get; set; }
 
     /// <summary>
     ///     Internal property used for tests to get all properties from all tabs
@@ -67,7 +73,9 @@ public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, ICo
 
 public class ContentVariantScheduleDisplay : ContentVariantDisplay
 {
-    [DataMember(Name = "releaseDate")] public DateTime? ReleaseDate { get; set; }
+    [DataMember(Name = "releaseDate")]
+    public DateTime? ReleaseDate { get; set; }
 
-    [DataMember(Name = "expireDate")] public DateTime? ExpireDate { get; set; }
+    [DataMember(Name = "expireDate")]
+    public DateTime? ExpireDate { get; set; }
 }

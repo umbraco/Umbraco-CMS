@@ -19,6 +19,5 @@ public class BasicAuthSettings
     [DefaultValue(StaticEnabled)]
     public bool Enabled { get; set; } = StaticEnabled;
 
-
     public string[] AllowedIPs { get; set; } = Array.Empty<string>();
 }

@@ -1,6 +1,5 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Mapping;
 
@@ -35,8 +34,7 @@ public class LanguageMapDefinition : IMapDefinition
         target.FallbackLanguageId = source.FallbackLanguageId;
     }
 
-    private static void Map(IEnumerable<ILanguage> source, IEnumerable<ContentEditing.Language> target,
-        MapperContext context)
+    private static void Map(IEnumerable<ILanguage> source, IEnumerable<ContentEditing.Language> target, MapperContext context)
     {
         if (target == null)
         {
@@ -50,14 +48,14 @@ public class LanguageMapDefinition : IMapDefinition
 
         List<ContentEditing.Language> temp = context.MapEnumerable<ILanguage, ContentEditing.Language>(source);
 
-        //Put the default language first in the list & then sort rest by a-z
-        ContentEditing.Language defaultLang = temp.SingleOrDefault(x => x!.IsDefault);
+        // Put the default language first in the list & then sort rest by a-z
+        ContentEditing.Language? defaultLang = temp.SingleOrDefault(x => x.IsDefault);
 
         // insert default lang first, then remaining language a-z
         if (defaultLang is not null)
         {
             list.Add(defaultLang);
-            list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x!.Name).WhereNotNull());
+            list.AddRange(temp.Where(x => x != defaultLang).OrderBy(x => x.Name));
         }
     }
 }

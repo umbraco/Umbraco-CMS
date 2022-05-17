@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;

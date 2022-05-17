@@ -27,7 +27,7 @@ public class ContentVariantMapper
         if (!variesByCulture && !variesBySegment)
         {
             // this is invariant so just map the IContent instance to ContentVariationDisplay
-            TVariant variantDisplay = context.Map<TVariant>(source);
+            TVariant? variantDisplay = context.Map<TVariant>(source);
             if (variantDisplay is not null)
             {
                 variants.Add(variantDisplay);
@@ -44,7 +44,7 @@ public class ContentVariantMapper
         else if (variesBySegment && !variesByCulture)
         {
             // Segment only
-            IEnumerable<string> segments = GetSegments(source);
+            IEnumerable<string?> segments = GetSegments(source);
             variants = segments?
                 .Select(segment => CreateVariantDisplay<TVariant>(context, source, null, segment))
                 .WhereNotNull()
@@ -72,8 +72,10 @@ public class ContentVariantMapper
         return SortVariants(variants);
     }
 
+    private static bool IsDefaultSegment(ContentVariantDisplay variant) => variant.Segment == null;
 
-    private IList<TVariant>? SortVariants<TVariant>(IList<TVariant>? variants) where TVariant : ContentVariantDisplay
+    private IList<TVariant>? SortVariants<TVariant>(IList<TVariant>? variants)
+        where TVariant : ContentVariantDisplay
     {
         if (variants == null || variants.Count <= 1)
         {
@@ -88,8 +90,6 @@ public class ContentVariantMapper
             .ThenBy(v => v.Segment)
             .ToList();
     }
-
-    private static bool IsDefaultSegment(ContentVariantDisplay variant) => variant.Segment == null;
 
     private static bool IsDefaultLanguage(ContentVariantDisplay variant) =>
         variant.Language == null || variant.Language.IsDefault;
@@ -117,7 +117,7 @@ public class ContentVariantMapper
     {
         // The default segment (null) is always there,
         // even when there is no property data at all yet
-        var segments = new List<string?> {null};
+        var segments = new List<string?> { null };
 
         // Add actual segments based on the property values
         segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
@@ -126,13 +126,13 @@ public class ContentVariantMapper
         return segments.Distinct();
     }
 
-    private TVariant? CreateVariantDisplay<TVariant>(MapperContext context, IContent content,
-        ContentEditing.Language? language, string? segment) where TVariant : ContentVariantDisplay
+    private TVariant? CreateVariantDisplay<TVariant>(MapperContext context, IContent content, ContentEditing.Language? language, string? segment)
+        where TVariant : ContentVariantDisplay
     {
         context.SetCulture(language?.IsoCode);
         context.SetSegment(segment);
 
-        TVariant variantDisplay = context.Map<TVariant>(content);
+        TVariant? variantDisplay = context.Map<TVariant>(content);
 
         if (variantDisplay is null)
         {

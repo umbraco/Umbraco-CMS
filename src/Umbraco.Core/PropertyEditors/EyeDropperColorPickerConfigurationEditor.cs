@@ -6,8 +6,10 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<EyeDropperColorPickerConfiguration>
 {
-    public EyeDropperColorPickerConfigurationEditor(IIOHelper ioHelper,
-        IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
+    public EyeDropperColorPickerConfigurationEditor(
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 
@@ -16,7 +18,7 @@ internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<Ey
         ToConfigurationEditor(EyeDropperColorPickerConfiguration? configuration) =>
         new Dictionary<string, object>
         {
-            {"showAlpha", configuration?.ShowAlpha ?? false}, {"showPalette", configuration?.ShowPalette ?? false}
+            { "showAlpha", configuration?.ShowAlpha ?? false }, { "showPalette", configuration?.ShowPalette ?? false },
         };
 
     /// <inheritdoc />
@@ -44,6 +46,6 @@ internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<Ey
             }
         }
 
-        return new EyeDropperColorPickerConfiguration {ShowAlpha = showAlpha, ShowPalette = showPalette};
+        return new EyeDropperColorPickerConfiguration { ShowAlpha = showAlpha, ShowPalette = showPalette };
     }
 }

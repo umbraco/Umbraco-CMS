@@ -51,6 +51,34 @@ public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICol
     public IEnumerable<Type> GetTypes() => _types;
 
     /// <summary>
+    ///     Gets a value indicating whether the collection contains a type.
+    /// </summary>
+    /// <typeparam name="T">The type to look for.</typeparam>
+    /// <returns>A value indicating whether the collection contains the type.</returns>
+    /// <remarks>
+    ///     Some builder implementations may use this to expose a public Has{T}() method,
+    ///     when it makes sense. Probably does not make sense for lazy builders, for example.
+    /// </remarks>
+    public virtual bool Has<T>()
+        where T : TItem =>
+        _types.Contains(typeof(T));
+
+    /// <summary>
+    ///     Gets a value indicating whether the collection contains a type.
+    /// </summary>
+    /// <param name="type">The type to look for.</param>
+    /// <returns>A value indicating whether the collection contains the type.</returns>
+    /// <remarks>
+    ///     Some builder implementations may use this to expose a public Has{T}() method,
+    ///     when it makes sense. Probably does not make sense for lazy builders, for example.
+    /// </remarks>
+    public virtual bool Has(Type type)
+    {
+        EnsureType(type, "find");
+        return _types.Contains(type);
+    }
+
+    /// <summary>
     ///     Configures the internal list of types.
     /// </summary>
     /// <param name="action">The action to execute.</param>
@@ -76,6 +104,40 @@ public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICol
     /// <returns>The list of types to register.</returns>
     /// <remarks>Used by implementations to add types to the internal list, sort the list, etc.</remarks>
     protected virtual IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types) => types;
+
+    /// <summary>
+    ///     Creates the collection items.
+    /// </summary>
+    /// <returns>The collection items.</returns>
+    protected virtual IEnumerable<TItem> CreateItems(IServiceProvider factory)
+    {
+        if (_registeredTypes == null)
+        {
+            throw new InvalidOperationException(
+                "Cannot create items before the collection builder has been registered.");
+        }
+
+        return _registeredTypes // respect order
+            .Select(x => CreateItem(factory, x))
+            .ToArray(); // safe
+    }
+
+    /// <summary>
+    ///     Creates a collection item.
+    /// </summary>
+    protected virtual TItem CreateItem(IServiceProvider factory, Type itemType)
+        => (TItem)factory.GetRequiredService(itemType);
+
+    protected Type EnsureType(Type type, string action)
+    {
+        if (typeof(TItem).IsAssignableFrom(type) == false)
+        {
+            throw new InvalidOperationException(
+                $"Cannot {action} type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
+        }
+
+        return type;
+    }
 
     private void RegisterTypes(IServiceCollection services)
     {
@@ -107,68 +169,6 @@ public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICol
         }
     }
 
-    /// <summary>
-    ///     Creates the collection items.
-    /// </summary>
-    /// <returns>The collection items.</returns>
-    protected virtual IEnumerable<TItem> CreateItems(IServiceProvider factory)
-    {
-        if (_registeredTypes == null)
-        {
-            throw new InvalidOperationException(
-                "Cannot create items before the collection builder has been registered.");
-        }
-
-        return _registeredTypes // respect order
-            .Select(x => CreateItem(factory, x))
-            .ToArray(); // safe
-    }
-
-    /// <summary>
-    ///     Creates a collection item.
-    /// </summary>
-    protected virtual TItem CreateItem(IServiceProvider factory, Type itemType)
-        => (TItem)factory.GetRequiredService(itemType);
-
     // used to resolve a Func<IEnumerable<TItem>> parameter
     private Func<IEnumerable<TItem>> CreateItemsFactory(IServiceProvider factory) => () => CreateItems(factory);
-
-    protected Type EnsureType(Type type, string action)
-    {
-        if (typeof(TItem).IsAssignableFrom(type) == false)
-        {
-            throw new InvalidOperationException(
-                $"Cannot {action} type {type.FullName} as it does not inherit from/implement {typeof(TItem).FullName}.");
-        }
-
-        return type;
-    }
-
-    /// <summary>
-    ///     Gets a value indicating whether the collection contains a type.
-    /// </summary>
-    /// <typeparam name="T">The type to look for.</typeparam>
-    /// <returns>A value indicating whether the collection contains the type.</returns>
-    /// <remarks>
-    ///     Some builder implementations may use this to expose a public Has{T}() method,
-    ///     when it makes sense. Probably does not make sense for lazy builders, for example.
-    /// </remarks>
-    public virtual bool Has<T>()
-        where T : TItem =>
-        _types.Contains(typeof(T));
-
-    /// <summary>
-    ///     Gets a value indicating whether the collection contains a type.
-    /// </summary>
-    /// <param name="type">The type to look for.</param>
-    /// <returns>A value indicating whether the collection contains the type.</returns>
-    /// <remarks>
-    ///     Some builder implementations may use this to expose a public Has{T}() method,
-    ///     when it makes sense. Probably does not make sense for lazy builders, for example.
-    /// </remarks>
-    public virtual bool Has(Type type)
-    {
-        EnsureType(type, "find");
-        return _types.Contains(type);
-    }
 }

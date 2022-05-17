@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Reflection;
@@ -7,7 +7,7 @@ namespace Umbraco.Extensions;
 
 public static class AssemblyExtensions
 {
-    private static string _rootDir = "";
+    private static string _rootDir = string.Empty;
 
     /// <summary>
     ///     Utility method that returns the path to the root of the application, by getting the path to where the assembly
@@ -34,7 +34,7 @@ public static class AssemblyExtensions
         }
 
         _rootDir = baseDirectory.Contains("bin")
-            ? baseDirectory.Substring(0, baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)
+            ? baseDirectory[..(baseDirectory.LastIndexOf("bin", StringComparison.OrdinalIgnoreCase) - 1)]
             : baseDirectory;
 
         return _rootDir;
@@ -69,7 +69,7 @@ public static class AssemblyExtensions
             }
             catch (FileNotFoundException)
             {
-                //this will occur if it cannot load the assembly
+                // this will occur if it cannot load the assembly
                 return false;
             }
         }
@@ -83,7 +83,8 @@ public static class AssemblyExtensions
     /// <param name="assembly"></param>
     /// <returns></returns>
     public static bool IsGlobalAsaxAssembly(this Assembly assembly) =>
-        //only way I can figure out how to test is by the name
+
+        // only way I can figure out how to test is by the name
         assembly.FullName!.StartsWith("App_global.asax");
 
     /// <summary>

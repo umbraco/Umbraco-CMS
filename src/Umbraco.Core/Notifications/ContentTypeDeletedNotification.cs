@@ -5,11 +5,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ContentTypeDeletedNotification : DeletedNotification<IContentType>
 {
-    public ContentTypeDeletedNotification(IContentType target, EventMessages messages) : base(target, messages)
+    public ContentTypeDeletedNotification(IContentType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ContentTypeDeletedNotification(IEnumerable<IContentType> target, EventMessages messages) : base(target,
+    public ContentTypeDeletedNotification(IEnumerable<IContentType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

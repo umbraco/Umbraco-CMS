@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Composing;
+namespace Umbraco.Cms.Core.Composing;
 
 /// <summary>
 ///     Indicates that a composer requires another composer.

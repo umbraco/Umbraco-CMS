@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Install.Models;
@@ -34,7 +34,7 @@ public abstract class InstallSetupStep
 {
     protected InstallSetupStep()
     {
-        InstallSetupStepAttribute att = GetType().GetCustomAttribute<InstallSetupStepAttribute>(false);
+        InstallSetupStepAttribute? att = GetType().GetCustomAttribute<InstallSetupStepAttribute>(false);
         if (att == null)
         {
             throw new InvalidOperationException("Each step must be attributed");
@@ -48,9 +48,11 @@ public abstract class InstallSetupStep
         PerformsAppRestart = att.PerformsAppRestart;
     }
 
-    [DataMember(Name = "name")] public string Name { get; private set; }
+    [DataMember(Name = "name")]
+    public string Name { get; private set; }
 
-    [DataMember(Name = "view")] public virtual string View { get; private set; }
+    [DataMember(Name = "view")]
+    public virtual string View { get; private set; }
 
     /// <summary>
     ///     The view model used to render the view, by default is null but can be populated
@@ -58,11 +60,14 @@ public abstract class InstallSetupStep
     [DataMember(Name = "model")]
     public virtual object? ViewModel { get; private set; }
 
-    [DataMember(Name = "description")] public string Description { get; private set; }
+    [DataMember(Name = "description")]
+    public string Description { get; private set; }
 
-    [IgnoreDataMember] public InstallationType InstallTypeTarget { get; }
+    [IgnoreDataMember]
+    public InstallationType InstallTypeTarget { get; }
 
-    [IgnoreDataMember] public bool PerformsAppRestart { get; }
+    [IgnoreDataMember]
+    public bool PerformsAppRestart { get; }
 
     /// <summary>
     ///     Defines what order this step needs to execute on the server side since the

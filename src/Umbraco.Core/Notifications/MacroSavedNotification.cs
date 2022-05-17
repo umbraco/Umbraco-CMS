@@ -5,11 +5,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class MacroSavedNotification : SavedNotification<IMacro>
 {
-    public MacroSavedNotification(IMacro target, EventMessages messages) : base(target, messages)
+    public MacroSavedNotification(IMacro target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MacroSavedNotification(IEnumerable<IMacro> target, EventMessages messages) : base(target, messages)
+    public MacroSavedNotification(IEnumerable<IMacro> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

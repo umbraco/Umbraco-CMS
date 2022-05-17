@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
@@ -45,9 +45,10 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
     {
         var cached = InnerCache.Get(key, () =>
         {
-            Lazy<object> result = SafeLazy.GetSafeLazy(factory);
+            Lazy<object?> result = SafeLazy.GetSafeLazy(factory);
             var value = result
                 .Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+
             // do not store null values (backward compat), clone / reset to go into the cache
             return value == null ? null : CheckCloneableAndTracksChanges(value);
         });
@@ -65,35 +66,45 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
             .Select(CheckCloneableAndTracksChanges);
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false,
-        string[]? dependentFiles = null)
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
     {
-        var cached = InnerCache.Get(key, () =>
+        var cached = InnerCache.Get(
+            key,
+            () =>
         {
-            Lazy<object> result = SafeLazy.GetSafeLazy(factory);
+            Lazy<object?> result = SafeLazy.GetSafeLazy(factory);
             var value = result
                 .Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+
             // do not store null values (backward compat), clone / reset to go into the cache
             return value == null ? null : CheckCloneableAndTracksChanges(value);
 
             // clone / reset to go into the cache
-        }, timeout, isSliding, dependentFiles);
+        },
+            timeout,
+            isSliding,
+            dependentFiles);
 
         // clone / reset to go into the cache
         return CheckCloneableAndTracksChanges(cached);
     }
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false,
-        string[]? dependentFiles = null) =>
-        InnerCache.Insert(key, () =>
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null) =>
+        InnerCache.Insert(
+            key,
+            () =>
         {
-            Lazy<object> result = SafeLazy.GetSafeLazy(factory);
+            Lazy<object?> result = SafeLazy.GetSafeLazy(factory);
             var value = result
                 .Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+
             // do not store null values (backward compat), clone / reset to go into the cache
             return value == null ? null : CheckCloneableAndTracksChanges(value);
-        }, timeout, isSliding, dependentFiles);
+        },
+            timeout,
+            isSliding,
+            dependentFiles);
 
     /// <inheritdoc />
     public void Clear() => InnerCache.Clear();
@@ -117,8 +128,22 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
     public void ClearByRegex(string regex) => InnerCache.ClearByRegex(regex);
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                InnerCache.DisposeIfDisposable();
+            }
+
+            _disposedValue = true;
+        }
+    }
 
     private static object? CheckCloneableAndTracksChanges(object? input)
     {
@@ -135,18 +160,5 @@ public class DeepCloneAppCache : IAppPolicyCache, IDisposable
         }
 
         return input;
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                InnerCache.DisposeIfDisposable();
-            }
-
-            _disposedValue = true;
-        }
     }
 }

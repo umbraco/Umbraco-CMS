@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Logging;
+namespace Umbraco.Cms.Core.Logging;
 
 /// <summary>
 ///     Used to render a profiler in a web page

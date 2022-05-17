@@ -11,7 +11,9 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 public interface IUmbracoBuilder
 {
     IServiceCollection Services { get; }
+
     IConfiguration Config { get; }
+
     TypeLoader TypeLoader { get; }
 
     /// <summary>
@@ -31,7 +33,11 @@ public interface IUmbracoBuilder
     IHostingEnvironment? BuilderHostingEnvironment { get; }
 
     IProfiler Profiler { get; }
+
     AppCaches AppCaches { get; }
-    TBuilder? WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder;
+
+    TBuilder? WithCollectionBuilder<TBuilder>()
+        where TBuilder : ICollectionBuilder;
+
     void Build();
 }

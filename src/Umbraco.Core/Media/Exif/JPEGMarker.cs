@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents a JPEG marker byte.
@@ -91,5 +91,5 @@ internal enum JPEGMarker : byte
     COM = 0xfe,
 
     // Temporary
-    TEM = 0x01
+    TEM = 0x01,
 }

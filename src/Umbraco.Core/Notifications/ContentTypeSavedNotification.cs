@@ -5,11 +5,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ContentTypeSavedNotification : SavedNotification<IContentType>
 {
-    public ContentTypeSavedNotification(IContentType target, EventMessages messages) : base(target, messages)
+    public ContentTypeSavedNotification(IContentType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ContentTypeSavedNotification(IEnumerable<IContentType> target, EventMessages messages) : base(target,
+    public ContentTypeSavedNotification(IEnumerable<IContentType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

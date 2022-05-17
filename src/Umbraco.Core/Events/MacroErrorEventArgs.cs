@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Macros;
 
 namespace Umbraco.Cms.Core.Events;
 

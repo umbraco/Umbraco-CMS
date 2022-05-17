@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class LanguageDeletedNotification : DeletedNotification<ILanguage>
 {
-    public LanguageDeletedNotification(ILanguage target, EventMessages messages) : base(target, messages)
+    public LanguageDeletedNotification(ILanguage target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Defines a value validator that can be referenced in a manifest.

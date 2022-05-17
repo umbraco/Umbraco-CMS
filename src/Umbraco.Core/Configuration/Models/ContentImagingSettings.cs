@@ -12,7 +12,7 @@ public class ContentImagingSettings
 {
     internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-    private static readonly ImagingAutoFillUploadField[] s_defaultImagingAutoFillUploadField =
+    private static readonly ImagingAutoFillUploadField[] DefaultImagingAutoFillUploadField =
     {
         new()
         {
@@ -20,8 +20,8 @@ public class ContentImagingSettings
             WidthFieldAlias = Constants.Conventions.Media.Width,
             HeightFieldAlias = Constants.Conventions.Media.Height,
             ExtensionFieldAlias = Constants.Conventions.Media.Extension,
-            LengthFieldAlias = Constants.Conventions.Media.Bytes
-        }
+            LengthFieldAlias = Constants.Conventions.Media.Bytes,
+        },
     };
 
     /// <summary>
@@ -33,5 +33,5 @@ public class ContentImagingSettings
     /// <summary>
     ///     Gets or sets a value for the imaging autofill following media file upload fields.
     /// </summary>
-    public ImagingAutoFillUploadField[] AutoFillImageProperties { get; set; } = s_defaultImagingAutoFillUploadField;
+    public ImagingAutoFillUploadField[] AutoFillImageProperties { get; set; } = DefaultImagingAutoFillUploadField;
 }

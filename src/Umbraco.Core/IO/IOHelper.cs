@@ -14,9 +14,9 @@ public abstract class IOHelper : IIOHelper
         hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 
     // static compiled regex for faster performance
-    //private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+    // private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-    //helper to try and match the old path to a new virtual one
+    // helper to try and match the old path to a new virtual one
     public string FindFile(string virtualPath)
     {
         var retval = virtualPath;
@@ -80,14 +80,13 @@ public abstract class IOHelper : IIOHelper
         return retval;
     }
 
-
     /// <summary>
     ///     Verifies that the current filepath matches a directory where the user is allowed to edit a file.
     /// </summary>
     /// <param name="filePath">The filepath to validate.</param>
     /// <param name="validDir">The valid directory.</param>
     /// <returns>A value indicating whether the filepath is valid.</returns>
-    public bool VerifyEditPath(string filePath, string validDir) => VerifyEditPath(filePath, new[] {validDir});
+    public bool VerifyEditPath(string filePath, string validDir) => VerifyEditPath(filePath, new[] { validDir });
 
     /// <summary>
     ///     Verifies that the current filepath matches one of several directories where the user is allowed to edit a file.
@@ -105,7 +104,6 @@ public abstract class IOHelper : IIOHelper
 
         // TODO: what's below is dirty, there are too many ways to get the root dir, etc.
         // not going to fix everything today
-
         var mappedRoot = MapPath(_hostingEnvironment.ApplicationVirtualPath);
         if (!PathStartsWith(filePath, mappedRoot))
         {
@@ -115,8 +113,7 @@ public abstract class IOHelper : IIOHelper
 
         // yes we can (see above)
         //// don't trust what we get, it may contain relative segments
-        //filePath = Path.GetFullPath(filePath);
-
+        // filePath = Path.GetFullPath(filePath);
         foreach (var dir in validDirs)
         {
             var validDir = dir;
@@ -167,7 +164,7 @@ public abstract class IOHelper : IIOHelper
         if (path.IsFullPath())
         {
             var rootDirectory = MapPath("~");
-            var relativePath = PathStartsWith(path, rootDirectory) ? path.Substring(rootDirectory.Length) : path;
+            var relativePath = PathStartsWith(path, rootDirectory) ? path[rootDirectory.Length..] : path;
             path = relativePath;
         }
 
@@ -182,7 +179,7 @@ public abstract class IOHelper : IIOHelper
     {
         var tempFolderPaths = new[]
         {
-            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads)
+            _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads),
         };
 
         foreach (var tempFolderPath in tempFolderPaths)

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -12,29 +12,19 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
 {
     private ILanguage? _language;
 
-    //note: this will be memberwise cloned
+    // note: this will be memberwise cloned
     private string _value;
 
     public DictionaryTranslation(ILanguage language, string value)
     {
-        if (language == null)
-        {
-            throw new ArgumentNullException("language");
-        }
-
-        _language = language;
+        _language = language ?? throw new ArgumentNullException("language");
         LanguageId = _language.Id;
         _value = value;
     }
 
     public DictionaryTranslation(ILanguage language, string value, Guid uniqueId)
     {
-        if (language == null)
-        {
-            throw new ArgumentNullException("language");
-        }
-
-        _language = language;
+        _language = language ?? throw new ArgumentNullException("language");
         LanguageId = _language.Id;
         _value = value;
         Key = uniqueId;
@@ -85,6 +75,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
 
             return _language;
         }
+
         set
         {
             SetPropertyValueAndDetectChanges(value, ref _language, nameof(Language));

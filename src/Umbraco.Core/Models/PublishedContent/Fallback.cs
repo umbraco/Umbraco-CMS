@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -7,6 +7,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public struct Fallback : IEnumerable<int>
 {
+    /// <summary>
+    ///     Do not fallback.
+    /// </summary>
+    public const int None = 0;
+
     private readonly int[] _values;
 
     /// <summary>
@@ -21,19 +26,9 @@ public struct Fallback : IEnumerable<int>
     public static Fallback To(params int[] values) => new(values);
 
     /// <summary>
-    ///     Do not fallback.
-    /// </summary>
-    public const int None = 0;
-
-    /// <summary>
     ///     Fallback to default value.
     /// </summary>
     public const int DefaultValue = 1;
-
-    /// <summary>
-    ///     Gets the fallback to default value policy.
-    /// </summary>
-    public static Fallback ToDefaultValue => new(new[] {DefaultValue});
 
     /// <summary>
     ///     Fallback to other languages.
@@ -41,19 +36,24 @@ public struct Fallback : IEnumerable<int>
     public const int Language = 2;
 
     /// <summary>
-    ///     Gets the fallback to language policy.
-    /// </summary>
-    public static Fallback ToLanguage => new(new[] {Language});
-
-    /// <summary>
     ///     Fallback to tree ancestors.
     /// </summary>
     public const int Ancestors = 3;
 
     /// <summary>
+    ///     Gets the fallback to default value policy.
+    /// </summary>
+    public static Fallback ToDefaultValue => new(new[] { DefaultValue });
+
+    /// <summary>
+    ///     Gets the fallback to language policy.
+    /// </summary>
+    public static Fallback ToLanguage => new(new[] { Language });
+
+    /// <summary>
     ///     Gets the fallback to tree ancestors policy.
     /// </summary>
-    public static Fallback ToAncestors => new(new[] {Ancestors});
+    public static Fallback ToAncestors => new(new[] { Ancestors });
 
     /// <inheritdoc />
     public IEnumerator<int> GetEnumerator() => ((IEnumerable<int>)_values ?? Array.Empty<int>()).GetEnumerator();

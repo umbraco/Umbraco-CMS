@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -34,8 +34,7 @@ public class MacroPropertyCollection : ObservableDictionary<string, IMacroProper
     ///     The existing property alias
     /// </param>
     /// <param name="newAlias"></param>
-    public void UpdateProperty(string currentAlias, string? name = null, int? sortOrder = null,
-        string? editorAlias = null, string? newAlias = null)
+    public void UpdateProperty(string currentAlias, string? name = null, int? sortOrder = null, string? editorAlias = null, string? newAlias = null)
     {
         IMacroProperty prop = this[currentAlias];
         if (prop == null)

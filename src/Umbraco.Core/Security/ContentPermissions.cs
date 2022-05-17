@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -12,14 +12,15 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class ContentPermissions
 {
+    private readonly AppCaches _appCaches;
+
     public enum ContentAccess
     {
         Granted,
         Denied,
-        NotFound
+        NotFound,
     }
 
-    private readonly AppCaches _appCaches;
     private readonly IContentService _contentService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
@@ -36,10 +37,43 @@ public class ContentPermissions
         _appCaches = appCaches;
     }
 
+    public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
+        }
+
+        // check for no access
+        if (startNodeIds is null || startNodeIds.Length == 0)
+        {
+            return false;
+        }
+
+        // check for root access
+        if (startNodeIds.Contains(Constants.System.Root))
+        {
+            return true;
+        }
+
+        var formattedPath = string.Concat(",", path, ",");
+
+        // only users with root access have access to the recycle bin,
+        // if the above check didn't pass then access is denied
+        if (formattedPath.Contains(string.Concat(",", recycleBinId.ToString(CultureInfo.InvariantCulture), ",")))
+        {
+            return false;
+        }
+
+        // check for a start node in the path
+        return startNodeIds.Any(x =>
+            formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
+    }
+
     public ContentAccess CheckPermissions(
         IContent content,
         IUser user,
-        char permissionToCheck) => CheckPermissions(content, user, new[] {permissionToCheck});
+        char permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck });
 
     public ContentAccess CheckPermissions(
         IContent? content,
@@ -68,7 +102,7 @@ public class ContentPermissions
             return ContentAccess.Granted;
         }
 
-        //get the implicit/inherited permissions for the user for this path
+        // get the implicit/inherited permissions for the user for this path
         return CheckPermissionsPath(content.Path, user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -77,7 +111,7 @@ public class ContentPermissions
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
-        char permissionToCheck) => CheckPermissions(entity, user, new[] {permissionToCheck});
+        char permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck });
 
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
@@ -106,7 +140,7 @@ public class ContentPermissions
             return ContentAccess.Granted;
         }
 
-        //get the implicit/inherited permissions for the user for this path
+        // get the implicit/inherited permissions for the user for this path
         return CheckPermissionsPath(entity.Path, user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -173,7 +207,7 @@ public class ContentPermissions
             return ContentAccess.Granted;
         }
 
-        //get the implicit/inherited permissions for the user for this path
+        // get the implicit/inherited permissions for the user for this path
         return CheckPermissionsPath(entity.Path, user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -241,7 +275,7 @@ public class ContentPermissions
             return ContentAccess.Granted;
         }
 
-        //get the implicit/inherited permissions for the user for this path
+        // get the implicit/inherited permissions for the user for this path
         return CheckPermissionsPath(contentItem.Path, user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -254,8 +288,8 @@ public class ContentPermissions
             permissionsToCheck = Array.Empty<char>();
         }
 
-        //get the implicit/inherited permissions for the user for this path,
-        //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+        // get the implicit/inherited permissions for the user for this path,
+        // if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
         EntityPermissionSet permission = _userService.GetPermissionsForPath(user, path);
 
         var allowed = true;
@@ -271,41 +305,7 @@ public class ContentPermissions
         return allowed;
     }
 
-    public static bool HasPathAccess(string? path, int[]? startNodeIds, int recycleBinId)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
-        }
-
-        // check for no access
-        if (startNodeIds is null || startNodeIds.Length == 0)
-        {
-            return false;
-        }
-
-        // check for root access
-        if (startNodeIds.Contains(Constants.System.Root))
-        {
-            return true;
-        }
-
-        var formattedPath = string.Concat(",", path, ",");
-
-        // only users with root access have access to the recycle bin,
-        // if the above check didn't pass then access is denied
-        if (formattedPath.Contains(string.Concat(",", recycleBinId.ToString(CultureInfo.InvariantCulture), ",")))
-        {
-            return false;
-        }
-
-        // check for a start node in the path
-        return startNodeIds.Any(x =>
-            formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
-    }
-
-    public static bool IsInBranchOfStartNode(string path, int[]? startNodeIds, string[]? startNodePaths,
-        out bool hasPathAccess)
+    public static bool IsInBranchOfStartNode(string path, int[]? startNodeIds, string[]? startNodePaths, out bool hasPathAccess)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -327,7 +327,7 @@ public class ContentPermissions
             return true;
         }
 
-        //is it self?
+        // is it self?
         var self = startNodePaths?.Any(x => x == path) ?? false;
         if (self)
         {
@@ -335,15 +335,15 @@ public class ContentPermissions
             return true;
         }
 
-        //is it ancestor?
+        // is it ancestor?
         var ancestor = startNodePaths?.Any(x => x.StartsWith(path)) ?? false;
         if (ancestor)
         {
-            //hasPathAccess = false;
+            // hasPathAccess = false;
             return true;
         }
 
-        //is it descendant?
+        // is it descendant?
         var descendant = startNodePaths?.Any(x => path.StartsWith(x)) ?? false;
         if (descendant)
         {

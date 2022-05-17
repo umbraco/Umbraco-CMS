@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.WebAssets;
 
@@ -13,6 +13,7 @@ public class AssetFile : IAssetFile
     #region IAssetFile Members
 
     public string? FilePath { get; set; }
+
     public AssetType DependencyType { get; }
 
     #endregion

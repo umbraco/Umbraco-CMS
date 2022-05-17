@@ -12,15 +12,15 @@ namespace Umbraco.Cms.Core.Events;
 /// </content>
 public partial class EventAggregator : IEventAggregator
 {
-    private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper> s_notificationAsyncHandlers
+    private static readonly ConcurrentDictionary<Type, NotificationAsyncHandlerWrapper> NotificationAsyncHandlers
         = new();
 
-    private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> s_notificationHandlers = new();
+    private static readonly ConcurrentDictionary<Type, NotificationHandlerWrapper> NotificationHandlers = new();
 
     private Task PublishNotificationAsync(INotification notification, CancellationToken cancellationToken = default)
     {
         Type notificationType = notification.GetType();
-        NotificationAsyncHandlerWrapper asyncHandler = s_notificationAsyncHandlers.GetOrAdd(
+        NotificationAsyncHandlerWrapper asyncHandler = NotificationAsyncHandlers.GetOrAdd(
             notificationType,
             t =>
             {
@@ -37,7 +37,7 @@ public partial class EventAggregator : IEventAggregator
     private void PublishNotification(INotification notification)
     {
         Type notificationType = notification.GetType();
-        NotificationHandlerWrapper? asyncHandler = s_notificationHandlers.GetOrAdd(
+        NotificationHandlerWrapper? asyncHandler = NotificationHandlers.GetOrAdd(
             notificationType,
             t =>
             {

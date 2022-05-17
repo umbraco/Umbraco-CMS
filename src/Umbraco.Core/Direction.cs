@@ -1,7 +1,7 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public enum Direction
 {
     Ascending = 0,
-    Descending = 1
+    Descending = 1,
 }

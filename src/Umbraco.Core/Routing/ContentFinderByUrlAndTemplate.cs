@@ -55,7 +55,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
     /// <remarks>If successful, also assigns the template.</remarks>
-    public override async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public override Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
         var path = frequest.AbsolutePathDecoded;
 
@@ -72,13 +72,13 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
                 _logger.LogDebug("No template in path '/'");
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         // look for template in last position
         var pos = path.LastIndexOf('/');
-        var templateAlias = path.Substring(pos + 1);
-        path = pos == 0 ? "/" : path.Substring(0, pos);
+        var templateAlias = path[(pos + 1)..];
+        path = pos == 0 ? "/" : path[..pos];
 
         ITemplate? template = _fileService.GetTemplate(templateAlias);
 
@@ -89,7 +89,7 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
                 _logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         if (_logger.IsEnabled(LogLevel.Debug))
@@ -108,20 +108,20 @@ public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
                 _logger.LogDebug("Not a valid route to node: '{Route}'", route);
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
         if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
         {
-            _logger.LogWarning("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.",
-                template.Alias, node.Id);
+            _logger.LogWarning(
+                "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
             frequest.SetPublishedContent(null); // clear
-            return false;
+            return Task.FromResult(false);
         }
 
         // got it
         frequest.SetTemplate(template);
-        return true;
+        return Task.FromResult(true);
     }
 }

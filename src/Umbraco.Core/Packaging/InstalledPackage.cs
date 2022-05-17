@@ -11,8 +11,8 @@ public class InstalledPackage
     public string? PackageName { get; set; }
 
     // TODO: Version? Icon? Other metadata? This would need to come from querying the package on Our
-
-    [DataMember(Name = "packageView")] public string? PackageView { get; set; }
+    [DataMember(Name = "packageView")]
+    public string? PackageView { get; set; }
 
     [DataMember(Name = "plans")]
     public IEnumerable<InstalledPackageMigrationPlans> PackageMigrationPlans { get; set; } =

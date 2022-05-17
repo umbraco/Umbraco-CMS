@@ -5,6 +5,8 @@ namespace Umbraco.Cms.Core.Models;
 
 public interface IPropertyCollection : IEnumerable<IProperty>, IDeepCloneable, INotifyCollectionChanged
 {
+    int Count { get; }
+
     /// <summary>
     ///     Gets the property with the specified alias.
     /// </summary>
@@ -15,8 +17,8 @@ public interface IPropertyCollection : IEnumerable<IProperty>, IDeepCloneable, I
     /// </summary>
     IProperty? this[int index] { get; }
 
-    int Count { get; }
     bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property);
+
     bool Contains(string key);
 
     /// <summary>

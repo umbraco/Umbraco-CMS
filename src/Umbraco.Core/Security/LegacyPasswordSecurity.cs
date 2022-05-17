@@ -13,6 +13,13 @@ namespace Umbraco.Cms.Core.Security;
 /// </remarks>
 public class LegacyPasswordSecurity
 {
+    public static string GenerateSalt()
+    {
+        var numArray = new byte[16];
+        new RNGCryptoServiceProvider().GetBytes(numArray);
+        return Convert.ToBase64String(numArray);
+    }
+
     // TODO: Remove v11
     // Used for tests
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -24,8 +31,7 @@ public class LegacyPasswordSecurity
             throw new ArgumentException("password cannot be empty", nameof(password));
         }
 
-        string salt;
-        var hashed = HashNewPassword(algorithmType, password, out salt);
+        var hashed = HashNewPassword(algorithmType, password, out string salt);
         return FormatPasswordForStorage(algorithmType, hashed, salt);
     }
 
@@ -70,7 +76,7 @@ public class LegacyPasswordSecurity
         }
         catch (ArgumentOutOfRangeException)
         {
-            //This can happen if the length of the password is wrong and a salt cannot be extracted.
+            // This can happen if the length of the password is wrong and a salt cannot be extracted.
             return false;
         }
     }
@@ -82,8 +88,8 @@ public class LegacyPasswordSecurity
     {
         var hashAlgorithm = new HMACSHA1
         {
-            //the legacy salt was actually the password :(
-            Key = Encoding.Unicode.GetBytes(password)
+            // the legacy salt was actually the password :(
+            Key = Encoding.Unicode.GetBytes(password),
         };
 
         var hashed = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
@@ -127,15 +133,25 @@ public class LegacyPasswordSecurity
         }
 
         var saltLen = GenerateSalt();
-        salt = storedString.Substring(0, saltLen.Length);
-        return storedString.Substring(saltLen.Length);
+        salt = storedString[..saltLen.Length];
+        return storedString[saltLen.Length..];
     }
 
-    public static string GenerateSalt()
+    public bool SupportHashAlgorithm(string algorithm)
     {
-        var numArray = new byte[16];
-        new RNGCryptoServiceProvider().GetBytes(numArray);
-        return Convert.ToBase64String(numArray);
+        // This is for the v6-v8 hashing algorithm
+        if (algorithm.InvariantEquals(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName))
+        {
+            return true;
+        }
+
+        // Default validation value for old machine keys (switched to HMACSHA256 aspnet 4 https://docs.microsoft.com/en-us/aspnet/whitepapers/aspnet4/breaking-changes)
+        if (algorithm.InvariantEquals("SHA1"))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -153,31 +169,29 @@ public class LegacyPasswordSecurity
         }
 
         // This is the correct way to implement this (as per the sql membership provider)
-
         var bytes = Encoding.Unicode.GetBytes(pass);
         var saltBytes = Convert.FromBase64String(salt);
         byte[] inArray;
 
         using HashAlgorithm hashAlgorithm = GetHashAlgorithm(algorithmType);
-        var algorithm = hashAlgorithm as KeyedHashAlgorithm;
-        if (algorithm != null)
+        if (hashAlgorithm is KeyedHashAlgorithm algorithm)
         {
             KeyedHashAlgorithm keyedHashAlgorithm = algorithm;
             if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
             {
-                //if the salt bytes is the required key length for the algorithm, use it as-is
+                // if the salt bytes is the required key length for the algorithm, use it as-is
                 keyedHashAlgorithm.Key = saltBytes;
             }
             else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
             {
-                //if the salt bytes is too long for the required key length for the algorithm, reduce it
+                // if the salt bytes is too long for the required key length for the algorithm, reduce it
                 var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
                 Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
                 keyedHashAlgorithm.Key = numArray2;
             }
             else
             {
-                //if the salt bytes is too short for the required key length for the algorithm, extend it
+                // if the salt bytes is too short for the required key length for the algorithm, extend it
                 var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
                 var dstOffset = 0;
                 while (dstOffset < numArray2.Length)
@@ -223,22 +237,5 @@ public class LegacyPasswordSecurity
         }
 
         return alg;
-    }
-
-    public bool SupportHashAlgorithm(string algorithm)
-    {
-        // This is for the v6-v8 hashing algorithm
-        if (algorithm.InvariantEquals(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName))
-        {
-            return true;
-        }
-
-        // Default validation value for old machine keys (switched to HMACSHA256 aspnet 4 https://docs.microsoft.com/en-us/aspnet/whitepapers/aspnet4/breaking-changes)
-        if (algorithm.InvariantEquals("SHA1"))
-        {
-            return true;
-        }
-
-        return false;
     }
 }

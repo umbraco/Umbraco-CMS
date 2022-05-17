@@ -43,7 +43,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterReadLock();
             entries = GetDictionaryEntries()
-                .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
+                .Where(x => ((string)x.Key)[plen..].InvariantStartsWith(keyStartsWith))
                 .ToArray(); // evaluate while locked
         }
         finally
@@ -67,7 +67,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterReadLock();
             entries = GetDictionaryEntries()
-                .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
+                .Where(x => compiled.IsMatch(((string)x.Key)[plen..]))
                 .ToArray(); // evaluate while locked
         }
         finally
@@ -113,7 +113,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
     }
 
     /// <inheritdoc />
-    public virtual void ClearOfType(Type type)
+    public virtual void ClearOfType(Type? type)
     {
         if (type == null)
         {
@@ -205,8 +205,9 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
                              // if T is an interface remove anything that implements that interface
                              // otherwise remove exact types (not inherited types)
                              return (isInterface ? value is T : value.GetType() == typeOfT)
+
                                     // run predicate on the 'public key' part only, ie without prefix
-                                    && predicate(((string)x.Key).Substring(plen), (T)value);
+                                    && predicate(((string)x.Key)[plen..], (T)value);
                          }))
             {
                 RemoveEntry((string)entry.Key);
@@ -226,7 +227,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterWriteLock();
             foreach (KeyValuePair<object, object> entry in GetDictionaryEntries()
-                         .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
+                         .Where(x => ((string)x.Key)[plen..].InvariantStartsWith(keyStartsWith))
                          .ToArray())
             {
                 RemoveEntry((string)entry.Key);
@@ -247,7 +248,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterWriteLock();
             foreach (KeyValuePair<object, object> entry in GetDictionaryEntries()
-                         .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
+                         .Where(x => compiled.IsMatch(((string)x.Key)[plen..]))
                          .ToArray())
             {
                 RemoveEntry((string)entry.Key);
@@ -267,16 +268,20 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
     // these *must* be called from within the appropriate locks
     // and use the full prefixed cache keys
     protected abstract IEnumerable<KeyValuePair<object, object>> GetDictionaryEntries();
+
     protected abstract void RemoveEntry(string key);
+
     protected abstract object? GetEntry(string key);
 
     // read-write lock the underlying cache
-    //protected abstract IDisposable ReadLock { get; }
-    //protected abstract IDisposable WriteLock { get; }
-
+    // protected abstract IDisposable ReadLock { get; }
+    // protected abstract IDisposable WriteLock { get; }
     protected abstract void EnterReadLock();
+
     protected abstract void ExitReadLock();
+
     protected abstract void EnterWriteLock();
+
     protected abstract void ExitWriteLock();
 
     protected string GetCacheKey(string key) => $"{CacheItemPrefix}-{key}";

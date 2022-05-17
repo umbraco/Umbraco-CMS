@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -88,7 +88,6 @@ public class DataType : TreeEntityBase, IDataType
             // if we know we have a configuration (which may be null), return it
             // if we don't have an editor, then we have no configuration, return null
             // else, use the editor to get the configuration object
-
             if (_hasConfiguration)
             {
                 return _configuration;
@@ -111,6 +110,7 @@ public class DataType : TreeEntityBase, IDataType
 
             return _configuration;
         }
+
         set
         {
             if (value == null)
@@ -122,7 +122,8 @@ public class DataType : TreeEntityBase, IDataType
             // configurations are kinda non-mutable, mainly because detecting changes would be a pain
             if (_configuration == value) // reference comparison
             {
-                throw new ArgumentException("Configurations are kinda non-mutable. Do not reassign the same object.",
+                throw new ArgumentException(
+                    "Configurations are kinda non-mutable. Do not reassign the same object.",
                     nameof(value));
             }
 
@@ -142,7 +143,8 @@ public class DataType : TreeEntityBase, IDataType
 
             // extract database type from dictionary, if appropriate
             if (value is IDictionary<string, object> dictionaryConfiguration
-                && dictionaryConfiguration.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType,
+                && dictionaryConfiguration.TryGetValue(
+                    Constants.PropertyEditors.ConfigurationKeys.DataValueType,
                     out var valueTypeObject)
                 && valueTypeObject is string valueTypeString
                 && ValueTypes.IsValue(valueTypeString))
@@ -191,7 +193,6 @@ public class DataType : TreeEntityBase, IDataType
     {
         // note: in both cases, make sure we capture what we need - we don't want
         // to capture a reference to this full, potentially heavy, DataType instance.
-
         if (_hasConfiguration)
         {
             // if configuration has already been de-serialized, return
@@ -202,7 +203,7 @@ public class DataType : TreeEntityBase, IDataType
         {
             // else, create a Lazy de-serializer
             var capturedConfiguration = _configurationJson;
-            IDataEditor capturedEditor = _editor;
+            IDataEditor? capturedEditor = _editor;
             return new Lazy<object?>(() =>
             {
                 try

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Used when determining available compositions for a given content type
@@ -12,5 +12,6 @@ public class ContentTypeAvailableCompositionsResult
     }
 
     public IContentTypeComposition Composition { get; }
+
     public bool Allowed { get; }
 }

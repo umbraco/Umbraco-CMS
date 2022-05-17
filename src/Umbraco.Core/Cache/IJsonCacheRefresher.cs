@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 ///     A cache refresher that supports refreshing or removing cache based on a custom Json payload

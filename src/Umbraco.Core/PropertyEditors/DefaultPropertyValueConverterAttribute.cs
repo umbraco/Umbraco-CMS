@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Indicates that this is a default property value converter (shipped with Umbraco)

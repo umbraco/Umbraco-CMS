@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
 
@@ -13,14 +13,14 @@ public sealed class EmailValidator : IManifestValueValidator
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
     {
-        var asString = value == null ? "" : value.ToString();
+        var asString = value == null ? string.Empty : value.ToString();
 
         var emailVal = new EmailAddressAttribute();
 
         if (asString != string.Empty && emailVal.IsValid(asString) == false)
         {
             // TODO: localize these!
-            yield return new ValidationResult("Email is invalid", new[] {"value"});
+            yield return new ValidationResult("Email is invalid", new[] { "value" });
         }
     }
 }

@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentDeletedBlueprintNotification : EnumerableObjectNotification<IContent>
 {
-    public ContentDeletedBlueprintNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentDeletedBlueprintNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ContentDeletedBlueprintNotification(IEnumerable<IContent> target, EventMessages messages) : base(target,
+    public ContentDeletedBlueprintNotification(IEnumerable<IContent> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

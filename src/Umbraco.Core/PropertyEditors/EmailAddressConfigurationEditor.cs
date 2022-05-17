@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +20,8 @@ public class EmailAddressConfigurationEditor : ConfigurationEditor<EmailAddressC
     {
     }
 
-    public EmailAddressConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser)
+    public EmailAddressConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 }

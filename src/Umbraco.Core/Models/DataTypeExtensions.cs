@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Extensions;
@@ -43,7 +43,7 @@ public static class DataTypeExtensions
         Constants.DataTypes.Guids.LabelDateTimeGuid,
         Constants.DataTypes.Guids.LabelBigIntGuid,
         Constants.DataTypes.Guids.LabelTimeGuid,
-        Constants.DataTypes.Guids.LabelDateTimeGuid
+        Constants.DataTypes.Guids.LabelDateTimeGuid,
     };
 
     /// <summary>

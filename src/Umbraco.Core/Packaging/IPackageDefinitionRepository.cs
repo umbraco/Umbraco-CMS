@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Packaging;
+namespace Umbraco.Cms.Core.Packaging;
 
 /// <summary>
 ///     Defines methods for persisting package definitions to storage
@@ -6,7 +6,9 @@
 public interface IPackageDefinitionRepository
 {
     IEnumerable<PackageDefinition?> GetAll();
+
     PackageDefinition? GetById(int id);
+
     void Delete(int id);
 
     /// <summary>

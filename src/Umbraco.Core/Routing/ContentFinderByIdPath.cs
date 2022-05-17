@@ -44,17 +44,16 @@ public class ContentFinderByIdPath : IContentFinder
     /// </summary>
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        if (umbracoContext == null || (umbracoContext != null && umbracoContext.InPreviewMode == false &&
-                                       _webRoutingSettings.DisableFindContentByIdPath))
+        if (umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath)
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         IPublishedContent? node = null;
@@ -65,7 +64,7 @@ public class ContentFinderByIdPath : IContentFinder
         // no id if "/"
         if (path != "/")
         {
-            var noSlashPath = path.Substring(1);
+            var noSlashPath = path[1..];
 
             if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out nodeId) == false)
             {
@@ -79,7 +78,7 @@ public class ContentFinderByIdPath : IContentFinder
                     _logger.LogDebug("Id={NodeId}", nodeId);
                 }
 
-                node = umbracoContext?.Content?.GetById(nodeId);
+                node = umbracoContext.Content?.GetById(nodeId);
 
                 if (node != null)
                 {
@@ -113,6 +112,6 @@ public class ContentFinderByIdPath : IContentFinder
             }
         }
 
-        return node != null;
+        return Task.FromResult(node != null);
     }
 }

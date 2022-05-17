@@ -1,11 +1,9 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
-
 namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Defines a Template File (Mvc View)
 /// </summary>
-public interface ITemplate : IFile, IRememberBeingDirty, ICanBeDirty
+public interface ITemplate : IFile
 {
     /// <summary>
     ///     Gets the Name of the File including extension

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "contentTypeCollection", Namespace = "")]
 public class CreatedContentTypeCollectionResult
 {
-    [DataMember(Name = "collectionId")] public int CollectionId { get; set; }
+    [DataMember(Name = "collectionId")]
+    public int CollectionId { get; set; }
 
-    [DataMember(Name = "containerId")] public int ContainerId { get; set; }
+    [DataMember(Name = "containerId")]
+    public int ContainerId { get; set; }
 }

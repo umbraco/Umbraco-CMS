@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -31,11 +31,14 @@ public class BlockListConfiguration
     [DataContract]
     public class BlockConfiguration
     {
-        [DataMember(Name = "backgroundColor")] public string? BackgroundColor { get; set; }
+        [DataMember(Name = "backgroundColor")]
+        public string? BackgroundColor { get; set; }
 
-        [DataMember(Name = "iconColor")] public string? IconColor { get; set; }
+        [DataMember(Name = "iconColor")]
+        public string? IconColor { get; set; }
 
-        [DataMember(Name = "thumbnail")] public string? Thumbnail { get; set; }
+        [DataMember(Name = "thumbnail")]
+        public string? Thumbnail { get; set; }
 
         [DataMember(Name = "contentElementTypeKey")]
         public Guid ContentElementTypeKey { get; set; }
@@ -43,13 +46,17 @@ public class BlockListConfiguration
         [DataMember(Name = "settingsElementTypeKey")]
         public Guid? SettingsElementTypeKey { get; set; }
 
-        [DataMember(Name = "view")] public string? View { get; set; }
+        [DataMember(Name = "view")]
+        public string? View { get; set; }
 
-        [DataMember(Name = "stylesheet")] public string? Stylesheet { get; set; }
+        [DataMember(Name = "stylesheet")]
+        public string? Stylesheet { get; set; }
 
-        [DataMember(Name = "label")] public string? Label { get; set; }
+        [DataMember(Name = "label")]
+        public string? Label { get; set; }
 
-        [DataMember(Name = "editorSize")] public string? EditorSize { get; set; }
+        [DataMember(Name = "editorSize")]
+        public string? EditorSize { get; set; }
 
         [DataMember(Name = "forceHideContentEditorInOverlay")]
         public bool ForceHideContentEditorInOverlay { get; set; }
@@ -58,8 +65,10 @@ public class BlockListConfiguration
     [DataContract]
     public class NumberRange
     {
-        [DataMember(Name = "min")] public int? Min { get; set; }
+        [DataMember(Name = "min")]
+        public int? Min { get; set; }
 
-        [DataMember(Name = "max")] public int? Max { get; set; }
+        [DataMember(Name = "max")]
+        public int? Max { get; set; }
     }
 }

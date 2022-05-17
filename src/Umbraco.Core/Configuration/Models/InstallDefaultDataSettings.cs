@@ -26,7 +26,7 @@ public enum InstallDefaultDataOption
     /// <summary>
     ///     Install all default data.
     /// </summary>
-    All
+    All,
 }
 
 /// <summary>

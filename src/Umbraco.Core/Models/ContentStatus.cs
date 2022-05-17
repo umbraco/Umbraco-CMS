@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -15,25 +15,30 @@ public enum ContentStatus
     /// <summary>
     ///     The document is not trashed, and not published.
     /// </summary>
-    [EnumMember] Unpublished,
+    [EnumMember]
+    Unpublished,
 
     /// <summary>
     ///     The document is published.
     /// </summary>
-    [EnumMember] Published,
+    [EnumMember]
+    Published,
 
     /// <summary>
     ///     The document is not trashed, not published, after being unpublished by a scheduled action.
     /// </summary>
-    [EnumMember] Expired,
+    [EnumMember]
+    Expired,
 
     /// <summary>
     ///     The document is trashed.
     /// </summary>
-    [EnumMember] Trashed,
+    [EnumMember]
+    Trashed,
 
     /// <summary>
     ///     The document is not trashed, not published, and pending publication by a scheduled action.
     /// </summary>
-    [EnumMember] AwaitingRelease
+    [EnumMember]
+    AwaitingRelease,
 }

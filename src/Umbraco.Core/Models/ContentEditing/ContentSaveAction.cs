@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
 ///     The action associated with saving a content item
@@ -65,5 +65,5 @@ public enum ContentSaveAction
     ///     Creates and publishes the content item including all descendants regardless of whether they have a published
     ///     version or not
     /// </summary>
-    PublishWithDescendantsForceNew = 11
+    PublishWithDescendantsForceNew = 11,
 }

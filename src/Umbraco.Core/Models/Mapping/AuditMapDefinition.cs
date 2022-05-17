@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Models.Mapping;

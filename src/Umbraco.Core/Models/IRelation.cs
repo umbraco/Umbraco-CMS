@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -11,7 +11,8 @@ public interface IRelation : IEntity, IRememberBeingDirty
     [DataMember]
     int ParentId { get; set; }
 
-    [DataMember] Guid ParentObjectType { get; set; }
+    [DataMember]
+    Guid ParentObjectType { get; set; }
 
     /// <summary>
     ///     Gets or sets the Child Id of the Relation (Destination)
@@ -19,7 +20,8 @@ public interface IRelation : IEntity, IRememberBeingDirty
     [DataMember]
     int ChildId { get; set; }
 
-    [DataMember] Guid ChildObjectType { get; set; }
+    [DataMember]
+    Guid ChildObjectType { get; set; }
 
     /// <summary>
     ///     Gets or sets the <see cref="RelationType" /> for the Relation

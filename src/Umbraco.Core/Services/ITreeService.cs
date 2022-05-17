@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.Trees;
 
 namespace Umbraco.Cms.Core.Services;
 

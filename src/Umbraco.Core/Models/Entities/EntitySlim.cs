@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Entities;
 
@@ -20,7 +20,7 @@ public class EntitySlim : IEntitySlim
     /// <summary>
     ///     Gets an entity representing "root".
     /// </summary>
-    public static readonly IEntitySlim Root = new EntitySlim {Path = "-1", Name = "root", HasChildren = true};
+    public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
 
     private IDictionary<string, object?>? _additionalData;
 
@@ -50,7 +50,6 @@ public class EntitySlim : IEntitySlim
     [DataMember]
     public bool HasIdentity => Id != 0;
 
-
     // implement ITreeEntity
 
     /// <inheritdoc />
@@ -66,12 +65,12 @@ public class EntitySlim : IEntitySlim
     public int ParentId { get; set; }
 
     /// <inheritdoc />
-    public void SetParent(ITreeEntity? parent) =>
-        throw new InvalidOperationException("This property won't be implemented.");
-
-    /// <inheritdoc />
     [DataMember]
     public int Level { get; set; }
+
+    /// <inheritdoc />
+    public void SetParent(ITreeEntity? parent) =>
+        throw new InvalidOperationException("This property won't be implemented.");
 
     /// <inheritdoc />
     [DataMember]
@@ -85,18 +84,16 @@ public class EntitySlim : IEntitySlim
     [DataMember]
     public bool Trashed { get; set; }
 
-
     // implement IUmbracoEntity
 
     /// <inheritdoc />
     [DataMember]
     public IDictionary<string, object?>? AdditionalData =>
-        _additionalData ?? (_additionalData = new Dictionary<string, object?>());
+_additionalData ??= new Dictionary<string, object?>();
 
     /// <inheritdoc />
     [IgnoreDataMember]
     public bool HasAdditionalData => _additionalData != null;
-
 
     // implement IEntitySlim
 
@@ -111,7 +108,6 @@ public class EntitySlim : IEntitySlim
     /// <inheritdoc />
     [DataMember]
     public virtual bool IsContainer { get; set; }
-
 
     #region IDeepCloneable
 
@@ -130,7 +126,6 @@ public class EntitySlim : IEntitySlim
 
     // IEntitySlim does *not* track changes, but since it indirectly implements IUmbracoEntity,
     // and therefore IRememberBeingDirty, we have to have those methods - which all throw.
-
     public bool IsDirty() => throw new InvalidOperationException("This method won't be implemented.");
 
     public bool IsPropertyDirty(string propName) =>

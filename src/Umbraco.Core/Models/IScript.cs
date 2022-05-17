@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public interface IScript : IFile
 {

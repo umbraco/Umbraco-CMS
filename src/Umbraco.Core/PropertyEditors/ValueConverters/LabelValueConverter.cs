@@ -20,7 +20,7 @@ public class LabelValueConverter : PropertyValueConverterBase
 
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
     {
-        LabelConfiguration valueType =
+        LabelConfiguration? valueType =
             ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
         switch (valueType?.ValueType)
         {
@@ -43,10 +43,9 @@ public class LabelValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        LabelConfiguration valueType =
+        LabelConfiguration? valueType =
             ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
         switch (valueType?.ValueType)
         {
@@ -59,8 +58,7 @@ public class LabelValueConverter : PropertyValueConverterBase
 
                 if (source is string sourceDateTimeString)
                 {
-                    return DateTime.TryParse(sourceDateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.None,
-                        out DateTime dt)
+                    return DateTime.TryParse(sourceDateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt)
                         ? dt
                         : DateTime.MinValue;
                 }
@@ -88,8 +86,7 @@ public class LabelValueConverter : PropertyValueConverterBase
 
                 if (source is string sourceDecimalString)
                 {
-                    return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture,
-                        out var d)
+                    return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out var d)
                         ? d
                         : 0;
                 }
@@ -99,7 +96,7 @@ public class LabelValueConverter : PropertyValueConverterBase
                     return Convert.ToDecimal(sourceDouble);
                 }
 
-                return (decimal)0;
+                return 0M;
             case ValueTypes.Integer:
                 if (source is int sourceInt)
                 {
@@ -120,7 +117,7 @@ public class LabelValueConverter : PropertyValueConverterBase
                     return long.TryParse(sourceLongString, out var i) ? i : 0;
                 }
 
-                return (long)0;
+                return 0L;
             default: // everything else is a string
                 return source?.ToString() ?? string.Empty;
         }

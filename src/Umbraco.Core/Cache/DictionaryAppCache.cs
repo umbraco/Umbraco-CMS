@@ -34,7 +34,7 @@ public class DictionaryAppCache : IRequestCache
     public virtual IEnumerable<object?> SearchByKey(string keyStartsWith)
     {
         var items = new List<object?>();
-        foreach (var (key, value) in _items)
+        foreach ((string key, object? value) in _items)
         {
             if (key.InvariantStartsWith(keyStartsWith))
             {
@@ -50,7 +50,7 @@ public class DictionaryAppCache : IRequestCache
     {
         var compiled = new Regex(regex, RegexOptions.Compiled);
         var items = new List<object?>();
-        foreach (var (key, value) in _items)
+        foreach ((string key, object? value) in _items)
         {
             if (compiled.IsMatch(key))
             {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Collections;
+namespace Umbraco.Cms.Core.Collections;
 
 public enum ListCloneBehavior
 {
@@ -15,5 +15,5 @@ public enum ListCloneBehavior
     /// <summary>
     ///     When set, DeepClone will always clone all items
     /// </summary>
-    Always
+    Always,
 }

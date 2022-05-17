@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Scoping;
+namespace Umbraco.Cms.Core.Scoping;
 
 /// <summary>
 ///     Represents a scope context.

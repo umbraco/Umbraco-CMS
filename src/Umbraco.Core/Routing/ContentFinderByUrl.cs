@@ -34,11 +34,11 @@ public class ContentFinderByUrl : IContentFinder
     /// </summary>
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-    public virtual async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public virtual Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? _))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         string route;
@@ -53,7 +53,7 @@ public class ContentFinderByUrl : IContentFinder
         }
 
         IPublishedContent? node = FindContent(frequest, route);
-        return node != null;
+        return Task.FromResult(node != null);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class ContentFinderByUrl : IContentFinder
     /// <returns>The document node, or null.</returns>
     protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route)
     {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
             return null;
         }

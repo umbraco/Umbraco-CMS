@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validation;
 
@@ -19,6 +19,7 @@ public class ComplexEditorPropertyTypeValidationResult : ValidationResult
         PropertyTypeAlias = propertyTypeAlias;
 
     public IReadOnlyList<ValidationResult> ValidationResults => _validationResults;
+
     public string PropertyTypeAlias { get; }
 
     public void AddValidationResult(ValidationResult validationResult)

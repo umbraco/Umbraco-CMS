@@ -28,7 +28,6 @@ public static partial class Constants
             public const string MemberRoleRuleType = "MemberRole";
         }
 
-
         public static class DataTypes
         {
             public const string ListViewPrefix = "List View - ";
@@ -345,9 +344,9 @@ public static partial class Constants
             ///     Developers should not manually use these relation types since they will all be cleared whenever an entity
             ///     (content, media or member) is saved since they are auto-populated based on property values.
             /// </remarks>
-            public static string[] AutomaticRelationTypes { get; } = {RelatedMediaAlias, RelatedDocumentAlias};
+            public static string[] AutomaticRelationTypes { get; } = { RelatedMediaAlias, RelatedDocumentAlias };
 
-            //TODO: return a list of built in types so we can use that to prevent deletion in the uI
+            // TODO: return a list of built in types so we can use that to prevent deletion in the uI
         }
     }
 }

@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentRolledBackNotification : RolledBackNotification<IContent>
 {
-    public ContentRolledBackNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentRolledBackNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

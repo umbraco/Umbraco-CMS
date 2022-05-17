@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -25,7 +25,8 @@ public class ContentPropertyBasic
     [ReadOnly(true)]
     public Guid DataTypeKey { get; set; }
 
-    [DataMember(Name = "value")] public object? Value { get; set; }
+    [DataMember(Name = "value")]
+    public object? Value { get; set; }
 
     [DataMember(Name = "alias", IsRequired = true)]
     [Required(AllowEmptyStrings = false)]

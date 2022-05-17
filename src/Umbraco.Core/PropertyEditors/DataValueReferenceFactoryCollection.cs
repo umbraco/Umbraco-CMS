@@ -6,33 +6,33 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataValueReferenceFactory>
 {
-    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items) : base(items)
+    public DataValueReferenceFactoryCollection(Func<IEnumerable<IDataValueReferenceFactory>> items)
+        : base(items)
     {
     }
 
     // TODO: We could further reduce circular dependencies with PropertyEditorCollection by not having IDataValueReference implemented
     // by property editors and instead just use the already built in IDataValueReferenceFactory and/or refactor that into a more normal collection
-
-    public IEnumerable<UmbracoEntityReference> GetAllReferences(IPropertyCollection properties,
+    public IEnumerable<UmbracoEntityReference> GetAllReferences(
+        IPropertyCollection properties,
         PropertyEditorCollection propertyEditors)
     {
         var trackedRelations = new HashSet<UmbracoEntityReference>();
 
         foreach (IProperty p in properties)
         {
-            if (!propertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out IDataEditor editor))
+            if (!propertyEditors.TryGet(p.PropertyType.PropertyEditorAlias, out IDataEditor? editor))
             {
                 continue;
             }
 
-            //TODO: We will need to change this once we support tracking via variants/segments
+            // TODO: We will need to change this once we support tracking via variants/segments
             // for now, we are tracking values from ALL variants
-
             foreach (IPropertyValue propertyVal in p.Values)
             {
                 var val = propertyVal.EditedValue;
 
-                IDataValueEditor valueEditor = editor?.GetValueEditor();
+                IDataValueEditor? valueEditor = editor?.GetValueEditor();
                 if (valueEditor is IDataValueReference reference)
                 {
                     IEnumerable<UmbracoEntityReference> refs = reference.GetReferences(val);

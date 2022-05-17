@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DataTypeDeletingNotification : DeletingNotification<IDataType>
 {
-    public DataTypeDeletingNotification(IDataType target, EventMessages messages) : base(target, messages)
+    public DataTypeDeletingNotification(IDataType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

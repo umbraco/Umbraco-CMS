@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 

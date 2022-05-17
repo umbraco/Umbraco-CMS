@@ -5,23 +5,16 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCacheRefresherNotification>
 {
-    public ApplicationCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+    public static readonly Guid UniqueId = Guid.Parse("B15F34A1-BC1D-4F8B-8369-3222728AB4C8");
+
+    public ApplicationCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, eventAggregator, factory)
     {
     }
 
-    #region Define
-
-    public static readonly Guid UniqueId = Guid.Parse("B15F34A1-BC1D-4F8B-8369-3222728AB4C8");
-
     public override Guid RefresherUniqueId => UniqueId;
 
     public override string Name => "Application Cache Refresher";
-
-    #endregion
-
-    #region Refresher
 
     public override void RefreshAll()
     {
@@ -40,6 +33,4 @@ public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCa
         AppCaches.RuntimeCache.Clear(CacheKeys.ApplicationsCacheKey);
         base.Remove(id);
     }
-
-    #endregion
 }

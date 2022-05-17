@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -84,7 +84,6 @@ public class IndexedArrayItem<TContent>
     /// </returns>
     // TODO: This method should be removed or moved to an extension method on HtmlHelper.
     public bool IsNotFirst() => IsFirst() == false;
-
 
     /// <summary>
     ///     If this item is not the first, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise,

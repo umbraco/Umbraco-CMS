@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -22,7 +22,8 @@ public class ContentCultureInfos : BeingDirtyBase, IDeepCloneable, IEquatable<Co
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(culture));
         }
 

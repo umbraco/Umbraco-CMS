@@ -1,10 +1,11 @@
-﻿using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.IO;
 
 public class IOHelperOSX : IOHelper
 {
-    public IOHelperOSX(IHostingEnvironment hostingEnvironment) : base(hostingEnvironment)
+    public IOHelperOSX(IHostingEnvironment hostingEnvironment)
+        : base(hostingEnvironment)
     {
     }
 
@@ -14,10 +15,9 @@ public class IOHelperOSX : IOHelper
     {
         // either it is identical to root,
         // or it is root + separator + anything
-
         if (separators == null || separators.Length == 0)
         {
-            separators = new[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+            separators = new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
         }
 
         if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase))

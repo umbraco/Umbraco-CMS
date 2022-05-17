@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Extensions;
 
@@ -7,7 +7,8 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class AppCacheExtensions
 {
-    public static T? GetCacheItem<T>(this IAppPolicyCache provider,
+    public static T? GetCacheItem<T>(
+        this IAppPolicyCache provider,
         string cacheKey,
         Func<T?> getCacheItem,
         TimeSpan? timeout,
@@ -18,7 +19,8 @@ public static class AppCacheExtensions
         return result == null ? default : result.TryConvertTo<T>().Result;
     }
 
-    public static void InsertCacheItem<T>(this IAppPolicyCache provider,
+    public static void InsertCacheItem<T>(
+        this IAppPolicyCache provider,
         string cacheKey,
         Func<T> getCacheItem,
         TimeSpan? timeout = null,
@@ -28,13 +30,13 @@ public static class AppCacheExtensions
 
     public static IEnumerable<T?> GetCacheItemsByKeySearch<T>(this IAppCache provider, string keyStartsWith)
     {
-        IEnumerable<object> result = provider.SearchByKey(keyStartsWith);
+        IEnumerable<object?> result = provider.SearchByKey(keyStartsWith);
         return result.Select(x => x.TryConvertTo<T>().Result);
     }
 
     public static IEnumerable<T?> GetCacheItemsByKeyExpression<T>(this IAppCache provider, string regexString)
     {
-        IEnumerable<object> result = provider.SearchByRegex(regexString);
+        IEnumerable<object?> result = provider.SearchByRegex(regexString);
         return result.Select(x => x.TryConvertTo<T>().Result);
     }
 

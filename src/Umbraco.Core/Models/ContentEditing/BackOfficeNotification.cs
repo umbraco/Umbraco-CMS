@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -16,9 +16,12 @@ public class BackOfficeNotification
         NotificationType = notificationType;
     }
 
-    [DataMember(Name = "header")] public string? Header { get; set; }
+    [DataMember(Name = "header")]
+    public string? Header { get; set; }
 
-    [DataMember(Name = "message")] public string? Message { get; set; }
+    [DataMember(Name = "message")]
+    public string? Message { get; set; }
 
-    [DataMember(Name = "type")] public NotificationStyle NotificationType { get; set; }
+    [DataMember(Name = "type")]
+    public NotificationStyle NotificationType { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 
@@ -50,7 +50,8 @@ public static class GlobalSettingsExtensions
         return _mvcArea;
     }
 
-    internal static string GetUmbracoMvcAreaNoCache(this GlobalSettings globalSettings,
+    internal static string GetUmbracoMvcAreaNoCache(
+        this GlobalSettings globalSettings,
         IHostingEnvironment hostingEnvironment)
     {
         var path = string.IsNullOrEmpty(globalSettings.UmbracoPath)
@@ -62,9 +63,10 @@ public static class GlobalSettingsExtensions
             throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
         }
 
-        if (path.StartsWith(hostingEnvironment.ApplicationVirtualPath)) // beware of TrimStart, see U4-2518
+        // beware of TrimStart, see U4-2518
+        if (path.StartsWith(hostingEnvironment.ApplicationVirtualPath))
         {
-            path = path.Substring(hostingEnvironment.ApplicationVirtualPath.Length);
+            path = path[hostingEnvironment.ApplicationVirtualPath.Length..];
         }
 
         return path.TrimStart(Constants.CharArrays.Tilde).TrimStart(Constants.CharArrays.ForwardSlash).Replace('/', '-')

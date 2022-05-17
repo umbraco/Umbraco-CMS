@@ -15,19 +15,23 @@ public interface IDataTypeService : IService
     /// <returns></returns>
     IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name,
-        int userId = Constants.Security.SuperUserId);
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
 
     Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
+
     EntityContainer? GetContainer(int containerId);
+
     EntityContainer? GetContainer(Guid containerId);
+
     IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+
     IEnumerable<EntityContainer> GetContainers(IDataType dataType);
+
     IEnumerable<EntityContainer> GetContainers(int[] containerIds);
+
     Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
 
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
-        int userId = Constants.Security.SuperUserId);
+    Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets a <see cref="IDataType" /> by its Name

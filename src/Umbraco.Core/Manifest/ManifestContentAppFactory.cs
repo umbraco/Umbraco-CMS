@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest;
+
 // contentApps: [
 //   {
 //     name: 'App Name',        // required
@@ -68,14 +69,14 @@ public class ManifestContentAppFactory : IContentAppFactory
                 break;
             case IDictionaryItem _:
                 partA = "dictionary";
-                partB = "*"; //Not really a different type for dictionary items
+                partB = "*"; // Not really a different type for dictionary items
                 break;
 
             default:
                 return null;
         }
 
-        ShowRule[] rules = _showRules ?? (_showRules = ShowRule.Parse(_definition.Show).ToArray());
+        ShowRule[] rules = _showRules ??= ShowRule.Parse(_definition.Show).ToArray();
         var userGroupsList = userGroups.ToList();
 
         var okRole = false;
@@ -116,7 +117,9 @@ public class ManifestContentAppFactory : IContentAppFactory
                     break;
                 }
             }
-            else // it is a type rule
+
+            // it is a type rule
+            else
             {
                 // if type has been ok-ed already, skip the rule
                 if (okType)
@@ -161,22 +164,21 @@ public class ManifestContentAppFactory : IContentAppFactory
             Name = _definition.Name,
             Icon = _definition.Icon,
             View = _ioHelper.ResolveRelativeOrVirtualUrl(_definition.View),
-            Weight = _definition.Weight
+            Weight = _definition.Weight,
         };
     }
 
     private class ShowRule
     {
-        private static readonly Regex ShowRegex = new("^([+-])?([a-z]+)/([a-z0-9_]+|\\*)$",
+        private static readonly Regex ShowRegex = new(
+            "^([+-])?([a-z]+)/([a-z0-9_]+|\\*)$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public bool Show { get; private set; }
-        public string? PartA { get; private set; }
-        public string? PartB { get; private set; }
 
-        public bool Matches(string? partA, string? partB) =>
-            (PartA == "*" || (PartA?.InvariantEquals(partA) ?? false)) &&
-            (PartB == "*" || (PartB?.InvariantEquals(partB) ?? false));
+        public string? PartA { get; private set; }
+
+        public string? PartB { get; private set; }
 
         public static IEnumerable<ShowRule> Parse(string[] rules)
         {
@@ -192,9 +194,13 @@ public class ManifestContentAppFactory : IContentAppFactory
                 {
                     Show = match.Groups[1].Value != "-",
                     PartA = match.Groups[2].Value,
-                    PartB = match.Groups[3].Value
+                    PartB = match.Groups[3].Value,
                 };
             }
         }
+
+        public bool Matches(string? partA, string? partB) =>
+            (PartA == "*" || (PartA?.InvariantEquals(partA) ?? false)) &&
+            (PartB == "*" || (PartB?.InvariantEquals(partB) ?? false));
     }
 }

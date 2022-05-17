@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
 using Umbraco.Cms.Core.Composing;
@@ -29,28 +29,31 @@ public static class DeepCloneHelper
             throw new InvalidOperationException("Both the input and output types must be the same");
         }
 
-        //get the property metadata from cache so we only have to figure this out once per type
+        // get the property metadata from cache so we only have to figure this out once per type
         ClonePropertyInfo[] refProperties = PropCache.GetOrAdd(inputType, type =>
             inputType.GetProperties()
                 .Select<PropertyInfo, ClonePropertyInfo?>(propertyInfo =>
                 {
                     if (
-                        //is not attributed with the ignore clone attribute
+
+                        // is not attributed with the ignore clone attribute
                         propertyInfo.GetCustomAttribute<DoNotCloneAttribute>() != null
-                        //reference type but not string
+
+                        // reference type but not string
                         || propertyInfo.PropertyType.IsValueType || propertyInfo.PropertyType == typeof(string)
-                        //settable
+
+                        // settable
                         || propertyInfo.CanWrite == false
-                        //non-indexed
+
+                        // non-indexed
                         || propertyInfo.GetIndexParameters().Any())
                     {
                         return null;
                     }
 
-
                     if (TypeHelper.IsTypeAssignableFrom<IDeepCloneable>(propertyInfo.PropertyType))
                     {
-                        return new ClonePropertyInfo(propertyInfo) {IsDeepCloneable = true};
+                        return new ClonePropertyInfo(propertyInfo) { IsDeepCloneable = true };
                     }
 
                     if (TypeHelper.IsTypeAssignableFrom<IEnumerable>(propertyInfo.PropertyType)
@@ -63,43 +66,43 @@ public static class DeepCloneHelper
                                 || propertyInfo.PropertyType.GetGenericTypeDefinition() ==
                                 typeof(IReadOnlyCollection<>)))
                         {
-                            //if it is a IEnumerable<>, IReadOnlyCollection<T>, IList<T> or ICollection<> we'll use a List<> since it implements them all
+                            // if it is a IEnumerable<>, IReadOnlyCollection<T>, IList<T> or ICollection<> we'll use a List<> since it implements them all
                             Type genericType =
                                 typeof(List<>).MakeGenericType(propertyInfo.PropertyType.GetGenericArguments());
-                            return new ClonePropertyInfo(propertyInfo) {GenericListType = genericType};
+                            return new ClonePropertyInfo(propertyInfo) { GenericListType = genericType };
                         }
 
                         if (propertyInfo.PropertyType.IsArray
                             || (propertyInfo.PropertyType.IsInterface &&
                                 propertyInfo.PropertyType.IsGenericType == false))
                         {
-                            //if its an array, we'll create a list to work with first and then convert to array later
-                            //otherwise if its just a regular derivative of IEnumerable, we can use a list too
-                            return new ClonePropertyInfo(propertyInfo) {GenericListType = typeof(List<object>)};
+                            // if its an array, we'll create a list to work with first and then convert to array later
+                            // otherwise if its just a regular derivative of IEnumerable, we can use a list too
+                            return new ClonePropertyInfo(propertyInfo) { GenericListType = typeof(List<object>) };
                         }
 
-                        //skip instead of trying to create instance of abstract or interface
+                        // skip instead of trying to create instance of abstract or interface
                         if (propertyInfo.PropertyType.IsAbstract || propertyInfo.PropertyType.IsInterface)
                         {
                             return null;
                         }
 
-                        //its a custom IEnumerable, we'll try to create it
+                        // its a custom IEnumerable, we'll try to create it
                         try
                         {
                             var custom = Activator.CreateInstance(propertyInfo.PropertyType);
-                            //if it's an IList we can work with it, otherwise we cannot
-                            var newList = custom as IList;
-                            if (newList == null)
+
+                            // if it's an IList we can work with it, otherwise we cannot
+                            if (custom is not IList)
                             {
                                 return null;
                             }
 
-                            return new ClonePropertyInfo(propertyInfo) {GenericListType = propertyInfo.PropertyType};
+                            return new ClonePropertyInfo(propertyInfo) { GenericListType = propertyInfo.PropertyType };
                         }
                         catch (Exception)
                         {
-                            //could not create this type so we'll skip it
+                            // could not create this type so we'll skip it
                             return null;
                         }
                     }
@@ -114,12 +117,12 @@ public static class DeepCloneHelper
         {
             if (clonePropertyInfo.IsDeepCloneable)
             {
-                //this ref property is also deep cloneable so clone it
+                // this ref property is also deep cloneable so clone it
                 var result = (IDeepCloneable?)clonePropertyInfo.PropertyInfo.GetValue(input, null);
 
                 if (result != null)
                 {
-                    //set the cloned value to the property
+                    // set the cloned value to the property
                     clonePropertyInfo.PropertyInfo.SetValue(output, result.DeepClone(), null);
                 }
             }
@@ -131,36 +134,35 @@ public static class DeepCloneHelper
                     continue;
                 }
 
-                IList newList = clonePropertyInfo.GenericListType is not null
+                IList? newList = clonePropertyInfo.GenericListType is not null
                     ? (IList?)Activator.CreateInstance(clonePropertyInfo.GenericListType)
                     : null;
 
                 var isUsableType = true;
 
-                //now clone each item
+                // now clone each item
                 foreach (var o in enumerable)
                 {
-                    //first check if the item is deep cloneable and copy that way
-                    var dc = o as IDeepCloneable;
-                    if (dc != null)
+                    // first check if the item is deep cloneable and copy that way
+                    if (o is IDeepCloneable dc)
                     {
                         newList?.Add(dc.DeepClone());
                     }
                     else if (o is string || o.GetType().IsValueType)
                     {
-                        //check if the item is a value type or a string, then we can just use it
+                        // check if the item is a value type or a string, then we can just use it
                         newList?.Add(o);
                     }
                     else
                     {
-                        //this will occur if the item is not a string or value type or IDeepCloneable, in this case we cannot
+                        // this will occur if the item is not a string or value type or IDeepCloneable, in this case we cannot
                         // clone each element, we'll need to skip this property, people will have to manually clone this list
                         isUsableType = false;
                         break;
                     }
                 }
 
-                //if this was not usable, skip this property
+                // if this was not usable, skip this property
                 if (isUsableType == false)
                 {
                     continue;
@@ -168,8 +170,9 @@ public static class DeepCloneHelper
 
                 if (clonePropertyInfo.PropertyInfo.PropertyType.IsArray)
                 {
-                    //need to convert to array
-                    var arr = (object?[]?)Activator.CreateInstance(clonePropertyInfo.PropertyInfo.PropertyType,
+                    // need to convert to array
+                    var arr = (object?[]?)Activator.CreateInstance(
+                        clonePropertyInfo.PropertyInfo.PropertyType,
                         newList?.Count ?? 0);
                     for (var i = 0; i < newList?.Count; i++)
                     {
@@ -179,12 +182,12 @@ public static class DeepCloneHelper
                         }
                     }
 
-                    //set the cloned collection
+                    // set the cloned collection
                     clonePropertyInfo.PropertyInfo.SetValue(output, arr, null);
                 }
                 else
                 {
-                    //set the cloned collection
+                    // set the cloned collection
                     clonePropertyInfo.PropertyInfo.SetValue(output, newList, null);
                 }
             }
@@ -196,19 +199,18 @@ public static class DeepCloneHelper
     /// </summary>
     private struct ClonePropertyInfo
     {
-        public ClonePropertyInfo(PropertyInfo propertyInfo) : this()
+        public ClonePropertyInfo(PropertyInfo propertyInfo)
+            : this()
         {
-            if (propertyInfo == null)
-            {
-                throw new ArgumentNullException("propertyInfo");
-            }
-
-            PropertyInfo = propertyInfo;
+            PropertyInfo = propertyInfo ?? throw new ArgumentNullException("propertyInfo");
         }
 
         public PropertyInfo PropertyInfo { get; }
+
         public bool IsDeepCloneable { get; set; }
+
         public Type? GenericListType { get; set; }
+
         public bool IsList => GenericListType != null;
     }
 }

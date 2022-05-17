@@ -41,6 +41,58 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
     /// <inheritdoc />
     public override object DefaultConfigurationObject => new TConfiguration();
 
+    /// <inheritdoc />
+    public override bool IsConfiguration(object obj)
+        => obj is TConfiguration;
+
+        /// <inheritdoc />
+    public override object FromDatabase(
+        string? configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(configuration))
+            {
+                return new TConfiguration();
+            }
+
+            return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration)!;
+        }
+        catch (Exception e)
+        {
+            throw new InvalidOperationException(
+                $"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).",
+                e);
+        }
+    }
+
+    /// <inheritdoc />
+    public sealed override object? FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
+        object? configuration) => FromConfigurationEditor(editorValues, (TConfiguration?)configuration);
+
+    /// <summary>
+    ///     Converts the configuration posted by the editor.
+    /// </summary>
+    /// <param name="editorValues">The configuration object posted by the editor.</param>
+    /// <param name="configuration">The current configuration object.</param>
+    public virtual TConfiguration? FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
+        TConfiguration? configuration) =>
+        _editorConfigurationParser.ParseFromConfigurationEditor<TConfiguration>(editorValues, Fields);
+
+    /// <inheritdoc />
+    public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration) =>
+        ToConfigurationEditor((TConfiguration?)configuration);
+
+    /// <summary>
+    ///     Converts configuration values to values for the editor.
+    /// </summary>
+    /// <param name="configuration">The configuration.</param>
+    public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration) =>
+        _editorConfigurationParser.ParseToConfigurationEditor(configuration);
+
     /// <summary>
     ///     Discovers fields from configuration properties marked with the field attribute.
     /// </summary>
@@ -51,7 +103,7 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
 
         foreach (PropertyInfo property in properties)
         {
-            ConfigurationFieldAttribute attribute = property.GetCustomAttribute<ConfigurationFieldAttribute>(false);
+            ConfigurationFieldAttribute? attribute = property.GetCustomAttribute<ConfigurationFieldAttribute>(false);
             if (attribute == null)
             {
                 continue;
@@ -60,6 +112,7 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
             ConfigurationField field;
 
             var attributeView = ioHelper.ResolveRelativeOrVirtualUrl(attribute.View);
+
             // if the field does not have its own type, use the base type
             if (attribute.Type == null)
             {
@@ -72,7 +125,7 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
                     PropertyType = property.PropertyType,
                     Description = attribute.Description,
                     HideLabel = attribute.HideLabel,
-                    View = attributeView
+                    View = attributeView,
                 };
 
                 fields.Add(field);
@@ -131,53 +184,4 @@ public abstract class ConfigurationEditor<TConfiguration> : ConfigurationEditor
 
         return fields;
     }
-
-    /// <inheritdoc />
-    public override bool IsConfiguration(object obj)
-        => obj is TConfiguration;
-
-    /// <inheritdoc />
-    public override object FromDatabase(string? configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(configuration))
-            {
-                return new TConfiguration();
-            }
-
-            return configurationEditorJsonSerializer.Deserialize<TConfiguration>(configuration)!;
-        }
-        catch (Exception e)
-        {
-            throw new InvalidOperationException(
-                $"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).",
-                e);
-        }
-    }
-
-    /// <inheritdoc />
-    public sealed override object? FromConfigurationEditor(IDictionary<string, object?>? editorValues,
-        object? configuration) => FromConfigurationEditor(editorValues, (TConfiguration?)configuration);
-
-    /// <summary>
-    ///     Converts the configuration posted by the editor.
-    /// </summary>
-    /// <param name="editorValues">The configuration object posted by the editor.</param>
-    /// <param name="configuration">The current configuration object.</param>
-    public virtual TConfiguration? FromConfigurationEditor(IDictionary<string, object?>? editorValues,
-        TConfiguration? configuration) =>
-        _editorConfigurationParser.ParseFromConfigurationEditor<TConfiguration>(editorValues, Fields);
-
-    /// <inheritdoc />
-    public sealed override IDictionary<string, object> ToConfigurationEditor(object? configuration) =>
-        ToConfigurationEditor((TConfiguration?)configuration);
-
-    /// <summary>
-    ///     Converts configuration values to values for the editor.
-    /// </summary>
-    /// <param name="configuration">The configuration.</param>
-    public virtual Dictionary<string, object> ToConfigurationEditor(TConfiguration? configuration) =>
-        _editorConfigurationParser.ParseToConfigurationEditor(configuration);
 }

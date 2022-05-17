@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Entities;
+namespace Umbraco.Cms.Core.Models.Entities;
 
 /// <summary>
 ///     Implements <see cref="IMediaEntitySlim" />.

@@ -53,7 +53,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
     /// <summary>
     ///     Exports an IContent item as an XElement.
     /// </summary>
-    public XElement Serialize(IContent content,
+    public XElement Serialize(
+        IContent content,
         bool published,
         bool withDescendants = false) // TODO: take care of usage! only used for the packager
     {
@@ -64,18 +65,18 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         var nodeName = content.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
-        XElement xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders),
-            nodeName, published);
+        XElement xml = SerializeContentBase(content, content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
 
         xml.Add(new XAttribute("nodeType", content.ContentType.Id));
         xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
 
         xml.Add(new XAttribute("creatorName", content.GetCreatorProfile(_userService)?.Name ?? "??"));
-        //xml.Add(new XAttribute("creatorID", content.CreatorId));
+
+        // xml.Add(new XAttribute("creatorID", content.CreatorId));
         xml.Add(new XAttribute("writerName", content.GetWriterProfile(_userService)?.Name ?? "??"));
         xml.Add(new XAttribute("writerID", content.WriterId));
 
-        xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? ""));
+        xml.Add(new XAttribute("template", content.TemplateId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty));
 
         xml.Add(new XAttribute("isPublished", content.Published));
 
@@ -139,18 +140,16 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         var urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
         XElement xml = SerializeContentBase(media, urlValue, nodeName, published);
 
-
         xml.Add(new XAttribute("nodeType", media.ContentType.Id));
         xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
 
-        //xml.Add(new XAttribute("creatorName", media.GetCreatorProfile(userService).Name));
-        //xml.Add(new XAttribute("creatorID", media.CreatorId));
+        // xml.Add(new XAttribute("creatorName", media.GetCreatorProfile(userService).Name));
+        // xml.Add(new XAttribute("creatorID", media.CreatorId));
         xml.Add(new XAttribute("writerName", media.GetWriterProfile(_userService)?.Name ?? string.Empty));
         xml.Add(new XAttribute("writerID", media.WriterId));
         xml.Add(new XAttribute("udi", media.GetUdi()));
 
-        //xml.Add(new XAttribute("template", 0)); // no template for media
-
+        // xml.Add(new XAttribute("template", 0)); // no template for media
         onMediaItemSerialized?.Invoke(media, xml);
 
         if (withDescendants)
@@ -176,15 +175,14 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         var nodeName = member.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
         const bool published = false; // always false for member
-        XElement xml = SerializeContentBase(member, "", nodeName, published);
+        XElement xml = SerializeContentBase(member, string.Empty, nodeName, published);
 
         xml.Add(new XAttribute("nodeType", member.ContentType.Id));
         xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
 
         // what about writer/creator/version?
-
-        xml.Add(new XAttribute("loginName", member.Username!));
-        xml.Add(new XAttribute("email", member.Email!));
+        xml.Add(new XAttribute("loginName", member.Username));
+        xml.Add(new XAttribute("email", member.Email));
         xml.Add(new XAttribute("icon", member.ContentType.Icon!));
 
         return xml;
@@ -210,7 +208,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
     {
         var xml = new XElement("DataType");
         xml.Add(new XAttribute("Name", dataType.Name!));
-        //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
+
+        // The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
         xml.Add(new XAttribute("Id", dataType.EditorAlias));
         xml.Add(new XAttribute("Definition", dataType.Key));
         xml.Add(new XAttribute("DatabaseType", dataType.DatabaseType.ToString()));
@@ -220,7 +219,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         var folderKeys = string.Empty;
         if (dataType.Level != 1)
         {
-            //get URL encoded folder names
+            // get URL encoded folder names
             IOrderedEnumerable<EntityContainer> folders = _dataTypeService.GetContainers(dataType)
                 .OrderBy(x => x.Level);
 
@@ -233,7 +232,6 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             xml.Add(new XAttribute("Folders", folderNames));
             xml.Add(new XAttribute("FolderKeys", folderKeys));
         }
-
 
         return xml;
     }
@@ -267,7 +265,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         if (includeChildren)
         {
-            IEnumerable<IDictionaryItem> children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+            IEnumerable<IDictionaryItem>? children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
             if (children is not null)
             {
                 foreach (IDictionaryItem child in children)
@@ -282,7 +280,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
     public XElement Serialize(IStylesheet stylesheet, bool includeProperties)
     {
-        var xml = new XElement("Stylesheet",
+        var xml = new XElement(
+            "Stylesheet",
             new XElement("Name", stylesheet.Alias),
             new XElement("FileName", stylesheet.Path),
             new XElement("Content", new XCData(stylesheet.Content!)));
@@ -299,7 +298,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         {
             foreach (IStylesheetProperty prop in stylesheet.Properties)
             {
-                props.Add(new XElement("Property",
+                props.Add(new XElement(
+                    "Property",
                     new XElement("Name", prop.Name),
                     new XElement("Alias", prop.Alias),
                     new XElement("Value", prop.Value)));
@@ -327,10 +327,11 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
     public XElement Serialize(ILanguage language)
     {
-        var xml = new XElement("Language",
+        var xml = new XElement(
+            "Language",
             new XAttribute("Id", language.Id),
             new XAttribute("CultureAlias", language.IsoCode),
-            new XAttribute("FriendlyName", language.CultureName!));
+            new XAttribute("FriendlyName", language.CultureName));
 
         return xml;
     }
@@ -372,10 +373,10 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         return xml;
     }
 
-
     public XElement Serialize(IMediaType mediaType)
     {
-        var info = new XElement("Info",
+        var info = new XElement(
+            "Info",
             new XElement("Name", mediaType.Name),
             new XElement("Alias", mediaType.Alias),
             new XElement("Key", mediaType.Key),
@@ -399,13 +400,16 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             }
         }
 
-        var genericProperties = new XElement("GenericProperties",
+        var genericProperties = new XElement(
+            "GenericProperties",
             SerializePropertyTypes(mediaType.PropertyTypes, mediaType.PropertyGroups)); // actually, all of them
 
-        var tabs = new XElement("Tabs",
+        var tabs = new XElement(
+            "Tabs",
             SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
-        var xml = new XElement("MediaType",
+        var xml = new XElement(
+            "MediaType",
             info,
             structure,
             genericProperties,
@@ -446,7 +450,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         var properties = new XElement("properties");
         foreach (IMacroProperty property in macro.Properties)
         {
-            properties.Add(new XElement("property",
+            properties.Add(new XElement(
+                "property",
                 new XAttribute("key", property.Key),
                 new XAttribute("name", property.Name!),
                 new XAttribute("alias", property.Alias),
@@ -461,7 +466,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
     public XElement Serialize(IContentType contentType)
     {
-        var info = new XElement("Info",
+        var info = new XElement(
+            "Info",
             new XElement("Name", contentType.Name),
             new XElement("Alias", contentType.Alias),
             new XElement("Key", contentType.Key),
@@ -473,7 +479,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             new XElement("IsElement", contentType.IsElement.ToString()),
             new XElement("Variations", contentType.Variations.ToString()));
 
-        IContentTypeComposition masterContentType =
+        IContentTypeComposition? masterContentType =
             contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
         if (masterContentType != null)
         {
@@ -506,7 +512,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         }
         else
         {
-            info.Add(new XElement("DefaultTemplate", ""));
+            info.Add(new XElement("DefaultTemplate", string.Empty));
         }
 
         var structure = new XElement("Structure");
@@ -518,13 +524,16 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             }
         }
 
-        var genericProperties = new XElement("GenericProperties",
+        var genericProperties = new XElement(
+            "GenericProperties",
             SerializePropertyTypes(contentType.PropertyTypes, contentType.PropertyGroups)); // actually, all of them
 
-        var tabs = new XElement("Tabs",
+        var tabs = new XElement(
+            "Tabs",
             SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
-        var xml = new XElement("DocumentType",
+        var xml = new XElement(
+            "DocumentType",
             info,
             structure,
             genericProperties,
@@ -537,10 +546,11 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
 
         var folderNames = string.Empty;
         var folderKeys = string.Empty;
-        //don't add folders if this is a child doc type
+
+        // don't add folders if this is a child doc type
         if (contentType.Level != 1 && masterContentType == null)
         {
-            //get URL encoded folder names
+            // get URL encoded folder names
             IOrderedEnumerable<EntityContainer> folders = _contentTypeService.GetContainers(contentType)
                 .OrderBy(x => x.Level);
 
@@ -554,35 +564,37 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             xml.Add(new XAttribute("FolderKeys", folderKeys));
         }
 
-
         return xml;
     }
 
     private XElement Serialize(IDictionaryItem dictionaryItem)
     {
-        var xml = new XElement("DictionaryItem",
+        var xml = new XElement(
+            "DictionaryItem",
             new XAttribute("Key", dictionaryItem.Key),
             new XAttribute("Name", dictionaryItem.ItemKey));
 
-        foreach (IDictionaryTranslation translation in dictionaryItem.Translations!)
+        foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
         {
-            xml.Add(new XElement("Value",
+            xml.Add(new XElement(
+                "Value",
                 new XAttribute("LanguageId", translation.Language!.Id),
                 new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
-                new XCData(translation.Value!)));
+                new XCData(translation.Value)));
         }
 
         return xml;
     }
 
-    private IEnumerable<XElement> SerializePropertyTypes(IEnumerable<IPropertyType> propertyTypes,
+    private IEnumerable<XElement> SerializePropertyTypes(
+        IEnumerable<IPropertyType> propertyTypes,
         IEnumerable<PropertyGroup> propertyGroups)
     {
         foreach (IPropertyType propertyType in propertyTypes)
         {
-            IDataType definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            IDataType? definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
 
-            PropertyGroup propertyGroup = propertyType.PropertyGroupId == null // true generic property
+            PropertyGroup? propertyGroup = propertyType.PropertyGroupId == null // true generic property
                 ? null
                 : propertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
@@ -597,7 +609,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
     {
         foreach (PropertyGroup propertyGroup in propertyGroups)
         {
-            yield return new XElement("Tab", // TODO Rename to PropertyGroup
+            yield return new XElement(
+                "Tab", // TODO Rename to PropertyGroup
                 new XElement("Id", propertyGroup.Id),
                 new XElement("Key", propertyGroup.Key),
                 new XElement("Type", propertyGroup.Type.ToString()),
@@ -607,30 +620,22 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         }
     }
 
-    private XElement SerializePropertyType(IPropertyType propertyType, IDataType? definition,
-        PropertyGroup? propertyGroup)
-        => new("GenericProperty",
+    private XElement SerializePropertyType(IPropertyType propertyType, IDataType? definition, PropertyGroup? propertyGroup)
+        => new(
+            "GenericProperty",
             new XElement("Name", propertyType.Name),
             new XElement("Alias", propertyType.Alias),
             new XElement("Key", propertyType.Key),
             new XElement("Type", propertyType.PropertyEditorAlias),
             definition is not null ? new XElement("Definition", definition.Key) : null,
-            propertyGroup is not null
-                ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias))
-                : null, // TODO Replace with PropertyGroupAlias
+            propertyGroup is not null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
             new XElement("SortOrder", propertyType.SortOrder),
             new XElement("Mandatory", propertyType.Mandatory.ToString()),
             new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
-            propertyType.MandatoryMessage != null
-                ? new XElement("MandatoryMessage", propertyType.MandatoryMessage)
-                : null,
+            propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
             propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
-            propertyType.ValidationRegExpMessage != null
-                ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage)
-                : null,
-            propertyType.Description != null
-                ? new XElement("Description", new XCData(propertyType.Description))
-                : null);
+            propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
+            propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
 
     private XElement SerializeCleanupPolicy(HistoryCleanup cleanupPolicy)
     {
@@ -639,7 +644,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(cleanupPolicy));
         }
 
-        var element = new XElement("HistoryCleanupPolicy",
+        var element = new XElement(
+            "HistoryCleanupPolicy",
             new XAttribute("preventCleanup", cleanupPolicy.PreventCleanup));
 
         if (cleanupPolicy.KeepAllVersionsNewerThanDays.HasValue)
@@ -658,7 +664,8 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
     // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
     private XElement SerializeContentBase(IContentBase contentBase, string? urlValue, string nodeName, bool published)
     {
-        var xml = new XElement(nodeName,
+        var xml = new XElement(
+            nodeName,
             new XAttribute("id", contentBase.Id.ToInvariantString()),
             new XAttribute("key", contentBase.Key),
             new XAttribute("parentID", (contentBase.Level > 1 ? contentBase.ParentId : -1).ToInvariantString()),
@@ -670,8 +677,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             new XAttribute("nodeName", contentBase.Name!),
             new XAttribute("urlName", urlValue!),
             new XAttribute("path", contentBase.Path),
-            new XAttribute("isDoc", ""));
-
+            new XAttribute("isDoc", string.Empty));
 
         // Add culture specific node names
         foreach (var culture in contentBase.AvailableCultures)
@@ -693,7 +699,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
         IPropertyType propertyType = property.PropertyType;
 
         // get the property editor for this property and let it convert it to the xml structure
-        IDataEditor propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
+        IDataEditor? propertyEditor = _propertyEditors[propertyType.PropertyEditorAlias];
         return propertyEditor == null
             ? Array.Empty<XElement>()
             : propertyEditor.GetValueEditor().ConvertDbToXml(property, published);
@@ -715,6 +721,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             {
                 IEnumerable<IContent> grandChildren =
                     _contentService.GetPagedChildren(child.Id, page++, pageSize, out total);
+
                 // recurse
                 SerializeChildren(grandChildren, childXml, published);
             }
@@ -722,8 +729,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
     }
 
     // exports an IMedia item descendants.
-    private void SerializeChildren(IEnumerable<IMedia> children, XElement xml,
-        Action<IMedia, XElement>? onMediaItemSerialized)
+    private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement>? onMediaItemSerialized)
     {
         foreach (IMedia child in children)
         {
@@ -738,6 +744,7 @@ internal class EntityXmlSerializer : IEntityXmlSerializer
             {
                 IEnumerable<IMedia> grandChildren =
                     _mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
+
                 // recurse
                 SerializeChildren(grandChildren, childXml, onMediaItemSerialized);
             }

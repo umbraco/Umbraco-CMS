@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     A readonly user group providing basic information
@@ -6,9 +6,13 @@
 public interface IReadOnlyUserGroup
 {
     string? Name { get; }
+
     string? Icon { get; }
+
     int Id { get; }
+
     int? StartContentId { get; }
+
     int? StartMediaId { get; }
 
     /// <summary>

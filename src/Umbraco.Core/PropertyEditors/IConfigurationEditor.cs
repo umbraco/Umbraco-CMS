@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -58,7 +58,8 @@ public interface IConfigurationEditor
     ///     Converting the configuration object to the serialized database value is
     ///     achieved by simply serializing the configuration. See <see cref="ConfigurationEditor.ToDatabase" />.
     /// </remarks>
-    object FromDatabase(string? configurationJson,
+    object FromDatabase(
+        string? configurationJson,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer);
 
     /// <summary>

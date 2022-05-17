@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -64,12 +64,12 @@ public class MacroMapDefinition : IMapDefinition
         target.Name = source.Name;
         target.SortOrder = source.SortOrder;
 
-        //map the view and the config
+        // map the view and the config
         // we need to show the deprecated ones for backwards compatibility
-        IDataEditor paramEditor = _parameterEditors[source.EditorAlias]; // TODO: include/filter deprecated?!
+        IDataEditor? paramEditor = _parameterEditors[source.EditorAlias]; // TODO: include/filter deprecated?!
         if (paramEditor == null)
         {
-            //we'll just map this to a text box
+            // we'll just map this to a text box
             paramEditor = _parameterEditors[Constants.PropertyEditors.Aliases.TextBox];
             _logger.LogWarning(
                 "Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place",
@@ -83,8 +83,7 @@ public class MacroMapDefinition : IMapDefinition
         // after ToValueEditor - important to use DefaultConfigurationObject here, because depending
         // on editors, ToValueEditor expects the actual strongly typed configuration - not the
         // dictionary thing returned by DefaultConfiguration
-
-        IConfigurationEditor configurationEditor = paramEditor?.GetConfigurationEditor();
+        IConfigurationEditor? configurationEditor = paramEditor?.GetConfigurationEditor();
         target.Configuration = configurationEditor?.ToValueEditor(configurationEditor.DefaultConfigurationObject);
     }
 }

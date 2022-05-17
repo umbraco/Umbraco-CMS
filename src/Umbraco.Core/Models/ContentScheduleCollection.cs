@@ -4,9 +4,11 @@ namespace Umbraco.Cms.Core.Models;
 
 public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable, IEquatable<ContentScheduleCollection>
 {
-    //underlying storage for the collection backed by a sorted list so that the schedule is always in order of date and that duplicate dates per culture are not allowed
+    // underlying storage for the collection backed by a sorted list so that the schedule is always in order of date and that duplicate dates per culture are not allowed
     private readonly Dictionary<string, SortedList<DateTime, ContentSchedule>> _schedule
         = new(StringComparer.InvariantCultureIgnoreCase);
+
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     /// <summary>
     ///     Returns all schedules registered
@@ -49,7 +51,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         foreach ((var culture, SortedList<DateTime, ContentSchedule> thisList) in thisSched)
         {
             // if culture is missing, or actions differ, false
-            if (!thatSched.TryGetValue(culture, out SortedList<DateTime, ContentSchedule> thatList) ||
+            if (!thatSched.TryGetValue(culture, out SortedList<DateTime, ContentSchedule>? thatList) ||
                 !thatList.SequenceEqual(thisList))
             {
                 return false;
@@ -59,14 +61,17 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         return true;
     }
 
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+    public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
+    {
+        var schedule = new ContentScheduleCollection();
+        schedule.Add(string.Empty, release, expire);
+        return schedule;
+    }
 
     /// <summary>
     ///     Clears all <see cref="CollectionChanged" /> event handlers
     /// </summary>
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
-
-    private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
     /// <summary>
     ///     Add an existing schedule
@@ -74,7 +79,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="schedule"></param>
     public void Add(ContentSchedule schedule)
     {
-        if (!_schedule.TryGetValue(schedule.Culture, out SortedList<DateTime, ContentSchedule> changes))
+        if (!_schedule.TryGetValue(schedule.Culture, out SortedList<DateTime, ContentSchedule>? changes))
         {
             changes = new SortedList<DateTime, ContentSchedule>();
             _schedule[schedule.Culture] = changes;
@@ -85,6 +90,8 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
 
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, schedule));
     }
+
+    private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
     /// <summary>
     ///     Adds a new schedule for invariant content
@@ -118,8 +125,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
         }
 
         // TODO: Do we allow passing in a release or expiry date that is before now?
-
-        if (!_schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule> changes))
+        if (!_schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule>? changes))
         {
             changes = new SortedList<DateTime, ContentSchedule>();
             _schedule[culture] = changes;
@@ -127,7 +133,6 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
 
         // TODO: Below will throw if there are duplicate dates added, should validate/return bool?
         // but the bool won't indicate which date was in error, maybe have 2 diff methods to schedule start/end?
-
         if (releaseDate.HasValue)
         {
             var entry = new ContentSchedule(culture, releaseDate.Value, ContentScheduleAction.Release);
@@ -151,7 +156,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="change"></param>
     public void Remove(ContentSchedule change)
     {
-        if (_schedule.TryGetValue(change.Culture, out SortedList<DateTime, ContentSchedule> s))
+        if (_schedule.TryGetValue(change.Culture, out SortedList<DateTime, ContentSchedule>? s))
         {
             var removed = s.Remove(change.Date);
             if (removed)
@@ -181,7 +186,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <param name="date">If specified, will clear all entries with dates less than or equal to the value</param>
     public void Clear(string? culture, ContentScheduleAction action, DateTime? date = null)
     {
-        if (culture is null || !_schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule> schedules))
+        if (culture is null || !_schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule>? schedules))
         {
             return;
         }
@@ -231,7 +236,7 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     /// <returns></returns>
     public IEnumerable<ContentSchedule> GetSchedule(string? culture, ContentScheduleAction? action = null)
     {
-        if (culture is not null && _schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule> changes))
+        if (culture is not null && _schedule.TryGetValue(culture, out SortedList<DateTime, ContentSchedule>? changes))
         {
             return action == null ? changes.Values : changes.Values.Where(x => x.Action == action.Value);
         }
@@ -242,17 +247,15 @@ public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneabl
     public override bool Equals(object? obj)
         => obj is ContentScheduleCollection other && Equals(other);
 
-    public static ContentScheduleCollection CreateWithEntry(DateTime? release, DateTime? expire)
-    {
-        var schedule = new ContentScheduleCollection();
-        schedule.Add(string.Empty, release, expire);
-        return schedule;
-    }
-
     public static ContentScheduleCollection CreateWithEntry(string culture, DateTime? release, DateTime? expire)
     {
         var schedule = new ContentScheduleCollection();
         schedule.Add(culture, release, expire);
         return schedule;
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
     }
 }

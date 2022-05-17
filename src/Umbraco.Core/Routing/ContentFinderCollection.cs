@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core.Routing;
 
 public class ContentFinderCollection : BuilderCollectionBase<IContentFinder>
 {
-    public ContentFinderCollection(Func<IEnumerable<IContentFinder>> items) : base(items)
+    public ContentFinderCollection(Func<IEnumerable<IContentFinder>> items)
+        : base(items)
     {
     }
 }

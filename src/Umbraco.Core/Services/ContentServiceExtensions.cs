@@ -14,13 +14,16 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ContentServiceExtensions
 {
+    #region RTE Anchor values
+
+    private static readonly Regex AnchorRegex = new("<a id=\"(.*?)\">", RegexOptions.Compiled);
+
     public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)
         {
-            var guidUdi = udi as GuidUdi;
-            if (guidUdi is null)
+            if (udi is not GuidUdi guidUdi)
             {
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +
                                                     " which is required by content");
@@ -44,14 +47,13 @@ public static class ContentServiceExtensions
     public static IContent CreateContent(this IContentService contentService, string name, Udi parentId,
         string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
-        var guidUdi = parentId as GuidUdi;
-        if (guidUdi is null)
+        if (parentId is not GuidUdi guidUdi)
         {
             throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +
                                                 " which is required by content");
         }
 
-        IContent parent = contentService.GetById(guidUdi.Guid);
+        IContent? parent = contentService.GetById(guidUdi.Guid);
         return contentService.Create(name, parent, contentTypeAlias, userId);
     }
 
@@ -63,15 +65,11 @@ public static class ContentServiceExtensions
     public static void RemoveContentPermissions(this IContentService contentService, int contentId) =>
         contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
 
-    #region RTE Anchor values
-
-    private static readonly Regex AnchorRegex = new("<a id=\"(.*?)\">", RegexOptions.Compiled);
-
     public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id,
         string? culture = "*")
     {
         var result = new List<string>();
-        IContent content = contentService.GetById(id);
+        IContent? content = contentService.GetById(id);
 
         if (content is not null)
         {
@@ -92,8 +90,8 @@ public static class ContentServiceExtensions
         return result;
     }
 
-
-    public static IEnumerable<string> GetAnchorValuesFromRTEContent(this IContentService contentService,
+    public static IEnumerable<string> GetAnchorValuesFromRTEContent(
+        this IContentService contentService,
         string rteContent)
     {
         var result = new List<string>();

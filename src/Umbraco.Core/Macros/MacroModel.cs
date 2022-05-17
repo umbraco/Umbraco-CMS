@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Macros;
 
@@ -8,7 +8,7 @@ public class MacroModel
     {
     }
 
-    public MacroModel(IMacro macro)
+    public MacroModel(IMacro? macro)
     {
         if (macro == null)
         {

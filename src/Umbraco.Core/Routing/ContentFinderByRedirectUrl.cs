@@ -45,11 +45,11 @@ public class ContentFinderByRedirectUrl : IContentFinder
     ///     Optionally, can also assign the template or anything else on the document request, although that is not
     ///     required.
     /// </remarks>
-    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         var route = frequest.Domain != null
@@ -66,7 +66,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
                 _logger.LogDebug("No match for route: {Route}", route);
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
@@ -75,19 +75,17 @@ public class ContentFinderByRedirectUrl : IContentFinder
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route,
-                    redirectUrl.ContentId);
+                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
             }
 
-            return false;
+            return Task.FromResult(false);
         }
 
         // Appending any querystring from the incoming request to the redirect URL
         url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route,
-                content?.Id, url);
+            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content?.Id, url);
         }
 
         frequest
@@ -98,9 +96,9 @@ public class ContentFinderByRedirectUrl : IContentFinder
             // Setting automatic 301 redirects to not be cached because browsers cache these very aggressively which then leads
             // to problems if you rename a page back to it's original name or create a new page with the original name
             .SetNoCacheHeader(true)
-            .SetCacheExtensions(new List<string> {"no-store, must-revalidate"})
-            .SetHeaders(new Dictionary<string, string> {{"Pragma", "no-cache"}, {"Expires", "0"}});
+            .SetCacheExtensions(new List<string> { "no-store, must-revalidate" })
+            .SetHeaders(new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } });
 
-        return true;
+        return Task.FromResult(true);
     }
 }

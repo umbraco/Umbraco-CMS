@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models.Membership;
 
@@ -7,6 +7,7 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     string Alias { get; set; }
 
     int? StartContentId { get; set; }
+
     int? StartMediaId { get; set; }
 
     /// <summary>

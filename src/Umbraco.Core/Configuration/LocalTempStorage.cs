@@ -4,5 +4,5 @@ public enum LocalTempStorage
 {
     Unknown = 0,
     Default,
-    EnvironmentTemp
+    EnvironmentTemp,
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Used to attribute properties that have a setter and are a reference type

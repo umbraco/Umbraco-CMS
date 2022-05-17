@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -22,8 +22,14 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "");
+    IEnumerable<IMember> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        string? memberTypeAlias = null,
+        string filter = "");
 
     /// <summary>
     ///     Gets a list of paged <see cref="IMember" /> objects
@@ -40,8 +46,15 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter);
+    IEnumerable<IMember> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        bool orderBySystemField,
+        string? memberTypeAlias,
+        string filter);
 
     /// <summary>
     ///     Creates an <see cref="IMember" /> object without persisting it
@@ -203,8 +216,12 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, long pageIndex, int pageSize,
-        out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+    IEnumerable<IMember> FindMembersByDisplayName(
+        string displayNameToMatch,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -218,7 +235,9 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value,
+    IEnumerable<IMember>? GetMembersByPropertyValue(
+        string propertyTypeAlias,
+        string value,
         StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
 
     /// <summary>
@@ -233,8 +252,7 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value,
-        ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
     /// <summary>
     ///     Gets a list of Members based on a property search
@@ -258,6 +276,5 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value,
-        ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
+    IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 }

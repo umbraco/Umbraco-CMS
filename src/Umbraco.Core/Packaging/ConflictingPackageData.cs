@@ -1,4 +1,4 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -20,7 +20,7 @@ public class ConflictingPackageData
         stylesheetNodes?
             .Select(n =>
             {
-                XElement xElement = n.Element("Name") ?? n.Element("name");
+                XElement? xElement = n.Element("Name") ?? n.Element("name");
                 if (xElement == null)
                 {
                     throw new FormatException("Missing \"Name\" element");
@@ -34,7 +34,7 @@ public class ConflictingPackageData
         templateNodes?
             .Select(n =>
             {
-                XElement xElement = n.Element("Alias") ?? n.Element("alias");
+                XElement? xElement = n.Element("Alias") ?? n.Element("alias");
                 if (xElement == null)
                 {
                     throw new FormatException("missing a \"Alias\" element");
@@ -48,7 +48,7 @@ public class ConflictingPackageData
         macroNodes?
             .Select(n =>
             {
-                XElement xElement = n.Element("alias") ?? n.Element("Alias");
+                XElement? xElement = n.Element("alias") ?? n.Element("Alias");
                 if (xElement == null)
                 {
                     throw new FormatException("missing a \"alias\" element in alias element");

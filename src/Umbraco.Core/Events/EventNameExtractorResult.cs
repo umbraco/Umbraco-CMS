@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class EventNameExtractorResult
 {
@@ -7,5 +7,6 @@ public class EventNameExtractorResult
     public EventNameExtractorResult(EventNameExtractorError? error) => Error = error;
 
     public EventNameExtractorError? Error { get; }
+
     public string? Name { get; }
 }

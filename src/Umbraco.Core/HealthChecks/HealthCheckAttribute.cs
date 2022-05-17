@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks;
+namespace Umbraco.Cms.Core.HealthChecks;
 
 /// <summary>
 ///     Metadata attribute for Health checks
@@ -13,6 +13,7 @@ public sealed class HealthCheckAttribute : Attribute
     }
 
     public string Name { get; }
+
     public string? Description { get; set; }
 
     public string? Group { get; set; }

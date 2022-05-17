@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
@@ -7,7 +7,7 @@ public class FormsDashboard : IDashboard
 {
     public string Alias => "formsInstall";
 
-    public string[] Sections => new[] {Constants.Applications.Forms};
+    public string[] Sections => new[] { Constants.Applications.Forms };
 
     public string View => "views/dashboard/forms/formsdashboardintro.html";
 

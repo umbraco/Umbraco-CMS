@@ -13,8 +13,10 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
     private readonly IDocumentVersionRepository _documentVersionRepository;
     private readonly ICoreScopeProvider _scopeProvider;
 
-    public DefaultContentVersionCleanupPolicy(IOptions<ContentSettings> contentSettings,
-        ICoreScopeProvider scopeProvider, IDocumentVersionRepository documentVersionRepository)
+    public DefaultContentVersionCleanupPolicy(
+        IOptions<ContentSettings> contentSettings,
+        ICoreScopeProvider scopeProvider,
+        IDocumentVersionRepository documentVersionRepository)
     {
         _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
         _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
@@ -26,7 +28,6 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
     {
         // Note: Not checking global enable flag, that's handled in the scheduled job.
         // If this method is called and policy is globally disabled someone has chosen to run in code.
-
         Configuration.Models.ContentVersionCleanupPolicySettings globalPolicy =
             _contentSettings.Value.ContentVersionCleanupPolicy;
 
@@ -41,9 +42,9 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
             {
                 TimeSpan age = asAtDate - version.VersionDate;
 
-                ContentVersionCleanupPolicySettings overrides = GetOverridePolicy(version, policyOverrides);
+                ContentVersionCleanupPolicySettings? overrides = GetOverridePolicy(version, policyOverrides);
 
-                var keepAll = overrides?.KeepAllVersionsNewerThanDays ?? globalPolicy.KeepAllVersionsNewerThanDays!;
+                var keepAll = overrides?.KeepAllVersionsNewerThanDays ?? globalPolicy.KeepAllVersionsNewerThanDays;
                 var keepLatest = overrides?.KeepLatestVersionPerDayForDays ??
                                  globalPolicy.KeepLatestVersionPerDayForDays;
                 var preventCleanup = overrides?.PreventCleanup ?? false;
@@ -67,7 +68,7 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
                 theRest.Add(version);
             }
 
-            var grouped = theRest.GroupBy(x => new {x.ContentId, x.VersionDate.Date});
+            var grouped = theRest.GroupBy(x => new { x.ContentId, x.VersionDate.Date });
 
             foreach (var group in grouped)
             {
@@ -88,7 +89,7 @@ public class DefaultContentVersionCleanupPolicy : IContentVersionCleanupPolicy
             return null;
         }
 
-        _ = overrides.TryGetValue(version.ContentTypeId, out ContentVersionCleanupPolicySettings value);
+        _ = overrides.TryGetValue(version.ContentTypeId, out ContentVersionCleanupPolicySettings? value);
 
         return value;
     }

@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class MediaMovingNotification : MovingNotification<IMedia>
 {
-    public MediaMovingNotification(MoveEventInfo<IMedia> target, EventMessages messages) : base(target, messages)
+    public MediaMovingNotification(MoveEventInfo<IMedia> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MediaMovingNotification(IEnumerable<MoveEventInfo<IMedia>> target, EventMessages messages) : base(target,
+    public MediaMovingNotification(IEnumerable<MoveEventInfo<IMedia>> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Macros;
+namespace Umbraco.Cms.Core.Macros;
 
 public enum MacroErrorBehaviour
 {
@@ -24,5 +24,5 @@ public enum MacroErrorBehaviour
     ///     Silently eat the error and display the custom content reported in
     ///     the error event args
     /// </summary>
-    Content
+    Content,
 }

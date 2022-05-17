@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Umbraco.Cms.Core.Collections;
 
@@ -13,6 +13,32 @@ public class ConcurrentHashSet<T> : ICollection<T>
 {
     private readonly HashSet<T> _innerSet = new();
     private readonly ReaderWriterLockSlim _instanceLocker = new(LockRecursionPolicy.NoRecursion);
+
+    /// <summary>
+    ///     Gets the number of elements contained in the <see cref="T:System.Collections.ICollection" />.
+    /// </summary>
+    /// <returns>
+    ///     The number of elements contained in the <see cref="T:System.Collections.ICollection" />.
+    /// </returns>
+    /// <filterpriority>2</filterpriority>
+    public int Count
+    {
+        get
+        {
+            try
+            {
+                _instanceLocker.EnterReadLock();
+                return _innerSet.Count;
+            }
+            finally
+            {
+                if (_instanceLocker.IsReadLockHeld)
+                {
+                    _instanceLocker.ExitReadLock();
+                }
+            }
+        }
+    }
 
     /// <summary>
     ///     Returns an enumerator that iterates through the collection.
@@ -58,33 +84,6 @@ public class ConcurrentHashSet<T> : ICollection<T>
             if (_instanceLocker.IsWriteLockHeld)
             {
                 _instanceLocker.ExitWriteLock();
-            }
-        }
-    }
-
-
-    /// <summary>
-    ///     Gets the number of elements contained in the <see cref="T:System.Collections.ICollection" />.
-    /// </summary>
-    /// <returns>
-    ///     The number of elements contained in the <see cref="T:System.Collections.ICollection" />.
-    /// </returns>
-    /// <filterpriority>2</filterpriority>
-    public int Count
-    {
-        get
-        {
-            try
-            {
-                _instanceLocker.EnterReadLock();
-                return _innerSet.Count;
-            }
-            finally
-            {
-                if (_instanceLocker.IsReadLockHeld)
-                {
-                    _instanceLocker.ExitReadLock();
-                }
             }
         }
     }
@@ -211,7 +210,7 @@ public class ConcurrentHashSet<T> : ICollection<T>
         {
             _instanceLocker.EnterWriteLock();
 
-            //double check
+            // double check
             if (_innerSet.Contains(item))
             {
                 return false;
@@ -227,25 +226,6 @@ public class ConcurrentHashSet<T> : ICollection<T>
                 _instanceLocker.ExitWriteLock();
             }
         }
-    }
-
-    private HashSet<T> GetThreadSafeClone()
-    {
-        HashSet<T>? clone = null;
-        try
-        {
-            _instanceLocker.EnterReadLock();
-            clone = new HashSet<T>(_innerSet, _innerSet.Comparer);
-        }
-        finally
-        {
-            if (_instanceLocker.IsReadLockHeld)
-            {
-                _instanceLocker.ExitReadLock();
-            }
-        }
-
-        return clone;
     }
 
     /// <summary>
@@ -274,5 +254,24 @@ public class ConcurrentHashSet<T> : ICollection<T>
     {
         HashSet<T> clone = GetThreadSafeClone();
         Array.Copy(clone.ToArray(), 0, array, index, clone.Count);
+    }
+
+    private HashSet<T> GetThreadSafeClone()
+    {
+        HashSet<T>? clone = null;
+        try
+        {
+            _instanceLocker.EnterReadLock();
+            clone = new HashSet<T>(_innerSet, _innerSet.Comparer);
+        }
+        finally
+        {
+            if (_instanceLocker.IsReadLockHeld)
+            {
+                _instanceLocker.ExitReadLock();
+            }
+        }
+
+        return clone;
     }
 }

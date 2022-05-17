@@ -1,7 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class ContentDataIntegrityReport
 {
+    public ContentDataIntegrityReport(IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> detectedIssues) =>
+        DetectedIssues = detectedIssues;
+
     public enum IssueType
     {
         /// <summary>
@@ -27,11 +30,8 @@ public class ContentDataIntegrityReport
         /// <summary>
         ///     The item's path does not have it's parent Id as the 2nd last entry
         /// </summary>
-        InvalidPathByParentId
+        InvalidPathByParentId,
     }
-
-    public ContentDataIntegrityReport(IReadOnlyDictionary<int, ContentDataIntegrityReportEntry> detectedIssues) =>
-        DetectedIssues = detectedIssues;
 
     public bool Ok => DetectedIssues.Count == 0 || DetectedIssues.Count == DetectedIssues.Values.Count(x => x.Fixed);
 

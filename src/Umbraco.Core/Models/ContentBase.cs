@@ -22,8 +22,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentBase" /> class.
     /// </summary>
-    protected ContentBase(string? name, int parentId, IContentTypeComposition? contentType,
-        IPropertyCollection properties, string? culture = null)
+    protected ContentBase(string? name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
         : this(name, contentType, properties, culture)
     {
         if (parentId == 0)
@@ -37,8 +36,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentBase" /> class.
     /// </summary>
-    protected ContentBase(string? name, IContentBase? parent, IContentTypeComposition contentType,
-        IPropertyCollection properties, string? culture = null)
+    protected ContentBase(string? name, IContentBase? parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
         : this(name, contentType, properties, culture)
     {
         if (parent == null)
@@ -49,8 +47,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         SetParent(parent);
     }
 
-    private ContentBase(string? name, IContentTypeComposition? contentType, IPropertyCollection properties,
-        string? culture = null)
+    private ContentBase(string? name, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
     {
         ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
@@ -64,15 +61,16 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         _properties = properties ?? throw new ArgumentNullException(nameof(properties));
         _properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
 
-        //track all property types on this content type, these can never change during the lifetime of this single instance
-        //there is no real extra memory overhead of doing this since these property types are already cached on this object via the
-        //properties already.
+        // track all property types on this content type, these can never change during the lifetime of this single instance
+        // there is no real extra memory overhead of doing this since these property types are already cached on this object via the
+        // properties already.
         AllPropertyTypes = new List<IPropertyType>(contentType.CompositionPropertyTypes);
     }
 
     internal IReadOnlyList<IPropertyType> AllPropertyTypes { get; }
 
-    [IgnoreDataMember] public ISimpleContentType ContentType { get; private set; }
+    [IgnoreDataMember]
+    public ISimpleContentType ContentType { get; private set; }
 
     /// <summary>
     ///     Id of the user who wrote/updated this entity
@@ -84,7 +82,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         set => SetPropertyValueAndDetectChanges(value, ref _writerId, nameof(WriterId));
     }
 
-    [IgnoreDataMember] public int VersionId { get; set; }
+    [IgnoreDataMember]
+    public int VersionId { get; set; }
 
     /// <summary>
     ///     Integer Id of the default ContentType
@@ -94,8 +93,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     {
         get
         {
-            //There will be cases where this has not been updated to reflect the true content type ID.
-            //This will occur when inserting new content.
+            // There will be cases where this has not been updated to reflect the true content type ID.
+            // This will occur when inserting new content.
             if (_contentTypeId == 0 && ContentType != null)
             {
                 _contentTypeId = ContentType.Id;
@@ -148,29 +147,29 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
         var clonedContent = (ContentBase)clone;
 
-        //need to manually clone this since it's not settable
+        // Need to manually clone this since it's not settable
         clonedContent.ContentType = ContentType;
 
-        //if culture infos exist then deal with event bindings
+        // If culture infos exist then deal with event bindings
         if (clonedContent._cultureInfos != null)
         {
-            clonedContent._cultureInfos.ClearCollectionChangedEvents(); //clear this event handler if any
+            clonedContent._cultureInfos.ClearCollectionChangedEvents(); // clear this event handler if any
             clonedContent._cultureInfos =
-                (ContentCultureInfosCollection?)_cultureInfos?.DeepClone(); //manually deep clone
+                (ContentCultureInfosCollection?)_cultureInfos?.DeepClone(); // manually deep clone
             if (clonedContent._cultureInfos is not null)
             {
                 clonedContent._cultureInfos.CollectionChanged +=
-                    clonedContent.CultureInfosCollectionChanged; //re-assign correct event handler
+                    clonedContent.CultureInfosCollectionChanged; // re-assign correct event handler
             }
         }
 
-        //if properties exist then deal with event bindings
+        // if properties exist then deal with event bindings
         if (clonedContent._properties != null)
         {
-            clonedContent._properties.ClearCollectionChangedEvents(); //clear this event handler if any
-            clonedContent._properties = (IPropertyCollection)_properties.DeepClone(); //manually deep clone
+            clonedContent._properties.ClearCollectionChangedEvents(); // clear this event handler if any
+            clonedContent._properties = (IPropertyCollection)_properties.DeepClone(); // manually deep clone
             clonedContent._properties.CollectionChanged +=
-                clonedContent.PropertiesChanged; //re-assign correct event handler
+                clonedContent.PropertiesChanged; // re-assign correct event handler
         }
 
         clonedContent._currentCultureChanges.updatedCultures = null;
@@ -233,6 +232,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
             return _cultureInfos;
         }
+
         set
         {
             if (_cultureInfos != null)
@@ -328,8 +328,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(culture));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
         }
 
         if (_cultureInfos == null)
@@ -355,7 +354,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         {
             case NotifyCollectionChangedAction.Add:
             {
-                ContentCultureInfos cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
+                ContentCultureInfos? cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                 if (_currentCultureChanges.addedCultures == null)
                 {
                     _currentCultureChanges.addedCultures =
@@ -377,10 +376,11 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
                 break;
             }
+
             case NotifyCollectionChangedAction.Remove:
             {
-                //remove listening for changes
-                ContentCultureInfos cultureInfo = e.OldItems?.Cast<ContentCultureInfos>().First();
+                // Remove listening for changes
+                ContentCultureInfos? cultureInfo = e.OldItems?.Cast<ContentCultureInfos>().First();
                 if (_currentCultureChanges.removedCultures == null)
                 {
                     _currentCultureChanges.removedCultures =
@@ -398,8 +398,8 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             }
             case NotifyCollectionChangedAction.Replace:
             {
-                //replace occurs when an Update occurs
-                ContentCultureInfos cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
+                // Replace occurs when an Update occurs
+                ContentCultureInfos? cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                 if (_currentCultureChanges.updatedCultures == null)
                 {
                     _currentCultureChanges.updatedCultures =
@@ -425,17 +425,15 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
         => Properties.Contains(propertyTypeAlias);
 
     /// <inheritdoc />
-    public object? GetValue(string propertyTypeAlias, string? culture = null, string? segment = null,
-        bool published = false) =>
-        Properties.TryGetValue(propertyTypeAlias, out IProperty property)
+    public object? GetValue(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false) =>
+        Properties.TryGetValue(propertyTypeAlias, out IProperty? property)
             ? property?.GetValue(culture, segment, published)
             : null;
 
     /// <inheritdoc />
-    public TValue? GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null,
-        bool published = false)
+    public TValue? GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false)
     {
-        if (!Properties.TryGetValue(propertyTypeAlias, out IProperty property))
+        if (!Properties.TryGetValue(propertyTypeAlias, out IProperty? property))
         {
             return default;
         }
@@ -449,7 +447,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <inheritdoc />
     public void SetValue(string propertyTypeAlias, object? value, string? culture = null, string? segment = null)
     {
-        if (!Properties.TryGetValue(propertyTypeAlias, out IProperty property))
+        if (!Properties.TryGetValue(propertyTypeAlias, out IProperty? property))
         {
             throw new InvalidOperationException(
                 $"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
@@ -457,7 +455,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
         property?.SetValue(value, culture, segment);
 
-        //bump the culture to be flagged for updating
+        // bump the culture to be flagged for updating
         this.TouchCulture(culture);
     }
 
@@ -484,17 +482,20 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             _previousCultureChanges.addedCultures =
                 _currentCultureChanges.addedCultures == null || _currentCultureChanges.addedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentCultureChanges.addedCultures,
+                    : new HashSet<string>(
+                        _currentCultureChanges.addedCultures,
                         StringComparer.InvariantCultureIgnoreCase);
             _previousCultureChanges.removedCultures =
                 _currentCultureChanges.removedCultures == null || _currentCultureChanges.removedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentCultureChanges.removedCultures,
+                    : new HashSet<string>(
+                        _currentCultureChanges.removedCultures,
                         StringComparer.InvariantCultureIgnoreCase);
             _previousCultureChanges.updatedCultures =
                 _currentCultureChanges.updatedCultures == null || _currentCultureChanges.updatedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentCultureChanges.updatedCultures,
+                    : new HashSet<string>(
+                        _currentCultureChanges.updatedCultures,
                         StringComparer.InvariantCultureIgnoreCase);
         }
         else
@@ -553,7 +554,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             return true;
         }
 
-        //Special check here since we want to check if the request is for changed cultures
+        // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
         {
             var culture = propertyName.TrimStart(ChangeTrackingPrefix.AddedCulture);
@@ -584,7 +585,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
             return true;
         }
 
-        //Special check here since we want to check if the request is for changed cultures
+        // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.AddedCulture))
         {
             var culture = propertyName.TrimStart(ChangeTrackingPrefix.AddedCulture);

@@ -60,9 +60,9 @@ public static class ContentTypeServiceExtensions
             ? Array.Empty<string>()
             : filterPropertyTypes.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
 
-        //create the full list of property types to use as the filter
-        //this is the combination of all property type aliases found in the content types passed in for the filter
-        //as well as the specific property types passed in for the filter
+        // create the full list of property types to use as the filter
+        // this is the combination of all property type aliases found in the content types passed in for the filter
+        // as well as the specific property types passed in for the filter
         filterPropertyTypes = allContentTypes
             .Where(c => filterContentTypes.InvariantContains(c.Alias))
             .SelectMany(c => c.PropertyTypes)
@@ -77,7 +77,7 @@ public static class ContentTypeServiceExtensions
             allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
         if (isUsing.Length > 0)
         {
-            //if already in use a composition, do not allow any composited types
+            // if already in use a composition, do not allow any composited types
             return new ContentTypeAvailableCompositionsResults();
         }
 
@@ -103,19 +103,19 @@ public static class ContentTypeServiceExtensions
             list.Add(x);
         }
 
-        //At this point we have a list of content types that 'could' be compositions
+        // At this point we have a list of content types that 'could' be compositions
 
-        //now we'll filter this list based on the filters requested
+        // now we'll filter this list based on the filters requested
         var filtered = list
             .Where(x =>
             {
-                //need to filter any content types that are included in this list
+                // need to filter any content types that are included in this list
                 return filterContentTypes.Any(c => c.InvariantEquals(x.Alias)) == false;
             })
             .Where(x =>
             {
-                //need to filter any content types that have matching property aliases that are included in this list
-                //ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
+                // need to filter any content types that have matching property aliases that are included in this list
+                // ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
                 return filterPropertyTypes.Intersect(
                     x.PropertyTypes.Select(p => p.Alias),
                     StringComparer.InvariantCultureIgnoreCase).Any() == false;
@@ -123,13 +123,14 @@ public static class ContentTypeServiceExtensions
             .OrderBy(x => x.Name)
             .ToList();
 
-        //get ancestor ids - we will filter all ancestors
+        // get ancestor ids - we will filter all ancestors
         IContentTypeComposition[] ancestors = GetAncestors(source, allContentTypes);
         var ancestorIds = ancestors.Select(x => x.Id).ToArray();
 
-        //now we can create our result based on what is still available and the ancestors
+        // now we can create our result based on what is still available and the ancestors
         var result = list
-            //not itself
+
+            // not itself
             .Where(x => x.Id != sourceId)
             .OrderBy(x => x.Name)
             .Select(composition => filtered.Contains(composition)
@@ -139,8 +140,8 @@ public static class ContentTypeServiceExtensions
         return new ContentTypeAvailableCompositionsResults(ancestors, result);
     }
 
-
-    private static IContentTypeComposition[] GetAncestors(IContentTypeComposition? ctype,
+    private static IContentTypeComposition[] GetAncestors(
+        IContentTypeComposition? ctype,
         IContentTypeComposition[] allContentTypes)
     {
         if (ctype == null)
@@ -152,7 +153,7 @@ public static class ContentTypeServiceExtensions
         var parentId = ctype.ParentId;
         while (parentId > 0)
         {
-            IContentTypeComposition parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
+            IContentTypeComposition? parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
             if (parent != null)
             {
                 ancestors.Add(parent);

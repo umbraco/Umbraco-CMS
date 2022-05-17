@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Editors;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 

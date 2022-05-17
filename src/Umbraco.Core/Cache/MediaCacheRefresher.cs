@@ -16,8 +16,12 @@ public sealed class
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-    public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer,
-        IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IEventAggregator eventAggregator,
+    public MediaCacheRefresher(
+        AppCaches appCaches,
+        IJsonSerializer serializer,
+        IPublishedSnapshotService publishedSnapshotService,
+        IIdKeyMap idKeyMap,
+        IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory)
     {
@@ -43,7 +47,9 @@ public sealed class
         }
 
         public int Id { get; }
+
         public Guid? Key { get; }
+
         public TreeChangeTypes ChangeTypes { get; }
     }
 
@@ -61,7 +67,7 @@ public sealed class
 
     #region Refresher
 
-    public override void Refresh(JsonPayload[] payloads)
+    public override void Refresh(JsonPayload[]? payloads)
     {
         if (payloads == null)
         {
@@ -75,7 +81,7 @@ public sealed class
             AppCaches.ClearPartialViewCache();
             AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
 
-            Attempt<IAppPolicyCache> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
+            Attempt<IAppPolicyCache?> mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
             foreach (JsonPayload payload in payloads)
             {
@@ -109,7 +115,6 @@ public sealed class
 
     // these events should never trigger
     // everything should be JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();

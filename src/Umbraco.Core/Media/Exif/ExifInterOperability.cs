@@ -1,10 +1,18 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents interoperability data for an exif tag in the platform byte order.
 /// </summary>
 internal struct ExifInterOperability
 {
+    public ExifInterOperability(ushort tagid, ushort typeid, uint count, byte[] data)
+    {
+        TagID = tagid;
+        TypeID = typeid;
+        Count = count;
+        Data = data;
+    }
+
     /// <summary>
     ///     Gets the tag ID defined in the Exif standard.
     /// </summary>
@@ -45,12 +53,4 @@ internal struct ExifInterOperability
     /// <returns></returns>
     public override string ToString() => string.Format("Tag: {0}, Type: {1}, Count: {2}, Data Length: {3}", TagID,
         TypeID, Count, Data.Length);
-
-    public ExifInterOperability(ushort tagid, ushort typeid, uint count, byte[] data)
-    {
-        TagID = tagid;
-        TypeID = typeid;
-        Count = count;
-        Data = data;
-    }
 }

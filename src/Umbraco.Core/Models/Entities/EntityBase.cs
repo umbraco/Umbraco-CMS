@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Entities;
@@ -90,6 +90,17 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
     public override bool Equals(object? obj) =>
         obj != null && (ReferenceEquals(this, obj) || SameIdentityAs(obj as EntityBase));
 
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = HasIdentity.GetHashCode();
+            hashCode = (hashCode * 397) ^ Id;
+            hashCode = (hashCode * 397) ^ GetType().GetHashCode();
+            return hashCode;
+        }
+    }
+
     private bool SameIdentityAs(EntityBase? other)
     {
         if (other == null)
@@ -100,24 +111,12 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         // same identity if
         // - same object (reference equals)
         // - or same CLR type, both have identities, and they are identical
-
         if (ReferenceEquals(this, other))
         {
             return true;
         }
 
         return GetType() == other.GetType() && HasIdentity && other.HasIdentity && Id == other.Id;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var hashCode = HasIdentity.GetHashCode();
-            hashCode = (hashCode * 397) ^ Id;
-            hashCode = (hashCode * 397) ^ GetType().GetHashCode();
-            return hashCode;
-        }
     }
 
     public object DeepClone()
@@ -130,7 +129,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
             clone.InstanceId = Guid.NewGuid();
 #endif
 
-        //disable change tracking while we deep clone IDeepCloneable properties
+        // disable change tracking while we deep clone IDeepCloneable properties
         clone.DisableChangeTracking();
 
         // deep clone ref properties that are IDeepCloneable
@@ -141,7 +140,7 @@ public abstract class EntityBase : BeingDirtyBase, IEntity
         // clear changes (ensures the clone has its own dictionaries)
         clone.ResetDirtyProperties(false);
 
-        //re-enable change tracking
+        // re-enable change tracking
         clone.EnableChangeTracking();
 
         return clone;

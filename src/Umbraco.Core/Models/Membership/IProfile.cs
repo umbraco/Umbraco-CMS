@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     Defines the User Profile interface
@@ -6,5 +6,6 @@
 public interface IProfile
 {
     int Id { get; }
+
     string? Name { get; }
 }

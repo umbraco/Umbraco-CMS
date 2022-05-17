@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     An event message
@@ -16,7 +16,9 @@ public sealed class EventMessage
     }
 
     public string Category { get; }
+
     public string Message { get; }
+
     public EventMessageType MessageType { get; }
 
     /// <summary>

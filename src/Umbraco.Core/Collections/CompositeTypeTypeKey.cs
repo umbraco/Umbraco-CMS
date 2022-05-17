@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Collections;
+namespace Umbraco.Cms.Core.Collections;
 
 /// <summary>
 ///     Represents a composite key of (Type, Type) for fast dictionaries.
@@ -25,6 +25,12 @@ public struct CompositeTypeTypeKey : IEquatable<CompositeTypeTypeKey>
     /// </summary>
     public Type Type2 { get; }
 
+    public static bool operator ==(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
+        key1.Type1 == key2.Type1 && key1.Type2 == key2.Type2;
+
+    public static bool operator !=(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
+        key1.Type1 != key2.Type1 || key1.Type2 != key2.Type2;
+
     /// <inheritdoc />
     public bool Equals(CompositeTypeTypeKey other) => Type1 == other.Type1 && Type2 == other.Type2;
 
@@ -34,12 +40,6 @@ public struct CompositeTypeTypeKey : IEquatable<CompositeTypeTypeKey>
         CompositeTypeTypeKey other = obj is CompositeTypeTypeKey key ? key : default;
         return Type1 == other.Type1 && Type2 == other.Type2;
     }
-
-    public static bool operator ==(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
-        key1.Type1 == key2.Type1 && key1.Type2 == key2.Type2;
-
-    public static bool operator !=(CompositeTypeTypeKey key1, CompositeTypeTypeKey key2) =>
-        key1.Type1 != key2.Type1 || key1.Type2 != key2.Type2;
 
     /// <inheritdoc />
     public override int GetHashCode()

@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class MediaSavingNotification : SavingNotification<IMedia>
 {
-    public MediaSavingNotification(IMedia target, EventMessages messages) : base(target, messages)
+    public MediaSavingNotification(IMedia target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MediaSavingNotification(IEnumerable<IMedia> target, EventMessages messages) : base(target, messages)
+    public MediaSavingNotification(IEnumerable<IMedia> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

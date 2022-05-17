@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 

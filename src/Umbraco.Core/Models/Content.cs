@@ -52,8 +52,7 @@ public class Content : ContentBase, IContent
     /// <param name="contentType">ContentType for the current Content object</param>
     /// <param name="properties">Collection of properties</param>
     /// <param name="culture">An optional culture.</param>
-    public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties,
-        string? culture = null)
+    public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string? culture = null)
         : base(name, parent, contentType, properties, culture)
     {
         if (contentType == null)
@@ -100,8 +99,7 @@ public class Content : ContentBase, IContent
     /// <param name="contentType">ContentType for the current Content object</param>
     /// <param name="properties">Collection of properties</param>
     /// <param name="culture">An optional culture.</param>
-    public Content(string? name, int parentId, IContentType? contentType, PropertyCollection properties,
-        string? culture = null)
+    public Content(string? name, int parentId, IContentType? contentType, PropertyCollection properties, string? culture = null)
         : base(name, parentId, contentType, properties, culture)
     {
         if (contentType == null)
@@ -170,7 +168,8 @@ public class Content : ContentBase, IContent
         }
     }
 
-    [IgnoreDataMember] public bool Edited { get; set; }
+    [IgnoreDataMember]
+    public bool Edited { get; set; }
 
     /// <inheritdoc />
     [IgnoreDataMember]
@@ -202,6 +201,7 @@ public class Content : ContentBase, IContent
 
     /// <inheritdoc />
     public bool IsCulturePublished(string culture)
+
         // just check _publishInfos
         // a non-available culture could not become published anyways
         => !culture.IsNullOrWhiteSpace() && _publishInfos != null && _publishInfos.ContainsKey(culture);
@@ -227,6 +227,7 @@ public class Content : ContentBase, IContent
             _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
             return _publishInfos;
         }
+
         set
         {
             if (_publishInfos != null)
@@ -284,9 +285,11 @@ public class Content : ContentBase, IContent
         return _publishInfos.TryGetValue(culture, out ContentCultureInfos infos) ? infos.Date : null;
     }
 
-    [IgnoreDataMember] public int PublishedVersionId { get; set; }
+    [IgnoreDataMember]
+    public int PublishedVersionId { get; set; }
 
-    [DataMember] public bool Blueprint { get; set; }
+    [DataMember]
+    public bool Blueprint { get; set; }
 
     public override void ResetWereDirtyProperties()
     {
@@ -306,20 +309,17 @@ public class Content : ContentBase, IContent
                 _currentPublishCultureChanges.addedCultures == null ||
                 _currentPublishCultureChanges.addedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentPublishCultureChanges.addedCultures,
-                        StringComparer.InvariantCultureIgnoreCase);
+                    : new HashSet<string>(_currentPublishCultureChanges.addedCultures, StringComparer.InvariantCultureIgnoreCase);
             _previousPublishCultureChanges.removedCultures =
                 _currentPublishCultureChanges.removedCultures == null ||
                 _currentPublishCultureChanges.removedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentPublishCultureChanges.removedCultures,
-                        StringComparer.InvariantCultureIgnoreCase);
+                    : new HashSet<string>(_currentPublishCultureChanges.removedCultures, StringComparer.InvariantCultureIgnoreCase);
             _previousPublishCultureChanges.updatedCultures =
                 _currentPublishCultureChanges.updatedCultures == null ||
                 _currentPublishCultureChanges.updatedCultures.Count == 0
                     ? null
-                    : new HashSet<string>(_currentPublishCultureChanges.updatedCultures,
-                        StringComparer.InvariantCultureIgnoreCase);
+                    : new HashSet<string>(_currentPublishCultureChanges.updatedCultures, StringComparer.InvariantCultureIgnoreCase);
         }
         else
         {
@@ -350,7 +350,7 @@ public class Content : ContentBase, IContent
     /// <remarks>Overridden to check special keys.</remarks>
     public override bool IsPropertyDirty(string propertyName)
     {
-        //Special check here since we want to check if the request is for changed cultures
+        // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
         {
             var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
@@ -376,7 +376,7 @@ public class Content : ContentBase, IContent
     /// <remarks>Overridden to check special keys.</remarks>
     public override bool WasPropertyDirty(string propertyName)
     {
-        //Special check here since we want to check if the request is for changed cultures
+        // Special check here since we want to check if the request is for changed cultures
         if (propertyName.StartsWith(ChangeTrackingPrefix.PublishedCulture))
         {
             var culture = propertyName.TrimStart(ChangeTrackingPrefix.PublishedCulture);
@@ -424,13 +424,13 @@ public class Content : ContentBase, IContent
     {
         OnPropertyChanged(nameof(PublishCultureInfos));
 
-        //we don't need to handle other actions, only add/remove, however we could implement Replace and track updated cultures in _updatedCultures too
-        //which would allows us to continue doing WasCulturePublished, but don't think we need it anymore
+        // we don't need to handle other actions, only add/remove, however we could implement Replace and track updated cultures in _updatedCultures too
+        // which would allows us to continue doing WasCulturePublished, but don't think we need it anymore
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
             {
-                ContentCultureInfos cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
+                ContentCultureInfos? cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                 if (_currentPublishCultureChanges.addedCultures == null)
                 {
                     _currentPublishCultureChanges.addedCultures =
@@ -452,10 +452,11 @@ public class Content : ContentBase, IContent
 
                 break;
             }
+
             case NotifyCollectionChangedAction.Remove:
             {
-                //remove listening for changes
-                ContentCultureInfos cultureInfo = e.OldItems?.Cast<ContentCultureInfos>().First();
+                // Remove listening for changes
+                ContentCultureInfos? cultureInfo = e.OldItems?.Cast<ContentCultureInfos>().First();
                 if (_currentPublishCultureChanges.removedCultures == null)
                 {
                     _currentPublishCultureChanges.removedCultures =
@@ -471,10 +472,11 @@ public class Content : ContentBase, IContent
 
                 break;
             }
+
             case NotifyCollectionChangedAction.Replace:
             {
-                //replace occurs when an Update occurs
-                ContentCultureInfos cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
+                // Replace occurs when an Update occurs
+                ContentCultureInfos? cultureInfo = e.NewItems?.Cast<ContentCultureInfos>().First();
                 if (_currentPublishCultureChanges.updatedCultures == null)
                 {
                     _currentPublishCultureChanges.updatedCultures =
@@ -527,18 +529,20 @@ public class Content : ContentBase, IContent
 
         var clonedContent = (Content)clone;
 
-        //fixme - need to reset change tracking bits
+        // fixme - need to reset change tracking bits
 
-        //if culture infos exist then deal with event bindings
+        // if culture infos exist then deal with event bindings
         if (clonedContent._publishInfos != null)
         {
-            clonedContent._publishInfos.ClearCollectionChangedEvents(); //clear this event handler if any
-            clonedContent._publishInfos =
-                (ContentCultureInfosCollection?)_publishInfos?.DeepClone(); //manually deep clone
+            // Clear this event handler if any
+            clonedContent._publishInfos.ClearCollectionChangedEvents();
+
+            // Manually deep clone
+            clonedContent._publishInfos = (ContentCultureInfosCollection?)_publishInfos?.DeepClone();
             if (clonedContent._publishInfos is not null)
             {
-                clonedContent._publishInfos.CollectionChanged +=
-                    clonedContent.PublishNamesCollectionChanged; //re-assign correct event handler
+                // Re-assign correct event handler
+                clonedContent._publishInfos.CollectionChanged += clonedContent.PublishNamesCollectionChanged;
             }
         }
 

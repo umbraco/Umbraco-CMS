@@ -18,10 +18,14 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
     }
 
     /// <inheritdoc />
-    public virtual UrlInfo? GetMediaUrl(IPublishedContent content,
-        string propertyAlias, UrlMode mode, string? culture, Uri current)
+    public virtual UrlInfo? GetMediaUrl(
+        IPublishedContent content,
+        string propertyAlias,
+        UrlMode mode,
+        string? culture,
+        Uri current)
     {
-        IPublishedProperty prop = content.GetProperty(propertyAlias);
+        IPublishedProperty? prop = content.GetProperty(propertyAlias);
 
         // get the raw source value since this is what is used by IDataEditorWithMediaPath for processing
         var value = prop?.GetSourceValue(culture);
@@ -30,7 +34,7 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
             return null;
         }
 
-        IPublishedPropertyType propType = prop?.PropertyType;
+        IPublishedPropertyType? propType = prop?.PropertyType;
 
         if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
         {

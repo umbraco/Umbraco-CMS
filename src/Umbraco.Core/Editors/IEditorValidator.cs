@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Editors;
+
 // note - about IEditorValidator
 //
 // interface: IEditorValidator

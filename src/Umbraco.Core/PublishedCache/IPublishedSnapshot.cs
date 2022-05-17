@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.PublishedCache;
 

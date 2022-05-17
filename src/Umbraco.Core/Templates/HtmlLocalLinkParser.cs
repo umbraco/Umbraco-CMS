@@ -18,7 +18,8 @@ public sealed class HtmlLocalLinkParser
 
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-    public HtmlLocalLinkParser(IUmbracoContextAccessor umbracoContextAccessor,
+    public HtmlLocalLinkParser(
+        IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
@@ -44,7 +45,7 @@ public sealed class HtmlLocalLinkParser
     /// <returns></returns>
     public string EnsureInternalLinks(string text, bool preview)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
             throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
         }
@@ -54,7 +55,7 @@ public sealed class HtmlLocalLinkParser
             return EnsureInternalLinks(text);
         }
 
-        using (umbracoContext!.ForcedPreview(preview)) // force for URL provider
+        using (umbracoContext.ForcedPreview(preview)) // force for URL provider
         {
             return EnsureInternalLinks(text);
         }
@@ -112,10 +113,10 @@ public sealed class HtmlLocalLinkParser
         {
             if (tag.Groups.Count > 0)
             {
-                var id = tag.Groups[1].Value; //.Remove(tag.Groups[1].Value.Length - 1, 1);
+                var id = tag.Groups[1].Value; // .Remove(tag.Groups[1].Value.Length - 1, 1);
 
-                //The id could be an int or a UDI
-                if (UdiParser.TryParse(id, out Udi udi))
+                // The id could be an int or a UDI
+                if (UdiParser.TryParse(id, out Udi? udi))
                 {
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi is not null)

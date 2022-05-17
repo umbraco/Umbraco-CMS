@@ -24,8 +24,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     {
     }
 
-    protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent,
-        string alias)
+    protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, IContentTypeComposition parent, string alias)
         : base(shortStringHelper, parent, alias) =>
         AddContentType(parent);
 
@@ -57,7 +56,6 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
             // it would be nice to cache the resulting enumerable, but alas we cannot, otherwise
             // any change to compositions are ignored and that breaks many things - and tracking
             // changes to refresh the cache would be expensive.
-
             void AcquireProperty(IPropertyType propertyType)
             {
                 propertyType.Variations &= Variations;
@@ -91,7 +89,6 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
             // so that we can change their variation according to this content type variations.
             //
             // see note in CompositionPropertyGroups for comments on caching the resulting enumerable
-
             IPropertyType AcquireProperty(IPropertyType propertyType)
             {
                 propertyType = (IPropertyType)propertyType.DeepClone();
@@ -143,8 +140,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
 
             if (conflictingPropertyTypeAliases.Any())
             {
-                throw new InvalidCompositionException(Alias, contentType.Alias,
-                    conflictingPropertyTypeAliases.ToArray());
+                throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
             }
 
             _contentTypeComposition.Add(contentType);
@@ -166,9 +162,10 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     {
         if (ContentTypeCompositionExists(alias))
         {
-            IContentTypeComposition contentTypeComposition =
-                ContentTypeComposition.FirstOrDefault(x => x.Alias == alias);
-            if (contentTypeComposition == null) // You can't remove a composition from another composition
+            IContentTypeComposition? contentTypeComposition = ContentTypeComposition.FirstOrDefault(x => x.Alias == alias);
+
+            // You can't remove a composition from another composition
+            if (contentTypeComposition == null)
             {
                 return false;
             }
@@ -221,8 +218,7 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
     public override bool AddPropertyGroup(string alias, string name) => AddAndReturnPropertyGroup(alias, name) != null;
 
     /// <inheritdoc />
-    public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias,
-        string? propertyGroupName = null)
+    public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string? propertyGroupName = null)
     {
         // ensure no duplicate alias - over all composition properties
         if (PropertyTypeExists(propertyType.Alias))
@@ -278,6 +274,18 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
             .Select(x => x.Id)
             .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
 
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var clonedEntity = (ContentTypeCompositionBase)clone;
+
+        // need to manually assign since this is an internal field and will not be automatically mapped
+        clonedEntity._removedContentTypeKeyTracker = new List<int>();
+        clonedEntity._contentTypeComposition =
+            ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
+    }
+
     private IEnumerable<IPropertyType> GetRawComposedPropertyTypes(bool start = true)
     {
         IEnumerable<IPropertyType> propertyTypes = ContentTypeComposition
@@ -301,16 +309,16 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         }
 
         // Add new group
-        var group = new PropertyGroup(SupportsPublishing) {Alias = alias, Name = name};
+        var group = new PropertyGroup(SupportsPublishing) { Alias = alias, Name = name };
 
         // check if it is inherited - there might be more than 1 but we want the 1st, to
         // reuse its sort order - if there are more than 1 and they have different sort
         // orders... there isn't much we can do anyways
-        PropertyGroup inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Alias == alias);
+        PropertyGroup? inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Alias == alias);
         if (inheritGroup == null)
         {
             // no, just local, set sort order
-            PropertyGroup lastGroup = PropertyGroups.LastOrDefault();
+            PropertyGroup? lastGroup = PropertyGroups.LastOrDefault();
             if (lastGroup != null)
             {
                 group.SortOrder = lastGroup.SortOrder + 1;
@@ -326,17 +334,5 @@ public abstract class ContentTypeCompositionBase : ContentTypeBase, IContentType
         PropertyGroups.Add(group);
 
         return group;
-    }
-
-    protected override void PerformDeepClone(object clone)
-    {
-        base.PerformDeepClone(clone);
-
-        var clonedEntity = (ContentTypeCompositionBase)clone;
-
-        // need to manually assign since this is an internal field and will not be automatically mapped
-        clonedEntity._removedContentTypeKeyTracker = new List<int>();
-        clonedEntity._contentTypeComposition =
-            ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
     }
 }

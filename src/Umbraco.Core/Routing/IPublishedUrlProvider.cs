@@ -45,8 +45,7 @@ public interface IPublishedUrlProvider
     ///     </para>
     ///     <para>If the provider is unable to provide a url, it returns "#".</para>
     /// </remarks>
-    string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null,
-        Uri? current = null);
+    string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null);
 
     string GetUrlFromRoute(int id, string? route, string? culture);
 
@@ -87,8 +86,7 @@ public interface IPublishedUrlProvider
     /// <param name="propertyAlias"></param>
     /// <param name="current"></param>
     /// <returns></returns>
-    string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null,
-        string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
+    string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
 
     /// <summary>
     ///     Gets the url of a media item.
@@ -105,8 +103,7 @@ public interface IPublishedUrlProvider
     ///         If the media is multi-lingual, gets the url for the specified culture or,
     ///         when no culture is specified, the current culture.
     ///     </para>
-    ///     <para>If the provider is unable to provide a url, it returns <see cref="String.Empty" />.</para>
+    ///     <para>If the provider is unable to provide a url, it returns <see cref="string.Empty" />.</para>
     /// </remarks>
-    string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null,
-        string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
+    string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null);
 }

@@ -26,18 +26,6 @@ public sealed class DistributedCache
         _cacheRefreshers = cacheRefreshers;
     }
 
-    // helper method to get an ICacheRefresher by its unique identifier
-    private ICacheRefresher GetRefresherById(Guid refresherGuid)
-    {
-        ICacheRefresher? refresher = _cacheRefreshers[refresherGuid];
-        if (refresher == null)
-        {
-            throw new InvalidOperationException($"No cache refresher found with id {refresherGuid}");
-        }
-
-        return refresher;
-    }
-
     #region Core notification methods
 
     /// <summary>
@@ -61,6 +49,18 @@ public sealed class DistributedCache
             GetRefresherById(refresherGuid),
             getNumericId,
             instances);
+    }
+
+    // helper method to get an ICacheRefresher by its unique identifier
+    private ICacheRefresher GetRefresherById(Guid refresherGuid)
+    {
+        ICacheRefresher? refresher = _cacheRefreshers[refresherGuid];
+        if (refresher == null)
+        {
+            throw new InvalidOperationException($"No cache refresher found with id {refresherGuid}");
+        }
+
+        return refresher;
     }
 
     /// <summary>
@@ -130,15 +130,15 @@ public sealed class DistributedCache
     ///// </summary>
     ///// <param name="refresherId">The unique identifier of the ICacheRefresher.</param>
     ///// <param name="payload">The notification content.</param>
-    //internal void Notify(Guid refresherId, object payload)
-    //{
+    // internal void Notify(Guid refresherId, object payload)
+    // {
     //    if (refresherId == Guid.Empty || payload == null) return;
 
-    //    _serverMessenger.Notify(
+    // _serverMessenger.Notify(
     //        Current.ServerRegistrar.Registrations,
     //        GetRefresherById(refresherId),
     //        json);
-    //}
+    // }
 
     /// <summary>
     ///     Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher" />.

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif;
 
@@ -44,8 +44,6 @@ internal abstract class ExifProperty
         set => mName = value;
     }
 
-    protected abstract object _Value { get; set; }
-
     /// <summary>
     ///     Gets or sets the value of this property.
     /// </summary>
@@ -54,6 +52,8 @@ internal abstract class ExifProperty
         get => _Value;
         set => _Value = value;
     }
+
+    protected abstract object _Value { get; set; }
 
     /// <summary>
     ///     Gets interoperability data for this property.
@@ -72,20 +72,20 @@ internal class ExifByte : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = Convert.ToByte(value);
-    }
-
     public new byte Value
     {
         get => mValue;
         set => mValue = value;
     }
 
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = Convert.ToByte(value);
+    }
+
     public override ExifInterOperability Interoperability =>
-        new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, 1, new[] {mValue});
+        new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, 1, new[] { mValue });
 
     public static implicit operator byte(ExifByte obj) => obj.mValue;
 
@@ -103,16 +103,16 @@ internal class ExifByteArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (byte[])value;
-    }
-
     public new byte[] Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (byte[])value;
     }
 
     public override ExifInterOperability Interoperability =>
@@ -150,22 +150,26 @@ internal class ExifAscii : ExifProperty
         Encoding = encoding;
     }
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (string)value;
-    }
-
     public new string Value
     {
         get => mValue;
         set => mValue = value;
     }
 
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (string)value;
+    }
+
     public Encoding Encoding { get; }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 2,
-        (uint)mValue.Length + 1, ExifBitConverter.GetBytes(mValue, true, Encoding));
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            2,
+            (uint)mValue.Length + 1,
+            ExifBitConverter.GetBytes(mValue, true, Encoding));
 
     public static implicit operator string(ExifAscii obj) => obj.mValue;
 
@@ -183,20 +187,24 @@ internal class ExifUShort : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = Convert.ToUInt16(value);
-    }
-
     public new ushort Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 3,
-        1, BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = Convert.ToUInt16(value);
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            3,
+            1,
+            BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
 
     public static implicit operator ushort(ExifUShort obj) => obj.mValue;
 
@@ -215,20 +223,24 @@ internal class ExifUShortArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (ushort[])value;
-    }
-
     public new ushort[] Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 3,
-        (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (ushort[])value;
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            3,
+            (uint)mValue.Length,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static implicit operator ushort[](ExifUShortArray obj) => obj.mValue;
 
@@ -259,20 +271,24 @@ internal class ExifUInt : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = Convert.ToUInt32(value);
-    }
-
     public new uint Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 4,
-        1, BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = Convert.ToUInt32(value);
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            4,
+            1,
+            BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
 
     public static implicit operator uint(ExifUInt obj) => obj.mValue;
 
@@ -291,20 +307,19 @@ internal class ExifUIntArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (uint[])value;
-    }
-
     public new uint[] Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 3,
-        (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (uint[])value;
+    }
+
+    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 3, (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static implicit operator uint[](ExifUIntArray obj) => obj.mValue;
 
@@ -340,27 +355,32 @@ internal class ExifURational : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (MathEx.UFraction32)value;
-    }
-
     public new MathEx.UFraction32 Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 5,
-        1, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (MathEx.UFraction32)value;
+    }
 
-    public override string ToString() => mValue.ToString();
-    public float ToFloat() => (float)mValue;
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            5,
+            1,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static explicit operator float(ExifURational obj) => (float)obj.mValue;
 
-    public uint[] ToArray() => new[] {mValue.Numerator, mValue.Denominator};
+    public override string ToString() => mValue.ToString();
+
+    public float ToFloat() => (float)mValue;
+
+    public uint[] ToArray() => new[] { mValue.Numerator, mValue.Denominator };
 }
 
 /// <summary>
@@ -375,20 +395,24 @@ internal class ExifURationalArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (MathEx.UFraction32[])value;
-    }
-
     public new MathEx.UFraction32[] Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 5,
-        (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (MathEx.UFraction32[])value;
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            5,
+            (uint)mValue.Length,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static explicit operator float[](ExifURationalArray obj)
     {
@@ -428,16 +452,16 @@ internal class ExifUndefined : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (byte[])value;
-    }
-
     public new byte[] Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (byte[])value;
     }
 
     public override ExifInterOperability Interoperability =>
@@ -472,24 +496,28 @@ internal class ExifSInt : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = Convert.ToInt32(value);
-    }
-
     public new int Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 9,
-        1, BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = Convert.ToInt32(value);
+    }
 
-    public override string ToString() => mValue.ToString();
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            9,
+            1,
+            BitConverterEx.GetBytes(mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
 
     public static implicit operator int(ExifSInt obj) => obj.mValue;
+
+    public override string ToString() => mValue.ToString();
 }
 
 /// <summary>
@@ -504,20 +532,26 @@ internal class ExifSIntArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (int[])value;
-    }
-
     public new int[] Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 9,
-        (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (int[])value;
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            9,
+            (uint)mValue.Length,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+
+    public static implicit operator int[](ExifSIntArray obj) => obj.mValue;
 
     public override string ToString()
     {
@@ -533,8 +567,6 @@ internal class ExifSIntArray : ExifProperty
         sb.Append(']');
         return sb.ToString();
     }
-
-    public static implicit operator int[](ExifSIntArray obj) => obj.mValue;
 }
 
 /// <summary>
@@ -553,27 +585,32 @@ internal class ExifSRational : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (MathEx.Fraction32)value;
-    }
-
     public new MathEx.Fraction32 Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 10,
-        1, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (MathEx.Fraction32)value;
+    }
 
-    public override string ToString() => mValue.ToString();
-    public float ToFloat() => (float)mValue;
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            10,
+            1,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static explicit operator float(ExifSRational obj) => (float)obj.mValue;
 
-    public int[] ToArray() => new[] {mValue.Numerator, mValue.Denominator};
+    public override string ToString() => mValue.ToString();
+
+    public float ToFloat() => (float)mValue;
+
+    public int[] ToArray() => new[] { mValue.Numerator, mValue.Denominator };
 }
 
 /// <summary>
@@ -588,20 +625,24 @@ internal class ExifSRationalArray : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (MathEx.Fraction32[])value;
-    }
-
     public new MathEx.Fraction32[] Value
     {
         get => mValue;
         set => mValue = value;
     }
 
-    public override ExifInterOperability Interoperability => new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 10,
-        (uint)mValue.Length, ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (MathEx.Fraction32[])value;
+    }
+
+    public override ExifInterOperability Interoperability =>
+        new ExifInterOperability(
+            ExifTagFactory.GetTagID(mTag),
+            10,
+            (uint)mValue.Length,
+            ExifBitConverter.GetBytes(mValue, BitConverterEx.SystemByteOrder));
 
     public static explicit operator float[](ExifSRationalArray obj)
     {

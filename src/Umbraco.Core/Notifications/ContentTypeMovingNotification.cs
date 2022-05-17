@@ -5,13 +5,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ContentTypeMovingNotification : MovingNotification<IContentType>
 {
-    public ContentTypeMovingNotification(MoveEventInfo<IContentType> target, EventMessages messages) : base(target,
+    public ContentTypeMovingNotification(MoveEventInfo<IContentType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public ContentTypeMovingNotification(IEnumerable<MoveEventInfo<IContentType>> target, EventMessages messages) :
-        base(target, messages)
+    public ContentTypeMovingNotification(IEnumerable<MoveEventInfo<IContentType>> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

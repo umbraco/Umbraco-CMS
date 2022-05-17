@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
@@ -65,7 +65,10 @@ public class ContentSchedule : IDeepCloneable
         => obj is ContentSchedule other && Equals(other);
 
     public bool Equals(ContentSchedule other) =>
+
         // don't compare Ids, two ContentSchedule are equal if they are for the same change
         // for the same culture, on the same date - and the collection deals w/duplicates
         Culture.InvariantEquals(other.Culture) && Date == other.Date && Action == other.Action;
+
+    public override int GetHashCode() => throw new NotImplementedException();
 }

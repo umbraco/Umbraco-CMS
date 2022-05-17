@@ -21,14 +21,14 @@ public class FastDictionaryAppCache : IAppCache
     /// <inheritdoc />
     public object? Get(string cacheKey)
     {
-        _items.TryGetValue(cacheKey, out Lazy<object> result); // else null
-        return result == null ? null : SafeLazy.GetSafeLazyValue(result!); // return exceptions as null
+        _items.TryGetValue(cacheKey, out Lazy<object?>? result); // else null
+        return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
     }
 
     /// <inheritdoc />
     public object? Get(string cacheKey, Func<object?> getCacheItem)
     {
-        Lazy<object> result = _items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
+        Lazy<object?>? result = _items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
 
         var value = result.Value; // will not throw (safe lazy)
         if (!(value is SafeLazy.ExceptionHolder eh))
@@ -39,7 +39,6 @@ public class FastDictionaryAppCache : IAppCache
         // and... it's in the cache anyway - so contrary to other cache providers,
         // which would trick with GetSafeLazyValue, we need to remove by ourselves,
         // in order NOT to cache exceptions
-
         _items.TryRemove(cacheKey, out result);
         eh.Exception.Throw(); // throw once!
         return null; // never reached
@@ -69,7 +68,7 @@ public class FastDictionaryAppCache : IAppCache
     public void Clear(string key) => _items.TryRemove(key, out _);
 
     /// <inheritdoc />
-    public void ClearOfType(Type type)
+    public void ClearOfType(Type? type)
     {
         if (type == null)
         {
@@ -78,7 +77,7 @@ public class FastDictionaryAppCache : IAppCache
 
         var isInterface = type.IsInterface;
 
-        foreach (KeyValuePair<string, Lazy<object>> kvp in _items
+        foreach (KeyValuePair<string, Lazy<object?>> kvp in _items
                      .Where(x =>
                      {
                          // entry.Value is Lazy<object> and not null, its value may be null
@@ -101,7 +100,7 @@ public class FastDictionaryAppCache : IAppCache
         Type typeOfT = typeof(T);
         var isInterface = typeOfT.IsInterface;
 
-        foreach (KeyValuePair<string, Lazy<object>> kvp in _items
+        foreach (KeyValuePair<string, Lazy<object?>> kvp in _items
                      .Where(x =>
                      {
                          // entry.Value is Lazy<object> and not null, its value may be null
@@ -125,7 +124,7 @@ public class FastDictionaryAppCache : IAppCache
         Type typeOfT = typeof(T);
         var isInterface = typeOfT.IsInterface;
 
-        foreach (KeyValuePair<string, Lazy<object>> kvp in _items
+        foreach (KeyValuePair<string, Lazy<object?>> kvp in _items
                      .Where(x =>
                      {
                          // entry.Value is Lazy<object> and not null, its value may be null
@@ -141,6 +140,7 @@ public class FastDictionaryAppCache : IAppCache
                          // if T is an interface remove anything that implements that interface
                          // otherwise remove exact types (not inherited types)
                          return (isInterface ? value is T : value.GetType() == typeOfT)
+
                                 // run predicate on the 'public key' part only, ie without prefix
                                 && predicate(x.Key, (T)value);
                      }))
@@ -152,7 +152,7 @@ public class FastDictionaryAppCache : IAppCache
     /// <inheritdoc />
     public void ClearByKey(string keyStartsWith)
     {
-        foreach (KeyValuePair<string, Lazy<object>> ikvp in _items
+        foreach (KeyValuePair<string, Lazy<object?>> ikvp in _items
                      .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith)))
         {
             _items.TryRemove(ikvp.Key, out _);
@@ -163,7 +163,7 @@ public class FastDictionaryAppCache : IAppCache
     public void ClearByRegex(string regex)
     {
         var compiled = new Regex(regex, RegexOptions.Compiled);
-        foreach (KeyValuePair<string, Lazy<object>> ikvp in _items
+        foreach (KeyValuePair<string, Lazy<object?>> ikvp in _items
                      .Where(kvp => compiled.IsMatch(kvp.Key)))
         {
             _items.TryRemove(ikvp.Key, out _);

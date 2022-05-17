@@ -34,7 +34,6 @@ public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
     // that will still only resolve Assemblies that are already loaded but it would also make it possible to
     // query dynamically generated assemblies once they are added. It would also provide the ability to probe
     // assembly locations that are not in the same place as the entry point assemblies.
-
     public IEnumerable<Assembly> Assemblies
     {
         get
@@ -50,8 +49,11 @@ public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
                 additionalTargetAssemblies = additionalTargetAssemblies.Concat(_additionalTargetAssemblies);
             }
 
-            var finder = new FindAssembliesWithReferencesTo(new[] {_entryPointAssembly},
-                additionalTargetAssemblies.ToArray(), true, _loggerFactory);
+            var finder = new FindAssembliesWithReferencesTo(
+                new[] { _entryPointAssembly },
+                additionalTargetAssemblies.ToArray(),
+                true,
+                _loggerFactory);
             _discovered = finder.Find().ToList();
 
             return _discovered;

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
@@ -16,17 +16,19 @@ public abstract class ContentTypeSave : ContentTypeBasic, IValidatableObject
         CompositeContentTypes = new List<string>();
     }
 
-    //Compositions
+    // Compositions
     [DataMember(Name = "compositeContentTypes")]
     public IEnumerable<string> CompositeContentTypes { get; set; }
 
-    [DataMember(Name = "allowAsRoot")] public bool AllowAsRoot { get; set; }
+    [DataMember(Name = "allowAsRoot")]
+    public bool AllowAsRoot { get; set; }
 
-    //Allowed child types
+    // Allowed child types
     [DataMember(Name = "allowedContentTypes")]
     public IEnumerable<int> AllowedContentTypes { get; set; }
 
-    [DataMember(Name = "historyCleanup")] public HistoryCleanupViewModel? HistoryCleanup { get; set; }
+    [DataMember(Name = "historyCleanup")]
+    public HistoryCleanupViewModel? HistoryCleanup { get; set; }
 
     /// <summary>
     ///     Custom validation
@@ -37,8 +39,9 @@ public abstract class ContentTypeSave : ContentTypeBasic, IValidatableObject
     {
         if (CompositeContentTypes.Any(x => x.IsNullOrWhiteSpace()))
         {
-            yield return new ValidationResult("Composite Content Type value cannot be null",
-                new[] {"CompositeContentTypes"});
+            yield return new ValidationResult(
+                "Composite Content Type value cannot be null",
+                new[] { "CompositeContentTypes" });
         }
     }
 }
@@ -65,8 +68,9 @@ public abstract class ContentTypeSave<TPropertyType> : ContentTypeSave
     [DataMember(Name = "allowSegmentVariant")]
     public bool AllowSegmentVariant { get; set; }
 
-    //Tabs
-    [DataMember(Name = "groups")] public IEnumerable<PropertyGroupBasic<TPropertyType>> Groups { get; set; }
+    // Tabs
+    [DataMember(Name = "groups")]
+    public IEnumerable<PropertyGroupBasic<TPropertyType>> Groups { get; set; }
 
     /// <summary>
     ///     Custom validation
@@ -87,16 +91,17 @@ public abstract class ContentTypeSave<TPropertyType> : ContentTypeSave
             yield return new ValidationResult("Duplicate aliases are not allowed: " + duplicateGroupAlias.Key, new[]
             {
                 // TODO: We don't display the alias yet, so add the validation message to the name
-                $"Groups[{lastGroupIndex}].Name"
+                $"Groups[{lastGroupIndex}].Name",
             });
         }
 
-        foreach (IGrouping<(string, string Name), PropertyGroupBasic<TPropertyType>> duplicateGroupName in Groups
+        foreach (IGrouping<(string?, string? Name), PropertyGroupBasic<TPropertyType>> duplicateGroupName in Groups
                      .GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1))
         {
             var lastGroupIndex = Groups.IndexOf(duplicateGroupName.Last());
-            yield return new ValidationResult("Duplicate names are not allowed",
-                new[] {$"Groups[{lastGroupIndex}].Name"});
+            yield return new ValidationResult(
+                "Duplicate names are not allowed",
+                new[] { $"Groups[{lastGroupIndex}].Name" });
         }
 
         foreach (IGrouping<string, TPropertyType> duplicatePropertyAlias in Groups.SelectMany(x => x.Properties)
@@ -107,8 +112,9 @@ public abstract class ContentTypeSave<TPropertyType> : ContentTypeSave
             var lastPropertyIndex = propertyGroup.Properties.IndexOf(lastProperty);
             var propertyGroupIndex = Groups.IndexOf(propertyGroup);
 
-            yield return new ValidationResult("Duplicate property aliases not allowed: " + duplicatePropertyAlias.Key,
-                new[] {$"Groups[{propertyGroupIndex}].Properties[{lastPropertyIndex}].Alias"});
+            yield return new ValidationResult(
+                "Duplicate property aliases not allowed: " + duplicatePropertyAlias.Key,
+                new[] { $"Groups[{propertyGroupIndex}].Properties[{lastPropertyIndex}].Alias" });
         }
     }
 }

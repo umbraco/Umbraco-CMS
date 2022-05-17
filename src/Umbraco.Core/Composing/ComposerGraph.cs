@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Composing;
+
 // note: this class is NOT thread-safe in any way
 
 /// <summary>
@@ -36,8 +37,7 @@ internal class ComposerGraph
     ///     or
     ///     logger
     /// </exception>
-    public ComposerGraph(IUmbracoBuilder builder, IEnumerable<Type> composerTypes,
-        IEnumerable<Attribute> enableDisableAttributes, ILogger<ComposerGraph> logger)
+    public ComposerGraph(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<ComposerGraph> logger)
     {
         _builder = builder ?? throw new ArgumentNullException(nameof(builder));
         _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
@@ -62,17 +62,70 @@ internal class ComposerGraph
         }
     }
 
+    internal static string GetComposersReport(Dictionary<Type, List<Type>?> requirements)
+    {
+        var text = new StringBuilder();
+        text.AppendLine("Composers & Dependencies:");
+        text.AppendLine("  <  compose before");
+        text.AppendLine("  >  compose after");
+        text.AppendLine("  :  implements");
+        text.AppendLine("  =  depends");
+        text.AppendLine();
+
+        bool HasReq(IEnumerable<Type> types, Type type)
+        {
+            return types.Any(x => type.IsAssignableFrom(x) && !x.IsInterface);
+        }
+
+        foreach (KeyValuePair<Type, List<Type>?> kvp in requirements)
+        {
+            Type type = kvp.Key;
+
+            text.AppendLine(type.FullName);
+            foreach (ComposeAfterAttribute attribute in type.GetCustomAttributes<ComposeAfterAttribute>())
+            {
+                var weak = !(attribute.RequiredType.IsInterface ? attribute.Weak == false : attribute.Weak != true);
+                text.AppendLine("  > " + attribute.RequiredType +
+                                (weak ? " (weak" : " (strong") +
+                                (HasReq(requirements.Keys, attribute.RequiredType) ? ", found" : ", missing") + ")");
+            }
+
+            foreach (ComposeBeforeAttribute attribute in type.GetCustomAttributes<ComposeBeforeAttribute>())
+            {
+                text.AppendLine("  < " + attribute.RequiringType);
+            }
+
+            foreach (Type i in type.GetInterfaces())
+            {
+                text.AppendLine("  : " + i.FullName);
+            }
+
+            if (kvp.Value != null)
+            {
+                foreach (Type t in kvp.Value)
+                {
+                    text.AppendLine("  = " + t);
+                }
+            }
+
+            text.AppendLine();
+        }
+
+        text.AppendLine("/");
+        text.AppendLine();
+        return text.ToString();
+    }
+
     internal IEnumerable<Type> PrepareComposerTypes()
     {
-        Dictionary<Type, List<Type>> requirements = GetRequirements();
+        Dictionary<Type, List<Type>?> requirements = GetRequirements();
 
         // only for debugging, this is verbose
-        //_logger.Debug<ComposerGraph>(GetComposersReport(requirements));
-
+        // _logger.Debug<ComposerGraph>(GetComposersReport(requirements));
         IEnumerable<Type> sortedComposerTypes = SortComposers(requirements);
 
         // bit verbose but should help for troubleshooting
-        //var text = "Ordered Composers: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComposerTypes) + Environment.NewLine;
+        // var text = "Ordered Composers: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComposerTypes) + Environment.NewLine;
         _logger.LogDebug("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
 
         return sortedComposerTypes;
@@ -86,8 +139,7 @@ internal class ComposerGraph
         // enable or disable composers
         EnableDisableComposers(_enableDisableAttributes, composerTypeList);
 
-        void GatherInterfaces<TAttribute>(Type type, Func<TAttribute, Type> getTypeInAttribute, HashSet<Type> iset,
-            List<Type> set2)
+        static void GatherInterfaces<TAttribute>(Type type, Func<TAttribute, Type> getTypeInAttribute, HashSet<Type> iset, List<Type> set2)
             where TAttribute : Attribute
         {
             foreach (TAttribute attribute in type.GetCustomAttributes<TAttribute>())
@@ -168,60 +220,6 @@ internal class ComposerGraph
         return sortedComposerTypes;
     }
 
-    internal static string GetComposersReport(Dictionary<Type, List<Type>?> requirements)
-    {
-        var text = new StringBuilder();
-        text.AppendLine("Composers & Dependencies:");
-        text.AppendLine("  <  compose before");
-        text.AppendLine("  >  compose after");
-        text.AppendLine("  :  implements");
-        text.AppendLine("  =  depends");
-        text.AppendLine();
-
-        bool HasReq(IEnumerable<Type> types, Type type)
-        {
-            return types.Any(x => type.IsAssignableFrom(x) && !x.IsInterface);
-        }
-
-        foreach (KeyValuePair<Type, List<Type>> kvp in requirements)
-        {
-            Type type = kvp.Key;
-
-            text.AppendLine(type.FullName);
-            foreach (ComposeAfterAttribute attribute in type.GetCustomAttributes<ComposeAfterAttribute>())
-            {
-                var weak = !(attribute.RequiredType.IsInterface ? attribute.Weak == false : attribute.Weak != true);
-                text.AppendLine("  > " + attribute.RequiredType +
-                                (weak ? " (weak" : " (strong") +
-                                (HasReq(requirements.Keys, attribute.RequiredType) ? ", found" : ", missing") + ")");
-            }
-
-            foreach (ComposeBeforeAttribute attribute in type.GetCustomAttributes<ComposeBeforeAttribute>())
-            {
-                text.AppendLine("  < " + attribute.RequiringType);
-            }
-
-            foreach (Type i in type.GetInterfaces())
-            {
-                text.AppendLine("  : " + i.FullName);
-            }
-
-            if (kvp.Value != null)
-            {
-                foreach (Type t in kvp.Value)
-                {
-                    text.AppendLine("  = " + t);
-                }
-            }
-
-            text.AppendLine();
-        }
-
-        text.AppendLine("/");
-        text.AppendLine();
-        return text.ToString();
-    }
-
     private static void EnableDisableComposers(IEnumerable<Attribute> enableDisableAttributes, ICollection<Type> types)
     {
         var enabled = new Dictionary<Type, EnableInfo>();
@@ -234,10 +232,9 @@ internal class ComposerGraph
         // what happens in case of conflicting remote declarations is unspecified. more
         // precisely, the last declaration to be processed wins, but the order of the
         // declarations depends on the type finder and is unspecified.
-
         void UpdateEnableInfo(Type composerType, int weight2, Dictionary<Type, EnableInfo> enabled2, bool value)
         {
-            if (enabled.TryGetValue(composerType, out EnableInfo enableInfo) == false)
+            if (enabled.TryGetValue(composerType, out EnableInfo? enableInfo) == false)
             {
                 enableInfo = enabled2[composerType] = new EnableInfo();
             }
@@ -287,8 +284,7 @@ internal class ComposerGraph
         }
     }
 
-    private static void GatherRequirementsFromAfterAttribute(Type type, ICollection<Type> types,
-        IDictionary<Type, List<Type>?> requirements, bool throwOnMissing = true)
+    private static void GatherRequirementsFromAfterAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>?> requirements, bool throwOnMissing = true)
     {
         // get 'require' attributes
         // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
@@ -325,6 +321,7 @@ internal class ComposerGraph
                         $"Broken composer dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
                 }
             }
+
             // requiring a class = require that the composer is enabled
             // unless weak, and then requires it if it is enabled
             else
@@ -347,8 +344,7 @@ internal class ComposerGraph
         }
     }
 
-    private static void GatherRequirementsFromBeforeAttribute(Type type, ICollection<Type> types,
-        IDictionary<Type, List<Type>?> requirements)
+    private static void GatherRequirementsFromBeforeAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>?> requirements)
     {
         // get 'required' attributes
         // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
@@ -379,6 +375,7 @@ internal class ComposerGraph
                     requirements[implem]!.Add(type);
                 }
             }
+
             // required by a class
             else
             {
@@ -414,6 +411,7 @@ internal class ComposerGraph
     private class EnableInfo
     {
         public bool Enabled { get; set; }
+
         public int Weight { get; set; } = -1;
     }
 }

@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.HealthChecks;
 
 public class HealthCheckNotificationMethodCollection : BuilderCollectionBase<IHealthCheckNotificationMethod>
 {
-    public HealthCheckNotificationMethodCollection(Func<IEnumerable<IHealthCheckNotificationMethod>> items) :
-        base(items)
+    public HealthCheckNotificationMethodCollection(Func<IEnumerable<IHealthCheckNotificationMethod>> items)
+        : base(items)
     {
     }
 }

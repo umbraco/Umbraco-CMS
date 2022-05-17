@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     Dispatches events from within a scope.
@@ -51,8 +51,7 @@ public interface IEventDispatcher
     /// <param name="name">The optional name of the event.</param>
     /// <returns>A value indicating whether the cancelable event was cancelled.</returns>
     /// <remarks>See general remarks on the interface.</remarks>
-    bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args,
-        string? name = null)
+    bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? name = null)
         where TArgs : CancellableEventArgs;
 
     /// <summary>
@@ -83,8 +82,7 @@ public interface IEventDispatcher
     /// <param name="args">The event data.</param>
     /// <param name="name">The optional name of the event.</param>
     /// <remarks>See general remarks on the interface.</remarks>
-    void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args,
-        string? name = null);
+    void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? name = null);
 
     /// <summary>
     ///     Notifies the dispatcher that the scope is exiting.

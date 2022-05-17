@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 public interface IFileTypeCollection
 {

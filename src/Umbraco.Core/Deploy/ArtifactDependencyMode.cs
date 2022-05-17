@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 /// <summary>
 ///     Indicates the mode of the dependency.
@@ -13,5 +13,5 @@ public enum ArtifactDependencyMode
     /// <summary>
     ///     The dependency must exist.
     /// </summary>
-    Exist
+    Exist,
 }

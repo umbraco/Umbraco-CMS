@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -23,13 +23,14 @@ public class MediaPickerConfigurationEditor : ConfigurationEditor<MediaPickerCon
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPickerConfigurationEditor" /> class.
     /// </summary>
-    public MediaPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser) =>
+    public MediaPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser) =>
+
         // configure fields
         // this is not part of ContentPickerConfiguration,
         // but is required to configure the UI editor (when editing the configuration)
         Field(nameof(MediaPickerConfiguration.StartNodeId))
-            .Config = new Dictionary<string, object> {{"idType", "udi"}};
+            .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
     public override IDictionary<string, object> ToValueEditor(object? configuration)
     {

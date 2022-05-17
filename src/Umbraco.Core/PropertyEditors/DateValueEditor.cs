@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
@@ -31,7 +31,7 @@ internal class DateValueEditor : DataValueEditor
             return string.Empty;
         }
 
-        //Dates will be formatted as yyyy-MM-dd
+        // Dates will be formatted as yyyy-MM-dd
         return date.Result.Value.ToString("yyyy-MM-dd");
     }
 }

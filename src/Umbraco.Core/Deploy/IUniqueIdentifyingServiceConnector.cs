@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 /// <summary>
 ///     Provides a method to retrieve an artifact's unique identifier.

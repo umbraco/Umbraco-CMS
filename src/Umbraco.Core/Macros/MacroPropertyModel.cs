@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Macros;
+namespace Umbraco.Cms.Core.Macros;
 
 public class MacroPropertyModel
 {

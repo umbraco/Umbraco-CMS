@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Entities;
+namespace Umbraco.Cms.Core.Models.Entities;
 
 /// <summary>
 ///     Represents an entity that can be managed by the entity service.

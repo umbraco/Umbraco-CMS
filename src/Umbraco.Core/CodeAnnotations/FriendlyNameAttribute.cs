@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.CodeAnnotations;
+namespace Umbraco.Cms.Core.CodeAnnotations;
 
 /// <summary>
 ///     Attribute to add a Friendly Name string with an UmbracoObjectType enum value

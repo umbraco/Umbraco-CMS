@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Indicates how values can vary.
@@ -32,5 +32,5 @@ public enum ContentVariation : byte
     /// <summary>
     ///     Values vary by culture and segment.
     /// </summary>
-    CultureAndSegment = Culture | Segment
+    CultureAndSegment = Culture | Segment,
 }

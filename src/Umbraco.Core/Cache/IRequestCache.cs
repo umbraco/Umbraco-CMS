@@ -8,5 +8,6 @@ public interface IRequestCache : IAppCache, IEnumerable<KeyValuePair<string, obj
     bool IsAvailable { get; }
 
     bool Set(string key, object? value);
+
     bool Remove(string key);
 }

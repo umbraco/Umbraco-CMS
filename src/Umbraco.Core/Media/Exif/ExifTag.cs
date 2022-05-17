@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents the tags associated with exif fields.
@@ -246,6 +246,7 @@ internal enum ExifTag
     // ****************************
     // JFIF Tags
     // ****************************
+
     /// <summary>
     ///     Represents the JFIF version.
     /// </summary>
@@ -305,5 +306,5 @@ internal enum ExifTag
     ///     JFIF thumbnail. The thumbnail will be either a JPEG,
     ///     a 256 color palette bitmap, or a 24-bit RGB bitmap.
     /// </summary>
-    JFXXThumbnail = IFD.JFXX + 202
+    JFXXThumbnail = IFD.JFXX + 202,
 }

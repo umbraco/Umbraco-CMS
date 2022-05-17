@@ -5,10 +5,15 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public abstract class DeletedVersionsNotificationBase<T> : StatefulNotification where T : class
+public abstract class DeletedVersionsNotificationBase<T> : StatefulNotification
+    where T : class
 {
-    protected DeletedVersionsNotificationBase(int id, EventMessages messages, int specificVersion = default,
-        bool deletePriorVersions = false, DateTime dateToRetain = default)
+    protected DeletedVersionsNotificationBase(
+        int id,
+        EventMessages messages,
+        int specificVersion = default,
+        bool deletePriorVersions = false,
+        DateTime dateToRetain = default)
     {
         Id = id;
         Messages = messages;

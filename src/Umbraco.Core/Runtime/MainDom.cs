@@ -113,7 +113,6 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         // once signaled, we stop waiting, but then there is the hosting environment
         // so we have to make sure that we only enter that method once
-
         lock (_locko)
         {
             _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
@@ -189,8 +188,8 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
             // start without having MainDom? This would mean that it couldn't write
             // to nucache/examine and would only be ok if this was a super short lived appdomain.
             // maybe safer to just keep throwing in this case.
-
             throw new TimeoutException("Cannot acquire MainDom");
+
             // return false;
         }
 
@@ -198,12 +197,12 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
         {
             // Listen for the signal from another AppDomain coming online to release the lock
             _listenTask = _mainDomLock.ListenAsync();
-            _listenCompleteTask = _listenTask.ContinueWith(t =>
+            _listenCompleteTask = _listenTask.ContinueWith(
+                t =>
             {
                 if (_listenTask.Exception != null)
                 {
-                    _logger.LogWarning("Listening task completed with {TaskStatus}, Exception: {Exception}",
-                        _listenTask.Status, _listenTask.Exception);
+                    _logger.LogWarning("Listening task completed with {TaskStatus}, Exception: {Exception}", _listenTask.Status, _listenTask.Exception);
                 }
                 else
                 {
@@ -211,7 +210,8 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
                 }
 
                 OnSignal("signal");
-            }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+            },
+                TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
         }
         catch (OperationCanceledException ex)
         {
@@ -236,7 +236,6 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
         //
         // we *cannot* use the process ID here because when an AppPool restarts it is
         // a new process for the same application path
-
         var appPath = hostingEnvironment.ApplicationPhysicalPath?.ToLowerInvariant() ?? string.Empty;
         var hash = (appId + ":::" + appPath).GenerateHash<SHA1>();
 
@@ -271,7 +270,6 @@ public class MainDom : IMainDom, IRegisteredObject, IDisposable
     #region IDisposable Support
 
     // This code added to correctly implement the disposable pattern.
-
     private bool disposedValue; // To detect redundant calls
 
     protected virtual void Dispose(bool disposing)

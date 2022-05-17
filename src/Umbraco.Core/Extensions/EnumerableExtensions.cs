@@ -12,6 +12,18 @@ public static class EnumerableExtensions
 {
     public static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T>? list) => list == null || list.Count == 0;
 
+    /// <summary>
+    ///     Wraps this object instance into an IEnumerable{T} consisting of a single item.
+    /// </summary>
+    /// <typeparam name="T"> Type of the object. </typeparam>
+    /// <param name="item"> The instance that will be wrapped. </param>
+    /// <returns> An IEnumerable{T} consisting of a single item. </returns>
+    public static IEnumerable<T> Yield<T>(this T item)
+    {
+        // see EnumeratorBenchmarks - this is faster, and allocates less, than returning an array
+        yield return item;
+    }
+
     internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
     {
         var hs = new HashSet<T>();
@@ -26,19 +38,6 @@ public static class EnumerableExtensions
         return false;
     }
 
-
-    /// <summary>
-    ///     Wraps this object instance into an IEnumerable{T} consisting of a single item.
-    /// </summary>
-    /// <typeparam name="T"> Type of the object. </typeparam>
-    /// <param name="item"> The instance that will be wrapped. </param>
-    /// <returns> An IEnumerable{T} consisting of a single item. </returns>
-    public static IEnumerable<T> Yield<T>(this T item)
-    {
-        // see EnumeratorBenchmarks - this is faster, and allocates less, than returning an array
-        yield return item;
-    }
-
     public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T>? source, int groupSize)
     {
         if (source == null)
@@ -51,9 +50,7 @@ public static class EnumerableExtensions
             throw new ArgumentException("Must be greater than zero.", "groupSize");
         }
 
-
         // following code derived from MoreLinq and does not allocate bazillions of tuples
-
         T[]? temp = null;
         var count = 0;
 
@@ -81,15 +78,18 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(this IEnumerable<TSource> source,
+    public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(
+        this IEnumerable<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TResult>> selector, int groupSize)
     {
         // don't want to use a SelectMany(x => x) here - isn't this better?
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (IEnumerable<TResult> resultGroup in source.InGroupsOf(groupSize).Select(selector))
-        foreach (TResult result in resultGroup)
         {
-            yield return result;
+            foreach (TResult result in resultGroup)
+            {
+                yield return result;
+            }
         }
     }
 
@@ -113,7 +113,8 @@ public static class EnumerableExtensions
     /// <param name="items">The items.</param>
     /// <param name="action">The action.</param>
     /// <typeparam name="TItem">The type</typeparam>
-    public static void IfNotNull<TItem>(this IEnumerable<TItem> items, Action<TItem> action) where TItem : class
+    public static void IfNotNull<TItem>(this IEnumerable<TItem> items, Action<TItem> action)
+        where TItem : class
     {
         if (items != null)
         {
@@ -123,7 +124,6 @@ public static class EnumerableExtensions
             }
         }
     }
-
 
     /// <summary>
     ///     Returns true if all items in the other collection exist in this collection
@@ -237,10 +237,13 @@ public static class EnumerableExtensions
     /// <param name="coll">The coll.</param>
     /// <returns></returns>
     /// <remarks></remarks>
-    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> coll) where T : class =>
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> coll)
+        where T : class
+        =>
         coll.Where(x => x != null)!;
 
-    public static IEnumerable<TBase> ForAllThatAre<TBase, TActual>(this IEnumerable<TBase> sequence,
+    public static IEnumerable<TBase> ForAllThatAre<TBase, TActual>(
+        this IEnumerable<TBase> sequence,
         Action<TActual> projection)
         where TActual : class =>
         sequence.Select(
@@ -352,7 +355,8 @@ public static class EnumerableExtensions
     /// <param name="source"></param>
     /// <param name="transform"></param>
     /// <returns></returns>
-    public static IEnumerable<TTarget> Transform<TSource, TTarget>(this IEnumerable<TSource> source,
+    public static IEnumerable<TTarget> Transform<TSource, TTarget>(
+        this IEnumerable<TSource> source,
         Func<IEnumerable<TSource>, IEnumerable<TTarget>> transform) => transform(source);
 
     /// <summary>
@@ -384,7 +388,8 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IEnumerable<TSource> source,
+    public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(
+        this IEnumerable<TSource> source,
         Func<TSource, TKey> keySelector, Direction sortOrder) => sortOrder == Direction.Ascending
         ? source.OrderBy(keySelector)
         : source.OrderByDescending(keySelector);

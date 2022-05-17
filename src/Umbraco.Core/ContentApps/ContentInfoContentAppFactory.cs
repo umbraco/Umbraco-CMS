@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -24,7 +24,7 @@ public class ContentInfoContentAppFactory : IContentAppFactory
                     Name = "Info",
                     Icon = "icon-info",
                     View = "views/content/apps/info/info.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
 
             case IMedia _:
@@ -34,7 +34,7 @@ public class ContentInfoContentAppFactory : IContentAppFactory
                     Name = "Info",
                     Icon = "icon-info",
                     View = "views/media/apps/info/info.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             case IMember _:
                 return _memberApp ??= new ContentApp
@@ -43,7 +43,7 @@ public class ContentInfoContentAppFactory : IContentAppFactory
                     Name = "Info",
                     Icon = "icon-info",
                     View = "views/member/apps/info/info.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
 
             default:

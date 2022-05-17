@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Xml.XPath;
+namespace Umbraco.Cms.Core.Xml.XPath;
 
 /// <summary>
 ///     Represents a content that can be navigated via XPath.
@@ -58,5 +58,5 @@ public interface INavigableContent
     ///// <param name="languageKey">The language key.</param>
     ///// <returns>The value of the field for the specified language.</returns>
     ///// <remarks>...</remarks>
-    //object Value(int index, string languageKey);
+    // object Value(int index, string languageKey);
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public interface IDeletingMediaFilesEventArgs
 {

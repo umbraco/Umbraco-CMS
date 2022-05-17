@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif;
 
@@ -20,50 +20,61 @@ internal static class ExifPropertyFactory
     /// <param name="ifd">IFD section containing this property.</param>
     /// <param name="encoding">The encoding to be used for text metadata when the source encoding is unknown.</param>
     /// <returns>an ExifProperty initialized from the interoperability parameters.</returns>
-    public static ExifProperty Get(ushort tag, ushort type, uint count, byte[] value,
-        BitConverterEx.ByteOrder byteOrder, IFD ifd, Encoding encoding)
+    public static ExifProperty Get(ushort tag, ushort type, uint count, byte[] value, BitConverterEx.ByteOrder byteOrder, IFD ifd, Encoding encoding)
     {
         var conv = new BitConverterEx(byteOrder, BitConverterEx.SystemByteOrder);
+
         // Find the exif tag corresponding to given tag id
         ExifTag etag = ExifTagFactory.GetExifTag(ifd, tag);
 
         if (ifd == IFD.Zeroth)
         {
-            if (tag == 0x103) // Compression
+            // Compression
+            if (tag == 0x103)
             {
                 return new ExifEnumProperty<Compression>(ExifTag.Compression, (Compression)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x106) // PhotometricInterpretation
+            // PhotometricInterpretation
+            if (tag == 0x106)
             {
-                return new ExifEnumProperty<PhotometricInterpretation>(ExifTag.PhotometricInterpretation,
+                return new ExifEnumProperty<PhotometricInterpretation>(
+                    ExifTag.PhotometricInterpretation,
                     (PhotometricInterpretation)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x112) // Orientation
+            // Orientation
+            if (tag == 0x112)
             {
                 return new ExifEnumProperty<Orientation>(ExifTag.Orientation, (Orientation)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x11c) // PlanarConfiguration
+            // PlanarConfiguration
+            if (tag == 0x11c)
             {
-                return new ExifEnumProperty<PlanarConfiguration>(ExifTag.PlanarConfiguration,
+                return new ExifEnumProperty<PlanarConfiguration>(
+                    ExifTag.PlanarConfiguration,
                     (PlanarConfiguration)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x213) // YCbCrPositioning
+            // YCbCrPositioning
+            if (tag == 0x213)
             {
-                return new ExifEnumProperty<YCbCrPositioning>(ExifTag.YCbCrPositioning,
+                return new ExifEnumProperty<YCbCrPositioning>(
+                    ExifTag.YCbCrPositioning,
                     (YCbCrPositioning)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x128) // ResolutionUnit
+            // ResolutionUnit
+            if (tag == 0x128)
             {
-                return new ExifEnumProperty<ResolutionUnit>(ExifTag.ResolutionUnit,
+                return new ExifEnumProperty<ResolutionUnit>(
+                    ExifTag.ResolutionUnit,
                     (ResolutionUnit)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x132) // DateTime
+            // DateTime
+            if (tag == 0x132)
             {
                 return new ExifDateTime(ExifTag.DateTime, ExifBitConverter.ToDateTime(value));
             }
@@ -71,28 +82,33 @@ internal static class ExifPropertyFactory
             if (tag == 0x9c9b || tag == 0x9c9c || // Windows tags
                 tag == 0x9c9d || tag == 0x9c9e || tag == 0x9c9f)
             {
-                return new WindowsByteString(etag,
+                return new WindowsByteString(
+                    etag,
                     Encoding.Unicode.GetString(value).TrimEnd(Constants.CharArrays.NullTerminator));
             }
         }
         else if (ifd == IFD.EXIF)
         {
-            if (tag == 0x9000) // ExifVersion
+            // ExifVersion
+            if (tag == 0x9000)
             {
                 return new ExifVersion(ExifTag.ExifVersion, ExifBitConverter.ToAscii(value, Encoding.ASCII));
             }
 
-            if (tag == 0xa000) // FlashpixVersion
+            // FlashpixVersion
+            if (tag == 0xa000)
             {
                 return new ExifVersion(ExifTag.FlashpixVersion, ExifBitConverter.ToAscii(value, Encoding.ASCII));
             }
 
-            if (tag == 0xa001) // ColorSpace
+            // ColorSpace
+            if (tag == 0xa001)
             {
                 return new ExifEnumProperty<ColorSpace>(ExifTag.ColorSpace, (ColorSpace)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x9286) // UserComment
+            // UserComment
+            if (tag == 0x9286)
             {
                 // Default to ASCII
                 Encoding enc = Encoding.ASCII;
@@ -129,301 +145,376 @@ internal static class ExifPropertyFactory
                 return new ExifEncodedString(ExifTag.UserComment, val, enc);
             }
 
-            if (tag == 0x9003) // DateTimeOriginal
+            // DateTimeOriginal
+            if (tag == 0x9003)
             {
                 return new ExifDateTime(ExifTag.DateTimeOriginal, ExifBitConverter.ToDateTime(value));
             }
 
-            if (tag == 0x9004) // DateTimeDigitized
+            // DateTimeDigitized
+            if (tag == 0x9004)
             {
                 return new ExifDateTime(ExifTag.DateTimeDigitized, ExifBitConverter.ToDateTime(value));
             }
 
-            if (tag == 0x8822) // ExposureProgram
+            // ExposureProgram
+            if (tag == 0x8822)
             {
-                return new ExifEnumProperty<ExposureProgram>(ExifTag.ExposureProgram,
+                return new ExifEnumProperty<ExposureProgram>(
+                    ExifTag.ExposureProgram,
                     (ExposureProgram)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x9207) // MeteringMode
+            // MeteringMode
+            if (tag == 0x9207)
             {
                 return new ExifEnumProperty<MeteringMode>(ExifTag.MeteringMode, (MeteringMode)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x9208) // LightSource
+            // LightSource
+            if (tag == 0x9208)
             {
                 return new ExifEnumProperty<LightSource>(ExifTag.LightSource, (LightSource)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x9209) // Flash
+            // Flash
+            if (tag == 0x9209)
             {
                 return new ExifEnumProperty<Flash>(ExifTag.Flash, (Flash)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0x9214) // SubjectArea
+            // SubjectArea
+            if (tag == 0x9214)
             {
                 if (count == 3)
                 {
-                    return new ExifCircularSubjectArea(ExifTag.SubjectArea,
+                    return new ExifCircularSubjectArea(
+                        ExifTag.SubjectArea,
                         ExifBitConverter.ToUShortArray(value, (int)count, byteOrder));
                 }
 
                 if (count == 4)
                 {
-                    return new ExifRectangularSubjectArea(ExifTag.SubjectArea,
+                    return new ExifRectangularSubjectArea(
+                        ExifTag.SubjectArea,
                         ExifBitConverter.ToUShortArray(value, (int)count, byteOrder));
                 }
 
-                return new ExifPointSubjectArea(ExifTag.SubjectArea,
+                return new ExifPointSubjectArea(
+                    ExifTag.SubjectArea,
                     ExifBitConverter.ToUShortArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 0xa210) // FocalPlaneResolutionUnit
+            // FocalPlaneResolutionUnit
+            if (tag == 0xa210)
             {
-                return new ExifEnumProperty<ResolutionUnit>(ExifTag.FocalPlaneResolutionUnit,
-                    (ResolutionUnit)conv.ToUInt16(value, 0), true);
+                return new ExifEnumProperty<ResolutionUnit>(
+                    ExifTag.FocalPlaneResolutionUnit,
+                    (ResolutionUnit)conv.ToUInt16(value, 0),
+                    true);
             }
 
-            if (tag == 0xa214) // SubjectLocation
+            // SubjectLocation
+            if (tag == 0xa214)
             {
-                return new ExifPointSubjectArea(ExifTag.SubjectLocation,
+                return new ExifPointSubjectArea(
+                    ExifTag.SubjectLocation,
                     ExifBitConverter.ToUShortArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 0xa217) // SensingMethod
+            // SensingMethod
+            if (tag == 0xa217)
             {
-                return new ExifEnumProperty<SensingMethod>(ExifTag.SensingMethod,
-                    (SensingMethod)conv.ToUInt16(value, 0), true);
+                return new ExifEnumProperty<SensingMethod>(
+                    ExifTag.SensingMethod,
+                    (SensingMethod)conv.ToUInt16(value, 0),
+                    true);
             }
 
-            if (tag == 0xa300) // FileSource
+            // FileSource
+            if (tag == 0xa300)
             {
                 return new ExifEnumProperty<FileSource>(ExifTag.FileSource, (FileSource)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa301) // SceneType
+            // SceneType
+            if (tag == 0xa301)
             {
                 return new ExifEnumProperty<SceneType>(ExifTag.SceneType, (SceneType)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa401) // CustomRendered
+            // CustomRendered
+            if (tag == 0xa401)
             {
-                return new ExifEnumProperty<CustomRendered>(ExifTag.CustomRendered,
-                    (CustomRendered)conv.ToUInt16(value, 0), true);
-            }
-
-            if (tag == 0xa402) // ExposureMode
-            {
-                return new ExifEnumProperty<ExposureMode>(ExifTag.ExposureMode, (ExposureMode)conv.ToUInt16(value, 0),
+                return new ExifEnumProperty<CustomRendered>(
+                    ExifTag.CustomRendered,
+                    (CustomRendered)conv.ToUInt16(value, 0),
                     true);
             }
 
-            if (tag == 0xa403) // WhiteBalance
+            // ExposureMode
+            if (tag == 0xa402)
             {
-                return new ExifEnumProperty<WhiteBalance>(ExifTag.WhiteBalance, (WhiteBalance)conv.ToUInt16(value, 0),
+                return new ExifEnumProperty<ExposureMode>(ExifTag.ExposureMode, (ExposureMode)conv.ToUInt16(value, 0), true);
+            }
+
+            // WhiteBalance
+            if (tag == 0xa403)
+            {
+                return new ExifEnumProperty<WhiteBalance>(ExifTag.WhiteBalance, (WhiteBalance)conv.ToUInt16(value, 0), true);
+            }
+
+            // SceneCaptureType
+            if (tag == 0xa406)
+            {
+                return new ExifEnumProperty<SceneCaptureType>(
+                    ExifTag.SceneCaptureType,
+                    (SceneCaptureType)conv.ToUInt16(value, 0),
                     true);
             }
 
-            if (tag == 0xa406) // SceneCaptureType
+            // GainControl
+            if (tag == 0xa407)
             {
-                return new ExifEnumProperty<SceneCaptureType>(ExifTag.SceneCaptureType,
-                    (SceneCaptureType)conv.ToUInt16(value, 0), true);
+                return new ExifEnumProperty<GainControl>(ExifTag.GainControl, (GainControl)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa407) // GainControl
-            {
-                return new ExifEnumProperty<GainControl>(ExifTag.GainControl, (GainControl)conv.ToUInt16(value, 0),
-                    true);
-            }
-
-            if (tag == 0xa408) // Contrast
+            // Contrast
+            if (tag == 0xa408)
             {
                 return new ExifEnumProperty<Contrast>(ExifTag.Contrast, (Contrast)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa409) // Saturation
+            // Saturation
+            if (tag == 0xa409)
             {
                 return new ExifEnumProperty<Saturation>(ExifTag.Saturation, (Saturation)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa40a) // Sharpness
+            // Sharpness
+            if (tag == 0xa40a)
             {
                 return new ExifEnumProperty<Sharpness>(ExifTag.Sharpness, (Sharpness)conv.ToUInt16(value, 0), true);
             }
 
-            if (tag == 0xa40c) // SubjectDistanceRange
+            // SubjectDistanceRange
+            if (tag == 0xa40c)
             {
-                return new ExifEnumProperty<SubjectDistanceRange>(ExifTag.SubjectDistanceRange,
-                    (SubjectDistanceRange)conv.ToUInt16(value, 0), true);
+                return new ExifEnumProperty<SubjectDistanceRange>(
+                    ExifTag.SubjectDistanceRange,
+                    (SubjectDistanceRange)conv.ToUInt16(value, 0),
+                    true);
             }
         }
         else if (ifd == IFD.GPS)
         {
-            if (tag == 0) // GPSVersionID
+            // GPSVersionID
+            if (tag == 0)
             {
                 return new ExifVersion(ExifTag.GPSVersionID, ExifBitConverter.ToString(value));
             }
 
-            if (tag == 1) // GPSLatitudeRef
+            // GPSLatitudeRef
+            if (tag == 1)
             {
                 return new ExifEnumProperty<GPSLatitudeRef>(ExifTag.GPSLatitudeRef, (GPSLatitudeRef)value[0]);
             }
 
-            if (tag == 2) // GPSLatitude
+            // GPSLatitude
+            if (tag == 2)
             {
-                return new GPSLatitudeLongitude(ExifTag.GPSLatitude,
+                return new GPSLatitudeLongitude(
+                    ExifTag.GPSLatitude,
                     ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 3) // GPSLongitudeRef
+            // GPSLongitudeRef
+            if (tag == 3)
             {
                 return new ExifEnumProperty<GPSLongitudeRef>(ExifTag.GPSLongitudeRef, (GPSLongitudeRef)value[0]);
             }
 
-            if (tag == 4) // GPSLongitude
+            // GPSLongitude
+            if (tag == 4)
             {
-                return new GPSLatitudeLongitude(ExifTag.GPSLongitude,
+                return new GPSLatitudeLongitude(
+                    ExifTag.GPSLongitude,
                     ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 5) // GPSAltitudeRef
+            // GPSAltitudeRef
+            if (tag == 5)
             {
                 return new ExifEnumProperty<GPSAltitudeRef>(ExifTag.GPSAltitudeRef, (GPSAltitudeRef)value[0]);
             }
 
-            if (tag == 7) // GPSTimeStamp
+            // GPSTimeStamp
+            if (tag == 7)
             {
-                return new GPSTimeStamp(ExifTag.GPSTimeStamp,
+                return new GPSTimeStamp(
+                    ExifTag.GPSTimeStamp,
                     ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 9) // GPSStatus
+            // GPSStatus
+            if (tag == 9)
             {
                 return new ExifEnumProperty<GPSStatus>(ExifTag.GPSStatus, (GPSStatus)value[0]);
             }
 
-            if (tag == 10) // GPSMeasureMode
+            // GPSMeasureMode
+            if (tag == 10)
             {
                 return new ExifEnumProperty<GPSMeasureMode>(ExifTag.GPSMeasureMode, (GPSMeasureMode)value[0]);
             }
 
-            if (tag == 12) // GPSSpeedRef
+            // GPSSpeedRef
+            if (tag == 12)
             {
                 return new ExifEnumProperty<GPSSpeedRef>(ExifTag.GPSSpeedRef, (GPSSpeedRef)value[0]);
             }
 
-            if (tag == 14) // GPSTrackRef
+            // GPSTrackRef
+            if (tag == 14)
             {
                 return new ExifEnumProperty<GPSDirectionRef>(ExifTag.GPSTrackRef, (GPSDirectionRef)value[0]);
             }
 
-            if (tag == 16) // GPSImgDirectionRef
+            // GPSImgDirectionRef
+            if (tag == 16)
             {
                 return new ExifEnumProperty<GPSDirectionRef>(ExifTag.GPSImgDirectionRef, (GPSDirectionRef)value[0]);
             }
 
-            if (tag == 19) // GPSDestLatitudeRef
+            // GPSDestLatitudeRef
+            if (tag == 19)
             {
                 return new ExifEnumProperty<GPSLatitudeRef>(ExifTag.GPSDestLatitudeRef, (GPSLatitudeRef)value[0]);
             }
 
-            if (tag == 20) // GPSDestLatitude
+            // GPSDestLatitude
+            if (tag == 20)
             {
-                return new GPSLatitudeLongitude(ExifTag.GPSDestLatitude,
+                return new GPSLatitudeLongitude(
+                    ExifTag.GPSDestLatitude,
                     ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 21) // GPSDestLongitudeRef
+            // GPSDestLongitudeRef
+            if (tag == 21)
             {
                 return new ExifEnumProperty<GPSLongitudeRef>(ExifTag.GPSDestLongitudeRef, (GPSLongitudeRef)value[0]);
             }
 
-            if (tag == 22) // GPSDestLongitude
+            // GPSDestLongitude
+            if (tag == 22)
             {
-                return new GPSLatitudeLongitude(ExifTag.GPSDestLongitude,
+                return new GPSLatitudeLongitude(
+                    ExifTag.GPSDestLongitude,
                     ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
             }
 
-            if (tag == 23) // GPSDestBearingRef
+            // GPSDestBearingRef
+            if (tag == 23)
             {
                 return new ExifEnumProperty<GPSDirectionRef>(ExifTag.GPSDestBearingRef, (GPSDirectionRef)value[0]);
             }
 
-            if (tag == 25) // GPSDestDistanceRef
+            // GPSDestDistanceRef
+            if (tag == 25)
             {
                 return new ExifEnumProperty<GPSDistanceRef>(ExifTag.GPSDestDistanceRef, (GPSDistanceRef)value[0]);
             }
 
-            if (tag == 29) // GPSDate
+            // GPSDate
+            if (tag == 29)
             {
                 return new ExifDateTime(ExifTag.GPSDateStamp, ExifBitConverter.ToDateTime(value, false));
             }
 
-            if (tag == 30) // GPSDifferential
+            // GPSDifferential
+            if (tag == 30)
             {
-                return new ExifEnumProperty<GPSDifferential>(ExifTag.GPSDifferential,
+                return new ExifEnumProperty<GPSDifferential>(
+                    ExifTag.GPSDifferential,
                     (GPSDifferential)conv.ToUInt16(value, 0));
             }
         }
         else if (ifd == IFD.Interop)
         {
-            if (tag == 1) // InteroperabilityIndex
+            // InteroperabilityIndex
+            if (tag == 1)
             {
-                return new ExifAscii(ExifTag.InteroperabilityIndex, ExifBitConverter.ToAscii(value, Encoding.ASCII),
-                    Encoding.ASCII);
+                return new ExifAscii(ExifTag.InteroperabilityIndex, ExifBitConverter.ToAscii(value, Encoding.ASCII), Encoding.ASCII);
             }
 
-            if (tag == 2) // InteroperabilityVersion
+            // InteroperabilityVersion
+            if (tag == 2)
             {
-                return new ExifVersion(ExifTag.InteroperabilityVersion,
+                return new ExifVersion(
+                    ExifTag.InteroperabilityVersion,
                     ExifBitConverter.ToAscii(value, Encoding.ASCII));
             }
         }
         else if (ifd == IFD.First)
         {
-            if (tag == 0x103) // Compression
+            // Compression
+            if (tag == 0x103)
             {
-                return new ExifEnumProperty<Compression>(ExifTag.ThumbnailCompression,
+                return new ExifEnumProperty<Compression>(
+                    ExifTag.ThumbnailCompression,
                     (Compression)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x106) // PhotometricInterpretation
+            // PhotometricInterpretation
+            if (tag == 0x106)
             {
-                return new ExifEnumProperty<PhotometricInterpretation>(ExifTag.ThumbnailPhotometricInterpretation,
+                return new ExifEnumProperty<PhotometricInterpretation>(
+                    ExifTag.ThumbnailPhotometricInterpretation,
                     (PhotometricInterpretation)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x112) // Orientation
+            // Orientation
+            if (tag == 0x112)
             {
-                return new ExifEnumProperty<Orientation>(ExifTag.ThumbnailOrientation,
+                return new ExifEnumProperty<Orientation>(
+                    ExifTag.ThumbnailOrientation,
                     (Orientation)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x11c) // PlanarConfiguration
+            // PlanarConfiguration
+            if (tag == 0x11c)
             {
-                return new ExifEnumProperty<PlanarConfiguration>(ExifTag.ThumbnailPlanarConfiguration,
+                return new ExifEnumProperty<PlanarConfiguration>(
+                    ExifTag.ThumbnailPlanarConfiguration,
                     (PlanarConfiguration)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x213) // YCbCrPositioning
+            // YCbCrPositioning
+            if (tag == 0x213)
             {
-                return new ExifEnumProperty<YCbCrPositioning>(ExifTag.ThumbnailYCbCrPositioning,
+                return new ExifEnumProperty<YCbCrPositioning>(
+                    ExifTag.ThumbnailYCbCrPositioning,
                     (YCbCrPositioning)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x128) // ResolutionUnit
+            // ResolutionUnit
+            if (tag == 0x128)
             {
-                return new ExifEnumProperty<ResolutionUnit>(ExifTag.ThumbnailResolutionUnit,
+                return new ExifEnumProperty<ResolutionUnit>(
+                    ExifTag.ThumbnailResolutionUnit,
                     (ResolutionUnit)conv.ToUInt16(value, 0));
             }
 
-            if (tag == 0x132) // DateTime
+            // DateTime
+            if (tag == 0x132)
             {
                 return new ExifDateTime(ExifTag.ThumbnailDateTime, ExifBitConverter.ToDateTime(value));
             }
         }
 
-        if (type == 1) // 1 = BYTE An 8-bit unsigned integer.
+        // 1 = BYTE An 8-bit unsigned integer.
+        if (type == 1)
         {
             if (count == 1)
             {
@@ -433,12 +524,14 @@ internal static class ExifPropertyFactory
             return new ExifByteArray(etag, value);
         }
 
-        if (type == 2) // 2 = ASCII An 8-bit byte containing one 7-bit ASCII code.
+        // 2 = ASCII An 8-bit byte containing one 7-bit ASCII code.
+        if (type == 2)
         {
             return new ExifAscii(etag, ExifBitConverter.ToAscii(value, encoding), encoding);
         }
 
-        if (type == 3) // 3 = SHORT A 16-bit (2-byte) unsigned integer.
+        // 3 = SHORT A 16-bit (2-byte) unsigned integer.
+        if (type == 3)
         {
             if (count == 1)
             {
@@ -448,7 +541,8 @@ internal static class ExifPropertyFactory
             return new ExifUShortArray(etag, ExifBitConverter.ToUShortArray(value, (int)count, byteOrder));
         }
 
-        if (type == 4) // 4 = LONG A 32-bit (4-byte) unsigned integer.
+        // 4 = LONG A 32-bit (4-byte) unsigned integer.
+        if (type == 4)
         {
             if (count == 1)
             {
@@ -458,7 +552,8 @@ internal static class ExifPropertyFactory
             return new ExifUIntArray(etag, ExifBitConverter.ToUIntArray(value, (int)count, byteOrder));
         }
 
-        if (type == 5) // 5 = RATIONAL Two LONGs. The first LONG is the numerator and the second LONG expresses the denominator.
+        // 5 = RATIONAL Two LONGs. The first LONG is the numerator and the second LONG expresses the denominator.
+        if (type == 5)
         {
             if (count == 1)
             {
@@ -468,12 +563,14 @@ internal static class ExifPropertyFactory
             return new ExifURationalArray(etag, ExifBitConverter.ToURationalArray(value, (int)count, byteOrder));
         }
 
-        if (type == 7) // 7 = UNDEFINED An 8-bit byte that can take any value depending on the field definition.
+        // 7 = UNDEFINED An 8-bit byte that can take any value depending on the field definition.
+        if (type == 7)
         {
             return new ExifUndefined(etag, value);
         }
 
-        if (type == 9) // 9 = SLONG A 32-bit (4-byte) signed integer (2's complement notation).
+        // 9 = SLONG A 32-bit (4-byte) signed integer (2's complement notation).
+        if (type == 9)
         {
             if (count == 1)
             {
@@ -483,7 +580,8 @@ internal static class ExifPropertyFactory
             return new ExifSIntArray(etag, ExifBitConverter.ToSIntArray(value, (int)count, byteOrder));
         }
 
-        if (type == 10) // 10 = SRATIONAL Two SLONGs. The first SLONG is the numerator and the second SLONG is the denominator.
+        // 10 = SRATIONAL Two SLONGs. The first SLONG is the numerator and the second SLONG is the denominator.
+        if (type == 10)
         {
             if (count == 1)
             {

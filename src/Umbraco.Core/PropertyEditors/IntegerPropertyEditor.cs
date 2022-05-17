@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Cms.Core.PropertyEditors;

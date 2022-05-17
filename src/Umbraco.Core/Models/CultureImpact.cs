@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -13,15 +13,6 @@ namespace Umbraco.Cms.Core.Models;
 /// </remarks>
 public sealed class CultureImpact
 {
-    [Flags]
-    public enum Behavior : byte
-    {
-        AllCultures = 1,
-        InvariantCulture = 2,
-        ExplicitCulture = 4,
-        InvariantProperties = 8
-    }
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="CultureImpact" /> class.
     /// </summary>
@@ -42,6 +33,15 @@ public sealed class CultureImpact
         }
 
         ImpactsOnlyDefaultCulture = isDefault;
+    }
+
+    [Flags]
+    public enum Behavior : byte
+    {
+        AllCultures = 1,
+        InvariantCulture = 2,
+        ExplicitCulture = 4,
+        InvariantProperties = 8,
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class CultureImpact
     {
         get
         {
-            //null can only be invariant
+            // null can only be invariant
             if (Culture == null)
             {
                 return Behavior.InvariantCulture | Behavior.InvariantProperties;
@@ -120,10 +120,10 @@ public sealed class CultureImpact
                 return Behavior.AllCultures | Behavior.InvariantProperties;
             }
 
-            //else it's explicit
+            // else it's explicit
             Behavior result = Behavior.ExplicitCulture;
 
-            //if the explicit culture is the default, then the behavior is also InvariantProperties
+            // if the explicit culture is the default, then the behavior is also InvariantProperties
             if (ImpactsOnlyDefaultCulture)
             {
                 result |= Behavior.InvariantProperties;
@@ -161,10 +161,12 @@ public sealed class CultureImpact
         }
 
         var cultureForInvariantErrors = savingCultures.Any(x => x.InvariantEquals(defaultCulture))
-            //the default culture is being flagged for saving so use it
+
+            // the default culture is being flagged for saving so use it
             ? defaultCulture
-            //If the content has no published version, we need to affiliate validation with the first variant being saved.
-            //If the content has a published version we will not affiliate the validation with any culture (null)
+
+            // If the content has no published version, we need to affiliate validation with the first variant being saved.
+            // If the content has a published version we will not affiliate the validation with any culture (null)
             : !content.Published
                 ? savingCultures[0]
                 : null;
@@ -210,7 +212,7 @@ public sealed class CultureImpact
     public static CultureImpact? Create(string culture, bool isDefault, IContent content)
     {
         // throws if not successful
-        TryCreate(culture, isDefault, content.ContentType.Variations, true, out CultureImpact impact);
+        TryCreate(culture, isDefault, content.ContentType.Variations, true, out CultureImpact? impact);
         return impact;
     }
 

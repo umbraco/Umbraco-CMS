@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 /// <summary>
 ///     Provides ways to create attempts.
@@ -63,7 +63,6 @@ public static class Attempt
     /// <returns>The failed attempt.</returns>
     public static Attempt<TResult?> Fail<TResult>(TResult result, Exception exception) =>
         Attempt<TResult>.Fail(result, exception);
-
 
     /// <summary>
     ///     Creates a failed attempt with a result, an exception and a status.

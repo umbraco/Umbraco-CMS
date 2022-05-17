@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models.Membership;
 
@@ -19,8 +19,6 @@ public class ContentPermissionSet : EntityPermissionSet, IEntity
 
     public override int EntityId => _content.Id;
 
-    #region Explicit implementation of IAggregateRoot
-
     int IEntity.Id
     {
         get => EntityId;
@@ -29,10 +27,10 @@ public class ContentPermissionSet : EntityPermissionSet, IEntity
 
     bool IEntity.HasIdentity => EntityId > 0;
 
+    Guid IEntity.Key { get; set; }
+
     void IEntity.ResetIdentity() =>
         throw new InvalidOperationException($"Resetting identity on {nameof(ContentPermissionSet)} is invalid");
-
-    Guid IEntity.Key { get; set; }
 
     DateTime IEntity.CreateDate { get; set; }
 
@@ -41,6 +39,4 @@ public class ContentPermissionSet : EntityPermissionSet, IEntity
     DateTime? IEntity.DeleteDate { get; set; }
 
     object IDeepCloneable.DeepClone() => throw new NotImplementedException();
-
-    #endregion
 }

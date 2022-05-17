@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     Provides a base class for classes representing event data, for events that support cancellation, and expose an
@@ -6,8 +6,7 @@
 /// </summary>
 public abstract class CancellableObjectEventArgs : CancellableEventArgs
 {
-    protected CancellableObjectEventArgs(object? eventObject, bool canCancel, EventMessages messages,
-        IDictionary<string, object> additionalData)
+    protected CancellableObjectEventArgs(object? eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
         : base(canCancel, messages, additionalData) =>
         EventObject = eventObject;
 

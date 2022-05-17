@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -78,6 +78,7 @@ public class Consent : EntityBase, IConsent
     public ConsentState State
     {
         get => _state;
+
         // note: we probably should validate the state here, but since the
         //  enum is [Flags] with many combinations, this could be expensive
         set => SetPropertyValueAndDetectChanges(value, ref _state, nameof(State));

@@ -19,7 +19,7 @@ public class ContentItemDisplayWithSchedule : ContentItemDisplay<ContentVariantS
 [DataContract(Name = "content", Namespace = "")]
 public class
     ContentItemDisplay<TVariant> : INotificationModel,
-        IErrorModel //ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
+        IErrorModel // ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     where TVariant : ContentVariantDisplay
 {
     public ContentItemDisplay()
@@ -39,7 +39,8 @@ public class
     [ReadOnly(true)]
     public Udi? Udi { get; set; }
 
-    [DataMember(Name = "icon")] public string? Icon { get; set; }
+    [DataMember(Name = "icon")]
+    public string? Icon { get; set; }
 
     [DataMember(Name = "trashed")]
     [ReadOnly(true)]
@@ -71,9 +72,11 @@ public class
     [DataMember(Name = "variants")]
     public IEnumerable<TVariant>? Variants { get; set; }
 
-    [DataMember(Name = "owner")] public UserProfile? Owner { get; set; }
+    [DataMember(Name = "owner")]
+    public UserProfile? Owner { get; set; }
 
-    [DataMember(Name = "updater")] public UserProfile? Updater { get; set; }
+    [DataMember(Name = "updater")]
+    public UserProfile? Updater { get; set; }
 
     /// <summary>
     ///     The name of the content type
@@ -109,15 +112,18 @@ public class
     [DataMember(Name = "treeNodeUrl")]
     public string? TreeNodeUrl { get; set; }
 
-    [DataMember(Name = "contentTypeId")] public int? ContentTypeId { get; set; }
+    [DataMember(Name = "contentTypeId")]
+    public int? ContentTypeId { get; set; }
 
-    [DataMember(Name = "contentTypeKey")] public Guid ContentTypeKey { get; set; }
+    [DataMember(Name = "contentTypeKey")]
+    public Guid ContentTypeKey { get; set; }
 
     [DataMember(Name = "contentTypeAlias", IsRequired = true)]
     [Required(AllowEmptyStrings = false)]
     public string ContentTypeAlias { get; set; } = null!;
 
-    [DataMember(Name = "sortOrder")] public int SortOrder { get; set; }
+    [DataMember(Name = "sortOrder")]
+    public int SortOrder { get; set; }
 
     /// <summary>
     ///     This is the last updated date for the entire content object regardless of variants
@@ -128,16 +134,20 @@ public class
     [DataMember(Name = "updateDate")]
     public DateTime UpdateDate { get; set; }
 
-    [DataMember(Name = "template")] public string? TemplateAlias { get; set; }
+    [DataMember(Name = "template")]
+    public string? TemplateAlias { get; set; }
 
-    [DataMember(Name = "templateId")] public int TemplateId { get; set; }
+    [DataMember(Name = "templateId")]
+    public int TemplateId { get; set; }
 
     [DataMember(Name = "allowedTemplates")]
     public IDictionary<string, string?>? AllowedTemplates { get; set; }
 
-    [DataMember(Name = "documentType")] public ContentTypeBasic? DocumentType { get; set; }
+    [DataMember(Name = "documentType")]
+    public ContentTypeBasic? DocumentType { get; set; }
 
-    [DataMember(Name = "urls")] public UrlInfo[]? Urls { get; set; }
+    [DataMember(Name = "urls")]
+    public UrlInfo[]? Urls { get; set; }
 
     /// <summary>
     ///     Determines whether previewing is allowed for this node
@@ -158,9 +168,11 @@ public class
     [DataMember(Name = "allowedActions")]
     public IEnumerable<string>? AllowedActions { get; set; }
 
-    [DataMember(Name = "isBlueprint")] public bool IsBlueprint { get; set; }
+    [DataMember(Name = "isBlueprint")]
+    public bool IsBlueprint { get; set; }
 
-    [DataMember(Name = "apps")] public IEnumerable<ContentApp> ContentApps { get; set; }
+    [DataMember(Name = "apps")]
+    public IEnumerable<ContentApp> ContentApps { get; set; }
 
     /// <summary>
     ///     The real persisted content object - used during inbound model binding

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Mapping;
+namespace Umbraco.Cms.Core.Mapping;
 
 /// <summary>
 ///     Represents a mapper context.
@@ -21,7 +21,7 @@ public class MapperContext
     /// <summary>
     ///     Gets the context items.
     /// </summary>
-    public IDictionary<string, object?> Items => _items ?? (_items = new Dictionary<string, object?>());
+    public IDictionary<string, object?> Items => _items ??= new Dictionary<string, object?>();
 
     #region Map
 

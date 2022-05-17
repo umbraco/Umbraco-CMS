@@ -1,10 +1,10 @@
-﻿// ReSharper disable once CheckNamespace
+// ReSharper disable once CheckNamespace
 
 using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Cms.Core;
 
-static partial class Constants
+public static partial class Constants
 {
     /// <summary>
     ///     Defines lock objects.

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Core.Cache;
 public interface ICacheRefresherNotificationFactory
 {
     /// <summary>
-    ///     Creates a <see cref="ICacheRefresherNotification" />
+    ///     Creates a <see cref="CacheRefresherNotification" />
     /// </summary>
-    /// <typeparam name="TNotification">The <see cref="ICacheRefresherNotification" /> to create</typeparam>
+    /// <typeparam name="TNotification">The <see cref="CacheRefresherNotification" /> to create</typeparam>
     TNotification Create<TNotification>(object msgObject, MessageType type)
         where TNotification : CacheRefresherNotification;
 }

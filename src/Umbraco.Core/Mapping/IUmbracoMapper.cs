@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Mapping;
+namespace Umbraco.Cms.Core.Mapping;
 
 public interface IUmbracoMapper
 {
@@ -32,7 +32,8 @@ public interface IUmbracoMapper
     /// <typeparam name="TTarget">The target type.</typeparam>
     /// <param name="ctor">A constructor method.</param>
     /// <param name="map">A mapping method.</param>
-    void Define<TSource, TTarget>(Func<TSource, MapperContext, TTarget> ctor,
+    void Define<TSource, TTarget>(
+        Func<TSource, MapperContext, TTarget> ctor,
         Action<TSource, TTarget, MapperContext> map);
 
     /// <summary>
@@ -139,7 +140,8 @@ public interface IUmbracoMapper
     /// <param name="source">The source objects.</param>
     /// <param name="f">A mapper context preparation method.</param>
     /// <returns>A list containing the target objects.</returns>
-    List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source,
+    List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(
+        IEnumerable<TSourceElement> source,
         Action<MapperContext> f);
 
     /// <summary>
@@ -150,6 +152,7 @@ public interface IUmbracoMapper
     /// <param name="source">The source objects.</param>
     /// <param name="context">A mapper context.</param>
     /// <returns>A list containing the target objects.</returns>
-    List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(IEnumerable<TSourceElement> source,
+    List<TTargetElement> MapEnumerable<TSourceElement, TTargetElement>(
+        IEnumerable<TSourceElement> source,
         MapperContext context);
 }

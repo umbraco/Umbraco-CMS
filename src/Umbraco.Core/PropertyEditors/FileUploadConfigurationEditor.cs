@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -17,8 +17,8 @@ public class FileUploadConfigurationEditor : ConfigurationEditor<FileUploadConfi
     {
     }
 
-    public FileUploadConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser)
+    public FileUploadConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 }

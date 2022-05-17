@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DomainSavedNotification : SavedNotification<IDomain>
 {
-    public DomainSavedNotification(IDomain target, EventMessages messages) : base(target, messages)
+    public DomainSavedNotification(IDomain target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public DomainSavedNotification(IEnumerable<IDomain> target, EventMessages messages) : base(target, messages)
+    public DomainSavedNotification(IEnumerable<IDomain> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

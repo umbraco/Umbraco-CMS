@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Models.Entities;
 
@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Core.Models.Entities;
 /// </summary>
 public interface ICanBeDirty
 {
+    event PropertyChangedEventHandler PropertyChanged;
+
     /// <summary>
     ///     Determines whether the current entity is dirty.
     /// </summary>
@@ -36,6 +38,4 @@ public interface ICanBeDirty
     ///     Enables change tracking.
     /// </summary>
     void EnableChangeTracking();
-
-    event PropertyChangedEventHandler PropertyChanged;
 }

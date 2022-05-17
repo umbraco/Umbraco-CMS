@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class ContentVersionMeta
 {
-    public ContentVersionMeta() { }
+    public ContentVersionMeta()
+    {
+    }
 
     public ContentVersionMeta(
         int versionId,
@@ -28,14 +30,21 @@ public class ContentVersionMeta
     }
 
     public int ContentId { get; }
+
     public int ContentTypeId { get; }
+
     public int VersionId { get; }
+
     public int UserId { get; }
 
     public DateTime VersionDate { get; }
+
     public bool CurrentPublishedVersion { get; }
+
     public bool CurrentDraftVersion { get; }
+
     public bool PreventCleanup { get; }
+
     public string? Username { get; }
 
     public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";

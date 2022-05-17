@@ -54,7 +54,6 @@ public static class ContentExtensions
 
     public static bool WasAnyUserPropertyDirty(this IContentBase entity) => entity.Properties.Any(x => x.WasDirty());
 
-
     public static bool IsMoving(this IContentBase entity)
     {
         // Check if this entity is being moved as a descendant as part of a bulk moving operations.
@@ -67,7 +66,6 @@ public static class ContentExtensions
 
         return isMoving;
     }
-
 
     /// <summary>
     ///     Removes characters that are not valid XML characters from all entity properties
@@ -99,6 +97,15 @@ public static class ContentExtensions
     }
 
     /// <summary>
+    ///     Returns all properties based on the editorAlias
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="editorAlias"></param>
+    /// <returns></returns>
+    public static IEnumerable<IProperty> GetPropertiesByEditor(this IContentBase content, string editorAlias)
+        => content.Properties.Where(x => x.PropertyType?.PropertyEditorAlias == editorAlias);
+
+    /// <summary>
     ///     Checks if the IContentBase has children
     /// </summary>
     /// <param name="content"></param>
@@ -122,17 +129,6 @@ public static class ContentExtensions
         return false;
     }
 
-
-    /// <summary>
-    ///     Returns all properties based on the editorAlias
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="editorAlias"></param>
-    /// <returns></returns>
-    public static IEnumerable<IProperty> GetPropertiesByEditor(this IContentBase content, string editorAlias)
-        => content.Properties.Where(x => x.PropertyType?.PropertyEditorAlias == editorAlias);
-
-
     /// <summary>
     ///     Gets the <see cref="IProfile" /> for the Creator of this content item.
     /// </summary>
@@ -151,7 +147,6 @@ public static class ContentExtensions
     public static IProfile? GetWriterProfile(this IMedia content, IUserService userService) =>
         userService.GetProfileById(content.WriterId);
 
-
     #region User/Profile methods
 
     /// <summary>
@@ -161,7 +156,6 @@ public static class ContentExtensions
         userService.GetProfileById(media.CreatorId);
 
     #endregion
-
 
     /// <summary>
     ///     Returns properties that do not belong to a group
@@ -181,12 +175,12 @@ public static class ContentExtensions
     /// <returns></returns>
     public static IEnumerable<IProperty>
         GetPropertiesForGroup(this IContentBase content, PropertyGroup propertyGroup) =>
-        //get the properties for the current tab
+
+        // get the properties for the current tab
         content.Properties
             .Where(property => propertyGroup.PropertyTypes is not null && propertyGroup.PropertyTypes
                 .Select(propertyType => propertyType.Id)
                 .Contains(property.PropertyTypeId));
-
 
     #region Dirty
 
@@ -194,7 +188,6 @@ public static class ContentExtensions
         entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
 
     #endregion
-
 
     /// <summary>
     ///     Creates the full xml representation for the <see cref="IContent" /> object and all of it's descendants
@@ -214,7 +207,6 @@ public static class ContentExtensions
     public static XElement ToXml(this IContent content, IEntityXmlSerializer serializer) =>
         serializer.Serialize(content, false);
 
-
     /// <summary>
     ///     Creates the xml representation for the <see cref="IMedia" /> object
     /// </summary>
@@ -231,14 +223,12 @@ public static class ContentExtensions
     /// <returns>Xml representation of the passed in <see cref="IContent" /></returns>
     public static XElement ToXml(this IMember member, IEntityXmlSerializer serializer) => serializer.Serialize(member);
 
-
     #region IContent
 
     /// <summary>
     ///     Gets the current status of the Content
     /// </summary>
-    public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule,
-        string? culture = null)
+    public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string? culture = null)
     {
         if (content.Trashed)
         {
@@ -287,7 +277,6 @@ public static class ContentExtensions
 
     #endregion
 
-
     #region SetValue for setting file contents
 
     /// <summary>
@@ -318,8 +307,47 @@ public static class ContentExtensions
 
         filename = filename.ToLower();
 
-        SetUploadFile(content, mediaFileManager, mediaUrlGenerators, contentTypeBaseServiceProvider, propertyTypeAlias,
-            filename, filestream, culture, segment);
+        SetUploadFile(content, mediaFileManager, mediaUrlGenerators, contentTypeBaseServiceProvider, propertyTypeAlias, filename, filestream, culture, segment);
+    }
+
+    /// <summary>
+    ///     Stores a file.
+    /// </summary>
+    /// <param name="content"><see cref="IContentBase" />A content item.</param>
+    /// <param name="propertyTypeAlias">The property alias.</param>
+    /// <param name="filename">The name of the file.</param>
+    /// <param name="filestream">A stream containing the file data.</param>
+    /// <param name="filepath">The original file path, if any.</param>
+    /// <returns>The path to the file, relative to the media filesystem.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Does NOT set the property value, so one should probably store the file and then do
+    ///         something alike: property.Value = MediaHelper.FileSystem.GetUrl(filepath).
+    ///     </para>
+    ///     <para>
+    ///         The original file path is used, in the old media file path scheme, to try and reuse
+    ///         the "folder number" that was assigned to the previous file referenced by the property,
+    ///         if any.
+    ///     </para>
+    /// </remarks>
+    public static string StoreFile(
+        this IContentBase content,
+        MediaFileManager mediaFileManager,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        string propertyTypeAlias,
+        string filename,
+        Stream filestream,
+        string filepath)
+    {
+        IContentTypeComposition? contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
+        IPropertyType? propertyType = contentType?
+            .CompositionPropertyTypes.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
+        if (propertyType == null)
+        {
+            throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
+        }
+
+        return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);
     }
 
     private static void SetUploadFile(
@@ -353,17 +381,19 @@ public static class ContentExtensions
     }
 
     // gets or creates a property for a content item.
-    private static IProperty GetProperty(IContentBase content,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias)
+    private static IProperty GetProperty(
+        IContentBase content,
+        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        string propertyTypeAlias)
     {
-        IProperty property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
+        IProperty? property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
         if (property != null)
         {
             return property;
         }
 
-        IContentTypeComposition contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-        IPropertyType propertyType = contentType?.CompositionPropertyTypes
+        IContentTypeComposition? contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
+        IPropertyType? propertyType = contentType?.CompositionPropertyTypes
             .FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
         if (propertyType == null)
         {
@@ -373,41 +403,6 @@ public static class ContentExtensions
         property = new Property(propertyType);
         content.Properties.Add(property);
         return property;
-    }
-
-    /// <summary>
-    ///     Stores a file.
-    /// </summary>
-    /// <param name="content"><see cref="IContentBase" />A content item.</param>
-    /// <param name="propertyTypeAlias">The property alias.</param>
-    /// <param name="filename">The name of the file.</param>
-    /// <param name="filestream">A stream containing the file data.</param>
-    /// <param name="filepath">The original file path, if any.</param>
-    /// <returns>The path to the file, relative to the media filesystem.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         Does NOT set the property value, so one should probably store the file and then do
-    ///         something alike: property.Value = MediaHelper.FileSystem.GetUrl(filepath).
-    ///     </para>
-    ///     <para>
-    ///         The original file path is used, in the old media file path scheme, to try and reuse
-    ///         the "folder number" that was assigned to the previous file referenced by the property,
-    ///         if any.
-    ///     </para>
-    /// </remarks>
-    public static string StoreFile(this IContentBase content, MediaFileManager mediaFileManager,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename,
-        Stream filestream, string filepath)
-    {
-        IContentTypeComposition contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
-        IPropertyType propertyType = contentType?
-            .CompositionPropertyTypes.FirstOrDefault(x => x.Alias?.InvariantEquals(propertyTypeAlias) ?? false);
-        if (propertyType == null)
-        {
-            throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
-        }
-
-        return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);
     }
 
     #endregion

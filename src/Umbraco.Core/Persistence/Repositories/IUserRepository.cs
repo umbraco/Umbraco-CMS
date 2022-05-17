@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 
@@ -28,11 +28,10 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// <returns></returns>
     bool ExistsByUserName(string username);
 
-
     /// <summary>
     ///     Checks if a user with the login exists
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="login"></param>
     /// <returns></returns>
     bool ExistsByLogin(string login);
 
@@ -96,13 +95,19 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     IUser? Get(int? id, bool includeSecurityData);
 
     IProfile? GetProfile(string username);
+
     IProfile? GetProfile(int id);
+
     IDictionary<UserState, int> GetUserStates();
 
     Guid CreateLoginSession(int? userId, string requestingIpAddress, bool cleanStaleSessions = true);
+
     bool ValidateLoginSession(int userId, Guid sessionId);
+
     int ClearLoginSessions(int userId);
+
     int ClearLoginSessions(TimeSpan timespan);
+
     void ClearLoginSession(Guid sessionId);
 
     IEnumerable<IUser> GetNextUsers(int id, int count);

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Editors;
@@ -14,6 +14,8 @@ public class BackOfficePreviewModel
     }
 
     public IEnumerable<ILanguage> Languages { get; }
+
     public bool DisableDevicePreview => _features.Disabled.DisableDevicePreview;
+
     public string? PreviewExtendedHeaderView => _features.Enabled.PreviewExtendedView;
 }

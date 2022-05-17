@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 [SupersedeEvent(typeof(SaveEventArgs<>))]
 [SupersedeEvent(typeof(PublishEventArgs<>))]
@@ -13,15 +13,17 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// <param name="eventObject"></param>
     /// <param name="canCancel"></param>
     /// <param name="eventMessages"></param>
-    public DeleteEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages eventMessages) :
-        base(eventObject, canCancel, eventMessages) => MediaFilesToDelete = new List<string>();
+    public DeleteEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages eventMessages)
+        : base(eventObject, canCancel, eventMessages) => MediaFilesToDelete = new List<string>();
 
     /// <summary>
     ///     Constructor accepting multiple entities that are used in the delete operation
     /// </summary>
     /// <param name="eventObject"></param>
     /// <param name="eventMessages"></param>
-    public DeleteEventArgs(IEnumerable<TEntity> eventObject, EventMessages eventMessages) : base(eventObject,
+    public DeleteEventArgs(IEnumerable<TEntity> eventObject, EventMessages eventMessages)
+        : base(
+        eventObject,
         eventMessages) => MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -30,7 +32,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// <param name="eventObject"></param>
     /// <param name="eventMessages"></param>
     public DeleteEventArgs(TEntity eventObject, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, eventMessages) =>
+        : base(new List<TEntity> { eventObject }, eventMessages) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -40,7 +42,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// <param name="canCancel"></param>
     /// <param name="eventMessages"></param>
     public DeleteEventArgs(TEntity eventObject, bool canCancel, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, canCancel, eventMessages) =>
+        : base(new List<TEntity> { eventObject }, canCancel, eventMessages) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -48,14 +50,16 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// </summary>
     /// <param name="eventObject"></param>
     /// <param name="canCancel"></param>
-    public DeleteEventArgs(IEnumerable<TEntity> eventObject, bool canCancel) : base(eventObject, canCancel) =>
+    public DeleteEventArgs(IEnumerable<TEntity> eventObject, bool canCancel)
+        : base(eventObject, canCancel) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
     ///     Constructor accepting multiple entities that are used in the delete operation
     /// </summary>
     /// <param name="eventObject"></param>
-    public DeleteEventArgs(IEnumerable<TEntity> eventObject) : base(eventObject) =>
+    public DeleteEventArgs(IEnumerable<TEntity> eventObject)
+        : base(eventObject) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -63,7 +67,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// </summary>
     /// <param name="eventObject"></param>
     public DeleteEventArgs(TEntity eventObject)
-        : base(new List<TEntity> {eventObject}) =>
+        : base(new List<TEntity> { eventObject }) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -72,7 +76,7 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     /// <param name="eventObject"></param>
     /// <param name="canCancel"></param>
     public DeleteEventArgs(TEntity eventObject, bool canCancel)
-        : base(new List<TEntity> {eventObject}, canCancel) =>
+        : base(new List<TEntity> { eventObject }, canCancel) =>
         MediaFilesToDelete = new List<string>();
 
     /// <summary>
@@ -88,6 +92,9 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
     ///     A list of media files that can be added to during a deleted operation for which Umbraco will ensure are removed
     /// </summary>
     public List<string> MediaFilesToDelete { get; }
+
+    public static bool operator ==(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right) =>
+        Equals(left, right);
 
     public bool Equals(DeleteEventArgs<TEntity>? other)
     {
@@ -132,9 +139,6 @@ public class DeleteEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEn
         }
     }
 
-    public static bool operator ==(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right) =>
-        Equals(left, right);
-
     public static bool operator !=(DeleteEventArgs<TEntity> left, DeleteEventArgs<TEntity> right) =>
         !Equals(left, right);
 }
@@ -155,6 +159,8 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
     ///     Gets the Id of the object being deleted.
     /// </summary>
     public int Id { get; }
+
+    public static bool operator ==(DeleteEventArgs left, DeleteEventArgs right) => Equals(left, right);
 
     public bool Equals(DeleteEventArgs? other)
     {
@@ -198,8 +204,6 @@ public class DeleteEventArgs : CancellableEventArgs, IEquatable<DeleteEventArgs>
             return (base.GetHashCode() * 397) ^ Id;
         }
     }
-
-    public static bool operator ==(DeleteEventArgs left, DeleteEventArgs right) => Equals(left, right);
 
     public static bool operator !=(DeleteEventArgs left, DeleteEventArgs right) => !Equals(left, right);
 }

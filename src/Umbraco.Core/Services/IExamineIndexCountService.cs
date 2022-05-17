@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 public interface IExamineIndexCountService
 {

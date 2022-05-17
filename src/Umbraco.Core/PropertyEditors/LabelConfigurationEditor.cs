@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -20,26 +20,28 @@ public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     {
     }
 
-    public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(
+    public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(
         ioHelper, editorConfigurationParser)
     {
     }
 
     /// <inheritdoc />
-    public override LabelConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues,
+    public override LabelConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
         LabelConfiguration? configuration)
     {
         var newConfiguration = new LabelConfiguration();
 
         // get the value type
         // not simply deserializing Json because we want to validate the valueType
-
         if (editorValues is not null && editorValues.TryGetValue(
                                          Constants.PropertyEditors.ConfigurationKeys.DataValueType,
                                          out var valueTypeObj)
                                      && valueTypeObj is string stringValue)
         {
-            if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate
+            // validate
+            if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue))
             {
                 newConfiguration.ValueType = stringValue;
             }

@@ -13,7 +13,7 @@ public abstract class HealthCheck : IDiscoverable
     protected HealthCheck()
     {
         Type thisType = GetType();
-        HealthCheckAttribute meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
+        HealthCheckAttribute? meta = thisType.GetCustomAttribute<HealthCheckAttribute>(false);
         if (meta == null)
         {
             throw new InvalidOperationException(
@@ -26,13 +26,17 @@ public abstract class HealthCheck : IDiscoverable
         Id = meta.Id;
     }
 
-    [DataMember(Name = "id")] public Guid Id { get; private set; }
+    [DataMember(Name = "id")]
+    public Guid Id { get; private set; }
 
-    [DataMember(Name = "name")] public string Name { get; private set; }
+    [DataMember(Name = "name")]
+    public string Name { get; private set; }
 
-    [DataMember(Name = "description")] public string? Description { get; private set; }
+    [DataMember(Name = "description")]
+    public string? Description { get; private set; }
 
-    [DataMember(Name = "group")] public string? Group { get; private set; }
+    [DataMember(Name = "group")]
+    public string? Group { get; private set; }
 
     /// <summary>
     ///     Get the status for this health check

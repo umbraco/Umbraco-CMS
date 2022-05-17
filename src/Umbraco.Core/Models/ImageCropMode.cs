@@ -37,5 +37,5 @@ public enum ImageCropMode
     ///     Resizes the image until the shortest side reaches the set given dimension. This will maintain the aspect ratio of
     ///     the original image. Upscaling is disabled in this mode and the original image will be returned if attempted.
     /// </summary>
-    Min
+    Min,
 }

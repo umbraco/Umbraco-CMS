@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Models.Blocks;

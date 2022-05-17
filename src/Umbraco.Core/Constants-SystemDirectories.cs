@@ -62,6 +62,7 @@ public static partial class Constants
         /// </summary>
         public const string LogFiles = Umbraco + "/Logs";
 
-        [Obsolete("Use PluginIcons instead")] public static string AppPluginIcons => "/Backoffice/Icons";
+        [Obsolete("Use PluginIcons instead")]
+        public static string AppPluginIcons => "/Backoffice/Icons";
     }
 }

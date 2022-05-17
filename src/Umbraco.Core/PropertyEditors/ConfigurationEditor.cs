@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -46,12 +46,39 @@ public class ConfigurationEditor : IConfigurationEditor
     /// <inheritdoc />
     public virtual object? DefaultConfigurationObject => DefaultConfiguration;
 
+    /// <summary>
+    ///     Converts a configuration object into a serialized database value.
+    /// </summary>
+    public static string? ToDatabase(
+        object? configuration,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
+
+    /// <summary>
+    ///     Gets the configuration as a typed object.
+    /// </summary>
+    public static TConfiguration? ConfigurationAs<TConfiguration>(object? obj)
+    {
+        if (obj == null)
+        {
+            return default;
+        }
+
+        if (obj is TConfiguration configuration)
+        {
+            return configuration;
+        }
+
+        throw new InvalidCastException(
+            $"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
+    }
+
     /// <inheritdoc />
     public virtual bool IsConfiguration(object obj) => obj is IDictionary<string, object>;
 
-
     /// <inheritdoc />
-    public virtual object FromDatabase(string? configurationJson,
+    public virtual object FromDatabase(
+        string? configurationJson,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
         => string.IsNullOrWhiteSpace(configurationJson)
             ? new Dictionary<string, object>()
@@ -63,7 +90,6 @@ public class ConfigurationEditor : IConfigurationEditor
         // by default, return the posted dictionary
         // but only keep entries that have a non-null/empty value
         // rest will fall back to default during ToConfigurationEditor()
-
         var keys = editorValues?.Where(x =>
                 x.Value == null || (x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue)))
             .Select(x => x.Key).ToList();
@@ -85,7 +111,6 @@ public class ConfigurationEditor : IConfigurationEditor
         // editors that do not override ToEditor/FromEditor have their configuration
         // as a dictionary of <string, object> and, by default, we merge their default
         // configuration with their current configuration
-
         if (configuration == null)
         {
             configuration = new Dictionary<string, object>();
@@ -100,7 +125,7 @@ public class ConfigurationEditor : IConfigurationEditor
 
         // clone the default configuration, and apply the current configuration values
         var d = new Dictionary<string, object>(DefaultConfiguration);
-        foreach (var (key, value) in c)
+        foreach ((string key, object value) in c)
         {
             d[key] = value;
         }
@@ -121,30 +146,4 @@ public class ConfigurationEditor : IConfigurationEditor
     /// </remarks>
     protected ConfigurationField Field(string name)
         => Fields.First(x => x.PropertyName == name);
-
-    /// <summary>
-    ///     Gets the configuration as a typed object.
-    /// </summary>
-    public static TConfiguration? ConfigurationAs<TConfiguration>(object? obj)
-    {
-        if (obj == null)
-        {
-            return default;
-        }
-
-        if (obj is TConfiguration configuration)
-        {
-            return configuration;
-        }
-
-        throw new InvalidCastException(
-            $"Cannot cast configuration of type {obj.GetType().Name} to {typeof(TConfiguration).Name}.");
-    }
-
-    /// <summary>
-    ///     Converts a configuration object into a serialized database value.
-    /// </summary>
-    public static string? ToDatabase(object? configuration,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
-        => configuration == null ? null : configurationEditorJsonSerializer.Serialize(configuration);
 }

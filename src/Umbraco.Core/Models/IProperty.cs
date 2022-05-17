@@ -34,5 +34,6 @@ public interface IProperty : IEntity, IRememberBeingDirty
     void SetValue(object? value, string? culture = null, string? segment = null);
 
     void PublishValues(string? culture = "*", string segment = "*");
+
     void UnpublishValues(string? culture = "*", string segment = "*");
 }

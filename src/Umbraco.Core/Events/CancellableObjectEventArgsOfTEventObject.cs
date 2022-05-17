@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     Represent event data, for events that support cancellation, and expose an impacted object.
@@ -7,8 +7,7 @@
 public class CancellableObjectEventArgs<TEventObject> : CancellableObjectEventArgs,
     IEquatable<CancellableObjectEventArgs<TEventObject>>
 {
-    public CancellableObjectEventArgs(TEventObject? eventObject, bool canCancel, EventMessages messages,
-        IDictionary<string, object> additionalData)
+    public CancellableObjectEventArgs(TEventObject? eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
         : base(eventObject, canCancel, messages, additionalData)
     {
     }
@@ -44,6 +43,14 @@ public class CancellableObjectEventArgs<TEventObject> : CancellableObjectEventAr
         get => (TEventObject?)base.EventObject;
         set => base.EventObject = value;
     }
+
+    public static bool operator ==(
+        CancellableObjectEventArgs<TEventObject> left,
+        CancellableObjectEventArgs<TEventObject> right) => Equals(left, right);
+
+    public static bool operator !=(
+        CancellableObjectEventArgs<TEventObject> left,
+        CancellableObjectEventArgs<TEventObject> right) => !Equals(left, right);
 
     public bool Equals(CancellableObjectEventArgs<TEventObject>? other)
     {
@@ -92,10 +99,4 @@ public class CancellableObjectEventArgs<TEventObject> : CancellableObjectEventAr
             return base.GetHashCode() * 397;
         }
     }
-
-    public static bool operator ==(CancellableObjectEventArgs<TEventObject> left,
-        CancellableObjectEventArgs<TEventObject> right) => Equals(left, right);
-
-    public static bool operator !=(CancellableObjectEventArgs<TEventObject> left,
-        CancellableObjectEventArgs<TEventObject> right) => !Equals(left, right);
 }

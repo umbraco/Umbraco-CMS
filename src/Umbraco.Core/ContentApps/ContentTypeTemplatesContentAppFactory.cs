@@ -21,7 +21,7 @@ public class ContentTypeTemplatesContentAppFactory : IContentAppFactory
                     Name = "Templates",
                     Icon = "icon-layout",
                     View = "views/documentTypes/views/templates/templates.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             default:
                 return null;

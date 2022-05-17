@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Install.Models;
@@ -44,7 +44,7 @@ public class FilePermissionsStep : InstallSetupStep<object>
             report.ToDictionary(x => _localizedTextService.Localize("permissions", x.Key), x => x.Value);
         if (permissionsOk == false)
         {
-            throw new InstallException("Permission check failed", "permissionsreport", new {errors = translatedErrors});
+            throw new InstallException("Permission check failed", "permissionsreport", new { errors = translatedErrors });
         }
 
         return Task.FromResult<InstallSetupResult?>(null);

@@ -98,6 +98,16 @@ public interface IPublishedContent : IPublishedElement
     /// </summary>
     PublishedItemType ItemType { get; }
 
+    #endregion
+
+    #region Tree
+
+    /// <summary>
+    ///     Gets the parent of the content item.
+    /// </summary>
+    /// <remarks>The parent of root content is <c>null</c>.</remarks>
+    IPublishedContent? Parent { get; }
+
     /// <summary>
     ///     Gets a value indicating whether the content is draft.
     /// </summary>
@@ -133,16 +143,6 @@ public interface IPublishedContent : IPublishedElement
     ///     </para>
     /// </remarks>
     bool IsPublished(string? culture = null);
-
-    #endregion
-
-    #region Tree
-
-    /// <summary>
-    ///     Gets the parent of the content item.
-    /// </summary>
-    /// <remarks>The parent of root content is <c>null</c>.</remarks>
-    IPublishedContent? Parent { get; }
 
     /// <summary>
     ///     Gets the children of the content item that are available for the current culture.

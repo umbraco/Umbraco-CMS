@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections;
@@ -49,19 +49,18 @@ public static class DictionaryExtensions
     ///     http://stackoverflow.com/questions/12240219/is-there-a-way-to-use-concurrentdictionary-tryupdate-with-a-lambda-expression
     ///     If there is an item in the dictionary with the key, it will keep trying to update it until it can
     /// </remarks>
-    public static bool TryUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key,
-        Func<TValue, TValue> updateFactory)
+    public static bool TryUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
         where TKey : notnull
     {
-        TValue? curValue;
-        while (dict.TryGetValue(key, out curValue))
+        while (dict.TryGetValue(key, out TValue? curValue))
         {
             if (dict.TryUpdate(key, updateFactory(curValue), curValue))
             {
                 return true;
             }
-            //if we're looping either the key was removed by another thread, or another thread
-            //changed the value, so we start again.
+
+            // if we're looping either the key was removed by another thread, or another thread
+            // changed the value, so we start again.
         }
 
         return false;
@@ -81,18 +80,16 @@ public static class DictionaryExtensions
     ///     http://stackoverflow.com/questions/12240219/is-there-a-way-to-use-concurrentdictionary-tryupdate-with-a-lambda-expression
     ///     WARNING: If the value changes after we've retrieved it, then the item will not be updated
     /// </remarks>
-    public static bool TryUpdateOptimisitic<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key,
-        Func<TValue, TValue> updateFactory)
+    public static bool TryUpdateOptimisitic<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
         where TKey : notnull
     {
-        TValue? curValue;
-        if (!dict.TryGetValue(key, out curValue))
+        if (!dict.TryGetValue(key, out TValue? curValue))
         {
             return false;
         }
 
         dict.TryUpdate(key, updateFactory(curValue), curValue);
-        return true; //note we return true whether we succeed or not, see explanation below.
+        return true; // note we return true whether we succeed or not, see explanation below.
     }
 
     /// <summary>
@@ -123,8 +120,10 @@ public static class DictionaryExtensions
     /// <param name="keyConverter"></param>
     /// <param name="valConverter"></param>
     /// <returns></returns>
-    public static IDictionary<TKeyOut, TValOut> ConvertTo<TKeyOut, TValOut>(this IDictionary d,
-        Func<object, TKeyOut> keyConverter, Func<object, TValOut> valConverter)
+    public static IDictionary<TKeyOut, TValOut> ConvertTo<TKeyOut, TValOut>(
+        this IDictionary d,
+        Func<object, TKeyOut> keyConverter,
+        Func<object, TValOut> valConverter)
         where TKeyOut : notnull
     {
         var result = new Dictionary<TKeyOut, TValOut>();
@@ -152,7 +151,6 @@ public static class DictionaryExtensions
         return n;
     }
 
-
     /// <summary>
     ///     Merges all key/values from the sources dictionaries into the destination dictionary
     /// </summary>
@@ -167,8 +165,7 @@ public static class DictionaryExtensions
     ///     it will just use the last found key/value if this is true.
     /// </param>
     /// <param name="sources">The other dictionaries to merge values from</param>
-    public static void MergeLeft<T, TK, TV>(this T destination, IEnumerable<IDictionary<TK, TV>> sources,
-        bool overwrite = false)
+    public static void MergeLeft<T, TK, TV>(this T destination, IEnumerable<IDictionary<TK, TV>> sources, bool overwrite = false)
         where T : IDictionary<TK, TV>
     {
         foreach (KeyValuePair<TK, TV> p in sources.SelectMany(src => src)
@@ -194,7 +191,7 @@ public static class DictionaryExtensions
     /// <param name="source">The other dictionary to merge values from</param>
     public static void MergeLeft<T, TK, TV>(this T destination, IDictionary<TK, TV> source, bool overwrite = false)
         where T : IDictionary<TK, TV> =>
-        destination.MergeLeft(new[] {source}, overwrite);
+        destination.MergeLeft(new[] { source }, overwrite);
 
     /// <summary>
     ///     Returns the value of the key value based on the key, if the key is not found, a null value is returned
@@ -265,14 +262,13 @@ public static class DictionaryExtensions
     {
         if (!d.Any())
         {
-            return "";
+            return string.Empty;
         }
 
         var builder = new StringBuilder();
         foreach (KeyValuePair<string, object> i in d)
         {
-            builder.Append(string.Format("{0}={1}&", WebUtility.UrlEncode(i.Key),
-                i.Value == null ? string.Empty : WebUtility.UrlEncode(i.Value.ToString())));
+            builder.Append(string.Format("{0}={1}&", WebUtility.UrlEncode(i.Key), i.Value == null ? string.Empty : WebUtility.UrlEncode(i.Value.ToString())));
         }
 
         return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);

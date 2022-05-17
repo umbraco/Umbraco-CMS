@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class CopyEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<CopyEventArgs<TEntity>>
 {
@@ -40,6 +40,8 @@ public class CopyEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
     public int ParentId { get; }
 
     public bool RelateToOriginal { get; set; }
+
+    public static bool operator ==(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right) => Equals(left, right);
 
     public bool Equals(CopyEventArgs<TEntity>? other)
     {
@@ -92,8 +94,6 @@ public class CopyEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
             return hashCode;
         }
     }
-
-    public static bool operator ==(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right) => Equals(left, right);
 
     public static bool operator !=(CopyEventArgs<TEntity> left, CopyEventArgs<TEntity> right) => !Equals(left, right);
 }

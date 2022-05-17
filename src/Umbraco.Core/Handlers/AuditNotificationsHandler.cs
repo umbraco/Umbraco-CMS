@@ -54,13 +54,20 @@ public sealed class AuditNotificationsHandler :
     {
         get
         {
-            IUser identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            IUser user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+            IUser? identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            IUser? user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
             return user ?? UnknownUser(_globalSettings);
         }
     }
 
     private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
+
+    public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings)
+    {
+        Id = Constants.Security.UnknownUserId,
+        Name = Constants.Security.UnknownUserName,
+        Email = string.Empty,
+    };
 
     public void Handle(AssignedMemberRolesNotification notification)
     {
@@ -69,12 +76,16 @@ public sealed class AuditNotificationsHandler :
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
-            members.TryGetValue(id, out IMember member);
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            members.TryGetValue(id, out IMember? member);
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
-                "umbraco/member/roles/assigned", $"roles modified, assigned {roles}");
+                -1,
+                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                "umbraco/member/roles/assigned",
+                $"roles modified, assigned {roles}");
         }
     }
 
@@ -84,9 +95,9 @@ public sealed class AuditNotificationsHandler :
         IEnumerable<EntityPermission> perms = notification.EntityPermissions;
         foreach (EntityPermission perm in perms)
         {
-            IUserGroup group = _userService.GetUserGroupById(perm.UserGroupId);
+            IUserGroup? group = _userService.GetUserGroupById(perm.UserGroupId);
             var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
-            IEntitySlim entity = _entityService.Get(perm.EntityId);
+            IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
             _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
@@ -146,7 +157,7 @@ public sealed class AuditNotificationsHandler :
         var members = _memberService.GetAllMembers(notification.MemberIds).ToDictionary(x => x.Id, x => x);
         foreach (var id in notification.MemberIds)
         {
-            members.TryGetValue(id, out IMember member);
+            members.TryGetValue(id, out IMember? member);
             _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
@@ -208,7 +219,6 @@ public sealed class AuditNotificationsHandler :
                 "umbraco/user-group/save", $"{sb}");
 
             // now audit the users that have changed
-
             foreach (IUser user in groupWithUser.RemovedUsers)
             {
                 _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
@@ -248,18 +258,13 @@ public sealed class AuditNotificationsHandler :
                 DateTime.UtcNow,
                 affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                 "umbraco/user/save",
-                $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? "" : "; groups assigned: " + groups)}");
+                $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
     }
 
-    public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings)
-    {
-        Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = ""
-    };
-
     private string FormatEmail(IMember? member) =>
-        member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? "" : $"<{member.Email}>";
+        member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
 
     private string FormatEmail(IUser user) =>
-        user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
+        user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
 }

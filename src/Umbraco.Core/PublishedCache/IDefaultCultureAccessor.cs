@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PublishedCache;
+namespace Umbraco.Cms.Core.PublishedCache;
 
 /// <summary>
 ///     Gives access to the default culture.

@@ -21,15 +21,11 @@ public class LocalizedTextService : ILocalizedTextService
     /// </summary>
     /// <param name="fileSources"></param>
     /// <param name="logger"></param>
-    public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources,
+    public LocalizedTextService(
+        Lazy<LocalizedTextServiceFileSources> fileSources,
         ILogger<LocalizedTextService> logger)
     {
-        if (logger == null)
-        {
-            throw new ArgumentNullException(nameof(logger));
-        }
-
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (fileSources == null)
         {
             throw new ArgumentNullException(nameof(fileSources));
@@ -49,7 +45,8 @@ public class LocalizedTextService : ILocalizedTextService
     /// </summary>
     /// <param name="source"></param>
     /// <param name="logger"></param>
-    public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source,
+    public LocalizedTextService(
+        IDictionary<CultureInfo, Lazy<XDocument>> source,
         ILogger<LocalizedTextService> logger)
     {
         if (source == null)
@@ -69,8 +66,10 @@ public class LocalizedTextService : ILocalizedTextService
 
     [Obsolete(
         "Use other ctor with IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> as input parameter.")]
-    public LocalizedTextService(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source,
-        ILogger<LocalizedTextService> logger) : this(
+    public LocalizedTextService(
+        IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> source,
+        ILogger<LocalizedTextService> logger)
+        : this(
         source.ToDictionary(x => x.Key, x => new Lazy<IDictionary<string, IDictionary<string, string>>>(() => x.Value)),
         logger)
     {
@@ -98,7 +97,8 @@ public class LocalizedTextService : ILocalizedTextService
             Dictionary<string, IDictionary<string, string>> areaAliaValue =
                 GetAreaStoredTranslations(source, cultureDictionary.Key);
 
-            cultureNoAreaDictionary.Add(cultureDictionary.Key,
+            cultureNoAreaDictionary.Add(
+                cultureDictionary.Key,
                 new Lazy<IDictionary<string, string>>(() => GetAliasValues(areaAliaValue)));
         }
 
@@ -106,21 +106,20 @@ public class LocalizedTextService : ILocalizedTextService
             new Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>>(() => cultureNoAreaDictionary);
     }
 
-    private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> _dictionarySource =>
+    private IDictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>> DictionarySource =>
         _dictionarySourceLazy.Value;
 
-    private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> _noAreaDictionarySource =>
+    private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> NoAreaDictionarySource =>
         _noAreaDictionarySourceLazy.Value;
 
-    public string Localize(string? area, string? alias, CultureInfo? culture,
-        IDictionary<string, string?>? tokens = null)
+    public string Localize(string? area, string? alias, CultureInfo? culture, IDictionary<string, string?>? tokens = null)
     {
         if (culture == null)
         {
             throw new ArgumentNullException(nameof(culture));
         }
 
-        //This is what the legacy ui service did
+        // This is what the legacy ui service did
         if (string.IsNullOrEmpty(alias))
         {
             return string.Empty;
@@ -145,7 +144,7 @@ public class LocalizedTextService : ILocalizedTextService
         // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
         culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-        if (_dictionarySource.ContainsKey(culture) == false)
+        if (DictionarySource.ContainsKey(culture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -154,13 +153,15 @@ public class LocalizedTextService : ILocalizedTextService
         }
 
         IDictionary<string, string> result = new Dictionary<string, string>();
-        //convert all areas + keys to a single key with a '/'
-        foreach (KeyValuePair<string, IDictionary<string, string>> area in _dictionarySource[culture].Value)
+
+        // convert all areas + keys to a single key with a '/'
+        foreach (KeyValuePair<string, IDictionary<string, string>> area in DictionarySource[culture].Value)
         {
             foreach (KeyValuePair<string, string> key in area.Value)
             {
                 var dictionaryKey = string.Format("{0}/{1}", area.Key, key.Key);
-                //i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
+
+                // i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
                 if (result.ContainsKey(dictionaryKey) == false)
                 {
                     result.Add(dictionaryKey, key.Value);
@@ -175,7 +176,7 @@ public class LocalizedTextService : ILocalizedTextService
     ///     Returns a list of all currently supported cultures
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<CultureInfo> GetSupportedCultures() => _dictionarySource.Keys;
+    public IEnumerable<CultureInfo> GetSupportedCultures() => DictionarySource.Keys;
 
     /// <summary>
     ///     Tries to resolve a full 4 letter culture from a 2 letter culture name
@@ -210,7 +211,7 @@ public class LocalizedTextService : ILocalizedTextService
             return currentCulture;
         }
 
-        Attempt<CultureInfo> attempt =
+        Attempt<CultureInfo?> attempt =
             _fileSources.Value.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
         return attempt.Success ? attempt.Result! : currentCulture;
     }
@@ -229,7 +230,7 @@ public class LocalizedTextService : ILocalizedTextService
         // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
         culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-        if (_dictionarySource.ContainsKey(culture) == false)
+        if (DictionarySource.ContainsKey(culture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -237,7 +238,75 @@ public class LocalizedTextService : ILocalizedTextService
             return new Dictionary<string, IDictionary<string, string>>(0);
         }
 
-        return _dictionarySource[culture].Value;
+        return DictionarySource[culture].Value;
+    }
+
+    public string Localize(string key, CultureInfo culture, IDictionary<string, string?>? tokens = null)
+    {
+        if (culture == null)
+        {
+            throw new ArgumentNullException(nameof(culture));
+        }
+
+        // This is what the legacy ui service did
+        if (string.IsNullOrEmpty(key))
+        {
+            return string.Empty;
+        }
+
+        var keyParts = key.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
+        var area = keyParts.Length > 1 ? keyParts[0] : null;
+        var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
+        return Localize(area, alias, culture, tokens);
+    }
+
+    /// <summary>
+    ///     Parses the tokens in the value
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="tokens"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     This is based on how the legacy ui localized text worked, each token was just a sequential value delimited with a %
+    ///     symbol.
+    ///     For example: hello %0%, you are %1% !
+    ///     Since we're going to continue using the same language files for now, the token system needs to remain the same.
+    ///     With our new service
+    ///     we support a dictionary which means in the future we can really have any sort of token system.
+    ///     Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw
+    ///     exceptions if that is not the case.
+    /// </remarks>
+    internal static string ParseTokens(string value, IDictionary<string, string?>? tokens)
+    {
+        if (tokens == null || tokens.Any() == false)
+        {
+            return value;
+        }
+
+        foreach (KeyValuePair<string, string?> token in tokens)
+        {
+            value = value.Replace(string.Concat("%", token.Key, "%"), token.Value);
+        }
+
+        return value;
+    }
+
+    private static Dictionary<string, string> GetAliasValues(
+        Dictionary<string, IDictionary<string, string>> areaAliaValue)
+    {
+        var aliasValue = new Dictionary<string, string>();
+        foreach (KeyValuePair<string, IDictionary<string, string>> area in areaAliaValue)
+        {
+            foreach (KeyValuePair<string, string> alias in area.Value)
+            {
+                if (!aliasValue.ContainsKey(alias.Key))
+                {
+                    aliasValue.Add(alias.Key, alias.Value);
+                }
+            }
+        }
+
+        return aliasValue;
     }
 
     private IDictionary<CultureInfo, Lazy<IDictionary<string, string>>> FileSourcesToNoAreaDictionarySources(
@@ -285,43 +354,6 @@ public class LocalizedTextService : ILocalizedTextService
         return cultureDictionary;
     }
 
-    private static Dictionary<string, string> GetAliasValues(
-        Dictionary<string, IDictionary<string, string>> areaAliaValue)
-    {
-        var aliasValue = new Dictionary<string, string>();
-        foreach (KeyValuePair<string, IDictionary<string, string>> area in areaAliaValue)
-        {
-            foreach (KeyValuePair<string, string> alias in area.Value)
-            {
-                if (!aliasValue.ContainsKey(alias.Key))
-                {
-                    aliasValue.Add(alias.Key, alias.Value);
-                }
-            }
-        }
-
-        return aliasValue;
-    }
-
-    public string Localize(string key, CultureInfo culture, IDictionary<string, string?>? tokens = null)
-    {
-        if (culture == null)
-        {
-            throw new ArgumentNullException(nameof(culture));
-        }
-
-        //This is what the legacy ui service did
-        if (string.IsNullOrEmpty(key))
-        {
-            return string.Empty;
-        }
-
-        var keyParts = key.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
-        var area = keyParts.Length > 1 ? keyParts[0] : null;
-        var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
-        return Localize(area, alias, culture, tokens);
-    }
-
     private IDictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(
         IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
     {
@@ -335,7 +367,8 @@ public class LocalizedTextService : ILocalizedTextService
             {
                 var dictionaryKey =
                     (string)key.Attribute("alias")!;
-                //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+
+                // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                 if (result.ContainsKey(dictionaryKey) == false)
                 {
                     result.Add(dictionaryKey, key.Value);
@@ -345,7 +378,7 @@ public class LocalizedTextService : ILocalizedTextService
             overallResult.Add(area.Attribute("alias")!.Value, result);
         }
 
-        //Merge English Dictionary
+        // Merge English Dictionary
         var englishCulture = new CultureInfo("en-US");
         if (!cult.Equals(englishCulture))
         {
@@ -364,7 +397,8 @@ public class LocalizedTextService : ILocalizedTextService
                 {
                     var dictionaryKey =
                         (string)key.Attribute("alias")!;
-                    //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+
+                    // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                     if (result.ContainsKey(dictionaryKey) == false)
                     {
                         result.Add(dictionaryKey, key.Value);
@@ -391,14 +425,15 @@ public class LocalizedTextService : ILocalizedTextService
         {
             var dictionaryKey =
                 (string)key.Attribute("alias")!;
-            //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+
+            // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
             if (result.ContainsKey(dictionaryKey) == false)
             {
                 result.Add(dictionaryKey, key.Value);
             }
         }
 
-        //Merge English Dictionary
+        // Merge English Dictionary
         var englishCulture = new CultureInfo("en-US");
         if (!cult.Equals(englishCulture))
         {
@@ -408,7 +443,8 @@ public class LocalizedTextService : ILocalizedTextService
             {
                 var dictionaryKey =
                     (string)key.Attribute("alias")!;
-                //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+
+                // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                 if (result.ContainsKey(dictionaryKey) == false)
                 {
                     result.Add(dictionaryKey, key.Value);
@@ -432,7 +468,7 @@ public class LocalizedTextService : ILocalizedTextService
             ICollection<string> keys = area.Value.Keys;
             foreach (var key in keys)
             {
-                //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                // there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                 if (result.ContainsKey(key) == false)
                 {
                     result.Add(key, area.Value[key]);
@@ -445,10 +481,9 @@ public class LocalizedTextService : ILocalizedTextService
         return overallResult;
     }
 
-    private string GetFromDictionarySource(CultureInfo culture, string? area, string key,
-        IDictionary<string, string?>? tokens)
+    private string GetFromDictionarySource(CultureInfo culture, string? area, string key, IDictionary<string, string?>? tokens)
     {
-        if (_dictionarySource.ContainsKey(culture) == false)
+        if (DictionarySource.ContainsKey(culture) == false)
         {
             _logger.LogWarning(
                 "The culture specified {Culture} was not found in any configured sources for this service",
@@ -456,63 +491,30 @@ public class LocalizedTextService : ILocalizedTextService
             return "[" + key + "]";
         }
 
-
         string? found = null;
         if (string.IsNullOrWhiteSpace(area))
         {
-            _noAreaDictionarySource[culture].Value.TryGetValue(key, out found);
+            NoAreaDictionarySource[culture].Value.TryGetValue(key, out found);
         }
         else
         {
-            if (_dictionarySource[culture].Value.TryGetValue(area, out IDictionary<string, string> areaDictionary))
+            if (DictionarySource[culture].Value.TryGetValue(area, out IDictionary<string, string>? areaDictionary))
             {
                 areaDictionary.TryGetValue(key, out found);
             }
 
             if (found == null)
             {
-                _noAreaDictionarySource[culture].Value.TryGetValue(key, out found);
+                NoAreaDictionarySource[culture].Value.TryGetValue(key, out found);
             }
         }
-
 
         if (found != null)
         {
             return ParseTokens(found, tokens);
         }
 
-        //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+        // NOTE: Based on how legacy works, the default text does not contain the area, just the key
         return "[" + key + "]";
-    }
-
-    /// <summary>
-    ///     Parses the tokens in the value
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="tokens"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This is based on how the legacy ui localized text worked, each token was just a sequential value delimited with a %
-    ///     symbol.
-    ///     For example: hello %0%, you are %1% !
-    ///     Since we're going to continue using the same language files for now, the token system needs to remain the same.
-    ///     With our new service
-    ///     we support a dictionary which means in the future we can really have any sort of token system.
-    ///     Currently though, the token key's will need to be an integer and sequential - though we aren't going to throw
-    ///     exceptions if that is not the case.
-    /// </remarks>
-    internal static string ParseTokens(string value, IDictionary<string, string?>? tokens)
-    {
-        if (tokens == null || tokens.Any() == false)
-        {
-            return value;
-        }
-
-        foreach (KeyValuePair<string, string> token in tokens)
-        {
-            value = value.Replace(string.Concat("%", token.Key, "%"), token.Value);
-        }
-
-        return value;
     }
 }

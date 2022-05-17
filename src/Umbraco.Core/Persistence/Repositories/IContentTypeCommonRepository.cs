@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
+
 // TODO
 // this should be IContentTypeRepository, and what is IContentTypeRepository at the moment should
 // become IDocumentTypeRepository - but since these interfaces are public, that would be breaking

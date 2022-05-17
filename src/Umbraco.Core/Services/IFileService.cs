@@ -9,9 +9,13 @@ namespace Umbraco.Cms.Core.Services;
 public interface IFileService : IService
 {
     IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+
     void CreatePartialViewFolder(string folderPath);
+
     void CreatePartialViewMacroFolder(string folderPath);
+
     void DeletePartialViewFolder(string folderPath);
+
     void DeletePartialViewMacroFolder(string folderPath);
 
     /// <summary>
@@ -21,17 +25,19 @@ public interface IFileService : IService
     IEnumerable<IPartialView> GetPartialViews(params string[] names);
 
     IPartialView? GetPartialView(string path);
+
     IPartialView? GetPartialViewMacro(string path);
 
-    Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null,
-        int? userId = Constants.Security.SuperUserId);
+    Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
-    Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null,
-        int? userId = Constants.Security.SuperUserId);
+    Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
 
     bool DeletePartialView(string path, int? userId = null);
+
     bool DeletePartialViewMacro(string path, int? userId = null);
+
     Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
+
     Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null);
 
     /// <summary>
@@ -254,11 +260,12 @@ public interface IFileService : IService
     /// <returns>
     ///     The template created
     /// </returns>
-    Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias,
-        string? contentTypeName, int userId = Constants.Security.SuperUserId);
-
-    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null,
+    Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(
+        string contentTypeAlias,
+        string? contentTypeName,
         int userId = Constants.Security.SuperUserId);
+
+    ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes a template by its alias

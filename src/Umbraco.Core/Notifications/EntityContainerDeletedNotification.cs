@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class EntityContainerDeletedNotification : DeletedNotification<EntityContainer>
 {
-    public EntityContainerDeletedNotification(EntityContainer target, EventMessages messages) : base(target, messages)
+    public EntityContainerDeletedNotification(EntityContainer target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

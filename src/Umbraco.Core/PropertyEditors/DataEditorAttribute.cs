@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Marks a class that represents a data editor.
@@ -66,7 +66,8 @@ public sealed class DataEditorAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(alias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(alias));
         }
 
@@ -82,7 +83,8 @@ public sealed class DataEditorAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -93,7 +95,8 @@ public sealed class DataEditorAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(view))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(view));
         }
 
@@ -139,7 +142,8 @@ public sealed class DataEditorAttribute : Attribute
 
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+                throw new ArgumentException(
+                    "Value can't be empty or consist only of white-space characters.",
                     nameof(value));
             }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics.CodeAnalysis;
@@ -20,12 +20,13 @@ public static class ClaimsIdentityExtensions
     /// </remarks>
     public static IEnumerable<string> RequiredBackOfficeClaimTypes => new[]
     {
-        ClaimTypes.NameIdentifier, //id
-        ClaimTypes.Name, //username
+        ClaimTypes.NameIdentifier, // id
+        ClaimTypes.Name, // username
         ClaimTypes.GivenName,
+
         // Constants.Security.StartContentNodeIdClaimType, These seem to be able to be null...
         // Constants.Security.StartMediaNodeIdClaimType,
-        ClaimTypes.Locality, Constants.Security.SecurityStampClaimType
+        ClaimTypes.Locality, Constants.Security.SecurityStampClaimType,
     };
 
     public static T? GetUserId<T>(this IIdentity identity)
@@ -125,7 +126,8 @@ public static class ClaimsIdentityExtensions
     /// <param name="identity"></param>
     /// <param name="verifiedIdentity">Verified identity wrapped in a ClaimsIdentity with BackOfficeAuthentication type</param>
     /// <returns>True if ClaimsIdentity</returns>
-    public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity,
+    public static bool VerifyBackOfficeIdentity(
+        this ClaimsIdentity identity,
         [MaybeNullWhen(false)] out ClaimsIdentity verifiedIdentity)
     {
         if (identity is null)
@@ -164,11 +166,9 @@ public static class ClaimsIdentityExtensions
     /// <param name="securityStamp">Security stamp</param>
     /// <param name="allowedApps">Allowed apps</param>
     /// <param name="roles">Roles</param>
-    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username,
-        string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture,
-        string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
+    public static void AddRequiredClaims(this ClaimsIdentity identity, string userId, string username, string realName, IEnumerable<int>? startContentNodes, IEnumerable<int>? startMediaNodes, string culture, string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
     {
-        //This is the id that 'identity' uses to check for the user id
+        // This is the id that 'identity' uses to check for the user id
         if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
         {
             identity.AddClaim(new Claim(
@@ -256,8 +256,7 @@ public static class ClaimsIdentityExtensions
         }
 
         // Add each app as a separate claim
-        if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false &&
-            allowedApps != null)
+        if (identity.HasClaim(x => x.Type == Constants.Security.AllowedApplicationsClaimType) == false && allowedApps != null)
         {
             foreach (var application in allowedApps)
             {
@@ -374,7 +373,6 @@ public static class ClaimsIdentityExtensions
     /// <returns>Array of roles</returns>
     public static string[] GetRoles(this ClaimsIdentity identity) => identity
         .FindAll(x => x.Type == ClaimsIdentity.DefaultRoleClaimType).Select(role => role.Value).ToArray();
-
 
     /// <summary>
     ///     Adds or updates and existing claim.

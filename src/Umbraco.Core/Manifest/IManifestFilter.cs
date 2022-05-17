@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Manifest;
+namespace Umbraco.Cms.Core.Manifest;
 
 /// <summary>
 ///     Provides filtering for package manifests.

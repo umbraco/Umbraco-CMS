@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -10,14 +10,15 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class MediaPermissions
 {
+    private readonly AppCaches _appCaches;
+
     public enum MediaAccess
     {
         Granted,
         Denied,
-        NotFound
+        NotFound,
     }
 
-    private readonly AppCaches _appCaches;
     private readonly IEntityService _entityService;
     private readonly IMediaService _mediaService;
 
@@ -33,9 +34,8 @@ public class MediaPermissions
     ///     start node and/or permissions for the node
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="mediaService"></param>
-    /// <param name="entityService"></param>
     /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
+    /// <param name="media"></param>
     /// <returns></returns>
     public MediaAccess CheckPermissions(IUser? user, int nodeId, out IMedia? media)
     {

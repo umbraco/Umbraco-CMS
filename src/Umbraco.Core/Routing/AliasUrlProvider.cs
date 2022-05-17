@@ -17,8 +17,11 @@ public class AliasUrlProvider : IUrlProvider
     private readonly UriUtility _uriUtility;
     private RequestHandlerSettings _requestConfig;
 
-    public AliasUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper,
-        UriUtility uriUtility, IPublishedValueFallback publishedValueFallback,
+    public AliasUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestConfig,
+        ISiteDomainMapper siteDomainMapper,
+        UriUtility uriUtility,
+        IPublishedValueFallback publishedValueFallback,
         IUmbracoContextAccessor umbracoContextAccessor)
     {
         _requestConfig = requestConfig.CurrentValue;
@@ -33,7 +36,6 @@ public class AliasUrlProvider : IUrlProvider
     // note - at the moment we seem to accept pretty much anything as an alias
     // without any form of validation ... could even prob. kill the XPath ...
     // ok, this is somewhat experimental and is NOT enabled by default
-
     #region GetUrl
 
     /// <inheritdoc />
@@ -47,7 +49,6 @@ public class AliasUrlProvider : IUrlProvider
     /// <summary>
     ///     Gets the other URLs of a published content.
     /// </summary>
-    /// <param name="umbracoContext">The Umbraco context.</param>
     /// <param name="id">The published content id.</param>
     /// <param name="current">The current absolute URL.</param>
     /// <returns>The other URLs for the published content.</returns>
@@ -60,7 +61,7 @@ public class AliasUrlProvider : IUrlProvider
     public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IPublishedContent node = umbracoContext.Content?.GetById(id);
+        IPublishedContent? node = umbracoContext.Content?.GetById(id);
         if (node == null)
         {
             yield break;
@@ -72,17 +73,15 @@ public class AliasUrlProvider : IUrlProvider
         }
 
         // look for domains, walking up the tree
-        IPublishedContent n = node;
-        IEnumerable<DomainAndUri> domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains,
-            _siteDomainMapper, n.Id, current, false);
+        IPublishedContent? n = node;
+        IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
         while (domainUris == null && n != null) // n is null at root
         {
             // move to parent node
             n = n.Parent;
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id,
-                    current, false);
+                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
         }
 
         // determine whether the alias property varies
@@ -130,8 +129,7 @@ public class AliasUrlProvider : IUrlProvider
                 }
 
                 var umbracoUrlName = varies
-                    ? node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias,
-                        domainUri.Culture)
+                    ? node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias, domainUri.Culture)
                     : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
                 var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
@@ -145,7 +143,8 @@ public class AliasUrlProvider : IUrlProvider
                 {
                     var path = "/" + alias;
                     var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                    yield return UrlInfo.Url(_uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
+                    yield return UrlInfo.Url(
+                        _uriUtility.UriFromUmbraco(uri, _requestConfig).ToString(),
                         domainUri.Culture);
                 }
             }

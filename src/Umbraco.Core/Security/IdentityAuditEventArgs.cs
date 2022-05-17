@@ -1,5 +1,21 @@
 namespace Umbraco.Cms.Core.Security;
 
+public enum AuditEvent
+{
+    AccountLocked,
+    AccountUnlocked,
+    ForgotPasswordRequested,
+    ForgotPasswordChangedSuccess,
+    LoginFailed,
+    LoginRequiresVerification,
+    LoginSucces,
+    LogoutSuccess,
+    PasswordChanged,
+    PasswordReset,
+    ResetAccessFailedCount,
+    SendingUserInvite,
+}
+
 /// <summary>
 ///     This class is used by events raised from the BackofficeUserManager
 /// </summary>
@@ -8,13 +24,7 @@ public class IdentityAuditEventArgs : EventArgs
     /// <summary>
     ///     Default constructor
     /// </summary>
-    /// <param name="action"></param>
-    /// <param name="ipAddress"></param>
-    /// <param name="comment"></param>
-    /// <param name="performingUser"></param>
-    /// <param name="affectedUser"></param>
-    public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment,
-        string affectedUser, string affectedUsername)
+    public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment, string affectedUser, string affectedUsername)
     {
         DateTimeUtc = DateTime.UtcNow;
         Action = action;
@@ -25,8 +35,7 @@ public class IdentityAuditEventArgs : EventArgs
         AffectedUser = affectedUser;
     }
 
-    public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment,
-        string affectedUsername)
+    public IdentityAuditEventArgs(AuditEvent action, string ipAddress, string performingUser, string comment, string affectedUsername)
         : this(action, ipAddress, performingUser, comment, Constants.Security.SuperUserIdAsString, affectedUsername)
     {
     }
@@ -65,20 +74,4 @@ public class IdentityAuditEventArgs : EventArgs
     ///     This property is always empty except in the LoginFailed event for an unknown user trying to login
     /// </summary>
     public string AffectedUsername { get; }
-}
-
-public enum AuditEvent
-{
-    AccountLocked,
-    AccountUnlocked,
-    ForgotPasswordRequested,
-    ForgotPasswordChangedSuccess,
-    LoginFailed,
-    LoginRequiresVerification,
-    LoginSucces,
-    LogoutSuccess,
-    PasswordChanged,
-    PasswordReset,
-    ResetAccessFailedCount,
-    SendingUserInvite
 }

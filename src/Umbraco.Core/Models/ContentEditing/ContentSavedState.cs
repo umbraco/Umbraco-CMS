@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
 ///     The saved state of a content item
@@ -23,5 +23,5 @@ public enum ContentSavedState
     /// <summary>
     ///     The item is published and there are pending changes
     /// </summary>
-    PublishedPendingChanges = 4
+    PublishedPendingChanges = 4,
 }

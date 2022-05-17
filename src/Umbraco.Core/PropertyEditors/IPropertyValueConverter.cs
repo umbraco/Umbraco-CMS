@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -73,8 +73,7 @@ public interface IPropertyValueConverter : IDiscoverable
     ///         white spaces.
     ///     </para>
     /// </remarks>
-    object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source,
-        bool preview);
+    object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview);
 
     /// <summary>
     ///     Converts a property intermediate value to an Object value.
@@ -97,8 +96,7 @@ public interface IPropertyValueConverter : IDiscoverable
     ///         the cache levels of property values. It is not meant to be used by the converter.
     ///     </para>
     /// </remarks>
-    object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
     /// <summary>
     ///     Converts a property intermediate value to an XPath value.
@@ -130,6 +128,5 @@ public interface IPropertyValueConverter : IDiscoverable
     ///         the cache levels of property values. It is not meant to be used by the converter.
     ///     </para>
     /// </remarks>
-    object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
+    object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

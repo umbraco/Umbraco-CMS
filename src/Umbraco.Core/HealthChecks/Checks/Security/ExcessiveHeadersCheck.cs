@@ -13,12 +13,11 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 [HealthCheck(
     "92ABBAA2-0586-4089-8AE2-9A843439D577",
     "Excessive Headers",
-    Description =
-        "Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.",
+    Description = "Checks to see if your site is revealing information in its headers that gives away unnecessary details about the technology used to build and host it.",
     Group = "Security")]
 public class ExcessiveHeadersCheck : HealthCheck
 {
-    private static HttpClient? s_httpClient;
+    private static HttpClient? httpClient;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizedTextService _textService;
 
@@ -31,7 +30,7 @@ public class ExcessiveHeadersCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private static HttpClient HttpClient => s_httpClient ??= new HttpClient();
+    private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
     /// <summary>
     ///     Get the status for this health check
@@ -59,11 +58,11 @@ public class ExcessiveHeadersCheck : HealthCheck
 
             IEnumerable<string> allHeaders = response.Headers.Select(x => x.Key);
             var headersToCheckFor =
-                new List<string> {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version"};
+                new List<string> { "Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version" };
 
             // Ignore if server header is present and it's set to cloudflare
             if (allHeaders.InvariantContains("Server") &&
-                response.Headers.TryGetValues("Server", out IEnumerable<string> serverHeaders) &&
+                response.Headers.TryGetValues("Server", out IEnumerable<string>? serverHeaders) &&
                 (serverHeaders.FirstOrDefault()?.InvariantEquals("cloudflare") ?? false))
             {
                 headersToCheckFor.Remove("Server");
@@ -75,12 +74,11 @@ public class ExcessiveHeadersCheck : HealthCheck
             success = headersFound.Any() == false;
             message = success
                 ? _textService.Localize("healthcheck", "excessiveHeadersNotFound")
-                : _textService.Localize("healthcheck", "excessiveHeadersFound",
-                    new[] {string.Join(", ", headersFound)});
+                : _textService.Localize("healthcheck", "excessiveHeadersFound", new[] { string.Join(", ", headersFound) });
         }
         catch (Exception ex)
         {
-            message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] {url, ex.Message});
+            message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url, ex.Message });
         }
 
         return
@@ -89,7 +87,7 @@ public class ExcessiveHeadersCheck : HealthCheck
                 ResultType = success ? StatusResultType.Success : StatusResultType.Warning,
                 ReadMoreLink = success
                     ? null
-                    : Constants.HealthChecks.DocumentationLinks.Security.ExcessiveHeadersCheck
+                    : Constants.HealthChecks.DocumentationLinks.Security.ExcessiveHeadersCheck,
             };
     }
 }

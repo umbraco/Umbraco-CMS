@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     Represents an entity -&gt; user group & permission key value pair collection
@@ -29,7 +29,6 @@ public class EntityPermissionSet
     /// </summary>
     /// <returns></returns>
     public static EntityPermissionSet Empty() => EmptyInstance.Value;
-
 
     /// <summary>
     ///     Returns the aggregate permissions in the permission set

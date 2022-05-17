@@ -61,7 +61,7 @@ public sealed class
 
     public override void Refresh(string json)
     {
-        JsonPayload[] payloads = Deserialize(json);
+        JsonPayload[]? payloads = Deserialize(json);
 
         if (payloads is not null)
         {
@@ -99,7 +99,7 @@ public sealed class
         new[]
         {
             CacheKeys.MacroContentCacheKey, // macro render cache
-            CacheKeys.MacroFromAliasCacheKey // lookup macro by alias
+            CacheKeys.MacroFromAliasCacheKey, // lookup macro by alias
         };
 
     internal static string[] GetCacheKeysForAlias(string alias) =>

@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class LanguageSavingNotification : SavingNotification<ILanguage>
 {
-    public LanguageSavingNotification(ILanguage target, EventMessages messages) : base(target, messages)
+    public LanguageSavingNotification(ILanguage target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public LanguageSavingNotification(IEnumerable<ILanguage> target, EventMessages messages) : base(target, messages)
+    public LanguageSavingNotification(IEnumerable<ILanguage> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

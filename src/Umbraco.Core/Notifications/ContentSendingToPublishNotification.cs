@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentSendingToPublishNotification : CancelableObjectNotification<IContent>
 {
-    public ContentSendingToPublishNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentSendingToPublishNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

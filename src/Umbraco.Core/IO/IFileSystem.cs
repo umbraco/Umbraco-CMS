@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.IO;
+namespace Umbraco.Cms.Core.IO;
 
 /// <summary>
 ///     Provides methods allowing the manipulation of files.
@@ -170,8 +170,8 @@ public interface IFileSystem
 
     // TODO: implement these
     //
-    //void CreateDirectory(string path);
+    // void CreateDirectory(string path);
     //
     //// move or rename, directory or file
-    //void Move(string source, string target);
+    // void Move(string source, string target);
 }

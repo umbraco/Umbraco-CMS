@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
@@ -31,7 +31,7 @@ public class DocumentTypeSave : ContentTypeSave<PropertyTypeBasic>
     {
         if (AllowedTemplates?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
         {
-            yield return new ValidationResult("Template value cannot be null", new[] {"AllowedTemplates"});
+            yield return new ValidationResult("Template value cannot be null", new[] { "AllowedTemplates" });
         }
 
         foreach (ValidationResult v in base.Validate(validationContext))

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -8,9 +8,11 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 public interface IMacroProperty : IValueObject, IDeepCloneable, IRememberBeingDirty
 {
-    [DataMember] int Id { get; set; }
+    [DataMember]
+    int Id { get; set; }
 
-    [DataMember] Guid Key { get; set; }
+    [DataMember]
+    Guid Key { get; set; }
 
     /// <summary>
     ///     Gets or sets the Alias of the Property

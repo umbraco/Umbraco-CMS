@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Trees;
@@ -19,9 +19,11 @@ namespace Umbraco.Cms.Core.Models.Trees;
 /// </remarks>
 public abstract class ActionMenuItem : MenuItem
 {
-    protected ActionMenuItem(string alias, string name) : base(alias, name) => Initialize();
+    protected ActionMenuItem(string alias, string name)
+        : base(alias, name) => Initialize();
 
-    protected ActionMenuItem(string alias, ILocalizedTextService textService) : base(alias, textService) =>
+    protected ActionMenuItem(string alias, ILocalizedTextService textService)
+        : base(alias, textService) =>
         Initialize();
 
     /// <summary>
@@ -36,10 +38,10 @@ public abstract class ActionMenuItem : MenuItem
 
     private void Initialize()
     {
-        //add the current type to the metadata
+        // add the current type to the metadata
         if (AngularServiceMethodName.IsNullOrWhiteSpace())
         {
-            //if no method name is supplied we will assume that the menu action is the type name of the current menu class
+            // if no method name is supplied we will assume that the menu action is the type name of the current menu class
             ExecuteJsMethod($"{AngularServiceName}.{GetType().Name}");
         }
         else

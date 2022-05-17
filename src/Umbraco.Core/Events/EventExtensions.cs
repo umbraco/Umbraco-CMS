@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     Extension methods for cancellable event operations
@@ -18,8 +18,7 @@ public static class EventExtensions
     /// <param name="sender">The event data.</param>
     /// <returns>A value indicating whether the cancelable event should be cancelled</returns>
     /// <remarks>A cancelable event is raised by a component when it is about to perform an action that can be canceled.</remarks>
-    public static bool IsRaisedEventCancelled<TSender, TArgs>(this TypedEventHandler<TSender, TArgs> eventHandler,
-        TArgs args, TSender sender)
+    public static bool IsRaisedEventCancelled<TSender, TArgs>(this TypedEventHandler<TSender, TArgs> eventHandler, TArgs args, TSender sender)
         where TArgs : CancellableEventArgs
     {
         if (eventHandler == null)
@@ -39,8 +38,7 @@ public static class EventExtensions
     /// <param name="eventHandler">The event handler.</param>
     /// <param name="args">The event source.</param>
     /// <param name="sender">The event data.</param>
-    public static void RaiseEvent<TSender, TArgs>(this TypedEventHandler<TSender, TArgs> eventHandler, TArgs args,
-        TSender sender)
+    public static void RaiseEvent<TSender, TArgs>(this TypedEventHandler<TSender, TArgs> eventHandler, TArgs args, TSender sender)
         where TArgs : EventArgs
     {
         if (eventHandler == null)

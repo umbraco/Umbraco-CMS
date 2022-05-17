@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Editors;
 
@@ -43,14 +43,16 @@ public class ContentItemSave : IContentSave<IContent>
     [Required]
     public ContentSaveAction Action { get; set; }
 
-    [IgnoreDataMember] public List<ContentPropertyFile> UploadedFiles { get; }
+    [IgnoreDataMember]
+    public List<ContentPropertyFile> UploadedFiles { get; }
 
-    //These need explicit implementation because we are using internal models
+    // These need explicit implementation because we are using internal models
+
     /// <inheritdoc />
     [IgnoreDataMember]
     IContent IContentSave<IContent>.PersistedContent { get; set; } = null!;
 
-    //Non explicit internal getter so we don't need to explicitly cast in our own code
+    // Non explicit internal getter so we don't need to explicitly cast in our own code
     [IgnoreDataMember]
     public IContent PersistedContent
     {

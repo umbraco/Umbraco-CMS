@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Extensions;
@@ -12,7 +12,8 @@ public static class IfExtensions
     /// <param name="item">The item.</param>
     /// <param name="action">The action.</param>
     /// <typeparam name="TItem">The type</typeparam>
-    public static void IfNotNull<TItem>(this TItem item, Action<TItem> action) where TItem : class
+    public static void IfNotNull<TItem>(this TItem item, Action<TItem> action)
+        where TItem : class
     {
         if (item != null)
         {
@@ -40,8 +41,7 @@ public static class IfExtensions
     /// <param name="action">The action.</param>
     /// <param name="defaultValue">The default value.</param>
     /// <returns></returns>
-    public static TResult? IfNotNull<TResult, TItem>(this TItem? item, Func<TItem, TResult> action,
-        TResult? defaultValue = default)
+    public static TResult? IfNotNull<TResult, TItem>(this TItem? item, Func<TItem, TResult> action, TResult? defaultValue = default)
         where TItem : class
         => item != null ? action(item) : defaultValue;
 

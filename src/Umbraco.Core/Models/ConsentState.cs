@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Represents the state of a consent.
@@ -8,8 +8,8 @@ public enum ConsentState // : int
 {
     // note - this is a [Flags] enumeration
     // on can create detailed flags such as:
-    //GrantedOptIn = Granted | 0x0001
-    //GrandedByForce = Granted | 0x0002
+    // GrantedOptIn = Granted | 0x0001
+    // GrandedByForce = Granted | 0x0002
     //
     // 16 situations for each Pending/Granted/Revoked should be ok
 
@@ -31,5 +31,5 @@ public enum ConsentState // : int
     /// <summary>
     ///     Consent has been revoked.
     /// </summary>
-    Revoked = 0x40000
+    Revoked = 0x40000,
 }

@@ -16,7 +16,6 @@ public sealed class DelimitedValueValidator : IManifestValueValidator
     /// <inheritdoc />
     public string ValidationName => "Delimited";
 
-
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
     {
@@ -24,14 +23,15 @@ public sealed class DelimitedValueValidator : IManifestValueValidator
         if (value != null)
         {
             var delimiter = Configuration?.Delimiter ?? ",";
-            Regex regex = Configuration?.Pattern != null ? new Regex(Configuration.Pattern) : null;
+            Regex? regex = Configuration?.Pattern != null ? new Regex(Configuration.Pattern) : null;
 
             var stringVal = value.ToString();
-            var split = stringVal!.Split(new[] {delimiter}, StringSplitOptions.RemoveEmptyEntries);
+            var split = stringVal!.Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < split.Length; i++)
             {
                 var s = split[i];
-                //next if we have a regex statement validate with that
+
+                // next if we have a regex statement validate with that
                 if (regex != null)
                 {
                     if (regex.IsMatch(s) == false)
@@ -40,8 +40,8 @@ public sealed class DelimitedValueValidator : IManifestValueValidator
                             "The item at index " + i + " did not match the expression " + regex,
                             new[]
                             {
-                                //make the field name called 'value0' where 0 is the index
-                                "value" + i
+                                // make the field name called 'value0' where 0 is the index
+                                "value" + i,
                             });
                     }
                 }
@@ -53,5 +53,6 @@ public sealed class DelimitedValueValidator : IManifestValueValidator
 public class DelimitedValueValidatorConfig
 {
     public string? Delimiter { get; set; }
+
     public string? Pattern { get; set; }
 }

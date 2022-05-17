@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -11,7 +11,9 @@ public class DomainService : RepositoryService, IDomainService
 {
     private readonly IDomainRepository _domainRepository;
 
-    public DomainService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    public DomainService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IDomainRepository domainRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>

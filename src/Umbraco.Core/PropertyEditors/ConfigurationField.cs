@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class ConfigurationField
 {
-    private string? _view;
+    private readonly string? _view;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigurationField" /> class.
@@ -36,7 +36,7 @@ public class ConfigurationField
         Config = new Dictionary<string, object>();
 
         // fill details from attribute, if any
-        ConfigurationFieldAttribute attribute = GetType().GetCustomAttribute<ConfigurationFieldAttribute>(false);
+        ConfigurationFieldAttribute? attribute = GetType().GetCustomAttribute<ConfigurationFieldAttribute>(false);
         if (attribute is null)
         {
             return;

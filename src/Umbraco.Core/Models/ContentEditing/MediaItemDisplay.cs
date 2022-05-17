@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -10,9 +10,12 @@ public class MediaItemDisplay : ListViewAwareContentItemDisplayBase<ContentPrope
 {
     public MediaItemDisplay() => ContentApps = new List<ContentApp>();
 
-    [DataMember(Name = "contentType")] public ContentTypeBasic? ContentType { get; set; }
+    [DataMember(Name = "contentType")]
+    public ContentTypeBasic? ContentType { get; set; }
 
-    [DataMember(Name = "mediaLink")] public string? MediaLink { get; set; }
+    [DataMember(Name = "mediaLink")]
+    public string? MediaLink { get; set; }
 
-    [DataMember(Name = "apps")] public IEnumerable<ContentApp> ContentApps { get; set; }
+    [DataMember(Name = "apps")]
+    public IEnumerable<ContentApp> ContentApps { get; set; }
 }

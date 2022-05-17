@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -32,8 +32,7 @@ public class ContentPickerPropertyEditor : DataEditor
     public ContentPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 
@@ -74,7 +73,7 @@ public class ContentPickerPropertyEditor : DataEditor
                 yield break;
             }
 
-            if (UdiParser.TryParse(asString, out Udi udi))
+            if (UdiParser.TryParse(asString, out Udi? udi))
             {
                 yield return new UmbracoEntityReference(udi);
             }

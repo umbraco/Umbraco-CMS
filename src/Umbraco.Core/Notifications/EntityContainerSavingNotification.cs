@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class EntityContainerSavingNotification : SavingNotification<EntityContainer>
 {
-    public EntityContainerSavingNotification(EntityContainer target, EventMessages messages) : base(target, messages)
+    public EntityContainerSavingNotification(EntityContainer target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

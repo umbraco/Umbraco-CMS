@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -26,17 +26,18 @@ public class LabelPropertyEditor : DataEditor
 
     // Scheduled for removal in v12
     [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public LabelPropertyEditor(IDataValueEditorFactory dataValueEditorFactory,
+    public LabelPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : this(dataValueEditorFactory, ioHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        : this(dataValueEditorFactory, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="LabelPropertyEditor" /> class.
     /// </summary>
-    public LabelPropertyEditor(IDataValueEditorFactory dataValueEditorFactory,
+    public LabelPropertyEditor(
+        IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
         IEditorConfigurationParser editorConfigurationParser)
         : base(dataValueEditorFactory)

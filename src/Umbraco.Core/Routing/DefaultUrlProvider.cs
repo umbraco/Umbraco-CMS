@@ -25,10 +25,18 @@ public class DefaultUrlProvider : IUrlProvider
     private RequestHandlerSettings _requestSettings;
 
     [Obsolete("Use ctor with all parameters")]
-    public DefaultUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestSettings,
+    public DefaultUrlProvider(
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
         ILogger<DefaultUrlProvider> logger,
-        ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
-        : this(requestSettings, logger, siteDomainMapper, umbracoContextAccessor, uriUtility,
+        ISiteDomainMapper siteDomainMapper,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        UriUtility uriUtility)
+        : this(
+            requestSettings,
+            logger,
+            siteDomainMapper,
+            umbracoContextAccessor,
+            uriUtility,
             StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
     {
     }
@@ -78,15 +86,15 @@ public class DefaultUrlProvider : IUrlProvider
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris =
-            DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id,
-                current, false);
-        while (domainUris == null && n != null) // n is null at root
+            DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
+
+        // n is null at root
+        while (domainUris == null && n != null)
         {
             n = n.Parent; // move to parent node
             domainUris = n == null
                 ? null
-                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id,
-                    current);
+                : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current);
         }
 
         // no domains = exit
@@ -108,7 +116,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
             var pos = route.IndexOf('/');
-            var path = pos == 0 ? route : route.Substring(pos);
+            var path = pos == 0 ? route : route[pos..];
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);
@@ -129,6 +137,7 @@ public class DefaultUrlProvider : IUrlProvider
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+
         // will not use cache if previewing
         var route = umbracoContext.Content?.GetRouteById(content.Id, culture);
 
@@ -154,11 +163,15 @@ public class DefaultUrlProvider : IUrlProvider
         // extract domainUri and path
         // route is /<path> or <domainRootId>/<path>
         var pos = route.IndexOf('/');
-        var path = pos == 0 ? route : route.Substring(pos);
+        var path = pos == 0 ? route : route[pos..];
         DomainAndUri? domainUri = pos == 0
             ? null
-            : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper,
-                int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current, culture);
+            : DomainUtilities.DomainForNode(
+                umbracoContext.PublishedSnapshot.Domains,
+                _siteDomainMapper,
+                int.Parse(route[..pos], CultureInfo.InvariantCulture),
+                current,
+                culture);
 
         var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
         if (domainUri is not null || string.IsNullOrEmpty(culture) ||
@@ -180,7 +193,6 @@ public class DefaultUrlProvider : IUrlProvider
         Uri uri;
 
         // ignore vdir at that point, UriFromUmbraco will do it
-
         if (domainUri == null) // no domain was found
         {
             if (current == null)
@@ -205,7 +217,7 @@ public class DefaultUrlProvider : IUrlProvider
         {
             if (mode == UrlMode.Auto)
             {
-                //this check is a little tricky, we can't just compare domains
+                // this check is a little tricky, we can't just compare domains
                 if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) ==
                     current.GetLeftPart(UriPartial.Authority))
                 {

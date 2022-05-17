@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models;
@@ -275,8 +275,7 @@ public static class ContentVariationExtensions
     /// <remarks>
     ///     This method does not support setting the variation to nothing.
     /// </remarks>
-    public static ContentVariation SetFlag(this ContentVariation variations, ContentVariation variation,
-        bool value = true) =>
+    public static ContentVariation SetFlag(this ContentVariation variations, ContentVariation variation, bool value = true) =>
         value
             ? variations | variation // Set flag using bitwise logical OR
             : variations &
@@ -315,8 +314,7 @@ public static class ContentVariationExtensions
     ///     </para>
     ///     <para>Both <paramref name="culture" /> and <paramref name="segment" /> can be "*" to indicate "all of them".</para>
     /// </remarks>
-    public static bool ValidateVariation(this ContentVariation variation, string? culture, string? segment, bool exact,
-        bool wildcards, bool throwIfInvalid)
+    public static bool ValidateVariation(this ContentVariation variation, string? culture, string? segment, bool exact, bool wildcards, bool throwIfInvalid)
     {
         culture = culture?.NullOrWhiteSpaceAsNull();
         segment = segment?.NullOrWhiteSpaceAsNull();

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Runtime;
+namespace Umbraco.Cms.Core.Runtime;
 
 /// <summary>
 ///     An application-wide distributed lock

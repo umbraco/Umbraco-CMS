@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Models;
 public class ContentTypeSort : IValueObject, IDeepCloneable
 {
     // this parameterless ctor should never be used BUT is required by AutoMapper in EntityMapperProfile
-    public ContentTypeSort() { }
+    public ContentTypeSort()
+    {
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
@@ -41,7 +43,6 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
     /// </summary>
     public string Alias { get; set; } = string.Empty;
 
-
     public object DeepClone()
     {
         var clone = (ContentTypeSort)MemberwiseClone();
@@ -49,9 +50,6 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         clone.Id = new Lazy<int>(() => id);
         return clone;
     }
-
-    protected bool Equals(ContentTypeSort other) =>
-        Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
 
     public override bool Equals(object? obj)
     {
@@ -73,12 +71,15 @@ public class ContentTypeSort : IValueObject, IDeepCloneable
         return Equals((ContentTypeSort)obj);
     }
 
+    protected bool Equals(ContentTypeSort other) =>
+        Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+
     public override int GetHashCode()
     {
         unchecked
         {
-            //The hash code will just be the alias if one is assigned, otherwise it will be the hash code of the Id.
-            //In some cases the alias can be null of the non lazy ctor is used, in that case, the lazy Id will already have a value created.
+            // The hash code will just be the alias if one is assigned, otherwise it will be the hash code of the Id.
+            // In some cases the alias can be null of the non lazy ctor is used, in that case, the lazy Id will already have a value created.
             return Alias != null ? Alias.GetHashCode() : Id.Value.GetHashCode() * 397;
         }
     }

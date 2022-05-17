@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
@@ -16,8 +16,7 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -28,7 +27,6 @@ public class DatePickerValueConverter : PropertyValueConverterBase
         // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
         // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
         // We should just be using TryConvertTo instead.
-
         if (source is string sourceString)
         {
             Attempt<DateTime> attempt = sourceString.TryConvertTo<DateTime>();
@@ -41,9 +39,12 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     }
 
     // default ConvertSourceToObject just returns source ie a DateTime value
-
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToXPath(
+        IPublishedElement owner,
+        IPublishedPropertyType propertyType,
+        PropertyCacheLevel referenceCacheLevel,
+        object? inter,
+        bool preview)
     {
         // source should come from ConvertSource and be a DateTime already
         if (inter is null)

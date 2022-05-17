@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Validation;
 
@@ -45,9 +45,11 @@ public class ContentVariantSave : IContentProperties<ContentPropertyBasic>
     [DataMember(Name = "publish")]
     public bool Publish { get; set; }
 
-    [DataMember(Name = "expireDate")] public DateTime? ExpireDate { get; set; }
+    [DataMember(Name = "expireDate")]
+    public DateTime? ExpireDate { get; set; }
 
-    [DataMember(Name = "releaseDate")] public DateTime? ReleaseDate { get; set; }
+    [DataMember(Name = "releaseDate")]
+    public DateTime? ReleaseDate { get; set; }
 
     /// <summary>
     ///     The property DTO object is used to gather all required property data including data type information etc... for use
@@ -62,5 +64,6 @@ public class ContentVariantSave : IContentProperties<ContentPropertyBasic>
     [IgnoreDataMember]
     public ContentPropertyCollectionDto? PropertyCollectionDto { get; set; }
 
-    [DataMember(Name = "properties")] public IEnumerable<ContentPropertyBasic> Properties { get; set; }
+    [DataMember(Name = "properties")]
+    public IEnumerable<ContentPropertyBasic> Properties { get; set; }
 }

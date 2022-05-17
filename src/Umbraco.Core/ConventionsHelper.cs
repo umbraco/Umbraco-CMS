@@ -9,12 +9,14 @@ public static class ConventionsHelper
         new()
         {
             {
-                Constants.Conventions.Member.Comments, new PropertyType(
+                Constants.Conventions.Member.Comments,
+                new PropertyType(
                     shortStringHelper,
                     Constants.PropertyEditors.Aliases.TextArea,
                     ValueStorageType.Ntext,
                     true,
-                    Constants.Conventions.Member.Comments) {Name = Constants.Conventions.Member.CommentsLabel}
-            }
+                    Constants.Conventions.Member.Comments)
+                { Name = Constants.Conventions.Member.CommentsLabel }
+            },
         };
 }

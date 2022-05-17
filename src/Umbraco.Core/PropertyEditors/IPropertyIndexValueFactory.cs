@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -22,6 +22,5 @@ public interface IPropertyIndexValueFactory
     ///         more than one value for a given field.
     ///     </para>
     /// </remarks>
-    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture,
-        string? segment, bool published);
+    IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published);
 }

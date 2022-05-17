@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 /// <summary>
 ///     Provides utility methods for handling enumerations.
@@ -60,7 +60,8 @@ public static class Enum<T>
             return parsed;
         }
 
-        throw new ArgumentException($"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.",
+        throw new ArgumentException(
+            $"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.",
             nameof(value));
     }
 

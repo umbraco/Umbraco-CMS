@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Logging;
+namespace Umbraco.Cms.Core.Logging;
 
 /// <summary>
 ///     Defines the profiling service.

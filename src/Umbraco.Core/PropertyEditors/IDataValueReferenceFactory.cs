@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 public interface IDataValueReferenceFactory
 {

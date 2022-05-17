@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     Represents event data, for events that support cancellation, and expose impacted objects.
@@ -7,14 +7,12 @@
 public class CancellableEnumerableObjectEventArgs<TEventObject> : CancellableObjectEventArgs<IEnumerable<TEventObject>>,
     IEquatable<CancellableEnumerableObjectEventArgs<TEventObject>>
 {
-    public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel,
-        EventMessages messages, IDictionary<string, object> additionalData)
+    public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
         : base(eventObject, canCancel, messages, additionalData)
     {
     }
 
-    public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel,
-        EventMessages eventMessages)
+    public CancellableEnumerableObjectEventArgs(IEnumerable<TEventObject> eventObject, bool canCancel, EventMessages eventMessages)
         : base(eventObject, canCancel, eventMessages)
     {
     }

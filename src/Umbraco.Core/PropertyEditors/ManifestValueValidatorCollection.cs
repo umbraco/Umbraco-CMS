@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class ManifestValueValidatorCollection : BuilderCollectionBase<IManifestValueValidator>
 {
-    public ManifestValueValidatorCollection(Func<IEnumerable<IManifestValueValidator>> items) : base(items)
+    public ManifestValueValidatorCollection(Func<IEnumerable<IManifestValueValidator>> items)
+        : base(items)
     {
     }
 
@@ -20,7 +21,7 @@ public class ManifestValueValidatorCollection : BuilderCollectionBase<IManifestV
 
     public IManifestValueValidator GetByName(string name)
     {
-        IManifestValueValidator v = this.FirstOrDefault(x => x.ValidationName.InvariantEquals(name));
+        IManifestValueValidator? v = this.FirstOrDefault(x => x.ValidationName.InvariantEquals(name));
         if (v == null)
         {
             throw new InvalidOperationException($"Could not find a validator named \"{name}\".");

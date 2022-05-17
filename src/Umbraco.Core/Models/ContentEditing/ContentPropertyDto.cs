@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 /// <summary>
 ///     Represents a content property from the database

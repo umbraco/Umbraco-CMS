@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents the format of the <see cref="ImageFile" />.
@@ -23,5 +23,5 @@ internal enum ImageFileFormat
     /// <summary>
     ///     The file is a SVG File.
     /// </summary>
-    SVG
+    SVG,
 }

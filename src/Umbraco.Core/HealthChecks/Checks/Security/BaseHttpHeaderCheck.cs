@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 /// </summary>
 public abstract class BaseHttpHeaderCheck : HealthCheck
 {
-    private static HttpClient? s_httpClient;
+    private static HttpClient? httpClient;
     private readonly string _header;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly string _localizedTextPrefix;
@@ -26,7 +26,8 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         string header,
         string value,
         string localizedTextPrefix,
-        bool metaTagOptionAvailable) : this(hostingEnvironment, textService, header, localizedTextPrefix,
+        bool metaTagOptionAvailable)
+        : this(hostingEnvironment, textService, header, localizedTextPrefix,
         metaTagOptionAvailable)
     {
     }
@@ -51,12 +52,12 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
     [Obsolete("Save ILocalizedTextService in a field on the super class instead of using this")]
     protected ILocalizedTextService LocalizedTextService { get; }
 
-    private static HttpClient HttpClient => s_httpClient ??= new HttpClient();
-
     /// <summary>
     ///     Gets a link to an external read more page.
     /// </summary>
     protected abstract string ReadMoreLink { get; }
+
+    private static HttpClient HttpClient => httpClient ??= new HttpClient();
 
     /// <summary>
     ///     Get the status for this health check
@@ -101,15 +102,23 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         }
         catch (Exception ex)
         {
-            message = LocalizedTextService.Localize("healthcheck", "healthCheckInvalidUrl", new[] {url, ex.Message});
+            message = LocalizedTextService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url, ex.Message });
         }
 
         return
             new HealthCheckStatus(message)
             {
                 ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                ReadMoreLink = success ? null : ReadMoreLink
+                ReadMoreLink = success ? null : ReadMoreLink,
             };
+    }
+
+    private static Dictionary<string, string> ParseMetaTags(string html)
+    {
+        var regex = new Regex("<meta http-equiv=\"(.+?)\" content=\"(.+?)\"", RegexOptions.IgnoreCase);
+
+        return regex.Matches(html)
+            .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
     }
 
     private bool HasMatchingHeader(IEnumerable<string> headerKeys)
@@ -131,13 +140,5 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
                 return HasMatchingHeader(metaTags.Keys);
             }
         }
-    }
-
-    private static Dictionary<string, string> ParseMetaTags(string html)
-    {
-        var regex = new Regex("<meta http-equiv=\"(.+?)\" content=\"(.+?)\"", RegexOptions.IgnoreCase);
-
-        return regex.Matches(html)
-            .ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
     }
 }

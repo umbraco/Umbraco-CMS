@@ -21,7 +21,7 @@ public class ContentTypeDesignContentAppFactory : IContentAppFactory
                     Name = "Design",
                     Icon = "icon-document-dashed-line",
                     View = "views/documentTypes/views/design/design.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             default:
                 return null;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Entities;
+namespace Umbraco.Cms.Core.Models.Entities;
 
 /// <summary>
 ///     Represents a lightweight content entity, managed by the entity service.

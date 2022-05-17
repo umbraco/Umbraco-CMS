@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -20,17 +20,16 @@ public class MediaPicker3ConfigurationEditor : ConfigurationEditor<MediaPicker3C
     /// <summary>
     ///     Initializes a new instance of the <see cref="MediaPicker3ConfigurationEditor" /> class.
     /// </summary>
-    public MediaPicker3ConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser)
+    public MediaPicker3ConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
         // configure fields
         // this is not part of ContentPickerConfiguration,
         // but is required to configure the UI editor (when editing the configuration)
-
         Field(nameof(MediaPicker3Configuration.StartNodeId))
-            .Config = new Dictionary<string, object> {{"idType", "udi"}};
+            .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
         Field(nameof(MediaPicker3Configuration.Filter))
-            .Config = new Dictionary<string, object> {{"itemType", "media"}};
+            .Config = new Dictionary<string, object> { { "itemType", "media" } };
     }
 }

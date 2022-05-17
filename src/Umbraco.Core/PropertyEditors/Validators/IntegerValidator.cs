@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -19,7 +19,7 @@ public sealed class IntegerValidator : IManifestValueValidator
             Attempt<int> result = value.TryConvertTo<int>();
             if (result.Success == false)
             {
-                yield return new ValidationResult("The value " + value + " is not a valid integer", new[] {"value"});
+                yield return new ValidationResult("The value " + value + " is not a valid integer", new[] { "value" });
             }
         }
     }

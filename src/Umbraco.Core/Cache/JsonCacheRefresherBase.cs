@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Core.Cache;
 /// <summary>
 ///     A base class for "json" cache refreshers.
 /// </summary>
-/// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
 /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
 public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : CacheRefresherBase<TNotification>,
     IJsonCacheRefresher
@@ -17,7 +16,6 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
     /// <summary>
     ///     Initializes a new instance of the <see cref="JsonCacheRefresherBase{TInstanceType}" />.
     /// </summary>
-    /// <param name="appCaches">A cache helper.</param>
     protected JsonCacheRefresherBase(
         AppCaches appCaches,
         IJsonSerializer jsonSerializer,
@@ -43,7 +41,6 @@ public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : Cach
     /// <param name="json">The json payload.</param>
     /// <returns>The deserialized object payload.</returns>
     public TJsonPayload[]? Deserialize(string json) => JsonSerializer.Deserialize<TJsonPayload[]>(json);
-
 
     public string Serialize(params TJsonPayload[] jsonPayloads) => JsonSerializer.Serialize(jsonPayloads);
 

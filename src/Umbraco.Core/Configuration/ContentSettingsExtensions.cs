@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Extensions;
 

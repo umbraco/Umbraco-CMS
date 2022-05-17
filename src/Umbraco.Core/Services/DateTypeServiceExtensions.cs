@@ -10,10 +10,10 @@ public static class DateTypeServiceExtensions
     {
         if (DataTypeExtensions.IsBuildInDataType(key))
         {
-            return false; //built in ones can never be ignoring start nodes
+            return false; // built in ones can never be ignoring start nodes
         }
 
-        IDataType dataType = dataTypeService.GetDataType(key);
+        IDataType? dataType = dataTypeService.GetDataType(key);
 
         if (dataType != null && dataType.Configuration is IIgnoreUserStartNodesConfig ignoreStartNodesConfig)
         {

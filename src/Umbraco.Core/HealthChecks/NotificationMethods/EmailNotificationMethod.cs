@@ -58,19 +58,20 @@ public class EmailNotificationMethod : NotificationMethodBase
             return;
         }
 
-        var message = _textService?.Localize("healthcheck", "scheduledHealthCheckEmailBody",
+        var message = _textService?.Localize(
+            "healthcheck",
+            "scheduledHealthCheckEmailBody",
             new[]
             {
                 DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(),
-                _markdownToHtmlConverter?.ToHtml(results, Verbosity)
+                _markdownToHtmlConverter?.ToHtml(results, Verbosity),
             });
 
         // Include the umbraco Application URL host in the message subject so that
         // you can identify the site that these results are for.
         var host = _hostingEnvironment?.ApplicationMainUrl?.ToString();
 
-        var subject = _textService?.Localize("healthcheck", "scheduledHealthCheckEmailSubject", new[] {host});
-
+        var subject = _textService?.Localize("healthcheck", "scheduledHealthCheckEmailSubject", new[] { host });
 
         EmailMessage mailMessage = CreateMailMessage(subject, message);
         Task? task = _emailSender?.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck);

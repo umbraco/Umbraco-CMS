@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Defines scheduled actions for documents.
@@ -13,5 +13,5 @@ public enum ContentScheduleAction
     /// <summary>
     ///     Expire the document.
     /// </summary>
-    Expire
+    Expire,
 }

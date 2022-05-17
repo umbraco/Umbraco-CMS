@@ -42,12 +42,12 @@ public interface IMacroService : IService
     ///// Gets a list all available <see cref="IMacroPropertyType"/> plugins
     ///// </summary>
     ///// <returns>An enumerable list of <see cref="IMacroPropertyType"/> objects</returns>
-    //IEnumerable<IMacroPropertyType> GetMacroPropertyTypes();
+    // IEnumerable<IMacroPropertyType> GetMacroPropertyTypes();
 
     ///// <summary>
     ///// Gets an <see cref="IMacroPropertyType"/> by its alias
     ///// </summary>
     ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
     ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
-    //IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
+    // IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
 }

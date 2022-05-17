@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core;
 
@@ -24,8 +24,7 @@ public class GuidUdi : Udi
     public GuidUdi(Uri uriValue)
         : base(uriValue)
     {
-        Guid guid;
-        if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out guid) == false)
+        if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out Guid guid) == false)
         {
             throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
         }
@@ -43,8 +42,7 @@ public class GuidUdi : Udi
 
     public override bool Equals(object? obj)
     {
-        var other = obj as GuidUdi;
-        if (other is null)
+        if (obj is not GuidUdi other)
         {
             return false;
         }

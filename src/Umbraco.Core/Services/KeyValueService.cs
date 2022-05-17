@@ -40,10 +40,10 @@ internal class KeyValueService : IKeyValueService
         {
             scope.WriteLock(Constants.Locks.KeyValues);
 
-            IKeyValue keyValue = _repository.Get(key);
+            IKeyValue? keyValue = _repository.Get(key);
             if (keyValue == null)
             {
-                keyValue = new KeyValue {Identifier = key, Value = value, UpdateDate = DateTime.Now};
+                keyValue = new KeyValue { Identifier = key, Value = value, UpdateDate = DateTime.Now };
             }
             else
             {
@@ -73,7 +73,7 @@ internal class KeyValueService : IKeyValueService
         {
             scope.WriteLock(Constants.Locks.KeyValues);
 
-            IKeyValue keyValue = _repository.Get(key);
+            IKeyValue? keyValue = _repository.Get(key);
             if (keyValue == null || keyValue.Value != originalValue)
             {
                 return false;

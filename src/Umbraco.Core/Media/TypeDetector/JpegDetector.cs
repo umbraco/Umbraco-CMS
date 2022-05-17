@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.TypeDetector;
+namespace Umbraco.Cms.Core.Media.TypeDetector;
 
 public class JpegDetector : RasterizedTypeDetector
 {

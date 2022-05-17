@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -11,11 +11,15 @@ public class DomainDisplay
         Lang = lang;
     }
 
-    [DataMember(Name = "name")] public string Name { get; }
+    [DataMember(Name = "name")]
+    public string Name { get; }
 
-    [DataMember(Name = "lang")] public int Lang { get; }
+    [DataMember(Name = "lang")]
+    public int Lang { get; }
 
-    [DataMember(Name = "duplicate")] public bool Duplicate { get; set; }
+    [DataMember(Name = "duplicate")]
+    public bool Duplicate { get; set; }
 
-    [DataMember(Name = "other")] public string? Other { get; set; }
+    [DataMember(Name = "other")]
+    public string? Other { get; set; }
 }

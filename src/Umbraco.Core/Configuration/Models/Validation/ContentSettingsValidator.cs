@@ -27,7 +27,8 @@ public class ContentSettingsValidator : ConfigurationValidatorBase, IValidateOpt
     }
 
     private bool ValidateError404Collection(IEnumerable<ContentErrorPage> values, out string message) =>
-        ValidateCollection($"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.Error404Collection)}",
+        ValidateCollection(
+            $"{Constants.Configuration.ConfigContent}:{nameof(ContentSettings.Error404Collection)}",
             values,
             "Culture and one and only one of ContentId, ContentKey and ContentXPath must be specified for each entry",
             out message);

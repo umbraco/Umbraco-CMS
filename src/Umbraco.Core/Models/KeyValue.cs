@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 [Serializable]
 [DataContract(IsReference = true)]
-public class KeyValue : EntityBase, IKeyValue, IEntity
+public class KeyValue : EntityBase, IKeyValue
 {
     private string _identifier = null!;
     private string? _value;

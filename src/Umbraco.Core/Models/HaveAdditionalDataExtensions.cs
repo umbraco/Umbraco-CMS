@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Entities;
@@ -10,8 +10,7 @@ public static class HaveAdditionalDataExtensions
     /// <summary>
     ///     Gets additional data.
     /// </summary>
-    public static object? GetAdditionalDataValueIgnoreCase(this IHaveAdditionalData entity, string key,
-        object? defaultValue)
+    public static object? GetAdditionalDataValueIgnoreCase(this IHaveAdditionalData entity, string key, object? defaultValue)
     {
         if (!entity.HasAdditionalData)
         {

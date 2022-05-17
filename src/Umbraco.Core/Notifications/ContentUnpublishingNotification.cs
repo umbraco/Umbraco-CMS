@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentUnpublishingNotification : CancelableEnumerableObjectNotification<IContent>
 {
-    public ContentUnpublishingNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentUnpublishingNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ContentUnpublishingNotification(IEnumerable<IContent> target, EventMessages messages) : base(target,
+    public ContentUnpublishingNotification(IEnumerable<IContent> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

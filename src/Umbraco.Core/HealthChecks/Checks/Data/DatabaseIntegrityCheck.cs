@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text;
@@ -39,39 +39,20 @@ public class DatabaseIntegrityCheck : HealthCheck
     ///     Get the status for this health check
     /// </summary>
     public override Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
-        Task.FromResult((IEnumerable<HealthCheckStatus>)new[] {CheckDocuments(false), CheckMedia(false)});
+        Task.FromResult((IEnumerable<HealthCheckStatus>)new[] { CheckDocuments(false), CheckMedia(false) });
 
-    private HealthCheckStatus CheckMedia(bool fix) =>
-        CheckPaths(
-            SSsFixMediaPaths,
-            SFixMediaPathsTitle,
-            Constants.UdiEntityType.Media,
-            fix,
-            () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions {FixIssues = fix}));
-
-    private HealthCheckStatus CheckDocuments(bool fix) =>
-        CheckPaths(
-            SFixContentPaths,
-            SFixContentPathsTitle,
-            Constants.UdiEntityType.Document,
-            fix,
-            () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions {FixIssues = fix}));
-
-    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport,
-        Func<ContentDataIntegrityReport> doCheck)
+    /// <inheritdoc />
+    public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
     {
-        ContentDataIntegrityReport report = doCheck();
-
-        var actions = new List<HealthCheckAction>();
-        if (!report.Ok)
+        switch (action.Alias)
         {
-            actions.Add(new HealthCheckAction(actionAlias, Id) {Name = actionName});
+            case SFixContentPaths:
+                return CheckDocuments(true);
+            case SSsFixMediaPaths:
+                return CheckMedia(true);
+            default:
+                throw new InvalidOperationException("Action not supported");
         }
-
-        return new HealthCheckStatus(GetReport(report, entityType, detailedReport))
-        {
-            ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error, Actions = actions
-        };
     }
 
     private static string GetReport(ContentDataIntegrityReport report, string entityType, bool detailed)
@@ -111,17 +92,37 @@ public class DatabaseIntegrityCheck : HealthCheck
         return sb.ToString();
     }
 
-    /// <inheritdoc />
-    public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
+    private HealthCheckStatus CheckMedia(bool fix) =>
+        CheckPaths(
+            SSsFixMediaPaths,
+            SFixMediaPathsTitle,
+            Constants.UdiEntityType.Media,
+            fix,
+            () => _mediaService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+
+    private HealthCheckStatus CheckDocuments(bool fix) =>
+        CheckPaths(
+            SFixContentPaths,
+            SFixContentPathsTitle,
+            Constants.UdiEntityType.Document,
+            fix,
+            () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
+
+    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport,
+        Func<ContentDataIntegrityReport> doCheck)
     {
-        switch (action.Alias)
+        ContentDataIntegrityReport report = doCheck();
+
+        var actions = new List<HealthCheckAction>();
+        if (!report.Ok)
         {
-            case SFixContentPaths:
-                return CheckDocuments(true);
-            case SSsFixMediaPaths:
-                return CheckMedia(true);
-            default:
-                throw new InvalidOperationException("Action not supported");
+            actions.Add(new HealthCheckAction(actionAlias, Id) { Name = actionName });
         }
+
+        return new HealthCheckStatus(GetReport(report, entityType, detailedReport))
+        {
+            ResultType = report.Ok ? StatusResultType.Success : StatusResultType.Error,
+            Actions = actions,
+        };
     }
 }

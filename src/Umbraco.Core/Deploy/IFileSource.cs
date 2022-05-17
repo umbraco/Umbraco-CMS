@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 /// <summary>
 ///     Represents a file source, ie a mean for a target environment involved in a
@@ -81,5 +81,5 @@ public interface IFileSource
     ///// </summary>
     ///// <param name="Udi">A file entity identifier.</param>
     ///// <returns>A byte array containing the file content.</returns>
-    //byte[] GetFileBytes(StringUdi Udi);
+    // byte[] GetFileBytes(StringUdi Udi);
 }

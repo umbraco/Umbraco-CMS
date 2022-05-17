@@ -14,5 +14,6 @@ public abstract class CacheRefresherNotification : INotification
     }
 
     public object MessageObject { get; }
+
     public MessageType MessageType { get; }
 }

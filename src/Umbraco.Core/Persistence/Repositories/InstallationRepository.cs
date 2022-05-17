@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
@@ -24,6 +24,7 @@ public class InstallationRepository : IInstallationRepository
 
             await _httpClient.PostAsync(RestApiInstallUrl, content);
         }
+
         // this occurs if the server for Our is down or cannot be reached
         catch (HttpRequestException)
         {

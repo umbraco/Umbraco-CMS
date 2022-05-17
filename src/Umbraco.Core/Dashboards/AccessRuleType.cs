@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Dashboards;
+namespace Umbraco.Cms.Core.Dashboards;
 
 /// <summary>
 ///     Defines dashboard access rules type.
@@ -23,5 +23,5 @@ public enum AccessRuleType
     /// <summary>
     ///     Grant access to the dashboard if user has access to the specified section.
     /// </summary>
-    GrantBySection
+    GrantBySection,
 }

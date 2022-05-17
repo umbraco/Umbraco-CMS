@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 

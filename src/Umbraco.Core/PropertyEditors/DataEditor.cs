@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
@@ -51,18 +51,18 @@ public class DataEditor : IDataEditor
     }
 
     /// <summary>
-    ///     Gets the editor attribute.
-    /// </summary>
-    protected DataEditorAttribute? Attribute { get; }
-
-    protected IDataValueEditorFactory DataValueEditorFactory { get; }
-
-    /// <summary>
     ///     Gets or sets an explicit value editor.
     /// </summary>
     /// <remarks>Used for manifest data editors.</remarks>
     [DataMember(Name = "editor")]
     public IDataValueEditor? ExplicitValueEditor { get; set; }
+
+    /// <summary>
+    ///     Gets the editor attribute.
+    /// </summary>
+    protected DataEditorAttribute? Attribute { get; }
+
+    protected IDataValueEditorFactory DataValueEditorFactory { get; }
 
     /// <summary>
     ///     Gets or sets an explicit configuration editor.
@@ -94,6 +94,18 @@ public class DataEditor : IDataEditor
     /// <inheritdoc />
     [IgnoreDataMember]
     public bool IsDeprecated { get; }
+
+    /// <inheritdoc />
+    [DataMember(Name = "defaultConfig")]
+    public IDictionary<string, object> DefaultConfiguration
+    {
+        // for property value editors, get the ConfigurationEditor.DefaultConfiguration
+        // else fallback to a default, empty dictionary
+        get => _defaultConfiguration ?? ((Type & EditorType.PropertyValue) > 0
+            ? GetConfigurationEditor().DefaultConfiguration
+            : _defaultConfiguration = new Dictionary<string, object>());
+        set => _defaultConfiguration = value;
+    }
 
     /// <inheritdoc />
     /// <remarks>
@@ -168,19 +180,6 @@ public class DataEditor : IDataEditor
     public IConfigurationEditor GetConfigurationEditor() => ExplicitConfigurationEditor ?? CreateConfigurationEditor();
 
     /// <inheritdoc />
-    [DataMember(Name = "defaultConfig")]
-    public IDictionary<string, object> DefaultConfiguration
-    {
-        // for property value editors, get the ConfigurationEditor.DefaultConfiguration
-        // else fallback to a default, empty dictionary
-
-        get => _defaultConfiguration ?? ((Type & EditorType.PropertyValue) > 0
-            ? GetConfigurationEditor().DefaultConfiguration
-            : _defaultConfiguration = new Dictionary<string, object>());
-        set => _defaultConfiguration = value;
-    }
-
-    /// <inheritdoc />
     public virtual IPropertyIndexValueFactory PropertyIndexValueFactory => new DefaultPropertyIndexValueFactory();
 
     /// <summary>
@@ -203,6 +202,7 @@ public class DataEditor : IDataEditor
     protected virtual IConfigurationEditor CreateConfigurationEditor()
     {
         var editor = new ConfigurationEditor();
+
         // pass the default configuration if this is not a property value editor
         if ((Type & EditorType.PropertyValue) == 0 && _defaultConfiguration is not null)
         {

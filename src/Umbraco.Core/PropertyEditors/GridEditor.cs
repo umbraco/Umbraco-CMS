@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Configuration.Grid;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -15,7 +15,8 @@ public class GridEditor : IGridEditorConfig
     [DataMember(Name = "name", IsRequired = true)]
     public string? Name { get; set; }
 
-    [DataMember(Name = "nameTemplate")] public string? NameTemplate { get; set; }
+    [DataMember(Name = "nameTemplate")]
+    public string? NameTemplate { get; set; }
 
     [DataMember(Name = "alias", IsRequired = true)]
     public string Alias { get; set; }
@@ -23,14 +24,14 @@ public class GridEditor : IGridEditorConfig
     [DataMember(Name = "view", IsRequired = true)]
     public string? View { get; set; }
 
-    [DataMember(Name = "render")] public string? Render { get; set; }
+    [DataMember(Name = "render")]
+    public string? Render { get; set; }
 
     [DataMember(Name = "icon", IsRequired = true)]
     public string? Icon { get; set; }
 
-    [DataMember(Name = "config")] public IDictionary<string, object> Config { get; set; }
-
-    protected bool Equals(GridEditor other) => string.Equals(Alias, other.Alias);
+    [DataMember(Name = "config")]
+    public IDictionary<string, object> Config { get; set; }
 
     /// <summary>
     ///     Determines whether the specified <see cref="T:System.Object" /> is equal to the current
@@ -59,6 +60,8 @@ public class GridEditor : IGridEditorConfig
 
         return Equals((GridEditor)obj);
     }
+
+    protected bool Equals(GridEditor other) => string.Equals(Alias, other.Alias);
 
     /// <summary>
     ///     Serves as a hash function for a particular type.

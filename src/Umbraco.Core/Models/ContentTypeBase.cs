@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models;
 [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
 public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
 {
-    //Custom comparer for enumerable
+    // Custom comparer for enumerable
     private static readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
         new(
             (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
@@ -102,6 +102,19 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public abstract bool SupportsPublishing { get; }
 
     /// <summary>
+    ///     The Alias of the ContentType
+    /// </summary>
+    [DataMember]
+    public virtual string Alias
+    {
+        get => _alias;
+        set => SetPropertyValueAndDetectChanges(
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase),
+            ref _alias!,
+            nameof(Alias));
+    }
+
+    /// <summary>
     ///     A boolean flag indicating if a property type has been removed from this instance.
     /// </summary>
     /// <remarks>
@@ -123,23 +136,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     ///     PropertyTypes that are not part of a PropertyGroup
     /// </summary>
     [IgnoreDataMember]
+
     // TODO: should we mark this as EditorBrowsable hidden since it really isn't ever used?
     internal PropertyTypeCollection PropertyTypeCollection { get; private set; }
 
     public abstract ISimpleContentType ToSimple();
-
-    /// <summary>
-    ///     The Alias of the ContentType
-    /// </summary>
-    [DataMember]
-    public virtual string Alias
-    {
-        get => _alias;
-        set => SetPropertyValueAndDetectChanges(
-            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase),
-            ref _alias!,
-            nameof(Alias));
-    }
 
     /// <summary>
     ///     Description for the ContentType
@@ -209,8 +210,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public IEnumerable<ContentTypeSort>? AllowedContentTypes
     {
         get => _allowedContentTypes;
-        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes),
-            ContentTypeSortComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, nameof(AllowedContentTypes), ContentTypeSortComparer);
     }
 
     /// <summary>
@@ -221,20 +221,6 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         get => _variations;
         set => SetPropertyValueAndDetectChanges(value, ref _variations, nameof(Variations));
     }
-
-    /// <inheritdoc />
-    public bool SupportsVariation(string culture, string segment, bool wildcards = false) =>
-        // exact validation: cannot accept a 'null' culture if the property type varies
-        //  by culture, and likewise for segment
-        // wildcard validation: can accept a '*' culture or segment
-        Variations.ValidateVariation(culture, segment, true, wildcards, false);
-
-    /// <inheritdoc />
-    public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false) =>
-        // non-exact validation: can accept a 'null' culture if the property type varies
-        //  by culture, and likewise for segment
-        // wildcard validation: can accept a '*' culture or segment
-        Variations.ValidateVariation(culture, segment, false, true, false);
 
     /// <inheritdoc />
     /// <remarks>
@@ -250,10 +236,27 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         {
             _propertyGroups = value;
             _propertyGroups.CollectionChanged += PropertyGroupsChanged;
-            PropertyGroupsChanged(_propertyGroups,
+            PropertyGroupsChanged(
+                _propertyGroups,
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
+
+    /// <inheritdoc />
+    public bool SupportsVariation(string culture, string segment, bool wildcards = false) =>
+
+        // exact validation: cannot accept a 'null' culture if the property type varies
+        //  by culture, and likewise for segment
+        // wildcard validation: can accept a '*' culture or segment
+        Variations.ValidateVariation(culture, segment, true, wildcards, false);
+
+    /// <inheritdoc />
+    public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false) =>
+
+        // non-exact validation: can accept a 'null' culture if the property type varies
+        //  by culture, and likewise for segment
+        // wildcard validation: can accept a '*' culture or segment
+        Variations.ValidateVariation(culture, segment, false, true, false);
 
     /// <inheritdoc />
     [IgnoreDataMember]
@@ -275,7 +278,8 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
 
             PropertyTypeCollection = new PropertyTypeCollection(SupportsPublishing, value);
             PropertyTypeCollection.CollectionChanged += PropertyTypesChanged;
-            PropertyTypesChanged(PropertyTypeCollection,
+            PropertyTypesChanged(
+                PropertyTypeCollection,
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
@@ -291,8 +295,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public abstract bool AddPropertyGroup(string alias, string name);
 
     /// <inheritdoc />
-    public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias,
-        string? propertyGroupName = null);
+    public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string? propertyGroupName = null);
 
     /// <summary>
     ///     Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -323,7 +326,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public bool MovePropertyType(string propertyTypeAlias, string propertyGroupAlias)
     {
         // get property, ensure it exists
-        IPropertyType propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+        IPropertyType? propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
         if (propertyType == null)
         {
             return false;
@@ -343,8 +346,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         }
 
         // get old group
-        PropertyGroup oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
-            x.PropertyTypes?.Any(y => y.Alias == propertyTypeAlias) ?? false);
+        PropertyGroup? oldPropertyGroup = PropertyGroups.FirstOrDefault(x => x.PropertyTypes?.Any(y => y.Alias == propertyTypeAlias) ?? false);
 
         // set new group
         propertyType.PropertyGroupId =
@@ -363,7 +365,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     /// <param name="alias">Alias of the <see cref="IPropertyType" /> to remove</param>
     public void RemovePropertyType(string alias)
     {
-        //check through each property group to see if we can remove the property type by alias from it
+        // check through each property group to see if we can remove the property type by alias from it
         foreach (PropertyGroup propertyGroup in PropertyGroups)
         {
             if (propertyGroup.PropertyTypes?.RemoveItem(alias) ?? false)
@@ -378,7 +380,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
             }
         }
 
-        //check through each local property type collection (not assigned to a tab)
+        // check through each local property type collection (not assigned to a tab)
         if (PropertyTypeCollection.RemoveItem(alias))
         {
             if (!HasPropertyTypeBeenRemoved)
@@ -445,7 +447,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
         base.ResetDirtyProperties();
 
-        //loop through each property group to reset the property types
+        // loop through each property group to reset the property types
         var propertiesReset = new List<int>();
 
         foreach (PropertyGroup propertyGroup in PropertyGroups)
@@ -461,58 +463,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
             }
         }
 
-        //then loop through our property type collection since some might not exist on a property group
-        //but don't re-reset ones we've already done.
+        // then loop through our property type collection since some might not exist on a property group
+        // but don't re-reset ones we've already done.
         foreach (IPropertyType propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
         {
             propertyType.ResetDirtyProperties();
-        }
-    }
-
-    protected void PropertyGroupsChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-        OnPropertyChanged(nameof(PropertyGroups));
-
-    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-        //enable this to detect duplicate property aliases. We do want this, however making this change in a
-        //patch release might be a little dangerous
-        ////detect if there are any duplicate aliases - this cannot be allowed
-        //if (e.Action == NotifyCollectionChangedAction.Add
-        //    || e.Action == NotifyCollectionChangedAction.Replace)
-        //{
-        //    var allAliases = _noGroupPropertyTypes.Concat(PropertyGroups.SelectMany(x => x.PropertyTypes)).Select(x => x.Alias);
-        //    if (allAliases.HasDuplicates(false))
-        //    {
-        //        var newAliases = string.Join(", ", e.NewItems.Cast<PropertyType>().Select(x => x.Alias));
-        //        throw new InvalidOperationException($"Other property types already exist with the aliases: {newAliases}");
-        //    }
-        //}
-        OnPropertyChanged(nameof(PropertyTypes));
-
-    protected override void PerformDeepClone(object clone)
-    {
-        base.PerformDeepClone(clone);
-
-        var clonedEntity = (ContentTypeBase)clone;
-
-        if (clonedEntity.PropertyTypeCollection != null)
-        {
-            //need to manually wire up the event handlers for the property type collections - we've ensured
-            // its ignored from the auto-clone process because its return values are unions, not raw and
-            // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
-
-            clonedEntity.PropertyTypeCollection.ClearCollectionChangedEvents(); //clear this event handler if any
-            clonedEntity.PropertyTypeCollection =
-                (PropertyTypeCollection)PropertyTypeCollection.DeepClone(); //manually deep clone
-            clonedEntity.PropertyTypeCollection.CollectionChanged +=
-                clonedEntity.PropertyTypesChanged; //re-assign correct event handler
-        }
-
-        if (clonedEntity._propertyGroups != null)
-        {
-            clonedEntity._propertyGroups.ClearCollectionChangedEvents(); //clear this event handler if any
-            clonedEntity._propertyGroups = (PropertyGroupCollection)_propertyGroups.DeepClone(); //manually deep clone
-            clonedEntity._propertyGroups.CollectionChanged +=
-                clonedEntity.PropertyGroupsChanged; //re-assign correct event handler
         }
     }
 
@@ -536,5 +491,52 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
         clone.ResetIdentity();
         clone.ResetDirtyProperties(false);
         return clone;
+    }
+
+    protected void PropertyGroupsChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+        OnPropertyChanged(nameof(PropertyGroups));
+
+    protected void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+
+        // enable this to detect duplicate property aliases. We do want this, however making this change in a
+        // patch release might be a little dangerous
+        ////detect if there are any duplicate aliases - this cannot be allowed
+        // if (e.Action == NotifyCollectionChangedAction.Add
+        //    || e.Action == NotifyCollectionChangedAction.Replace)
+        // {
+        //    var allAliases = _noGroupPropertyTypes.Concat(PropertyGroups.SelectMany(x => x.PropertyTypes)).Select(x => x.Alias);
+        //    if (allAliases.HasDuplicates(false))
+        //    {
+        //        var newAliases = string.Join(", ", e.NewItems.Cast<PropertyType>().Select(x => x.Alias));
+        //        throw new InvalidOperationException($"Other property types already exist with the aliases: {newAliases}");
+        //    }
+        // }
+        OnPropertyChanged(nameof(PropertyTypes));
+
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var clonedEntity = (ContentTypeBase)clone;
+
+        if (clonedEntity.PropertyTypeCollection != null)
+        {
+            // need to manually wire up the event handlers for the property type collections - we've ensured
+            // its ignored from the auto-clone process because its return values are unions, not raw and
+            // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
+            clonedEntity.PropertyTypeCollection.ClearCollectionChangedEvents(); // clear this event handler if any
+            clonedEntity.PropertyTypeCollection =
+                (PropertyTypeCollection)PropertyTypeCollection.DeepClone(); // manually deep clone
+            clonedEntity.PropertyTypeCollection.CollectionChanged +=
+                clonedEntity.PropertyTypesChanged; // re-assign correct event handler
+        }
+
+        if (clonedEntity._propertyGroups != null)
+        {
+            clonedEntity._propertyGroups.ClearCollectionChangedEvents(); // clear this event handler if any
+            clonedEntity._propertyGroups = (PropertyGroupCollection)_propertyGroups.DeepClone(); // manually deep clone
+            clonedEntity._propertyGroups.CollectionChanged +=
+                clonedEntity.PropertyGroupsChanged; // re-assign correct event handler
+        }
     }
 }

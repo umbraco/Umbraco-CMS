@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Models.Membership;
 public interface IMembershipUser : IEntity
 {
     string Username { get; set; }
+
     string Email { get; set; }
+
     DateTime? EmailConfirmedDate { get; set; }
 
     /// <summary>
@@ -22,10 +24,15 @@ public interface IMembershipUser : IEntity
     string? PasswordConfiguration { get; set; }
 
     string? Comments { get; set; }
+
     bool IsApproved { get; set; }
+
     bool IsLockedOut { get; set; }
+
     DateTime? LastLoginDate { get; set; }
+
     DateTime? LastPasswordChangeDate { get; set; }
+
     DateTime? LastLockoutDate { get; set; }
 
     /// <summary>
@@ -43,6 +50,6 @@ public interface IMembershipUser : IEntity
     /// </summary>
     string? SecurityStamp { get; set; }
 
-    //object ProfileId { get; set; }
-    //IEnumerable<object> Groups { get; set; }
+    // object ProfileId { get; set; }
+    // IEnumerable<object> Groups { get; set; }
 }

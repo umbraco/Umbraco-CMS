@@ -21,7 +21,7 @@ internal class DictionaryContentAppFactory : IContentAppFactory
                     Name = "Content",
                     Icon = "icon-document",
                     View = "views/dictionary/views/content/content.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             default:
                 return null;

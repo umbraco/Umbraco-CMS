@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentUnpublishedNotification : EnumerableObjectNotification<IContent>
 {
-    public ContentUnpublishedNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentUnpublishedNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ContentUnpublishedNotification(IEnumerable<IContent> target, EventMessages messages) : base(target, messages)
+    public ContentUnpublishedNotification(IEnumerable<IContent> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

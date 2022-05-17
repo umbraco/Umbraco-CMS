@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Collections;
+namespace Umbraco.Cms.Core.Collections;
 
 /// <summary>
 ///     Represents a composite key of (int, string) for fast dictionaries.
@@ -16,7 +16,7 @@ public struct CompositeIntStringKey : IEquatable<CompositeIntStringKey>
     /// <summary>
     ///     Initializes a new instance of the <see cref="CompositeIntStringKey" /> struct.
     /// </summary>
-    public CompositeIntStringKey(int? key1, string key2)
+    public CompositeIntStringKey(int? key1, string? key2)
     {
         if (key1 < 0)
         {
@@ -27,6 +27,12 @@ public struct CompositeIntStringKey : IEquatable<CompositeIntStringKey>
         _key2 = key2?.ToLowerInvariant() ?? "NULL";
     }
 
+    public static bool operator ==(CompositeIntStringKey key1, CompositeIntStringKey key2)
+        => key1._key2 == key2._key2 && key1._key1 == key2._key1;
+
+    public static bool operator !=(CompositeIntStringKey key1, CompositeIntStringKey key2)
+        => key1._key2 != key2._key2 || key1._key1 != key2._key1;
+
     public bool Equals(CompositeIntStringKey other)
         => _key2 == other._key2 && _key1 == other._key1;
 
@@ -35,10 +41,4 @@ public struct CompositeIntStringKey : IEquatable<CompositeIntStringKey>
 
     public override int GetHashCode()
         => (_key2.GetHashCode() * 31) + _key1;
-
-    public static bool operator ==(CompositeIntStringKey key1, CompositeIntStringKey key2)
-        => key1._key2 == key2._key2 && key1._key1 == key2._key1;
-
-    public static bool operator !=(CompositeIntStringKey key1, CompositeIntStringKey key2)
-        => key1._key2 != key2._key2 || key1._key1 != key2._key1;
 }

@@ -21,5 +21,5 @@ public enum BundleOptions
     /// <summary>
     ///     The packages assets will be processed as it's own separate bundle. (in debug, files will not be processed)
     /// </summary>
-    Independent = 2
+    Independent = 2,
 }

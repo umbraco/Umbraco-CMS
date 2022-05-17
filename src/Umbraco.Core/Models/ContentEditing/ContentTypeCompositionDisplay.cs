@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
@@ -7,31 +7,31 @@ public abstract class ContentTypeCompositionDisplay : ContentTypeBasic, INotific
 {
     protected ContentTypeCompositionDisplay()
     {
-        //initialize collections so at least their never null
+        // initialize collections so at least their never null
         AllowedContentTypes = new List<int>();
         CompositeContentTypes = new List<string>();
         Notifications = new List<BackOfficeNotification>();
     }
 
-    //name, alias, icon, thumb, desc, inherited from basic
-
+    // name, alias, icon, thumb, desc, inherited from basic
     [DataMember(Name = "listViewEditorName")]
     [ReadOnly(true)]
     public string? ListViewEditorName { get; set; }
 
-    //Allowed child types
+    // Allowed child types
     [DataMember(Name = "allowedContentTypes")]
     public IEnumerable<int>? AllowedContentTypes { get; set; }
 
-    //Compositions
+    // Compositions
     [DataMember(Name = "compositeContentTypes")]
     public IEnumerable<string?> CompositeContentTypes { get; set; }
 
-    //Locked compositions
+    // Locked compositions
     [DataMember(Name = "lockedCompositeContentTypes")]
     public IEnumerable<string>? LockedCompositeContentTypes { get; set; }
 
-    [DataMember(Name = "allowAsRoot")] public bool AllowAsRoot { get; set; }
+    [DataMember(Name = "allowAsRoot")]
+    public bool AllowAsRoot { get; set; }
 
     /// <summary>
     ///     This is used for validation of a content item.
@@ -59,9 +59,11 @@ public abstract class ContentTypeCompositionDisplay<TPropertyTypeDisplay> : Cont
     where TPropertyTypeDisplay : PropertyTypeDisplay
 {
     protected ContentTypeCompositionDisplay() =>
-        //initialize collections so at least their never null
+
+        // initialize collections so at least their never null
         Groups = new List<PropertyGroupDisplay<TPropertyTypeDisplay>>();
 
-    //Tabs
-    [DataMember(Name = "groups")] public IEnumerable<PropertyGroupDisplay<TPropertyTypeDisplay>> Groups { get; set; }
+    // Tabs
+    [DataMember(Name = "groups")]
+    public IEnumerable<PropertyGroupDisplay<TPropertyTypeDisplay>> Groups { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Composing;
+namespace Umbraco.Cms.Core.Composing;
 
 /// <summary>
 ///     Used to create a hash value of the current runtime

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Marks a ConfigurationEditor property as a configuration field, and a class as a configuration field type.
@@ -43,7 +43,8 @@ public class ConfigurationFieldAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -54,7 +55,8 @@ public class ConfigurationFieldAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(view))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(view));
         }
 
@@ -81,7 +83,8 @@ public class ConfigurationFieldAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -92,7 +95,8 @@ public class ConfigurationFieldAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(view))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(view));
         }
 

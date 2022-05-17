@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 /// <summary>
 ///     Borrowed from http://stackoverflow.com/a/2575444/694494
@@ -23,8 +23,7 @@ public static class HashCodeHelper
         }
     }
 
-    public static int GetHashCode<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3,
-        T4 arg4)
+    public static int GetHashCode<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
     {
         unchecked
         {

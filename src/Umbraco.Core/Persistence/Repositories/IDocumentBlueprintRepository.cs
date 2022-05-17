@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Persistence.Repositories;
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface IDocumentBlueprintRepository : IDocumentRepository
 {

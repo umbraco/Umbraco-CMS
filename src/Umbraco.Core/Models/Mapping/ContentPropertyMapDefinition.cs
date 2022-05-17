@@ -18,17 +18,31 @@ public class ContentPropertyMapDefinition : IMapDefinition
     private readonly ContentPropertyDisplayMapper _contentPropertyDisplayMapper;
     private readonly ContentPropertyDtoMapper _contentPropertyDtoConverter;
 
-    public ContentPropertyMapDefinition(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService,
-        IEntityService entityService, ILocalizedTextService textService, ILoggerFactory loggerFactory,
+    public ContentPropertyMapDefinition(
+        ICultureDictionary cultureDictionary,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        ILoggerFactory loggerFactory,
         PropertyEditorCollection propertyEditors)
     {
-        _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(dataTypeService,
-            entityService, loggerFactory.CreateLogger<ContentPropertyBasicMapper<ContentPropertyBasic>>(),
+        _contentPropertyBasicConverter = new ContentPropertyBasicMapper<ContentPropertyBasic>(
+            dataTypeService,
+            entityService,
+            loggerFactory.CreateLogger<ContentPropertyBasicMapper<ContentPropertyBasic>>(),
             propertyEditors);
-        _contentPropertyDtoConverter = new ContentPropertyDtoMapper(dataTypeService, entityService,
-            loggerFactory.CreateLogger<ContentPropertyDtoMapper>(), propertyEditors);
-        _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(cultureDictionary, dataTypeService,
-            entityService, textService, loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(), propertyEditors);
+        _contentPropertyDtoConverter = new ContentPropertyDtoMapper(
+            dataTypeService,
+            entityService,
+            loggerFactory.CreateLogger<ContentPropertyDtoMapper>(),
+            propertyEditors);
+        _contentPropertyDisplayMapper = new ContentPropertyDisplayMapper(
+            cultureDictionary,
+            dataTypeService,
+            entityService,
+            textService,
+            loggerFactory.CreateLogger<ContentPropertyDisplayMapper>(),
+            propertyEditors);
     }
 
     public void DefineMaps(IUmbracoMapper mapper)
@@ -52,14 +66,17 @@ public class ContentPropertyMapDefinition : IMapDefinition
     }
 
     private void Map(IProperty source, ContentPropertyBasic target, MapperContext context) =>
+
         // assume this is mapping everything and no MapAll is required
         _contentPropertyBasicConverter.Map(source, target, context);
 
     private void Map(IProperty source, ContentPropertyDto target, MapperContext context) =>
+
         // assume this is mapping everything and no MapAll is required
         _contentPropertyDtoConverter.Map(source, target, context);
 
     private void Map(IProperty source, ContentPropertyDisplay target, MapperContext context) =>
+
         // assume this is mapping everything and no MapAll is required
         _contentPropertyDisplayMapper.Map(source, target, context);
 }

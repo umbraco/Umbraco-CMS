@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentEmptiedRecycleBinNotification : EmptiedRecycleBinNotification<IContent>
 {
-    public ContentEmptiedRecycleBinNotification(IEnumerable<IContent> deletedEntities, EventMessages messages) : base(
+    public ContentEmptiedRecycleBinNotification(IEnumerable<IContent> deletedEntities, EventMessages messages)
+        : base(
         deletedEntities, messages)
     {
     }

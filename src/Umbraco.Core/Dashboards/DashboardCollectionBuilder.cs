@@ -23,7 +23,8 @@ public class
         return dashboardSections;
     }
 
-    private IEnumerable<IDashboard> Merge(IEnumerable<IDashboard> dashboardsFromCode,
+    private IEnumerable<IDashboard> Merge(
+        IEnumerable<IDashboard> dashboardsFromCode,
         IReadOnlyList<ManifestDashboard> dashboardFromManifest) =>
         dashboardsFromCode.Concat(dashboardFromManifest)
             .Where(x => !string.IsNullOrEmpty(x.Alias))

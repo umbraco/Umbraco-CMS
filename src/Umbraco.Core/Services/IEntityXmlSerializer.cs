@@ -11,9 +11,10 @@ public interface IEntityXmlSerializer
     /// <summary>
     ///     Exports an IContent item as an XElement.
     /// </summary>
-    XElement Serialize(IContent content,
-            bool published,
-            bool withDescendants = false) // TODO: take care of usage! only used for the packager
+    XElement Serialize(
+        IContent content,
+        bool published,
+        bool withDescendants = false) // TODO: take care of usage! only used for the packager
         ;
 
     /// <summary>
@@ -64,6 +65,7 @@ public interface IEntityXmlSerializer
     XElement Serialize(IEnumerable<ILanguage> languages);
 
     XElement Serialize(ILanguage language);
+
     XElement Serialize(ITemplate template);
 
     /// <summary>
@@ -83,5 +85,6 @@ public interface IEntityXmlSerializer
     XElement Serialize(IEnumerable<IMacro> macros);
 
     XElement Serialize(IMacro macro);
+
     XElement Serialize(IContentType contentType);
 }

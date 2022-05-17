@@ -29,7 +29,7 @@ public class MacroNavigator : XPathNavigator
                     break;
                 case StatePosition.Parameter:
                     MacroParameter parameter = _macro.Parameters[InternalState.ParameterIndex];
-                    XPathNavigator nav = parameter.NavigatorValue;
+                    XPathNavigator? nav = parameter.NavigatorValue;
                     if (parameter.WrapNavigatorInNodes || nav != null)
                     {
                         isEmpty = false;
@@ -387,7 +387,7 @@ public class MacroNavigator : XPathNavigator
                 break;
             case StatePosition.Parameter:
                 MacroParameter parameter = _macro.Parameters[InternalState.ParameterIndex];
-                XPathNavigator nav = parameter.NavigatorValue;
+                XPathNavigator? nav = parameter.NavigatorValue;
                 if (parameter.WrapNavigatorInNodes)
                 {
                     InternalState.Position = StatePosition.ParameterNodes;
@@ -512,6 +512,7 @@ public class MacroNavigator : XPathNavigator
     public override bool MoveToId(string id)
     {
         DebugEnter("MoveToId");
+
         // impossible to implement since parameters can contain duplicate fragments of the
         // main xml and therefore there can be duplicate unique node identifiers.
         DebugReturn("NotImplementedException");
@@ -798,7 +799,8 @@ public class MacroNavigator : XPathNavigator
             {
                 return true;
             }
-        } while (clone.MoveToNextAttribute());
+        }
+        while (clone.MoveToNextAttribute());
 
         return false;
     }
@@ -837,13 +839,13 @@ public class MacroNavigator : XPathNavigator
     // in Debug configuration, uncomment lines in Debug() to write to console or to log.
     //
     // much of this code is duplicated in each navigator due to conditional compilation
-
 #if DEBUG
     private const string Tabs = "                    ";
     private int _tabs;
     private readonly int _uid = GetUid();
     private static int _uidg;
     private static readonly object Uidl = new();
+
     private static int GetUid()
     {
         lock (Uidl)
@@ -857,7 +859,7 @@ public class MacroNavigator : XPathNavigator
     private void DebugEnter(string name)
     {
 #if DEBUG
-        Debug("");
+        Debug(string.Empty);
         DebugState(":");
         Debug(name);
         _tabs = Math.Min(Tabs.Length, _tabs + 2);
@@ -878,6 +880,7 @@ public class MacroNavigator : XPathNavigator
 #if DEBUG
 // ReSharper disable IntroduceOptionalParameters.Local
         DebugReturn("(void)");
+
 // ReSharper restore IntroduceOptionalParameters.Local
 #endif
     }
@@ -914,27 +917,28 @@ public class MacroNavigator : XPathNavigator
                 position = "At macro.";
                 break;
             case StatePosition.Parameter:
-                position = string.Format("At parameter '{0}'.",
+                position = string.Format(
+                    "At parameter '{0}'.",
                     _macro.Parameters[InternalState.ParameterIndex].Name);
                 break;
             case StatePosition.ParameterAttribute:
-                position = string.Format("At parameter attribute '{0}/{1}'.",
+                position = string.Format(
+                    "At parameter attribute '{0}/{1}'.",
                     _macro.Parameters[InternalState.ParameterIndex].Name,
-                    _macro.Parameters[InternalState.ParameterIndex].Attributes?[InternalState.ParameterAttributeIndex]
-                        .Key);
+                    _macro.Parameters[InternalState.ParameterIndex].Attributes?[InternalState.ParameterAttributeIndex].Key);
                 break;
             case StatePosition.ParameterNavigator:
-                position = string.Format("In parameter '{0}{1}' navigator.",
+                position = string.Format(
+                    "In parameter '{0}{1}' navigator.",
                     _macro.Parameters[InternalState.ParameterIndex].Name,
-                    _macro.Parameters[InternalState.ParameterIndex].WrapNavigatorInNodes ? "/nodes" : "");
+                    _macro.Parameters[InternalState.ParameterIndex].WrapNavigatorInNodes ? "/nodes" : string.Empty);
                 break;
             case StatePosition.ParameterNodes:
-                position = string.Format("At parameter '{0}/nodes'.",
-                    _macro.Parameters[InternalState.ParameterIndex].Name);
+
+                position = string.Format("At parameter '{0}/nodes'.", _macro.Parameters[InternalState.ParameterIndex].Name);
                 break;
             case StatePosition.ParameterText:
-                position = string.Format("In parameter '{0}' text.",
-                    _macro.Parameters[InternalState.ParameterIndex].Name);
+                position = string.Format("In parameter '{0}' text.", _macro.Parameters[InternalState.ParameterIndex].Name);
                 break;
             case StatePosition.Root:
                 position = "At root.";
@@ -951,7 +955,6 @@ public class MacroNavigator : XPathNavigator
     private void Debug(string format, params object[] args)
     {
         // remove comments to write
-
         format = "[" + _uid.ToString("00000") + "] " + Tabs.Substring(0, _tabs) + format;
 #pragma warning disable 168
         var msg = string.Format(format, args); // unused if not writing, hence #pragma
@@ -975,14 +978,15 @@ public class MacroNavigator : XPathNavigator
     {
         // note: assuming we're not thinking about supporting
         // XPathIterator in parameters - enough nonsense!
-
         public MacroParameter(string name, string value)
         {
             Name = name;
             StringValue = value;
         }
 
-        public MacroParameter(string name, XPathNavigator navigator,
+        public MacroParameter(
+            string name,
+            XPathNavigator navigator,
             int maxNavigatorDepth = int.MaxValue,
             bool wrapNavigatorInNodes = false,
             IEnumerable<KeyValuePair<string, string>>? attributes = null)
@@ -1003,10 +1007,15 @@ public class MacroNavigator : XPathNavigator
         }
 
         public string Name { get; }
+
         public string? StringValue { get; }
+
         public XPathNavigator? NavigatorValue { get; }
+
         public int MaxNavigatorDepth { get; }
+
         public bool WrapNavigatorInNodes { get; }
+
         public KeyValuePair<string, string>[]? Attributes { get; }
     }
 
@@ -1023,7 +1032,7 @@ public class MacroNavigator : XPathNavigator
         ParameterAttribute,
         ParameterText,
         ParameterNodes,
-        ParameterNavigator
+        ParameterNavigator,
     }
 
     // gets the state

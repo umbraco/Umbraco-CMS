@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif;
 
@@ -23,16 +23,16 @@ internal class ExifEnumProperty<T> : ExifProperty
     {
     }
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (T)value;
-    }
-
     public new T Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (T)value;
     }
 
     public bool IsBitField => mIsBitField;
@@ -49,7 +49,7 @@ internal class ExifEnumProperty<T> : ExifProperty
             if (type == typeof(FileSource) || type == typeof(SceneType))
             {
                 // UNDEFINED
-                return new ExifInterOperability(tagid, 7, 1, new[] {(byte)(object)mValue});
+                return new ExifInterOperability(tagid, 7, 1, new[] { (byte)(object)mValue });
             }
 
             if (type == typeof(GPSLatitudeRef) || type == typeof(GPSLongitudeRef) ||
@@ -58,21 +58,23 @@ internal class ExifEnumProperty<T> : ExifProperty
                 type == typeof(GPSDistanceRef))
             {
                 // ASCII
-                return new ExifInterOperability(tagid, 2, 2, new byte[] {(byte)(object)mValue, 0});
+                return new ExifInterOperability(tagid, 2, 2, new byte[] { (byte)(object)mValue, 0 });
             }
 
             if (basetype == typeof(byte))
             {
                 // BYTE
-                return new ExifInterOperability(tagid, 1, 1, new[] {(byte)(object)mValue});
+                return new ExifInterOperability(tagid, 1, 1, new[] { (byte)(object)mValue });
             }
 
             if (basetype == typeof(ushort))
             {
                 // SHORT
-                return new ExifInterOperability(tagid, 3, 1,
-                    BitConverterEx.GetBytes((ushort)(object)mValue, BitConverterEx.SystemByteOrder,
-                        BitConverterEx.SystemByteOrder));
+                return new ExifInterOperability(
+                    tagid,
+                    3,
+                    1,
+                    BitConverterEx.GetBytes((ushort)(object)mValue, BitConverterEx.SystemByteOrder, BitConverterEx.SystemByteOrder));
             }
 
             throw new InvalidOperationException(
@@ -99,16 +101,16 @@ internal class ExifEncodedString : ExifProperty
         Encoding = encoding;
     }
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (string)value;
-    }
-
     public new string Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (string)value;
     }
 
     public Encoding Encoding { get; set; }
@@ -117,7 +119,7 @@ internal class ExifEncodedString : ExifProperty
     {
         get
         {
-            var enc = "";
+            var enc = string.Empty;
             if (Encoding == null)
             {
                 enc = "\0\0\0\0\0\0\0\0";
@@ -165,16 +167,16 @@ internal class ExifDateTime : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (DateTime)value;
-    }
-
     public new DateTime Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (DateTime)value;
     }
 
     public override ExifInterOperability Interoperability =>
@@ -198,7 +200,7 @@ internal class ExifVersion : ExifProperty
     {
         if (value.Length > 4)
         {
-            mValue = value.Substring(0, 4);
+            mValue = value[..4];
         }
         else if (value.Length < 4)
         {
@@ -210,16 +212,16 @@ internal class ExifVersion : ExifProperty
         }
     }
 
+    public new string Value
+    {
+        get => mValue;
+        set => mValue = value[..4];
+    }
+
     protected override object _Value
     {
         get => Value;
         set => Value = (string)value;
-    }
-
-    public new string Value
-    {
-        get => mValue;
-        set => mValue = value.Substring(0, 4);
     }
 
     public override ExifInterOperability Interoperability
@@ -258,20 +260,20 @@ internal class ExifPointSubjectArea : ExifUShortArray
     }
 
     public ExifPointSubjectArea(ExifTag tag, ushort x, ushort y)
-        : base(tag, new[] {x, y})
+        : base(tag, new[] { x, y })
     {
-    }
-
-    protected new ushort[] Value
-    {
-        get => mValue;
-        set => mValue = value;
     }
 
     public ushort X
     {
         get => mValue[0];
         set => mValue[0] = value;
+    }
+
+    protected new ushort[] Value
+    {
+        get => mValue;
+        set => mValue = value;
     }
 
     public ushort Y
@@ -301,7 +303,7 @@ internal class ExifCircularSubjectArea : ExifPointSubjectArea
     }
 
     public ExifCircularSubjectArea(ExifTag tag, ushort x, ushort y, ushort d)
-        : base(tag, new[] {x, y, d})
+        : base(tag, new[] { x, y, d })
     {
     }
 
@@ -332,7 +334,7 @@ internal class ExifRectangularSubjectArea : ExifPointSubjectArea
     }
 
     public ExifRectangularSubjectArea(ExifTag tag, ushort x, ushort y, ushort w, ushort h)
-        : base(tag, new[] {x, y, w, h})
+        : base(tag, new[] { x, y, w, h })
     {
     }
 
@@ -367,20 +369,20 @@ internal class GPSLatitudeLongitude : ExifURationalArray
     }
 
     public GPSLatitudeLongitude(ExifTag tag, float d, float m, float s)
-        : base(tag, new[] {new(d), new MathEx.UFraction32(m), new MathEx.UFraction32(s)})
+        : base(tag, new[] { new(d), new MathEx.UFraction32(m), new MathEx.UFraction32(s) })
     {
-    }
-
-    protected new MathEx.UFraction32[] Value
-    {
-        get => mValue;
-        set => mValue = value;
     }
 
     public MathEx.UFraction32 Degrees
     {
         get => mValue[0];
         set => mValue[0] = value;
+    }
+
+    protected new MathEx.UFraction32[] Value
+    {
+        get => mValue;
+        set => mValue = value;
     }
 
     public MathEx.UFraction32 Minutes
@@ -414,20 +416,20 @@ internal class GPSTimeStamp : ExifURationalArray
     }
 
     public GPSTimeStamp(ExifTag tag, float h, float m, float s)
-        : base(tag, new[] {new(h), new MathEx.UFraction32(m), new MathEx.UFraction32(s)})
+        : base(tag, new[] { new(h), new MathEx.UFraction32(m), new MathEx.UFraction32(s) })
     {
-    }
-
-    protected new MathEx.UFraction32[] Value
-    {
-        get => mValue;
-        set => mValue = value;
     }
 
     public MathEx.UFraction32 Hour
     {
         get => mValue[0];
         set => mValue[0] = value;
+    }
+
+    protected new MathEx.UFraction32[] Value
+    {
+        get => mValue;
+        set => mValue = value;
     }
 
     public MathEx.UFraction32 Minute
@@ -458,16 +460,16 @@ internal class WindowsByteString : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (string)value;
-    }
-
     public new string Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (string)value;
     }
 
     public override ExifInterOperability Interoperability

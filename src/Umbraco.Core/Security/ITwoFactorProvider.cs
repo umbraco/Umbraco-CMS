@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Security;
+namespace Umbraco.Cms.Core.Security;
 
 public interface ITwoFactorProvider
 {

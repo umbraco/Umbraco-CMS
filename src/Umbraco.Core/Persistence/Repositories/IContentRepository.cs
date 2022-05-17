@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
@@ -73,8 +73,13 @@ public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository
     ///     Gets paged content items.
     /// </summary>
     /// <remarks>Here, <paramref name="filter" /> can be null but <paramref name="ordering" /> cannot.</remarks>
-    IEnumerable<TEntity> GetPage(IQuery<TEntity>? query, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<TEntity>? filter, Ordering? ordering);
+    IEnumerable<TEntity> GetPage(
+        IQuery<TEntity>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<TEntity>? filter,
+        Ordering? ordering);
 
     ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 }

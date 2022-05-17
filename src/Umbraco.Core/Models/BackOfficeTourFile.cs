@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -25,5 +25,6 @@ public class BackOfficeTourFile
     [DataMember(Name = "pluginName")]
     public string? PluginName { get; set; }
 
-    [DataMember(Name = "tours")] public IEnumerable<BackOfficeTour> Tours { get; set; }
+    [DataMember(Name = "tours")]
+    public IEnumerable<BackOfficeTour> Tours { get; set; }
 }

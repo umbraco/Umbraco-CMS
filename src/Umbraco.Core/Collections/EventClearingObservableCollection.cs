@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace Umbraco.Cms.Core.Collections;
@@ -19,11 +19,13 @@ public class EventClearingObservableCollection<TValue> : ObservableCollection<TV
     {
     }
 
-    public EventClearingObservableCollection(List<TValue> list) : base(list)
+    public EventClearingObservableCollection(List<TValue> list)
+        : base(list)
     {
     }
 
-    public EventClearingObservableCollection(IEnumerable<TValue> collection) : base(collection)
+    public EventClearingObservableCollection(IEnumerable<TValue> collection)
+        : base(collection)
     {
     }
 

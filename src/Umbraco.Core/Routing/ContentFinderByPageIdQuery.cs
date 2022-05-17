@@ -27,25 +27,24 @@ public class ContentFinderByPageIdQuery : IContentFinder
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
-        if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), NumberStyles.Integer,
-                CultureInfo.InvariantCulture, out var pageId))
+        if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var pageId))
         {
             IPublishedContent? doc = umbracoContext.Content?.GetById(pageId);
 
             if (doc != null)
             {
                 frequest.SetPublishedContent(doc);
-                return true;
+                return Task.FromResult(true);
             }
         }
 
-        return false;
+        return Task.FromResult(false);
     }
 }

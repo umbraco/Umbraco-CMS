@@ -14,8 +14,10 @@ public class EntitySearchResults : IEnumerable<SearchResultEntity?>
         TotalResults = totalFound;
     }
 
-    [DataMember(Name = "totalResults")] public long TotalResults { get; set; }
+    [DataMember(Name = "totalResults")]
+    public long TotalResults { get; set; }
 
     public IEnumerator<SearchResultEntity?> GetEnumerator() => _results.GetEnumerator();
+
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_results).GetEnumerator();
 }

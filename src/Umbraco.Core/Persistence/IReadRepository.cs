@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Persistence;
+namespace Umbraco.Cms.Core.Persistence;
 
 /// <summary>
 ///     Defines the base implementation of a reading repository.

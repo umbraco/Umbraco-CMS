@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache;
@@ -48,8 +48,7 @@ public interface ITagQuery
     /// <summary>
     ///     Gets all tags attached to an entity via a property.
     /// </summary>
-    IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null);
+    IEnumerable<TagModel?> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags attached to an entity.

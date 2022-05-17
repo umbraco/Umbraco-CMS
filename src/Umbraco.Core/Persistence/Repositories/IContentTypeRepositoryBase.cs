@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Events;
@@ -10,6 +10,7 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     where TItem : IContentTypeComposition
 {
     TItem? Get(string alias);
+
     IEnumerable<MoveEventInfo<TItem>> Move(TItem moving, EntityContainer container);
 
     /// <summary>
@@ -19,7 +20,6 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
     /// <remarks>Unique across all content, media and member types.</remarks>
     string GetUniqueAlias(string alias);
-
 
     /// <summary>
     ///     Gets a value indicating whether there is a list view content item in the path.

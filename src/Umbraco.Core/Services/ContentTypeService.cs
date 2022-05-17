@@ -23,12 +23,13 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         ContentService = contentService;
 
     // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = {Constants.Locks.ContentTypes};
-    protected override int[] WriteLockIds { get; } = {Constants.Locks.ContentTree, Constants.Locks.ContentTypes};
+    protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
 
-    private IContentService ContentService { get; }
+    protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
+
+    private IContentService ContentService { get; }
 
     /// <summary>
     ///     Gets all property type aliases across content, media and member types.
@@ -90,28 +91,36 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
 
     #region Notifications
 
-    protected override SavingNotification<IContentType> GetSavingNotification(IContentType item,
+    protected override SavingNotification<IContentType> GetSavingNotification(
+        IContentType item,
         EventMessages eventMessages) => new ContentTypeSavingNotification(item, eventMessages);
 
-    protected override SavingNotification<IContentType> GetSavingNotification(IEnumerable<IContentType> items,
+    protected override SavingNotification<IContentType> GetSavingNotification(
+        IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeSavingNotification(items, eventMessages);
 
-    protected override SavedNotification<IContentType> GetSavedNotification(IContentType item,
+    protected override SavedNotification<IContentType> GetSavedNotification(
+        IContentType item,
         EventMessages eventMessages) => new ContentTypeSavedNotification(item, eventMessages);
 
-    protected override SavedNotification<IContentType> GetSavedNotification(IEnumerable<IContentType> items,
+    protected override SavedNotification<IContentType> GetSavedNotification(
+        IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeSavedNotification(items, eventMessages);
 
-    protected override DeletingNotification<IContentType> GetDeletingNotification(IContentType item,
+    protected override DeletingNotification<IContentType> GetDeletingNotification(
+        IContentType item,
         EventMessages eventMessages) => new ContentTypeDeletingNotification(item, eventMessages);
 
-    protected override DeletingNotification<IContentType> GetDeletingNotification(IEnumerable<IContentType> items,
+    protected override DeletingNotification<IContentType> GetDeletingNotification(
+        IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeDeletingNotification(items, eventMessages);
 
-    protected override DeletedNotification<IContentType> GetDeletedNotification(IEnumerable<IContentType> items,
+    protected override DeletedNotification<IContentType> GetDeletedNotification(
+        IEnumerable<IContentType> items,
         EventMessages eventMessages) => new ContentTypeDeletedNotification(items, eventMessages);
 
-    protected override MovingNotification<IContentType> GetMovingNotification(MoveEventInfo<IContentType> moveInfo,
+    protected override MovingNotification<IContentType> GetMovingNotification(
+        MoveEventInfo<IContentType> moveInfo,
         EventMessages eventMessages) => new ContentTypeMovingNotification(moveInfo, eventMessages);
 
     protected override MovedNotification<IContentType> GetMovedNotification(

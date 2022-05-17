@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Editors;
+namespace Umbraco.Cms.Core.Models.Editors;
 
 /// <summary>
 ///     Represents an uploaded file for a property.

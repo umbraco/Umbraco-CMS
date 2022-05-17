@@ -43,11 +43,11 @@ public class ContentFinderByUrlAlias : IContentFinder
     /// </summary>
     /// <param name="frequest">The <c>PublishedRequest</c>.</param>
     /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         IPublishedContent? node = null;
@@ -56,7 +56,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         if (frequest.Uri.AbsolutePath != "/")
         {
             node = FindContentByAlias(
-                umbracoContext!.Content,
+                umbracoContext.Content,
                 frequest.Domain != null ? frequest.Domain.ContentId : 0,
                 frequest.Culture,
                 frequest.AbsolutePathDecoded);
@@ -66,17 +66,16 @@ public class ContentFinderByUrlAlias : IContentFinder
                 frequest.SetPublishedContent(node);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}",
-                        frequest.Uri.AbsolutePath, node.Id);
+                    _logger.LogDebug(
+                        "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, node.Id);
                 }
             }
         }
 
-        return node != null;
+        return Task.FromResult(node != null);
     }
 
-    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture,
-        string alias)
+    private IPublishedContent? FindContentByAlias(IPublishedContentCache? cache, int rootNodeId, string? culture, string alias)
     {
         if (alias == null)
         {
@@ -109,7 +108,7 @@ public class ContentFinderByUrlAlias : IContentFinder
             }
 
             IPublishedProperty? p = c.GetProperty(propertyAlias);
-            var varies = p!.PropertyType?.VariesByCulture();
+            var varies = p?.PropertyType?.VariesByCulture();
             string? v;
             if (varies ?? false)
             {

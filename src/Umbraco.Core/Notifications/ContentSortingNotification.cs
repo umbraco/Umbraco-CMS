@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentSortingNotification : SortingNotification<IContent>
 {
-    public ContentSortingNotification(IEnumerable<IContent> target, EventMessages messages) : base(target, messages)
+    public ContentSortingNotification(IEnumerable<IContent> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

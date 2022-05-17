@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Extensions;
 
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models;
 [DataContract(IsReference = true)]
 public class DictionaryItem : EntityBase, IDictionaryItem
 {
-    //Custom comparer for enumerable
+    // Custom comparer for enumerable
     private static readonly DelegateEqualityComparer<IEnumerable<IDictionaryTranslation>>
         DictionaryTranslationComparer =
             new(
@@ -65,9 +65,10 @@ public class DictionaryItem : EntityBase, IDictionaryItem
         get => _translations;
         set
         {
-            IDictionaryTranslation[] asArray = value?.ToArray();
-            //ensure the language callback is set on each translation
-            if (GetLanguage != null && asArray is not null)
+            IDictionaryTranslation[] asArray = value.ToArray();
+
+            // ensure the language callback is set on each translation
+            if (GetLanguage != null)
             {
                 foreach (DictionaryTranslation translation in asArray.OfType<DictionaryTranslation>())
                 {
@@ -75,8 +76,7 @@ public class DictionaryItem : EntityBase, IDictionaryItem
                 }
             }
 
-            SetPropertyValueAndDetectChanges(asArray, ref _translations!, nameof(Translations),
-                DictionaryTranslationComparer);
+            SetPropertyValueAndDetectChanges(asArray, ref _translations!, nameof(Translations), DictionaryTranslationComparer);
         }
     }
 }

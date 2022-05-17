@@ -17,8 +17,12 @@ public class EntityService : RepositoryService, IEntityService
     private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
     private IQuery<IUmbracoEntity>? _queryRootEntity;
 
-    public EntityService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IIdKeyMap idKeyMap, IEntityRepository entityRepository)
+    public EntityService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IIdKeyMap idKeyMap,
+        IEntityRepository entityRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _idKeyMap = idKeyMap;
@@ -26,22 +30,21 @@ public class EntityService : RepositoryService, IEntityService
 
         _objectTypes = new Dictionary<string, UmbracoObjectTypes>
         {
-            {typeof(IDataType).FullName!, UmbracoObjectTypes.DataType},
-            {typeof(IContent).FullName!, UmbracoObjectTypes.Document},
-            {typeof(IContentType).FullName!, UmbracoObjectTypes.DocumentType},
-            {typeof(IMedia).FullName!, UmbracoObjectTypes.Media},
-            {typeof(IMediaType).FullName!, UmbracoObjectTypes.MediaType},
-            {typeof(IMember).FullName!, UmbracoObjectTypes.Member},
-            {typeof(IMemberType).FullName!, UmbracoObjectTypes.MemberType}
+            { typeof(IDataType).FullName!, UmbracoObjectTypes.DataType },
+            { typeof(IContent).FullName!, UmbracoObjectTypes.Document },
+            { typeof(IContentType).FullName!, UmbracoObjectTypes.DocumentType },
+            { typeof(IMedia).FullName!, UmbracoObjectTypes.Media },
+            { typeof(IMediaType).FullName!, UmbracoObjectTypes.MediaType },
+            { typeof(IMember).FullName!, UmbracoObjectTypes.Member },
+            { typeof(IMemberType).FullName!, UmbracoObjectTypes.MemberType },
         };
     }
 
     #region Static Queries
 
     // lazy-constructed because when the ctor runs, the query factory may not be ready
-    private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity
-                                                      ?? (_queryRootEntity = Query<IUmbracoEntity>()
-                                                          .Where(x => x.ParentId == -1));
+    private IQuery<IUmbracoEntity> QueryRootEntity => _queryRootEntity ??= Query<IUmbracoEntity>()
+                                                          .Where(x => x.ParentId == -1);
 
     #endregion
 
@@ -119,9 +122,9 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
-
     /// <inheritdoc />
-    public virtual IEnumerable<IEntitySlim> GetAll<T>() where T : IUmbracoEntity
+    public virtual IEnumerable<IEntitySlim> GetAll<T>()
+        where T : IUmbracoEntity
         => GetAll<T>(Array.Empty<int>());
 
     /// <inheritdoc />
@@ -145,7 +148,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, params int[] ids)
     {
-        Type entityType = objectType.GetClrType();
+        Type? entityType = objectType.GetClrType();
         if (entityType == null)
         {
             throw new NotSupportedException($"Type \"{objectType}\" is not supported here.");
@@ -166,7 +169,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
     {
-        Type entityType = ObjectTypes.GetClrType(objectType);
+        Type? entityType = ObjectTypes.GetClrType(objectType);
         GetObjectType(entityType);
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -192,7 +195,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, Guid[] keys)
     {
-        Type entityType = objectType.GetClrType();
+        Type? entityType = objectType.GetClrType();
         GetObjectType(entityType);
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -204,7 +207,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
     {
-        Type entityType = ObjectTypes.GetClrType(objectType);
+        Type? entityType = ObjectTypes.GetClrType(objectType);
         GetObjectType(entityType);
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -227,7 +230,7 @@ public class EntityService : RepositoryService, IEntityService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEntitySlim entity = _entityRepository.Get(id);
+            IEntitySlim? entity = _entityRepository.Get(id);
             if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
             {
                 return null;
@@ -242,7 +245,7 @@ public class EntityService : RepositoryService, IEntityService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEntitySlim entity = _entityRepository.Get(id);
+            IEntitySlim? entity = _entityRepository.Get(id);
             if (entity is null || entity.ParentId == -1 || entity.ParentId == -20 || entity.ParentId == -21)
             {
                 return null;
@@ -277,7 +280,7 @@ public class EntityService : RepositoryService, IEntityService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEntitySlim entity = _entityRepository.Get(id);
+            IEntitySlim? entity = _entityRepository.Get(id);
             var pathMatch = entity?.Path + ",";
             IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>()
                 .Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
@@ -290,7 +293,7 @@ public class EntityService : RepositoryService, IEntityService
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IEntitySlim entity = _entityRepository.Get(id);
+            IEntitySlim? entity = _entityRepository.Get(id);
             if (entity is null)
             {
                 return Enumerable.Empty<IEntitySlim>();
@@ -303,23 +306,32 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IEntitySlim> GetPagedChildren(int id, UmbracoObjectTypes objectType, long pageIndex,
-        int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IEntitySlim> GetPagedChildren(
+        int id,
+        UmbracoObjectTypes objectType,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == false);
 
-            return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize,
-                out totalRecords, filter, ordering);
+            return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<IEntitySlim> GetPagedDescendants(int id, UmbracoObjectTypes objectType, long pageIndex,
-        int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
+        int id,
+        UmbracoObjectTypes objectType,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -340,15 +352,19 @@ public class EntityService : RepositoryService, IEntityService
                 query.Where(x => x.Path.SqlStartsWith(path + ",", TextColumnType.NVarchar));
             }
 
-            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize,
-                out totalRecords, filter, ordering);
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<IEntitySlim> GetPagedDescendants(IEnumerable<int> ids, UmbracoObjectTypes objectType,
-        long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
+        IEnumerable<int> ids,
+        UmbracoObjectTypes objectType,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null)
     {
         totalRecords = 0;
 
@@ -381,7 +397,7 @@ public class EntityService : RepositoryService, IEntityService
                         continue;
                     }
 
-                    TreeEntityPath entityPath = paths.FirstOrDefault(x => x.Id == id);
+                    TreeEntityPath? entityPath = paths.FirstOrDefault(x => x.Id == id);
                     if (entityPath == null)
                     {
                         continue;
@@ -397,15 +413,19 @@ public class EntityService : RepositoryService, IEntityService
                 query.WhereAny(clauses);
             }
 
-            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize,
-                out totalRecords, filter, ordering);
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypeGuid, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<IEntitySlim> GetPagedDescendants(UmbracoObjectTypes objectType, long pageIndex, int pageSize,
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
+        UmbracoObjectTypes objectType,
+        long pageIndex,
+        int pageSize,
         out long totalRecords,
-        IQuery<IUmbracoEntity>? filter = null, Ordering? ordering = null, bool includeTrashed = true)
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null,
+        bool includeTrashed = true)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -415,8 +435,7 @@ public class EntityService : RepositoryService, IEntityService
                 query.Where(x => x.Trashed == false);
             }
 
-            return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize,
-                out totalRecords, filter, ordering);
+            return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
 
@@ -464,7 +483,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[]? ids)
     {
-        Type entityType = objectType.GetClrType();
+        Type? entityType = objectType.GetClrType();
         GetObjectType(entityType);
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -476,7 +495,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
     {
-        Type entityType = objectType.GetClrType();
+        Type? entityType = objectType.GetClrType();
         GetObjectType(entityType);
 
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Logging;
+namespace Umbraco.Cms.Core.Logging;
 
 /// <summary>
 ///     Specifies the level of a log event.
@@ -10,5 +10,5 @@ public enum LogLevel
     Information,
     Warning,
     Error,
-    Fatal
+    Fatal,
 }

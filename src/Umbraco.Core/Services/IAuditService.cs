@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Services;
@@ -11,8 +11,11 @@ public interface IAuditService : IService
     void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
     IEnumerable<IAuditItem> GetLogs(int objectId);
+
     IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
+
     IEnumerable<IAuditItem> GetLogs(AuditType type, DateTime? sinceDate = null);
+
     void CleanLogs(int maximumAgeOfLogsInMinutes);
 
     /// <summary>
@@ -34,7 +37,11 @@ public interface IAuditService : IService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
+    IEnumerable<IAuditItem> GetPagedItemsByEntity(
+        int entityId,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
@@ -58,7 +65,11 @@ public interface IAuditService : IService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords,
+    IEnumerable<IAuditItem> GetPagedItemsByUser(
+        int userId,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null);
@@ -81,6 +92,13 @@ public interface IAuditService : IService
     ///     </example>
     /// </param>
     /// <param name="eventDetails">Free-form details about the audited event.</param>
-    IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc,
-        int affectedUserId, string affectedDetails, string eventType, string eventDetails);
+    IAuditEntry Write(
+        int performingUserId,
+        string perfomingDetails,
+        string performingIp,
+        DateTime eventDateUtc,
+        int affectedUserId,
+        string affectedDetails,
+        string eventType,
+        string eventDetails);
 }

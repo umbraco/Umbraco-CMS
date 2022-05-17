@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentSavedBlueprintNotification : ObjectNotification<IContent>
 {
-    public ContentSavedBlueprintNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentSavedBlueprintNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

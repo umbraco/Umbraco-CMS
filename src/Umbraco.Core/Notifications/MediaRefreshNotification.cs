@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class MediaRefreshNotification : EntityRefreshNotification<IMedia>
 {
-    public MediaRefreshNotification(IMedia target, EventMessages messages) : base(target, messages)
+    public MediaRefreshNotification(IMedia target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Gives access to the current <see cref="VariationContext" />.

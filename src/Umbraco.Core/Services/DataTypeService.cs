@@ -30,19 +30,45 @@ public class DataTypeService : RepositoryService, IDataTypeService
     private readonly IEditorConfigurationParser _editorConfigurationParser;
     private readonly IEntityRepository _entityRepository;
     private readonly IIOHelper _ioHelper;
-    private readonly IJsonSerializer _jsonSerializer;
-    private readonly ILocalizationService _localizationService;
-    private readonly ILocalizedTextService _localizedTextService;
-    private readonly IShortStringHelper _shortStringHelper;
 
-    [Obsolete("Please use constructor that takes an ")]
     public DataTypeService(
         IDataValueEditorFactory dataValueEditorFactory,
-        ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-        IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
-        IAuditRepository auditRepository, IEntityRepository entityRepository,
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDataTypeRepository dataTypeRepository,
+        IDataTypeContainerRepository dataTypeContainerRepository,
+        IAuditRepository auditRepository,
+        IEntityRepository entityRepository,
         IContentTypeRepository contentTypeRepository,
-        IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
+        IIOHelper ioHelper,
+        IEditorConfigurationParser editorConfigurationParser)
+        : base(provider, loggerFactory, eventMessagesFactory)
+    {
+        _dataValueEditorFactory = dataValueEditorFactory;
+        _dataTypeRepository = dataTypeRepository;
+        _dataTypeContainerRepository = dataTypeContainerRepository;
+        _auditRepository = auditRepository;
+        _entityRepository = entityRepository;
+        _contentTypeRepository = contentTypeRepository;
+        _ioHelper = ioHelper;
+        _editorConfigurationParser = editorConfigurationParser;
+    }
+
+    [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+    public DataTypeService(
+        IDataValueEditorFactory dataValueEditorFactory,
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDataTypeRepository dataTypeRepository,
+        IDataTypeContainerRepository dataTypeContainerRepository,
+        IAuditRepository auditRepository,
+        IEntityRepository entityRepository,
+        IContentTypeRepository contentTypeRepository,
+        IIOHelper ioHelper,
+        ILocalizedTextService localizedTextService,
+        ILocalizationService localizationService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer)
         : this(
@@ -62,43 +88,27 @@ public class DataTypeService : RepositoryService, IDataTypeService
             jsonSerializer,
             StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        _dataValueEditorFactory = dataValueEditorFactory;
-        _dataTypeRepository = dataTypeRepository;
-        _dataTypeContainerRepository = dataTypeContainerRepository;
-        _auditRepository = auditRepository;
-        _entityRepository = entityRepository;
-        _contentTypeRepository = contentTypeRepository;
-        _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
-        _localizationService = localizationService;
-        _shortStringHelper = shortStringHelper;
-        _jsonSerializer = jsonSerializer;
     }
 
+    [Obsolete("Please use constructor that takes an does not take ILocalizedTextService, ILocalizationService, IShortStringHelper & IJsonSerializer instead")]
     public DataTypeService(
         IDataValueEditorFactory dataValueEditorFactory,
-        ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-        IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
-        IAuditRepository auditRepository, IEntityRepository entityRepository,
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDataTypeRepository dataTypeRepository,
+        IDataTypeContainerRepository dataTypeContainerRepository,
+        IAuditRepository auditRepository,
+        IEntityRepository entityRepository,
         IContentTypeRepository contentTypeRepository,
-        IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
+        IIOHelper ioHelper,
+        ILocalizedTextService localizedTextService,
+        ILocalizationService localizationService,
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IEditorConfigurationParser editorConfigurationParser)
-        : base(provider, loggerFactory, eventMessagesFactory)
+        : this(dataValueEditorFactory, provider, loggerFactory, eventMessagesFactory, dataTypeRepository, dataTypeContainerRepository, auditRepository, entityRepository, contentTypeRepository, ioHelper, editorConfigurationParser)
     {
-        _dataValueEditorFactory = dataValueEditorFactory;
-        _dataTypeRepository = dataTypeRepository;
-        _dataTypeContainerRepository = dataTypeContainerRepository;
-        _auditRepository = auditRepository;
-        _entityRepository = entityRepository;
-        _contentTypeRepository = contentTypeRepository;
-        _ioHelper = ioHelper;
-        _localizedTextService = localizedTextService;
-        _localizationService = localizationService;
-        _shortStringHelper = shortStringHelper;
-        _jsonSerializer = jsonSerializer;
-        _editorConfigurationParser = editorConfigurationParser;
     }
 
     /// <summary>
@@ -112,8 +122,7 @@ public class DataTypeService : RepositoryService, IDataTypeService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDataType dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))
-                ?.FirstOrDefault();
+            IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name)).FirstOrDefault();
             ConvertMissingEditorOfDataTypeToLabel(dataType);
             return dataType;
         }
@@ -130,7 +139,7 @@ public class DataTypeService : RepositoryService, IDataTypeService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDataType dataType = _dataTypeRepository.Get(id);
+            IDataType? dataType = _dataTypeRepository.Get(id);
             ConvertMissingEditorOfDataTypeToLabel(dataType);
             return dataType;
         }
@@ -148,7 +157,7 @@ public class DataTypeService : RepositoryService, IDataTypeService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
             ConvertMissingEditorOfDataTypeToLabel(dataType);
             return dataType;
         }
@@ -354,7 +363,6 @@ public class DataTypeService : RepositoryService, IDataTypeService
                 //
                 // what IS weird is that a content type is losing a property and we do NOT raise any
                 // content type event... so ppl better listen on the data type events too.
-
                 _contentTypeRepository.Save(contentType);
             }
 
@@ -377,35 +385,9 @@ public class DataTypeService : RepositoryService, IDataTypeService
         }
     }
 
-    private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
-    {
-        if (dataType == null)
-        {
-            return;
-        }
-
-        ConvertMissingEditorsOfDataTypesToLabels(new[] {dataType});
-    }
-
-    private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
-    {
-        // Any data types that don't have an associated editor are created of a specific type.
-        // We convert them to labels to make clear to the user why the data type cannot be used.
-        IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes
-            .Where(x => x.Editor is MissingPropertyEditor);
-        foreach (IDataType dataType in dataTypesWithMissingEditors)
-        {
-            dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper, _editorConfigurationParser);
-        }
-    }
-
-    private void Audit(AuditType type, int userId, int objectId) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.DataType.GetName()));
-
     #region Containers
 
-    public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key,
-        string name, int userId = Constants.Security.SuperUserId)
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -414,7 +396,10 @@ public class DataTypeService : RepositoryService, IDataTypeService
             {
                 var container = new EntityContainer(Constants.ObjectTypes.DataType)
                 {
-                    Name = name, ParentId = parentId, CreatorId = userId, Key = key
+                    Name = name,
+                    ParentId = parentId,
+                    CreatorId = userId,
+                    Key = key,
                 };
 
                 var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
@@ -432,7 +417,6 @@ public class DataTypeService : RepositoryService, IDataTypeService
                         savingEntityContainerNotification));
 
                 // TODO: Audit trail ?
-
                 return OperationResult.Attempt.Succeed(evtMsgs, container);
             }
             catch (Exception ex)
@@ -441,6 +425,31 @@ public class DataTypeService : RepositoryService, IDataTypeService
             }
         }
     }
+
+    private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
+    {
+        if (dataType == null)
+        {
+            return;
+        }
+
+        ConvertMissingEditorsOfDataTypesToLabels(new[] { dataType });
+    }
+
+    private void ConvertMissingEditorsOfDataTypesToLabels(IEnumerable<IDataType> dataTypes)
+    {
+        // Any data types that don't have an associated editor are created of a specific type.
+        // We convert them to labels to make clear to the user why the data type cannot be used.
+        IEnumerable<IDataType> dataTypesWithMissingEditors = dataTypes
+            .Where(x => x.Editor is MissingPropertyEditor);
+        foreach (IDataType dataType in dataTypesWithMissingEditors)
+        {
+            dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper, _editorConfigurationParser);
+        }
+    }
+
+    private void Audit(AuditType type, int userId, int objectId) =>
+        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.DataType.GetName()));
 
     public EntityContainer? GetContainer(int containerId)
     {
@@ -488,7 +497,8 @@ public class DataTypeService : RepositoryService, IDataTypeService
         }
     }
 
-    public Attempt<OperationResult?> SaveContainer(EntityContainer container,
+    public Attempt<OperationResult?> SaveContainer(
+        EntityContainer container,
         int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
@@ -532,7 +542,7 @@ public class DataTypeService : RepositoryService, IDataTypeService
         EventMessages evtMsgs = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            EntityContainer container = _dataTypeContainerRepository.Get(containerId);
+            EntityContainer? container = _dataTypeContainerRepository.Get(containerId);
             if (container == null)
             {
                 return OperationResult.Attempt.NoOperation(evtMsgs);
@@ -540,7 +550,7 @@ public class DataTypeService : RepositoryService, IDataTypeService
 
             // 'container' here does not know about its children, so we need
             // to get it again from the entity repository, as a light entity
-            IEntitySlim entity = _entityRepository.Get(container.Id);
+            IEntitySlim? entity = _entityRepository.Get(container.Id);
             if (entity?.HasChildren ?? false)
             {
                 scope.Complete();
@@ -566,17 +576,16 @@ public class DataTypeService : RepositoryService, IDataTypeService
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
-    public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
-        int userId = Constants.Security.SuperUserId)
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             try
             {
-                EntityContainer container = _dataTypeContainerRepository.Get(id);
+                EntityContainer? container = _dataTypeContainerRepository.Get(id);
 
-                //throw if null, this will be caught by the catch and a failed returned
+                // throw if null, this will be caught by the catch and a failed returned
                 if (container == null)
                 {
                     throw new InvalidOperationException("No container found with id " + id);

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
@@ -29,7 +29,9 @@ public interface IAuditRepository : IReadRepository<int, IAuditItem>, IWriteRepo
     /// <returns></returns>
     IEnumerable<IAuditItem> GetPagedResultsByQuery(
         IQuery<IAuditItem> query,
-        long pageIndex, int pageSize, out long totalRecords,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
         Direction orderDirection,
         AuditType[]? auditTypeFilter,
         IQuery<IAuditItem>? customFilter);

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Blocks;
+namespace Umbraco.Cms.Core.Models.Blocks;
 
 /// <summary>
 ///     Represents a data item reference for a Block Editor implementation.

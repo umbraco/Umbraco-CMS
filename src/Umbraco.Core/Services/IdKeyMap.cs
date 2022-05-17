@@ -14,12 +14,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     private readonly Dictionary<int, TypedId<Guid>> _id2Key = new();
     private readonly Dictionary<Guid, TypedId<int>> _key2Id = new();
 
-    public IdKeyMap(ICoreScopeProvider scopeProvider, IIdKeyMapRepository idKeyMapRepository)
-    {
-        _scopeProvider = scopeProvider;
-        _idKeyMapRepository = idKeyMapRepository;
-    }
-
     // note - for pure read-only we might want to *not* enforce a transaction?
 
     // notes
@@ -43,35 +37,20 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     //   if the idkMap already knows about the map, it returns the value
     //   else it tries the published cache via mappers
     //   else it hits the database
-
     private readonly ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)>
         _dictionary
             = new();
+
+    public IdKeyMap(ICoreScopeProvider scopeProvider, IIdKeyMapRepository idKeyMapRepository)
+    {
+        _scopeProvider = scopeProvider;
+        _idKeyMapRepository = idKeyMapRepository;
+    }
 
     private bool _disposedValue;
 
     public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id) =>
         _dictionary[umbracoObjectType] = (id2key, key2id);
-
-    internal void Populate(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
-    {
-        try
-        {
-            _locker.EnterWriteLock();
-            foreach ((int id, Guid key) pair in pairs)
-            {
-                _id2Key[pair.id] = new TypedId<Guid>(pair.key, umbracoObjectType);
-                _key2Id[pair.key] = new TypedId<int>(pair.id, umbracoObjectType);
-            }
-        }
-        finally
-        {
-            if (_locker.IsWriteLockHeld)
-            {
-                _locker.ExitWriteLock();
-            }
-        }
-    }
 
 #if POPULATE_FROM_DATABASE
         private void PopulateLocked()
@@ -165,7 +144,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
         // optimize for read speed: reading database outside a lock means that we could read
         // multiple times, but we don't lock the cache while accessing the database = better
-
         int? val = null;
 
         if (_dictionary.TryGetValue(umbracoObjectType, out (Func<int, Guid> id2key, Func<Guid, int> key2id) mappers))
@@ -191,9 +169,8 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
 
         // cache reservations, when something is saved this cache is cleared anyways
-        //if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
+        // if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
         //    Attempt.Succeed(val.Value);
-
         try
         {
             _locker.EnterWriteLock();
@@ -209,6 +186,26 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
 
         return Attempt.Succeed(val.Value);
+    }
+
+    internal void Populate(IEnumerable<(int id, Guid key)> pairs, UmbracoObjectTypes umbracoObjectType)
+    {
+        try
+        {
+            _locker.EnterWriteLock();
+            foreach ((int id, Guid key) in pairs)
+            {
+                _id2Key[id] = new TypedId<Guid>(key, umbracoObjectType);
+                _key2Id[key] = new TypedId<int>(id, umbracoObjectType);
+            }
+        }
+        finally
+        {
+            if (_locker.IsWriteLockHeld)
+            {
+                _locker.ExitWriteLock();
+            }
+        }
     }
 
     public Attempt<int> GetIdForUdi(Udi udi)
@@ -227,7 +224,8 @@ public class IdKeyMap : IIdKeyMap, IDisposable
     {
         Attempt<Guid> keyAttempt = GetKeyForId(id, umbracoObjectType);
         return keyAttempt.Success
-            ? Attempt.Succeed<Udi?>(new GuidUdi(UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType),
+            ? Attempt.Succeed<Udi?>(new GuidUdi(
+                UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType),
                 keyAttempt.Result))
             : Attempt<Udi?>.Fail();
     }
@@ -263,7 +261,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
 
         // optimize for read speed: reading database outside a lock means that we could read
         // multiple times, but we don't lock the cache while accessing the database = better
-
         Guid? val = null;
 
         if (_dictionary.TryGetValue(umbracoObjectType, out (Func<int, Guid> id2key, Func<Guid, int> key2id) mappers))
@@ -289,9 +286,8 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
 
         // cache reservations, when something is saved this cache is cleared anyways
-        //if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
+        // if (umbracoObjectType == UmbracoObjectTypes.IdReservation)
         //    Attempt.Succeed(val.Value);
-
         try
         {
             _locker.EnterWriteLock();
@@ -372,30 +368,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
-    // ReSharper disable ClassNeverInstantiated.Local
-    // ReSharper disable UnusedAutoPropertyAccessor.Local
-    private class TypedIdDto
-    {
-        public int Id { get; set; }
-        public Guid UniqueId { get; set; }
-        public Guid NodeObjectType { get; set; }
-    }
-    // ReSharper restore ClassNeverInstantiated.Local
-    // ReSharper restore UnusedAutoPropertyAccessor.Local
-
-    private struct TypedId<T>
-    {
-        public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
-        {
-            UmbracoObjectType = umbracoObjectType;
-            Id = id;
-        }
-
-        public UmbracoObjectTypes UmbracoObjectType { get; }
-
-        public T Id { get; }
-    }
-
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -409,7 +381,34 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         }
     }
 
+    // ReSharper restore ClassNeverInstantiated.Local
+    // ReSharper restore UnusedAutoPropertyAccessor.Local
+    private struct TypedId<T>
+    {
+        public TypedId(T id, UmbracoObjectTypes umbracoObjectType)
+        {
+            UmbracoObjectType = umbracoObjectType;
+            Id = id;
+        }
+
+        public UmbracoObjectTypes UmbracoObjectType { get; }
+
+        public T Id { get; }
+    }
+
+    // ReSharper disable ClassNeverInstantiated.Local
+    // ReSharper disable UnusedAutoPropertyAccessor.Local
+    private class TypedIdDto
+    {
+        public int Id { get; set; }
+
+        public Guid UniqueId { get; set; }
+
+        public Guid NodeObjectType { get; set; }
+    }
+
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 }

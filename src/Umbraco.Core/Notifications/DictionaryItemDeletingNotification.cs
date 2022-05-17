@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DictionaryItemDeletingNotification : DeletingNotification<IDictionaryItem>
 {
-    public DictionaryItemDeletingNotification(IDictionaryItem target, EventMessages messages) : base(target, messages)
+    public DictionaryItemDeletingNotification(IDictionaryItem target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public DictionaryItemDeletingNotification(IEnumerable<IDictionaryItem> target, EventMessages messages) : base(
+    public DictionaryItemDeletingNotification(IEnumerable<IDictionaryItem> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

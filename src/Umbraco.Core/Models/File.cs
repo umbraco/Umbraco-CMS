@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -34,7 +34,7 @@ public abstract class File : EntityBase, IFile
     ///     Gets or sets the Name of the File including extension
     /// </summary>
     [DataMember]
-    public virtual string Name => _name ?? (_name = System.IO.Path.GetFileName(Path));
+    public virtual string Name => _name ??= System.IO.Path.GetFileName(Path);
 
     /// <summary>
     ///     Gets or sets the Alias of the File, which is the name without the extension
@@ -53,7 +53,7 @@ public abstract class File : EntityBase, IFile
                 }
 
                 var lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
-                _alias = name.Substring(0, lastIndexOf);
+                _alias = name[..lastIndexOf];
             }
 
             return _alias;
@@ -69,7 +69,7 @@ public abstract class File : EntityBase, IFile
         get => _path;
         set
         {
-            //reset
+            // reset
             _alias = null;
             _name = null;
 
@@ -81,11 +81,6 @@ public abstract class File : EntityBase, IFile
     ///     Gets the original path of the file
     /// </summary>
     public string OriginalPath { get; private set; }
-
-    /// <summary>
-    ///     Called to re-set the OriginalPath to the Path
-    /// </summary>
-    public void ResetOriginalPath() => OriginalPath = _path;
 
     /// <summary>
     ///     Gets or sets the Content of a File
@@ -108,27 +103,28 @@ public abstract class File : EntityBase, IFile
                 _content = GetFileContent(this);
             }
 
-            return _content ?? (_content = string.Empty);
+            return _content ??= string.Empty;
         }
         set =>
             SetPropertyValueAndDetectChanges(
                 value ?? string.Empty, // cannot set to null
-                ref _content, nameof(Content));
+                ref _content,
+                nameof(Content));
     }
+
+    /// <summary>
+    ///     Called to re-set the OriginalPath to the Path
+    /// </summary>
+    public void ResetOriginalPath() => OriginalPath = _path;
 
     /// <summary>
     ///     Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
     /// </summary>
     public string? VirtualPath { get; set; }
 
-    private static string SanitizePath(string path) =>
-        path
-            .Replace('\\', System.IO.Path.DirectorySeparatorChar)
-            .Replace('/', System.IO.Path.DirectorySeparatorChar);
-
-    //Don't strip the start - this was a bug fixed in 7.3, see ScriptRepositoryTests.PathTests
-    //.TrimStart(System.IO.Path.DirectorySeparatorChar)
-    //.TrimStart('/');
+    // Don't strip the start - this was a bug fixed in 7.3, see ScriptRepositoryTests.PathTests
+    // .TrimStart(System.IO.Path.DirectorySeparatorChar)
+    // .TrimStart('/');
     // this exists so that class that manage name and alias differently, eg Template,
     // can implement their own cloning - (though really, not sure it's even needed)
     protected virtual void DeepCloneNameAndAlias(File clone)
@@ -137,6 +133,11 @@ public abstract class File : EntityBase, IFile
         clone._name = Name;
         clone._alias = Alias;
     }
+
+    private static string SanitizePath(string path) =>
+        path
+            .Replace('\\', System.IO.Path.DirectorySeparatorChar)
+            .Replace('/', System.IO.Path.DirectorySeparatorChar);
 
     protected override void PerformDeepClone(object clone)
     {

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -15,8 +15,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -38,8 +37,7 @@ public class DecimalValueConverter : PropertyValueConverterBase
         // is it a string?
         if (source is string sourceString)
         {
-            return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign,
-                CultureInfo.InvariantCulture, out var d)
+            return decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var d)
                 ? d
                 : 0M;
         }

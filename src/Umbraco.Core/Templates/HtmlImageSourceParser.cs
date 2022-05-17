@@ -38,7 +38,7 @@ public sealed class HtmlImageSourceParser
 
         foreach (Match match in matches)
         {
-            if (match.Groups.Count == 2 && UdiParser.TryParse(match.Groups[1].Value, out Udi udi))
+            if (match.Groups.Count == 2 && UdiParser.TryParse(match.Groups[1].Value, out Udi? udi))
             {
                 yield return udi;
             }
@@ -67,7 +67,7 @@ public sealed class HtmlImageSourceParser
             // - 4 = the data-udi attribute value
             // - 5 = anything after group 4 until the image tag is closed
             var udi = match.Groups[4].Value;
-            if (udi.IsNullOrWhiteSpace() || UdiParser.TryParse(udi, out GuidUdi guidUdi) == false)
+            if (udi.IsNullOrWhiteSpace() || UdiParser.TryParse<GuidUdi>(udi, out GuidUdi? guidUdi) == false)
             {
                 return match.Value;
             }
@@ -90,6 +90,7 @@ public sealed class HtmlImageSourceParser
     /// <param name="text"></param>
     /// <returns></returns>
     public string RemoveImageSources(string text)
+
         // see comment in ResolveMediaFromTextString for group reference
         => ResolveImgPattern.Replace(text, "$1$3$4$5");
 }

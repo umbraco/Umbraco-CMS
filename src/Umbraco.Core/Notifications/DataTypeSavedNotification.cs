@@ -5,11 +5,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DataTypeSavedNotification : SavedNotification<IDataType>
 {
-    public DataTypeSavedNotification(IDataType target, EventMessages messages) : base(target, messages)
+    public DataTypeSavedNotification(IDataType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public DataTypeSavedNotification(IEnumerable<IDataType> target, EventMessages messages) : base(target, messages)
+    public DataTypeSavedNotification(IEnumerable<IDataType> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

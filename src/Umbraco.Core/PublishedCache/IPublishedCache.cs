@@ -1,4 +1,4 @@
-﻿using System.Xml.XPath;
+using System.Xml.XPath;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
 

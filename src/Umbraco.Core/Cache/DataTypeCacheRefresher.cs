@@ -67,10 +67,9 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
     public override void Refresh(JsonPayload[] payloads)
     {
-        //we need to clear the ContentType runtime cache since that is what caches the
+        // we need to clear the ContentType runtime cache since that is what caches the
         // db data type to store the value against and anytime a datatype changes, this also might change
         // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
-
         ClearAllIsolatedCacheByEntityType<IContent>();
         ClearAllIsolatedCacheByEntityType<IContentType>();
         ClearAllIsolatedCacheByEntityType<IMedia>();
@@ -78,7 +77,7 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         ClearAllIsolatedCacheByEntityType<IMember>();
         ClearAllIsolatedCacheByEntityType<IMemberType>();
 
-        Attempt<IAppPolicyCache> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
+        Attempt<IAppPolicyCache?> dataTypeCache = AppCaches.IsolatedCaches.Get<IDataType>();
 
         foreach (JsonPayload payload in payloads)
         {
@@ -95,7 +94,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
         SliderValueConverter.ClearCaches();
 
         // refresh the models and cache
-
         _publishedModelFactory.WithSafeLiveFactoryReset(() =>
             _publishedSnapshotService.Notify(payloads));
 
@@ -104,7 +102,6 @@ public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeC
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();

@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DictionaryItemSavingNotification : SavingNotification<IDictionaryItem>
 {
-    public DictionaryItemSavingNotification(IDictionaryItem target, EventMessages messages) : base(target, messages)
+    public DictionaryItemSavingNotification(IDictionaryItem target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public DictionaryItemSavingNotification(IEnumerable<IDictionaryItem> target, EventMessages messages) : base(target,
+    public DictionaryItemSavingNotification(IEnumerable<IDictionaryItem> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

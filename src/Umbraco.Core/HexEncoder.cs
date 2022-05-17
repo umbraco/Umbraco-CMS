@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Umbraco.Cms.Core;
 
@@ -10,7 +10,7 @@ public static class HexEncoder
     // LUT's that provide the hexadecimal representation of each possible byte value.
     private static readonly char[] HexLutBase =
     {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
     };
 
     // The base LUT arranged in 16x each item order. 0 * 16, 1 * 16, .... F * 16

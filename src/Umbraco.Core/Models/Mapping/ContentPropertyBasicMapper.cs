@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -17,8 +17,11 @@ internal class ContentPropertyBasicMapper<TDestination>
     private readonly ILogger<ContentPropertyBasicMapper<TDestination>> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
 
-    public ContentPropertyBasicMapper(IDataTypeService dataTypeService, IEntityService entityService,
-        ILogger<ContentPropertyBasicMapper<TDestination>> logger, PropertyEditorCollection propertyEditors)
+    public ContentPropertyBasicMapper(
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        ILogger<ContentPropertyBasicMapper<TDestination>> logger,
+        PropertyEditorCollection propertyEditors)
     {
         _logger = logger;
         _propertyEditors = propertyEditors;
@@ -34,9 +37,7 @@ internal class ContentPropertyBasicMapper<TDestination>
     /// <returns></returns>
     public virtual void Map(IProperty property, TDestination dest, MapperContext context)
     {
-        IDataEditor editor = property.PropertyType is not null
-            ? _propertyEditors[property.PropertyType.PropertyEditorAlias]
-            : null;
+        IDataEditor? editor = property.PropertyType is not null ? _propertyEditors[property.PropertyType.PropertyEditorAlias] : null;
         if (editor == null)
         {
             _logger.LogError(
@@ -68,17 +69,17 @@ internal class ContentPropertyBasicMapper<TDestination>
             return;
         }
 
-        //Get the culture from the context which will be set during the mapping operation for each property
+        // Get the culture from the context which will be set during the mapping operation for each property
         var culture = context.GetCulture();
 
-        //a culture needs to be in the context for a property type that can vary
+        // a culture needs to be in the context for a property type that can vary
         if (culture == null && property.PropertyType.VariesByCulture())
         {
             throw new InvalidOperationException(
                 $"No culture found in mapping operation when one is required for the culture variant property type {property.PropertyType.Alias}");
         }
 
-        //set the culture to null if it's an invariant property type
+        // set the culture to null if it's an invariant property type
         culture = !property.PropertyType.VariesByCulture() ? null : culture;
 
         dest.Culture = culture;

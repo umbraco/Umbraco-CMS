@@ -16,7 +16,8 @@ public static class ContentRepositoryExtensions
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -27,7 +28,8 @@ public static class ContentRepositoryExtensions
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(culture));
         }
 
@@ -89,7 +91,6 @@ public static class ContentRepositoryExtensions
             }
         }
 
-
         if (!publishing)
         {
             return;
@@ -134,7 +135,7 @@ public static class ContentRepositoryExtensions
             return Array.Empty<string>();
         }
 
-        IEnumerable<string> culturesUnpublishing = content.CultureInfos?.Values
+        IEnumerable<string>? culturesUnpublishing = content.CultureInfos?.Values
             .Where(x => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + x.Culture))
             .Select(x => x.Culture);
 
@@ -212,7 +213,6 @@ public static class ContentRepositoryExtensions
         }
 
         // copy names, too
-
         if (culture == "*")
         {
             content.CultureInfos?.Clear();
@@ -246,7 +246,8 @@ public static class ContentRepositoryExtensions
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -257,7 +258,8 @@ public static class ContentRepositoryExtensions
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(culture));
         }
 
@@ -273,7 +275,8 @@ public static class ContentRepositoryExtensions
         }
         else
         {
-            var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace())!,
+            var editedCultures = new HashSet<string>(
+                cultures.Where(x => !x.IsNullOrWhiteSpace())!,
                 StringComparer.OrdinalIgnoreCase);
             content.EditedCultures = editedCultures.Count > 0 ? editedCultures : null;
         }
@@ -324,6 +327,7 @@ public static class ContentRepositoryExtensions
             {
                 return false;
             }
+
             // PublishName set by repository - nothing to do here
         }
         else if (impact.ImpactsExplicitCulture)
@@ -418,7 +422,8 @@ public static class ContentRepositoryExtensions
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(culture));
         }
 

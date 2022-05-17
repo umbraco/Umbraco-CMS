@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class AssignedUserGroupPermissionsNotification : EnumerableObjectNotification<EntityPermission>
 {
-    public AssignedUserGroupPermissionsNotification(IEnumerable<EntityPermission> target, EventMessages messages) :
-        base(target, messages)
+    public AssignedUserGroupPermissionsNotification(IEnumerable<EntityPermission> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

@@ -234,7 +234,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 continue;
             }
 
-            IContentTypeComposition contentTypeDependency = allContentTypes.FirstOrDefault(x =>
+            IContentTypeComposition? contentTypeDependency = allContentTypes.FirstOrDefault(x =>
                 x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
             if (contentTypeDependency == null)
             {
@@ -353,7 +353,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private static void AddChange(ICollection<ContentTypeChange<TItem>> changes, TItem contentType,
         ContentTypeChangeTypes changeTypes)
     {
-        ContentTypeChange<TItem> change = changes.FirstOrDefault(x => x.Item == contentType);
+        ContentTypeChange<TItem>? change = changes.FirstOrDefault(x => x.Item == contentType);
         if (change == null)
         {
             changes.Add(new ContentTypeChange<TItem>(contentType, changeTypes));
@@ -435,7 +435,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            TItem found = Get(id);
+            TItem? found = Get(id);
             if (found == null)
             {
                 return Enumerable.Empty<TItem>();
@@ -462,7 +462,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(ReadLockIds);
-            TItem found = Get(id);
+            TItem? found = Get(id);
             if (found == null)
             {
                 return false;
@@ -507,7 +507,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             var descendants = new List<TItem>();
             if (andSelf)
             {
-                TItem self = Repository.Get(id);
+                TItem? self = Repository.Get(id);
                 if (self is not null)
                 {
                     descendants.Add(self);
@@ -905,7 +905,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 if (containerId > 0)
                 {
-                    EntityContainer container = _containerRepository?.Get(containerId);
+                    EntityContainer? container = _containerRepository?.Get(containerId);
                     if (container == null)
                     {
                         throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType
@@ -927,7 +927,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 // all other compositions remain in place in the copied content type
                 if (copy.ParentId > 0)
                 {
-                    TItem parent = Repository.Get(copy.ParentId);
+                    TItem? parent = Repository.Get(copy.ParentId);
                     if (parent != null)
                     {
                         copy.RemoveContentType(parent.Alias);

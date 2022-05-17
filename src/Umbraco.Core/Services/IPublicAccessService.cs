@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -45,8 +45,7 @@ public interface IPublicAccessService : IService
     /// <param name="ruleType"></param>
     /// <param name="ruleValue"></param>
     /// <returns></returns>
-    Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType,
-        string ruleValue);
+    Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType, string ruleValue);
 
     /// <summary>
     ///     Removes a rule

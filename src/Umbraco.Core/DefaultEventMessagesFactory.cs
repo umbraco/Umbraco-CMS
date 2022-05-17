@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core;
 
@@ -8,17 +8,12 @@ public class DefaultEventMessagesFactory : IEventMessagesFactory
 
     public DefaultEventMessagesFactory(IEventMessagesAccessor eventMessagesAccessor)
     {
-        if (eventMessagesAccessor == null)
-        {
-            throw new ArgumentNullException(nameof(eventMessagesAccessor));
-        }
-
-        _eventMessagesAccessor = eventMessagesAccessor;
+        _eventMessagesAccessor = eventMessagesAccessor ?? throw new ArgumentNullException(nameof(eventMessagesAccessor));
     }
 
     public EventMessages Get()
     {
-        EventMessages eventMessages = _eventMessagesAccessor.EventMessages;
+        EventMessages? eventMessages = _eventMessagesAccessor.EventMessages;
         if (eventMessages == null)
         {
             _eventMessagesAccessor.EventMessages = eventMessages = new EventMessages();

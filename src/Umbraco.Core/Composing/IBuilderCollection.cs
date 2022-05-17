@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Composing;
+namespace Umbraco.Cms.Core.Composing;
 
 /// <summary>
 ///     Represents a builder collection, ie an immutable enumeration of items.

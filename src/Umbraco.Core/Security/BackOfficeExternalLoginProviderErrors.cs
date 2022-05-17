@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Security;
+namespace Umbraco.Cms.Core.Security;
 
 public class BackOfficeExternalLoginProviderErrors
 {
@@ -14,5 +14,6 @@ public class BackOfficeExternalLoginProviderErrors
     }
 
     public string? AuthenticationType { get; set; }
+
     public IEnumerable<string>? Errors { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -33,7 +33,8 @@ public class DomainAndUri : Domain
         {
             throw new ArgumentException(
                 $"Failed to parse invalid domain: node id={domain.ContentId}, hostname=\"{Name.ToCSharpString()}\"."
-                + " Hostname should be a valid uri.", nameof(domain));
+                + " Hostname should be a valid uri.",
+                nameof(domain));
         }
     }
 

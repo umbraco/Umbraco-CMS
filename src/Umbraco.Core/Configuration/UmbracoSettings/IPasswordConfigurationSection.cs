@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
+namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
 public interface IPasswordConfigurationSection : IUmbracoConfigurationSection
 {

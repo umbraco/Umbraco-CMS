@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Trees;
+namespace Umbraco.Cms.Core.Trees;
 
 /// <summary>
 ///     Specifies the action to take for a menu item when a URL is specified
@@ -6,5 +6,5 @@
 public enum ActionUrlMethod
 {
     Dialog,
-    BlankWindow
+    BlankWindow,
 }

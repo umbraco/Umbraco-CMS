@@ -30,12 +30,13 @@ public class ContentType : ContentTypeCompositionBase, IContentTypeWithHistoryCl
     /// </summary>
     /// <remarks>Only use this for creating ContentTypes at the root (with ParentId -1).</remarks>
     /// <param name="parentId"></param>
-    public ContentType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
+    /// <param name="shortStringHelper"></param>
+    public ContentType(IShortStringHelper shortStringHelper, int parentId)
+        : base(shortStringHelper, parentId)
     {
         _allowedTemplates = new List<ITemplate>();
         HistoryCleanup = new HistoryCleanup();
     }
-
 
     /// <summary>
     ///     Constuctor for creating a ContentType with the parent as an inherited type.
@@ -43,6 +44,7 @@ public class ContentType : ContentTypeCompositionBase, IContentTypeWithHistoryCl
     /// <remarks>Use this to ensure inheritance from parent.</remarks>
     /// <param name="parent"></param>
     /// <param name="alias"></param>
+    /// <param name="shortStringHelper"></param>
     public ContentType(IShortStringHelper shortStringHelper, IContentType parent, string alias)
         : base(shortStringHelper, parent, alias)
     {
@@ -52,9 +54,6 @@ public class ContentType : ContentTypeCompositionBase, IContentTypeWithHistoryCl
 
     /// <inheritdoc />
     public override bool SupportsPublishing => SupportsPublishingConst;
-
-    /// <inheritdoc />
-    public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
     /// <summary>
     ///     Gets or sets the alias of the default Template.
@@ -66,6 +65,8 @@ public class ContentType : ContentTypeCompositionBase, IContentTypeWithHistoryCl
     public ITemplate? DefaultTemplate =>
         AllowedTemplates?.FirstOrDefault(x => x != null && x.Id == DefaultTemplateId);
 
+    /// <inheritdoc />
+    public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
     [DataMember]
     public int DefaultTemplateId

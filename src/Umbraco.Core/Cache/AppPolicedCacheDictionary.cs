@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -25,6 +25,7 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     protected AppPolicedCacheDictionary(Func<TKey, IAppPolicyCache> cacheFactory) => _cacheFactory = cacheFactory;
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -33,14 +34,6 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     /// </summary>
     public IAppPolicyCache GetOrCreate(TKey key)
         => _caches.GetOrAdd(key, k => _cacheFactory(k));
-
-    /// <summary>
-    ///     Tries to get a cache.
-    /// </summary>
-    protected Attempt<IAppPolicyCache?> Get(TKey key)
-        => _caches.TryGetValue(key, out IAppPolicyCache cache)
-            ? Attempt.Succeed(cache)
-            : Attempt.Fail<IAppPolicyCache?>();
 
     /// <summary>
     ///     Removes a cache.
@@ -53,22 +46,30 @@ public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     public void RemoveAll() => _caches.Clear();
 
     /// <summary>
-    ///     Clears a cache.
+    ///     Clears all caches.
     /// </summary>
-    protected void ClearCache(TKey key)
+    public void ClearAllCaches()
     {
-        if (_caches.TryGetValue(key, out IAppPolicyCache cache))
+        foreach (IAppPolicyCache cache in _caches.Values)
         {
             cache.Clear();
         }
     }
 
     /// <summary>
-    ///     Clears all caches.
+    ///     Tries to get a cache.
     /// </summary>
-    public void ClearAllCaches()
+    protected Attempt<IAppPolicyCache?> Get(TKey key)
+        => _caches.TryGetValue(key, out IAppPolicyCache? cache)
+            ? Attempt.Succeed(cache)
+            : Attempt.Fail<IAppPolicyCache?>();
+
+    /// <summary>
+    ///     Clears a cache.
+    /// </summary>
+    protected void ClearCache(TKey key)
     {
-        foreach (IAppPolicyCache cache in _caches.Values)
+        if (_caches.TryGetValue(key, out IAppPolicyCache? cache))
         {
             cache.Clear();
         }

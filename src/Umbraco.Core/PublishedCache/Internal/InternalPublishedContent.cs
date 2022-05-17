@@ -28,16 +28,16 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public IEnumerable<int>? ChildIds { get; set; }
 
+    public int Id { get; set; }
+
     public object? this[string alias]
     {
         get
         {
-            IPublishedProperty property = GetProperty(alias);
+            IPublishedProperty? property = GetProperty(alias);
             return property == null || property.HasValue() == false ? null : property.GetValue();
         }
     }
-
-    public int Id { get; set; }
 
     public Guid Key { get; set; }
 
@@ -65,11 +65,11 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public PublishedItemType ItemType => PublishedItemType.Content;
 
+    public IPublishedContent? Parent { get; set; }
+
     public bool IsDraft(string? culture = null) => false;
 
     public bool IsPublished(string? culture = null) => true;
-
-    public IPublishedContent? Parent { get; set; }
 
     public IEnumerable<IPublishedContent>? Children { get; set; }
 
@@ -81,11 +81,6 @@ public sealed class InternalPublishedContent : IPublishedContent
 
     public IPublishedProperty? GetProperty(string alias) =>
         Properties?.FirstOrDefault(p => p.Alias.InvariantEquals(alias));
-
-    private Dictionary<string, PublishedCultureInfo> GetCultures() => new()
-    {
-        {string.Empty, new PublishedCultureInfo(string.Empty, Name, UrlSegment, UpdateDate)}
-    };
 
     public IPublishedProperty? GetProperty(string alias, bool recurse)
     {
@@ -104,4 +99,9 @@ public sealed class InternalPublishedContent : IPublishedContent
 
         return property;
     }
+
+    private Dictionary<string, PublishedCultureInfo> GetCultures() => new()
+    {
+        { string.Empty, new PublishedCultureInfo(string.Empty, Name, UrlSegment, UpdateDate) },
+    };
 }

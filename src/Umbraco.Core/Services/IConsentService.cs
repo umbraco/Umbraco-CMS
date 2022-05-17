@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -41,7 +41,12 @@ public interface IConsentService : IService
     /// <param name="actionStartsWith">Determines whether <paramref name="action" /> is a start pattern.</param>
     /// <param name="includeHistory">Determines whether to include the history of consents.</param>
     /// <returns>Consents matching the parameters.</returns>
-    IEnumerable<IConsent> LookupConsent(string? source = null, string? context = null, string? action = null,
-        bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
+    IEnumerable<IConsent> LookupConsent(
+        string? source = null,
+        string? context = null,
+        string? action = null,
+        bool sourceStartsWith = false,
+        bool contextStartsWith = false,
+        bool actionStartsWith = false,
         bool includeHistory = false);
 }

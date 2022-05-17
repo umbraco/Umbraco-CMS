@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -11,6 +11,7 @@ public interface IContentAppFactory
     ///     Gets the content app for an object.
     /// </summary>
     /// <param name="source">The source object.</param>
+    /// <param name="userGroups">The user groups</param>
     /// <returns>The content app for the object, or null.</returns>
     /// <remarks>
     ///     <para>

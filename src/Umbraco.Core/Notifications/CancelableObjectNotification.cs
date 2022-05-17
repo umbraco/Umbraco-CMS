@@ -5,9 +5,11 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public abstract class CancelableObjectNotification<T> : ObjectNotification<T>, ICancelableNotification where T : class
+public abstract class CancelableObjectNotification<T> : ObjectNotification<T>, ICancelableNotification
+    where T : class
 {
-    protected CancelableObjectNotification(T target, EventMessages messages) : base(target, messages)
+    protected CancelableObjectNotification(T target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

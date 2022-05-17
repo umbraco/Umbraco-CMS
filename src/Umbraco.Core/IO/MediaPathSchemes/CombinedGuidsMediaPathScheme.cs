@@ -13,7 +13,6 @@ public class CombinedGuidsMediaPathScheme : IMediaPathScheme
     {
         // assumes that cuid and puid keys can be trusted - and that a single property type
         // for a single content cannot store two different files with the same name
-
         Guid combinedGuid = GuidUtils.Combine(itemGuid, propertyGuid);
         var directory =
             HexEncoder.Encode(

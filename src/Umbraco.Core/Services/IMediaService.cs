@@ -9,11 +9,15 @@ namespace Umbraco.Cms.Core.Services;
 public interface IMediaService : IContentServiceBase<IMedia>
 {
     int CountNotTrashed(string? contentTypeAlias = null);
+
     int Count(string? mediaTypeAlias = null);
+
     int CountChildren(int parentId, string? mediaTypeAlias = null);
+
     int CountDescendants(int parentId, string? mediaTypeAlias = null);
 
     IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+
     IEnumerable<IMedia> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
@@ -90,9 +94,9 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="orderDirection">Direction to order by</param>
     /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
     /// <param name="filter"></param>
+    /// <param name="ordering"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects by Parent Id
@@ -104,8 +108,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="ordering"></param>
     /// <param name="filter"></param>
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
-    IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets paged documents of a content
@@ -116,8 +119,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Search text filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets paged documents for specified content types
@@ -128,8 +130,13 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Search text filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    IEnumerable<IMedia> GetPagedOfTypes(
+        int[] contentTypeIds,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IMedia>? filter = null,
+        Ordering? ordering = null);
 
     /// <summary>
     ///     Gets a collection of <see cref="IMedia" /> objects, which reside at the first level / root
@@ -141,8 +148,12 @@ public interface IMediaService : IContentServiceBase<IMedia>
     ///     Gets a collection of an <see cref="IMedia" /> objects, which resides in the Recycle Bin
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null);
+    IEnumerable<IMedia> GetPagedMediaInRecycleBin(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IMedia>? filter = null,
+        Ordering? ordering = null);
 
     /// <summary>
     ///     Moves an <see cref="IMedia" /> object to a new location
@@ -328,8 +339,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId);
+    IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />
@@ -346,8 +356,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId);
+    IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Gets the content of a media as a stream.

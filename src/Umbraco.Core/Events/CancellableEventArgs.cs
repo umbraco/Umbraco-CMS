@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 namespace Umbraco.Cms.Core.Events;
 
@@ -7,8 +7,7 @@ namespace Umbraco.Cms.Core.Events;
 /// </summary>
 public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
 {
-    private static readonly ReadOnlyDictionary<string, object> EmptyAdditionalData =
-        new(new Dictionary<string, object>());
+    private static readonly ReadOnlyDictionary<string, object> EmptyAdditionalData = new(new Dictionary<string, object>());
 
     private bool _cancel;
     private IDictionary<string, object>? _eventState;
@@ -22,20 +21,16 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
 
     public CancellableEventArgs(bool canCancel, EventMessages eventMessages)
     {
-        if (eventMessages == null)
-        {
-            throw new ArgumentNullException("eventMessages");
-        }
-
         CanCancel = canCancel;
-        Messages = eventMessages;
+        Messages = eventMessages ?? throw new ArgumentNullException("eventMessages");
         AdditionalData = EmptyAdditionalData;
     }
 
     public CancellableEventArgs(bool canCancel)
     {
         CanCancel = canCancel;
-        //create a standalone messages
+
+        // create a standalone messages
         Messages = new EventMessages();
         AdditionalData = EmptyAdditionalData;
     }
@@ -69,6 +64,7 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
 
             return _cancel;
         }
+
         set
         {
             if (CanCancel == false)
@@ -103,9 +99,13 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     /// </summary>
     public IDictionary<string, object> EventState
     {
-        get => _eventState ?? (_eventState = new Dictionary<string, object>());
+        get => _eventState ??= new Dictionary<string, object>();
         set => _eventState = value;
     }
+
+    public static bool operator ==(CancellableEventArgs? left, CancellableEventArgs? right) => Equals(left, right);
+
+    public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right) => Equals(left, right) == false;
 
     public bool Equals(CancellableEventArgs? other)
     {
@@ -154,9 +154,4 @@ public class CancellableEventArgs : EventArgs, IEquatable<CancellableEventArgs>
     }
 
     public override int GetHashCode() => AdditionalData != null ? AdditionalData.GetHashCode() : 0;
-
-    public static bool operator ==(CancellableEventArgs? left, CancellableEventArgs? right) => Equals(left, right);
-
-    public static bool operator !=(CancellableEventArgs left, CancellableEventArgs right) =>
-        Equals(left, right) == false;
 }

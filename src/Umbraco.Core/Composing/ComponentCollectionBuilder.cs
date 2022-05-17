@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Core.Composing;
@@ -29,8 +29,10 @@ public class
     {
         IProfilingLogger logger = factory.GetRequiredService<IProfilingLogger>();
 
-        using (logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.",
-                   $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+        using (logger.DebugDuration<ComponentCollectionBuilder>(
+            $"Creating {itemType.FullName}.",
+            $"Created {itemType.FullName}.",
+            thresholdMilliseconds: LogThresholdMilliseconds))
         {
             return base.CreateItem(factory, itemType);
         }

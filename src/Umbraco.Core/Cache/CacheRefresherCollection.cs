@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core.Cache;
 
 public class CacheRefresherCollection : BuilderCollectionBase<ICacheRefresher>
 {
-    public CacheRefresherCollection(Func<IEnumerable<ICacheRefresher>> items) : base(items)
+    public CacheRefresherCollection(Func<IEnumerable<ICacheRefresher>> items)
+        : base(items)
     {
     }
 

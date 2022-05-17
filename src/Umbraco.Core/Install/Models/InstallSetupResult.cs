@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Install.Models;
+namespace Umbraco.Cms.Core.Install.Models;
 
 /// <summary>
 ///     The object returned from each installation step

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
 

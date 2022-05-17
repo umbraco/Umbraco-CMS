@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Validation;
@@ -27,7 +27,8 @@ public class EntityBasic
     [ReadOnly(true)]
     public Udi? Udi { get; set; }
 
-    [DataMember(Name = "icon")] public string? Icon { get; set; }
+    [DataMember(Name = "icon")]
+    public string? Icon { get; set; }
 
     [DataMember(Name = "trashed")]
     [ReadOnly(true)]

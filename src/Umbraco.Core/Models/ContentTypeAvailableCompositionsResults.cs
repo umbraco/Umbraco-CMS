@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Used when determining available compositions for a given content type
@@ -11,7 +11,8 @@ public class ContentTypeAvailableCompositionsResults
         Results = Enumerable.Empty<ContentTypeAvailableCompositionsResult>();
     }
 
-    public ContentTypeAvailableCompositionsResults(IEnumerable<IContentTypeComposition> ancestors,
+    public ContentTypeAvailableCompositionsResults(
+        IEnumerable<IContentTypeComposition> ancestors,
         IEnumerable<ContentTypeAvailableCompositionsResult> results)
     {
         Ancestors = ancestors;
@@ -19,5 +20,6 @@ public class ContentTypeAvailableCompositionsResults
     }
 
     public IEnumerable<IContentTypeComposition> Ancestors { get; }
+
     public IEnumerable<ContentTypeAvailableCompositionsResult> Results { get; }
 }

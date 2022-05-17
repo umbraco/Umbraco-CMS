@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Deploy;
 
@@ -30,8 +30,7 @@ public interface IValueConnector
     ///     Gets the content property value corresponding to a deploy property value.
     /// </summary>
     /// <param name="value">The deploy property value.</param>
-    /// <param name="propertyType">
-    ///     The value property type<</param>
+    /// <param name="propertyType">The value property type</param>
     /// <param name="currentValue">The current content property value.</param>
     /// <returns>The content property value.</returns>
     object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue);

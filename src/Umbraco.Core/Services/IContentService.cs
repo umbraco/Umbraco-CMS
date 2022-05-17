@@ -76,6 +76,8 @@ public interface IContentService : IContentServiceBase<IContent>
     /// </summary>
     IContent? GetById(int id);
 
+    new
+
     /// <summary>
     ///     Gets a document.
     /// </summary>
@@ -185,8 +187,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Gets documents in the recycle bin.
     /// </summary>
-    IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent>? filter = null, Ordering? ordering = null);
+    IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets child documents of a parent.
@@ -197,8 +198,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent>? filter = null, Ordering? ordering = null);
+    IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets descendant documents of a given parent.
@@ -209,8 +209,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Query filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent>? filter = null, Ordering? ordering = null);
+    IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets paged documents of a content
@@ -221,8 +220,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Search text filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent> filter, Ordering? ordering = null);
+    IEnumerable<IContent> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent> filter, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets paged documents for specified content types
@@ -233,8 +231,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="totalRecords">Total number of documents.</param>
     /// <param name="filter">Search text filter.</param>
     /// <param name="ordering">Ordering infos.</param>
-    IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IContent>? filter, Ordering? ordering = null);
+    IEnumerable<IContent> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter, Ordering? ordering = null);
 
     /// <summary>
     ///     Counts documents of a given document type.
@@ -336,8 +333,7 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <remarks>
     ///     <para>Optionally recursively copies all children.</para>
     /// </remarks>
-    IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive,
-        int userId = Constants.Security.SuperUserId);
+    IContent? Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Moves a document to the recycle bin.
@@ -423,8 +419,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*",
-        int userId = Constants.Security.SuperUserId);
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Saves and publishes a document branch.
@@ -440,8 +435,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///         published. The root of the branch is always published, regardless of <paramref name="force" />.
     ///     </para>
     /// </remarks>
-    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures,
-        int userId = Constants.Security.SuperUserId);
+    IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     ///// <summary>
     ///// Saves and publishes a document branch.
@@ -463,7 +457,7 @@ public interface IContentService : IContentServiceBase<IContent>
     ///// each document. It can publish all, one, or a selection of cultures. It returns a boolean indicating
     ///// whether the cultures could be published.</para>
     ///// </remarks>
-    //IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
+    // IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force,
     //    Func<IContent, HashSet<string>> shouldPublish,
     //    Func<IContent, HashSet<string>, bool> publishCultures,
     //    int userId = Constants.Security.SuperUserId);
@@ -549,20 +543,17 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <summary>
     ///     Creates a document.
     /// </summary>
-    IContent Create(string name, IContent? parent, string documentTypeAlias,
-        int userId = Constants.Security.SuperUserId);
+    IContent Create(string name, IContent? parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates and saves a document.
     /// </summary>
-    IContent CreateAndSave(string name, int parentId, string contentTypeAlias,
-        int userId = Constants.Security.SuperUserId);
+    IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates and saves a document.
     /// </summary>
-    IContent CreateAndSave(string name, IContent parent, string contentTypeAlias,
-        int userId = Constants.Security.SuperUserId);
+    IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = Constants.Security.SuperUserId);
 
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents the JFIF version as a 16 bit unsigned integer. (EXIF Specification: SHORT)
@@ -34,16 +34,16 @@ internal class JFIFThumbnailProperty : ExifProperty
         : base(tag) =>
         mValue = value;
 
-    protected override object _Value
-    {
-        get => Value;
-        set => Value = (JFIFThumbnail)value;
-    }
-
     public new JFIFThumbnail Value
     {
         get => mValue;
         set => mValue = value;
+    }
+
+    protected override object _Value
+    {
+        get => Value;
+        set => Value = (JFIFThumbnail)value;
     }
 
     public override ExifInterOperability Interoperability
@@ -52,8 +52,7 @@ internal class JFIFThumbnailProperty : ExifProperty
         {
             if (mValue.Format == JFIFThumbnail.ImageFormat.BMP24Bit)
             {
-                return new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, (uint)mValue.PixelData.Length,
-                    mValue.PixelData);
+                return new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, (uint)mValue.PixelData.Length, mValue.PixelData);
             }
 
             if (mValue.Format == JFIFThumbnail.ImageFormat.BMPPalette)
@@ -66,8 +65,7 @@ internal class JFIFThumbnailProperty : ExifProperty
 
             if (mValue.Format == JFIFThumbnail.ImageFormat.JPEG)
             {
-                return new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, (uint)mValue.PixelData.Length,
-                    mValue.PixelData);
+                return new ExifInterOperability(ExifTagFactory.GetTagID(mTag), 1, (uint)mValue.PixelData.Length, mValue.PixelData);
             }
 
             throw new InvalidOperationException("Unknown thumbnail type.");

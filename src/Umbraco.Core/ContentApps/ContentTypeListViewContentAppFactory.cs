@@ -21,7 +21,7 @@ public class ContentTypeListViewContentAppFactory : IContentAppFactory
                     Name = "List view",
                     Icon = "icon-list",
                     View = "views/documentTypes/views/listview/listview.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             default:
                 return null;

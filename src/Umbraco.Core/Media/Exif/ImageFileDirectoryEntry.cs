@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents an entry in the image file directory.
@@ -97,37 +97,44 @@ internal struct ImageFileDirectoryEntry
     /// <param name="type">Type identifier.</param>
     private static uint GetBaseLength(ushort type)
     {
-        if (type == 1 || type == 6) // BYTE and SBYTE
+        // BYTE and SBYTE
+        if (type == 1 || type == 6)
         {
             return 1;
         }
 
-        if (type == 2 || type == 7) // ASCII and UNDEFINED
+        // ASCII and UNDEFINED
+        if (type == 2 || type == 7)
         {
             return 1;
         }
 
-        if (type == 3 || type == 8) // SHORT and SSHORT
+        // SHORT and SSHORT
+        if (type == 3 || type == 8)
         {
             return 2;
         }
 
-        if (type == 4 || type == 9) // LONG and SLONG
+        // LONG and SLONG
+        if (type == 4 || type == 9)
         {
             return 4;
         }
 
-        if (type == 5 || type == 10) // RATIONAL (2xLONG) and SRATIONAL (2xSLONG)
+        // RATIONAL (2xLONG) and SRATIONAL (2xSLONG)
+        if (type == 5 || type == 10)
         {
             return 8;
         }
 
-        if (type == 11) // FLOAT
+        // FLOAT
+        if (type == 11)
         {
             return 4;
         }
 
-        if (type == 12) // DOUBLE
+        // DOUBLE
+        if (type == 12)
         {
             return 8;
         }

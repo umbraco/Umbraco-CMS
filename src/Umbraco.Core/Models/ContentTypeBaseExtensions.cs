@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions;
@@ -44,8 +44,10 @@ public static class ContentTypeBaseExtensions
     ///     Used to check if any property type was changed between variant/invariant
     /// </summary>
     /// <param name="contentType"></param>
+    /// <param name="aliases"></param>
     /// <returns></returns>
-    internal static bool WasPropertyTypeVariationChanged(this IContentTypeBase contentType,
+    internal static bool WasPropertyTypeVariationChanged(
+        this IContentTypeBase contentType,
         out IReadOnlyCollection<string> aliases)
     {
         var a = new List<string>();

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -14,8 +14,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.LiveEnvironment;
 [HealthCheck(
     "61214FF3-FC57-4B31-B5CF-1D095C977D6D",
     "Debug Compilation Mode",
-    Description =
-        "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
+    Description = "Leaving debug compilation mode enabled can severely slow down a website and take up more memory on the server.",
     Group = "Live Environment")]
 public class CompilationDebugCheck : AbstractSettingsCheck
 {
@@ -41,7 +40,7 @@ public class CompilationDebugCheck : AbstractSettingsCheck
     /// <inheritdoc />
     public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
     {
-        new() {IsRecommended = true, Value = bool.FalseString.ToLower()}
+        new() { IsRecommended = true, Value = bool.FalseString.ToLower() },
     };
 
     /// <inheritdoc />

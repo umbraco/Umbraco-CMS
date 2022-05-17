@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Umbraco.Cms.Core;
 
@@ -41,7 +41,7 @@ public class HashCodeCombiner
 
     public void AddFileSystemItem(FileSystemInfo f)
     {
-        //if it doesn't exist, don't proceed.
+        // if it doesn't exist, don't proceed.
         if (!f.Exists)
         {
             return;
@@ -51,15 +51,13 @@ public class HashCodeCombiner
         AddDateTime(f.CreationTimeUtc);
         AddDateTime(f.LastWriteTimeUtc);
 
-        //check if it is a file or folder
-        var fileInfo = f as FileInfo;
-        if (fileInfo != null)
+        // check if it is a file or folder
+        if (f is FileInfo fileInfo)
         {
             AddInt(fileInfo.Length.GetHashCode());
         }
 
-        var dirInfo = f as DirectoryInfo;
-        if (dirInfo != null)
+        if (f is DirectoryInfo dirInfo)
         {
             foreach (FileInfo d in dirInfo.GetFiles())
             {

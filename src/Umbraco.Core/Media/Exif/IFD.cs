@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents the IFD section containing tags.
@@ -13,5 +13,5 @@ internal enum IFD
     First = 500000,
     MakerNote = 600000,
     JFIF = 700000,
-    JFXX = 800000
+    JFXX = 800000,
 }

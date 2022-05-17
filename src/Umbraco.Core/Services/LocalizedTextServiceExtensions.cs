@@ -39,33 +39,13 @@ public static class LocalizedTextServiceExtensions
     /// <param name="culture"></param>
     /// <param name="tokens"></param>
     /// <returns></returns>
-    public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture,
-        string?[] tokens)
+    public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string?[] tokens)
         => manager.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
 
-    /// <summary>
-    ///     Convert an array of strings to a dictionary of indices -> values
-    /// </summary>
-    /// <param name="variables"></param>
-    /// <returns></returns>
-    internal static IDictionary<string, string?>? ConvertToDictionaryVars(string?[]? variables)
-    {
-        if (variables == null)
-        {
-            return null;
-        }
-
-        if (variables.Any() == false)
-        {
-            return null;
-        }
-
-        return variables.Select((s, i) => new {index = i.ToString(CultureInfo.InvariantCulture), value = s})
-            .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
-    }
-
-    public static string? UmbracoDictionaryTranslate(this ILocalizedTextService manager,
-        ICultureDictionary cultureDictionary, string? text)
+    public static string? UmbracoDictionaryTranslate(
+        this ILocalizedTextService manager,
+        ICultureDictionary cultureDictionary,
+        string? text)
     {
         if (text == null)
         {
@@ -77,7 +57,7 @@ public static class LocalizedTextServiceExtensions
             return text;
         }
 
-        text = text.Substring(1);
+        text = text[1..];
         var value = cultureDictionary[text];
         if (value.IsNullOrWhiteSpace() == false)
         {
@@ -98,5 +78,26 @@ public static class LocalizedTextServiceExtensions
 
         value = manager.Localize(areaAndKey[0], areaAndKey[1]);
         return value.StartsWith("[") ? text : value;
+    }
+
+    /// <summary>
+    ///     Convert an array of strings to a dictionary of indices -> values
+    /// </summary>
+    /// <param name="variables"></param>
+    /// <returns></returns>
+    internal static IDictionary<string, string?>? ConvertToDictionaryVars(string?[]? variables)
+    {
+        if (variables == null)
+        {
+            return null;
+        }
+
+        if (variables.Any() == false)
+        {
+            return null;
+        }
+
+        return variables.Select((s, i) => new { index = i.ToString(CultureInfo.InvariantCulture), value = s })
+            .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
     }
 }

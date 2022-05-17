@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
@@ -31,10 +31,10 @@ public class ContentSavedStateMapper<T>
 
         if (source.ContentType.VariesByCulture())
         {
-            //Get the culture from the context which will be set during the mapping operation for each variant
+            // Get the culture from the context which will be set during the mapping operation for each variant
             var culture = context.GetCulture();
 
-            //a culture needs to be in the context for a variant content item
+            // a culture needs to be in the context for a variant content item
             if (culture == null)
             {
                 throw new InvalidOperationException(
@@ -44,7 +44,7 @@ public class ContentSavedStateMapper<T>
             publishedState =
                 source.PublishedState ==
                 PublishedState
-                    .Unpublished //if the entire document is unpublished, then flag every variant as unpublished
+                    .Unpublished // if the entire document is unpublished, then flag every variant as unpublished
                     ? PublishedState.Unpublished
                     : source.IsCulturePublished(culture)
                         ? PublishedState.Published

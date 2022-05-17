@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DomainDeletingNotification : DeletingNotification<IDomain>
 {
-    public DomainDeletingNotification(IDomain target, EventMessages messages) : base(target, messages)
+    public DomainDeletingNotification(IDomain target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public DomainDeletingNotification(IEnumerable<IDomain> target, EventMessages messages) : base(target, messages)
+    public DomainDeletingNotification(IEnumerable<IDomain> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

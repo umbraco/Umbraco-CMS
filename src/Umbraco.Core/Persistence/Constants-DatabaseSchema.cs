@@ -6,7 +6,7 @@ public static partial class Constants
 {
     public static class DatabaseSchema
     {
-        //TODO: Why aren't all table names with the same prefix?
+        // TODO: Why aren't all table names with the same prefix?
         public const string TableNamePrefix = "umbraco";
 
         public static class Tables

@@ -28,8 +28,12 @@ public static class DomainUtilities
     ///         a culture to that document.
     ///     </para>
     /// </remarks>
-    public static string? GetCultureFromDomains(int contentId, string contentPath, Uri? current,
-        IUmbracoContext umbracoContext, ISiteDomainMapper siteDomainMapper)
+    public static string? GetCultureFromDomains(
+        int contentId,
+        string contentPath,
+        Uri? current,
+        IUmbracoContext umbracoContext,
+        ISiteDomainMapper siteDomainMapper)
     {
         if (umbracoContext == null)
         {
@@ -52,13 +56,12 @@ public static class DomainUtilities
         }
 
         var pos = route.IndexOf('/');
-        DomainAndUri domain = pos == 0
+        DomainAndUri? domain = pos == 0
             ? null
-            : DomainForNode(umbracoContext.Domains, siteDomainMapper,
-                int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current);
+            : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route[..pos], CultureInfo.InvariantCulture), current);
 
         var rootContentId = domain?.ContentId ?? -1;
-        Domain wcDomain = FindWildcardDomainInPath(umbracoContext.Domains?.GetAll(true), contentPath, rootContentId);
+        Domain? wcDomain = FindWildcardDomainInPath(umbracoContext.Domains?.GetAll(true), contentPath, rootContentId);
 
         if (wcDomain != null)
         {
@@ -71,91 +74,6 @@ public static class DomainUtilities
         }
 
         return umbracoContext.Domains?.DefaultCulture;
-    }
-
-    #endregion
-
-    #region Domain for Document
-
-    /// <summary>
-    ///     Finds the domain for the specified node, if any, that best matches a specified uri.
-    /// </summary>
-    /// <param name="domainCache">A domain cache.</param>
-    /// <param name="siteDomainMapper">The site domain helper.</param>
-    /// <param name="nodeId">The node identifier.</param>
-    /// <param name="current">The uri, or null.</param>
-    /// <param name="culture">The culture, or null.</param>
-    /// <returns>The domain and its uri, if any, that best matches the specified uri and culture, else null.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         If at least a domain is set on the node then the method returns the domain that
-    ///         best matches the specified uri and culture, else it returns null.
-    ///     </para>
-    ///     <para>
-    ///         If culture is null, uses the default culture for the installation instead. Otherwise,
-    ///         will try with the specified culture, else return null.
-    ///     </para>
-    /// </remarks>
-    internal static DomainAndUri? DomainForNode(IDomainCache? domainCache, ISiteDomainMapper siteDomainMapper,
-        int nodeId, Uri current, string? culture = null)
-    {
-        // be safe
-        if (nodeId <= 0)
-        {
-            return null;
-        }
-
-        // get the domains on that node
-        Domain[] domains = domainCache?.GetAssigned(nodeId).ToArray();
-
-        // none?
-        if (domains is null || domains.Length == 0)
-        {
-            return null;
-        }
-
-        // else filter
-        // it could be that none apply (due to culture)
-        return SelectDomain(domains, current, culture, domainCache?.DefaultCulture, siteDomainMapper.MapDomain);
-    }
-
-    /// <summary>
-    ///     Find the domains for the specified node, if any, that match a specified uri.
-    /// </summary>
-    /// <param name="domainCache">A domain cache.</param>
-    /// <param name="siteDomainMapper">The site domain helper.</param>
-    /// <param name="nodeId">The node identifier.</param>
-    /// <param name="current">The uri, or null.</param>
-    /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
-    /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
-    /// <remarks>
-    ///     If at least a domain is set on the node then the method returns the domains that
-    ///     best match the specified uri, else it returns null.
-    /// </remarks>
-    internal static IEnumerable<DomainAndUri>? DomainsForNode(IDomainCache? domainCache,
-        ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, bool excludeDefault = true)
-    {
-        // be safe
-        if (nodeId <= 0)
-        {
-            return null;
-        }
-
-        // get the domains on that node
-        Domain[] domains = domainCache?.GetAssigned(nodeId).ToArray();
-
-        // none?
-        if (domains is null || domains.Length == 0)
-        {
-            return null;
-        }
-
-        // get the domains and their uris
-        DomainAndUri[] domainAndUris = SelectDomains(domains, current).ToArray();
-
-        // filter
-        return siteDomainMapper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache?.DefaultCulture)
-            .ToArray();
     }
 
     #endregion
@@ -184,7 +102,10 @@ public static class DomainUtilities
     ///     </para>
     ///     <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
     /// </remarks>
-    public static DomainAndUri? SelectDomain(IEnumerable<Domain>? domains, Uri uri, string? culture = null,
+    public static DomainAndUri? SelectDomain(
+        IEnumerable<Domain>? domains,
+        Uri uri,
+        string? culture = null,
         string? defaultCulture = null,
         Func<IReadOnlyCollection<DomainAndUri>, Uri, string?, string?, DomainAndUri?>? filter = null)
     {
@@ -219,7 +140,7 @@ public static class DomainUtilities
         // if a culture is specified, then try to get domains for that culture
         // (else cultureDomains will be null)
         // do NOT specify a default culture, else it would pick those domains
-        IReadOnlyCollection<DomainAndUri> cultureDomains = SelectByCulture(domainsAndUris, culture, null);
+        IReadOnlyCollection<DomainAndUri>? cultureDomains = SelectByCulture(domainsAndUris, culture, null);
         IReadOnlyCollection<DomainAndUri> considerForBaseDomains = domainsAndUris;
         if (cultureDomains != null)
         {
@@ -243,12 +164,158 @@ public static class DomainUtilities
         // either restricting on cultureDomains, or on all domains
         if (filter != null)
         {
-            DomainAndUri domainAndUri = filter(cultureDomains ?? domainsAndUris, uri, culture, defaultCulture);
+            DomainAndUri? domainAndUri = filter(cultureDomains ?? domainsAndUris, uri, culture, defaultCulture);
             return domainAndUri;
         }
 
         return null;
     }
+
+    /// <summary>
+    ///     Parses a domain name into a URI.
+    /// </summary>
+    /// <param name="domainName">The domain name to parse</param>
+    /// <param name="currentUri">
+    ///     The currently requested URI. If the domain name is relative, the authority of URI will be
+    ///     used.
+    /// </param>
+    /// <returns>The domain name as a URI</returns>
+    public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
+    {
+        // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
+        var name = domainName.StartsWith("/") && currentUri != null
+            ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
+            : domainName;
+        var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
+        return new Uri(UriUtilityCore.TrimPathEndSlash(UriUtilityCore.StartWithScheme(name, scheme)));
+    }
+
+    /// <summary>
+    ///     Gets the deepest wildcard Domain, if any, from a group of Domains, in a node path.
+    /// </summary>
+    /// <param name="domains">The domains.</param>
+    /// <param name="path">The node path eg '-1,1234,5678'.</param>
+    /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
+    /// <returns>The deepest wildcard Domain in the path, or null.</returns>
+    /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
+    public static Domain? FindWildcardDomainInPath(IEnumerable<Domain>? domains, string path, int? rootNodeId)
+    {
+        var stopNodeId = rootNodeId ?? -1;
+
+        return path.Split(Constants.CharArrays.Comma)
+            .Reverse()
+            .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
+            .TakeWhile(id => id != stopNodeId)
+            .Select(id => domains?.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
+            .FirstOrDefault(domain => domain != null);
+    }
+
+    #endregion
+
+    #region Domain for Document
+
+    /// <summary>
+    ///     Finds the domain for the specified node, if any, that best matches a specified uri.
+    /// </summary>
+    /// <param name="domainCache">A domain cache.</param>
+    /// <param name="siteDomainMapper">The site domain helper.</param>
+    /// <param name="nodeId">The node identifier.</param>
+    /// <param name="current">The uri, or null.</param>
+    /// <param name="culture">The culture, or null.</param>
+    /// <returns>The domain and its uri, if any, that best matches the specified uri and culture, else null.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         If at least a domain is set on the node then the method returns the domain that
+    ///         best matches the specified uri and culture, else it returns null.
+    ///     </para>
+    ///     <para>
+    ///         If culture is null, uses the default culture for the installation instead. Otherwise,
+    ///         will try with the specified culture, else return null.
+    ///     </para>
+    /// </remarks>
+    internal static DomainAndUri? DomainForNode(
+        IDomainCache? domainCache,
+        ISiteDomainMapper siteDomainMapper,
+        int nodeId,
+        Uri current,
+        string? culture = null)
+    {
+        // be safe
+        if (nodeId <= 0)
+        {
+            return null;
+        }
+
+        // get the domains on that node
+        Domain[]? domains = domainCache?.GetAssigned(nodeId).ToArray();
+
+        // none?
+        if (domains is null || domains.Length == 0)
+        {
+            return null;
+        }
+
+        // else filter
+        // it could be that none apply (due to culture)
+        return SelectDomain(domains, current, culture, domainCache?.DefaultCulture, siteDomainMapper.MapDomain);
+    }
+
+    /// <summary>
+    ///     Find the domains for the specified node, if any, that match a specified uri.
+    /// </summary>
+    /// <param name="domainCache">A domain cache.</param>
+    /// <param name="siteDomainMapper">The site domain helper.</param>
+    /// <param name="nodeId">The node identifier.</param>
+    /// <param name="current">The uri, or null.</param>
+    /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
+    /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
+    /// <remarks>
+    ///     If at least a domain is set on the node then the method returns the domains that
+    ///     best match the specified uri, else it returns null.
+    /// </remarks>
+    internal static IEnumerable<DomainAndUri>? DomainsForNode(
+        IDomainCache? domainCache,
+        ISiteDomainMapper siteDomainMapper,
+        int nodeId,
+        Uri current,
+        bool excludeDefault = true)
+    {
+        // be safe
+        if (nodeId <= 0)
+        {
+            return null;
+        }
+
+        // get the domains on that node
+        Domain[]? domains = domainCache?.GetAssigned(nodeId).ToArray();
+
+        // none?
+        if (domains is null || domains.Length == 0)
+        {
+            return null;
+        }
+
+        // get the domains and their uris
+        DomainAndUri[] domainAndUris = SelectDomains(domains, current).ToArray();
+
+        // filter
+        return siteDomainMapper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache?.DefaultCulture)
+            .ToArray();
+    }
+
+    /// <summary>
+    ///     Selects the domains that match a specified uri, from a set of domains.
+    /// </summary>
+    /// <param name="domains">The domains.</param>
+    /// <param name="uri">The uri, or null.</param>
+    /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
+    internal static IEnumerable<DomainAndUri> SelectDomains(IEnumerable<Domain> domains, Uri uri) =>
+
+        // TODO: where are we matching ?!!?
+        domains
+            .Where(d => d.IsWildcard == false)
+            .Select(d => new DomainAndUri(d, uri))
+            .OrderByDescending(d => d.Uri.ToString());
 
     private static bool IsBaseOf(DomainAndUri domain, Uri uri)
         => domain.Uri.EndPathWithSlash().IsBaseOf(uri);
@@ -256,8 +323,10 @@ public static class DomainUtilities
     private static bool MatchesCulture(DomainAndUri domain, string? culture)
         => culture == null || domain.Culture.InvariantEquals(culture);
 
-    private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris,
-        Uri uri, string? culture)
+    private static IReadOnlyCollection<DomainAndUri> SelectByBase(
+        IReadOnlyCollection<DomainAndUri> domainsAndUris,
+        Uri uri,
+        string? culture)
     {
         // look for domains that would be the base of the uri
         // ie current is www.example.com/foo/bar, look for domain www.example.com
@@ -276,11 +345,12 @@ public static class DomainUtilities
         return baseDomains;
     }
 
-    private static IReadOnlyCollection<DomainAndUri>? SelectByCulture(IReadOnlyCollection<DomainAndUri> domainsAndUris,
-        string? culture, string? defaultCulture)
+    private static IReadOnlyCollection<DomainAndUri>? SelectByCulture(
+        IReadOnlyCollection<DomainAndUri> domainsAndUris,
+        string? culture,
+        string? defaultCulture)
     {
         // we try our best to match cultures, but may end with a bogus domain
-
         if (culture != null) // try the supplied culture
         {
             var cultureDomains = domainsAndUris.Where(x => x.Culture.InvariantEquals(culture)).ToList();
@@ -302,13 +372,11 @@ public static class DomainUtilities
         return null;
     }
 
-    private static DomainAndUri GetByCulture(IReadOnlyCollection<DomainAndUri> domainsAndUris, string? culture,
-        string? defaultCulture)
+    private static DomainAndUri GetByCulture(IReadOnlyCollection<DomainAndUri> domainsAndUris, string? culture, string? defaultCulture)
     {
         DomainAndUri? domainAndUri;
 
         // we try our best to match cultures, but may end with a bogus domain
-
         if (culture != null) // try the supplied culture
         {
             domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture));
@@ -328,38 +396,6 @@ public static class DomainUtilities
         }
 
         return domainsAndUris.First(); // what else?
-    }
-
-    /// <summary>
-    ///     Selects the domains that match a specified uri, from a set of domains.
-    /// </summary>
-    /// <param name="domains">The domains.</param>
-    /// <param name="uri">The uri, or null.</param>
-    /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
-    internal static IEnumerable<DomainAndUri> SelectDomains(IEnumerable<Domain> domains, Uri uri) =>
-        // TODO: where are we matching ?!!?
-        domains
-            .Where(d => d.IsWildcard == false)
-            .Select(d => new DomainAndUri(d, uri))
-            .OrderByDescending(d => d.Uri.ToString());
-
-    /// <summary>
-    ///     Parses a domain name into a URI.
-    /// </summary>
-    /// <param name="domainName">The domain name to parse</param>
-    /// <param name="currentUri">
-    ///     The currently requested URI. If the domain name is relative, the authority of URI will be
-    ///     used.
-    /// </param>
-    /// <returns>The domain name as a URI</returns>
-    public static Uri ParseUriFromDomainName(string domainName, Uri currentUri)
-    {
-        // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
-        var name = domainName.StartsWith("/") && currentUri != null
-            ? currentUri.GetLeftPart(UriPartial.Authority) + domainName
-            : domainName;
-        var scheme = currentUri?.Scheme ?? Uri.UriSchemeHttp;
-        return new Uri(UriUtilityCore.TrimPathEndSlash(UriUtilityCore.StartWithScheme(name, scheme)));
     }
 
     #endregion
@@ -400,26 +436,6 @@ public static class DomainUtilities
     }
 
     /// <summary>
-    ///     Gets the deepest wildcard Domain, if any, from a group of Domains, in a node path.
-    /// </summary>
-    /// <param name="domains">The domains.</param>
-    /// <param name="path">The node path eg '-1,1234,5678'.</param>
-    /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
-    /// <returns>The deepest wildcard Domain in the path, or null.</returns>
-    /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-    public static Domain? FindWildcardDomainInPath(IEnumerable<Domain>? domains, string path, int? rootNodeId)
-    {
-        var stopNodeId = rootNodeId ?? -1;
-
-        return path.Split(Constants.CharArrays.Comma)
-            .Reverse()
-            .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
-            .TakeWhile(id => id != stopNodeId)
-            .Select(id => domains?.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
-            .FirstOrDefault(domain => domain != null);
-    }
-
-    /// <summary>
     ///     Returns the part of a path relative to the uri of a domain.
     /// </summary>
     /// <param name="domainUri">The normalized uri of the domain.</param>
@@ -427,7 +443,7 @@ public static class DomainUtilities
     /// <returns>The path part relative to the uri of the domain.</returns>
     /// <remarks>Eg the relative part of <c>/foo/bar/nil</c> to domain <c>example.com/foo</c> is <c>/bar/nil</c>.</remarks>
     public static string PathRelativeToDomain(Uri domainUri, string path)
-        => path.Substring(domainUri.GetAbsolutePathDecoded().Length).EnsureStartsWith('/');
+        => path[domainUri.GetAbsolutePathDecoded().Length..].EnsureStartsWith('/');
 
     #endregion
 }

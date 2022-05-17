@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 ///     Constants storing cache keys used in caching

@@ -30,13 +30,13 @@ public class CompiledPackageXmlParser
             throw new FormatException("The xml document is invalid");
         }
 
-        XElement info = xml.Root.Element("info");
+        XElement? info = xml.Root.Element("info");
         if (info == null)
         {
             throw new FormatException("The xml document is invalid");
         }
 
-        XElement package = info.Element("package");
+        XElement? package = info.Element("package");
         if (package == null)
         {
             throw new FormatException("The xml document is invalid");
@@ -64,7 +64,7 @@ public class CompiledPackageXmlParser
                 xml.Root.Element("Documents")?.Elements("DocumentSet")?.Select(CompiledPackageContentBase.Create) ??
                 Enumerable.Empty<CompiledPackageContentBase>(),
             Media = xml.Root.Element("MediaItems")?.Elements()?.Select(CompiledPackageContentBase.Create) ??
-                    Enumerable.Empty<CompiledPackageContentBase>()
+                    Enumerable.Empty<CompiledPackageContentBase>(),
         };
 
         def.Warnings = GetInstallWarnings(def);
@@ -78,7 +78,7 @@ public class CompiledPackageXmlParser
         {
             ConflictingMacros = _conflictingPackageData.FindConflictingMacros(package.Macros),
             ConflictingTemplates = _conflictingPackageData.FindConflictingTemplates(package.Templates),
-            ConflictingStylesheets = _conflictingPackageData.FindConflictingStylesheets(package.Stylesheets)
+            ConflictingStylesheets = _conflictingPackageData.FindConflictingStylesheets(package.Stylesheets),
         };
 
         return installWarnings;

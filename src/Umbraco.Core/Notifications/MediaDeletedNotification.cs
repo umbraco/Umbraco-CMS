@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class MediaDeletedNotification : DeletedNotification<IMedia>
 {
-    public MediaDeletedNotification(IMedia target, EventMessages messages) : base(target, messages)
+    public MediaDeletedNotification(IMedia target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Exceptions;
@@ -76,8 +76,7 @@ public class BootFailedException : Exception
 
         // see https://stackoverflow.com/questions/57383
         // would that be the correct way to do it?
-        //ExceptionDispatchInfo.Capture(bootFailedException).Throw();
-
+        // ExceptionDispatchInfo.Capture(bootFailedException).Throw();
         Exception? e = bootFailedException;
         var m = new StringBuilder();
         m.Append(DefaultMessage);

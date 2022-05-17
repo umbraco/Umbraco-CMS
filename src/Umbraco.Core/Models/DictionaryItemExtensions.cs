@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Extensions;
 
@@ -12,7 +12,7 @@ public static class DictionaryItemExtensions
     /// <returns></returns>
     public static string? GetTranslatedValue(this IDictionaryItem d, int languageId)
     {
-        IDictionaryTranslation trans = d.Translations?.FirstOrDefault(x => x.LanguageId == languageId);
+        IDictionaryTranslation? trans = d.Translations.FirstOrDefault(x => x.LanguageId == languageId);
         return trans == null ? string.Empty : trans.Value;
     }
 
@@ -23,7 +23,7 @@ public static class DictionaryItemExtensions
     /// <returns></returns>
     public static string? GetDefaultValue(this IDictionaryItem d)
     {
-        IDictionaryTranslation defaultTranslation = d.Translations?.FirstOrDefault(x => x.Language?.Id == 1);
+        IDictionaryTranslation? defaultTranslation = d.Translations.FirstOrDefault(x => x.Language?.Id == 1);
         return defaultTranslation == null ? string.Empty : defaultTranslation.Value;
     }
 }

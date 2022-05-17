@@ -32,8 +32,7 @@ public static class FileSystemExtensions
     ///     Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
     ///     with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.
     /// </summary>
-    public static FileStream OpenReadWithRetry(this FileInfo file, int maxRetries = 5,
-        int sleepPerRetryInMilliseconds = 50)
+    public static FileStream OpenReadWithRetry(this FileInfo file, int maxRetries = 5, int sleepPerRetryInMilliseconds = 50)
     {
         var retries = maxRetries;
 
@@ -95,13 +94,14 @@ public static class FileSystemExtensions
     /// <returns>
     ///     <c>true</c> if the <see cref="IFileProvider" /> was successfully created; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryCreateFileProvider(this IFileSystem fileSystem,
+    public static bool TryCreateFileProvider(
+        this IFileSystem fileSystem,
         [MaybeNullWhen(false)] out IFileProvider fileProvider)
     {
         fileProvider = fileSystem switch
         {
             IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
-            _ => null
+            _ => null,
         };
 
         return fileProvider != null;

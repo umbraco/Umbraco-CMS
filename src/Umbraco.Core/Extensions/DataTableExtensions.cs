@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Data;
@@ -29,19 +29,19 @@ public static class DataTableExtensions
     {
         var dt = new DataTable(tableAlias);
 
-        //get all row data
-        Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>[] tableData =
+        // get all row data
+        Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>[] tableData =
             rowData().ToArray();
 
-        //get all headers
+        // get all headers
         IDictionary<string, string> propertyHeaders = GetPropertyHeaders(tableAlias, getHeaders);
         foreach (KeyValuePair<string, string> h in propertyHeaders)
         {
             dt.Columns.Add(new DataColumn(h.Value));
         }
 
-        //add row data
-        foreach (Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>> r in
+        // add row data
+        foreach (Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>> r in
                  tableData)
         {
             dt.PopulateRow(
@@ -79,10 +79,10 @@ public static class DataTableExtensions
         IEnumerable<KeyValuePair<string, object?>> userVals) =>
         rowData.Add(new Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>(
             standardVals,
-            userVals
-        ));
+            userVals));
 
-    private static IDictionary<string, string> GetPropertyHeaders(string alias,
+    private static IDictionary<string, string> GetPropertyHeaders(
+        string alias,
         Func<string, IEnumerable<KeyValuePair<string, string>>> getHeaders)
     {
         IEnumerable<KeyValuePair<string, string>> headers = getHeaders(alias);
@@ -97,12 +97,12 @@ public static class DataTableExtensions
         IEnumerable<KeyValuePair<string, object?>> userPropertyVals)
     {
         DataRow dr = dt.NewRow();
-        foreach (KeyValuePair<string, object> r in standardVals)
+        foreach (KeyValuePair<string, object?> r in standardVals)
         {
             dr[r.Key] = r.Value;
         }
 
-        foreach (KeyValuePair<string, object> p in userPropertyVals.Where(p => p.Value != null))
+        foreach (KeyValuePair<string, object?> p in userPropertyVals.Where(p => p.Value != null))
         {
             dr[aliasesToNames[p.Key]] = p.Value;
         }

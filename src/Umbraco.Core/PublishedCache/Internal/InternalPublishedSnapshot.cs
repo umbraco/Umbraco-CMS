@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal;
 public sealed class InternalPublishedSnapshot : IPublishedSnapshot
 {
     public InternalPublishedContentCache InnerContentCache { get; } = new();
+
     public InternalPublishedContentCache InnerMediaCache { get; } = new();
 
     public IPublishedContentCache Content => InnerContentCache;
@@ -18,10 +19,10 @@ public sealed class InternalPublishedSnapshot : IPublishedSnapshot
 
     public IDomainCache? Domains => null;
 
+    public IAppCache? SnapshotCache => null;
+
     public IDisposable ForcedPreview(bool forcedPreview, Action<bool>? callback = null) =>
         throw new NotImplementedException();
-
-    public IAppCache? SnapshotCache => null;
 
     public IAppCache? ElementsCache => null;
 

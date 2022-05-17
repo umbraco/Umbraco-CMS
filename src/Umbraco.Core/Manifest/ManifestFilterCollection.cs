@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Manifest;
 /// </summary>
 public class ManifestFilterCollection : BuilderCollectionBase<IManifestFilter>
 {
-    public ManifestFilterCollection(Func<IEnumerable<IManifestFilter>> items) : base(items)
+    public ManifestFilterCollection(Func<IEnumerable<IManifestFilter>> items)
+        : base(items)
     {
     }
 

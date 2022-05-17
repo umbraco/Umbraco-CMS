@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Core.DistributedLocking;
 public enum DistributedLockType
 {
     ReadLock,
-    WriteLock
+    WriteLock,
 }

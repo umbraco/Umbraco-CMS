@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Represents a simplified view of a content type.
@@ -6,7 +6,9 @@
 public interface ISimpleContentType
 {
     int Id { get; }
+
     Guid Key { get; }
+
     string? Name { get; }
 
     /// <summary>

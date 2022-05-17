@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 ///     Defines an application cache that support cache policies.

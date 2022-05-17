@@ -8,7 +8,7 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ContentBaseExtensions
 {
-    private static DefaultUrlSegmentProvider? s_defaultUrlSegmentProvider;
+    private static DefaultUrlSegmentProvider? defaultUrlSegmentProvider;
 
     /// <summary>
     ///     Gets the URL segment for a specified content and culture.
@@ -34,12 +34,12 @@ public static class ContentBaseExtensions
         var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);
         if (url == null)
         {
-            if (s_defaultUrlSegmentProvider == null)
+            if (defaultUrlSegmentProvider == null)
             {
-                s_defaultUrlSegmentProvider = new DefaultUrlSegmentProvider(shortStringHelper);
+                defaultUrlSegmentProvider = new DefaultUrlSegmentProvider(shortStringHelper);
             }
 
-            url = s_defaultUrlSegmentProvider.GetUrlSegment(content, culture); // be safe
+            url = defaultUrlSegmentProvider.GetUrlSegment(content, culture); // be safe
         }
 
         return url;

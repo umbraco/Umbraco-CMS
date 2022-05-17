@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Logging;
+namespace Umbraco.Cms.Core.Logging;
 
 public class LoggingConfiguration : ILoggingConfiguration
 {

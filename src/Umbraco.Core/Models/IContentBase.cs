@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -131,8 +131,7 @@ public interface IContentBase : IUmbracoEntity, IRememberBeingDirty
     ///     Gets the typed value of a Property
     /// </summary>
     /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-    TValue? GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null,
-        bool published = false);
+    TValue? GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false);
 
     /// <summary>
     ///     Sets the (edited) value of a Property

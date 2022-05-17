@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
@@ -15,12 +15,9 @@ public static partial class Constants
         //  this is validated by UdiTests.ValidateUdiEntityType
         // also, this is used exclusively in Udi static ctor, only once, so there is no
         //  need to keep it around in a field nor to make it readonly
-
-
         public const string Unknown = "unknown";
 
         // guid entity types
-
         public const string AnyGuid = "any-guid"; // that one is for tests
 
         public const string Element = "element";
@@ -50,13 +47,11 @@ public static partial class Constants
         public const string RelationType = "relation-type";
 
         // forms
-
         public const string FormsForm = "forms-form";
         public const string FormsPreValue = "forms-prevalue";
         public const string FormsDataSource = "forms-datasource";
 
         // string entity types
-
         public const string AnyString = "any-string"; // that one is for tests
 
         public const string Language = "language";

@@ -14,8 +14,7 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
 
     private readonly IProfilingLogger _profilingLogger;
 
-    public ComponentCollection(Func<IEnumerable<IComponent>> items, IProfilingLogger profilingLogger,
-        ILogger<ComponentCollection> logger)
+    public ComponentCollection(Func<IEnumerable<IComponent>> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
         : base(items)
     {
         _profilingLogger = profilingLogger;
@@ -30,8 +29,10 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
             foreach (IComponent component in this)
             {
                 Type componentType = component.GetType();
-                using (_profilingLogger.DebugDuration<ComponentCollection>($"Initializing {componentType.FullName}.",
-                           $"Initialized {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                    $"Initializing {componentType.FullName}.",
+                    $"Initialized {componentType.FullName}.",
+                    thresholdMilliseconds: LogThresholdMilliseconds))
                 {
                     component.Initialize();
                 }
@@ -44,11 +45,14 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
         using (_profilingLogger.DebugDuration<ComponentCollection>(
                    $"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
         {
-            foreach (IComponent component in this.Reverse()) // terminate components in reverse order
+            // terminate components in reverse order
+            foreach (IComponent component in this.Reverse())
             {
                 Type componentType = component.GetType();
-                using (_profilingLogger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.",
-                           $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                    $"Terminating {componentType.FullName}.",
+                    $"Terminated {componentType.FullName}.",
+                    thresholdMilliseconds: LogThresholdMilliseconds))
                 {
                     try
                     {
@@ -57,8 +61,7 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Error while terminating component {ComponentType}.",
-                            componentType.FullName);
+                        _logger.LogError(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
                     }
                 }
             }

@@ -7,12 +7,15 @@ namespace Umbraco.Cms.Core.Notifications;
 public abstract class ContentTypeRefreshNotification<T> : ContentTypeChangeNotification<T>
     where T : class, IContentTypeComposition
 {
-    protected ContentTypeRefreshNotification(ContentTypeChange<T> target, EventMessages messages) : base(target,
+    protected ContentTypeRefreshNotification(ContentTypeChange<T> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    protected ContentTypeRefreshNotification(IEnumerable<ContentTypeChange<T>> target, EventMessages messages) : base(
+    protected ContentTypeRefreshNotification(IEnumerable<ContentTypeChange<T>> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

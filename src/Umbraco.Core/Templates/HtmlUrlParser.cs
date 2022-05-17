@@ -18,8 +18,7 @@ public sealed class HtmlUrlParser
     private readonly IProfilingLogger _profilingLogger;
     private ContentSettings _contentSettings;
 
-    public HtmlUrlParser(IOptionsMonitor<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger,
-        IProfilingLogger profilingLogger, IIOHelper ioHelper)
+    public HtmlUrlParser(IOptionsMonitor<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
     {
         _contentSettings = contentSettings.CurrentValue;
         _logger = logger;
@@ -47,16 +46,17 @@ public sealed class HtmlUrlParser
             return text;
         }
 
-        using (DisposableTimer timer = _profilingLogger.DebugDuration(typeof(IOHelper),
-                   "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+        using (DisposableTimer? timer = _profilingLogger.DebugDuration(
+                   typeof(IOHelper),
+                   "ResolveUrlsFromTextString starting",
+                   "ResolveUrlsFromTextString complete"))
         {
             // find all relative URLs (ie. URLs that contain ~)
             MatchCollection tags = ResolveUrlPattern.Matches(text);
-            _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds,
-                tags.Count);
+            _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
             foreach (Match tag in tags)
             {
-                var url = "";
+                var url = string.Empty;
                 if (tag.Groups[1].Success)
                 {
                     url = tag.Groups[1].Value;
@@ -68,8 +68,8 @@ public sealed class HtmlUrlParser
                 //                else
                 if (string.IsNullOrEmpty(url) == false)
                 {
-                    var resolvedUrl = url.Substring(0, 1) == "/"
-                        ? _ioHelper.ResolveUrl(url.Substring(1))
+                    var resolvedUrl = url[..1] == "/"
+                        ? _ioHelper.ResolveUrl(url[1..])
                         : _ioHelper.ResolveUrl(url);
                     text = text.Replace(url, resolvedUrl);
                 }

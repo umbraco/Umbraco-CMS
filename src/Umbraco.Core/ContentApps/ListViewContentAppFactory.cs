@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -21,38 +21,11 @@ public class ListViewContentAppFactory : IContentAppFactory
         _propertyEditors = propertyEditors;
     }
 
-    public ContentApp? GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
-    {
-        string contentTypeAlias, entityType;
-        int dtdId;
-
-        switch (o)
-        {
-            case IContent content when !content.ContentType.IsContainer:
-                return null;
-            case IContent content:
-                contentTypeAlias = content.ContentType.Alias;
-                entityType = "content";
-                dtdId = Constants.DataTypes.DefaultContentListView;
-                break;
-            case IMedia media when !media.ContentType.IsContainer &&
-                                   media.ContentType.Alias != Constants.Conventions.MediaTypes.Folder:
-                return null;
-            case IMedia media:
-                contentTypeAlias = media.ContentType.Alias;
-                entityType = "media";
-                dtdId = Constants.DataTypes.DefaultMediaListView;
-                break;
-            default:
-                return null;
-        }
-
-        return CreateContentApp(_dataTypeService, _propertyEditors, entityType, contentTypeAlias, dtdId);
-    }
-
-    public static ContentApp CreateContentApp(IDataTypeService dataTypeService,
+    public static ContentApp CreateContentApp(
+        IDataTypeService dataTypeService,
         PropertyEditorCollection propertyEditors,
-        string entityType, string contentTypeAlias,
+        string entityType,
+        string contentTypeAlias,
         int defaultListViewDataType)
     {
         if (dataTypeService == null)
@@ -86,14 +59,14 @@ public class ListViewContentAppFactory : IContentAppFactory
             Name = "Child items",
             Icon = "icon-list",
             View = "views/content/apps/listview/listview.html",
-            Weight = Weight
+            Weight = Weight,
         };
 
         var customDtdName = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
 
-        //first try to get the custom one if there is one
-        IDataType dt = dataTypeService.GetDataType(customDtdName)
-                       ?? dataTypeService.GetDataType(defaultListViewDataType);
+        // first try to get the custom one if there is one
+        IDataType? dt = dataTypeService.GetDataType(customDtdName)
+                        ?? dataTypeService.GetDataType(defaultListViewDataType);
 
         if (dt == null)
         {
@@ -101,7 +74,7 @@ public class ListViewContentAppFactory : IContentAppFactory
                 "No list view data type was found for this document type, ensure that the default list view data types exists and/or that your custom list view data type exists");
         }
 
-        IDataEditor editor = propertyEditors[dt.EditorAlias];
+        IDataEditor? editor = propertyEditors[dt.EditorAlias];
         if (editor == null)
         {
             throw new NullReferenceException("The property editor with alias " + dt.EditorAlias + " does not exist");
@@ -109,24 +82,25 @@ public class ListViewContentAppFactory : IContentAppFactory
 
         IDictionary<string, object> listViewConfig =
             editor.GetConfigurationEditor().ToConfigurationEditor(dt.Configuration);
-        //add the entity type to the config
+
+        // add the entity type to the config
         listViewConfig["entityType"] = entityType;
 
-        //Override Tab Label if tabName is provided
+        // Override Tab Label if tabName is provided
         if (listViewConfig.ContainsKey("tabName"))
         {
             var configTabName = listViewConfig["tabName"];
-            if (configTabName != null && string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+            if (string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
             {
                 contentApp.Name = configTabName.ToString();
             }
         }
 
-        //Override Icon if icon is provided
+        // Override Icon if icon is provided
         if (listViewConfig.ContainsKey("icon"))
         {
             var configIcon = listViewConfig["icon"];
-            if (configIcon != null && string.IsNullOrWhiteSpace(configIcon.ToString()) == false)
+            if (string.IsNullOrWhiteSpace(configIcon.ToString()) == false)
             {
                 contentApp.Icon = configIcon.ToString();
             }
@@ -139,20 +113,49 @@ public class ListViewContentAppFactory : IContentAppFactory
             contentApp.Weight = ContentEditorContentAppFactory.Weight + 1;
         }
 
-        //This is the view model used for the list view app
+        // This is the view model used for the list view app
         contentApp.ViewModel = new List<ContentPropertyDisplay>
         {
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
-                Label = "",
+                Label = string.Empty,
                 Value = null,
                 View = editor.GetValueEditor().View,
                 HideLabel = true,
-                Config = listViewConfig
-            }
+                Config = listViewConfig,
+            },
         };
 
         return contentApp;
+    }
+
+    public ContentApp? GetContentAppFor(object o, IEnumerable<IReadOnlyUserGroup> userGroups)
+    {
+        string contentTypeAlias, entityType;
+        int dtdId;
+
+        switch (o)
+        {
+            case IContent content when !content.ContentType.IsContainer:
+                return null;
+            case IContent content:
+                contentTypeAlias = content.ContentType.Alias;
+                entityType = "content";
+                dtdId = Constants.DataTypes.DefaultContentListView;
+                break;
+            case IMedia media when !media.ContentType.IsContainer &&
+                                   media.ContentType.Alias != Constants.Conventions.MediaTypes.Folder:
+                return null;
+            case IMedia media:
+                contentTypeAlias = media.ContentType.Alias;
+                entityType = "media";
+                dtdId = Constants.DataTypes.DefaultMediaListView;
+                break;
+            default:
+                return null;
+        }
+
+        return CreateContentApp(_dataTypeService, _propertyEditors, entityType, contentTypeAlias, dtdId);
     }
 }

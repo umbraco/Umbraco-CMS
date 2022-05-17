@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks;
+namespace Umbraco.Cms.Core.HealthChecks;
 
 /// <summary>
 ///     Metadata attribute for health check notification methods

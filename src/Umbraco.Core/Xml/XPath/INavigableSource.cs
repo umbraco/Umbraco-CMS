@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Xml.XPath;
+namespace Umbraco.Cms.Core.Xml.XPath;
 
 /// <summary>
 ///     Represents a source of content that can be navigated via XPath.

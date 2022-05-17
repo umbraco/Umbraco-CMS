@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Install.Models;
+namespace Umbraco.Cms.Core.Install.Models;
 
 public sealed class InstallSetupStepAttribute : Attribute
 {
-    public InstallSetupStepAttribute(InstallationType installTypeTarget, string name, string view, int serverOrder,
-        string description)
+    public InstallSetupStepAttribute(InstallationType installTypeTarget, string name, string view, int serverOrder, string description)
     {
         InstallTypeTarget = installTypeTarget;
         Name = name;
@@ -11,12 +10,11 @@ public sealed class InstallSetupStepAttribute : Attribute
         ServerOrder = serverOrder;
         Description = description;
 
-        //default
+        // default
         PerformsAppRestart = false;
     }
 
-    public InstallSetupStepAttribute(InstallationType installTypeTarget, string name, int serverOrder,
-        string description)
+    public InstallSetupStepAttribute(InstallationType installTypeTarget, string name, int serverOrder, string description)
     {
         InstallTypeTarget = installTypeTarget;
         Name = name;
@@ -24,14 +22,18 @@ public sealed class InstallSetupStepAttribute : Attribute
         ServerOrder = serverOrder;
         Description = description;
 
-        //default
+        // default
         PerformsAppRestart = false;
     }
 
     public InstallationType InstallTypeTarget { get; }
+
     public string Name { get; }
+
     public string View { get; }
+
     public int ServerOrder { get; }
+
     public string Description { get; }
 
     /// <summary>

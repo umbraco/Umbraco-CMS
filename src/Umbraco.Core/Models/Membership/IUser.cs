@@ -6,14 +6,18 @@ namespace Umbraco.Cms.Core.Models.Membership;
 ///     Defines the interface for a <see cref="User" />
 /// </summary>
 /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
-public interface IUser : IMembershipUser, IRememberBeingDirty, ICanBeDirty
+public interface IUser : IMembershipUser, IRememberBeingDirty
 {
     UserState UserState { get; }
 
     string? Name { get; set; }
+
     int SessionTimeout { get; set; }
+
     int[]? StartContentIds { get; set; }
+
     int[]? StartMediaIds { get; set; }
+
     string? Language { get; set; }
 
     DateTime? InvitedDate { get; set; }
@@ -41,6 +45,8 @@ public interface IUser : IMembershipUser, IRememberBeingDirty, ICanBeDirty
     string? TourData { get; set; }
 
     void RemoveGroup(string group);
+
     void ClearGroups();
+
     void AddGroup(IReadOnlyUserGroup group);
 }

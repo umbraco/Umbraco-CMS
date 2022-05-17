@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -17,14 +17,17 @@ public class DataTypeReferences
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeReferences : EntityBasic
     {
-        [DataMember(Name = "properties")] public object? Properties { get; set; }
+        [DataMember(Name = "properties")]
+        public object? Properties { get; set; }
 
         [DataContract(Name = "property", Namespace = "")]
         public class PropertyTypeReferences
         {
-            [DataMember(Name = "name")] public string? Name { get; set; }
+            [DataMember(Name = "name")]
+            public string? Name { get; set; }
 
-            [DataMember(Name = "alias")] public string? Alias { get; set; }
+            [DataMember(Name = "alias")]
+            public string? Alias { get; set; }
         }
     }
 }

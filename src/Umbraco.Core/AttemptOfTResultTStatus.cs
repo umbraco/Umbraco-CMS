@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 /// <summary>
 ///     Represents the result of an operation attempt.
@@ -8,6 +8,15 @@
 [Serializable]
 public struct Attempt<TResult, TStatus>
 {
+    // private - use Succeed() or Fail() methods to create attempts
+    private Attempt(bool success, TResult result, TStatus status, Exception? exception)
+    {
+        Success = success;
+        Result = result;
+        Status = status;
+        Exception = exception;
+    }
+
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Attempt{TResult,TStatus}" /> was successful.
     /// </summary>
@@ -28,14 +37,12 @@ public struct Attempt<TResult, TStatus>
     /// </summary>
     public TStatus Status { get; }
 
-    // private - use Succeed() or Fail() methods to create attempts
-    private Attempt(bool success, TResult result, TStatus status, Exception? exception)
-    {
-        Success = success;
-        Result = result;
-        Status = status;
-        Exception = exception;
-    }
+    /// <summary>
+    ///     Implicitly operator to check if the attempt was successful without having to access the 'success' property
+    /// </summary>
+    /// <param name="a"></param>
+    /// <returns></returns>
+    public static implicit operator bool(Attempt<TResult, TStatus> a) => a.Success;
 
     /// <summary>
     ///     Creates a successful attempt.
@@ -111,11 +118,4 @@ public struct Attempt<TResult, TStatus>
     public static Attempt<TResult, TStatus>
         If(bool condition, TStatus succStatus, TStatus failStatus, TResult result) =>
         new Attempt<TResult, TStatus>(condition, result, condition ? succStatus : failStatus, null);
-
-    /// <summary>
-    ///     Implicitly operator to check if the attempt was successful without having to access the 'success' property
-    /// </summary>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public static implicit operator bool(Attempt<TResult, TStatus> a) => a.Success;
 }

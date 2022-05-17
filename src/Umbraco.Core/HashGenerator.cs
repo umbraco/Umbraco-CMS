@@ -36,13 +36,12 @@ public class HashGenerator : DisposableObjectSlim
 
     public void AddCaseInsensitiveString(string s)
     {
-        //I've tried to no allocate a new string with this which can be done if we use the CompareInfo.GetSortKey method which will create a new
-        //byte array that we can use to write to the output, however this also allocates new objects so i really don't think the performance
-        //would be much different. In any case, I'll leave this here for reference. We could write the bytes out based on the sort key,
-        //this is how we could deal with case insensitivity without allocating another string
-        //for reference see: https://stackoverflow.com/a/10452967/694494
-        //we could go a step further and s.Normalize() but we're not really dealing with crazy unicode with this class so far.
-
+        // I've tried to no allocate a new string with this which can be done if we use the CompareInfo.GetSortKey method which will create a new
+        // byte array that we can use to write to the output, however this also allocates new objects so i really don't think the performance
+        // would be much different. In any case, I'll leave this here for reference. We could write the bytes out based on the sort key,
+        // this is how we could deal with case insensitivity without allocating another string
+        // for reference see: https://stackoverflow.com/a/10452967/694494
+        // we could go a step further and s.Normalize() but we're not really dealing with crazy unicode with this class so far.
         if (s != null)
         {
             _writer.Write(s.ToUpperInvariant());
@@ -51,7 +50,7 @@ public class HashGenerator : DisposableObjectSlim
 
     public void AddFileSystemItem(FileSystemInfo f)
     {
-        //if it doesn't exist, don't proceed.
+        // if it doesn't exist, don't proceed.
         if (f.Exists == false)
         {
             return;
@@ -61,7 +60,7 @@ public class HashGenerator : DisposableObjectSlim
         AddDateTime(f.CreationTimeUtc);
         AddDateTime(f.LastWriteTimeUtc);
 
-        //check if it is a file or folder
+        // check if it is a file or folder
         if (f is FileInfo fileInfo)
         {
             AddLong(fileInfo.Length);
@@ -91,8 +90,7 @@ public class HashGenerator : DisposableObjectSlim
     /// <returns></returns>
     public string GenerateHash()
     {
-        //flush,close,dispose the writer,then create a new one since it's possible to keep adding after GenerateHash is called.
-
+        // flush,close,dispose the writer,then create a new one since it's possible to keep adding after GenerateHash is called.
         _writer.Flush();
         _writer.Close();
         _writer.Dispose();
@@ -100,7 +98,7 @@ public class HashGenerator : DisposableObjectSlim
 
         var hashType = CryptoConfig.AllowOnlyFipsAlgorithms ? "SHA1" : "MD5";
 
-        //create an instance of the correct hashing provider based on the type passed in
+        // create an instance of the correct hashing provider based on the type passed in
         var hasher = HashAlgorithm.Create(hashType);
         if (hasher == null)
         {
@@ -110,20 +108,21 @@ public class HashGenerator : DisposableObjectSlim
         using (hasher)
         {
             var buffer = _ms.GetBuffer();
-            //get the hashed values created by our selected provider
+
+            // get the hashed values created by our selected provider
             var hashedByteArray = hasher.ComputeHash(buffer);
 
-            //create a StringBuilder object
+            // create a StringBuilder object
             var stringBuilder = new StringBuilder();
 
-            //loop to each byte
+            // loop to each byte
             foreach (var b in hashedByteArray)
             {
-                //append it to our StringBuilder
+                // append it to our StringBuilder
                 stringBuilder.Append(b.ToString("x2"));
             }
 
-            //return the hashed value
+            // return the hashed value
             return stringBuilder.ToString();
         }
     }

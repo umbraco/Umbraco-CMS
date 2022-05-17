@@ -16,8 +16,7 @@ public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublish
     {
     }
 
-    public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null,
-        string? culture = null) => throw new NotImplementedException();
+    public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null) => throw new NotImplementedException();
 
     public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
         throw new NotImplementedException();
@@ -66,7 +65,6 @@ public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublish
     public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) =>
         throw new NotImplementedException();
 
-    //public void Add(InternalPublishedContent content) => _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
-
+    // public void Add(InternalPublishedContent content) => _content[content.Id] = content.CreateModel(Mock.Of<IPublishedModelFactory>());
     public void Clear() => _content.Clear();
 }

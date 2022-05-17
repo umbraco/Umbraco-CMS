@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing;
+namespace Umbraco.Cms.Core.Models.ContentEditing;
 
 public interface IContentProperties<T>
     where T : ContentPropertyBasic

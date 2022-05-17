@@ -10,7 +10,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
     private static readonly List<string> PropertiesToExclude = new()
     {
         Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
-        Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
+        Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture),
     };
 
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -27,14 +27,12 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Elements;
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
             return null;
         }
-
 
         if (source is not string)
         {
@@ -45,7 +43,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
             }
         }
 
-        //Don't attempt to convert to int for UDI
+        // Don't attempt to convert to int for UDI
         if (source is string strSource
             && !string.IsNullOrWhiteSpace(strSource)
             && !strSource.StartsWith("umb")
@@ -63,8 +61,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
         return null;
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (inter == null)
         {
@@ -86,8 +83,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
             }
             else
             {
-                var udi = inter as GuidUdi;
-                if (udi is null)
+                if (inter is not GuidUdi udi)
                 {
                     return null;
                 }
@@ -103,8 +99,7 @@ internal class ContentPickerValueConverter : PropertyValueConverterBase
         return inter;
     }
 
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (inter == null)
         {

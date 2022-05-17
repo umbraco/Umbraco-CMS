@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -95,8 +95,7 @@ public interface IPublishedPropertyType
     /// <param name="inter">The intermediate value.</param>
     /// <param name="preview">A value indicating whether content should be considered draft.</param>
     /// <returns>The object value.</returns>
-    object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter,
-        bool preview);
+    object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
     /// <summary>
     ///     Converts the intermediate value into the XPath value.
@@ -109,6 +108,5 @@ public interface IPublishedPropertyType
     /// <remarks>
     ///     <para>The XPath value can be either a string or an XPathNavigator.</para>
     /// </remarks>
-    object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter,
-        bool preview);
+    object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

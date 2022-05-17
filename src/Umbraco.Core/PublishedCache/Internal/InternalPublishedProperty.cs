@@ -14,6 +14,7 @@ public class InternalPublishedProperty : IPublishedProperty
     public bool SolidHasValue { get; set; }
 
     public object? SolidXPathValue { get; set; }
+
     public IPublishedPropertyType PropertyType { get; set; } = null!;
 
     public string Alias { get; set; } = string.Empty;

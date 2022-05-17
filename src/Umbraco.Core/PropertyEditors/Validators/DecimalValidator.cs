@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -22,7 +22,7 @@ public sealed class DecimalValidator : IManifestValueValidator
         Attempt<decimal> result = value.TryConvertTo<decimal>();
         if (result.Success == false)
         {
-            yield return new ValidationResult("The value " + value + " is not a valid decimal", new[] {"value"});
+            yield return new ValidationResult("The value " + value + " is not a valid decimal", new[] { "value" });
         }
     }
 }

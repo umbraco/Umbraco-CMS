@@ -15,8 +15,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration;
 [HealthCheck(
     "D0F7599E-9B2A-4D9E-9883-81C7EDC5616F",
     "Macro errors",
-    Description =
-        "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
+    Description = "Checks to make sure macro errors are not set to throw a YSOD (yellow screen of death), which would prevent certain or all pages from loading completely.",
     Group = "Configuration")]
 public class MacroErrorsCheck : AbstractSettingsCheck
 {
@@ -53,8 +52,8 @@ public class MacroErrorsCheck : AbstractSettingsCheck
         {
             var values = new List<AcceptableConfiguration>
             {
-                new() {IsRecommended = true, Value = MacroErrorBehaviour.Inline.ToString()},
-                new() {IsRecommended = false, Value = MacroErrorBehaviour.Silent.ToString()}
+                new() { IsRecommended = true, Value = MacroErrorBehaviour.Inline.ToString() },
+                new() { IsRecommended = false, Value = MacroErrorBehaviour.Silent.ToString() },
             };
 
             return values;
@@ -69,14 +68,12 @@ public class MacroErrorsCheck : AbstractSettingsCheck
     /// </summary>
     public override string CheckSuccessMessage =>
         _textService.Localize(
-            "healthcheck", "macroErrorModeCheckSuccessMessage",
-            new[] {CurrentValue, Values.First(v => v.IsRecommended).Value});
+            "healthcheck", "macroErrorModeCheckSuccessMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
 
     /// <summary>
     ///     Gets the message for when the check has failed.
     /// </summary>
     public override string CheckErrorMessage =>
         _textService.Localize(
-            "healthcheck", "macroErrorModeCheckErrorMessage",
-            new[] {CurrentValue, Values.First(v => v.IsRecommended).Value});
+            "healthcheck", "macroErrorModeCheckErrorMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
 }

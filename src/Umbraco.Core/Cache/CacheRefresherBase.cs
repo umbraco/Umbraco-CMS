@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Core.Cache;
 /// <summary>
 ///     A base class for cache refreshers that handles events.
 /// </summary>
-/// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
 /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
 public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     where TNotification : CacheRefresherNotification
@@ -16,9 +15,7 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     /// <summary>
     ///     Initializes a new instance of the <see cref="CacheRefresherBase{TInstanceType}" />.
     /// </summary>
-    /// <param name="appCaches">A cache helper.</param>
-    protected CacheRefresherBase(AppCaches appCaches, IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
+    protected CacheRefresherBase(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
     {
         AppCaches = appCaches;
         EventAggregator = eventAggregator;
@@ -38,7 +35,7 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     public abstract string Name { get; }
 
     /// <summary>
-    ///     Gets the <see cref="TNotificationFactory" /> for <see cref="TNotification" />
+    ///     Gets the <see cref="ICacheRefresherNotificationFactory" /> for <see cref="TNotification" />
     /// </summary>
     protected ICacheRefresherNotificationFactory NotificationFactory { get; }
 
@@ -50,6 +47,7 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     ///     Refreshes all entities.
     /// </summary>
     public virtual void RefreshAll() =>
+
         // NOTE: We pass in string.Empty here because if we pass in NULL this causes problems with
         // the underlying ActivatorUtilities.CreateInstance which doesn't seem to support passing in
         // null to an 'object' parameter and we end up with "A suitable constructor for type 'ZYZ' could not be located."
@@ -100,8 +98,6 @@ public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
     /// <summary>
     ///     Raises the CacheUpdated event.
     /// </summary>
-    /// <param name="sender">The event sender.</param>
-    /// <param name="args">The event arguments.</param>
     protected void OnCacheUpdated(CacheRefresherNotification notification) => EventAggregator.Publish(notification);
 
     #endregion

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
@@ -23,7 +23,6 @@ public interface IDashboard : IDashboardSlim
     /// </remarks>
     [DataMember(Name = "sections")]
     string[] Sections { get; }
-
 
     /// <summary>
     ///     Gets the access rule determining the visibility of the dashboard.

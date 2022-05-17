@@ -19,5 +19,5 @@ public enum LuceneDirectoryFactory
     /// <summary>
     ///     The index will operate only in the processes %temp% directory location
     /// </summary>
-    TempFileSystemDirectoryFactory
+    TempFileSystemDirectoryFactory,
 }

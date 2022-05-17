@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -14,7 +14,7 @@ public static class DateTimeExtensions
         Day,
         Hour,
         Minute,
-        Second
+        Second,
     }
 
     /// <summary>

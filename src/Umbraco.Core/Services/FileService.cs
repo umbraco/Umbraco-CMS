@@ -34,12 +34,18 @@ public class FileService : RepositoryService, IFileService
     private readonly IStylesheetRepository _stylesheetRepository;
     private readonly ITemplateRepository _templateRepository;
 
-    public FileService(ICoreScopeProvider uowProvider, ILoggerFactory loggerFactory,
+    public FileService(
+        ICoreScopeProvider uowProvider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository,
+        IStylesheetRepository stylesheetRepository,
+        IScriptRepository scriptRepository,
         ITemplateRepository templateRepository,
-        IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-        IAuditRepository auditRepository, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
+        IPartialViewRepository partialViewRepository,
+        IPartialViewMacroRepository partialViewMacroRepository,
+        IAuditRepository auditRepository,
+        IShortStringHelper shortStringHelper,
+        IOptions<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment)
         : base(uowProvider, loggerFactory, eventMessagesFactory)
     {
@@ -54,9 +60,6 @@ public class FileService : RepositoryService, IFileService
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
-
     #region Stylesheets
 
     /// <inheritdoc />
@@ -67,6 +70,9 @@ public class FileService : RepositoryService, IFileService
             return _stylesheetRepository.GetMany(paths);
         }
     }
+
+    private void Audit(AuditType type, int userId, int objectId, string? entityType) =>
+        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType));
 
     /// <inheritdoc />
     public IStylesheet? GetStylesheet(string? path)
@@ -86,7 +92,6 @@ public class FileService : RepositoryService, IFileService
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
@@ -221,7 +226,6 @@ public class FileService : RepositoryService, IFileService
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             var savingNotification = new ScriptSavingNotification(script, eventMessages);
@@ -335,7 +339,8 @@ public class FileService : RepositoryService, IFileService
         string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId)
     {
         var template = new Template(_shortStringHelper, contentTypeName,
-            //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
+
+            // NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
             // want to save template file names as camelCase, the Template ctor will clean the alias as
             // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
             // This fixes: http://issues.umbraco.org/issue/U4-7953
@@ -374,8 +379,10 @@ public class FileService : RepositoryService, IFileService
             scope.Complete();
         }
 
-        return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success,
-            eventMessages, template);
+        return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(
+            OperationResultType.Success,
+            eventMessages,
+            template);
     }
 
     /// <summary>
@@ -387,8 +394,12 @@ public class FileService : RepositoryService, IFileService
     /// <param name="masterTemplate"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content,
-        ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId)
+    public ITemplate CreateTemplateWithIdentity(
+        string? name,
+        string? alias,
+        string? content,
+        ITemplate? masterTemplate = null,
+        int userId = Constants.Security.SuperUserId)
     {
         if (name == null)
         {
@@ -406,7 +417,7 @@ public class FileService : RepositoryService, IFileService
         }
 
         // file might already be on disk, if so grab the content to avoid overwriting
-        var template = new Template(_shortStringHelper, name, alias) {Content = GetViewContent(alias) ?? content};
+        var template = new Template(_shortStringHelper, name, alias) { Content = GetViewContent(alias) ?? content };
 
         if (masterTemplate != null)
         {
@@ -513,7 +524,6 @@ public class FileService : RepositoryService, IFileService
                 "Name cannot be null, empty, contain only white-space characters or be more than 255 characters in length.");
         }
 
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -599,6 +609,15 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
+    /// <inheritdoc />
+    public Stream GetTemplateFileContentStream(string filepath)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _templateRepository.GetFileContentStream(filepath);
+        }
+    }
+
     private string? GetViewContent(string? fileName)
     {
         if (fileName.IsNullOrWhiteSpace())
@@ -616,15 +635,6 @@ public class FileService : RepositoryService, IFileService
         using (var view = new StreamReader(fs))
         {
             return view.ReadToEnd().Trim();
-        }
-    }
-
-    /// <inheritdoc />
-    public Stream GetTemplateFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _templateRepository.GetFileContentStream(filepath);
         }
     }
 
@@ -662,7 +672,7 @@ public class FileService : RepositoryService, IFileService
             .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
             .ToArray();
 
-        //Ensure the ones that are called 'Empty' are at the top
+        // Ensure the ones that are called 'Empty' are at the top
         var empty = files.Where(x => Path.GetFileName(x)?.InvariantStartsWith("Empty") ?? false)
             .OrderBy(x => x?.Length)
             .ToArray();
@@ -712,16 +722,20 @@ public class FileService : RepositoryService, IFileService
         }
     }
 
-    public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null,
-        int? userId = Constants.Security.SuperUserId) =>
+    public Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
 
-    public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null,
-        int? userId = Constants.Security.SuperUserId) =>
+    public Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId) =>
         CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
 
-    private Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType,
-        string? snippetName = null, int? userId = Constants.Security.SuperUserId)
+    public bool DeletePartialView(string path, int? userId = null) =>
+        DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
+
+    private Attempt<IPartialView?> CreatePartialViewMacro(
+        IPartialView partialView,
+        PartialViewType partialViewType,
+        string? snippetName = null,
+        int? userId = Constants.Security.SuperUserId)
     {
         string partialViewHeader;
         switch (partialViewType)
@@ -739,7 +753,7 @@ public class FileService : RepositoryService, IFileService
         string? partialViewContent = null;
         if (snippetName.IsNullOrWhiteSpace() == false)
         {
-            //create the file
+            // create the file
             Attempt<string> snippetPathAttempt = TryGetSnippetPath(snippetName);
             if (snippetPathAttempt.Success == false)
             {
@@ -750,10 +764,10 @@ public class FileService : RepositoryService, IFileService
             {
                 var snippetContent = snippetFile.ReadToEnd().Trim();
 
-                //strip the @inherits if it's there
+                // strip the @inherits if it's there
                 snippetContent = StripPartialViewHeader(snippetContent);
 
-                //Update Model.Content. to be Model. when used as PartialView
+                // Update Model.Content. to be Model. when used as PartialView
                 if (partialViewType == PartialViewType.PartialView)
                 {
                     snippetContent = snippetContent.Replace("Model.Content.", "Model.");
@@ -792,11 +806,11 @@ public class FileService : RepositoryService, IFileService
         return Attempt<IPartialView?>.Succeed(partialView);
     }
 
-    public bool DeletePartialView(string path, int? userId = null) =>
-        DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
-
     public bool DeletePartialViewMacro(string path, int? userId = null) =>
         DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
+
+    public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
+        SavePartialView(partialView, PartialViewType.PartialView, userId);
 
     private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int? userId = null)
     {
@@ -830,14 +844,25 @@ public class FileService : RepositoryService, IFileService
         return true;
     }
 
-    public Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null) =>
-        SavePartialView(partialView, PartialViewType.PartialView, userId);
-
     public Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null) =>
         SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
 
-    private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType,
-        int? userId = null)
+    public void CreatePartialViewFolder(string folderPath)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            _partialViewRepository.AddFolder(folderPath);
+            scope.Complete();
+        }
+    }
+
+    internal string StripPartialViewHeader(string contents)
+    {
+        var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
+        return headerMatch.Replace(contents, string.Empty);
+    }
+
+    private Attempt<IPartialView?> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int? userId = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -863,12 +888,6 @@ public class FileService : RepositoryService, IFileService
         return Attempt.Succeed(partialView);
     }
 
-    internal string StripPartialViewHeader(string contents)
-    {
-        var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
-        return headerMatch.Replace(contents, string.Empty);
-    }
-
     internal Attempt<string> TryGetSnippetPath(string? fileName)
     {
         if (fileName?.EndsWith(".cshtml") == false)
@@ -884,21 +903,21 @@ public class FileService : RepositoryService, IFileService
             : Attempt<string>.Fail();
     }
 
-    public void CreatePartialViewFolder(string folderPath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _partialViewRepository.AddFolder(folderPath);
-            scope.Complete();
-        }
-    }
-
     public void CreatePartialViewMacroFolder(string folderPath)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             _partialViewMacroRepository.AddFolder(folderPath);
             scope.Complete();
+        }
+    }
+
+    /// <inheritdoc />
+    public Stream GetPartialViewFileContentStream(string filepath)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _partialViewRepository.GetFileContentStream(filepath);
         }
     }
 
@@ -912,15 +931,6 @@ public class FileService : RepositoryService, IFileService
                 return _partialViewMacroRepository;
             default:
                 throw new ArgumentOutOfRangeException(nameof(partialViewType));
-        }
-    }
-
-    /// <inheritdoc />
-    public Stream GetPartialViewFileContentStream(string filepath)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _partialViewRepository.GetFileContentStream(filepath);
         }
     }
 
@@ -1004,7 +1014,7 @@ public class FileService : RepositoryService, IFileService
         var snippetProvider =
             new EmbeddedFileProvider(GetType().Assembly, "Umbraco.Cms.Core.EmbeddedResources.Snippets");
 
-        IFileInfo file = snippetProvider.GetDirectoryContents(string.Empty)
+        IFileInfo? file = snippetProvider.GetDirectoryContents(string.Empty)
             .FirstOrDefault(x => x.Exists && x.Name.Equals(snippetName + ".cshtml"));
 
         // Try and get the snippet path
@@ -1017,10 +1027,10 @@ public class FileService : RepositoryService, IFileService
         {
             var snippetContent = snippetFile.ReadToEnd().Trim();
 
-            //strip the @inherits if it's there
+            // strip the @inherits if it's there
             snippetContent = StripPartialViewHeader(snippetContent);
 
-            //Update Model.Content to be Model when used as PartialView
+            // Update Model.Content to be Model when used as PartialView
             if (partialViewType == PartialViewType.PartialView)
             {
                 snippetContent = snippetContent

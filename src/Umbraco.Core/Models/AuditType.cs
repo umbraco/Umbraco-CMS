@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Defines audit types.
@@ -123,5 +123,5 @@ public enum AuditType
     /// <summary>
     ///     Content version preventCleanup set to false
     /// </summary>
-    ContentVersionEnableCleanup
+    ContentVersionEnableCleanup,
 }

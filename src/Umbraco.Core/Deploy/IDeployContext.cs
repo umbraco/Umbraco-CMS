@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy;
+namespace Umbraco.Cms.Core.Deploy;
 
 /// <summary>
 ///     Represents a deployment context.
@@ -34,10 +34,11 @@ public interface IDeployContext
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <param name="key">The key of the item.</param>
     /// <returns>The item with the specified key and type, if any, else null.</returns>
-    T? Item<T>(string key) where T : class;
+    T? Item<T>(string key)
+        where T : class;
 
     ///// <summary>
     ///// Gets the global deployment cancellation token.
     ///// </summary>
-    //CancellationToken CancellationToken { get; }
+    // CancellationToken CancellationToken { get; }
 }

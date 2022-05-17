@@ -57,7 +57,7 @@ public sealed class MediaFileManager
         files = files.Distinct();
 
         // kinda try to keep things under control
-        var options = new ParallelOptions {MaxDegreeOfParallelism = 20};
+        var options = new ParallelOptions { MaxDegreeOfParallelism = 20 };
 
         Parallel.ForEach(files, options, file =>
         {
@@ -122,6 +122,8 @@ public sealed class MediaFileManager
     /// <param name="mediaFilePath">The file path if a file was found</param>
     /// <param name="propertyTypeAlias"></param>
     /// <param name="variationContextAccessor"></param>
+    /// <param name="culture"></param>
+    /// <param name="segment"></param>
     /// <returns></returns>
     public Stream GetFile(
         IContentBase content,
@@ -161,8 +163,7 @@ public sealed class MediaFileManager
     ///         file.
     ///     </para>
     /// </remarks>
-    public string StoreFile(IContentBase content, IPropertyType? propertyType, string filename, Stream filestream,
-        string? oldpath)
+    public string StoreFile(IContentBase content, IPropertyType? propertyType, string filename, Stream filestream, string? oldpath)
     {
         if (content == null)
         {
@@ -181,7 +182,8 @@ public sealed class MediaFileManager
 
         if (string.IsNullOrWhiteSpace(filename))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(filename));
         }
 
@@ -193,7 +195,7 @@ public sealed class MediaFileManager
         // clear the old file, if any
         if (string.IsNullOrWhiteSpace(oldpath) == false)
         {
-            FileSystem.DeleteFile(oldpath!);
+            FileSystem.DeleteFile(oldpath);
         }
 
         // get the filepath, store the data
@@ -228,7 +230,8 @@ public sealed class MediaFileManager
 
         if (string.IsNullOrWhiteSpace(sourcepath))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(sourcepath));
         }
 

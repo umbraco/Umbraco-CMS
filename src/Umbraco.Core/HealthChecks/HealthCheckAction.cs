@@ -8,12 +8,15 @@ public class HealthCheckAction
     /// <summary>
     ///     The name of the action - this is used to name the fix button
     /// </summary>
-    [DataMember(Name = "name")] private string? _name;
+    [DataMember(Name = "name")]
+    private string? _name;
 
     /// <summary>
     ///     Empty ctor used for serialization
     /// </summary>
-    public HealthCheckAction() { }
+    public HealthCheckAction()
+    {
+    }
 
     /// <summary>
     ///     Default ctor

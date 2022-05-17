@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class ContentSentToPublishNotification : ObjectNotification<IContent>
 {
-    public ContentSentToPublishNotification(IContent target, EventMessages messages) : base(target, messages)
+    public ContentSentToPublishNotification(IContent target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

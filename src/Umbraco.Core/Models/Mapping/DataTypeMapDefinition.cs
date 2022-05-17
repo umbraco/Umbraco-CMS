@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
@@ -14,7 +14,7 @@ public class DataTypeMapDefinition : IMapDefinition
     private static readonly int[] SystemIds =
     {
         Constants.DataTypes.DefaultContentListView, Constants.DataTypes.DefaultMediaListView,
-        Constants.DataTypes.DefaultMembersListView
+        Constants.DataTypes.DefaultMembersListView,
     };
 
     private readonly ContentSettings _contentSettings;
@@ -22,8 +22,7 @@ public class DataTypeMapDefinition : IMapDefinition
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IConfigurationEditorJsonSerializer _serializer;
 
-    public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger,
-        IOptions<ContentSettings> contentSettings, IConfigurationEditorJsonSerializer serializer)
+    public DataTypeMapDefinition(PropertyEditorCollection propertyEditors, ILogger<DataTypeMapDefinition> logger, IOptions<ContentSettings> contentSettings, IConfigurationEditorJsonSerializer serializer)
     {
         _propertyEditors = propertyEditors;
         _logger = logger;
@@ -42,7 +41,8 @@ public class DataTypeMapDefinition : IMapDefinition
         mapper.Define<IDataType, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
         mapper.Define<DataTypeSave, IDataType>(
             (source, context) =>
-                new DataType(_propertyEditors[source.EditorAlias], _serializer) {CreateDate = DateTime.Now}, Map);
+                new DataType(_propertyEditors[source.EditorAlias], _serializer) { CreateDate = DateTime.Now },
+            Map);
         mapper.Define<IDataEditor, IEnumerable<DataTypeConfigurationFieldDisplay>>(MapPreValues);
     }
 
@@ -87,12 +87,12 @@ public class DataTypeMapDefinition : IMapDefinition
         target.Trashed = source.Trashed;
         target.Udi = Udi.Create(Constants.UdiEntityType.DataType, source.Key);
 
-        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor editor))
+        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor? editor))
         {
             return;
         }
 
-        target.Alias = editor!.Alias;
+        target.Alias = editor.Alias;
         target.Group = editor.Group;
         target.Icon = editor.Icon;
     }
@@ -112,12 +112,12 @@ public class DataTypeMapDefinition : IMapDefinition
         target.Trashed = source.Trashed;
         target.Udi = Udi.Create(Constants.UdiEntityType.DataType, source.Key);
 
-        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor editor))
+        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor? editor))
         {
             return;
         }
 
-        target.Alias = editor!.Alias;
+        target.Alias = editor.Alias;
         target.Group = editor.Group;
         target.Icon = editor.Icon;
     }
@@ -147,15 +147,14 @@ public class DataTypeMapDefinition : IMapDefinition
         // in v7 it was apparently fine to have an empty .EditorAlias here, in which case we would map onto
         // an empty fields list, which made no sense since there would be nothing to map to - and besides,
         // a datatype without an editor alias is a serious issue - v8 wants an editor here
-
         if (string.IsNullOrWhiteSpace(dataType.EditorAlias) ||
-            !_propertyEditors.TryGet(dataType.EditorAlias, out IDataEditor editor))
+            !_propertyEditors.TryGet(dataType.EditorAlias, out IDataEditor? editor))
         {
             throw new InvalidOperationException(
                 $"Could not find a property editor with alias \"{dataType.EditorAlias}\".");
         }
 
-        IConfigurationEditor configurationEditor = editor!.GetConfigurationEditor();
+        IConfigurationEditor configurationEditor = editor.GetConfigurationEditor();
         var fields = context
             .MapEnumerable<ConfigurationField, DataTypeConfigurationFieldDisplay>(configurationEditor.Fields)
             .WhereNotNull().ToList();
@@ -167,8 +166,7 @@ public class DataTypeMapDefinition : IMapDefinition
         return fields;
     }
 
-    private void MapConfigurationFields(IDataType? dataType, List<DataTypeConfigurationFieldDisplay> fields,
-        IDictionary<string, object>? configuration)
+    private void MapConfigurationFields(IDataType? dataType, List<DataTypeConfigurationFieldDisplay> fields, IDictionary<string, object>? configuration)
     {
         if (fields == null)
         {
@@ -183,7 +181,7 @@ public class DataTypeMapDefinition : IMapDefinition
         // now we need to wire up the pre-values values with the actual fields defined
         foreach (DataTypeConfigurationFieldDisplay field in fields.ToList())
         {
-            //filter out the not-supported pre-values for built-in data types
+            // filter out the not-supported pre-values for built-in data types
             if (dataType != null && dataType.IsBuildInDataType() &&
                 (field.Key?.InvariantEquals(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes) ?? false))
             {
@@ -205,13 +203,13 @@ public class DataTypeMapDefinition : IMapDefinition
 
     private ValueStorageType MapDatabaseType(DataTypeSave source)
     {
-        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor editor))
+        if (!_propertyEditors.TryGet(source.EditorAlias, out IDataEditor? editor))
         {
             throw new InvalidOperationException($"Could not find property editor \"{source.EditorAlias}\".");
         }
 
         // TODO: what about source.PropertyEditor? can we get the configuration here? 'cos it may change the storage type?!
-        var valueType = editor!.GetValueEditor().ValueType;
+        var valueType = editor.GetValueEditor().ValueType;
         return ValueTypes.ToStorageType(valueType);
     }
 
@@ -221,7 +219,6 @@ public class DataTypeMapDefinition : IMapDefinition
         // get the configuration editor,
         // get the configuration fields and map to UI,
         // get the configuration default values and map to UI
-
         IConfigurationEditor configurationEditor = source.GetConfigurationEditor();
 
         var fields =

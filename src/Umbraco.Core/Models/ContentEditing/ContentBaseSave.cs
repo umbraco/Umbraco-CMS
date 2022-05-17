@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Editors;
 
@@ -27,14 +27,16 @@ public abstract class ContentBaseSave<TPersisted> : ContentItemBasic<ContentProp
         set => base.Properties = value;
     }
 
-    [IgnoreDataMember] public List<ContentPropertyFile> UploadedFiles { get; }
+    [IgnoreDataMember]
+    public List<ContentPropertyFile> UploadedFiles { get; }
 
-    //These need explicit implementation because we are using internal models
+    // These need explicit implementation because we are using internal models
+
     /// <inheritdoc />
     [IgnoreDataMember]
     TPersisted IContentSave<TPersisted>.PersistedContent { get; set; } = default!;
 
-    //Non explicit internal getter so we don't need to explicitly cast in our own code
+    // Non explicit internal getter so we don't need to explicitly cast in our own code
     [IgnoreDataMember]
     public TPersisted PersistedContent
     {

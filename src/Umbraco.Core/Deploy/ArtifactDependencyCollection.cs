@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Umbraco.Cms.Core.Deploy;
 
@@ -9,6 +9,8 @@ namespace Umbraco.Cms.Core.Deploy;
 public class ArtifactDependencyCollection : ICollection<ArtifactDependency>
 {
     private readonly Dictionary<Udi, ArtifactDependency> _dependencies = new();
+
+    public int Count => _dependencies.Count;
 
     public IEnumerator<ArtifactDependency> GetEnumerator() => _dependencies.Values.GetEnumerator();
 
@@ -37,8 +39,6 @@ public class ArtifactDependencyCollection : ICollection<ArtifactDependency>
     public void CopyTo(ArtifactDependency[] array, int arrayIndex) => _dependencies.Values.CopyTo(array, arrayIndex);
 
     public bool Remove(ArtifactDependency item) => throw new NotSupportedException();
-
-    public int Count => _dependencies.Count;
 
     public bool IsReadOnly => false;
 }

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models.Packaging;
 /// </summary>
 public class CompiledPackageContentBase
 {
-    public string? ImportMode { get; set; } //this is never used
+    public string? ImportMode { get; set; } // this is never used
 
     /// <summary>
     ///     The serialized version of the content
@@ -16,5 +16,5 @@ public class CompiledPackageContentBase
     public XElement XmlData { get; set; } = null!;
 
     public static CompiledPackageContentBase Create(XElement xml) =>
-        new() {XmlData = xml, ImportMode = xml.AttributeValue<string>("importMode")};
+        new() { XmlData = xml, ImportMode = xml.AttributeValue<string>("importMode") };
 }

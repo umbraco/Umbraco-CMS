@@ -14,7 +14,7 @@ public static class AuthenticationExtensions
     /// </summary>
     public static void EnsureCulture(this IIdentity identity)
     {
-        CultureInfo culture = GetCulture(identity);
+        CultureInfo? culture = GetCulture(identity);
         if (!(culture is null))
         {
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = culture;

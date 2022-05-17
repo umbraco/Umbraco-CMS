@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Composing;
 

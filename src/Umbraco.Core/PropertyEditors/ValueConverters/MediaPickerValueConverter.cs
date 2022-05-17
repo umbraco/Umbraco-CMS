@@ -17,7 +17,8 @@ public class MediaPickerValueConverter : PropertyValueConverterBase
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-    public MediaPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor,
+    public MediaPickerValueConverter(
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IPublishedModelFactory publishedModelFactory)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor ??
@@ -39,30 +40,33 @@ public class MediaPickerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
-    private bool IsMultipleDataType(PublishedDataType dataType)
-    {
-        MediaPickerConfiguration config =
-            ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.Configuration);
-        return config?.Multiple ?? false;
-    }
-
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
             return null;
         }
 
-        Udi[] nodeIds = source.ToString()?
+        Udi[]? nodeIds = source.ToString()?
             .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Select(UdiParser.Parse)
             .ToArray();
         return nodeIds;
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel cacheLevel, object? source, bool preview)
+    private bool IsMultipleDataType(PublishedDataType dataType)
+    {
+        MediaPickerConfiguration? config =
+            ConfigurationEditor.ConfigurationAs<MediaPickerConfiguration>(dataType.Configuration);
+        return config?.Multiple ?? false;
+    }
+
+    public override object? ConvertIntermediateToObject(
+        IPublishedElement owner,
+        IPublishedPropertyType propertyType,
+        PropertyCacheLevel cacheLevel,
+        object? source,
+        bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 
@@ -79,13 +83,12 @@ public class MediaPickerValueConverter : PropertyValueConverterBase
             IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             foreach (Udi udi in udis)
             {
-                var guidUdi = udi as GuidUdi;
-                if (guidUdi is null)
+                if (udi is not GuidUdi guidUdi)
                 {
                     continue;
                 }
 
-                IPublishedContent item = publishedSnapshot?.Media?.GetById(guidUdi.Guid);
+                IPublishedContent? item = publishedSnapshot?.Media?.GetById(guidUdi.Guid);
                 if (item != null)
                 {
                     mediaItems.Add(item);

@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class DataTypeMovedNotification : MovedNotification<IDataType>
 {
-    public DataTypeMovedNotification(MoveEventInfo<IDataType> target, EventMessages messages) : base(target, messages)
+    public DataTypeMovedNotification(MoveEventInfo<IDataType> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

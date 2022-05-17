@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Configuration.Grid;
+namespace Umbraco.Cms.Core.Configuration.Grid;
 
 public interface IGridConfig
 {

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
@@ -19,8 +19,12 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
     private readonly ICultureDictionary _cultureDictionary;
     private readonly ILocalizedTextService _textService;
 
-    public ContentPropertyDisplayMapper(ICultureDictionary cultureDictionary, IDataTypeService dataTypeService,
-        IEntityService entityService, ILocalizedTextService textService, ILogger<ContentPropertyDisplayMapper> logger,
+    public ContentPropertyDisplayMapper(
+        ICultureDictionary cultureDictionary,
+        IDataTypeService dataTypeService,
+        IEntityService entityService,
+        ILocalizedTextService textService,
+        ILogger<ContentPropertyDisplayMapper> logger,
         PropertyEditorCollection propertyEditors)
         : base(dataTypeService, entityService, logger, propertyEditors)
     {
@@ -43,16 +47,16 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
         // - does it make any sense to use a IDataValueEditor without configuring it?
 
         // configure the editor for display with configuration
-        IDataValueEditor valEditor = dest.PropertyEditor?.GetValueEditor(config);
+        IDataValueEditor? valEditor = dest.PropertyEditor?.GetValueEditor(config);
 
-        //set the display properties after mapping
+        // set the display properties after mapping
         dest.Alias = originalProp.Alias;
         dest.Description = originalProp.PropertyType?.Description;
         dest.Label = originalProp.PropertyType?.Name;
         dest.HideLabel = valEditor?.HideLabel ?? false;
         dest.LabelOnTop = originalProp.PropertyType?.LabelOnTop;
 
-        //add the validation information
+        // add the validation information
         dest.Validation.Mandatory = originalProp.PropertyType?.Mandatory ?? false;
         dest.Validation.MandatoryMessage = originalProp.PropertyType?.MandatoryMessage;
         dest.Validation.Pattern = originalProp.PropertyType?.ValidationRegExp;
@@ -60,19 +64,19 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
 
         if (dest.PropertyEditor == null)
         {
-            //display.Config = PreValueCollection.AsDictionary(preVals);
-            //if there is no property editor it means that it is a legacy data type
+            // display.Config = PreValueCollection.AsDictionary(preVals);
+            // if there is no property editor it means that it is a legacy data type
             // we cannot support editing with that so we'll just render the readonly value view.
             dest.View = "views/propertyeditors/readonlyvalue/readonlyvalue.html";
         }
         else
         {
-            //let the property editor format the pre-values
+            // let the property editor format the pre-values
             dest.Config = dest.PropertyEditor.GetConfigurationEditor().ToValueEditor(config);
             dest.View = valEditor?.View;
         }
 
-        //Translate
+        // Translate
         dest.Label = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Label);
         dest.Description = _textService.UmbracoDictionaryTranslate(_cultureDictionary, dest.Description);
     }

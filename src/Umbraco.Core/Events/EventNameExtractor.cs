@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -45,8 +45,7 @@ public class EventNameExtractor
     /// <returns>
     ///     null if not found or an ambiguous match
     /// </returns>
-    public static Attempt<EventNameExtractorResult?> FindEvent(Type senderType, Type argsType,
-        Func<string, bool> exclude)
+    public static Attempt<EventNameExtractorResult?> FindEvent(Type senderType, Type argsType, Func<string, bool> exclude)
     {
         var events = FindEvents(senderType, argsType, exclude);
 
@@ -59,7 +58,7 @@ public class EventNameExtractor
                 return Attempt.Succeed(new EventNameExtractorResult(events[0]));
 
             default:
-                //there's more than one left so it's ambiguous!
+                // there's more than one left so it's ambiguous!
                 return Attempt.Fail(new EventNameExtractorResult(EventNameExtractorError.Ambiguous));
         }
     }
@@ -72,11 +71,13 @@ public class EventNameExtractor
             {
                 return t.GetEvents(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
                                    BindingFlags.FlattenHierarchy)
-                    //we can only look for events handlers with generic types because that is the only
+
+                    // we can only look for events handlers with generic types because that is the only
                     // way that we can try to find a matching event based on the arg type passed in
                     .Where(x => x.EventHandlerType?.IsGenericType ?? false)
                     .Select(x => new EventInfoArgs(x, x.EventHandlerType!.GetGenericArguments()))
-                    //we are only looking for event handlers that have more than one generic argument
+
+                    // we are only looking for event handlers that have more than one generic argument
                     .Where(x =>
                     {
                         if (x.GenericArgs.Length == 1)
@@ -84,7 +85,7 @@ public class EventNameExtractor
                             return true;
                         }
 
-                        //special case for our own TypedEventHandler
+                        // special case for our own TypedEventHandler
                         if (x.EventInfo.EventHandlerType?.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>) &&
                             x.GenericArgs.Length == 2)
                         {
@@ -103,7 +104,7 @@ public class EventNameExtractor
                     return true;
                 }
 
-                //special case for our own TypedEventHandler
+                // special case for our own TypedEventHandler
                 if (x.EventInfo.EventHandlerType?.GetGenericTypeDefinition() == typeof(TypedEventHandler<,>)
                     && x.GenericArgs.Length == 2
                     && x.GenericArgs[1] == tuple.Item2)
@@ -177,6 +178,7 @@ public class EventNameExtractor
         }
 
         public EventInfo EventInfo { get; }
+
         public Type[] GenericArgs { get; }
     }
 }

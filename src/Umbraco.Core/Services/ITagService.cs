@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -77,8 +77,7 @@ public interface ITagService : IService
     /// <summary>
     ///     Gets all tags attached to an entity via a property.
     /// </summary>
-    IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null);
+    IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags attached to an entity.
@@ -88,8 +87,7 @@ public interface ITagService : IService
     /// <summary>
     ///     Gets all tags attached to an entity via a property.
     /// </summary>
-    IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null);
+    IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null, string? culture = null);
 
     /// <summary>
     ///     Gets all tags attached to an entity.

@@ -6,13 +6,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ContentTypeChangedNotification : ContentTypeChangeNotification<IContentType>
 {
-    public ContentTypeChangedNotification(ContentTypeChange<IContentType> target, EventMessages messages) : base(target,
+    public ContentTypeChangedNotification(ContentTypeChange<IContentType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public ContentTypeChangedNotification(IEnumerable<ContentTypeChange<IContentType>> target, EventMessages messages) :
-        base(target, messages)
+    public ContentTypeChangedNotification(IEnumerable<ContentTypeChange<IContentType>> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

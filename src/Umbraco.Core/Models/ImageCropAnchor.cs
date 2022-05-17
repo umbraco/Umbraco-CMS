@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public enum ImageCropAnchor
 {
@@ -10,5 +10,5 @@ public enum ImageCropAnchor
     TopLeft,
     TopRight,
     BottomLeft,
-    BottomRight
+    BottomRight,
 }

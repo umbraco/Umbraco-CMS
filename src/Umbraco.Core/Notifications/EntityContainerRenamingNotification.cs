@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class EntityContainerRenamingNotification : RenamingNotification<EntityContainer>
 {
-    public EntityContainerRenamingNotification(EntityContainer target, EventMessages messages) : base(target, messages)
+    public EntityContainerRenamingNotification(EntityContainer target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

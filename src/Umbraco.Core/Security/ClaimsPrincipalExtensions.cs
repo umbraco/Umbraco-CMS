@@ -10,7 +10,7 @@ namespace Umbraco.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity claimsIdentity)
+    public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity? claimsIdentity)
     {
         if (claimsIdentity is null)
         {
@@ -28,19 +28,19 @@ public static class ClaimsPrincipalExtensions
     /// <returns></returns>
     public static ClaimsIdentity? GetUmbracoIdentity(this IPrincipal principal)
     {
-        //If it's already a UmbracoBackOfficeIdentity
+        // If it's already a UmbracoBackOfficeIdentity
         if (principal.Identity is ClaimsIdentity claimsIdentity
             && claimsIdentity.IsBackOfficeAuthenticationType()
-            && claimsIdentity.VerifyBackOfficeIdentity(out ClaimsIdentity backOfficeIdentity))
+            && claimsIdentity.VerifyBackOfficeIdentity(out ClaimsIdentity? backOfficeIdentity))
         {
             return backOfficeIdentity;
         }
 
-        //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+        // Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
         // We can have assigned more identities if it is a preview request.
         if (principal is ClaimsPrincipal claimsPrincipal)
         {
-            ClaimsIdentity identity =
+            ClaimsIdentity? identity =
                 claimsPrincipal.Identities.FirstOrDefault(x => x.IsBackOfficeAuthenticationType());
             if (identity is not null)
             {
@@ -52,7 +52,7 @@ public static class ClaimsPrincipalExtensions
             }
         }
 
-        //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
+        // Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
         if (principal.Identity is ClaimsIdentity claimsIdentity2
             && claimsIdentity2.VerifyBackOfficeIdentity(out backOfficeIdentity))
         {
@@ -80,8 +80,7 @@ public static class ClaimsPrincipalExtensions
     /// <returns></returns>
     public static double GetRemainingAuthSeconds(this IPrincipal user, DateTimeOffset now)
     {
-        var claimsPrincipal = user as ClaimsPrincipal;
-        if (claimsPrincipal == null)
+        if (user is not ClaimsPrincipal claimsPrincipal)
         {
             return 0;
         }

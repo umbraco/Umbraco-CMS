@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public static partial class Constants
 {
@@ -67,7 +67,6 @@ public static partial class Constants
         public static class Strings
         {
             // ReSharper disable MemberHidesStaticFromOuterClass
-
             public const string DataTypeContainer = "521231E3-8B37-469C-9F9D-51AFC91FEB7B";
 
             public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";

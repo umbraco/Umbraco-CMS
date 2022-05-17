@@ -8,8 +8,7 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IMemberTypeService _memberTypeService;
 
-    public ContentTypeBaseServiceProvider(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
-        IMemberTypeService memberTypeService)
+    public ContentTypeBaseServiceProvider(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService)
     {
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
@@ -32,7 +31,8 @@ public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
             case IMember _:
                 return _memberTypeService;
             default:
-                throw new ArgumentException($"Invalid contentBase type: {contentBase.GetType().FullName}",
+                throw new ArgumentException(
+                    $"Invalid contentBase type: {contentBase.GetType().FullName}",
                     nameof(contentBase));
         }
     }

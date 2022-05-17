@@ -108,17 +108,25 @@ public class DataValueEditor : IDataValueEditor
     [DataMember(Name = "valueType")]
     public string ValueType { get; set; }
 
+    /// <summary>
+    ///     A collection of validators for the pre value editor
+    /// </summary>
+    [DataMember(Name = "validation")]
+    public List<IValueValidator> Validators { get; private set; } = new();
+
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(object? value, bool required, string? format)
     {
         List<ValidationResult>? results = null;
         var r = Validators.SelectMany(v => v.Validate(value, ValueType, Configuration)).ToList();
-        if (r.Any()) { results = r; }
+        if (r.Any())
+        {
+            results = r;
+        }
 
         // mandatory and regex validators cannot be part of valueEditor.Validators because they
         // depend on values that are not part of the configuration, .Mandatory and .ValidationRegEx,
         // so they have to be explicitly invoked here.
-
         if (required)
         {
             r = RequiredValidator.ValidateRequired(value, ValueType).ToList();
@@ -156,12 +164,6 @@ public class DataValueEditor : IDataValueEditor
     }
 
     /// <summary>
-    ///     A collection of validators for the pre value editor
-    /// </summary>
-    [DataMember(Name = "validation")]
-    public List<IValueValidator> Validators { get; private set; } = new();
-
-    /// <summary>
     ///     If this is true than the editor will be displayed full width without a label
     /// </summary>
     [DataMember(Name = "hideLabel")]
@@ -190,12 +192,11 @@ public class DataValueEditor : IDataValueEditor
     /// </remarks>
     public virtual object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        Attempt<object> result = TryConvertValueToCrlType(editorValue.Value);
+        Attempt<object?> result = TryConvertValueToCrlType(editorValue.Value);
         if (result.Success == false)
         {
             StaticApplicationLogging.Logger.LogWarning(
-                "The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value,
-                ValueTypes.ToStorageType(ValueType));
+                "The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
             return null;
         }
 
@@ -233,7 +234,7 @@ public class DataValueEditor : IDataValueEditor
                 {
                     try
                     {
-                        var json = _jsonSerializer?.Deserialize<dynamic>(stringValue!);
+                        dynamic? json = _jsonSerializer?.Deserialize<dynamic>(stringValue!);
                         return json;
                     }
                     catch
@@ -319,7 +320,7 @@ public class DataValueEditor : IDataValueEditor
     /// </remarks>
     public XNode ConvertDbToXml(IPropertyType propertyType, object? value)
     {
-        //check for null or empty value, we don't want to return CDATA if that is the case
+        // check for null or empty value, we don't want to return CDATA if that is the case
         if (value == null || value.ToString().IsNullOrWhiteSpace())
         {
             return new XText(ConvertDbToString(propertyType, value));
@@ -333,7 +334,7 @@ public class DataValueEditor : IDataValueEditor
                 return new XText(ConvertDbToString(propertyType, value));
             case ValueStorageType.Nvarchar:
             case ValueStorageType.Ntext:
-                //put text in cdata
+                // put text in cdata
                 return new XCData(ConvertDbToString(propertyType, value));
             default:
                 throw new ArgumentOutOfRangeException();
@@ -359,7 +360,7 @@ public class DataValueEditor : IDataValueEditor
             case ValueStorageType.Decimal:
                 return value.ToXmlString(value.GetType());
             case ValueStorageType.Date:
-                //treat dates differently, output the format as xml format
+                // treat dates differently, output the format as xml format
                 Attempt<DateTime?> date = value.TryConvertTo<DateTime?>();
                 if (date.Success == false || date.Result == null)
                 {
@@ -420,7 +421,7 @@ public class DataValueEditor : IDataValueEditor
                 // If parsing is successful, we need to return as an int, we're only dealing with long's here because of JSON.NET,
                 // we actually don't support long values and if we return a long value, it will get set as a 'long' on the Property.Value (object) and then
                 // when we compare the values for dirty tracking we'll be comparing an int -> long and they will not match.
-                Attempt<object> result = value.TryConvertTo(valueType);
+                Attempt<object?> result = value.TryConvertTo(valueType);
 
                 return result.Success && result.Result != null
                     ? Attempt<object?>.Succeed((int)(long)result.Result)

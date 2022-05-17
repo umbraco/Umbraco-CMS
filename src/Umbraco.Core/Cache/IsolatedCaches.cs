@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 ///     Represents a dictionary of <see cref="IAppPolicyCache" /> for types.

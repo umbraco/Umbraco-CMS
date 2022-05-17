@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents the units for the X and Y densities
@@ -19,7 +19,7 @@ internal enum JFIFDensityUnit : byte
     /// <summary>
     ///     XDensity and YDensity are dots per cm.
     /// </summary>
-    DotsPerCm = 2
+    DotsPerCm = 2,
 }
 
 /// <summary>
@@ -40,5 +40,5 @@ internal enum JFIFExtension : byte
     /// <summary>
     ///     Thumbnail stored using 3 bytes/pixel (24-bit) RGB values.
     /// </summary>
-    Thumbnail24BitRGB = 0x13
+    Thumbnail24BitRGB = 0x13,
 }

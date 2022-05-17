@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -16,12 +16,15 @@ public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfigura
 {
     // Scheduled for removal in v12
     [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
-    public DateTimeConfigurationEditor(IIOHelper ioHelper) : this(ioHelper,
+    public DateTimeConfigurationEditor(IIOHelper ioHelper)
+        : this(
+        ioHelper,
         StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
     }
 
-    public DateTimeConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(
+    public DateTimeConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(
         ioHelper, editorConfigurationParser)
     {
     }
@@ -32,7 +35,7 @@ public class DateTimeConfigurationEditor : ConfigurationEditor<DateTimeConfigura
 
         var format = d["format"].ToString()!;
 
-        d["pickTime"] = format.ContainsAny(new[] {"H", "m", "s"});
+        d["pickTime"] = format.ContainsAny(new[] { "H", "m", "s" });
 
         return d;
     }

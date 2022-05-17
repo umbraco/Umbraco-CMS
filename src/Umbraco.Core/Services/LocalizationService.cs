@@ -55,7 +55,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             throw new ArgumentNullException(nameof(language));
         }
 
-        IDictionaryTranslation existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
+        IDictionaryTranslation? existing = item.Translations?.FirstOrDefault(x => x.Language?.Id == language.Id);
         if (existing != null)
         {
             existing.Value = value;
@@ -66,12 +66,12 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             {
                 item.Translations = new List<IDictionaryTranslation>(item.Translations)
                 {
-                    new DictionaryTranslation(language, value)
+                    new DictionaryTranslation(language, value),
                 };
             }
             else
             {
-                item.Translations = new List<IDictionaryTranslation> {new DictionaryTranslation(language, value)};
+                item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, value) };
             }
         }
     }
@@ -87,11 +87,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            //validate the parent
-
+            // validate the parent
             if (parentId.HasValue && parentId.Value != Guid.Empty)
             {
-                IDictionaryItem parent = GetDictionaryItemById(parentId.Value);
+                IDictionaryItem? parent = GetDictionaryItemById(parentId.Value);
                 if (parent == null)
                 {
                     throw new ArgumentException($"No parent dictionary item was found with id {parentId.Value}.");
@@ -134,7 +133,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     }
 
     /// <summary>
-    ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="Int32" /> id
+    ///     Gets a <see cref="IDictionaryItem" /> by its <see cref="int" /> id
     /// </summary>
     /// <param name="id">Id of the <see cref="IDictionaryItem" /></param>
     /// <returns>
@@ -144,8 +143,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem item = _dictionaryRepository.Get(id);
-            //ensure the lazy Language callback is assigned
+            IDictionaryItem? item = _dictionaryRepository.Get(id);
+
+            // ensure the lazy Language callback is assigned
             EnsureDictionaryItemLanguageCallback(item);
             return item;
         }
@@ -162,8 +162,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem item = _dictionaryRepository.Get(id);
-            //ensure the lazy Language callback is assigned
+            IDictionaryItem? item = _dictionaryRepository.Get(id);
+
+            // ensure the lazy Language callback is assigned
             EnsureDictionaryItemLanguageCallback(item);
             return item;
         }
@@ -180,8 +181,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem item = _dictionaryRepository.Get(key);
-            //ensure the lazy Language callback is assigned
+            IDictionaryItem? item = _dictionaryRepository.Get(key);
+
+            // ensure the lazy Language callback is assigned
             EnsureDictionaryItemLanguageCallback(item);
             return item;
         }
@@ -197,10 +199,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-            IDictionaryItem[] items = _dictionaryRepository.Get(query)?.ToArray();
+            IDictionaryItem[]? items = _dictionaryRepository.Get(query)?.ToArray();
             if (items is not null)
             {
-                //ensure the lazy Language callback is assigned
+                // ensure the lazy Language callback is assigned
                 foreach (IDictionaryItem item in items)
                 {
                     EnsureDictionaryItemLanguageCallback(item);
@@ -221,7 +223,8 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
-            //ensure the lazy Language callback is assigned
+
+            // ensure the lazy Language callback is assigned
             foreach (IDictionaryItem item in items)
             {
                 EnsureDictionaryItemLanguageCallback(item);
@@ -240,10 +243,10 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IDictionaryItem> query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-            IDictionaryItem[] items = _dictionaryRepository.Get(query)?.ToArray();
+            IDictionaryItem[]? items = _dictionaryRepository.Get(query)?.ToArray();
             if (items is not null)
             {
-                //ensure the lazy Language callback is assigned
+                // ensure the lazy Language callback is assigned
                 foreach (IDictionaryItem item in items)
                 {
                     EnsureDictionaryItemLanguageCallback(item);
@@ -263,7 +266,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            IDictionaryItem item = _dictionaryRepository.Get(key);
+            IDictionaryItem? item = _dictionaryRepository.Get(key);
             return item != null;
         }
     }
@@ -289,7 +292,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
             // ensure the lazy Language callback is assigned
             // ensure the lazy Language callback is assigned
-
             EnsureDictionaryItemLanguageCallback(dictionaryItem);
             scope.Notifications.Publish(
                 new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
@@ -506,7 +508,9 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
 
         var id = language.FallbackLanguageId;
-        while (true) // assuming languages does not already contains a cycle, this must end
+
+        // assuming languages does not already contains a cycle, this must end
+        while (true)
         {
             if (!id.HasValue)
             {
@@ -536,14 +540,13 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </summary>
     private void EnsureDictionaryItemLanguageCallback(IDictionaryItem? d)
     {
-        var item = d as DictionaryItem;
-        if (item == null)
+        if (d is not DictionaryItem item)
         {
             return;
         }
 
         item.GetLanguage = GetLanguageById;
-        IEnumerable<DictionaryTranslation> translations = item.Translations?.OfType<DictionaryTranslation>();
+        IEnumerable<DictionaryTranslation>? translations = item.Translations?.OfType<DictionaryTranslation>();
         if (translations is not null)
         {
             foreach (DictionaryTranslation trans in translations)

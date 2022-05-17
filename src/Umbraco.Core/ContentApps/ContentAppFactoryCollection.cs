@@ -12,20 +12,14 @@ public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFact
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly ILogger<ContentAppFactoryCollection> _logger;
 
-    public ContentAppFactoryCollection(Func<IEnumerable<IContentAppFactory>> items,
-        ILogger<ContentAppFactoryCollection> logger, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public ContentAppFactoryCollection(
+        Func<IEnumerable<IContentAppFactory>> items,
+        ILogger<ContentAppFactoryCollection> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : base(items)
     {
         _logger = logger;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-    }
-
-    private IEnumerable<IReadOnlyUserGroup> GetCurrentUserGroups()
-    {
-        IUser currentUser = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
-        return currentUser == null
-            ? Enumerable.Empty<IReadOnlyUserGroup>()
-            : currentUser.Groups;
     }
 
     public IEnumerable<ContentApp> GetContentAppsFor(object o, IEnumerable<IReadOnlyUserGroup>? userGroups = null)
@@ -43,7 +37,7 @@ public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFact
             {
                 if (aliases.Contains(app.Alias))
                 {
-                    (dups ?? (dups = new List<string>())).Add(app.Alias);
+                    (dups ??= new List<string>()).Add(app.Alias);
                 }
                 else
                 {
@@ -56,10 +50,18 @@ public class ContentAppFactoryCollection : BuilderCollectionBase<IContentAppFact
         {
             // dying is not user-friendly, so let's write to log instead, and wish people read logs...
 
-            //throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
+            // throw new InvalidOperationException($"Duplicate content app aliases found: {string.Join(",", dups)}");
             _logger.LogWarning("Duplicate content app aliases found: {DuplicateAliases}", string.Join(",", dups));
         }
 
         return apps;
+    }
+
+    private IEnumerable<IReadOnlyUserGroup> GetCurrentUserGroups()
+    {
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        return currentUser == null
+            ? Enumerable.Empty<IReadOnlyUserGroup>()
+            : currentUser.Groups;
     }
 }

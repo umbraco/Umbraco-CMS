@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -16,7 +16,11 @@ public interface INotificationService : IService
     /// <param name="siteUri"></param>
     /// <param name="createSubject"></param>
     /// <param name="createBody"></param>
-    void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string? action, string? actionName,
+    void SendNotifications(
+        IUser operatingUser,
+        IEnumerable<IContent> entities,
+        string? action,
+        string? actionName,
         Uri siteUri,
         Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
         Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody);

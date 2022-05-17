@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -29,8 +29,7 @@ public class AppCaches : IDisposable
     ///     <para>When used by repositories, all cache policies apply, but the underlying caches do not cache anything.</para>
     ///     <para>Used by tests.</para>
     /// </remarks>
-    public static AppCaches Disabled { get; } = new(NoAppCache.Instance, NoAppCache.Instance,
-        new IsolatedCaches(_ => NoAppCache.Instance));
+    public static AppCaches Disabled { get; } = new(NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
     /// <summary>
     ///     Gets the special no-cache instance.
@@ -39,8 +38,7 @@ public class AppCaches : IDisposable
     ///     <para>When used by repositories, all cache policies are bypassed.</para>
     ///     <para>Used by repositories that do no cache.</para>
     /// </remarks>
-    public static AppCaches NoCache { get; } = new(NoAppCache.Instance, NoAppCache.Instance,
-        new IsolatedCaches(_ => NoAppCache.Instance));
+    public static AppCaches NoCache { get; } = new(NoAppCache.Instance, NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
 
     /// <summary>
     ///     Gets the per-request cache.
@@ -71,15 +69,16 @@ public class AppCaches : IDisposable
     /// </remarks>
     public IsolatedCaches IsolatedCaches { get; }
 
-    public void Dispose() =>
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
-
     public static AppCaches Create(IRequestCache requestCache) =>
         new(
             new DeepCloneAppCache(new ObjectCacheAppCache()),
             requestCache,
             new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+
+    public void Dispose() =>
+
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(true);
 
     protected virtual void Dispose(bool disposing)
     {

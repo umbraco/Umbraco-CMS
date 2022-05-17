@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.HealthChecks;

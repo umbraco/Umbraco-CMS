@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -15,6 +15,11 @@ public class IntegerValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview) => source.TryConvertTo<int>().Result;
+    public override object ConvertSourceToIntermediate(
+        IPublishedElement owner,
+        IPublishedPropertyType propertyType,
+        object? source,
+        bool preview) =>
+        source.TryConvertTo<int>()
+            .Result;
 }

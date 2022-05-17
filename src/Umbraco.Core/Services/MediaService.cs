@@ -30,10 +30,16 @@ public class MediaService : RepositoryService, IMediaService
 
     #region Constructors
 
-    public MediaService(ICoreScopeProvider provider, MediaFileManager mediaFileManager, ILoggerFactory loggerFactory,
+    public MediaService(
+        ICoreScopeProvider provider,
+        MediaFileManager mediaFileManager,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
-        IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
+        IMediaRepository mediaRepository,
+        IAuditRepository auditRepository,
+        IMediaTypeRepository mediaTypeRepository,
+        IEntityRepository entityRepository,
+        IShortStringHelper shortStringHelper)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _mediaFileManager = mediaFileManager;
@@ -43,13 +49,6 @@ public class MediaService : RepositoryService, IMediaService
         _entityRepository = entityRepository;
         _shortStringHelper = shortStringHelper;
     }
-
-    #endregion
-
-    #region Private Methods
-
-    private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Media.GetName(), message));
 
     #endregion
 
@@ -64,6 +63,13 @@ public class MediaService : RepositoryService, IMediaService
         }
     }
 
+    #endregion
+
+    #region Private Methods
+
+    private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
+        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Media.GetName(), message));
+
     public int CountNotTrashed(string? mediaTypeAlias = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -73,7 +79,7 @@ public class MediaService : RepositoryService, IMediaService
             var mediaTypeId = 0;
             if (string.IsNullOrWhiteSpace(mediaTypeAlias) == false)
             {
-                IMediaType mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
+                IMediaType? mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
                 if (mediaType == null)
                 {
                     return 0;
@@ -130,10 +136,9 @@ public class MediaService : RepositoryService, IMediaService
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId)
+    public IMedia CreateMedia(string name, Guid parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
-        IMedia parent = GetById(parentId);
+        IMedia? parent = GetById(parentId);
         return CreateMedia(name, parent, mediaTypeAlias, userId);
     }
 
@@ -150,8 +155,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="mediaTypeAlias">The alias of the media type.</param>
     /// <param name="userId">The optional id of the user creating the media.</param>
     /// <returns>The media object.</returns>
-    public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId)
+    public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         IMediaType mediaType = GetMediaType(mediaTypeAlias);
         if (mediaType == null)
@@ -159,7 +163,7 @@ public class MediaService : RepositoryService, IMediaService
             throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
         }
 
-        IMedia parent = parentId > 0 ? GetById(parentId) : null;
+        IMedia? parent = parentId > 0 ? GetById(parentId) : null;
         if (parentId > 0 && parent == null)
         {
             throw new ArgumentException("No media with that id.", nameof(parentId));
@@ -167,7 +171,6 @@ public class MediaService : RepositoryService, IMediaService
 
         if (name != null && name.Length > 255)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
@@ -196,7 +199,6 @@ public class MediaService : RepositoryService, IMediaService
     public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         // not locking since not saving anything
-
         IMediaType mediaType = GetMediaType(mediaTypeAlias);
         if (mediaType == null)
         {
@@ -205,7 +207,6 @@ public class MediaService : RepositoryService, IMediaService
 
         if (name != null && name.Length > 255)
         {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
         }
 
@@ -232,8 +233,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="mediaTypeAlias">The alias of the media type.</param>
     /// <param name="userId">The optional id of the user creating the media.</param>
     /// <returns>The media object.</returns>
-    public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId)
+    public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         if (parent == null)
         {
@@ -243,17 +243,16 @@ public class MediaService : RepositoryService, IMediaService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // not locking since not saving anything
-
             IMediaType mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
             {
-                throw new ArgumentException("No media type with that alias.",
+                throw new ArgumentException(
+                    "No media type with that alias.",
                     nameof(mediaTypeAlias)); // causes rollback
             }
 
             if (name != null && name.Length > 255)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
@@ -274,8 +273,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="mediaTypeAlias">The alias of the media type.</param>
     /// <param name="userId">The optional id of the user creating the media.</param>
     /// <returns>The media object.</returns>
-    public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId)
+    public IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -285,11 +283,12 @@ public class MediaService : RepositoryService, IMediaService
             IMediaType mediaType = GetMediaType(mediaTypeAlias); // + locks
             if (mediaType == null)
             {
-                throw new ArgumentException("No media type with that alias.",
+                throw new ArgumentException(
+                    "No media type with that alias.",
                     nameof(mediaTypeAlias)); // causes rollback
             }
 
-            IMedia parent = parentId > 0 ? GetById(parentId) : null; // + locks
+            IMedia? parent = parentId > 0 ? GetById(parentId) : null; // + locks
             if (parentId > 0 && parent == null)
             {
                 throw new ArgumentException("No media with that id.", nameof(parentId)); // causes rollback
@@ -314,8 +313,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="mediaTypeAlias">The alias of the media type.</param>
     /// <param name="userId">The optional id of the user creating the media.</param>
     /// <returns>The media object.</returns>
-    public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias,
-        int userId = Constants.Security.SuperUserId)
+    public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         if (parent == null)
         {
@@ -330,7 +328,8 @@ public class MediaService : RepositoryService, IMediaService
             IMediaType mediaType = GetMediaType(mediaTypeAlias); // + locks
             if (mediaType == null)
             {
-                throw new ArgumentException("No media type with that alias.",
+                throw new ArgumentException(
+                    "No media type with that alias.",
                     nameof(mediaTypeAlias)); // causes rollback
             }
 
@@ -339,6 +338,26 @@ public class MediaService : RepositoryService, IMediaService
 
             scope.Complete();
             return media;
+        }
+    }
+
+    #endregion
+
+    #region Get, Has, Is
+
+    /// <summary>
+    ///     Gets an <see cref="IMedia" /> object by Id
+    /// </summary>
+    /// <param name="id">Id of the Media to retrieve</param>
+    /// <returns>
+    ///     <see cref="IMedia" />
+    /// </returns>
+    public IMedia? GetById(int id)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(Constants.Locks.MediaTree);
+            return _mediaRepository.Get(id);
         }
     }
 
@@ -360,8 +379,7 @@ public class MediaService : RepositoryService, IMediaService
 
             scope.Notifications.Publish(
                 new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
-            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode,
-                eventMessages));
+            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
         }
 
         if (withIdentity == false)
@@ -370,26 +388,6 @@ public class MediaService : RepositoryService, IMediaService
         }
 
         Audit(AuditType.New, media.CreatorId, media.Id, $"Media '{media.Name}' was created with Id {media.Id}");
-    }
-
-    #endregion
-
-    #region Get, Has, Is
-
-    /// <summary>
-    ///     Gets an <see cref="IMedia" /> object by Id
-    /// </summary>
-    /// <param name="id">Id of the Media to retrieve</param>
-    /// <returns>
-    ///     <see cref="IMedia" />
-    /// </returns>
-    public IMedia? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.Get(id);
-        }
     }
 
     /// <summary>
@@ -453,8 +451,7 @@ public class MediaService : RepositoryService, IMediaService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IMedia> GetPagedOfType(int contentTypeId, long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
     {
         if (pageIndex < 0)
         {
@@ -476,13 +473,22 @@ public class MediaService : RepositoryService, IMediaService
             scope.ReadLock(Constants.Locks.ContentTree);
             return _mediaRepository.GetPage(
                 Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId),
-                pageIndex, pageSize, out totalRecords, filter, ordering);
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                filter,
+                ordering);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<IMedia> GetPagedOfTypes(int[] contentTypeIds, long pageIndex, int pageSize,
-        out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IMedia> GetPagedOfTypes(
+        int[] contentTypeIds,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IMedia>? filter = null,
+        Ordering? ordering = null)
     {
         if (pageIndex < 0)
         {
@@ -504,7 +510,11 @@ public class MediaService : RepositoryService, IMediaService
             scope.ReadLock(Constants.Locks.ContentTree);
             return _mediaRepository.GetPage(
                 Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
-                pageIndex, pageSize, out totalRecords, filter, ordering);
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                filter,
+                ordering);
         }
     }
 
@@ -560,7 +570,7 @@ public class MediaService : RepositoryService, IMediaService
     public IEnumerable<IMedia> GetAncestors(int id)
     {
         // intentionally not locking
-        IMedia media = GetById(id);
+        IMedia? media = GetById(id);
         return GetAncestors(media);
     }
 
@@ -571,7 +581,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
     public IEnumerable<IMedia> GetAncestors(IMedia? media)
     {
-        //null check otherwise we get exceptions
+        // null check otherwise we get exceptions
         if (media is null || media.Path.IsNullOrWhiteSpace())
         {
             return Enumerable.Empty<IMedia>();
@@ -595,8 +605,7 @@ public class MediaService : RepositoryService, IMediaService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
     {
         if (pageIndex < 0)
         {
@@ -617,14 +626,13 @@ public class MediaService : RepositoryService, IMediaService
         {
             scope.ReadLock(Constants.Locks.MediaTree);
 
-            IQuery<IMedia> query = Query<IMedia>()?.Where(x => x.ParentId == id);
+            IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
         }
     }
 
     /// <inheritdoc />
-    public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter = null, Ordering? ordering = null)
     {
         if (ordering == null)
         {
@@ -635,7 +643,7 @@ public class MediaService : RepositoryService, IMediaService
         {
             scope.ReadLock(Constants.Locks.MediaTree);
 
-            //if the id is System Root, then just get all
+            // if the id is System Root, then just get all
             if (id != Constants.System.Root)
             {
                 TreeEntityPath[] mediaPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
@@ -645,13 +653,23 @@ public class MediaService : RepositoryService, IMediaService
                     return Enumerable.Empty<IMedia>();
                 }
 
-                return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize,
-                    out totalChildren, filter, ordering);
+                return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
             }
 
-            return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter,
-                ordering);
+            return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
         }
+    }
+
+    /// <summary>
+    ///     Gets the parent of the current media as an <see cref="IMedia" /> item.
+    /// </summary>
+    /// <param name="id">Id of the <see cref="IMedia" /> to retrieve the parent from</param>
+    /// <returns>Parent <see cref="IMedia" /> object</returns>
+    public IMedia? GetParent(int id)
+    {
+        // intentionally not locking
+        IMedia? media = GetById(id);
+        return GetParent(media);
     }
 
     private IQuery<IMedia>? GetPagedDescendantQuery(string? mediaPath)
@@ -665,9 +683,7 @@ public class MediaService : RepositoryService, IMediaService
         return query;
     }
 
-    private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia>? query, long pageIndex, int pageSize,
-        out long totalChildren,
-        IQuery<IMedia>? filter, Ordering ordering)
+    private IEnumerable<IMedia> GetPagedLocked(IQuery<IMedia>? query, long pageIndex, int pageSize, out long totalChildren, IQuery<IMedia>? filter, Ordering ordering)
     {
         if (pageIndex < 0)
         {
@@ -685,18 +701,6 @@ public class MediaService : RepositoryService, IMediaService
         }
 
         return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
-    }
-
-    /// <summary>
-    ///     Gets the parent of the current media as an <see cref="IMedia" /> item.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> to retrieve the parent from</param>
-    /// <returns>Parent <see cref="IMedia" /> object</returns>
-    public IMedia? GetParent(int id)
-    {
-        // intentionally not locking
-        IMedia media = GetById(id);
-        return GetParent(media);
     }
 
     /// <summary>
@@ -731,8 +735,7 @@ public class MediaService : RepositoryService, IMediaService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords,
-        IQuery<IMedia>? filter = null, Ordering? ordering = null)
+    public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -742,8 +745,7 @@ public class MediaService : RepositoryService, IMediaService
             }
 
             scope.ReadLock(Constants.Locks.MediaTree);
-            IQuery<IMedia> query =
-                Query<IMedia>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
+            IQuery<IMedia>? query = Query<IMedia>().Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
             return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
@@ -821,9 +823,9 @@ public class MediaService : RepositoryService, IMediaService
             _mediaRepository.Save(media);
             scope.Notifications.Publish(
                 new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
+
             // TODO: See note about suppressing events in content service
-            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode,
-                eventMessages));
+            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
 
             Audit(AuditType.Save, userId, media.Id);
             scope.Complete();
@@ -867,6 +869,7 @@ public class MediaService : RepositoryService, IMediaService
 
             scope.Notifications.Publish(
                 new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
+
             // TODO: See note about suppressing events in content service
             scope.Notifications.Publish(new MediaTreeChangeNotification(treeChanges, messages));
             Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Bulk save media");
@@ -911,34 +914,7 @@ public class MediaService : RepositoryService, IMediaService
         return OperationResult.Attempt.Succeed(messages);
     }
 
-    private void DeleteLocked(ICoreScope scope, IMedia media, EventMessages evtMsgs)
-    {
-        void DoDelete(IMedia c)
-        {
-            _mediaRepository.Delete(c);
-            scope.Notifications.Publish(new MediaDeletedNotification(c, evtMsgs));
-
-            // media files deleted by QueuingEventDispatcher
-        }
-
-        const int pageSize = 500;
-        var page = 0;
-        var total = long.MaxValue;
-        while (page * pageSize < total)
-        {
-            //get descendants - ordered from deepest to shallowest
-            IEnumerable<IMedia> descendants = GetPagedDescendants(media.Id, page, pageSize, out total,
-                ordering: Ordering.By("Path", Direction.Descending));
-            foreach (IMedia c in descendants)
-            {
-                DoDelete(c);
-            }
-        }
-
-        DoDelete(media);
-    }
-
-    //TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
+    // TODO: both DeleteVersions methods below have an issue. Sort of. They do NOT take care of files the way
     // Delete does - for a good reason: the file may be referenced by other, non-deleted, versions. BUT,
     // if that's not the case, then the file will never be deleted, because when we delete the media,
     // the version referencing the file will not be there anymore. SO, we can leak files.
@@ -959,8 +935,78 @@ public class MediaService : RepositoryService, IMediaService
         }
     }
 
-    private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate,
-        int userId = Constants.Security.SuperUserId)
+    /// <summary>
+    ///     Permanently deletes specific version(s) from an <see cref="IMedia" /> object.
+    ///     This method will never delete the latest version of a media item.
+    /// </summary>
+    /// <param name="id">Id of the <see cref="IMedia" /> object to delete a version from</param>
+    /// <param name="versionId">Id of the version to delete</param>
+    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
+    /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
+    public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, versionId);
+            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
+            {
+                scope.Complete();
+                return;
+            }
+
+            if (deletePriorVersions)
+            {
+                IMedia? media = GetVersion(versionId);
+                if (media is not null)
+                {
+                    DeleteVersions(scope, true, id, media.UpdateDate, userId);
+                }
+            }
+            else
+            {
+                scope.WriteLock(Constants.Locks.MediaTree);
+            }
+
+            _mediaRepository.DeleteVersion(versionId);
+
+            scope.Notifications.Publish(
+                new MediaDeletedVersionsNotification(id, evtMsgs, versionId)
+                    .WithStateFrom(deletingVersionsNotification));
+            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
+
+            scope.Complete();
+        }
+    }
+
+    private void DeleteLocked(ICoreScope scope, IMedia media, EventMessages evtMsgs)
+    {
+        void DoDelete(IMedia c)
+        {
+            _mediaRepository.Delete(c);
+            scope.Notifications.Publish(new MediaDeletedNotification(c, evtMsgs));
+
+            // media files deleted by QueuingEventDispatcher
+        }
+
+        const int pageSize = 500;
+        var page = 0;
+        var total = long.MaxValue;
+        while (page * pageSize < total)
+        {
+            // get descendants - ordered from deepest to shallowest
+            IEnumerable<IMedia> descendants = GetPagedDescendants(media.Id, page, pageSize, out total, ordering: Ordering.By("Path", Direction.Descending));
+            foreach (IMedia c in descendants)
+            {
+                DoDelete(c);
+            }
+        }
+
+        DoDelete(media);
+    }
+
+    private void DeleteVersions(ICoreScope scope, bool wlock, int id, DateTime versionDate, int userId = Constants.Security.SuperUserId)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
@@ -984,52 +1030,6 @@ public class MediaService : RepositoryService, IMediaService
         Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version date");
     }
 
-    /// <summary>
-    ///     Permanently deletes specific version(s) from an <see cref="IMedia" /> object.
-    ///     This method will never delete the latest version of a media item.
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IMedia" /> object to delete a version from</param>
-    /// <param name="versionId">Id of the version to delete</param>
-    /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
-    /// <param name="userId">Optional Id of the User deleting versions of a Media object</param>
-    public void DeleteVersion(int id, int versionId, bool deletePriorVersions,
-        int userId = Constants.Security.SuperUserId)
-    {
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, versionId);
-            if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            if (deletePriorVersions)
-            {
-                IMedia media = GetVersion(versionId);
-                if (media is not null)
-                {
-                    DeleteVersions(scope, true, id, media.UpdateDate, userId);
-                }
-            }
-            else
-            {
-                scope.WriteLock(Constants.Locks.MediaTree);
-            }
-
-            _mediaRepository.DeleteVersion(versionId);
-
-            scope.Notifications.Publish(
-                new MediaDeletedVersionsNotification(id, evtMsgs, versionId)
-                    .WithStateFrom(deletingVersionsNotification));
-            Audit(AuditType.Delete, userId, Constants.System.Root, "Delete Media by version");
-
-            scope.Complete();
-        }
-    }
-
     #endregion
 
     #region Move, RecycleBin
@@ -1050,7 +1050,6 @@ public class MediaService : RepositoryService, IMediaService
 
             // TODO: missing 7.6 "ensure valid path" thing here?
             // but then should be in PerformMoveLocked on every moved item?
-
             var originalPath = media.Path;
 
             var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia);
@@ -1064,8 +1063,7 @@ public class MediaService : RepositoryService, IMediaService
 
             PerformMoveLocked(media, Constants.System.RecycleBinMedia, null, userId, moves, true);
 
-            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch,
-                messages));
+            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
             MoveEventInfo<IMedia>[] moveInfo =
                 moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId)).ToArray();
             scope.Notifications.Publish(
@@ -1122,10 +1120,9 @@ public class MediaService : RepositoryService, IMediaService
             var trashed = media.Trashed ? false : (bool?)null;
 
             PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
-            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch,
-                messages));
+            scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
 
-            MoveEventInfo<IMedia>[] moveInfo = moves //changes
+            MoveEventInfo<IMedia>[] moveInfo = moves // changes
                 .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                 .ToArray();
             scope.Notifications.Publish(
@@ -1135,68 +1132,6 @@ public class MediaService : RepositoryService, IMediaService
         }
 
         return OperationResult.Attempt.Succeed(messages);
-    }
-
-    // MUST be called from within WriteLock
-    // trash indicates whether we are trashing, un-trashing, or not changing anything
-    private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId,
-        ICollection<(IMedia, string)> moves, bool? trash)
-    {
-        media.ParentId = parentId;
-
-        // get the level delta (old pos to new pos)
-        // note that recycle bin (id:-20) level is 0!
-        var levelDelta = 1 - media.Level + (parent?.Level ?? 0);
-
-        var paths = new Dictionary<int, string>();
-
-        moves.Add((media, media.Path)); // capture original path
-
-        //need to store the original path to lookup descendants based on it below
-        var originalPath = media.Path;
-
-        // these will be updated by the repo because we changed parentId
-        //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
-        //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
-        //media.Level += levelDelta;
-        PerformMoveMediaLocked(media, userId, trash);
-
-        // if uow is not immediate, content.Path will be updated only when the UOW commits,
-        // and because we want it now, we have to calculate it by ourselves
-        //paths[media.Id] = media.Path;
-        paths[media.Id] =
-            (parent == null
-                ? parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString
-                : parent.Path) + "," + media.Id;
-
-        const int pageSize = 500;
-        IQuery<IMedia> query = GetPagedDescendantQuery(originalPath);
-        long total;
-        do
-        {
-            // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
-            IEnumerable<IMedia> descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path"));
-
-            foreach (IMedia descendant in descendants)
-            {
-                moves.Add((descendant, descendant.Path)); // capture original path
-
-                // update path and level since we do not update parentId
-                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
-                descendant.Level += levelDelta;
-                PerformMoveMediaLocked(descendant, userId, trash);
-            }
-        } while (total > pageSize);
-    }
-
-    private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
-    {
-        if (trash.HasValue)
-        {
-            ((ContentBase)media).Trashed = trash.Value;
-        }
-
-        _mediaRepository.Save(media);
     }
 
     /// <summary>
@@ -1238,6 +1173,68 @@ public class MediaService : RepositoryService, IMediaService
         }
 
         return OperationResult.Succeed(messages);
+    }
+
+    // MUST be called from within WriteLock
+    // trash indicates whether we are trashing, un-trashing, or not changing anything
+    private void PerformMoveLocked(IMedia media, int parentId, IMedia? parent, int userId, ICollection<(IMedia, string)> moves, bool? trash)
+    {
+        media.ParentId = parentId;
+
+        // get the level delta (old pos to new pos)
+        // note that recycle bin (id:-20) level is 0!
+        var levelDelta = 1 - media.Level + (parent?.Level ?? 0);
+
+        var paths = new Dictionary<int, string>();
+
+        moves.Add((media, media.Path)); // capture original path
+
+        // need to store the original path to lookup descendants based on it below
+        var originalPath = media.Path;
+
+        // these will be updated by the repo because we changed parentId
+        // media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
+        // media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
+        // media.Level += levelDelta;
+        PerformMoveMediaLocked(media, userId, trash);
+
+        // if uow is not immediate, content.Path will be updated only when the UOW commits,
+        // and because we want it now, we have to calculate it by ourselves
+        // paths[media.Id] = media.Path;
+        paths[media.Id] =
+            (parent == null
+                ? parentId == Constants.System.RecycleBinMedia ? "-1,-21" : Constants.System.RootString
+                : parent.Path) + "," + media.Id;
+
+        const int pageSize = 500;
+        IQuery<IMedia>? query = GetPagedDescendantQuery(originalPath);
+        long total;
+        do
+        {
+            // We always page a page 0 because for each page, we are moving the result so the resulting total will be reduced
+            IEnumerable<IMedia> descendants = GetPagedLocked(query, 0, pageSize, out total, null, Ordering.By("Path"));
+
+            foreach (IMedia descendant in descendants)
+            {
+                moves.Add((descendant, descendant.Path)); // capture original path
+
+                // update path and level since we do not update parentId
+                descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
+                descendant.Level += levelDelta;
+                PerformMoveMediaLocked(descendant, userId, trash);
+            }
+        }
+        while (total > pageSize);
+    }
+
+    private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
+    {
+        if (trash.HasValue)
+        {
+            ((ContentBase)media).Trashed = trash.Value;
+        }
+
+        _mediaRepository.Save(media);
     }
 
     public bool RecycleBinSmells()
@@ -1296,12 +1293,14 @@ public class MediaService : RepositoryService, IMediaService
 
                 // else update
                 media.SortOrder = sortOrder++;
+
                 // save
                 saved.Add(media);
                 _mediaRepository.Save(media);
             }
 
             scope.Notifications.Publish(new MediaSavedNotification(itemsA, messages).WithStateFrom(savingNotification));
+
             // TODO: See note about suppressing events in content service
             scope.Notifications.Publish(new MediaTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, messages));
             Audit(AuditType.Sort, userId, 0);
@@ -1322,13 +1321,13 @@ public class MediaService : RepositoryService, IMediaService
 
             if (report.FixedIssues.Count > 0)
             {
-                //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Models.Media("root", -1, new MediaType(_shortStringHelper, -1))
                 {
-                    Id = -1, Key = Guid.Empty
+                    Id = -1,
+                    Key = Guid.Empty,
                 };
-                scope.Notifications.Publish(new MediaTreeChangeNotification(root, TreeChangeTypes.RefreshAll,
-                    EventMessagesFactory.Get()));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             }
 
             return report;
@@ -1387,7 +1386,6 @@ public class MediaService : RepositoryService, IMediaService
         // of a different type, move them to the recycle bin, then permanently delete the content items.
         // The main problem with this is that for every content item being deleted, events are raised...
         // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
-
         var changes = new List<TreeChange<IMedia>>();
         var moves = new List<(IMedia, string)>();
         var mediaTypeIdsA = mediaTypeIds.ToArray();
@@ -1440,8 +1438,7 @@ public class MediaService : RepositoryService, IMediaService
 
             scope.Notifications.Publish(new MediaTreeChangeNotification(changes, messages));
 
-            Audit(AuditType.Delete, userId, Constants.System.Root,
-                $"Delete Media of types {string.Join(",", mediaTypeIdsA)}");
+            Audit(AuditType.Delete, userId, Constants.System.Root, $"Delete Media of types {string.Join(",", mediaTypeIdsA)}");
 
             scope.Complete();
         }
@@ -1454,7 +1451,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="mediaTypeId">Id of the <see cref="IMediaType" /></param>
     /// <param name="userId">Optional id of the user deleting the media</param>
     public void DeleteMediaOfType(int mediaTypeId, int userId = Constants.Security.SuperUserId) =>
-        DeleteMediaOfTypes(new[] {mediaTypeId}, userId);
+        DeleteMediaOfTypes(new[] { mediaTypeId }, userId);
 
     private IMediaType GetMediaType(string mediaTypeAlias)
     {
@@ -1465,7 +1462,8 @@ public class MediaService : RepositoryService, IMediaService
 
         if (string.IsNullOrWhiteSpace(mediaTypeAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(mediaTypeAlias));
         }
 
@@ -1474,7 +1472,7 @@ public class MediaService : RepositoryService, IMediaService
             scope.ReadLock(Constants.Locks.MediaTypes);
 
             IQuery<IMediaType> query = Query<IMediaType>().Where(x => x.Alias == mediaTypeAlias);
-            IMediaType mediaType = _mediaTypeRepository.Get(query)?.FirstOrDefault();
+            IMediaType? mediaType = _mediaTypeRepository.Get(query).FirstOrDefault();
 
             if (mediaType == null)
             {

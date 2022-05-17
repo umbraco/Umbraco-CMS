@@ -17,14 +17,12 @@ internal class ConsentService : RepositoryService, IConsentService
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentService" /> class.
     /// </summary>
-    public ConsentService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
+    public ConsentService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IConsentRepository consentRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _consentRepository = consentRepository;
 
     /// <inheritdoc />
-    public IConsent RegisterConsent(string source, string context, string action, ConsentState state,
-        string? comment = null)
+    public IConsent RegisterConsent(string source, string context, string action, ConsentState state, string? comment = null)
     {
         // prevent stupid states
         var v = 0;
@@ -56,7 +54,7 @@ internal class ConsentService : RepositoryService, IConsentService
             Action = action,
             CreateDate = DateTime.Now,
             State = state,
-            Comment = comment
+            Comment = comment,
         };
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -70,8 +68,13 @@ internal class ConsentService : RepositoryService, IConsentService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IConsent> LookupConsent(string? source = null, string? context = null, string? action = null,
-        bool sourceStartsWith = false, bool contextStartsWith = false, bool actionStartsWith = false,
+    public IEnumerable<IConsent> LookupConsent(
+        string? source = null,
+        string? context = null,
+        string? action = null,
+        bool sourceStartsWith = false,
+        bool contextStartsWith = false,
+        bool actionStartsWith = false,
         bool includeHistory = false)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))

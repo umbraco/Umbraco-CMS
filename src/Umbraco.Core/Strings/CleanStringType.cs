@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Strings;
+namespace Umbraco.Cms.Core.Strings;
 
 /// <summary>
 ///     Specifies the type of a clean string.
@@ -18,7 +18,6 @@ public enum CleanStringType
     ///     No value.
     /// </summary>
     None = 0x00,
-
 
     // casing values
 
@@ -62,7 +61,6 @@ public enum CleanStringType
     /// </remarks>
     UmbracoCase = 0x20,
 
-
     // encoding values
 
     /// <summary>
@@ -71,7 +69,7 @@ public enum CleanStringType
     CodeMask = Utf8 | Ascii | TryAscii,
 
     // Unicode encoding is obsolete, use Utf8
-    //Unicode = 0x0100,
+    // Unicode = 0x0100,
 
     /// <summary>
     ///     Utf8 encoding.
@@ -119,5 +117,5 @@ public enum CleanStringType
     ///     UnderscoreAlias role.
     /// </summary>
     /// <remarks>This is Alias + leading underscore.</remarks>
-    UnderscoreAlias = 0x100000
+    UnderscoreAlias = 0x100000,
 }

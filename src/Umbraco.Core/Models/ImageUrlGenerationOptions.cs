@@ -44,7 +44,7 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
 
     public override int GetHashCode()
     {
-        var hash = new HashCode();
+        var hash = default(HashCode);
 
         hash.Add(ImageUrl);
         hash.Add(Width);

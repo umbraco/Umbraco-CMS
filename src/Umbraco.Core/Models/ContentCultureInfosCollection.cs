@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Cms.Core.Models;
@@ -43,7 +43,8 @@ public class ContentCultureInfosCollection : ObservableDictionary<string, Conten
 
         if (string.IsNullOrWhiteSpace(culture))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(culture));
         }
 
@@ -58,7 +59,7 @@ public class ContentCultureInfosCollection : ObservableDictionary<string, Conten
         }
         else
         {
-            Add(new ContentCultureInfos(culture) {Name = name, Date = date});
+            Add(new ContentCultureInfos(culture) { Name = name, Date = date });
         }
     }
 }

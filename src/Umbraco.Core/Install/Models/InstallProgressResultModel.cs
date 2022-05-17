@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models;
 
@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Core.Install.Models;
 [DataContract(Name = "result", Namespace = "")]
 public class InstallProgressResultModel
 {
-    public InstallProgressResultModel(bool processComplete, string stepCompleted, string nextStep, string? view = null,
-        object? viewModel = null)
+    public InstallProgressResultModel(bool processComplete, string stepCompleted, string nextStep, string? view = null, object? viewModel = null)
     {
         ProcessComplete = processComplete;
         StepCompleted = stepCompleted;
@@ -25,11 +24,14 @@ public class InstallProgressResultModel
     [DataMember(Name = "view")]
     public string? View { get; private set; }
 
-    [DataMember(Name = "complete")] public bool ProcessComplete { get; set; }
+    [DataMember(Name = "complete")]
+    public bool ProcessComplete { get; set; }
 
-    [DataMember(Name = "stepCompleted")] public string StepCompleted { get; set; }
+    [DataMember(Name = "stepCompleted")]
+    public string StepCompleted { get; set; }
 
-    [DataMember(Name = "nextStep")] public string NextStep { get; set; }
+    [DataMember(Name = "nextStep")]
+    public string NextStep { get; set; }
 
     /// <summary>
     ///     The view model to return to the UI if this step is returning a view (optional)

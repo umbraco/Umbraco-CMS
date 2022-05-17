@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Umbraco.Cms.Core;
@@ -11,7 +11,7 @@ public static class GuidUtils
     private static readonly char[] Base32Table =
     {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-        'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5'
+        'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5',
     };
 
     /// <summary>
@@ -141,10 +141,14 @@ public static class GuidUtils
     [StructLayout(LayoutKind.Explicit)]
     private struct DecomposedGuid
     {
-        [FieldOffset(00)] public readonly Guid Value;
-        [FieldOffset(00)] public long Hi;
-        [FieldOffset(08)] public long Lo;
+        [FieldOffset(00)]
+        public readonly Guid Value;
+        [FieldOffset(00)]
+        public long Hi;
+        [FieldOffset(08)]
+        public long Lo;
 
-        public DecomposedGuid(Guid value) : this() => Value = value;
+        public DecomposedGuid(Guid value)
+            : this() => Value = value;
     }
 }

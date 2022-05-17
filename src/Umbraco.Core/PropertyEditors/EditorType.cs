@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Represents the type of an editor.
@@ -19,5 +19,5 @@ public enum EditorType
     /// <summary>
     ///     Macro parameter editor.
     /// </summary>
-    MacroParameter = 2
+    MacroParameter = 2,
 }

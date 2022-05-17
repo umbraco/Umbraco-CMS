@@ -44,9 +44,15 @@ public class FolderAndFilePermissionsCheck : HealthCheck
         {
             ResultType = x.Value.Any() ? StatusResultType.Error : StatusResultType.Success,
             ReadMoreLink = GetReadMoreLink(x),
-            Description = GetErrorDescription(x)
+            Description = GetErrorDescription(x),
         }));
     }
+
+    /// <summary>
+    ///     Executes the action and returns it's status
+    /// </summary>
+    public override HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
+        throw new InvalidOperationException("FolderAndFilePermissionsCheck has no executable actions");
 
     private string? GetErrorDescription(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
     {
@@ -87,13 +93,8 @@ public class FolderAndFilePermissionsCheck : HealthCheck
                 return Constants.HealthChecks.DocumentationLinks.FolderAndFilePermissionsCheck.FileWritingForPackages;
             case FilePermissionTest.MediaFolderCreation:
                 return Constants.HealthChecks.DocumentationLinks.FolderAndFilePermissionsCheck.MediaFolderCreation;
-            default: return null;
+            default:
+                return null;
         }
     }
-
-    /// <summary>
-    ///     Executes the action and returns it's status
-    /// </summary>
-    public override HealthCheckStatus ExecuteAction(HealthCheckAction action) =>
-        throw new InvalidOperationException("FolderAndFilePermissionsCheck has no executable actions");
 }

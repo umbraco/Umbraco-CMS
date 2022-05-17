@@ -7,5 +7,5 @@ public enum BackOfficeUserPasswordCheckerResult
 {
     ValidCredentials,
     InvalidCredentials,
-    FallbackToDefaultChecker
+    FallbackToDefaultChecker,
 }

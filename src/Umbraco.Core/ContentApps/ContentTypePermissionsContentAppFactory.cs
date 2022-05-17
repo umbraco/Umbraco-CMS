@@ -21,7 +21,7 @@ public class ContentTypePermissionsContentAppFactory : IContentAppFactory
                     Name = "Permissions",
                     Icon = "icon-keychain",
                     View = "views/documentTypes/views/permissions/permissions.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
             default:
                 return null;

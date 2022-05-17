@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.WebAssets;
+namespace Umbraco.Cms.Core.WebAssets;
 
 /// <summary>
 ///     Represents a CSS asset file

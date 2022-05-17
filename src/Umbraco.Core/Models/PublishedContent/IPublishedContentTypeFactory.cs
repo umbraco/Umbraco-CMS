@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Creates published content types.
@@ -28,8 +28,11 @@ public interface IPublishedContentTypeFactory
     /// <param name="dataTypeId">The datatype identifier.</param>
     /// <param name="variations">The variations.</param>
     /// <remarks>Is used by <see cref="PublishedContentType" /> constructor to create special property types.</remarks>
-    IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias,
-        int dataTypeId, ContentVariation variations);
+    IPublishedPropertyType CreatePropertyType(
+        IPublishedContentType contentType,
+        string propertyTypeAlias,
+        int dataTypeId,
+        ContentVariation variations);
 
     /// <summary>
     ///     Creates a core (non-user) published property type.
@@ -39,8 +42,11 @@ public interface IPublishedContentTypeFactory
     /// <param name="dataTypeId">The datatype identifier.</param>
     /// <param name="variations">The variations.</param>
     /// <remarks>Is used by <see cref="PublishedContentType" /> constructor to create special property types.</remarks>
-    IPublishedPropertyType CreateCorePropertyType(IPublishedContentType contentType, string propertyTypeAlias,
-        int dataTypeId, ContentVariation variations);
+    IPublishedPropertyType CreateCorePropertyType(
+        IPublishedContentType contentType,
+        string propertyTypeAlias,
+        int dataTypeId,
+        ContentVariation variations);
 
     /// <summary>
     ///     Gets a published datatype.
