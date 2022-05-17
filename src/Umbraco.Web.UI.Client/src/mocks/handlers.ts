@@ -7,9 +7,9 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         version: 'x.x.x',
-        installed: true
-      }),
-    )
+        installed: false,
+      })
+    );
   }),
 
   rest.post('/login', (_req, res, ctx) => {
@@ -17,8 +17,8 @@ export const handlers = [
     sessionStorage.setItem('is-authenticated', 'true');
     return res(
       // Respond with a 200 status code
-      ctx.status(200),
-    )
+      ctx.status(200)
+    );
   }),
 
   rest.post('/logout', (_req, res, ctx) => {
@@ -26,8 +26,8 @@ export const handlers = [
     sessionStorage.removeItem('is-authenticated');
     return res(
       // Respond with a 200 status code
-      ctx.status(200),
-    )
+      ctx.status(200)
+    );
   }),
 
   rest.get('/user', (_req, res, ctx) => {
@@ -39,15 +39,22 @@ export const handlers = [
         ctx.status(403),
         ctx.json({
           errorMessage: 'Not authorized',
-        }),
-      )
+        })
+      );
     }
     // If authenticated, return a mocked user details
     return res(
       ctx.status(200),
       ctx.json({
         username: 'admin',
-      }),
-    )
+      })
+    );
+  }),
+
+  rest.post('/install', (_req, res, ctx) => {
+    return res(
+      // Respond with a 200 status code
+      ctx.status(200)
+    );
   }),
 ];
