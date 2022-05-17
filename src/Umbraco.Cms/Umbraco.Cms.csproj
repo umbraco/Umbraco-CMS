@@ -36,7 +36,7 @@
   </Target>
 
   <Target Name="JsonSchemaBuild">
-    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o ..\Umbraco.Cms\appsettings-schema.json" />
+    <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o &quot;../Umbraco.Cms/appsettings-schema.json&quot;" />
   </Target>
   
   <ItemGroup>

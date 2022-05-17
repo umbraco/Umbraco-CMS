@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -60,6 +60,7 @@
   
   <Target Name="JsonSchemaBuild">
     <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o $(ProjectDir)appsettings-schema.json" />
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
   </Target>
   
   <Target Name="AppsettingsBuild">
