@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     /**
@@ -67,7 +67,8 @@
 
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService) {
 
-        var vm = this;
+        const vm = this;
+        
         var model = $scope.$parent.$parent.model;
 
         var contentTypeAliases = [];
@@ -135,17 +136,27 @@
             });
         }
 
-        var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+        let copyAllEntriesAction = {
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: [model.label],
-            icon: 'documents',
+            icon: "icon-documents",
             method: copyAllEntries,
-            isDisabled: true
-        }
+            isDisabled: true,
+            useLegacyIcon: false
+        };
 
+        let removeAllEntriesAction = {
+            labelKey: "clipboard_labelForRemoveAllEntries",
+            labelTokens: [],
+            icon: "icon-trash",
+            method: removeAllEntries,
+            isDisabled: true,
+            useLegacyIcon: false
+        };
+        
+        function removeAllEntries() {
 
-        var removeAllEntries = function () {
-            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],
@@ -161,22 +172,12 @@
                 });
             });
         }
-
-        var removeAllEntriesAction = {
-            labelKey: 'clipboard_labelForRemoveAllEntries',
-            labelTokens: [],
-            icon: 'trash',
-            method: removeAllEntries,
-            isDisabled: true
-        };
-
+        
         // helper to force the current form into the dirty state
         function setDirty() {
-
             if (vm.umbProperty) {
                 vm.umbProperty.setDirty();
             }
-
         };
 
         function addNode(alias) {
@@ -728,8 +729,6 @@
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
             removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled;
         }
-
-
 
         var propertyActions = [
             copyAllEntriesAction,
