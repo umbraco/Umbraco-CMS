@@ -4,8 +4,12 @@
   </PropertyGroup>
 
   <Target Name="CopyUmbracoSchema" BeforeTargets="Build">
-    <Message Text="Copying schema files from $(SchemaFilePath) to $(MSBuildProjectDirectory)" />
-    <Copy SourceFiles="@(SchemaFilePath)"
+    <ItemGroup>
+      <SchemaFile Include="$(SchemaFilePath)"/>
+    </ItemGroup>
+
+    <Message Text="Copying schema files from $(SchemaFilePath) to $(MSBuildProjectDirectory)" Importance="high"/>
+    <Copy SourceFiles="@(SchemaFile)"
           DestinationFolder="$(MSBuildProjectDirectory)"
           SkipUnchangedFiles="true" />
   </Target>
