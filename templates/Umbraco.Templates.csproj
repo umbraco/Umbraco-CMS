@@ -5,11 +5,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageType>Template</PackageType>
-    <IncludeContentInPack>true</IncludeContentInPack>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <ContentTargetFolders>content</ContentTargetFolders>
-    <NoDefaultExcludes>true</NoDefaultExcludes>
     <ContentTargetFolders>.</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
   </PropertyGroup>
   
   <ItemGroup>
