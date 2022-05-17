@@ -8,6 +8,10 @@
     "test": "echo 'TODO: Implement test'",
     "lint": "eslint --cache --ext .ts . --ignore-path .gitignore"
   },
+  "engines": {
+    "node": ">=16.0.0 <17",
+    "npm": ">=8.0.0 < 9"
+  },
   "dependencies": {
     "@umbraco-ui/uui": "^0.2.0",
     "lit": "^2.0.2"
