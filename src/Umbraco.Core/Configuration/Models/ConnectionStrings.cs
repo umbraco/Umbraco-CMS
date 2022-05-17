@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// </summary>
 public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (since v10 this only contains a single connection string)
 {
+    private string? _connectionString;
+
     /// <summary>
     /// The default provider name when not present in configuration.
     /// </summary>
@@ -37,7 +39,14 @@ public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (sin
     /// <value>
     /// The connection string.
     /// </value>
-    public string? ConnectionString { get; set; }
+    /// <remarks>
+    /// When set, the <see cref="DataDirectoryPlaceholder"/> will be replaced with the actual physical path.
+    /// </remarks>
+    public string? ConnectionString
+    {
+        get => _connectionString;
+        set => _connectionString = ConfigurationExtensions.ReplaceDataDirectoryPlaceholder(value);
+    }
 
     /// <summary>
     /// Gets or sets the name of the provider.
