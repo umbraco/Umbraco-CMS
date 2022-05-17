@@ -54,7 +54,7 @@ export class UmbApp extends LitElement {
 
   render() {
     return html`
-      ${!this._authorized
+      ${this._authorized
         ? html`<umb-auth-layout>
             <umb-login @login=${this._handleLogin}></umb-login>
           </umb-auth-layout>`
