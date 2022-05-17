@@ -29,7 +29,7 @@
             }
         });
 
-    function BlockGridController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockGridController($element, $scope, $timeout, $q, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, assetsService) {
 
         var unsubscribe = [];
         var modelObject;
@@ -143,7 +143,8 @@
 
             // Create Model Object, to manage our data for this Block Editor.
             modelObject = blockEditorService.createModelObject(vm.model.value, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
-            modelObject.load().then(onLoaded);
+
+            $q.all([modelObject.load(), assetsService.loadJs('lib/sortablejs/Sortable.min.js', $scope)]).then(onLoaded);
 
         };
 
@@ -151,7 +152,7 @@
         // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
         function onServerValueChanged(newVal, oldVal) {
 
-            // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+            // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
             if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
                 vm.model.value = newVal = {};
             }
@@ -167,8 +168,6 @@
         }
 
         function initializeLayout(layoutList) {
-
-            console.log("initializeLayout", layoutList)
 
             // reference the invalid items of this list, to be removed after the loop.
             var invalidLayoutItems = [];
@@ -220,6 +219,16 @@
                     }
                 });
 
+                // TODO: clean this up.
+                let i = layoutEntry.areas.length;
+                while(i--) {
+                    const layoutEntryArea = layoutEntry.areas[i];
+                    const areaConfigIndex = block.config.areas.findIndex(x => x.key === layoutEntryArea.key);
+                    if(areaConfigIndex === -1) {
+                        layoutEntry.areas.splice(i, 1);
+                    }
+                }
+
                 // if no columnSpan, then we set one:
                 if (!layoutEntry.columnSpan) {
                     layoutEntry.columnSpan = 4;
@@ -252,10 +261,7 @@
 
             vm.loading = false;
 
-            $scope.$evalAsync();
-
         }
-
         function updateAllBlockObjects() {
             // Update the blockObjects in our layout.
             vm.layout.forEach(entry => {
@@ -916,68 +922,6 @@
             requestShowClipboard: requestShowClipboard,
             internal: vm
         };
-
-        vm.sortableOptions = {
-            cursor: "grabbing",
-            cancel: "input,textarea,select,option",
-
-            //appendTo: ".umb-block-grid__layout-container",
-            //containment: ".umb-el-wrap",
-
-            connectWith: ".umb-block-grid__layout-container",
-            handle: "umb-block-grid-block",
-            items: '.umb-block-grid__layout-item',
-            placeholder: "umb-block-grid__layout-item-placeholder umb-block-grid__layout-item",
-            //forcePlaceholderSize: true,
-
-            //connectWith: ".umb-group-builder__tabs",
-            //placeholder: "umb-group-builder__tab-sortable-placeholder",
-            //handle: ".umb-group-builder__tab-handle",
-            //items: ".umb-group-builder__tab-sortable",
-            
-            delay: 120,
-            distance: 5,
-            tolerance: "pointer",
-            scroll: true,
-            /*sort: function(event, ui) {
-                var $target = $(event.target);
-                if (!/html|body/i.test($target.offsetParent()[0].tagName)) {
-                    var top = event.pageY - $target.offsetParent().offset().top - (ui.helper.outerHeight(true) / 2);
-                    ui.helper.css({'top' : top + 'px'});
-                    var left = event.pageX - $target.offsetParent().offset().left - (ui.helper.outerWidth(true) / 2);
-                    ui.helper.css({'left' : left + 'px'});
-                }
-            },*/
-            start: function(event, ui) {
-                const element = ui.item[0];
-                ui.placeholder.css("--umb-block-grid--item-column-span", element.dataset.colSpan);
-                ui.placeholder.css("--umb-block-grid--item-row-span", element.dataset.rowSpan);
-
-                //vm.sortableOptions.sort(event, ui);
-            },
-            beforeStop: function(event, ui) {
-                var newIndex = ui.placeholder.index();
-                console.log("beforeStop index", newIndex);
-                // this got the right index..
-            },
-            accept: function (sourceItemHandleScope, destSortableScope) {
-                return true;
-                //sourceItemHandleScope.itemScope.sortableScope.$id === destSortableScope.$id;
-            },
-            update: function (ev, ui) {
-                console.log("sort update", ui.item.index())
-                setDirty();
-            },
-            itemMoved: function (ev) {
-                console.log("itemMoved", ev)
-            },
-            change: function (event, ui) {
-                var newIndex = ui.item.index();
-                console.log("new index", newIndex)// This is wrong index.
-            }
-        };
-        // see https://github.com/a5hik/ng-sortable/issues/13 for scrolling while dragging.
-        
 
         function onAmountOfBlocksChanged() {
 

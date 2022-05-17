@@ -279,6 +279,11 @@ function dependencies() {
                 "./node_modules/wicg-inert/dist/inert.min.js.map"
             ],
             "base": "./node_modules/wicg-inert"
+        },
+        {
+            "name": "sortablejs",
+            "src":  ["./node_modules/sortablejs/Sortable.min.js"],
+            "base": "./node_modules/sortablejs"
         }
     ];
 
