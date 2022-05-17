@@ -16,7 +16,7 @@ public static class DatabaseProviderMetadataExtensions
     /// The available database provider metadata.
     /// </returns>
     public static IEnumerable<IDatabaseProviderMetadata> GetAvailable(this IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, bool onlyQuickInstall = false)
-        => databaseProviderMetadata.OrderBy(x => x.SortOrder).Where(x => (!onlyQuickInstall || x.SupportsQuickInstall) && x.IsAvailable);
+        => databaseProviderMetadata.Where(x => (!onlyQuickInstall || x.SupportsQuickInstall) && x.IsAvailable).OrderBy(x => x.SortOrder);
 
     /// <summary>
     /// Determines whether a database can be created for the specified provider name while ignoring the value of <see cref="GlobalSettings.InstallMissingDatabase" />.
