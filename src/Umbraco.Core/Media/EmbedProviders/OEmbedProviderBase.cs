@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 using System.Xml;
 using Microsoft.AspNetCore.WebUtilities;
@@ -44,12 +43,12 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
 
             if (maxWidth > 0)
             {
-                queryString.Add("maxwidth", maxWidth.ToString(CultureInfo.InvariantCulture));
+                queryString.Add("maxwidth", maxWidth.ToString());
             }
 
             if (maxHeight > 0)
             {
-                queryString.Add("maxheight", maxHeight.ToString(CultureInfo.InvariantCulture));
+                queryString.Add("maxheight", maxHeight.ToString());
             }
 
             return QueryHelpers.AddQueryString(ApiEndpoint, queryString);
