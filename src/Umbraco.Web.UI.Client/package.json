@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "echo 'TODO: Implement test'",
-    "lint": "eslint --cache --ext .ts . --ignore-path .gitignore"
+    "lint": "eslint . --ext .ts --ignore-path .gitignore --cache "
   },
   "engines": {
     "node": ">=16.0.0 <17",
@@ -21,6 +21,8 @@
     "@typescript-eslint/parser": "^5.24.0",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^2.7.1",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lit": "^1.6.1",
     "eslint-plugin-lit-a11y": "^1.1.0-next.1",
     "msw": "^0.39.2",
