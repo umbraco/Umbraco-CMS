@@ -1,5 +1,5 @@
-import { html, css, LitElement } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { html, css, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
 
 /**
  * An example element.
@@ -16,41 +16,39 @@ export class MyElement extends LitElement {
       padding: 16px;
       max-width: 800px;
     }
-  `
+  `;
 
   /**
    * The name to say "Hello" to.
    */
   @property()
-  name = 'World'
+  name = 'World';
 
   /**
    * The number of times the button has been clicked.
    */
   @property({ type: Number })
-  count = 0
+  count = 0;
 
   render() {
     return html`
       <h1>Hello, ${this.name}!</h1>
-      <button @click=${this._onClick} part="button">
-        Click Count: ${this.count}
-      </button>
+      <button @click=${this._onClick} part="button">Click Count: ${this.count}</button>
       <slot></slot>
-    `
+    `;
   }
 
   private _onClick() {
-    this.count++
+    this.count++;
   }
 
   foo(): string {
-    return 'foo'
+    return 'foo';
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement
+    'my-element': MyElement;
   }
 }
