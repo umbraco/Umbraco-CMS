@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Alias = alias;
             Name = textService.Localize("actions", Alias);
-            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
+            TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
         }
 
         /// <summary>
