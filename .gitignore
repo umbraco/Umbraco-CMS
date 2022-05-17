@@ -102,5 +102,5 @@ cypress.env.json
 /tests/Umbraco.Tests.UnitTests/[Uu]mbraco/[Dd]ata/TEMP/
 
 # Ignore auto-generated schema
-/src/Umbraco.Web.UI/[Uu]mbraco/config/appsettings-schema.json
+/src/Umbraco.Web.UI/appsettings-schema.json
 /src/Umbraco.Cms/appsettings-schema.json
