@@ -1,4 +1,4 @@
-# Umbraco CMS Build
+# Umbraco CMS Build
 
 ## Are you sure?
 
@@ -27,7 +27,7 @@ If you want to run a build without debugging, see [Building from source](#buildi
 In order to build the Umbraco source code locally with Visual Studio Code, first make sure you have the following installed.
 
   * [Visual Studio Code](https://code.visualstudio.com/)
-  * [dotnet SDK v6.0.202+](https://dotnet.microsoft.com/en-us/download)
+  * [dotnet SDK v6.0.2+](https://dotnet.microsoft.com/en-us/download)
   * [Node.js v14+](https://nodejs.org/en/download/)
   * npm v7+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
@@ -72,7 +72,7 @@ When the page eventually loads in your web browser, you can follow the installer
 
 In order to build the Umbraco source code locally with Visual Studio, first make sure you have the following installed.
 
-  * [Visual Studio 2019 v16.8+ with .NET 6.0.202+](https://visualstudio.microsoft.com/vs/) ([the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects)
+  * [Visual Studio 2019 v16.8+ with .NET 6.0.2+](https://visualstudio.microsoft.com/vs/) ([the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects)
   * [Node.js v14+](https://nodejs.org/en/download/)
   * npm v7+ (installed with Node.js)
   * [Git command line](https://git-scm.com/download/)
