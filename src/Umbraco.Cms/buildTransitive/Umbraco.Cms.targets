@@ -8,7 +8,7 @@
       <SchemaFile Include="$(SchemaFilePath)"/>
     </ItemGroup>
 
-    <Message Text="Copying schema files from $(SchemaFilePath) to $(MSBuildProjectDirectory)" Importance="high"/>
+    <Message Text="Copying Umbraco json schema file" Importance="high"/>
     <Copy SourceFiles="@(SchemaFile)"
           DestinationFolder="$(MSBuildProjectDirectory)"
           SkipUnchangedFiles="true" />
