@@ -1,5 +1,6 @@
 import './auth/login/umb-login.element';
 import './auth/umb-auth-layout.element';
+import './backoffice/umb-backoffice.element';
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 
@@ -27,6 +28,7 @@ export class UmbApp extends LitElement {
   constructor() {
     super();
     worker.start();
+    this._authorized = sessionStorage.getItem('is-authenticated') === 'true';
   }
 
   private async _getUser() {
@@ -43,7 +45,7 @@ export class UmbApp extends LitElement {
     this._getUser();
   };
 
-  private _renderBackoffice = () => html`hej`;
+  private _renderBackoffice = () => html`<umb-backoffice></umb-backoffice>`;
 
   private _renderAuth = () => html`
     <umb-auth-layout>
@@ -52,7 +54,11 @@ export class UmbApp extends LitElement {
   `;
 
   render() {
-    return html` ${this._authorized ? this._renderBackoffice() : this._renderAuth()} `;
+    return html`
+      <uui-icon-registry-essential>
+        ${this._authorized ? this._renderBackoffice() : this._renderAuth()}
+      </uui-icon-registry-essential>
+    `;
   }
 }
 
