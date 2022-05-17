@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserTwoFactorProviderModel>>> Get2FAProvidersForUser(int userId)
         {
-            var user = await _backOfficeUserManager.FindByIdAsync(userId.ToString());
+            var user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
 
             var enabledProviderNameHashSet = new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));
 
