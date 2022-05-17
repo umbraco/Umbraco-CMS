@@ -43,14 +43,16 @@ export class UmbApp extends LitElement {
     this._getUser();
   };
 
+  private _renderBackoffice = () => html`hej`;
+
+  private _renderAuth = () => html`
+    <umb-auth-layout>
+      <umb-login @login=${this._handleLogin}></umb-login>
+    </umb-auth-layout>
+  `;
+
   render() {
-    return html`
-      ${this._authorized
-        ? html`<umb-auth-layout>
-            <umb-login @login=${this._handleLogin}></umb-login>
-          </umb-auth-layout>`
-        : html`hej`}
-    `;
+    return html` ${this._authorized ? this._renderBackoffice() : this._renderAuth()} `;
   }
 }
 

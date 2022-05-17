@@ -60,7 +60,7 @@ export class UmbLogin extends LitElement {
     'Happy wonderful Wednesday',
     'Happy thunderous Thursday',
     'Happy funky Friday',
-    'Happy Caturday',
+    'Happy Saturday',
   ];
 
   @state()
