@@ -280,11 +280,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     });
             };
 
-            var childItems = parentId.HasValue == false
-                ? new[] { GetRootDictionaryItems()! }
-                : getItemsFromParents(new[] { parentId.Value });
+            if (!parentId.HasValue)
+            {
+                var sql = GetBaseQuery(false)
+                    .OrderBy<DictionaryDto>(x => x.UniqueId);
+                return Database
+                    .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                    .Select(ConvertFromDto);
+            }
 
-            return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
+            return getItemsFromParents(new[] { parentId.Value }).SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
 
         }
 
