@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,7 +11,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
@@ -165,7 +161,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // cannot connect to configured database, this is bad, fail
                     _logger.LogDebug("Could not connect to database.");
 
-                    if (_globalSettings.Value.InstallMissingDatabase || CanForceCreateDatabase(_databaseProviderMetadata, _databaseFactory))
+                    if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory.ProviderName))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;
@@ -333,8 +329,5 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             return canConnect;
         }
-
-        private static bool CanForceCreateDatabase(IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata, IUmbracoDatabaseFactory databaseFactory)
-            => databaseProviderMetadata.FirstOrDefault(x => x.ProviderName == databaseFactory.ProviderName)?.ForceCreateDatabase == true;
     }
 }
