@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@umbraco-ui/uui": "^0.2.0",
-    "lit": "^2.0.2",
+    "lit": "^2.2.4",
     "openapi-typescript-fetch": "^1.1.3"
   },
   "devDependencies": {
