@@ -191,7 +191,7 @@
     },
     "UsingUnattenedInstall": {
       "type": "computed",
-      "value": "(UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '' && HasDevelopmentConnectionString)"
+      "value": "(UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '' && (HasConnectionString || HasDevelopmentConnectionString))"
     },
     "NoNodesViewPath": {
       "displayName": "No nodes view path",

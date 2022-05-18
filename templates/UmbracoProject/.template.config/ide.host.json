@@ -4,7 +4,7 @@
   "icon": "../../icon.png",
   "description": {
     "id": "UmbracoProject",
-    "text": "Umbraco Web Application - An empty Umbraco CMS web application"
+    "text": "Umbraco Web Application - An empty Umbraco CMS web application."
   },
   "symbolInfo": [
     {
