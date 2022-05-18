@@ -7,7 +7,7 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         version: '13.0.0',
-        installed: true,
+        installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
       })
     );
   }),
