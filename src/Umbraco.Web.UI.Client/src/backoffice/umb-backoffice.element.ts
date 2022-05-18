@@ -1,8 +1,8 @@
-import { LitElement, html, css } from 'lit';
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
-import { property, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import './umb-backoffice-header.element';
+
+import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 
 @defineElement('umb-backoffice')
 export class UmbBackoffice extends LitElement {

@@ -1,5 +1,5 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUser extends LitElement {
