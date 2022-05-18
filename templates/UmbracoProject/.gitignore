@@ -466,4 +466,4 @@ $RECYCLE.BIN/
 
 # JSON Schema file for appsettings
 # This is auto generated from the build
-**/umbraco/config/appsettings-schema.json
+appsettings-schema.json
