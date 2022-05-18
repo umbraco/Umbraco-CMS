@@ -11,6 +11,14 @@ export class UmbInstallerUser extends LitElement {
       uui-input-password {
         width: 100%;
       }
+
+      #buttons {
+        display: flex;
+      }
+
+      #button-install {
+        margin-left: auto;
+      }
     `,
   ];
 
@@ -44,6 +52,10 @@ export class UmbInstallerUser extends LitElement {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  private _onCustomize() {
+    this.dispatchEvent(new CustomEvent('customize', { bubbles: true, composed: true }));
   }
 
   render() {
@@ -84,11 +96,19 @@ export class UmbInstallerUser extends LitElement {
           </uui-form-layout-item>
 
           <uui-form-layout-item>
-            <uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
+            <uui-checkbox name="persist" label="Remember me">
+              Keep me updated on Umbraco Versions, Security Bulletins and Community News
+            </uui-checkbox>
           </uui-form-layout-item>
 
-          <uui-button type="submit" label="Customize" look="secondary"></uui-button>
-          <uui-button type="submit" label="Install" look="positive"></uui-button>
+          <div id="buttons">
+            <uui-button
+              id="button-customize"
+              @click=${this._onCustomize}
+              label="Customize"
+              look="secondary"></uui-button>
+            <uui-button id="button-install" type="submit" label="Install" look="positive"></uui-button>
+          </div>
         </form>
       </uui-form>
     </div>`;
