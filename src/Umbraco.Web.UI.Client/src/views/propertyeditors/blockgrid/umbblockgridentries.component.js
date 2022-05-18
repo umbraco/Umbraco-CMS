@@ -35,6 +35,56 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
 
+            // Setup DOM method for communication between sortables:
+            gridLayoutContainerEl['Sortable:ng-sortable'] = () => {
+                return vm.entries;
+            };
+
+            var removed, nextSibling;
+
+            // Borrowed concept from: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
+            // TODO: investigate usage of Store options prop.
+            function _sync(evt) {
+                var items = vm.entries;
+
+                var oldIndex = evt.oldIndex,
+                    newIndex = evt.newIndex;
+
+                // If not the same layout array, then:
+                if (gridLayoutContainerEl !== evt.from) {
+                    var prevItems = evt.from['Sortable:ng-sortable']();
+
+                    removed = prevItems[oldIndex];
+
+                    if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
+                        removed = angular.copy(removed);
+                        prevItems.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevItems.splice(oldIndex, 1)[0]);
+
+                        if (evt.from.contains(evt.clone)) {
+                            evt.from.removeChild(evt.clone);
+                        }
+                    }
+                    else {
+                        prevItems.splice(oldIndex, 1);
+                    }
+
+                    items.splice(newIndex, 0, removed);
+
+                    // TODO: fix issue when dragging one level out.
+                    evt.from.insertBefore(evt.item, nextSibling); // revert element
+                }
+                else {
+                    items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+
+                    // move ng-repeat comment node to right position:
+                    if (nextSibling.nodeType === Node.COMMENT_NODE) {
+                        evt.from.insertBefore(nextSibling, evt.item.nextSibling);
+                    }
+                }
+
+                $scope.$apply();
+            }
+
             const sortable = Sortable.create(gridLayoutContainerEl, {
                 group: "uniqueGridEditorID",  // links groups with same name.
                 sort: true,  // sorting inside list
@@ -49,7 +99,7 @@
                 cancel: '',
                 //filter: ".ignore-elements",  // Selectors that do not lead to dragging (String or Function)
                 //preventOnFilter: true, // Call `event.preventDefault()` when triggered `filter`
-                draggable: ".umb-block-grid__layout-item"  // Specifies which items inside the element should be draggable
+                draggable: ".umb-block-grid__layout-item",  // Specifies which items inside the element should be draggable
 
                 //dataIdAttr: 'data-element-udi', // HTML attribute that is used by the `toArray()` method
 
@@ -72,6 +122,17 @@
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
                 //emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
 
+                onStart: function (/**Event*/evt) {
+                    nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
+                    $scope.$apply();
+                },
+                onAdd: function (evt) {
+                    _sync(evt);
+                    $scope.$apply();
+                },
+                onUpdate: function (evt) {
+                    _sync(evt);
+                }
                 /*
                 setData: function (dataTransfer, dragEl) {
                     dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
