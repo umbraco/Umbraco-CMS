@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "preview": "vite preview --open",
     "test": "echo 'TODO: Implement test'",
     "lint": "eslint . --ext .ts --cache",
     "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts"
