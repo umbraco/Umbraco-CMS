@@ -100,20 +100,23 @@ components:
     UserLoginRequest:
       type: object
       properties:
-        userame:
+        username:
           type: string
         password:
           type: string
-        role:
-          type: string
+        persist:
+          type: boolean
       required:
-        - userame
+        - username
         - password
-        - role
+        - persist
     UserResponse:
       type: object
       properties:
         username:
           type: string
+        role:
+          type: string
       required:
         - username
+        - role
