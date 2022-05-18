@@ -21,6 +21,10 @@
       "longName": "exclude-gitignore",
       "shortName": ""
     },
+    "MinimalGitignore": {
+      "longName": "minimal-gitignore",
+      "shortName": ""
+    },
     "ConnectionString": {
       "longName": "connection-string",
       "shortName": ""

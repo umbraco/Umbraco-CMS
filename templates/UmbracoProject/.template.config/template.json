@@ -75,6 +75,13 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
+    "MinimalGitignore": {
+      "displayName": "Minimal .gitignore",
+      "description": "Whether to only include minimal (Umbraco specific) rules in the .gitignore.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
     "ConnectionString": {
       "displayName": "Connection string",
       "description": "Database connection string used by Umbraco.",

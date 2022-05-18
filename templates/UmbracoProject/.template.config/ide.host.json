@@ -24,6 +24,10 @@
       "isVisible": true
     },
     {
+      "id": "MinimalGitignore",
+      "isVisible": true
+    },
+    {
       "id": "ConnectionString",
       "isVisible": true
     },
