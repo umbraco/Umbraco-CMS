@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "echo 'TODO: Implement test'",
-    "lint": "eslint . --ext .ts --ignore-path .gitignore --cache "
+    "lint": "eslint . --ext .ts --ignore-path .gitignore --cache",
+    "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/schema.ts"
   },
   "engines": {
     "node": ">=16.0.0 <17",
