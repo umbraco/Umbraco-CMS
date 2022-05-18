@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
@@ -35,8 +36,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" /> -->
 <ins>Macro alias: <strong>My.Map.isCool eh[boy!]</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -54,8 +55,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -73,8 +74,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -92,8 +93,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -111,8 +112,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -130,8 +131,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -161,8 +162,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -186,8 +187,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 <div class=""umb-macro-holder mceNonEditable"">
 <!-- <?UMBRACO_MACRO macroAlias=""login"" /> -->
 <ins>Macro alias: <strong>login</strong></ins></div>
-<p> </p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p> </p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -223,8 +224,8 @@ dfdsfds"" />
 asdfsdf
 </div>
 </body>
-</html>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+</html>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -242,8 +243,8 @@ asdfsdf
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -261,8 +262,8 @@ asdfsdf
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+<p>asdfasdf</p>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -318,8 +319,8 @@ asdfsdf
 asdfsdf
 </div>
 </body>
-</html>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+</html>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
@@ -353,8 +354,8 @@ asdfsdf
 asdfsdf
 </div>
 </body>
-</html>".Replace(Environment.NewLine, string.Empty),
-                result.Replace(Environment.NewLine, string.Empty));
+</html>".StripNewLines(),
+                result.StripNewLines());
         }
 
         [Test]
