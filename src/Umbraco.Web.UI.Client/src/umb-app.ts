@@ -15,15 +15,15 @@ import { UmbRouter, UmbRoute } from './core/router';
 const routes: Array<UmbRoute> = [
   {
     path: '/login',
-    elementName: 'umb-login'
+    elementName: 'umb-login',
   },
   {
     path: '/install',
-    elementName: 'umb-installer'
+    elementName: 'umb-installer',
   },
   {
     path: '/content',
-    elementName: 'umb-backoffice'
+    elementName: 'umb-backoffice',
   },
 ];
 
@@ -31,7 +31,9 @@ const routes: Array<UmbRoute> = [
 @customElement('umb-app')
 export class UmbApp extends LitElement {
   static styles = css`
-    :host {
+    :host,
+    #outlet {
+      display: block;
       width: 100vw;
       height: 100vh;
     }
@@ -71,13 +73,12 @@ export class UmbApp extends LitElement {
         this._router.push('/install');
         return;
       }
-      
+
       if (!this._authorized) {
         this._router.push('/login');
       } else {
         this._router.push('/content');
       }
-
     } catch (error) {
       console.log(error);
     }

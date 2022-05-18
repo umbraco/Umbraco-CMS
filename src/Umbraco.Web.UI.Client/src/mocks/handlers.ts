@@ -7,7 +7,7 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         version: 'x.x.x',
-        installed: false,
+        installed: true,
       })
     );
   }),
