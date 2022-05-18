@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -118,10 +113,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             get
             {
-                var quickInstallSettings = _databaseProviderMetadata
-                    .Where(x => x.SupportsQuickInstall)
-                    .Where(x => x.IsAvailable)
-                    .OrderBy(x => x.SortOrder)
+                var quickInstallSettings = _databaseProviderMetadata.GetAvailable(true)
                     .Select(x => new
                     {
                         displayName = x.DisplayName,
