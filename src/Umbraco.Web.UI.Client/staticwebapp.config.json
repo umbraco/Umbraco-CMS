@@ -1,0 +1,9 @@
+{
+    "routes": [
+        {
+            "route": "/*",
+            "rewrite": "/index.html"
+        }
+    ],
+    "trailingSlash": "never"
+}
