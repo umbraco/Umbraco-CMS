@@ -23,5 +23,15 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
 
         public string[] AllowedIPs { get; set; } = Array.Empty<string>();
+        public SharedSecret SharedSecret { get; set; } = new SharedSecret();
+
+        public bool RedirectToLoginPage { get; set; } = false;
+
+    }
+
+    public class SharedSecret
+    {
+        public string? HeaderName { get; set; } = "X-Authentication-Shared-Secret";
+        public string? Value { get; set; }
     }
 }

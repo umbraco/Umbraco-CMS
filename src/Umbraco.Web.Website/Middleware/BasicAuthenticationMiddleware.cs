@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
@@ -18,20 +22,41 @@ public class BasicAuthenticationMiddleware : IMiddleware
 {
     private readonly IBasicAuthService _basicAuthService;
     private readonly IRuntimeState _runtimeState;
+    private readonly string _backOfficePath;
 
     public BasicAuthenticationMiddleware(
         IRuntimeState runtimeState,
-        IBasicAuthService basicAuthService)
+        IBasicAuthService basicAuthService,
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment)
     {
         _runtimeState = runtimeState;
         _basicAuthService = basicAuthService;
+
+        _backOfficePath = globalSettings.CurrentValue.GetBackOfficePath(hostingEnvironment);
+    }
+
+    [Obsolete("Use Ctor with all methods. This will be removed in Umbraco 12")]
+    public BasicAuthenticationMiddleware(
+        IRuntimeState runtimeState,
+        IBasicAuthService basicAuthService) : this(
+        runtimeState,
+        basicAuthService,
+        StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
+        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>()
+    )
+    {
+
     }
 
     /// <inheritdoc />
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (_runtimeState.Level < RuntimeLevel.Run || context.Request.IsBackOfficeRequest() ||
-            !_basicAuthService.IsBasicAuthEnabled())
+        if (_runtimeState.Level < RuntimeLevel.Run
+            || context.Request.IsBackOfficeRequest()
+            || context.Request.IsClientSideRequest()
+            || AllowedClientRequest(context)
+            || _basicAuthService.HasCorrectSharedSecret(context.Request.Headers))
         {
             await next(context);
             return;
@@ -67,24 +92,36 @@ public class BasicAuthenticationMiddleware : IMiddleware
                 }
                 else
                 {
-                    SetUnauthorizedHeader(context);
+                    HandleUnauthorized(context);
                 }
             }
             else
             {
-                SetUnauthorizedHeader(context);
+                HandleUnauthorized(context);
             }
         }
         else
         {
             // no authorization header
-            SetUnauthorizedHeader(context);
+            HandleUnauthorized(context);
         }
     }
 
-    private static void SetUnauthorizedHeader(HttpContext context)
+    private bool AllowedClientRequest(HttpContext context)
     {
-        context.Response.StatusCode = 401;
-        context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
+        return context.Request.IsClientSideRequest() && _basicAuthService.IsRedirectToLoginPageEnabled();
+    }
+
+    private void HandleUnauthorized(HttpContext context)
+    {
+        if (_basicAuthService.IsRedirectToLoginPageEnabled())
+        {
+            context.Response.Redirect($"{_backOfficePath}#/login/false?returnPath=%252F" , false);
+        }
+        else
+        {
+            context.Response.StatusCode = 401;
+            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
+        }
     }
 }
