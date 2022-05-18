@@ -57,7 +57,7 @@
                     removed = prevItems[oldIndex];
 
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
-                        removed = angular.copy(removed);
+                        removed = Utilities.copy(removed);
                         prevItems.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevItems.splice(oldIndex, 1)[0]);
 
                         if (evt.from.contains(evt.clone)) {
