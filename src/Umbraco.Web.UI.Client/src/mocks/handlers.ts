@@ -6,7 +6,7 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(200),
       ctx.json({
-        version: 'x.x.x',
+        version: '13.0.0',
         installed: true,
       })
     );
