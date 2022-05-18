@@ -17,6 +17,10 @@
       "longName": "no-restore",
       "shortName": ""
     },
+    "ExcludeGitignore": {
+      "longName": "exclude-gitignore",
+      "shortName": ""
+    },
     "ConnectionString": {
       "longName": "connection-string",
       "shortName": ""

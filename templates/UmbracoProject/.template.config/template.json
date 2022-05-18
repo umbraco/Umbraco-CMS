@@ -18,6 +18,18 @@
   "sourceName": "UmbracoProject",
   "defaultName": "UmbracoProject1",
   "preferNameDirectory": true,
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(ExcludeGitignore)",
+          "exclude": [
+            ".gitignore"
+          ]
+        }
+      ]
+    }
+  ],
   "symbols": {
     "Framework": {
       "displayName": "Framework",
@@ -52,6 +64,13 @@
     "SkipRestore": {
       "displayName": "Skip restore",
       "description": "If specified, skips the automatic restore of the project on create.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "ExcludeGitignore": {
+      "displayName": "Exclude .gitignore",
+      "description": "Whether to exclude .gitignore from the generated template.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"

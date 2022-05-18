@@ -20,6 +20,10 @@
       "isVisible": true
     },
     {
+      "id": "ExcludeGitignore",
+      "isVisible": true
+    },
+    {
       "id": "ConnectionString",
       "isVisible": true
     },
