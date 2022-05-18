@@ -12,7 +12,7 @@ export class UmbBackoffice extends LitElement {
       :host {
         display: flex;
         flex-direction: column;
-        min-height: 100%;
+        height: 100%;
         width: 100%;
         color: var(--uui-color-text);
         font-size: 14px;
@@ -35,19 +35,19 @@ export class UmbBackoffice extends LitElement {
         --uui-tab-text-hover: var(--uui-color-current-emphasis);
       }
       #main {
-        width: 100%;
-        height: calc(100% - 48px);
         display: flex;
-        box-sizing: border-box;
+        flex: 1;
+        overflow: hidden;
       }
       #nav-side-bar {
-        width: 400px;
+        width: 300px;
         background-color: var(--uui-color-surface);
         height: 100%;
         border-right: 1px solid var(--uui-color-border);
         font-weight: 500;
         display: flex;
         flex-direction: column;
+        flex-shrink: 0;
       }
       #nav-side-bar b {
         padding: var(--uui-size-6) var(--uui-size-8);
@@ -63,6 +63,7 @@ export class UmbBackoffice extends LitElement {
         background-color: var(--uui-color-surface);
         width: 100%;
         display: flex;
+        flex: none;
         gap: 16px;
         align-items: center;
         border-bottom: 1px solid var(--uui-color-border);
@@ -79,28 +80,10 @@ export class UmbBackoffice extends LitElement {
       }
       #editor-content {
         padding: var(--uui-size-6);
-        height: 100%;
         display: flex;
+        flex: 1;
         flex-direction: column;
         gap: 16px;
-      }
-      .editor-property {
-        display: grid;
-        grid-template-columns: 200px 600px;
-        gap: 32px;
-      }
-      .editor-property uui-input,
-      .editor-property uui-textarea {
-        width: 100%;
-      }
-
-      uui-box hr {
-        margin-bottom: var(--uui-size-6);
-      }
-
-      hr {
-        border: 0;
-        border-top: 1px solid var(--uui-color-border-alt);
       }
 
       uui-tab {
@@ -109,6 +92,7 @@ export class UmbBackoffice extends LitElement {
 
       #editor-bottom {
         display: flex;
+        flex: none;
         justify-content: end;
         align-items: center;
         height: 70px;
@@ -178,151 +162,7 @@ export class UmbBackoffice extends LitElement {
             </uui-tab-group>
           </div>
           <uui-scroll-container id="editor-content">
-            <uui-box>
-              <div slot="headline">Hero</div>
-              <div class="editor-property">
-                <div class="label">
-                  <b>Header</b>
-                  <p>This is the main headline for the hero area on the Homepage</p>
-                </div>
-                <div class="value">
-                  <uui-input type="text" value="You have typed some stuff into this one already"></uui-input>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Description</b>
-                  <p>Write something nice</p>
-                </div>
-                <div class="value">
-                  <uui-textarea>I should probably write some more</uui-textarea>
-                  <div class="warning-box">
-                    Warning, the operation you're about to perform might influence other part of
-                    <b>Project Name</b>. as well as other projects
-                  </div>
-                </div>
-              </div>
-            </uui-box>
-            <uui-box>
-              <div slot="headline">Options</div>
-              <div class="editor-property">
-                <div class="label">
-                  <b>Disabled</b>
-                  <p>This is the main headline for the hero area on the Homepage</p>
-                </div>
-                <div class="value">
-                  <uui-input value="this is disabled" disabled></uui-input>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Header</b>
-                  <p>This is the main headline for the hero area on the Homepage</p>
-                </div>
-                <div class="value">
-                  <uui-input></uui-input>
-                  <div class="danger-box">
-                    Warning, the operation you're about to perform might influence other part of
-                    <b>Project Name</b>. as well as other projects
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Options</b>
-                  <p>This will show some options</p>
-                </div>
-                <div class="value">
-                  <uui-combobox-list>
-                    <uui-combobox-list-option> Option 1 </uui-combobox-list-option>
-                    <uui-combobox-list-option> Option 2 </uui-combobox-list-option>
-                    <uui-combobox-list-option> Option 3 </uui-combobox-list-option>
-                    <uui-combobox-list-option> Option 4 </uui-combobox-list-option>
-                    <uui-combobox-list-option> Option 5 </uui-combobox-list-option>
-                  </uui-combobox-list>
-                </div>
-              </div>
-            </uui-box>
-            <uui-box>
-              <div slot="headline">Buttons</div>
-              <div class="editor-property">
-                <div class="label">
-                  <b>Primary</b>
-                </div>
-                <div class="value">
-                  <div class="buttons">
-                    <uui-button color="primary">Button</uui-button>
-                    <uui-button color="primary" look="primary"> Button </uui-button>
-                    <uui-button color="primary" look="secondary"> Button </uui-button>
-                    <uui-button color="primary" look="outline"> Button </uui-button>
-                    <uui-button color="primary" look="placeholder"> Button </uui-button>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Positive</b>
-                </div>
-                <div class="value">
-                  <div class="buttons">
-                    <uui-button color="positive">Button</uui-button>
-                    <uui-button color="positive" look="primary"> Button </uui-button>
-                    <uui-button color="positive" look="secondary"> Button </uui-button>
-                    <uui-button color="positive" look="outline"> Button </uui-button>
-                    <uui-button color="positive" look="placeholder"> Button </uui-button>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Warning</b>
-                </div>
-                <div class="value">
-                  <div class="buttons">
-                    <uui-button color="warning">Button</uui-button>
-                    <uui-button color="warning" look="primary"> Button </uui-button>
-                    <uui-button color="warning" look="secondary"> Button </uui-button>
-                    <uui-button color="warning" look="outline"> Button </uui-button>
-                    <uui-button color="warning" look="placeholder"> Button </uui-button>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Danger</b>
-                </div>
-                <div class="value">
-                  <div class="buttons">
-                    <uui-button color="danger">Button</uui-button>
-                    <uui-button color="danger" look="primary"> Button </uui-button>
-                    <uui-button color="danger" look="secondary"> Button </uui-button>
-                    <uui-button color="danger" look="outline"> Button </uui-button>
-                    <uui-button color="danger" look="placeholder"> Button </uui-button>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <div class="editor-property">
-                <div class="label">
-                  <b>Disabled</b>
-                </div>
-                <div class="value">
-                  <div class="buttons">
-                    <uui-button disabled color="danger">Button</uui-button>
-                    <uui-button disabled color="danger" look="primary"> Button </uui-button>
-                    <uui-button disabled color="danger" look="secondary"> Button </uui-button>
-                    <uui-button disabled color="danger" look="outline"> Button </uui-button>
-                    <uui-button disabled color="danger" look="placeholder"> Button </uui-button>
-                  </div>
-                </div>
-              </div>
-            </uui-box>
+            <!-- CONTENT GOES HERE -->
           </uui-scroll-container>
           <div id="editor-bottom">
             <uui-button>Save and preview</uui-button>
