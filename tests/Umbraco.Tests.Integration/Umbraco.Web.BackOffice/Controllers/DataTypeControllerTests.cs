@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -21,7 +20,7 @@ public class DataTypeControllerTests : UmbracoTestServerTestBase
     [Test]
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Has_Values_Returns_Correct_values(bool expectHasValues)
+    public async Task Has_Values_Returns_Correct_Values(bool expectHasValues)
     {
         IDataTypeService dataTypeService = GetRequiredService<IDataTypeService>();
         IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
@@ -33,6 +32,7 @@ public class DataTypeControllerTests : UmbracoTestServerTestBase
             .WithoutIdentity()
             .WithDatabaseType(ValueStorageType.Ntext)
             .Build();
+        
         dataTypeService.Save(dataType);
 
         IContentType contentType = new ContentTypeBuilder()

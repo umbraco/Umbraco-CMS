@@ -846,11 +846,11 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Creates a SELECT CASE WHEN EXISTS query, which returns 1 if the sub query returns any results, and 0 if not
+        /// Creates a SELECT CASE WHEN EXISTS query, which returns 1 if the sub query returns any results, and 0 if not.
         /// </summary>
-        /// <param name="sql">The origin SQL</param>
-        /// <param name="nestedSelect">The nested select to run the query against</param>
-        /// <returns></returns>
+        /// <param name="sql">The original SQL.</param>
+        /// <param name="nestedSelect">The nested select to run the query against.</param>
+        /// <returns>The updated Sql statement.</returns>
         public static Sql<ISqlContext> SelectAnyExists(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect)
         {
             sql.Append("SELECT CASE WHEN EXISTS (");
