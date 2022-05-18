@@ -7,7 +7,7 @@
     "build": "tsc && vite build",
     "test": "echo 'TODO: Implement test'",
     "lint": "eslint . --ext .ts --ignore-path .gitignore --cache",
-    "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/schema.ts"
+    "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts"
   },
   "engines": {
     "node": ">=16.0.0 <17",
@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@umbraco-ui/uui": "^0.2.0",
-    "lit": "^2.0.2"
+    "lit": "^2.0.2",
+    "openapi-typescript-fetch": "^1.1.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.24.0",
