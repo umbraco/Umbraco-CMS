@@ -12,7 +12,7 @@ export const handlers = [
     );
   }),
 
-  rest.post('/umbraco/backoffice/login', (_req, res, ctx) => {
+  rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
     // Persist user's authentication in the session
     sessionStorage.setItem('is-authenticated', 'true');
     return res(
@@ -21,7 +21,7 @@ export const handlers = [
     );
   }),
 
-  rest.post('/umbraco/backoffice/logout', (_req, res, ctx) => {
+  rest.post('/umbraco/backoffice/user/logout', (_req, res, ctx) => {
     // Persist user's authentication in the session
     sessionStorage.removeItem('is-authenticated');
     return res(
