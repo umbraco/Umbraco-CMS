@@ -5,12 +5,13 @@ export interface InitResponse {
 
 export interface UserResponse {
     username: string;
+    role: string;
 }
 
 export interface UserLoginRequest {
-    userame: string;
+    username: string;
     password: string;
-    role: string;
+    persist: boolean;
 }
 
 export interface ErrorResponse {
