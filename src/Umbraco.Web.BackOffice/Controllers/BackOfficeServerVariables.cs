@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
         private DataTypesSettings _dataTypesSettings;
 
-        [Obsolete("Use constructor that takes IOptionsMontior<DataTypeSettings>")]
+        [Obsolete("Use constructor that takes IOptionsMontior<DataTypeSettings>, scheduled for removal in V12")]
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
