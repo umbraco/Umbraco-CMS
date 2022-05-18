@@ -438,8 +438,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             display.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.ContentTypeName);
             // if your user type doesn't have access to the Settings section it would not get this property mapped
             if (display.DocumentType != null)
+            {
                 display.DocumentType.Name = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Name);
-
+                display.DocumentType.Description = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Description);
+            }
             //remove the listview app if it exists
             display.ContentApps = display.ContentApps.Where(x => x.Alias != "umbListView").ToList();
 

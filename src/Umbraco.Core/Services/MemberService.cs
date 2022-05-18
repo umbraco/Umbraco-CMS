@@ -406,7 +406,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeAlias">Alias of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias)
+        public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -421,7 +421,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberTypeId">Id of the MemberType</param>
         /// <returns><see cref="IEnumerable{IMember}"/></returns>
-        public IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId)
+        public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
         {
             using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -894,17 +894,17 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="memberId"></param>
         /// <returns>A list of member roles</returns>
-        public IEnumerable<string?>? GetAllRoles(int memberId)
+        public IEnumerable<string> GetAllRoles(int memberId)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
                 var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
-                return result.Select(x => x.Name).Distinct();
+                return result.Select(x => x.Name).WhereNotNull().Distinct();
             }
         }
 
-        public IEnumerable<string> GetAllRoles(string? username)
+        public IEnumerable<string> GetAllRoles(string username)
         {
             using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
             {
@@ -1107,7 +1107,7 @@ namespace Umbraco.Cms.Core.Services
                     Name = member.Name,
                     Username = member.Username,
                     Email = member.Email,
-                    Groups = GetAllRoles(member.Id)?.ToList(),
+                    Groups = GetAllRoles(member.Id).ToList(),
                     ContentTypeAlias = member.ContentTypeAlias,
                     CreateDate = member.CreateDate,
                     UpdateDate = member.UpdateDate,

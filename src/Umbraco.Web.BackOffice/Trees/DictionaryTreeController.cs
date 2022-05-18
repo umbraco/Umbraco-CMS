@@ -126,26 +126,28 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = _menuItemCollectionFactory.Create();
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             if (id != Constants.System.RootString)
             {
-                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new MenuItem("export", LocalizedTextService)
                 {
-                    Icon = "download-alt",
+                    Icon = "icon-download-alt",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false
                 });
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
             }
             else
             {
                 menu.Items.Add(new MenuItem("import", LocalizedTextService)
                 {
-                    Icon = "page-up",
+                    Icon = "icon-page-up",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false
                 });
             }
 

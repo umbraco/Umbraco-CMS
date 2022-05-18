@@ -119,17 +119,19 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (id == Constants.System.RootString)
             {
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
                 {
-                    Icon = "page-up",
+                    Icon = "icon-page-up",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false,
                 });
+
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
@@ -138,21 +140,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
             if (container != null)
             {
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new MenuItem("rename", LocalizedTextService)
                 {
-                    Icon = "icon icon-edit"
+                    Icon = "icon-edit",
+                    UseLegacyIcon = false,
                 });
 
                 if (container.HasChildren == false)
                 {
-                    //can delete doc type
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                    // can delete doc type
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 }
+
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
             else
@@ -160,22 +164,25 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 var ct = _contentTypeService.Get(int.Parse(id, CultureInfo.InvariantCulture));
                 var parent = ct == null ? null : _contentTypeService.Get(ct.ParentId);
 
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                //no move action if this is a child doc type
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+
+                // no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 }
-                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
+
+                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new MenuItem("export", LocalizedTextService)
                 {
-                    Icon = "download-alt",
+                    Icon = "icon-download-alt",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false,
                 });
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
-                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
 
             return menu;

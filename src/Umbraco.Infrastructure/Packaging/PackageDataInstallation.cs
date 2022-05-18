@@ -687,7 +687,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                     // The folder might already exist, but with a different key, so check if it exists, even if there is a key.
                     // Level 1 = root level folders, there can only be one with the same name
-                    current ??= _contentTypeService.GetContainers(rootFolder, 1)?.FirstOrDefault();
+                    current ??= _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {

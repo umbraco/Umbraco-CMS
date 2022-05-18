@@ -2722,6 +2722,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       will no longer be available and will be shown as unsupported content.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
+    <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="addThumbnail">Add thumbnail</key>
     <key alias="tabCreateEmpty">Create empty</key>

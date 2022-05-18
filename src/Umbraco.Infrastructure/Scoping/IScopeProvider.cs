@@ -74,7 +74,9 @@ public interface IScopeProvider : ICoreScopeProvider
     /// <para>A detached scope is not ambient and has no parent.</para>
     /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>
     /// </remarks>
-    // TODO: This is not actually used apart from unit tests - I'm assuming it's maybe used by Deploy?
+    /// <remarks>
+    /// This is not used by CMS but is used by Umbraco Deploy.
+    /// </remarks>
     IScope CreateDetachedScope(
         IsolationLevel isolationLevel = IsolationLevel.Unspecified,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,

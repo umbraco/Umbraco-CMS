@@ -43,10 +43,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (id == Constants.System.RootString)
             {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService);
+                // Create the normal create action
+                menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
-                //refresh action
+                // refresh action
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (relationType.IsSystemRelationType() == false)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, useLegacyIcon: false);
             }
 
             return menu;
@@ -70,8 +70,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 nodes.AddRange(_relationService.GetAllRelationTypes()
-                    .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,
-                        "icon-trafic", false)));
+                    .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name, "icon-trafic", false)));
             }
 
             return nodes;

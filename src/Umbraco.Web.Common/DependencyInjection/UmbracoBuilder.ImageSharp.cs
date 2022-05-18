@@ -10,31 +10,34 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 using Umbraco.Cms.Web.Common.Media;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+public static partial class UmbracoBuilderExtensions
 {
-    public static partial class UmbracoBuilderExtensions
+    /// <summary>
+    ///     Adds Image Sharp with Umbraco settings
+    /// </summary>
+    public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
     {
-        /// <summary>
-        /// Adds Image Sharp with Umbraco settings
-        /// </summary>
-        public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
-        {
-            builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+        builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            builder.Services.AddImageSharp()
-                // Replace default image provider
-                .ClearProviders()
-                .AddProvider<WebRootImageProvider>()
-                // Add custom processors
-                .AddProcessor<CropWebProcessor>();
+        builder.Services.AddImageSharp()
 
-            // Configure middleware
-            builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ConfigureImageSharpMiddlewareOptions>();
+            // Replace default image provider
+            .ClearProviders()
+            .AddProvider<WebRootImageProvider>()
 
-            // Configure cache options
-            builder.Services.AddTransient<IConfigureOptions<PhysicalFileSystemCacheOptions>, ConfigurePhysicalFileSystemCacheOptions>();
+            // Add custom processors
+            .AddProcessor<CropWebProcessor>();
 
-            return builder.Services;
-        }
+        // Configure middleware
+        builder.Services
+            .AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ConfigureImageSharpMiddlewareOptions>();
+
+        // Configure cache options
+        builder.Services
+            .AddTransient<IConfigureOptions<PhysicalFileSystemCacheOptions>, ConfigurePhysicalFileSystemCacheOptions>();
+
+        return builder.Services;
     }
 }

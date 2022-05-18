@@ -300,8 +300,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 if (mediaValues is not null)
                 {
-                    foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value.HasValues)
-                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                    foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value?.HasValues ?? false)
+                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value!["udi"])))
                     {
                         yield return umbracoEntityReference;
                     }

@@ -471,14 +471,17 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 }
 
                 var menu = MenuItemCollectionFactory.Create();
+
                 // only add empty recycle bin if the current user is allowed to delete by default
                 if (deleteAllowed)
                 {
                     menu.Items.Add(new MenuItem("emptyrecyclebin", LocalizedTextService)
                     {
-                        Icon = "trash",
-                        OpensDialog = true
+                        Icon = "icon-trash",
+                        OpensDialog = true,
+                        UseLegacyIcon = false,
                     });
+
                     menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 }
                 return menu;

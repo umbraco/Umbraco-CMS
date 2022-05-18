@@ -65,10 +65,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     var hasChildren = FileSystem is not null && (FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any());
 
                     var name = Path.GetFileName(directory);
-                    var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
+                    var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, Constants.Icons.Folder, hasChildren);
+
                     OnRenderFolderNode(ref node);
+
                     if (node != null)
+                    {
                         nodes.Add(node);
+                    }
                 }
             }
 
@@ -94,9 +98,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                     var name = Path.GetFileName(file);
                     var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
+
                     OnRenderFileNode(ref node);
+
                     if (node != null)
+                    {
                         nodes.Add(node);
+                    }
                 }
             }
 
@@ -112,8 +120,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //check if there are any children
+            // check if there are any children
             var treeNodesResult = GetTreeNodes(Constants.System.RootString, queryStrings);
+
             if (!(treeNodesResult.Result is null))
             {
                 return treeNodesResult.Result;
@@ -132,11 +141,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = MenuItemCollectionFactory.Create();
 
-            //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
-            //create action
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-            //refresh action
+
+            // create action
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+
+            // refresh action
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
@@ -146,21 +157,22 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = MenuItemCollectionFactory.Create();
 
-            //set the default to create
+            // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
-            //create action
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+
+            // create action
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             var hasChildren = FileSystem is not null && (FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any());
 
-            //We can only delete folders if it doesn't have any children (folders or files)
+            // We can only delete folders if it doesn't have any children (folders or files)
             if (hasChildren == false)
             {
-                //delete action
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                // delete action
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
             }
 
-            //refresh action
+            // refresh action
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
@@ -170,8 +182,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = MenuItemCollectionFactory.Create();
 
-            //if it's not a directory then we only allow to delete the item
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            // if it's not a directory then we only allow to delete the item
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             return menu;
         }

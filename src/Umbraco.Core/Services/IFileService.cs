@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
@@ -10,6 +7,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]
         IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
         void CreatePartialViewFolder(string folderPath);
         void CreatePartialViewMacroFolder(string folderPath);
@@ -36,7 +34,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the partial view.</param>
         /// <returns>The content of the partial view.</returns>
-        Stream? GetPartialViewFileContentStream(string filepath);
+        Stream GetPartialViewFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a partial view.
@@ -57,7 +55,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the macro partial view.</param>
         /// <returns>The content of the macro partial view.</returns>
-        Stream? GetPartialViewMacroFileContentStream(string filepath);
+        Stream GetPartialViewMacroFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a macro partial view.
@@ -118,7 +116,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
         /// <returns>The content of the stylesheet.</returns>
-        Stream? GetStylesheetFileContentStream(string filepath);
+        Stream GetStylesheetFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a stylesheet.
@@ -179,7 +177,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the script.</param>
         /// <returns>The content of the script file.</returns>
-        Stream? GetScriptFileContentStream(string filepath);
+        Stream GetScriptFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a script file.
@@ -199,13 +197,13 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        IEnumerable<ITemplate>? GetTemplates(params string[] aliases);
+        IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
         /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
-        IEnumerable<ITemplate>? GetTemplates(int masterTemplateId);
+        IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its alias.
@@ -274,7 +272,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The content of the template.</returns>
-        Stream? GetTemplateFileContentStream(string filepath);
+        Stream GetTemplateFileContentStream(string filepath);
 
         /// <summary>
         /// Sets the content of a template.
@@ -295,6 +293,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns></returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewMacroSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewMacroSnippetContent(string snippetName);
 
         /// <summary>
@@ -302,6 +301,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns>The content of the partial view.</returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewSnippetContent(string snippetName);
     }
 }

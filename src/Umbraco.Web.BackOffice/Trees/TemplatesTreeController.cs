@@ -111,13 +111,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             var menu = _menuItemCollectionFactory.Create();
 
-            //Create the normal create action
-            var item = menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            // Create the normal create action
+            var item = menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             item?.NavigateToRoute($"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
             if (id == Constants.System.RootString)
             {
-                //refresh action
+                // refresh action
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
@@ -127,16 +127,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (template == null) return menu;
             var entity = FromTemplate(template);
 
-            //don't allow delete if it has child layouts
+            // don't allow delete if it has child layouts
             if (template.IsMasterTemplate == false)
             {
-                //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
+                // add delete option if it doesn't have children
+                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
             }
 
-            //add refresh
+            // add refresh
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
-
 
             return menu;
         }

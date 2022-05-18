@@ -14,7 +14,7 @@
                     ng-class="{sep:action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in menuActions">
                     <button type="button" ng-click="executeMenuItem(action)"
                         class="umb-action-link btn-reset umb-outline">
-                        <umb-icon icon="icon-{{action.cssclass}}" class="icon"></umb-icon>
+                        <umb-icon icon="{{action.icon}}" class="icon"></umb-icon>
                         <span class="menu-label">{{action.name}}</span>
                     </button>
                 </li>

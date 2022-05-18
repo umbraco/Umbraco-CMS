@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Core.Services
 
         IEnumerable<IMemberGroup> GetAllRoles();
 
-        IEnumerable<string?>? GetAllRoles(int memberId);
+        IEnumerable<string> GetAllRoles(int memberId);
 
-        IEnumerable<string> GetAllRoles(string? username);
+        IEnumerable<string> GetAllRoles(string username);
 
         IEnumerable<int> GetAllRolesIds();
 
