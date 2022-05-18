@@ -32,7 +32,7 @@ public class DataTypeUsageRepository : IDataTypeUsageRepository
             .Where<PropertyTypeDto>(pt => pt.DataTypeId == dataTypeId, "pt");
 
         Sql<ISqlContext> hasValueQuery = database.SqlContext.Sql()
-            .SelectAnyExists(selectQuery);
+            .SelectAnyIfExists(selectQuery);
 
         return database.ExecuteScalar<bool>(hasValueQuery);
     }

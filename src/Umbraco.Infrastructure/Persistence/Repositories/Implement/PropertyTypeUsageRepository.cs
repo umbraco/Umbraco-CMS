@@ -33,7 +33,7 @@ internal class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
             .Where<PropertyTypeDto>(m => m.Alias == propertyTypeAlias, "m");
 
         Sql<ISqlContext> hasValuesQuery = database.SqlContext.Sql()
-            .SelectAnyExists(selectQuery);
+            .SelectAnyIfExists(selectQuery);
 
         return database.ExecuteScalar<bool>(hasValuesQuery);
     }

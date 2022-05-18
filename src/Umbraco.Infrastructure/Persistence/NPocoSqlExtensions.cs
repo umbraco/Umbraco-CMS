@@ -851,7 +851,7 @@ namespace Umbraco.Extensions
         /// <param name="sql">The original SQL.</param>
         /// <param name="nestedSelect">The nested select to run the query against.</param>
         /// <returns>The updated Sql statement.</returns>
-        public static Sql<ISqlContext> SelectAnyExists(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect)
+        public static Sql<ISqlContext> SelectAnyIfExists(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect)
         {
             sql.Append("SELECT CASE WHEN EXISTS (");
             sql.Append(nestedSelect);
