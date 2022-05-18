@@ -2,6 +2,7 @@ using System.Data.Common;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -36,6 +37,15 @@ public static class UmbracoBuilderExtensions
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
         DbProviderFactories.RegisterFactory(Constants.ProviderName, SqlClientFactory.Instance);
+
+        // Support provider name set by the configuration API for connection string environment variables
+        builder.Services.ConfigureAll<ConnectionStrings>(options =>
+        {
+            if (options.ProviderName == "System.Data.SqlClient")
+            {
+                options.ProviderName = Constants.ProviderName;
+            }
+        });
 
         return builder;
     }

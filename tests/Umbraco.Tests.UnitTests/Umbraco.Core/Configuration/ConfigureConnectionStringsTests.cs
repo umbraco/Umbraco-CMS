@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Configuration;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration;
 
 [TestFixture]
 public class ConfigureConnectionStringsTests
@@ -27,7 +27,7 @@ public class ConfigureConnectionStringsTests
         var configuration = configurationBuilder.Build();
 
         var services = new ServiceCollection();
-        services.AddOptions<ConnectionStrings>().Bind(configuration.GetSection("ConnectionStrings"));
+        services.AddOptions();
         services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
         services.AddSingleton<IConfiguration>(configuration);
 
