@@ -1,7 +1,9 @@
-import { html, css, LitElement, CSSResultGroup } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+
+import { postUserLogin } from '../../api/fetcher';
 
 // create custom element with lit-element named 'umb-login'
 
@@ -43,7 +45,7 @@ export class UmbLogin extends LitElement {
     this._loggingIn = true;
 
     try {
-      await fetch('/login', { method: 'POST' });
+      await postUserLogin({ username, password, persist });
       this._loggingIn = false;
       // TODO: Change to redirect when router has been added.
       this.dispatchEvent(new CustomEvent('login', { bubbles: true, composed: true, detail: { username, password, persist } }));

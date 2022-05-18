@@ -1,16 +1,16 @@
-import './installer/installer.element';
 import './auth/login/umb-login.element';
 import './auth/umb-auth-layout.element';
 import './backoffice/umb-backoffice.element';
-
+import './installer/installer.element';
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
+import { getInitStatus } from './api/fetcher';
+import { UmbRoute, UmbRouter } from './core/router';
 import { worker } from './mocks/browser';
-import { UmbRouter, UmbRoute } from './core/router';
 
 const routes: Array<UmbRoute> = [
   {
@@ -66,8 +66,7 @@ export class UmbApp extends LitElement {
     this._router.setRoutes(routes);
 
     try {
-      const res = await fetch('/init', { method: 'POST' });
-      const data = await res.json();
+      const { data } = await getInitStatus({});
 
       if (!data.installed) {
         this._router.push('/install');

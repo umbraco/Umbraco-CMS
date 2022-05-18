@@ -1,6 +1,8 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
+import { postInstall } from '../api/fetcher';
+
 @customElement('umb-installer-user')
 export class UmbInstallerUser extends LitElement {
   static styles: CSSResultGroup = [
@@ -35,7 +37,7 @@ export class UmbInstallerUser extends LitElement {
     console.log('Installing', name, email, password, news);
 
     try {
-      await fetch('/install', { method: 'POST' });
+      await postInstall({});
 
       // TODO: Change to redirect when router has been added.
       this.dispatchEvent(new CustomEvent('install', { bubbles: true, composed: true }));
