@@ -4,7 +4,7 @@
   "description": "This is to be deleted when schema generation moves somewhere else",
   "main": "api.ts",
   "scripts": {
-    "generate": "npx @airtasker/spot generate --contract api.ts --language yaml --generator openapi3 --out ../schemas/api.yml",
+    "generate": "npx @airtasker/spot generate --contract api.ts --language yaml --generator openapi3 --out ../schemas/api",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "JOV",
