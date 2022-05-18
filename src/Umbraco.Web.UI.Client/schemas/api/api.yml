@@ -1,0 +1,119 @@
+openapi: 3.0.2
+info:
+  title: umbraco-backoffice-api
+  version: 1.0.0
+paths:
+  /init:
+    get:
+      operationId: GetInit
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/login:
+    post:
+      operationId: PostUserLogin
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        '201':
+          description: 201 response
+        '403':
+          description: 403 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/logout:
+    post:
+      operationId: PostUserLogout
+      responses:
+        '201':
+          description: 201 response
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user:
+    get:
+      operationId: GetUser
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: 403 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /install:
+    post:
+      operationId: PostInstall
+      responses:
+        '201':
+          description: 201 response
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    InitResponse:
+      type: object
+      properties:
+        version:
+          type: string
+        installed:
+          type: boolean
+      required:
+        - version
+        - installed
+    ErrorResponse:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+      required:
+        - errorMessage
+    UserLoginRequest:
+      type: object
+      properties:
+        userame:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+      required:
+        - userame
+        - password
+        - role
+    UserResponse:
+      type: object
+      properties:
+        username:
+          type: string
+      required:
+        - username
