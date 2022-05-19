@@ -8,6 +8,9 @@
     "preview": "vite preview --open",
     "test": "echo 'TODO: Implement test'",
     "lint": "eslint . --ext .ts --cache",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier 'src/**/*.ts'",
+    "format:fix": "npm run format -- --write",
     "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts"
   },
   "engines": {
