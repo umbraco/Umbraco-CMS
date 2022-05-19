@@ -1,9 +1,12 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import './installer-layout.element';
-import './installer-user.element';
 import './installer-database.element';
 import './installer-installing.element';
+import './installer-layout.element';
+import './installer-user.element';
+
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
+
+import { getInstall } from '../api/fetcher';
 
 @customElement('umb-installer')
 export class UmbInstaller extends LitElement {
@@ -29,6 +32,10 @@ export class UmbInstaller extends LitElement {
     this.addEventListener('install', () => this._handleInstall());
     this.addEventListener('customize', () => this._handleCustomize());
     this.addEventListener('user', () => this._handleUser());
+
+    getInstall({}).then(({ data }) => {
+      console.log('install data', data);
+    });
   }
 
   private _handleUser() {
