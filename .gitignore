@@ -54,6 +54,10 @@ preserve.belle
 /src/Umbraco.Web.UI.Docs/api/
 /src/Umbraco.Web.UI.Docs/package-lock.json
 
+# csharp-docs
+/build/csharp-docs/api/
+/build/csharp-docs/_site/
+
 # Build
 /build.out/
 /build.tmp/
@@ -64,8 +68,6 @@ preserve.belle
 /build/docs.zip
 /build/ui-docs.zip
 /build/csharp-docs.zip
-/build/ApiDocs/
-/src/ApiDocs/api/
 /src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
 
 # Environment specific data
