@@ -1,3 +1,5 @@
+import './installer';
+
 import { api, body, defaultResponse, endpoint, request, response } from '@airtasker/spot';
 
 import { ErrorResponse, InitResponse, UserLoginRequest, UserResponse } from './models';
@@ -55,16 +57,4 @@ class GetUser {
 
   @response({ status: 403 })
   failure(@body body: ErrorResponse) { }
-}
-
-@endpoint({
-  method: "POST",
-  path: "/install",
-})
-class PostInstall {
-  @response({ status: 201 })
-  success() { }
-
-  @defaultResponse
-  default(@body body: ErrorResponse) { }
 }

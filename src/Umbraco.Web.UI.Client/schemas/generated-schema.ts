@@ -17,6 +17,7 @@ export interface paths {
     get: operations["GetUser"];
   };
   "/install": {
+    get: operations["GetInstall"];
     post: operations["PostInstall"];
   };
 }
@@ -38,6 +39,52 @@ export interface components {
     UserResponse: {
       username: string;
       role: string;
+    };
+    ConsentLevel: {
+      /** @enum {string} */
+      level: "Minimal" | "Basic" | "Detailed";
+      description: string;
+    };
+    UmbracoDatabaseConfiguration: {
+      id: string;
+      /** Format: float */
+      sortOrder: number;
+      displayName: string;
+      defaultDatabaseName: string;
+      providerName: string | null;
+      supportsQuickInstall: boolean;
+      isAvailable: boolean;
+      requiresServer: boolean;
+      serverPlaceholder: string | null;
+      requiresCredentials: boolean;
+      supportsIntegratedAuthentication: boolean;
+      requiresConnectionTest: boolean;
+    };
+    UmbracoDatabaseConfigurationQuickInstall: {
+      displayName: string;
+      defaultDatabaseName: string;
+    };
+    UmbracoInstallerStepModel: {
+      /** Format: float */
+      minCharLength?: number;
+      /** Format: float */
+      minNonAlphaNumericLength?: number;
+      customInstallAvailable?: boolean;
+      consentLevels?: components["schemas"]["ConsentLevel"][];
+      databases?: components["schemas"]["UmbracoDatabaseConfiguration"][];
+      quickInstallSettings?: components["schemas"]["UmbracoDatabaseConfigurationQuickInstall"];
+    };
+    UmbracoInstallerStep: {
+      model: components["schemas"]["UmbracoInstallerStepModel"] | null;
+      view: string;
+      name: string;
+      description: string;
+      /** Format: float */
+      serverOrder: number;
+    };
+    UmbracoInstaller: {
+      installId: string;
+      steps: components["schemas"]["UmbracoInstallerStep"][];
     };
   };
 }
@@ -105,15 +152,31 @@ export interface operations {
       };
     };
   };
+  GetInstall: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UmbracoInstaller"];
+        };
+      };
+    };
+  };
   PostInstall: {
+    parameters: {};
     responses: {
       /** 201 response */
       201: unknown;
-      /** default response */
-      default: {
+      /** 400 response */
+      400: {
         content: {
           "application/json": components["schemas"]["ErrorResponse"];
         };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UmbracoInstaller"];
       };
     };
   };

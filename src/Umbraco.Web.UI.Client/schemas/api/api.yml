@@ -67,13 +67,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /install:
+    get:
+      operationId: GetInstall
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UmbracoInstaller'
     post:
       operationId: PostInstall
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UmbracoInstaller'
+        required: true
       responses:
         '201':
           description: 201 response
-        default:
-          description: default response
+        '400':
+          description: 400 response
           content:
             application/json:
               schema:
@@ -120,3 +136,124 @@ components:
       required:
         - username
         - role
+    ConsentLevel:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+            - Minimal
+            - Basic
+            - Detailed
+        description:
+          type: string
+      required:
+        - level
+        - description
+    UmbracoDatabaseConfiguration:
+      type: object
+      properties:
+        id:
+          type: string
+        sortOrder:
+          type: number
+          format: float
+        displayName:
+          type: string
+        defaultDatabaseName:
+          type: string
+        providerName:
+          type: string
+          nullable: true
+        supportsQuickInstall:
+          type: boolean
+        isAvailable:
+          type: boolean
+        requiresServer:
+          type: boolean
+        serverPlaceholder:
+          type: string
+          nullable: true
+        requiresCredentials:
+          type: boolean
+        supportsIntegratedAuthentication:
+          type: boolean
+        requiresConnectionTest:
+          type: boolean
+      required:
+        - id
+        - sortOrder
+        - displayName
+        - defaultDatabaseName
+        - providerName
+        - supportsQuickInstall
+        - isAvailable
+        - requiresServer
+        - serverPlaceholder
+        - requiresCredentials
+        - supportsIntegratedAuthentication
+        - requiresConnectionTest
+    UmbracoDatabaseConfigurationQuickInstall:
+      type: object
+      properties:
+        displayName:
+          type: string
+        defaultDatabaseName:
+          type: string
+      required:
+        - displayName
+        - defaultDatabaseName
+    UmbracoInstallerStepModel:
+      type: object
+      properties:
+        minCharLength:
+          type: number
+          format: float
+        minNonAlphaNumericLength:
+          type: number
+          format: float
+        customInstallAvailable:
+          type: boolean
+        consentLevels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentLevel'
+        databases:
+          type: array
+          items:
+            $ref: '#/components/schemas/UmbracoDatabaseConfiguration'
+        quickInstallSettings:
+          $ref: '#/components/schemas/UmbracoDatabaseConfigurationQuickInstall'
+    UmbracoInstallerStep:
+      type: object
+      properties:
+        model:
+          $ref: '#/components/schemas/UmbracoInstallerStepModel'
+          nullable: true
+        view:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        serverOrder:
+          type: number
+          format: float
+      required:
+        - model
+        - view
+        - name
+        - description
+        - serverOrder
+    UmbracoInstaller:
+      type: object
+      properties:
+        installId:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/UmbracoInstallerStep'
+      required:
+        - installId
+        - steps
