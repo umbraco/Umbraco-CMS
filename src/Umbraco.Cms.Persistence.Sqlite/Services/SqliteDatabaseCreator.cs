@@ -74,7 +74,7 @@ public class SqliteDatabaseCreator : IDatabaseCreator
          */
 
         var tempFile = Path.GetTempFileName();
-        var tempConnectionString = new SqliteConnectionStringBuilder { DataSource = tempFile };
+        var tempConnectionString = new SqliteConnectionStringBuilder { DataSource = tempFile, Pooling = false };
 
         using (var connection = new SqliteConnection(tempConnectionString.ConnectionString))
         {

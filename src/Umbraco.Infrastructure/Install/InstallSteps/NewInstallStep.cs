@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -153,10 +153,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             get
             {
-                var quickInstallSettings = _databaseProviderMetadata
-                    .Where(x => x.SupportsQuickInstall)
-                    .Where(x => x.IsAvailable)
-                    .OrderBy(x => x.SortOrder)
+                var quickInstallSettings = _databaseProviderMetadata.GetAvailable(true)
                     .Select(x => new
                     {
                         displayName = x.DisplayName,

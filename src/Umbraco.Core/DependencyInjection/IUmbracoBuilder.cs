@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         IProfiler Profiler { get; }
         AppCaches AppCaches { get; }
-        TBuilder? WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder;
+        TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder;
         void Build();
     }
 }

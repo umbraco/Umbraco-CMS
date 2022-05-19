@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="propertyType">The value property type</param>
         /// <param name="dependencies">The content dependencies.</param>
         /// <returns>The deploy property value.</returns>
-        string ToArtifact(object value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies);
+        string? ToArtifact(object? value, IPropertyType propertyType, ICollection<ArtifactDependency> dependencies);
 
         /// <summary>
         /// Gets the content property value corresponding to a deploy property value.
@@ -32,6 +32,6 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="propertyType">The value property type<</param>
         /// <param name="currentValue">The current content property value.</param>
         /// <returns>The content property value.</returns>
-        object FromArtifact(string value, IPropertyType propertyType, object currentValue);
+        object? FromArtifact(string? value, IPropertyType propertyType, object? currentValue);
     }
 }

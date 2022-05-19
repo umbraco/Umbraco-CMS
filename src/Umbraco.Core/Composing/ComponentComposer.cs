@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Composing
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <inheritdoc />
         public virtual void Compose(IUmbracoBuilder builder)
         {
-            builder.Components()?.Append<TComponent>();
+            builder.Components().Append<TComponent>();
         }
 
         // note: thanks to this class, a component that does not compose anything can be

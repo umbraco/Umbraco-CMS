@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
@@ -11,7 +9,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var assigned = domainCache.GetAssigned(documentId, includeWildcards);
 
             // It's super important that we always compare cultures with ignore case, since we can't be sure of the casing!
-            return culture is null ? assigned.Any() : assigned.Any(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
+            // Comparing with string.IsNullOrEmpty since both empty string and null signifies invariant.
+            return string.IsNullOrEmpty(culture) ? assigned.Any() : assigned.Any(x => x.Culture?.Equals(culture, StringComparison.InvariantCultureIgnoreCase) ?? false);
         }
     }
 }
