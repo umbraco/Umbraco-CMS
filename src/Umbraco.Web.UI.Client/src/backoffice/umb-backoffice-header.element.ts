@@ -1,7 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-
+import { when } from 'lit/directives/when.js';
 import { getUserSections } from '../api/fetcher';
 
 @customElement('umb-backoffice-header')
@@ -74,8 +74,35 @@ export class UmbBackofficeHeader extends LitElement {
   @state()
   private _open = false;
 
+  // TODO: these should come from all registered sections
   @state()
-  private _sections: Array<string> = ['Content', 'Media', 'Members', 'Settings', 'Packages'];
+  private _sections: Array<any> = [
+    {
+      type: 'section',
+      alias: 'Umb.Section.Content',
+      name: 'Content',
+    },
+    {
+      type: 'section',
+      alias: 'Umb.Section.Media',
+      name: 'Media',
+    },
+    {
+      type: 'section',
+      alias: 'Umb.Section.Members',
+      name: 'Members',
+    },
+    {
+      type: 'section',
+      alias: 'Umb.Section.Settings',
+      name: 'Settings',
+    },
+    {
+      type: 'section',
+      alias: 'Umb.Section.Packages',
+      name: 'Packages',
+    },
+  ];
 
   @state()
   private _activeSection: string = this._sections[0];
@@ -84,10 +111,10 @@ export class UmbBackofficeHeader extends LitElement {
   private _availableSections: string[] = [];
 
   @state()
-  private _visibleSections: Array<string> = ['Content', 'Media', 'Members'];
+  private _visibleSections: Array<string> = [];
 
   @state()
-  private _extraSections: Array<string> = ['Settings', 'Packages'];
+  private _extraSections: Array<string> = [];
 
   private _handleMore(e: MouseEvent) {
     e.stopPropagation();
@@ -121,7 +148,36 @@ export class UmbBackofficeHeader extends LitElement {
     const { data } = await getUserSections({});
 
     this._availableSections = data.sections;
-    this._visibleSections = data.sections;
+    this._visibleSections = this._sections
+      .filter((section) => this._availableSections.includes(section.alias))
+      .map((section) => section.name);
+    this._activeSection = this._visibleSections?.[0];
+  }
+
+  private _renderExtraSections() {
+    return when(
+      this._extraSections.length > 0,
+      () => html`
+        <uui-tab id="moreTab" @click="${this._handleTabClick}">
+          <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
+            <uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
+              <uui-symbol-more></uui-symbol-more>
+            </uui-button>
+
+            <div slot="popover" id="dropdown">
+              ${this._extraSections.map(
+                (section) => html`
+                  <uui-menu-item
+                    ?active="${this._activeSection === section}"
+                    label="${section}"
+                    @click-label="${this._handleLabelClick}"></uui-menu-item>
+                `
+              )}
+            </div>
+          </uui-popover>
+        </uui-tab>
+      `
+    );
   }
 
   render() {
@@ -134,32 +190,14 @@ export class UmbBackofficeHeader extends LitElement {
         <div id="sections">
           <uui-tab-group id="tabs">
             ${this._visibleSections.map(
-      (section) => html`
+              (section) => html`
                 <uui-tab
                   ?active="${this._activeSection === section}"
                   label="${section}"
                   @click="${this._handleTabClick}"></uui-tab>
               `
-    )}
-
-            <uui-tab id="moreTab" @click="${this._handleTabClick}">
-              <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
-                <uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
-                  <uui-symbol-more></uui-symbol-more>
-                </uui-button>
-
-                <div slot="popover" id="dropdown">
-                  ${this._extraSections.map(
-      (section) => html`
-                      <uui-menu-item
-                        ?active="${this._activeSection === section}"
-                        label="${section}"
-                        @click-label="${this._handleLabelClick}"></uui-menu-item>
-                    `
-    )}
-                </div>
-              </uui-popover>
-            </uui-tab>
+            )}
+            ${this._renderExtraSections()}
           </uui-tab-group>
         </div>
 

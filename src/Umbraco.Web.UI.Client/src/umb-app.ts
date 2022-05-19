@@ -11,6 +11,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { getInitStatus } from './api/fetcher';
 import { UmbRoute, UmbRouter } from './core/router';
 import { worker } from './mocks/browser';
+import { UmbContextProvideMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
   {
@@ -22,14 +23,14 @@ const routes: Array<UmbRoute> = [
     elementName: 'umb-installer',
   },
   {
-    path: '/content',
+    path: '/section/:section',
     elementName: 'umb-backoffice',
   },
 ];
 
 // Import somewhere else?
 @customElement('umb-app')
-export class UmbApp extends LitElement {
+export class UmbApp extends UmbContextProvideMixin(LitElement) {
   static styles = css`
     :host,
     #outlet {
@@ -50,20 +51,15 @@ export class UmbApp extends LitElement {
     this._authorized = sessionStorage.getItem('is-authenticated') === 'true';
   }
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    // TODO: remove when router can be injected into login element
-    this.addEventListener('login', () => {
-      this._router?.push('/content');
-    });
-  }
-
   protected async firstUpdated(): Promise<void> {
     const outlet = this.shadowRoot?.getElementById('outlet');
     if (!outlet) return;
 
     this._router = new UmbRouter(this, outlet);
     this._router.setRoutes(routes);
+
+    // TODO: find a solution for magic strings
+    this.provide('umbRouter', this._router);
 
     try {
       const { data } = await getInitStatus({});
@@ -76,7 +72,7 @@ export class UmbApp extends LitElement {
       if (!this._authorized) {
         this._router.push('/login');
       } else {
-        this._router.push('/content');
+        this._router.push('/section/content');
       }
     } catch (error) {
       console.log(error);
