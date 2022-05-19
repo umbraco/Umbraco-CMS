@@ -13,7 +13,7 @@ export class UmbInstaller extends LitElement {
   static styles: CSSResultGroup = [css``];
 
   @state()
-  step = 1;
+  step = 2;
 
   private _renderSection() {
     switch (this.step) {
@@ -30,7 +30,7 @@ export class UmbInstaller extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('install', () => this._handleInstall());
-    this.addEventListener('customize', () => this._handleCustomize());
+    this.addEventListener('database', () => this._handleDatabase());
     this.addEventListener('user', () => this._handleUser());
 
     getInstall({}).then(({ data }) => {
@@ -42,7 +42,7 @@ export class UmbInstaller extends LitElement {
     this.step = 1;
   }
 
-  private _handleCustomize() {
+  private _handleDatabase() {
     this.step = 2;
   }
 

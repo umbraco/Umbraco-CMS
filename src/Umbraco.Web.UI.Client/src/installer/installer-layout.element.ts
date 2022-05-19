@@ -37,8 +37,9 @@ export class UmbInstallerLayout extends LitElement {
       }
 
       #box {
-        width: 500px;
-        padding: var(--uui-size-space-4) var(--uui-size-space-6) var(--uui-size-space-6) var(--uui-size-space-6);
+        width: 450px;
+        box-sizing: border-box;
+        padding: var(--uui-size-layout-1) var(--uui-size-layout-2) var(--uui-size-layout-2) var(--uui-size-layout-2);
       }
     `,
   ];
