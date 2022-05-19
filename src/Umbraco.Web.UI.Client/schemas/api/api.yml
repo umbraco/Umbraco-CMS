@@ -99,7 +99,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UmbracoInstaller'
+              $ref: '#/components/schemas/UmbracoInstallerPerformInstallRequest'
+        required: true
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /install/database/validate:
+    post:
+      operationId: PostInstallValidateDatabase
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UmbracoInstallerDatabaseConfiguration'
         required: true
       responses:
         '201':
@@ -277,3 +296,45 @@ components:
       required:
         - installId
         - steps
+    UmbracoInstallerDatabaseConfiguration:
+      type: object
+      properties:
+        connectionString:
+          type: string
+        providerName:
+          type: string
+        integratedAuth:
+          type: boolean
+        databaseProviderMetadataId:
+          type: string
+      required:
+        - connectionString
+        - providerName
+        - integratedAuth
+        - databaseProviderMetadataId
+    UmbracoInstallerPerformInstallRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        subscribeToNewsletter:
+          type: boolean
+        telemetryLevel:
+          type: string
+          enum:
+            - Minimal
+            - Basic
+            - Detailed
+        database:
+          $ref: '#/components/schemas/UmbracoInstallerDatabaseConfiguration'
+      required:
+        - name
+        - email
+        - password
+        - subscribeToNewsletter
+        - telemetryLevel
+        - database

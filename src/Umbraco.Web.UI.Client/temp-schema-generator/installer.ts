@@ -17,13 +17,44 @@ export class GetInstall {
 })
 export class PostInstall {
     @request
-    request(@body body: UmbracoInstaller) { }
+    request(@body body: UmbracoInstallerPerformInstallRequest) { }
 
     @response({ status: 201 })
     success() { }
 
     @response({ status: 400 })
     badRequest(@body body: ErrorResponse) { }
+}
+
+@endpoint({
+    method: 'POST',
+    path: '/install/database/validate'
+})
+export class PostInstallValidateDatabase {
+    @request
+    request(@body body: UmbracoInstallerDatabaseConfiguration) { }
+
+    @response({ status: 201 })
+    success() { }
+
+    @response({ status: 400 })
+    badRequest(@body body: ErrorResponse) { }
+}
+
+export interface UmbracoInstallerPerformInstallRequest {
+    name: string;
+    email: string;
+    password: string;
+    subscribeToNewsletter: boolean;
+    telemetryLevel: 'Minimal' | 'Basic' | 'Detailed';
+    database: UmbracoInstallerDatabaseConfiguration;
+}
+
+export interface UmbracoInstallerDatabaseConfiguration {
+    connectionString: string;
+    providerName: string;
+    integratedAuth: boolean;
+    databaseProviderMetadataId: string;
 }
 
 export interface UmbracoInstaller {

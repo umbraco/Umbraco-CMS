@@ -41,11 +41,23 @@ export class UmbInstallerUser extends LitElement {
     this._install(name, email, password, news);
   };
 
-  private async _install(name: string, email: string, password: string, news: boolean) {
-    console.log('Installing', name, email, password, news);
+  private async _install(name: string, email: string, password: string, subscribeToNewsletter: boolean) {
+    console.log('Installing', name, email, password, subscribeToNewsletter);
 
     try {
-      await postInstall({});
+      await postInstall({
+        name,
+        email,
+        password,
+        telemetryLevel: 'Basic',
+        subscribeToNewsletter,
+        database: {
+          connectionString: '',
+          databaseProviderMetadataId: '1',
+          integratedAuth: false,
+          providerName: 'SQLite'
+        }
+      });
 
       // TODO: Change to redirect when router has been added.
       this.dispatchEvent(new CustomEvent('install', { bubbles: true, composed: true }));

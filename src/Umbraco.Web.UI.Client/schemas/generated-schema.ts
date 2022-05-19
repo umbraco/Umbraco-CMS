@@ -23,6 +23,9 @@ export interface paths {
     get: operations["GetInstall"];
     post: operations["PostInstall"];
   };
+  "/install/database/validate": {
+    post: operations["PostInstallValidateDatabase"];
+  };
 }
 
 export interface components {
@@ -90,6 +93,21 @@ export interface components {
     UmbracoInstaller: {
       installId: string;
       steps: components["schemas"]["UmbracoInstallerStep"][];
+    };
+    UmbracoInstallerDatabaseConfiguration: {
+      connectionString: string;
+      providerName: string;
+      integratedAuth: boolean;
+      databaseProviderMetadataId: string;
+    };
+    UmbracoInstallerPerformInstallRequest: {
+      name: string;
+      email: string;
+      password: string;
+      subscribeToNewsletter: boolean;
+      /** @enum {string} */
+      telemetryLevel: "Minimal" | "Basic" | "Detailed";
+      database: components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
     };
   };
 }
@@ -197,7 +215,25 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UmbracoInstaller"];
+        "application/json": components["schemas"]["UmbracoInstallerPerformInstallRequest"];
+      };
+    };
+  };
+  PostInstallValidateDatabase: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
       };
     };
   };
