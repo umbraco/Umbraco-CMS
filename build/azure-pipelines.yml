@@ -108,7 +108,7 @@ stages:
               artifactName: build_output
 
   - stage: Build_Docs
-    condition: and(succeeded(), or(startsWith('$(build.sourceBranch)', 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
@@ -274,7 +274,7 @@ stages:
 
       # Integration Tests (SQL Server)
       - job:
-        condition: or(startsWith('$(build.sourceBranch)', 'refs/heads/release/'), ${{parameters.sqlServerIntegrationTests}})
+        condition: or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.sqlServerIntegrationTests}})
         displayName: Integration Tests (SQL Server)
         strategy:
           matrix:
@@ -457,7 +457,7 @@ stages:
       - Unit
       - Integration
       # - E2E # TODO: Enable when stable.
-    condition: and(succeeded(), or(startsWith('$(build.sourceBranch)', 'refs/heads/release/'), ${{parameters.myGetDeploy}}))
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
         displayName: Push to pre-release feed
@@ -481,7 +481,7 @@ stages:
     dependsOn:
       - Deploy_MyGet
       - Build_Docs
-    condition: and(succeeded(), or(startsWith('$(build.sourceBranch)', 'refs/heads/release/'), ${{parameters.nuGetDeploy}}))
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
         displayName: Push to NuGet
@@ -509,7 +509,7 @@ stages:
     dependsOn:
       - Build
       - Deploy_NuGet
-    condition: and(succeeded(), or(startsWith('$(build.sourceBranch)', 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
         displayName: Upload C# Docs
