@@ -15,11 +15,12 @@ export function UmbContextInjectMixin<TBase extends Constructor>(Base: TBase) {
      * @param {string} contextKey
      */
     requestContext(contextKey: string) {
-      if (this._requesters.has(contextKey)) {
-        return;
-      }
+      if (this._requesters.has(contextKey)) return;
 
       const requester = new UmbContextRequester(this, contextKey, (_instance: any) => {
+        // don't to anything if the context is already resolved
+        if (this._resolved.has(contextKey) && this._resolved.get(contextKey) === _instance) return;
+        
         this._resolved.set(contextKey, _instance);
         this.contextInjected(this._resolved);
       });
