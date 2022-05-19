@@ -1,7 +1,20 @@
 {
   "name": "umbraco-cms-backoffice",
+  "license": "MIT",
   "private": true,
   "version": "0.0.0",
+  "repository": {
+    "url": "https://github.com/umbraco/Umbraco.CMS.Backoffice",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/umbraco/Umbraco.CMS.Backoffice/issues"
+  },
+  "author": {
+    "name": "Umbraco A/S",
+    "email": "backoffice@umbraco.com",
+    "url": "https://umbraco.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
