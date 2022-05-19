@@ -2,7 +2,7 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 
   $scope.majorVersion = Umbraco.Sys.ServerVariables.application.version;
   $scope.passwordPattern = /.*/;
-  $scope.installer.current.model.subscribeToNewsLetter = false;
+  $scope.installer.current.model.subscribeToNewsLetter = $scope.installer.current.model.subscribeToNewsLetter || false;
   $scope.installer.current.model.telemetryLevel = $scope.installer.current.model.consentLevels[1].level;
 
   if ($scope.installer.current.model.minNonAlphaNumericLength > 0) {
