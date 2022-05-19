@@ -149,6 +149,7 @@ export class UmbBackofficeHeader extends LitElement {
 
     this._availableSections = data.sections;
     this._visibleSections = this._sections.filter(section => this._availableSections.includes(section.alias)).map(section => section.name);
+    this._activeSection = this._visibleSections?.[0];
   }
 
   private _renderExtraSections() {
