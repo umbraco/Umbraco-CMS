@@ -7,6 +7,7 @@
     <Description>Installs Umbraco CMS in your ASP.NET Core project</Description>
   </PropertyGroup>
 
+  
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
@@ -37,4 +38,8 @@
   <Target Name="JsonSchemaBuild">
     <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o ..\Umbraco.Cms\appsettings-schema.json" />
   </Target>
+  
+  <ItemGroup>
+    <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+  </ItemGroup>
 </Project>
