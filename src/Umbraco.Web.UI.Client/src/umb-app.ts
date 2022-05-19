@@ -22,7 +22,7 @@ const routes: Array<UmbRoute> = [
     elementName: 'umb-installer',
   },
   {
-    path: '/content',
+    path: '/section/:section',
     elementName: 'umb-backoffice',
   },
 ];
@@ -54,7 +54,7 @@ export class UmbApp extends LitElement {
     super.connectedCallback();
     // TODO: remove when router can be injected into login element
     this.addEventListener('login', () => {
-      this._router?.push('/content');
+      this._router?.push('/section/content');
     });
   }
 
@@ -76,7 +76,7 @@ export class UmbApp extends LitElement {
       if (!this._authorized) {
         this._router.push('/login');
       } else {
-        this._router.push('/content');
+        this._router.push('/section/content');
       }
     } catch (error) {
       console.log(error);
