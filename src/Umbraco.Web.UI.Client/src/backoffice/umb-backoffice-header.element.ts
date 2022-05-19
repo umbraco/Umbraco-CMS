@@ -1,6 +1,8 @@
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+
+import { getUserSections } from '../api/fetcher';
 
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeader extends LitElement {
@@ -79,6 +81,9 @@ export class UmbBackofficeHeader extends LitElement {
   private _activeSection: string = this._sections[0];
 
   @state()
+  private _availableSections: string[] = [];
+
+  @state()
   private _visibleSections: Array<string> = ['Content', 'Media', 'Members'];
 
   @state()
@@ -110,6 +115,15 @@ export class UmbBackofficeHeader extends LitElement {
     this._open = false;
   }
 
+  async connectedCallback(): Promise<void> {
+    super.connectedCallback();
+
+    const { data } = await getUserSections({});
+
+    this._availableSections = data.sections;
+    this._visibleSections = data.sections;
+  }
+
   render() {
     return html`
       <div id="appHeader">
@@ -120,13 +134,13 @@ export class UmbBackofficeHeader extends LitElement {
         <div id="sections">
           <uui-tab-group id="tabs">
             ${this._visibleSections.map(
-              (section) => html`
+      (section) => html`
                 <uui-tab
                   ?active="${this._activeSection === section}"
                   label="${section}"
                   @click="${this._handleTabClick}"></uui-tab>
               `
-            )}
+    )}
 
             <uui-tab id="moreTab" @click="${this._handleTabClick}">
               <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
@@ -136,13 +150,13 @@ export class UmbBackofficeHeader extends LitElement {
 
                 <div slot="popover" id="dropdown">
                   ${this._extraSections.map(
-                    (section) => html`
+      (section) => html`
                       <uui-menu-item
                         ?active="${this._activeSection === section}"
                         label="${section}"
                         @click-label="${this._handleLabelClick}"></uui-menu-item>
                     `
-                  )}
+    )}
                 </div>
               </uui-popover>
             </uui-tab>

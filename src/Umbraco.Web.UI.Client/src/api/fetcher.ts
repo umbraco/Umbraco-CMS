@@ -9,7 +9,9 @@ fetcher.configure({
 });
 
 export const getInitStatus = fetcher.path('/init').method('get').create();
+export const getUser = fetcher.path('/user').method('get').create();
 export const postUserLogin = fetcher.path('/user/login').method('post').create();
 export const postUserLogout = fetcher.path('/user/logout').method('post').create();
+export const getUserSections = fetcher.path('/user/sections').method('get').create();
 export const getInstall = fetcher.path('/install').method('get').create();
 export const postInstall = fetcher.path('/install').method('post').create();

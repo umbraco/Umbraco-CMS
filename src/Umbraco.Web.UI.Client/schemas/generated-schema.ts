@@ -10,21 +10,24 @@ export interface paths {
   "/version": {
     get: operations["GetVersion"];
   };
-  "/user/login": {
-    post: operations["PostUserLogin"];
-  };
-  "/user/logout": {
-    post: operations["PostUserLogout"];
-  };
-  "/user": {
-    get: operations["GetUser"];
-  };
   "/install": {
     get: operations["GetInstall"];
     post: operations["PostInstall"];
   };
   "/install/database/validate": {
     post: operations["PostInstallValidateDatabase"];
+  };
+  "/user": {
+    get: operations["GetUser"];
+  };
+  "/user/login": {
+    post: operations["PostUserLogin"];
+  };
+  "/user/logout": {
+    post: operations["PostUserLogout"];
+  };
+  "/user/sections": {
+    get: operations["GetAllowedSections"];
   };
 }
 
@@ -38,15 +41,6 @@ export interface components {
     };
     VersionResponse: {
       version: string;
-    };
-    UserLoginRequest: {
-      username: string;
-      password: string;
-      persist: boolean;
-    };
-    UserResponse: {
-      username: string;
-      role: string;
     };
     ConsentLevel: {
       /** @enum {string} */
@@ -109,6 +103,18 @@ export interface components {
       telemetryLevel: "Minimal" | "Basic" | "Detailed";
       database: components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
     };
+    UserResponse: {
+      username: string;
+      role: string;
+    };
+    UserLoginRequest: {
+      username: string;
+      password: string;
+      persist: boolean;
+    };
+    AllowedSectionsResponse: {
+      sections: string[];
+    };
   };
 }
 
@@ -139,52 +145,6 @@ export interface operations {
       };
       /** default response */
       default: {
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
-  PostUserLogin: {
-    parameters: {};
-    responses: {
-      /** 201 response */
-      201: unknown;
-      /** 403 response */
-      403: {
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UserLoginRequest"];
-      };
-    };
-  };
-  PostUserLogout: {
-    responses: {
-      /** 201 response */
-      201: unknown;
-      /** default response */
-      default: {
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
-  GetUser: {
-    responses: {
-      /** 200 response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserResponse"];
-        };
-      };
-      /** 403 response */
-      403: {
         content: {
           "application/json": components["schemas"]["ErrorResponse"];
         };
@@ -234,6 +194,68 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
+      };
+    };
+  };
+  GetUser: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserResponse"];
+        };
+      };
+      /** 403 response */
+      403: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  PostUserLogin: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 403 response */
+      403: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UserLoginRequest"];
+      };
+    };
+  };
+  PostUserLogout: {
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  GetAllowedSections: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["AllowedSectionsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
       };
     };
   };

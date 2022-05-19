@@ -58,7 +58,17 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         username: 'admin',
-      })
+        role: 'administrator'
+      } as components['schemas']['UserResponse']),
+    );
+  }),
+
+  rest.get('/umbraco/backoffice/user/sections', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json({
+        sections: ['Content', 'Media', 'Members', 'Settings', 'Packages']
+      } as components['schemas']['AllowedSectionsResponse']),
     );
   }),
 

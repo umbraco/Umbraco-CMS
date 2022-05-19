@@ -35,53 +35,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /user/login:
-    post:
-      operationId: PostUserLogin
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserLoginRequest'
-        required: true
-      responses:
-        '201':
-          description: 201 response
-        '403':
-          description: 403 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /user/logout:
-    post:
-      operationId: PostUserLogout
-      responses:
-        '201':
-          description: 201 response
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /user:
-    get:
-      operationId: GetUser
-      responses:
-        '200':
-          description: 200 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
-        '403':
-          description: 403 response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /install:
     get:
       operationId: GetInstall
@@ -129,6 +82,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /user:
+    get:
+      operationId: GetUser
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: 403 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/login:
+    post:
+      operationId: PostUserLogin
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        '201':
+          description: 201 response
+        '403':
+          description: 403 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/logout:
+    post:
+      operationId: PostUserLogout
+      responses:
+        '201':
+          description: 201 response
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/sections:
+    get:
+      operationId: GetAllowedSections
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllowedSectionsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     InitResponse:
@@ -152,29 +168,6 @@ components:
           type: string
       required:
         - version
-    UserLoginRequest:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-        persist:
-          type: boolean
-      required:
-        - username
-        - password
-        - persist
-    UserResponse:
-      type: object
-      properties:
-        username:
-          type: string
-        role:
-          type: string
-      required:
-        - username
-        - role
     ConsentLevel:
       type: object
       properties:
@@ -338,3 +331,35 @@ components:
         - subscribeToNewsletter
         - telemetryLevel
         - database
+    UserResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        role:
+          type: string
+      required:
+        - username
+        - role
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        persist:
+          type: boolean
+      required:
+        - username
+        - password
+        - persist
+    AllowedSectionsResponse:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            type: string
+      required:
+        - sections
