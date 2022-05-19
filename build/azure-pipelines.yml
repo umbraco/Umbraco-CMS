@@ -347,7 +347,7 @@ stages:
               dockerfile: umbraco-linux.docker
               dockerImageName: umbraco-linux
               cypressBinaries: "/home/vsts/.cache/Cypress"
-            Windos:
+            Windows:
               vmImage: 'windows-latest'
               cypressBinaries: $(LOCALAPPDATA)/Cypress
         pool:
