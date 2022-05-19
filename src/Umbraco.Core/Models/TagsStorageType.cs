@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Defines how tags are stored.
@@ -17,5 +17,5 @@ public enum TagsStorageType
     /// <summary>
     ///     Store tags as serialized Json.
     /// </summary>
-    Json
+    Json,
 }

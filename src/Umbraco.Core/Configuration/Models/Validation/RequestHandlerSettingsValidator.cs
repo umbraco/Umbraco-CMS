@@ -23,9 +23,8 @@ public class RequestHandlerSettingsValidator : ConfigurationValidatorBase, IVali
 
     private bool ValidateConvertUrlsToAscii(string value, out string message)
     {
-        var validValues = new[] {"try", "true", "false"};
+        var validValues = new[] { "try", "true", "false" };
         return ValidateStringIsOneOfValidValues(
-            $"{Constants.Configuration.ConfigRequestHandler}:{nameof(RequestHandlerSettings.ConvertUrlsToAscii)}",
-            value, validValues, out message);
+            $"{Constants.Configuration.ConfigRequestHandler}:{nameof(RequestHandlerSettings.ConvertUrlsToAscii)}", value, validValues, out message);
     }
 }

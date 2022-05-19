@@ -1,4 +1,4 @@
-//using Newtonsoft.Json;
+// using Newtonsoft.Json;
 
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -13,10 +13,13 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class
     MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
+    #region Define
+
+    public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
+
     private readonly IIdKeyMap _idKeyMap;
 
-    public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap,
-        IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+    public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, serializer, eventAggregator, factory) =>
         _idKeyMap = idKeyMap;
 
@@ -28,7 +31,7 @@ public sealed class
 
     public class JsonPayload
     {
-        //[JsonConstructor]
+        // [JsonConstructor]
         public JsonPayload(int id, string? username, bool removed)
         {
             Id = id;
@@ -37,13 +40,11 @@ public sealed class
         }
 
         public int Id { get; }
+
         public string? Username { get; }
+
         public bool Removed { get; }
     }
-
-    #region Define
-
-    public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
     public override Guid RefresherUniqueId => UniqueId;
 
@@ -74,7 +75,7 @@ public sealed class
     private void ClearCache(params JsonPayload[] payloads)
     {
         AppCaches.ClearPartialViewCache();
-        Attempt<IAppPolicyCache> memberCache = AppCaches.IsolatedCaches.Get<IMember>();
+        Attempt<IAppPolicyCache?> memberCache = AppCaches.IsolatedCaches.Get<IMember>();
 
         foreach (JsonPayload p in payloads)
         {

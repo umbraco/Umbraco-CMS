@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     The states of a content item.
@@ -31,12 +31,14 @@ public enum PublishedState
     ///     The content item is published.
     /// </summary>
     Published,
+
     // also: handled over to repo to save draft values for a published content
 
     /// <summary>
     ///     The content item is not published.
     /// </summary>
     Unpublished,
+
     // also: handled over to repo to save draft values for an unpublished content
 
     // when it is handled over to the repository, its state can also be one of those:
@@ -65,5 +67,5 @@ public enum PublishedState
     ///     <value>Unpublished</value>
     ///     .
     /// </remarks>
-    Unpublishing
+    Unpublishing,
 }

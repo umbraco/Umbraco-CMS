@@ -1,11 +1,13 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Cache;
 
 public class NoCacheRepositoryCachePolicy<TEntity, TId> : IRepositoryCachePolicy<TEntity, TId>
     where TEntity : class, IEntity
 {
-    private NoCacheRepositoryCachePolicy() { }
+    private NoCacheRepositoryCachePolicy()
+    {
+    }
 
     public static NoCacheRepositoryCachePolicy<TEntity, TId> Instance { get; } = new();
 

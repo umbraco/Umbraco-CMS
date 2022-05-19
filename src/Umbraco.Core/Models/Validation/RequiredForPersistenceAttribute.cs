@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -26,7 +26,7 @@ public class RequiredForPersistenceAttribute : RequiredAttribute
     public static bool HasRequiredValuesForPersistence(object model) =>
         model.GetType().GetProperties().All(x =>
         {
-            RequiredForPersistenceAttribute a = x.GetCustomAttribute<RequiredForPersistenceAttribute>();
+            RequiredForPersistenceAttribute? a = x.GetCustomAttribute<RequiredForPersistenceAttribute>();
             return a == null || a.IsValid(x.GetValue(model));
         });
 }

@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ScriptSavingNotification : SavingNotification<IScript>
 {
-    public ScriptSavingNotification(IScript target, EventMessages messages) : base(target, messages)
+    public ScriptSavingNotification(IScript target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public ScriptSavingNotification(IEnumerable<IScript> target, EventMessages messages) : base(target, messages)
+    public ScriptSavingNotification(IEnumerable<IScript> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

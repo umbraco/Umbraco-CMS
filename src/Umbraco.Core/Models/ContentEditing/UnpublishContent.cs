@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "unpublish", Namespace = "")]
 public class UnpublishContent
 {
-    [DataMember(Name = "id")] public int Id { get; set; }
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
 
-    [DataMember(Name = "cultures")] public string[]? Cultures { get; set; }
+    [DataMember(Name = "cultures")]
+    public string[]? Cultures { get; set; }
 }

@@ -7,15 +7,14 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNotification>
 {
-    public UserCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
-        : base(appCaches, eventAggregator, factory)
-    {
-    }
-
     #region Define
 
     public static readonly Guid UniqueId = Guid.Parse("E057AF6D-2EE6-41F4-8045-3694010F0AA6");
+
+    public UserCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+        : base(appCaches, eventAggregator, factory)
+    {
+    }
 
     public override Guid RefresherUniqueId => UniqueId;
 
@@ -39,7 +38,7 @@ public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNo
 
     public override void Remove(int id)
     {
-        Attempt<IAppPolicyCache> userCache = AppCaches.IsolatedCaches.Get<IUser>();
+        Attempt<IAppPolicyCache?> userCache = AppCaches.IsolatedCaches.Get<IUser>();
         if (userCache.Success)
         {
             userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
@@ -48,7 +47,6 @@ public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNo
             userCache.Result?.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + id);
             userCache.Result?.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + id);
         }
-
 
         base.Remove(id);
     }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 /// <summary>
 ///     Describes <see cref="RefreshInstruction" /> refresh action type.
@@ -10,16 +10,15 @@ public enum RefreshMethodType
     // that enum should get merged somehow with MessageType and renamed somehow
     // but at the moment it is exposed in CacheRefresher webservice through RefreshInstruction
     // so for the time being we keep it as-is for backward compatibility reasons
-
     RefreshAll,
     RefreshByGuid,
     RefreshById,
     RefreshByIds,
     RefreshByJson,
-    RemoveById
+    RemoveById,
 
     // would adding values break backward compatibility?
-    //RemoveByIds
+    // RemoveByIds
 
     // these are MessageType values
     // note that AnythingByInstance are local messages and cannot be distributed

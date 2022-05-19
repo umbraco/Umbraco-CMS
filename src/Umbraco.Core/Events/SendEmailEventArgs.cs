@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Email;
+using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Core.Events;
 

@@ -1,4 +1,4 @@
-﻿// source: mvpxml.codeplex.com
+// source: mvpxml.codeplex.com
 
 namespace Umbraco.Cms.Core.Xml;
 

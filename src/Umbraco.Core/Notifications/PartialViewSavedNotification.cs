@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class PartialViewSavedNotification : SavedNotification<IPartialView>
 {
-    public PartialViewSavedNotification(IPartialView target, EventMessages messages) : base(target, messages)
+    public PartialViewSavedNotification(IPartialView target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public PartialViewSavedNotification(IEnumerable<IPartialView> target, EventMessages messages) : base(target,
+    public PartialViewSavedNotification(IEnumerable<IPartialView> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -14,7 +14,7 @@ public class Relation : EntityBase, IRelation
 
     private string? _comment;
 
-    //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
+    // NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
     private int _parentId;
     private IRelationType _relationType;
 
@@ -48,7 +48,6 @@ public class Relation : EntityBase, IRelation
         ChildObjectType = childObjectType;
     }
 
-
     /// <summary>
     ///     Gets or sets the Parent Id of the Relation (Source)
     /// </summary>
@@ -59,7 +58,8 @@ public class Relation : EntityBase, IRelation
         set => SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId));
     }
 
-    [DataMember] public Guid ParentObjectType { get; set; }
+    [DataMember]
+    public Guid ParentObjectType { get; set; }
 
     /// <summary>
     ///     Gets or sets the Child Id of the Relation (Destination)
@@ -71,7 +71,8 @@ public class Relation : EntityBase, IRelation
         set => SetPropertyValueAndDetectChanges(value, ref _childId, nameof(ChildId));
     }
 
-    [DataMember] public Guid ChildObjectType { get; set; }
+    [DataMember]
+    public Guid ChildObjectType { get; set; }
 
     /// <summary>
     ///     Gets or sets the <see cref="RelationType" /> for the Relation

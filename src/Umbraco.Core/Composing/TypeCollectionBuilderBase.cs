@@ -21,6 +21,12 @@ public abstract class
     public void RegisterWith(IServiceCollection services)
         => services.Add(new ServiceDescriptor(typeof(TCollection), CreateCollection, ServiceLifetime.Singleton));
 
+    public TBuilder Add(Type type)
+    {
+        _types.Add(Validate(type, "add"));
+        return This;
+    }
+
     private static Type Validate(Type type, string action)
     {
         if (!typeof(TConstraint).IsAssignableFrom(type))
@@ -30,12 +36,6 @@ public abstract class
         }
 
         return type;
-    }
-
-    public TBuilder Add(Type type)
-    {
-        _types.Add(Validate(type, "add"));
-        return This;
     }
 
     public TBuilder Add<T>()

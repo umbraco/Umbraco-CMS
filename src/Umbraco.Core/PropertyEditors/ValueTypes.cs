@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -105,7 +105,8 @@ public static class ValueTypes
                 return ValueStorageType.Date;
 
             default:
-                throw new ArgumentOutOfRangeException(nameof(valueType),
+                throw new ArgumentOutOfRangeException(
+                    nameof(valueType),
                     $"Value \"{valueType}\" is not a valid ValueTypes.");
         }
     }

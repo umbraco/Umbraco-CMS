@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -72,18 +72,18 @@ public abstract class PublishedContentBase : IPublishedContent
     /// <inheritdoc />
     public abstract PublishedItemType ItemType { get; }
 
-    /// <inheritdoc />
-    public abstract bool IsDraft(string? culture = null);
-
-    /// <inheritdoc />
-    public abstract bool IsPublished(string? culture = null);
-
     #endregion
 
     #region Tree
 
     /// <inheritdoc />
     public abstract IPublishedContent? Parent { get; }
+
+    /// <inheritdoc />
+    public abstract bool IsDraft(string? culture = null);
+
+    /// <inheritdoc />
+    public abstract bool IsPublished(string? culture = null);
 
     /// <inheritdoc />
     public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);

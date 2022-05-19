@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class UserDeletingNotification : DeletingNotification<IUser>
 {
-    public UserDeletingNotification(IUser target, EventMessages messages) : base(target, messages)
+    public UserDeletingNotification(IUser target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public UserDeletingNotification(IEnumerable<IUser> target, EventMessages messages) : base(target, messages)
+    public UserDeletingNotification(IEnumerable<IUser> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

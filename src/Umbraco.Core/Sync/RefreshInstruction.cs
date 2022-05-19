@@ -33,8 +33,7 @@ public class RefreshInstruction
     ///     Need this public one so it can be de-serialized - used by the Json thing
     ///     otherwise, should use GetInstructions(...)
     /// </remarks>
-    public RefreshInstruction(Guid refresherId, RefreshMethodType refreshType, Guid guidId, int intId, string jsonIds,
-        string jsonPayload)
+    public RefreshInstruction(Guid refresherId, RefreshMethodType refreshType, Guid guidId, int intId, string jsonIds, string jsonPayload)
         : this()
     {
         RefresherId = refresherId;
@@ -119,6 +118,8 @@ public class RefreshInstruction
     /// </summary>
     public string? JsonPayload { get; set; }
 
+    public static bool operator ==(RefreshInstruction left, RefreshInstruction right) => Equals(left, right);
+
     public static IEnumerable<RefreshInstruction> GetInstructions(
         ICacheRefresher refresher,
         IJsonSerializer jsonSerializer,
@@ -130,10 +131,10 @@ public class RefreshInstruction
         switch (messageType)
         {
             case MessageType.RefreshAll:
-                return new[] {new RefreshInstruction(refresher, RefreshMethodType.RefreshAll)};
+                return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshAll) };
 
             case MessageType.RefreshByJson:
-                return new[] {new RefreshInstruction(refresher, RefreshMethodType.RefreshByJson, json)};
+                return new[] { new RefreshInstruction(refresher, RefreshMethodType.RefreshByJson, json) };
 
             case MessageType.RefreshById:
                 if (idType == null)
@@ -147,8 +148,7 @@ public class RefreshInstruction
                     var intIds = ids?.Cast<int>().ToArray();
                     return new[]
                     {
-                        new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds,
-                            jsonSerializer.Serialize(intIds), intIds?.Length ?? 0)
+                        new RefreshInstruction(refresher, RefreshMethodType.RefreshByIds, jsonSerializer.Serialize(intIds), intIds?.Length ?? 0),
                     };
                 }
 
@@ -165,22 +165,14 @@ public class RefreshInstruction
                 // Must be ints, bulk-remove is not supported, so iterate.
                 return ids?.Select(x => new RefreshInstruction(refresher, RefreshMethodType.RemoveById, (int)x)) ??
                        Enumerable.Empty<RefreshInstruction>();
-            //return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
 
+            // return new[] { new RefreshInstruction(refresher, RefreshMethodType.RemoveByIds, JsonConvert.SerializeObject(ids.Cast<int>().ToArray())) };
             default:
-                //case MessageType.RefreshByInstance:
-                //case MessageType.RemoveByInstance:
+                // case MessageType.RefreshByInstance:
+                // case MessageType.RemoveByInstance:
                 throw new ArgumentOutOfRangeException("messageType");
         }
     }
-
-    protected bool Equals(RefreshInstruction other) =>
-        RefreshType == other.RefreshType
-        && RefresherId.Equals(other.RefresherId)
-        && GuidId.Equals(other.GuidId)
-        && IntId == other.IntId
-        && string.Equals(JsonIds, other.JsonIds)
-        && string.Equals(JsonPayload, other.JsonPayload);
 
     public override bool Equals(object? other)
     {
@@ -202,6 +194,14 @@ public class RefreshInstruction
         return Equals((RefreshInstruction)other);
     }
 
+    protected bool Equals(RefreshInstruction other) =>
+        RefreshType == other.RefreshType
+        && RefresherId.Equals(other.RefresherId)
+        && GuidId.Equals(other.GuidId)
+        && IntId == other.IntId
+        && string.Equals(JsonIds, other.JsonIds)
+        && string.Equals(JsonPayload, other.JsonPayload);
+
     public override int GetHashCode()
     {
         unchecked
@@ -215,8 +215,6 @@ public class RefreshInstruction
             return hashCode;
         }
     }
-
-    public static bool operator ==(RefreshInstruction left, RefreshInstruction right) => Equals(left, right);
 
     public static bool operator !=(RefreshInstruction left, RefreshInstruction right) => Equals(left, right) == false;
 }

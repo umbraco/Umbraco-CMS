@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 /// <summary>
 ///     The message type to be used for syncing across servers.
@@ -11,5 +11,5 @@ public enum MessageType
     RemoveById,
     RefreshByInstance,
     RemoveByInstance,
-    RefreshByPayload
+    RefreshByPayload,
 }

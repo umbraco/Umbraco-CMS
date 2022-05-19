@@ -34,10 +34,9 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNodeList? SelectNodes(this XmlNode source, string expression,
-        IEnumerable<XPathVariable>? variables)
+    public static XmlNodeList? SelectNodes(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
     {
-        XPathVariable[] av = variables == null ? null : variables.ToArray();
+        XPathVariable[]? av = variables?.ToArray();
         return SelectNodes(source, expression, av);
     }
 
@@ -57,10 +56,9 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNodeList? SelectNodes(this XmlNode source, XPathExpression expression,
-        IEnumerable<XPathVariable>? variables)
+    public static XmlNodeList? SelectNodes(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
     {
-        XPathVariable[] av = variables == null ? null : variables.ToArray();
+        XPathVariable[]? av = variables?.ToArray();
         return SelectNodes(source, expression, av);
     }
 
@@ -84,10 +82,10 @@ public static class XmlExtensions
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
         {
-            return source.SelectNodes(expression ?? "");
+            return source.SelectNodes(expression ?? string.Empty);
         }
 
-        XPathNodeIterator iterator = source.CreateNavigator()?.Select(expression ?? "", variables);
+        XPathNodeIterator? iterator = source.CreateNavigator()?.Select(expression ?? string.Empty, variables);
         return XmlNodeListFactory.CreateNodeList(iterator);
     }
 
@@ -107,15 +105,14 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression,
-        params XPathVariable[]? variables)
+    public static XmlNodeList SelectNodes(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
         {
             return source.SelectNodes(expression);
         }
 
-        XPathNodeIterator iterator = source.CreateNavigator()?.Select(expression, variables);
+        XPathNodeIterator? iterator = source.CreateNavigator()?.Select(expression, variables);
         return XmlNodeListFactory.CreateNodeList(iterator);
     }
 
@@ -135,10 +132,9 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNode? SelectSingleNode(this XmlNode source, string expression,
-        IEnumerable<XPathVariable>? variables)
+    public static XmlNode? SelectSingleNode(this XmlNode source, string expression, IEnumerable<XPathVariable>? variables)
     {
-        XPathVariable[] av = variables == null ? null : variables.ToArray();
+        XPathVariable[]? av = variables?.ToArray();
         return SelectSingleNode(source, expression, av);
     }
 
@@ -158,10 +154,9 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression,
-        IEnumerable<XPathVariable>? variables)
+    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, IEnumerable<XPathVariable>? variables)
     {
-        XPathVariable[] av = variables == null ? null : variables.ToArray();
+        XPathVariable[]? av = variables?.ToArray();
         return SelectSingleNode(source, expression, av);
     }
 
@@ -207,8 +202,7 @@ public static class XmlExtensions
     ///     </para>
     ///     <para>The XPath expression should reference variables as <c>$var</c>.</para>
     /// </remarks>
-    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression,
-        params XPathVariable[]? variables)
+    public static XmlNode? SelectSingleNode(this XmlNode source, XPathExpression expression, params XPathVariable[]? variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
         {
@@ -382,7 +376,7 @@ public static class XmlExtensions
 
     public static XmlNode? GetXmlNode(this XContainer element, XmlDocument xmlDoc)
     {
-        XmlNode node = element.GetXmlNode();
+        XmlNode? node = element.GetXmlNode();
         if (node is not null)
         {
             return xmlDoc.ImportNode(node, true);
@@ -400,7 +394,9 @@ public static class XmlExtensions
     {
         var settings = new XmlWriterSettings
         {
-            OmitXmlDeclaration = true, NewLineHandling = NewLineHandling.None, Indent = false
+            OmitXmlDeclaration = true,
+            NewLineHandling = NewLineHandling.None,
+            Indent = false,
         };
         var output = new StringBuilder();
         using (var writer = XmlWriter.Create(output, settings))

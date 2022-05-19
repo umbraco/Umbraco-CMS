@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -9,8 +9,7 @@ public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     protected NotificationMethodBase(IOptionsMonitor<HealthChecksSettings> healthCheckSettings)
     {
         Type type = GetType();
-        HealthCheckNotificationMethodAttribute attribute =
-            type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
+        HealthCheckNotificationMethodAttribute? attribute = type.GetCustomAttribute<HealthCheckNotificationMethodAttribute>();
         if (attribute == null)
         {
             Enabled = false;
@@ -19,8 +18,8 @@ public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
 
         IDictionary<string, HealthChecksNotificationMethodSettings> notificationMethods =
             healthCheckSettings.CurrentValue.Notification.NotificationMethods;
-        if (!notificationMethods.TryGetValue(attribute.Alias,
-                out HealthChecksNotificationMethodSettings notificationMethod))
+        if (!notificationMethods.TryGetValue(
+            attribute.Alias, out HealthChecksNotificationMethodSettings? notificationMethod))
         {
             Enabled = false;
             return;

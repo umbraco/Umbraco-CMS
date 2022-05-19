@@ -11,7 +11,9 @@ public class UrlAndAnchors
         AnchorValues = anchorValues;
     }
 
-    [DataMember(Name = "url")] public string Url { get; }
+    [DataMember(Name = "url")]
+    public string Url { get; }
 
-    [DataMember(Name = "anchorValues")] public IEnumerable<string> AnchorValues { get; }
+    [DataMember(Name = "anchorValues")]
+    public IEnumerable<string> AnchorValues { get; }
 }

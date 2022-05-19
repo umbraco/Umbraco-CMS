@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.Models;
@@ -15,6 +15,7 @@ public class TemplateOnDisk : Template
     /// </summary>
     /// <param name="name">The name of the template.</param>
     /// <param name="alias">The alias of the template.</param>
+    /// <param name="shortStringHelper">The short string helper</param>
     public TemplateOnDisk(IShortStringHelper shortStringHelper, string name, string alias)
         : base(shortStringHelper, name, alias) =>
         IsOnDisk = true;

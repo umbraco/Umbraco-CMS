@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 [Serializable]
 [DataContract(IsReference = true)]
-public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDependency
+public class RelationType : EntityBase, IRelationTypeWithIsDependency
 {
     private string _alias;
     private Guid? _childObjectType;
@@ -28,8 +28,7 @@ public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDepend
     {
     }
 
-    public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType,
-        bool isDependency)
+    public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency)
     {
         if (name == null)
         {
@@ -38,7 +37,8 @@ public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDepend
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -49,7 +49,8 @@ public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDepend
 
         if (string.IsNullOrWhiteSpace(alias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(alias));
         }
 
@@ -112,7 +113,6 @@ public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDepend
         get => _childObjectType;
         set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));
     }
-
 
     public bool IsDependency
     {

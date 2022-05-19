@@ -23,7 +23,7 @@ public static class UserServiceExtensions
                                                 " could not be parsed into an array of integers or the path was empty");
         }
 
-        return userService.GetPermissions(user, ids[ids.Length - 1]).FirstOrDefault();
+        return userService.GetPermissions(user, ids[^1]).FirstOrDefault();
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public static class UserServiceExtensions
     /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
     public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup? group,
         bool fallbackToDefaultPermissions, params int[] nodeIds) =>
-        service.GetPermissions(new[] {group}, fallbackToDefaultPermissions, nodeIds);
+        service.GetPermissions(new[] { group }, fallbackToDefaultPermissions, nodeIds);
 
     /// <summary>
     ///     Gets the permissions for the provided group and path
@@ -53,7 +53,7 @@ public static class UserServiceExtensions
     /// </param>
     public static EntityPermissionSet GetPermissionsForPath(this IUserService service, IUserGroup group, string path,
         bool fallbackToDefaultPermissions = false) =>
-        service.GetPermissionsForPath(new[] {group}, path, fallbackToDefaultPermissions);
+        service.GetPermissionsForPath(new[] { group }, path, fallbackToDefaultPermissions);
 
     /// <summary>
     ///     Remove all permissions for this user group for all nodes specified
@@ -71,7 +71,6 @@ public static class UserServiceExtensions
     /// <param name="groupId"></param>
     public static void RemoveUserGroupPermissions(this IUserService userService, int groupId) =>
         userService.ReplaceUserGroupPermissions(groupId, null);
-
 
     public static IEnumerable<IProfile> GetProfilesById(this IUserService userService, params int[] ids)
     {

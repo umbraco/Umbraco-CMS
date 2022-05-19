@@ -115,7 +115,7 @@ public class UmbracoBuilder : IUmbracoBuilder
         {
             builder = Activator.CreateInstance<TBuilder>();
         }
-        else if (typeof(TBuilder).GetConstructor(new[] {typeof(IUmbracoBuilder)}) != null)
+        else if (typeof(TBuilder).GetConstructor(new[] { typeof(IUmbracoBuilder) }) != null)
         {
             // Handle those collection builders which need a reference to umbraco builder i.e. DistributedLockingCollectionBuilder.
             builder = (TBuilder?)Activator.CreateInstance(typeof(TBuilder), this);
@@ -233,7 +233,8 @@ public class UmbracoBuilder : IUmbracoBuilder
         Services.AddUnique<IDataValueEditorFactory, DataValueEditorFactory>();
 
         // register distributed cache
-        Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(),
+        Services.AddUnique(f => new DistributedCache(
+            f.GetRequiredService<IServerMessenger>(),
             f.GetRequiredService<CacheRefresherCollection>()));
         Services.AddUnique<ICacheRefresherNotificationFactory, CacheRefresherNotificationFactory>();
 
@@ -311,8 +312,7 @@ public class UmbracoBuilder : IUmbracoBuilder
             factory.GetRequiredService<ICoreScopeProvider>(),
             factory.GetRequiredService<ILoggerFactory>(),
             factory.GetRequiredService<IEventMessagesFactory>(),
-            factory.GetRequiredService<IExternalLoginWithKeyRepository>()
-        ));
+            factory.GetRequiredService<IExternalLoginWithKeyRepository>()));
         Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
         Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
         Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(

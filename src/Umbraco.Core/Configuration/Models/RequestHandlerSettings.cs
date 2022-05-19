@@ -19,18 +19,18 @@ public class RequestHandlerSettings
 
     internal static readonly CharItem[] DefaultCharCollection =
     {
-        new() {Char = " ", Replacement = "-"}, new() {Char = "\"", Replacement = string.Empty},
-        new() {Char = "'", Replacement = string.Empty}, new() {Char = "%", Replacement = string.Empty},
-        new() {Char = ".", Replacement = string.Empty}, new() {Char = ";", Replacement = string.Empty},
-        new() {Char = "/", Replacement = string.Empty}, new() {Char = "\\", Replacement = string.Empty},
-        new() {Char = ":", Replacement = string.Empty}, new() {Char = "#", Replacement = string.Empty},
-        new() {Char = "+", Replacement = "plus"}, new() {Char = "*", Replacement = "star"},
-        new() {Char = "&", Replacement = string.Empty}, new() {Char = "?", Replacement = string.Empty},
-        new() {Char = "æ", Replacement = "ae"}, new() {Char = "ä", Replacement = "ae"},
-        new() {Char = "ø", Replacement = "oe"}, new() {Char = "ö", Replacement = "oe"},
-        new() {Char = "å", Replacement = "aa"}, new() {Char = "ü", Replacement = "ue"},
-        new() {Char = "ß", Replacement = "ss"}, new() {Char = "|", Replacement = "-"},
-        new() {Char = "<", Replacement = string.Empty}, new() {Char = ">", Replacement = string.Empty}
+        new() { Char = " ", Replacement = "-" }, new() { Char = "\"", Replacement = string.Empty },
+        new() { Char = "'", Replacement = string.Empty }, new() { Char = "%", Replacement = string.Empty },
+        new() { Char = ".", Replacement = string.Empty }, new() { Char = ";", Replacement = string.Empty },
+        new() { Char = "/", Replacement = string.Empty }, new() { Char = "\\", Replacement = string.Empty },
+        new() { Char = ":", Replacement = string.Empty }, new() { Char = "#", Replacement = string.Empty },
+        new() { Char = "+", Replacement = "plus" }, new() { Char = "*", Replacement = "star" },
+        new() { Char = "&", Replacement = string.Empty }, new() { Char = "?", Replacement = string.Empty },
+        new() { Char = "æ", Replacement = "ae" }, new() { Char = "ä", Replacement = "ae" },
+        new() { Char = "ø", Replacement = "oe" }, new() { Char = "ö", Replacement = "oe" },
+        new() { Char = "å", Replacement = "aa" }, new() { Char = "ü", Replacement = "ue" },
+        new() { Char = "ß", Replacement = "ss" }, new() { Char = "|", Replacement = "-" },
+        new() { Char = "<", Replacement = string.Empty }, new() { Char = ">", Replacement = string.Empty },
     };
 
     /// <summary>

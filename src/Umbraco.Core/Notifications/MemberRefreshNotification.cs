@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class MemberRefreshNotification : EntityRefreshNotification<IMember>
 {
-    public MemberRefreshNotification(IMember target, EventMessages messages) : base(target, messages)
+    public MemberRefreshNotification(IMember target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

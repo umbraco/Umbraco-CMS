@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class NotificationEmailBodyParams
 {
-    public NotificationEmailBodyParams(string? recipientName, string? action, string? itemName, string itemId,
-        string itemUrl, string? editedUser, string siteUrl, string summary)
+    public NotificationEmailBodyParams(string? recipientName, string? action, string? itemName, string itemId, string itemUrl, string? editedUser, string siteUrl, string summary)
     {
         RecipientName = recipientName ?? throw new ArgumentNullException(nameof(recipientName));
         Action = action ?? throw new ArgumentNullException(nameof(action));
@@ -16,9 +15,13 @@ public class NotificationEmailBodyParams
     }
 
     public string RecipientName { get; }
+
     public string Action { get; }
+
     public string ItemName { get; }
+
     public string ItemId { get; }
+
     public string ItemUrl { get; }
 
     /// <summary>
@@ -27,5 +30,6 @@ public class NotificationEmailBodyParams
     public string Summary { get; }
 
     public string EditedUser { get; }
+
     public string SiteUrl { get; }
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.PublishedCache;
@@ -13,11 +13,13 @@ namespace Umbraco.Cms.Core.PublishedCache;
 //
 public class PublishedElement : IPublishedElement
 {
+    #region Properties
+
+    private readonly IPublishedProperty[] _propertiesArray;
+
     // initializes a new instance of the PublishedElement class
     // within the context of a published snapshot service (eg a published content property value)
-    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values,
-        bool previewing,
-        PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
+    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?>? values, bool previewing, PropertyCacheLevel referenceCacheLevel, IPublishedSnapshotAccessor? publishedSnapshotAccessor)
     {
         if (key == Guid.Empty)
         {
@@ -46,8 +48,7 @@ public class PublishedElement : IPublishedElement
                                .Select(propertyType =>
                                {
                                    values.TryGetValue(propertyType.Alias, out var value);
-                                   return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this,
-                                       previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
+                                   return (IPublishedProperty)new PublishedElementPropertyBase(propertyType, this, previewing, referenceCacheLevel, value, publishedSnapshotAccessor);
                                })
                                .ToArray()
                            ?? new IPublishedProperty[0];
@@ -58,8 +59,7 @@ public class PublishedElement : IPublishedElement
     // + using an initial reference cache level of .None ensures that everything will be
     // cached at .Content level - and that reference cache level will propagate to all
     // properties
-    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values,
-        bool previewing)
+    public PublishedElement(IPublishedContentType contentType, Guid key, Dictionary<string, object?> values, bool previewing)
         : this(contentType, key, values, previewing, PropertyCacheLevel.None, null)
     {
     }
@@ -86,16 +86,12 @@ public class PublishedElement : IPublishedElement
         return ignoreCase ? values : new Dictionary<string, object?>(values, StringComparer.OrdinalIgnoreCase);
     }
 
-    #region Properties
-
-    private readonly IPublishedProperty[] _propertiesArray;
-
     public IEnumerable<IPublishedProperty> Properties => _propertiesArray;
 
     public IPublishedProperty? GetProperty(string alias)
     {
         var index = ContentType.GetPropertyIndex(alias);
-        IPublishedProperty property = index < 0 ? null : _propertiesArray?[index];
+        IPublishedProperty? property = index < 0 ? null : _propertiesArray?[index];
         return property;
     }
 

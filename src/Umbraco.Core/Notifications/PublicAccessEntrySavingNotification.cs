@@ -8,12 +8,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class PublicAccessEntrySavingNotification : SavingNotification<PublicAccessEntry>
 {
-    public PublicAccessEntrySavingNotification(PublicAccessEntry target, EventMessages messages) : base(target,
+    public PublicAccessEntrySavingNotification(PublicAccessEntry target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public PublicAccessEntrySavingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages) : base(
+    public PublicAccessEntrySavingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

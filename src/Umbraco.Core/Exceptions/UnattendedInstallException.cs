@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Exceptions;
 
@@ -19,7 +19,8 @@ public class UnattendedInstallException : Exception
     ///     Initializes a new instance of the <see cref="UnattendedInstallException" /> class with a specified error message.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
-    public UnattendedInstallException(string message) : base(message)
+    public UnattendedInstallException(string message)
+        : base(message)
     {
     }
 
@@ -29,7 +30,8 @@ public class UnattendedInstallException : Exception
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">The inner exception, or null.</param>
-    public UnattendedInstallException(string message, Exception innerException) : base(message, innerException)
+    public UnattendedInstallException(string message, Exception innerException)
+        : base(message, innerException)
     {
     }
 
@@ -44,7 +46,8 @@ public class UnattendedInstallException : Exception
     ///     The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual
     ///     information about the source or destination.
     /// </param>
-    protected UnattendedInstallException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected UnattendedInstallException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }

@@ -10,6 +10,7 @@ public static class NotificationExtensions
     }
 
     public static T WithStateFrom<T, TSource>(this T notification, TSource source)
-        where T : IStatefulNotification where TSource : IStatefulNotification
+        where T : IStatefulNotification
+        where TSource : IStatefulNotification
         => notification.WithState(source.State);
 }

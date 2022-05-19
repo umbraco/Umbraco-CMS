@@ -1,4 +1,4 @@
-﻿using System.Collections.Specialized;
+using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
@@ -15,8 +15,7 @@ public class PublicAccessEntry : EntityBase
     private int _noAccessNodeId;
     private int _protectedNodeId;
 
-    public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode,
-        IEnumerable<PublicAccessRule> ruleCollection)
+    public PublicAccessEntry(IContent protectedNode, IContent loginNode, IContent noAccessNode, IEnumerable<PublicAccessRule> ruleCollection)
     {
         if (protectedNode == null)
         {
@@ -38,7 +37,7 @@ public class PublicAccessEntry : EntityBase
         _protectedNodeId = protectedNode.Id;
 
         _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
-        _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+        _ruleCollection.CollectionChanged += RuleCollection_CollectionChanged;
 
         foreach (PublicAccessRule rule in _ruleCollection)
         {
@@ -46,8 +45,7 @@ public class PublicAccessEntry : EntityBase
         }
     }
 
-    public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId,
-        IEnumerable<PublicAccessRule> ruleCollection)
+    public PublicAccessEntry(Guid id, int protectedNodeId, int loginNodeId, int noAccessNodeId, IEnumerable<PublicAccessRule> ruleCollection)
     {
         Key = id;
         Id = Key.GetHashCode();
@@ -57,7 +55,7 @@ public class PublicAccessEntry : EntityBase
         _protectedNodeId = protectedNodeId;
 
         _ruleCollection = new EventClearingObservableCollection<PublicAccessRule>(ruleCollection);
-        _ruleCollection.CollectionChanged += _ruleCollection_CollectionChanged;
+        _ruleCollection.CollectionChanged += RuleCollection_CollectionChanged;
 
         foreach (PublicAccessRule rule in _ruleCollection)
         {
@@ -90,23 +88,29 @@ public class PublicAccessEntry : EntityBase
         set => SetPropertyValueAndDetectChanges(value, ref _protectedNodeId, nameof(ProtectedNodeId));
     }
 
-    private void _ruleCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    public PublicAccessRule AddRule(string ruleValue, string ruleType)
+    {
+        var rule = new PublicAccessRule { AccessEntryId = Key, RuleValue = ruleValue, RuleType = ruleType };
+        _ruleCollection.Add(rule);
+        return rule;
+    }
+
+    private void RuleCollection_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Rules));
 
-        //if (e.Action == NotifyCollectionChangedAction.Add)
-        //{
+        // if (e.Action == NotifyCollectionChangedAction.Add)
+        // {
         //    var item = e.NewItems.Cast<PublicAccessRule>().First();
 
-        //    if (_addedSections.Contains(item) == false)
+        // if (_addedSections.Contains(item) == false)
         //    {
         //        _addedSections.Add(item);
         //    }
-        //}
-
+        // }
         if (e.Action == NotifyCollectionChangedAction.Remove)
         {
-            PublicAccessRule item = e.OldItems?.Cast<PublicAccessRule>().First();
+            PublicAccessRule? item = e.OldItems?.Cast<PublicAccessRule>().First();
 
             if (item is not null)
             {
@@ -118,19 +122,9 @@ public class PublicAccessEntry : EntityBase
         }
     }
 
-    public PublicAccessRule AddRule(string ruleValue, string ruleType)
-    {
-        var rule = new PublicAccessRule {AccessEntryId = Key, RuleValue = ruleValue, RuleType = ruleType};
-        _ruleCollection.Add(rule);
-        return rule;
-    }
-
     public void RemoveRule(PublicAccessRule rule) => _ruleCollection.Remove(rule);
 
     public void ClearRules() => _ruleCollection.Clear();
-
-
-    internal void ClearRemovedRules() => _removedRules.Clear();
 
     public override void ResetDirtyProperties(bool rememberDirty)
     {
@@ -142,6 +136,8 @@ public class PublicAccessEntry : EntityBase
         }
     }
 
+    internal void ClearRemovedRules() => _removedRules.Clear();
+
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
@@ -150,9 +146,9 @@ public class PublicAccessEntry : EntityBase
 
         if (cloneEntity._ruleCollection != null)
         {
-            cloneEntity._ruleCollection.ClearCollectionChangedEvents(); //clear this event handler if any
+            cloneEntity._ruleCollection.ClearCollectionChangedEvents(); // clear this event handler if any
             cloneEntity._ruleCollection.CollectionChanged +=
-                cloneEntity._ruleCollection_CollectionChanged; //re-assign correct event handler
+                cloneEntity.RuleCollection_CollectionChanged; // re-assign correct event handler
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Xml.XPath;
+using System.Xml.XPath;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
@@ -72,10 +72,13 @@ public abstract class PublishedCacheBase : IPublishedCache
     public bool HasContent() => HasContent(PreviewDefault);
 
     public abstract IPublishedContentType? GetContentType(int id);
+
     public abstract IPublishedContentType? GetContentType(string alias);
+
     public abstract IPublishedContentType? GetContentType(Guid key);
 
     public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType) =>
+
         // this is probably not super-efficient, but works
         // some cache implementation may want to override it, though
         GetAtRoot()

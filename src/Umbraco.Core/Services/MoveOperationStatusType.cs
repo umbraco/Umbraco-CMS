@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     A status type of the result of moving an item
@@ -26,5 +26,5 @@ public enum MoveOperationStatusType : byte
     /// <summary>
     ///     Trying to move an item to an invalid path (i.e. a child of itself)
     /// </summary>
-    FailedNotAllowedByPath = 15
+    FailedNotAllowedByPath = 15,
 }

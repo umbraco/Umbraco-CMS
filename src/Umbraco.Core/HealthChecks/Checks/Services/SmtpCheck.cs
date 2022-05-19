@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Net.Sockets;
@@ -43,42 +43,6 @@ public class SmtpCheck : HealthCheck
     public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
         => throw new InvalidOperationException("SmtpCheck has no executable actions");
 
-    private HealthCheckStatus CheckSmtpSettings()
-    {
-        var success = false;
-
-        SmtpSettings? smtpSettings = _globalSettings.CurrentValue.Smtp;
-
-        string message;
-        if (smtpSettings == null)
-        {
-            message = _textService.Localize("healthcheck", "smtpMailSettingsNotFound");
-        }
-        else
-        {
-            if (string.IsNullOrEmpty(smtpSettings.Host))
-            {
-                message = _textService.Localize("healthcheck", "smtpMailSettingsHostNotConfigured");
-            }
-            else
-            {
-                success = CanMakeSmtpConnection(smtpSettings.Host, smtpSettings.Port);
-                message = success
-                    ? _textService.Localize("healthcheck", "smtpMailSettingsConnectionSuccess")
-                    : _textService.Localize(
-                        "healthcheck", "smtpMailSettingsConnectionFail",
-                        new[] {smtpSettings.Host, smtpSettings.Port.ToString()});
-            }
-        }
-
-        return
-            new HealthCheckStatus(message)
-            {
-                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
-                ReadMoreLink = success ? null : Constants.HealthChecks.DocumentationLinks.SmtpCheck
-            };
-    }
-
     private static bool CanMakeSmtpConnection(string host, int port)
     {
         try
@@ -103,5 +67,40 @@ public class SmtpCheck : HealthCheck
         {
             return false;
         }
+    }
+
+    private HealthCheckStatus CheckSmtpSettings()
+    {
+        var success = false;
+
+        SmtpSettings? smtpSettings = _globalSettings.CurrentValue.Smtp;
+
+        string message;
+        if (smtpSettings == null)
+        {
+            message = _textService.Localize("healthcheck", "smtpMailSettingsNotFound");
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(smtpSettings.Host))
+            {
+                message = _textService.Localize("healthcheck", "smtpMailSettingsHostNotConfigured");
+            }
+            else
+            {
+                success = CanMakeSmtpConnection(smtpSettings.Host, smtpSettings.Port);
+                message = success
+                    ? _textService.Localize("healthcheck", "smtpMailSettingsConnectionSuccess")
+                    : _textService.Localize(
+                        "healthcheck", "smtpMailSettingsConnectionFail", new[] { smtpSettings.Host, smtpSettings.Port.ToString() });
+            }
+        }
+
+        return
+            new HealthCheckStatus(message)
+            {
+                ResultType = success ? StatusResultType.Success : StatusResultType.Error,
+                ReadMoreLink = success ? null : Constants.HealthChecks.DocumentationLinks.SmtpCheck,
+            };
     }
 }

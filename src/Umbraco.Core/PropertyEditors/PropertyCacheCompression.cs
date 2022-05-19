@@ -32,23 +32,23 @@ public class PropertyCacheCompression : IPropertyCacheCompression
     {
         var compressedStorage = _isCompressedCache.GetOrAdd((content.ContentTypeId, alias, published), x =>
         {
-            if (!_contentTypes.TryGetValue(x.contentTypeId, out IContentTypeComposition ct))
+            if (!_contentTypes.TryGetValue(x.contentTypeId, out IContentTypeComposition? ct))
             {
                 return false;
             }
 
-            IPropertyType propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
+            IPropertyType? propertyType = ct.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == alias);
             if (propertyType == null)
             {
                 return false;
             }
 
-            if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out IDataEditor propertyEditor))
+            if (!_propertyEditors.TryGet(propertyType.PropertyEditorAlias, out IDataEditor? propertyEditor))
             {
                 return false;
             }
 
-            return _compressionOptions.IsCompressed(content, propertyType, propertyEditor!, published);
+            return _compressionOptions.IsCompressed(content, propertyType, propertyEditor, published);
         });
 
         return compressedStorage;

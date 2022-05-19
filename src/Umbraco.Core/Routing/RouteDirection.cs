@@ -13,5 +13,5 @@ public enum RouteDirection
     /// <summary>
     ///     An outbound route used to generate a URL for a content item
     /// </summary>
-    Outbound = 2
+    Outbound = 2,
 }

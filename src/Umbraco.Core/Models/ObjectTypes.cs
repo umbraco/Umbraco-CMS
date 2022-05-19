@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Reflection;
 using Umbraco.Cms.Core.CodeAnnotations;
 
@@ -18,6 +18,12 @@ public static class ObjectTypes
     private static readonly ConcurrentDictionary<Guid, UmbracoObjectTypes> GuidObjectTypes = new();
     private static readonly ConcurrentDictionary<Guid, Type?> GuidTypes = new();
 
+    /// <summary>
+    ///     Gets the Umbraco object type corresponding to a name.
+    /// </summary>
+    public static UmbracoObjectTypes GetUmbracoObjectType(string name) =>
+        (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), name, true);
+
     private static FieldInfo? GetEnumField(string name) =>
         typeof(UmbracoObjectTypes).GetField(name, BindingFlags.Public | BindingFlags.Static);
 
@@ -26,7 +32,7 @@ public static class ObjectTypes
         FieldInfo[] fields = typeof(UmbracoObjectTypes).GetFields(BindingFlags.Public | BindingFlags.Static);
         foreach (FieldInfo field in fields)
         {
-            UmbracoObjectTypeAttribute attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+            UmbracoObjectTypeAttribute? attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
             if (attribute != null && attribute.ObjectId == guid)
             {
                 return field;
@@ -36,12 +42,6 @@ public static class ObjectTypes
         return null;
     }
 
-    /// <summary>
-    ///     Gets the Umbraco object type corresponding to a name.
-    /// </summary>
-    public static UmbracoObjectTypes GetUmbracoObjectType(string name) =>
-        (UmbracoObjectTypes)Enum.Parse(typeof(UmbracoObjectTypes), name, true);
-
     #region Guid object type utilities
 
     /// <summary>
@@ -50,7 +50,7 @@ public static class ObjectTypes
     public static UmbracoObjectTypes GetUmbracoObjectType(Guid objectType) =>
         GuidObjectTypes.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(objectType);
+            FieldInfo? field = GetEnumField(objectType);
             if (field == null)
             {
                 return UmbracoObjectTypes.Unknown;
@@ -65,13 +65,13 @@ public static class ObjectTypes
     public static string GetUdiType(Guid objectType) =>
         GuidUdiTypes.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(objectType);
+            FieldInfo? field = GetEnumField(objectType);
             if (field == null)
             {
                 return Constants.UdiEntityType.Unknown;
             }
 
-            UmbracoUdiTypeAttribute attribute = field.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
+            UmbracoUdiTypeAttribute? attribute = field.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
             return attribute?.UdiType ?? Constants.UdiEntityType.Unknown;
         });
 
@@ -81,13 +81,13 @@ public static class ObjectTypes
     public static Type? GetClrType(Guid objectType) =>
         GuidTypes.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(objectType);
+            FieldInfo? field = GetEnumField(objectType);
             if (field == null)
             {
                 return null;
             }
 
-            UmbracoObjectTypeAttribute attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+            UmbracoObjectTypeAttribute? attribute = field.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
             return attribute?.ModelType;
         });
 
@@ -101,8 +101,8 @@ public static class ObjectTypes
     public static Guid GetGuid(this UmbracoObjectTypes objectType) =>
         UmbracoGuids.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(t.ToString());
-            UmbracoObjectTypeAttribute attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+            FieldInfo? field = GetEnumField(t.ToString());
+            UmbracoObjectTypeAttribute? attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
 
             return attribute?.ObjectId ?? Guid.Empty;
         });
@@ -113,8 +113,8 @@ public static class ObjectTypes
     public static string GetUdiType(this UmbracoObjectTypes objectType) =>
         UmbracoUdiTypes.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(t.ToString());
-            UmbracoUdiTypeAttribute attribute = field?.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
+            FieldInfo? field = GetEnumField(t.ToString());
+            UmbracoUdiTypeAttribute? attribute = field?.GetCustomAttribute<UmbracoUdiTypeAttribute>(false);
 
             return attribute?.UdiType ?? Constants.UdiEntityType.Unknown;
         });
@@ -131,8 +131,8 @@ public static class ObjectTypes
     public static string GetFriendlyName(this UmbracoObjectTypes objectType) =>
         UmbracoFriendlyNames.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(t.ToString());
-            FriendlyNameAttribute attribute = field?.GetCustomAttribute<FriendlyNameAttribute>(false);
+            FieldInfo? field = GetEnumField(t.ToString());
+            FriendlyNameAttribute? attribute = field?.GetCustomAttribute<FriendlyNameAttribute>(false);
 
             return attribute?.ToString() ?? string.Empty;
         });
@@ -143,8 +143,8 @@ public static class ObjectTypes
     public static Type? GetClrType(this UmbracoObjectTypes objectType) =>
         UmbracoTypes.GetOrAdd(objectType, t =>
         {
-            FieldInfo field = GetEnumField(t.ToString());
-            UmbracoObjectTypeAttribute attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
+            FieldInfo? field = GetEnumField(t.ToString());
+            UmbracoObjectTypeAttribute? attribute = field?.GetCustomAttribute<UmbracoObjectTypeAttribute>(false);
 
             return attribute?.ModelType;
         });

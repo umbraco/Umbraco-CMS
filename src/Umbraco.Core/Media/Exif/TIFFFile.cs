@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif;
 
@@ -51,6 +51,15 @@ internal class TIFFFile : ImageFile
 
     #endregion
 
+    #region Properties
+
+    /// <summary>
+    ///     Gets the TIFF header.
+    /// </summary>
+    public TIFFHeader TIFFHeader { get; }
+
+    #endregion
+
     #region Instance Methods
 
     /// <summary>
@@ -63,13 +72,16 @@ internal class TIFFFile : ImageFile
 
         // Write TIFF header
         uint ifdoffset = 8;
+
         // Byte order
         stream.Write(
             BitConverterEx.SystemByteOrder == BitConverterEx.ByteOrder.LittleEndian
-                ? new byte[] {0x49, 0x49}
-                : new byte[] {0x4D, 0x4D}, 0, 2);
+                ? new byte[] { 0x49, 0x49 }
+                : new byte[] { 0x4D, 0x4D }, 0, 2);
+
         // TIFF ID
         stream.Write(conv.GetBytes((ushort)42), 0, 2);
+
         // Offset to 0th IFD, will be corrected below
         stream.Write(conv.GetBytes(ifdoffset), 0, 4);
 
@@ -130,8 +142,10 @@ internal class TIFFFile : ImageFile
             {
                 // Tag
                 stream.Write(conv.GetBytes(field.Tag), 0, 2);
+
                 // Type
                 stream.Write(conv.GetBytes(field.Type), 0, 2);
+
                 // Count
                 stream.Write(conv.GetBytes(field.Count), 0, 4);
 
@@ -161,15 +175,6 @@ internal class TIFFFile : ImageFile
             stream.Write(conv.GetBytes(i == IFDs.Count - 1 ? 0 : ifdoffset), 0, 4);
         }
     }
-
-    #endregion
-
-    #region Properties
-
-    /// <summary>
-    ///     Gets the TIFF header.
-    /// </summary>
-    public TIFFHeader TIFFHeader { get; }
 
     /// <summary>
     ///     Gets the image file directories.

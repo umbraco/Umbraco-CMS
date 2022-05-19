@@ -48,9 +48,9 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
 
             _serverRegistrationRepository.ClearCache(); // ensure we have up-to-date cache
 
-            IServerRegistration[] regs = _serverRegistrationRepository.GetMany()?.ToArray();
+            IServerRegistration[]? regs = _serverRegistrationRepository.GetMany()?.ToArray();
             var hasSchedulingPublisher = regs?.Any(x => ((ServerRegistration)x).IsSchedulingPublisher);
-            IServerRegistration server =
+            IServerRegistration? server =
                 regs?.FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
 
             if (server == null)
@@ -73,12 +73,11 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
             _serverRegistrationRepository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
             // reload - cheap, cached
-
-            regs = _serverRegistrationRepository.GetMany()?.ToArray();
+            regs = _serverRegistrationRepository.GetMany().ToArray();
 
             // default role is single server, but if registrations contain more
             // than one active server, then role is scheduling publisher or subscriber
-            _currentServerRole = regs?.Count(x => x.IsActive) > 1
+            _currentServerRole = regs.Count(x => x.IsActive) > 1
                 ? server.IsSchedulingPublisher ? ServerRole.SchedulingPublisher : ServerRole.Subscriber
                 : ServerRole.Single;
 
@@ -93,7 +92,6 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
     public void DeactiveServer(string serverIdentity)
     {
         // because the repository caches "all" and has queries disabled...
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.Servers);
@@ -101,7 +99,7 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
             _serverRegistrationRepository
                 .ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
-            IServerRegistration server = _serverRegistrationRepository.GetMany()
+            IServerRegistration? server = _serverRegistrationRepository.GetMany()
                 ?.FirstOrDefault(x => x.ServerIdentity?.InvariantEquals(serverIdentity) ?? false);
             if (server == null)
             {

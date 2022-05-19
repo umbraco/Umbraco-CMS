@@ -18,7 +18,6 @@ public class RuntimeHash : IRuntimeHash
         _paths = paths;
     }
 
-
     public string GetHashValue()
     {
         if (_calculated != null)

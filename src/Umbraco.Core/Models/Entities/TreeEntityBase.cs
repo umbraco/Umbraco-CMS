@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Entities;
 
@@ -64,6 +64,7 @@ public abstract class TreeEntityBase : EntityBase, ITreeEntity
             _parent = null;
             return _parentId;
         }
+
         set
         {
             if (value == 0)
@@ -78,19 +79,19 @@ public abstract class TreeEntityBase : EntityBase, ITreeEntity
     }
 
     /// <inheritdoc />
-    public void SetParent(ITreeEntity? parent)
-    {
-        _hasParentId = false;
-        _parent = parent;
-        OnPropertyChanged(nameof(ParentId));
-    }
-
-    /// <inheritdoc />
     [DataMember]
     public int Level
     {
         get => _level;
         set => SetPropertyValueAndDetectChanges(value, ref _level, nameof(Level));
+    }
+
+    /// <inheritdoc />
+    public void SetParent(ITreeEntity? parent)
+    {
+        _hasParentId = false;
+        _parent = parent;
+        OnPropertyChanged(nameof(ParentId));
     }
 
     /// <inheritdoc />

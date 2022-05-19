@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.TemplateQuery;
+namespace Umbraco.Cms.Core.Models.TemplateQuery;
 
 public enum Operator
 {
@@ -9,5 +9,5 @@ public enum Operator
     LessThan = 5,
     LessThanEqualTo = 6,
     GreaterThan = 7,
-    GreaterThanEqualTo = 8
+    GreaterThanEqualTo = 8,
 }

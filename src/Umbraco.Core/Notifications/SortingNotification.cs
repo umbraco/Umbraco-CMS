@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public abstract class SortingNotification<T> : CancelableEnumerableObjectNotification<T>
 {
-    protected SortingNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+    protected SortingNotification(IEnumerable<T> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

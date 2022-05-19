@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
@@ -7,7 +7,7 @@ public class RedirectUrlDashboard : IDashboard
 {
     public string Alias => "contentRedirectManager";
 
-    public string[] Sections => new[] {"content"};
+    public string[] Sections => new[] { "content" };
 
     public string View => "views/dashboard/content/redirecturls.html";
 

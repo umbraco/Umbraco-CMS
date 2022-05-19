@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Composing;
+namespace Umbraco.Cms.Core.Composing;
 
 /// <summary>
 ///     Implements an ordered collection builder.

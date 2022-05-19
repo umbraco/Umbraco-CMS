@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
@@ -26,7 +26,8 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
     ///     the validator is used as an <see cref="IManifestValueValidator" /> and the regular expression
     ///     is supplied via the <see cref="Configuration" /> method.
     /// </remarks>
-    public RegexValidator(ILocalizedTextService textService) : this(textService, string.Empty)
+    public RegexValidator(ILocalizedTextService textService)
+        : this(textService, string.Empty)
     {
     }
 
@@ -58,7 +59,8 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
 
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+                throw new ArgumentException(
+                    "Value can't be empty or consist only of white-space characters.",
                     nameof(value));
             }
 
@@ -90,14 +92,16 @@ public sealed class RegexValidator : IValueFormatValidator, IManifestValueValida
 
         if (string.IsNullOrWhiteSpace(format))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(format));
         }
 
         if (value == null || !new Regex(format).IsMatch(value.ToString()!))
         {
-            yield return new ValidationResult(_textService?.Localize("validation", "invalidPattern") ?? ValueIsInvalid,
-                new[] {"value"});
+            yield return new ValidationResult(
+                _textService?.Localize("validation", "invalidPattern") ?? ValueIsInvalid,
+                new[] { "value" });
         }
     }
 }

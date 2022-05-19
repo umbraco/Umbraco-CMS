@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
-///     Defines a result object for the <see cref="ICacheInstructionService.ProcessInstructions(bool, DateTime)" />
+///     Defines a result object for the <see cref="ICacheInstructionService.ProcessInstructions" />
 ///     operation.
 /// </summary>
 public class ProcessInstructionsResult
@@ -17,13 +17,13 @@ public class ProcessInstructionsResult
     public bool InstructionsWerePruned { get; private set; }
 
     public static ProcessInstructionsResult AsCompleted(int numberOfInstructionsProcessed, int lastId) =>
-        new() {NumberOfInstructionsProcessed = numberOfInstructionsProcessed, LastId = lastId};
+        new() { NumberOfInstructionsProcessed = numberOfInstructionsProcessed, LastId = lastId };
 
     public static ProcessInstructionsResult AsCompletedAndPruned(int numberOfInstructionsProcessed, int lastId) =>
         new()
         {
             NumberOfInstructionsProcessed = numberOfInstructionsProcessed,
             LastId = lastId,
-            InstructionsWerePruned = true
+            InstructionsWerePruned = true,
         };
 }

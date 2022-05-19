@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.TemplateQuery;
+namespace Umbraco.Cms.Core.Models.TemplateQuery;
 
 public class TemplateQueryResult
 {

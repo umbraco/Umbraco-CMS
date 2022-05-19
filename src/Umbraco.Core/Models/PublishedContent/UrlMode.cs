@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Specifies the type of URLs that the URL provider should produce, Auto is the default.
@@ -23,5 +23,5 @@ public enum UrlMode
     /// <summary>
     ///     Indicates that the URL provider should determine automatically whether to return relative or absolute URLs.
     /// </summary>
-    Auto
+    Auto,
 }

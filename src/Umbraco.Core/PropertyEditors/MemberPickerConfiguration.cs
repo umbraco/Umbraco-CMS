@@ -1,7 +1,7 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MemberPickerConfiguration : ConfigurationEditor
 {
     public override IDictionary<string, object> DefaultConfiguration =>
-        new Dictionary<string, object> {{"idType", "udi"}};
+        new Dictionary<string, object> { { "idType", "udi" } };
 }

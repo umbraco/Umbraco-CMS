@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services.Changes;
+namespace Umbraco.Cms.Core.Services.Changes;
 
 public class TreeChange<TItem>
 {
@@ -9,6 +9,7 @@ public class TreeChange<TItem>
     }
 
     public TItem Item { get; }
+
     public TreeChangeTypes ChangeTypes { get; }
 
     public EventArgs ToEventArgs() => new EventArgs(this);
@@ -18,7 +19,7 @@ public class TreeChange<TItem>
         public EventArgs(IEnumerable<TreeChange<TItem>> changes) => Changes = changes.ToArray();
 
         public EventArgs(TreeChange<TItem> change)
-            : this(new[] {change})
+            : this(new[] { change })
         {
         }
 

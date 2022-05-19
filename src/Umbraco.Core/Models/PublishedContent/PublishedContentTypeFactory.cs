@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
@@ -14,8 +14,10 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     private readonly IPublishedModelFactory _publishedModelFactory;
     private Dictionary<int, PublishedDataType>? _publishedDataTypes;
 
-    public PublishedContentTypeFactory(IPublishedModelFactory publishedModelFactory,
-        PropertyValueConverterCollection propertyValueConverters, IDataTypeService dataTypeService)
+    public PublishedContentTypeFactory(
+        IPublishedModelFactory publishedModelFactory,
+        PropertyValueConverterCollection propertyValueConverters,
+        IDataTypeService dataTypeService)
     {
         _publishedModelFactory = publishedModelFactory;
         _propertyValueConverters = propertyValueConverters;
@@ -31,16 +33,21 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
         new PublishedPropertyType(contentType, propertyType, _propertyValueConverters, _publishedModelFactory, this);
 
     /// <inheritdoc />
-    public IPublishedPropertyType CreatePropertyType(IPublishedContentType contentType, string propertyTypeAlias,
-        int dataTypeId, ContentVariation variations = ContentVariation.Nothing) => new PublishedPropertyType(
-        contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory,
-        this);
+    public IPublishedPropertyType CreatePropertyType(
+        IPublishedContentType contentType,
+        string propertyTypeAlias,
+        int dataTypeId,
+        ContentVariation variations = ContentVariation.Nothing) =>
+        new PublishedPropertyType(
+        contentType, propertyTypeAlias, dataTypeId, true, variations, _propertyValueConverters, _publishedModelFactory, this);
 
     /// <inheritdoc />
-    public IPublishedPropertyType CreateCorePropertyType(IPublishedContentType contentType, string propertyTypeAlias,
-        int dataTypeId, ContentVariation variations = ContentVariation.Nothing) => new PublishedPropertyType(
-        contentType, propertyTypeAlias, dataTypeId, false, variations, _propertyValueConverters, _publishedModelFactory,
-        this);
+    public IPublishedPropertyType CreateCorePropertyType(
+        IPublishedContentType contentType,
+        string propertyTypeAlias,
+        int dataTypeId,
+        ContentVariation variations = ContentVariation.Nothing) =>
+        new PublishedPropertyType(contentType, propertyTypeAlias, dataTypeId, false, variations, _propertyValueConverters, _publishedModelFactory, this);
 
     /// <inheritdoc />
     public PublishedDataType GetDataType(int id)
@@ -57,7 +64,7 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
             publishedDataTypes = _publishedDataTypes;
         }
 
-        if (publishedDataTypes is null || !publishedDataTypes.TryGetValue(id, out PublishedDataType dataType))
+        if (publishedDataTypes is null || !publishedDataTypes.TryGetValue(id, out PublishedDataType? dataType))
         {
             throw new ArgumentException($"Could not find a datatype with identifier {id}.", nameof(id));
         }
@@ -95,30 +102,40 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     ///     This method is for tests and is not intended to be used directly from application code.
     /// </summary>
     /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
-    internal IPublishedContentType CreateContentType(Guid key, int id, string alias,
+    internal IPublishedContentType CreateContentType(
+        Guid key,
+        int id,
+        string alias,
         Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes,
-        ContentVariation variations = ContentVariation.Nothing, bool isElement = false) => new PublishedContentType(key,
-        id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
+        ContentVariation variations = ContentVariation.Nothing,
+        bool isElement = false) =>
+        new PublishedContentType(key, id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations, isElement);
 
     /// <summary>
     ///     This method is for tests and is not intended to be used directly from application code.
     /// </summary>
     /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
-    internal IPublishedContentType CreateContentType(Guid key, int id, string alias,
+    internal IPublishedContentType CreateContentType(
+        Guid key,
+        int id,
+        string alias,
         IEnumerable<string> compositionAliases,
         Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes,
-        ContentVariation variations = ContentVariation.Nothing, bool isElement = false) => new PublishedContentType(key,
-        id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
+        ContentVariation variations = ContentVariation.Nothing,
+        bool isElement = false) =>
+        new PublishedContentType(key, id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations, isElement);
 
     /// <summary>
     ///     This method is for tests and is not intended to be used directly from application code.
     /// </summary>
     /// <remarks>Values are assumed to be consisted and are not checked.</remarks>
-    internal IPublishedPropertyType CreatePropertyType(string propertyTypeAlias, int dataTypeId, bool umbraco = false,
-        ContentVariation variations = ContentVariation.Nothing) => new PublishedPropertyType(propertyTypeAlias,
-        dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
+    internal IPublishedPropertyType CreatePropertyType(
+        string propertyTypeAlias,
+        int dataTypeId,
+        bool umbraco = false,
+        ContentVariation variations = ContentVariation.Nothing) =>
+        new PublishedPropertyType(propertyTypeAlias, dataTypeId, umbraco, variations, _propertyValueConverters, _publishedModelFactory, this);
 
     private PublishedDataType CreatePublishedDataType(IDataType dataType)
-        => new(dataType.Id, dataType.EditorAlias,
-            dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object?>(() => dataType.Configuration));
+        => new(dataType.Id, dataType.EditorAlias, dataType is DataType d ? d.GetLazyConfiguration() : new Lazy<object?>(() => dataType.Configuration));
 }

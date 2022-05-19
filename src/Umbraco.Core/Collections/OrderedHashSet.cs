@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 
 namespace Umbraco.Cms.Core.Collections;
 
@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Collections;
 ///     and is customizable to keep the newest or oldest equatable item
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class OrderedHashSet<T> : KeyedCollection<T, T> where T : notnull
+public class OrderedHashSet<T> : KeyedCollection<T, T>
+    where T : notnull
 {
     private readonly bool _keepOldest;
 
@@ -24,7 +25,7 @@ public class OrderedHashSet<T> : KeyedCollection<T, T> where T : notnull
         {
             var exists = Dictionary.ContainsKey(item);
 
-            //if we want to keep the newest, then we need to remove the old item and add the new one
+            // if we want to keep the newest, then we need to remove the old item and add the new one
             if (exists == false)
             {
                 base.InsertItem(index, item);

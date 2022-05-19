@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class TemplateDeletedNotification : DeletedNotification<ITemplate>
 {
-    public TemplateDeletedNotification(ITemplate target, EventMessages messages) : base(target, messages)
+    public TemplateDeletedNotification(ITemplate target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

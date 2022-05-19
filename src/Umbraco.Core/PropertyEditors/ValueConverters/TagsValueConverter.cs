@@ -20,6 +20,8 @@ public class TagsValueConverter : PropertyValueConverterBase
         _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
     }
 
+    public static void ClearCaches() => Storages.Clear();
+
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Tags);
 
@@ -29,8 +31,7 @@ public class TagsValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -50,8 +51,7 @@ public class TagsValueConverter : PropertyValueConverterBase
         return source.ToString()?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel cacheLevel, object? source, bool preview) => (string[]?)source;
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview) => (string[]?)source;
 
     /// <summary>
     ///     Discovers if the tags data type is storing its data in a Json format
@@ -63,14 +63,13 @@ public class TagsValueConverter : PropertyValueConverterBase
     ///     The <see cref="bool" />.
     /// </returns>
     private bool JsonStorageType(int dataTypeId) =>
+
         // GetDataType(id) is cached at repository level; still, there is some
         // deep-cloning involved (expensive) - better cache here + trigger
         // refresh in DataTypeCacheRefresher
         Storages.GetOrAdd(dataTypeId, id =>
         {
-            TagConfiguration configuration = _dataTypeService.GetDataType(id)?.ConfigurationAs<TagConfiguration>();
+            TagConfiguration? configuration = _dataTypeService.GetDataType(id)?.ConfigurationAs<TagConfiguration>();
             return configuration?.StorageType == TagsStorageType.Json;
         });
-
-    public static void ClearCaches() => Storages.Clear();
 }

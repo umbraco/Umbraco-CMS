@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Collections;
+namespace Umbraco.Cms.Core.Collections;
 
 public class TopoGraph
 {
@@ -18,7 +18,9 @@ public class TopoGraph
         }
 
         public TKey Key { get; }
+
         public TItem Item { get; }
+
         public IEnumerable<TKey> Dependencies { get; }
     }
 }
@@ -93,8 +95,7 @@ public class TopoGraph<TKey, TItem> : TopoGraph
     private static bool Contains(TItem[] items, TItem item, int start, int count) =>
         Array.IndexOf(items, item, start, count) >= 0;
 
-    private void Visit(TItem item, ISet<TItem> visited, TItem[] sorted, ref int index, int incr, bool throwOnCycle,
-        bool throwOnMissing)
+    private void Visit(TItem item, ISet<TItem> visited, TItem[] sorted, ref int index, int incr, bool throwOnCycle, bool throwOnMissing)
     {
         if (visited.Contains(item))
         {
@@ -111,8 +112,8 @@ public class TopoGraph<TKey, TItem> : TopoGraph
 
         visited.Add(item);
 
-        IEnumerable<TKey> keys = _getDependencies(item);
-        IEnumerable<TItem> dependencies = keys == null ? null : FindDependencies(keys, throwOnMissing);
+        IEnumerable<TKey>? keys = _getDependencies(item);
+        IEnumerable<TItem>? dependencies = keys == null ? null : FindDependencies(keys, throwOnMissing);
 
         if (dependencies != null)
         {
@@ -130,8 +131,7 @@ public class TopoGraph<TKey, TItem> : TopoGraph
     {
         foreach (TKey key in keys)
         {
-            TItem? value;
-            if (_items.TryGetValue(key, out value))
+            if (_items.TryGetValue(key, out TItem? value))
             {
                 yield return value;
             }

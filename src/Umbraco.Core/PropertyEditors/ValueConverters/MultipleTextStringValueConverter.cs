@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class MultipleTextStringValueConverter : PropertyValueConverterBase
 {
-    private static readonly string[] NewLineDelimiters = {"\r\n", "\r", "\n"};
+    private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => Constants.PropertyEditors.Aliases.MultipleTextstring.Equals(propertyType.EditorAlias);
@@ -17,8 +17,7 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         // data is (both in database and xml):
         // <keyFeatureList>
@@ -28,14 +27,13 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
         //        <value>Efficient</value>
         //    </values>
         // </keyFeatureList>
-
         var sourceString = source?.ToString();
         if (string.IsNullOrWhiteSpace(sourceString))
         {
             return Enumerable.Empty<string>();
         }
 
-        //SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string
+        // SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string
         // as xml in the database, it's always been new line delimited. Will ask Stephen about this.
         // In the meantime, we'll do this xml check, see if it parses and if not just continue with
         // splitting by newline
@@ -48,7 +46,7 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
         {
             pos += "<value>".Length;
             var npos = sourceString.IndexOf("<", pos, StringComparison.Ordinal);
-            var value = sourceString.Substring(pos, npos - pos);
+            var value = sourceString[pos..npos];
             values.Add(value);
             pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
         }
@@ -59,8 +57,7 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
             : values.ToArray();
     }
 
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var d = new XmlDocument();
         XmlElement e = d.CreateElement("values");

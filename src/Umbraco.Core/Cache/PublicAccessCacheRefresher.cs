@@ -6,15 +6,14 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresherNotification>
 {
-    public PublicAccessCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory)
-        : base(appCaches, eventAggregator, factory)
-    {
-    }
-
     #region Define
 
     public static readonly Guid UniqueId = Guid.Parse("1DB08769-B104-4F8B-850E-169CAC1DF2EC");
+
+    public PublicAccessCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+        : base(appCaches, eventAggregator, factory)
+    {
+    }
 
     public override Guid RefresherUniqueId => UniqueId;
 

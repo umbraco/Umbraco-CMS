@@ -46,7 +46,8 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
         IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
         IOptions<IdentityOptions> identityOptions,
         IOptions<BackOfficeIdentityOptions> backOfficeIdentityOptions)
-        : this(twoFactorLoginRepository,
+        : this(
+            twoFactorLoginRepository,
             scopeProvider,
             twoFactorSetupGenerators,
             identityOptions,
@@ -97,7 +98,10 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
 
             var twoFactorLogin = new TwoFactorLogin
             {
-                Confirmed = true, Secret = secret, UserOrMemberKey = userOrMemberKey, ProviderName = providerName
+                Confirmed = true,
+                Secret = secret,
+                UserOrMemberKey = userOrMemberKey,
+                ProviderName = providerName,
             };
 
             await SaveAsync(twoFactorLogin);
@@ -175,13 +179,19 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    ///     Generates a new random unique secret.
+    /// </summary>
+    /// <returns>The random secret</returns>
+    protected virtual string GenerateSecret() => Guid.NewGuid().ToString();
+
     private async Task<IEnumerable<string>> GetEnabledProviderNamesAsync(Guid userOrMemberKey)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
         var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
             .Select(x => x.ProviderName).ToArray();
 
-        return providersOnUser.Where(IsKnownProviderName)!;
+        return providersOnUser.Where(IsKnownProviderName);
     }
 
     /// <summary>
@@ -206,10 +216,4 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
 
         return false;
     }
-
-    /// <summary>
-    ///     Generates a new random unique secret.
-    /// </summary>
-    /// <returns>The random secret</returns>
-    protected virtual string GenerateSecret() => Guid.NewGuid().ToString();
 }

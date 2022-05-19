@@ -30,14 +30,19 @@ public class MultipleMediaPickerParameterEditor : DataEditor
 
     internal class MultipleMediaPickerPropertyValueEditor : MultiplePickerParamateterValueEditorBase
     {
-        public MultipleMediaPickerPropertyValueEditor(ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, IIOHelper ioHelper,
-            DataEditorAttribute attribute, IEntityService entityService) : base(localizedTextService, shortStringHelper,
-            jsonSerializer, ioHelper, attribute, entityService)
+        public MultipleMediaPickerPropertyValueEditor(
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            IEntityService entityService)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute, entityService)
         {
         }
 
         public override string UdiEntityType { get; } = Constants.UdiEntityType.Media;
+
         public override UmbracoObjectTypes UmbracoObjectType { get; } = UmbracoObjectTypes.Media;
     }
 }

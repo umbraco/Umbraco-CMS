@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Configuration;
@@ -18,15 +18,15 @@ public static class PasswordConfigurationExtensions
         bool allowManuallyChangingPassword = false) =>
         new Dictionary<string, object>
         {
-            {"minPasswordLength", passwordConfiguration.RequiredLength},
+            { "minPasswordLength", passwordConfiguration.RequiredLength },
 
             // TODO: This doesn't make a ton of sense with asp.net identity and also there's a bunch of other settings
             // that we can consider with IPasswordConfiguration, but these are currently still based on how membership providers worked.
-            {"minNonAlphaNumericChars", passwordConfiguration.GetMinNonAlphaNumericChars()},
+            { "minNonAlphaNumericChars", passwordConfiguration.GetMinNonAlphaNumericChars() },
 
             // A flag to indicate if the current password box should be shown or not, only a user that has access to change other user/member passwords
             // doesn't have to specify the current password for the user/member. A user changing their own password must specify their current password.
-            {"allowManuallyChangingPassword", allowManuallyChangingPassword}
+            { "allowManuallyChangingPassword", allowManuallyChangingPassword },
         };
 
     public static int GetMinNonAlphaNumericChars(this IPasswordConfiguration passwordConfiguration) =>

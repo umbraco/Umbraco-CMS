@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -14,8 +14,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration;
 [HealthCheck(
     "3E2F7B14-4B41-452B-9A30-E67FBC8E1206",
     "Notification Email Settings",
-    Description =
-        "If notifications are used, the 'from' email address should be specified and changed from the default value.",
+    Description = "If notifications are used, the 'from' email address should be specified and changed from the default value.",
     Group = "Configuration")]
 public class NotificationEmailCheck : AbstractSettingsCheck
 {
@@ -40,7 +39,7 @@ public class NotificationEmailCheck : AbstractSettingsCheck
     /// <inheritdoc />
     public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
     {
-        new() {IsRecommended = false, Value = DefaultFromEmail}, new() {IsRecommended = false, Value = string.Empty}
+        new() { IsRecommended = false, Value = DefaultFromEmail }, new() { IsRecommended = false, Value = string.Empty },
     };
 
     /// <inheritdoc />
@@ -48,12 +47,13 @@ public class NotificationEmailCheck : AbstractSettingsCheck
 
     /// <inheritdoc />
     public override string CheckSuccessMessage =>
-        LocalizedTextService.Localize("healthcheck", "notificationEmailsCheckSuccessMessage",
-            new[] {CurrentValue ?? "&lt;null&gt;"});
+        LocalizedTextService.Localize("healthcheck", "notificationEmailsCheckSuccessMessage", new[] { CurrentValue ?? "&lt;null&gt;" });
 
     /// <inheritdoc />
-    public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck",
-        "notificationEmailsCheckErrorMessage", new[] {DefaultFromEmail});
+    public override string CheckErrorMessage => LocalizedTextService.Localize(
+        "healthcheck",
+        "notificationEmailsCheckErrorMessage",
+        new[] { DefaultFromEmail });
 
     /// <inheritdoc />
     public override string ReadMoreLink =>

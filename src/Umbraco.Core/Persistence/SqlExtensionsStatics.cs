@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Persistence;
+namespace Umbraco.Cms.Core.Persistence;
 
 /// <summary>
 ///     Provides a mean to express aliases in SELECT Sql statements.
@@ -40,6 +40,5 @@ public static class SqlExtensionsStatics
     /// <param name="field2">The name of the second field.</param>
     /// <param name="field3">The name of the third field.</param>
     /// <param name="expr">A function producing Sql text.</param>
-    public static T? SqlText<T>(string field1, string field2, string field3,
-        Func<string, string, string, string> expr) => default;
+    public static T? SqlText<T>(string field1, string field2, string field3, Func<string, string, string, string> expr) => default;
 }

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -8,7 +8,7 @@ public class TextStringValueConverter : PropertyValueConverterBase
 {
     private static readonly string[] PropertyTypeAliases =
     {
-        Constants.PropertyEditors.Aliases.TextBox, Constants.PropertyEditors.Aliases.TextArea
+        Constants.PropertyEditors.Aliases.TextBox, Constants.PropertyEditors.Aliases.TextArea,
     };
 
     private readonly HtmlLocalLinkParser _linkParser;
@@ -29,8 +29,7 @@ public class TextStringValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -46,13 +45,13 @@ public class TextStringValueConverter : PropertyValueConverterBase
         return sourceString;
     }
 
-    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
+    public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
+
         // source should come from ConvertSource and be a string (or null) already
         inter ?? string.Empty;
 
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
+
         // source should come from ConvertSource and be a string (or null) already
         inter;
 }

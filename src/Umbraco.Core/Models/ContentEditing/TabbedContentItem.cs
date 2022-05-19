@@ -1,8 +1,9 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
-public abstract class TabbedContentItem<T> : ContentItemBasic<T>, ITabbedContent<T> where T : ContentPropertyBasic
+public abstract class TabbedContentItem<T> : ContentItemBasic<T>, ITabbedContent<T>
+    where T : ContentPropertyBasic
 {
     protected TabbedContentItem() => Tabs = new List<Tab<T>>();
 

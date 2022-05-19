@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Sections;
@@ -29,17 +29,17 @@ public class SectionMapDefinition : IMapDefinition
         mapper.Define<Section, UsersSection>();
     }
 
-    // Umbraco.Code.MapAll -RoutePath
-    private void Map(ISection source, Section target, MapperContext context)
-    {
-        target.Alias = source.Alias;
-        target.Name = _textService.Localize("sections", source.Alias);
-    }
-
     // Umbraco.Code.MapAll
     private static void Map(Section source, ManifestSection target, MapperContext context)
     {
         target.Alias = source.Alias;
         target.Name = source.Name;
+    }
+
+    // Umbraco.Code.MapAll -RoutePath
+    private void Map(ISection source, Section target, MapperContext context)
+    {
+        target.Alias = source.Alias;
+        target.Name = _textService.Localize("sections", source.Alias);
     }
 }

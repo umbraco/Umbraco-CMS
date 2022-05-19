@@ -13,5 +13,5 @@ public enum PropertyGroupType : short
     /// <summary>
     ///     Display property types in a tab.
     /// </summary>
-    Tab = 1
+    Tab = 1,
 }

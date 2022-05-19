@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core.Strings;
 
 public class UrlSegmentProviderCollection : BuilderCollectionBase<IUrlSegmentProvider>
 {
-    public UrlSegmentProviderCollection(Func<IEnumerable<IUrlSegmentProvider>> items) : base(items)
+    public UrlSegmentProviderCollection(Func<IEnumerable<IUrlSegmentProvider>> items)
+        : base(items)
     {
     }
 }

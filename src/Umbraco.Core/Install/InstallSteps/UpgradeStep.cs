@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps;
 /// <summary>
 ///     This step is purely here to show the button to commence the upgrade
 /// </summary>
-[InstallSetupStep(InstallationType.Upgrade, "Upgrade", "upgrade", 1,
-    "Upgrading Umbraco to the latest and greatest version.")]
+[InstallSetupStep(InstallationType.Upgrade, "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
 public class UpgradeStep : InstallSetupStep<object>
 {
     private readonly IRuntimeState _runtimeState;
@@ -26,7 +25,7 @@ public class UpgradeStep : InstallSetupStep<object>
     {
         get
         {
-            string FormatGuidState(string? value)
+            static string FormatGuidState(string? value)
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -34,7 +33,7 @@ public class UpgradeStep : InstallSetupStep<object>
                 }
                 else if (Guid.TryParse(value, out Guid currentStateGuid))
                 {
-                    value = currentStateGuid.ToString("N").Substring(0, 8);
+                    value = currentStateGuid.ToString("N")[..8];
                 }
 
                 return value;
@@ -45,7 +44,7 @@ public class UpgradeStep : InstallSetupStep<object>
             var newVersion = _umbracoVersion.SemanticVersion?.ToSemanticStringWithoutBuild();
             var oldVersion =
                 new SemVersion(_umbracoVersion.SemanticVersion?.Major ?? 0)
-                    .ToString(); //TODO can we find the old version somehow? e.g. from current state
+                    .ToString(); // TODO can we find the old version somehow? e.g. from current state
 
             var reportUrl =
                 $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";
@@ -56,7 +55,7 @@ public class UpgradeStep : InstallSetupStep<object>
                 newVersion,
                 currentState,
                 newState,
-                reportUrl
+                reportUrl,
             };
         }
     }

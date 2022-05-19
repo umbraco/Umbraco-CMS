@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     The state of a user
@@ -10,5 +10,5 @@ public enum UserState
     Disabled = 1,
     LockedOut = 2,
     Invited = 3,
-    Inactive = 4
+    Inactive = 4,
 }

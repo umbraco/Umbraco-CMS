@@ -22,10 +22,10 @@ public class MemberMapDefinition : IMapDefinition
         target.Email = source.Email;
 
         // TODO: ensure all properties are mapped as required
-        //target.Id = source.Id;
-        //target.ParentId = -1;
-        //target.Path = "-1," + source.Id;
+        // target.Id = source.Id;
+        // target.ParentId = -1;
+        // target.Path = "-1," + source.Id;
 
-        //TODO: add groups as required
+        // TODO: add groups as required
     }
 }

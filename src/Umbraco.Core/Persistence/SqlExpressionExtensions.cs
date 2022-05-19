@@ -26,7 +26,8 @@ public static class SqlExpressionExtensions
     public static bool SqlWildcard(this string str, string txt, TextColumnType columnType)
     {
         var wildcardmatch = new Regex("^" + Regex.Escape(txt).
-            //deal with any wildcard chars %
+
+            // deal with any wildcard chars %
             Replace(@"\%", ".*") + "$");
 
         return wildcardmatch.IsMatch(str);

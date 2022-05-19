@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Umbraco.Cms.Core.Xml;
 
@@ -30,7 +30,6 @@ public class UmbracoXPathPathSyntaxParser
         // previous tokens were: "$currentPage", "$ancestorOrSelf", "$parentPage" and I believe they were
         // allowed 'inline', not just at the beginning... whether or not we want to support that is up
         // for discussion.
-
         if (xpathExpression == null)
         {
             throw new ArgumentNullException(nameof(xpathExpression));
@@ -38,7 +37,8 @@ public class UmbracoXPathPathSyntaxParser
 
         if (string.IsNullOrWhiteSpace(xpathExpression))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(xpathExpression));
         }
 
@@ -52,21 +52,20 @@ public class UmbracoXPathPathSyntaxParser
             throw new ArgumentNullException(nameof(publishedContentExists));
         }
 
-        //no need to parse it
+        // no need to parse it
         if (xpathExpression.StartsWith("$") == false)
         {
             return xpathExpression;
         }
 
-        //get nearest published item
+        // get nearest published item
         Func<IEnumerable<string>?, int> getClosestPublishedAncestor = path =>
         {
             if (path is not null)
             {
                 foreach (var i in path)
                 {
-                    int idAsInt;
-                    if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out idAsInt))
+                    if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out int idAsInt))
                     {
                         var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
                         if (exists)
@@ -82,10 +81,10 @@ public class UmbracoXPathPathSyntaxParser
 
         const string rootXpath = "id({0})";
 
-        //parseable items:
+        // parseable items:
         var vars = new Dictionary<string, Func<string, string>>();
 
-        //These parameters must have a node id context
+        // These parameters must have a node id context
         if (nodeContextId.HasValue)
         {
             vars.Add("$current", q =>
@@ -96,8 +95,8 @@ public class UmbracoXPathPathSyntaxParser
 
             vars.Add("$parent", q =>
             {
-                //remove the first item in the array if its the current node
-                //this happens when current is published, but we are looking for its parent specifically
+                // remove the first item in the array if its the current node
+                // this happens when current is published, but we are looking for its parent specifically
                 var path = getPath(nodeContextId.Value)?.ToArray();
                 if (path?[0] == nodeContextId.ToString())
                 {
@@ -108,11 +107,11 @@ public class UmbracoXPathPathSyntaxParser
                 return q.Replace("$parent", string.Format(rootXpath, closestPublishedAncestorId));
             });
 
-
             vars.Add("$site", q =>
             {
                 var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(nodeContextId.Value));
-                return q.Replace("$site",
+                return q.Replace(
+                    "$site",
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
         }
@@ -120,7 +119,6 @@ public class UmbracoXPathPathSyntaxParser
         // TODO: This used to just replace $root with string.Empty BUT, that would never work
         // the root is always "/root . Need to confirm with Per why this was string.Empty before!
         vars.Add("$root", q => q.Replace("$root", "/root"));
-
 
         foreach (KeyValuePair<string, Func<string, string>> varible in vars)
         {

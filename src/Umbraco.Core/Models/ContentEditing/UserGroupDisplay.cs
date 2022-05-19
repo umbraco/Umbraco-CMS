@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -11,7 +11,8 @@ public class UserGroupDisplay : UserGroupBasic
         AssignedPermissions = Enumerable.Empty<AssignedContentPermissions>();
     }
 
-    [DataMember(Name = "users")] public IEnumerable<UserBasic> Users { get; set; }
+    [DataMember(Name = "users")]
+    public IEnumerable<UserBasic> Users { get; set; }
 
     /// <summary>
     ///     The default permissions for the user group organized by permission group name

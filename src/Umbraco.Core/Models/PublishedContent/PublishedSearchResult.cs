@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -12,5 +12,6 @@ public class PublishedSearchResult
     }
 
     public IPublishedContent Content { get; }
+
     public float Score { get; }
 }

@@ -38,5 +38,6 @@ public sealed class RuntimeHashPaths
     public void AddFile(FileInfo fileInfo, bool scanFileContent = false) => _files.Add(fileInfo, scanFileContent);
 
     public IEnumerable<DirectoryInfo> GetFolders() => _paths;
+
     public IReadOnlyDictionary<FileInfo, bool> GetFiles() => _files;
 }

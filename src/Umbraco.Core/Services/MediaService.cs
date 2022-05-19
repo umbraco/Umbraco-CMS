@@ -524,7 +524,7 @@ public class MediaService : RepositoryService, IMediaService
     /// <param name="level">The level to retrieve Media from</param>
     /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
     /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
-    public IEnumerable<IMedia>? GetByLevel(int level)
+    public IEnumerable<IMedia> GetByLevel(int level)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -724,7 +724,7 @@ public class MediaService : RepositoryService, IMediaService
     ///     Gets a collection of <see cref="IMedia" /> objects, which reside at the first level / root
     /// </summary>
     /// <returns>An Enumerable list of <see cref="IMedia" /> objects</returns>
-    public IEnumerable<IMedia>? GetRootMedia()
+    public IEnumerable<IMedia> GetRootMedia()
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -810,7 +810,6 @@ public class MediaService : RepositoryService, IMediaService
 
             if (media.Name != null && media.Name.Length > 255)
             {
-                throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
 
@@ -1410,16 +1409,14 @@ public class MediaService : RepositoryService, IMediaService
             {
                 // if current media has children, move them to trash
                 IMedia m = media;
-                IQuery<IMedia>? childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
-                IEnumerable<IMedia>? children = _mediaRepository.Get(childQuery);
-                if (children is not null)
+                IQuery<IMedia> childQuery = Query<IMedia>().Where(x => x.Path.StartsWith(m.Path));
+                IEnumerable<IMedia> children = _mediaRepository.Get(childQuery);
+
+                foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
                 {
-                    foreach (IMedia child in children.Where(x => mediaTypeIdsA.Contains(x.ContentTypeId) == false))
-                    {
-                        // see MoveToRecycleBin
-                        PerformMoveLocked(child, Constants.System.RecycleBinMedia, null, userId, moves, true);
-                        changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
-                    }
+                    // see MoveToRecycleBin
+                    PerformMoveLocked(child, Constants.System.RecycleBinMedia, null, userId, moves, true);
+                    changes.Add(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch));
                 }
 
                 // delete media

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Cms.Core.IO;
 
@@ -16,7 +16,9 @@ internal class ShadowFileSystem : IFileSystem
 
     public IFileSystem Inner { get; }
 
-    private Dictionary<string, ShadowNode> Nodes => _nodes ?? (_nodes = new Dictionary<string, ShadowNode>());
+    public bool CanAddPhysical => true;
+
+    private Dictionary<string, ShadowNode> Nodes => _nodes ??= new Dictionary<string, ShadowNode>();
 
     public IEnumerable<string> GetDirectories(string path)
     {
@@ -54,8 +56,9 @@ internal class ShadowFileSystem : IFileSystem
         }
         else
         {
+            // actual content
             if (Nodes.Any(x => IsChild(normPath, x.Key) && x.Value.IsExist) // shadow content
-                || Inner.GetDirectories(path).Any() || Inner.GetFiles(path).Any()) // actual content
+                || Inner.GetDirectories(path).Any() || Inner.GetFiles(path).Any())
             {
                 throw new InvalidOperationException("Directory is not empty.");
             }
@@ -73,8 +76,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public bool DirectoryExists(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf))
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
         {
             return sf.IsDir && sf.IsExist;
         }
@@ -86,9 +88,8 @@ internal class ShadowFileSystem : IFileSystem
 
     public void AddFile(string path, Stream stream, bool overrideIfExists)
     {
-        ShadowNode? sf;
         var normPath = NormPath(path);
-        if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
+        if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
             throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
         }
@@ -97,8 +98,7 @@ internal class ShadowFileSystem : IFileSystem
         for (var i = 0; i < parts.Length - 1; i++)
         {
             var dirPath = string.Join("/", parts.Take(i + 1));
-            ShadowNode? sd;
-            if (Nodes.TryGetValue(dirPath, out sd))
+            if (Nodes.TryGetValue(dirPath, out ShadowNode? sd))
             {
                 if (sd.IsFile)
                 {
@@ -137,7 +137,7 @@ internal class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         KeyValuePair<string, ShadowNode>[] shadows = Nodes.Where(kvp => IsChild(normPath, kvp.Key)).ToArray();
         IEnumerable<string> files = filter != null ? Inner.GetFiles(path, filter) : Inner.GetFiles(path);
-        WildcardExpression wildcard = filter == null ? null : new WildcardExpression(filter);
+        WildcardExpression? wildcard = filter == null ? null : new WildcardExpression(filter);
         return files
             .Except(shadows.Where(kvp => (kvp.Value.IsFile && kvp.Value.IsDelete) || kvp.Value.IsDir)
                 .Select(kvp => kvp.Key))
@@ -169,8 +169,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public bool FileExists(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf))
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
         {
             return sf.IsFile && sf.IsExist;
         }
@@ -182,8 +181,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public string GetFullPath(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf))
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
         {
             return sf.IsDir || sf.IsDelete ? string.Empty : _sfs.GetFullPath(path);
         }
@@ -195,8 +193,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public DateTimeOffset GetLastModified(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf) == false)
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
         {
             return Inner.GetLastModified(path);
         }
@@ -211,8 +208,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public DateTimeOffset GetCreated(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf) == false)
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
         {
             return Inner.GetCreated(path);
         }
@@ -227,8 +223,7 @@ internal class ShadowFileSystem : IFileSystem
 
     public long GetSize(string path)
     {
-        ShadowNode? sf;
-        if (Nodes.TryGetValue(NormPath(path), out sf) == false)
+        if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf) == false)
         {
             return Inner.GetSize(path);
         }
@@ -241,13 +236,10 @@ internal class ShadowFileSystem : IFileSystem
         return _sfs.GetSize(path);
     }
 
-    public bool CanAddPhysical => true;
-
     public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
     {
-        ShadowNode? sf;
         var normPath = NormPath(path);
-        if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
+        if (Nodes.TryGetValue(normPath, out ShadowNode? sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
         {
             throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
         }
@@ -256,8 +248,7 @@ internal class ShadowFileSystem : IFileSystem
         for (var i = 0; i < parts.Length - 1; i++)
         {
             var dirPath = string.Join("/", parts.Take(i + 1));
-            ShadowNode? sd;
-            if (Nodes.TryGetValue(dirPath, out sd))
+            if (Nodes.TryGetValue(dirPath, out ShadowNode? sd))
             {
                 if (sd.IsFile)
                 {
@@ -400,30 +391,15 @@ internal class ShadowFileSystem : IFileSystem
         }
     }
 
-    private class ShadowNode
-    {
-        public ShadowNode(bool isDelete, bool isdir)
-        {
-            IsDelete = isDelete;
-            IsDir = isdir;
-        }
-
-        public bool IsDelete { get; }
-        public bool IsDir { get; }
-
-        public bool IsExist => IsDelete == false;
-        public bool IsFile => IsDir == false;
-    }
-
     // copied from System.Web.Util.Wildcard internal
     internal class WildcardExpression
     {
-        private static readonly Regex metaRegex = new("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
-        private static readonly Regex questRegex = new("\\?");
-        private static readonly Regex starRegex = new("\\*");
-        private static readonly Regex commaRegex = new(",");
-        private static Regex slashRegex = new("(?=/)");
-        private static Regex backslashRegex = new("(?=[\\\\:])");
+        private static readonly Regex MetaRegex = new("[\\+\\{\\\\\\[\\|\\(\\)\\.\\^\\$]");
+        private static readonly Regex QuestRegex = new("\\?");
+        private static readonly Regex StarRegex = new("\\*");
+        private static readonly Regex CommaRegex = new(",");
+        private static readonly Regex SlashRegex = new("(?=/)");
+        private static readonly Regex BackslashRegex = new("(?=[\\\\:])");
         private readonly bool _caseInsensitive;
         private readonly string _pattern;
         private Regex? _regex;
@@ -432,6 +408,12 @@ internal class ShadowFileSystem : IFileSystem
         {
             _pattern = pattern;
             _caseInsensitive = caseInsensitive;
+        }
+
+        public bool IsMatch(string input)
+        {
+            EnsureRegex(_pattern);
+            return _regex?.IsMatch(input) ?? false;
         }
 
         private void EnsureRegex(string pattern)
@@ -444,7 +426,6 @@ internal class ShadowFileSystem : IFileSystem
             RegexOptions options = RegexOptions.None;
 
             // match right-to-left (for speed) if the pattern starts with a *
-
             if (pattern.Length > 0 && pattern[0] == '*')
             {
                 options = RegexOptions.RightToLeft | RegexOptions.Singleline;
@@ -455,31 +436,38 @@ internal class ShadowFileSystem : IFileSystem
             }
 
             // case insensitivity
-
             if (_caseInsensitive)
             {
                 options |= RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
             }
 
             // Remove regex metacharacters
-
-            pattern = metaRegex.Replace(pattern, "\\$0");
+            pattern = MetaRegex.Replace(pattern, "\\$0");
 
             // Replace wildcard metacharacters with regex codes
-
-            pattern = questRegex.Replace(pattern, ".");
-            pattern = starRegex.Replace(pattern, ".*");
-            pattern = commaRegex.Replace(pattern, "\\z|\\A");
+            pattern = QuestRegex.Replace(pattern, ".");
+            pattern = StarRegex.Replace(pattern, ".*");
+            pattern = CommaRegex.Replace(pattern, "\\z|\\A");
 
             // anchor the pattern at beginning and end, and return the regex
-
             _regex = new Regex("\\A" + pattern + "\\z", options);
         }
+    }
 
-        public bool IsMatch(string input)
+    private class ShadowNode
+    {
+        public ShadowNode(bool isDelete, bool isdir)
         {
-            EnsureRegex(_pattern);
-            return _regex?.IsMatch(input) ?? false;
+            IsDelete = isDelete;
+            IsDir = isdir;
         }
+
+        public bool IsDelete { get; }
+
+        public bool IsDir { get; }
+
+        public bool IsExist => IsDelete == false;
+
+        public bool IsFile => IsDir == false;
     }
 }

@@ -35,5 +35,5 @@ public enum RuntimeLevel
     /// <summary>
     ///     The runtime has detected an up-to-date Umbraco install and is running.
     /// </summary>
-    Run = 100
+    Run = 100,
 }

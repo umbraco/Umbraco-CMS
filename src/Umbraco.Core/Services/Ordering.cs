@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -26,8 +26,7 @@ public class Ordering
     ///         empty string.
     ///     </para>
     /// </remarks>
-    public Ordering(string? orderBy, Direction direction = Direction.Ascending, string? culture = null,
-        bool isCustomField = false)
+    public Ordering(string? orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
     {
         OrderBy = orderBy.IfNullOrWhiteSpace(null); // empty is null and means, not sorting
         Direction = direction;
@@ -82,8 +81,7 @@ public class Ordering
     ///         empty string.
     ///     </para>
     /// </remarks>
-    public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string? culture = null,
-        bool isCustomField = false)
+    public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
         => new(orderBy, direction, culture, isCustomField);
 
     /// <summary>

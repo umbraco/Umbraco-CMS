@@ -73,7 +73,6 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         // TODO: refactor
         // we should NOT directly clear caches here, but instead ask whatever class
         // is managing the cache to please clear that cache properly
-
         _contentTypeCommonRepository.ClearCache(); // always
 
         if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
@@ -100,14 +99,14 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         }
 
         if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
-            // don't try to be clever - refresh all
         {
+            // don't try to be clever - refresh all
             ContentCacheRefresher.RefreshContentTypes(AppCaches);
         }
 
         if (payloads.Any(x => x.ItemType == typeof(IMediaType).Name))
-            // don't try to be clever - refresh all
         {
+            // don't try to be clever - refresh all
             MediaCacheRefresher.RefreshMediaTypes(AppCaches);
         }
 

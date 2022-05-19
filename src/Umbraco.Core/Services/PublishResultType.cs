@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     A value indicating the result of publishing or unpublishing a document.
@@ -7,7 +7,6 @@ public enum PublishResultType : byte
 {
     // all "ResultType" enum's must be byte-based, and declare Failed = 128, and declare
     // every failure codes as >128 - see OperationResult and OperationResultType for details.
-
     #region Success - Publish
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -14,22 +14,26 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     public const bool SupportsPublishingConst = false;
     private readonly IShortStringHelper _shortStringHelper;
 
-    //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
-    private string _alias = string.Empty;
-
     /// <summary>
     ///     Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, IsSensitive) by the PropertyTypes' alias.
     /// </summary>
-    private IDictionary<string, MemberTypePropertyProfileAccess> _memberTypePropertyTypes;
+    private readonly IDictionary<string, MemberTypePropertyProfileAccess> _memberTypePropertyTypes;
 
-    public MemberType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
+    // Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
+    private string _alias = string.Empty;
+
+    public MemberType(IShortStringHelper shortStringHelper, int parentId)
+        : base(shortStringHelper, parentId)
     {
         _shortStringHelper = shortStringHelper;
         _memberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
     }
 
-    public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent) : this(shortStringHelper,
-        parent, string.Empty)
+    public MemberType(IShortStringHelper shortStringHelper, IContentTypeComposition parent)
+        : this(
+        shortStringHelper,
+        parent,
+        string.Empty)
     {
     }
 
@@ -43,18 +47,17 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <inheritdoc />
     public override bool SupportsPublishing => SupportsPublishingConst;
 
-    /// <inheritdoc />
-    public override ISimpleContentType ToSimple() => new SimpleContentType(this);
-
     public override ContentVariation Variations
     {
         // note: although technically possible, variations on members don't make much sense
         // and therefore are disabled - they are fully supported at service level, though,
         // but not at published snapshot level.
-
         get => base.Variations;
         set => throw new NotSupportedException("Variations are not supported on members.");
     }
+
+    /// <inheritdoc />
+    public override ISimpleContentType ToSimple() => new SimpleContentType(this);
 
     /// <summary>
     ///     The Alias of the ContentType
@@ -65,7 +68,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
         get => _alias;
         set
         {
-            //NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
+            // NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
             // "_umbracoSystemDefaultProtectType" which is used internally, currently there is an issue with the safe alias as it strips
             // leading underscores which we don't want in this case.
             // see : http://issues.umbraco.org/issue/U4-3968
@@ -73,7 +76,6 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
             // TODO: BUT, I'm pretty sure we could do this with regards to underscores now:
             // .ToCleanString(CleanStringType.Alias | CleanStringType.UmbracoCase)
             // Need to ask Stephen
-
             var newVal = value == "_umbracoSystemDefaultProtectType"
                 ? value
                 : value == null
@@ -92,8 +94,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     public bool MemberCanEditProperty(string? propertyTypeAlias) => propertyTypeAlias is not null &&
                                                                     _memberTypePropertyTypes.TryGetValue(
                                                                         propertyTypeAlias,
-                                                                        out MemberTypePropertyProfileAccess
-                                                                            propertyProfile) &&
+                                                                        out MemberTypePropertyProfileAccess? propertyProfile) &&
                                                                     propertyProfile.IsEditable;
 
     /// <summary>
@@ -102,7 +103,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
     /// <returns></returns>
     public bool MemberCanViewProperty(string propertyTypeAlias) =>
-        _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess propertyProfile) &&
+        _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess? propertyProfile) &&
         propertyProfile.IsVisible;
 
     /// <summary>
@@ -111,7 +112,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <param name="propertyTypeAlias">PropertyType Alias of the Property to check</param>
     /// <returns></returns>
     public bool IsSensitiveProperty(string propertyTypeAlias) =>
-        _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess propertyProfile) &&
+        _memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess? propertyProfile) &&
         propertyProfile.IsSensitive;
 
     /// <summary>
@@ -121,8 +122,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <param name="value">Boolean value, true or false</param>
     public void SetMemberCanEditProperty(string propertyTypeAlias, bool value)
     {
-        if (_memberTypePropertyTypes.TryGetValue(propertyTypeAlias,
-                out MemberTypePropertyProfileAccess propertyProfile))
+        if (_memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess? propertyProfile))
         {
             propertyProfile.IsEditable = value;
         }
@@ -140,8 +140,7 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <param name="value">Boolean value, true or false</param>
     public void SetMemberCanViewProperty(string propertyTypeAlias, bool value)
     {
-        if (_memberTypePropertyTypes.TryGetValue(propertyTypeAlias,
-                out MemberTypePropertyProfileAccess propertyProfile))
+        if (_memberTypePropertyTypes.TryGetValue(propertyTypeAlias, out MemberTypePropertyProfileAccess? propertyProfile))
         {
             propertyProfile.IsVisible = value;
         }
@@ -159,8 +158,8 @@ public class MemberType : ContentTypeCompositionBase, IMemberType
     /// <param name="value">Boolean value, true or false</param>
     public void SetIsSensitiveProperty(string propertyTypeAlias, bool value)
     {
-        if (_memberTypePropertyTypes.TryGetValue(propertyTypeAlias,
-                out MemberTypePropertyProfileAccess propertyProfile))
+        if (_memberTypePropertyTypes.TryGetValue(
+            propertyTypeAlias, out MemberTypePropertyProfileAccess? propertyProfile))
         {
             propertyProfile.IsSensitive = value;
         }

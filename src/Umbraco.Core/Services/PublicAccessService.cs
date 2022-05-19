@@ -13,7 +13,9 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
 
-    public PublicAccessService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    public PublicAccessService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
@@ -49,23 +51,23 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     /// </remarks>
     public PublicAccessEntry? GetEntryForContent(string contentPath)
     {
-        //Get all ids in the path for the content item and ensure they all
+        // Get all ids in the path for the content item and ensure they all
         // parse to ints that are not -1.
         var ids = contentPath.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var val) ? val : -1)
             .Where(x => x != -1)
             .ToList();
 
-        //start with the deepest id
+        // start with the deepest id
         ids.Reverse();
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            //This will retrieve from cache!
+            // This will retrieve from cache!
             var entries = _publicAccessRepository.GetMany().ToList();
             foreach (var id in ids)
             {
-                PublicAccessEntry found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
+                PublicAccessEntry? found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);
                 if (found != null)
                 {
                     return found;
@@ -83,7 +85,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     /// <returns></returns>
     public Attempt<PublicAccessEntry?> IsProtected(IContent content)
     {
-        PublicAccessEntry result = GetEntryForContent(content);
+        PublicAccessEntry? result = GetEntryForContent(content);
         return Attempt.If(result != null, result);
     }
 
@@ -94,7 +96,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     /// <returns></returns>
     public Attempt<PublicAccessEntry?> IsProtected(string contentPath)
     {
-        PublicAccessEntry result = GetEntryForContent(contentPath);
+        PublicAccessEntry? result = GetEntryForContent(contentPath);
         return Attempt.If(result != null, result);
     }
 
@@ -105,8 +107,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     /// <param name="ruleType"></param>
     /// <param name="ruleValue"></param>
     /// <returns></returns>
-    public Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType,
-        string ruleValue)
+    public Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType, string ruleValue)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
         PublicAccessEntry? entry;
@@ -118,7 +119,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
                 return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
             }
 
-            PublicAccessRule existingRule =
+            PublicAccessRule? existingRule =
                 entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
             if (existingRule == null)
             {
@@ -126,7 +127,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             }
             else
             {
-                //If they are both the same already then there's nothing to update, exit
+                // If they are both the same already then there's nothing to update, exit
                 return OperationResult.Attempt.Succeed(evtMsgs, entry);
             }
 
@@ -163,14 +164,14 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
             entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
             if (entry == null)
             {
-                return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
+                return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
             }
 
-            PublicAccessRule existingRule =
+            PublicAccessRule? existingRule =
                 entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
             if (existingRule == null)
             {
-                return Attempt<OperationResult>.Fail(); // causes rollback // causes rollback
+                return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
             }
 
             entry.RemoveRule(existingRule);

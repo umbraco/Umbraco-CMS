@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +20,8 @@ public class SliderConfigurationEditor : ConfigurationEditor<SliderConfiguration
     {
     }
 
-    public SliderConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(
+    public SliderConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(
         ioHelper, editorConfigurationParser)
     {
     }

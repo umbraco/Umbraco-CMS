@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Notifications;
+namespace Umbraco.Cms.Core.Notifications;
 
 public class UserTwoFactorRequestedNotification : INotification
 {

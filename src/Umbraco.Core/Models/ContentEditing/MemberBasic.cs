@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -7,9 +7,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 /// </summary>
 public class MemberBasic : ContentItemBasic<ContentPropertyBasic>
 {
-    [DataMember(Name = "username")] public string? Username { get; set; }
+    [DataMember(Name = "username")]
+    public string? Username { get; set; }
 
-    [DataMember(Name = "email")] public string? Email { get; set; }
+    [DataMember(Name = "email")]
+    public string? Email { get; set; }
 
     [DataMember(Name = "properties")]
     public override IEnumerable<ContentPropertyBasic> Properties

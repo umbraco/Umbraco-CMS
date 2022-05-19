@@ -9,13 +9,15 @@ namespace Umbraco.Cms.Core.Notifications;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class MemberTypeRefreshedNotification : ContentTypeRefreshNotification<IMemberType>
 {
-    public MemberTypeRefreshedNotification(ContentTypeChange<IMemberType> target, EventMessages messages) : base(target,
+    public MemberTypeRefreshedNotification(ContentTypeChange<IMemberType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public MemberTypeRefreshedNotification(IEnumerable<ContentTypeChange<IMemberType>> target, EventMessages messages) :
-        base(target, messages)
+    public MemberTypeRefreshedNotification(IEnumerable<ContentTypeChange<IMemberType>> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

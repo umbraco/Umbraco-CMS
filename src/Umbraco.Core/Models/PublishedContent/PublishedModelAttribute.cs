@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <inheritdoc />
 /// <summary>
@@ -25,7 +25,8 @@ public sealed class PublishedModelAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(contentTypeAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(contentTypeAlias));
         }
 

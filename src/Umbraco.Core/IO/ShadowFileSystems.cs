@@ -1,6 +1,6 @@
-﻿namespace Umbraco.Cms.Core.IO;
-// shadow filesystems is definitively ... too convoluted
+namespace Umbraco.Cms.Core.IO;
 
+// shadow filesystems is definitively ... too convoluted
 internal class ShadowFileSystems : ICompletable
 {
     private readonly FileSystems _fileSystems;

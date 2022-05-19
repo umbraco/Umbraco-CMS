@@ -13,8 +13,7 @@ public static class PublishedPropertyExtension
 {
     #region Value
 
-    public static object? Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback,
-        string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
+    public static object? Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
     {
         if (property.HasValue(culture, segment))
         {
@@ -30,8 +29,7 @@ public static class PublishedPropertyExtension
 
     #region Value<T>
 
-    public static T? Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback,
-        string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
+    public static T? Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
     {
         if (property.HasValue(culture, segment))
         {
@@ -55,7 +53,7 @@ public static class PublishedPropertyExtension
         }
 
         // we don't have a value, try fallback
-        if (publishedValueFallback.TryGetValue(property, culture, segment, fallback, defaultValue, out T fallbackValue))
+        if (publishedValueFallback.TryGetValue(property, culture, segment, fallback, defaultValue, out T? fallbackValue))
         {
             return fallbackValue;
         }

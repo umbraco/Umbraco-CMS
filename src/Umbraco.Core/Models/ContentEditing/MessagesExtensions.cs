@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Extensions;
 
@@ -11,7 +11,7 @@ public static class MessagesExtensions
             return;
         }
 
-        model.Notifications?.Add(new BackOfficeNotification {Header = header, Message = msg, NotificationType = type});
+        model.Notifications?.Add(new BackOfficeNotification { Header = header, Message = msg, NotificationType = type });
     }
 
     public static void AddSuccessNotification(this INotificationModel model, string header, string msg)
@@ -23,7 +23,9 @@ public static class MessagesExtensions
 
         model.Notifications?.Add(new BackOfficeNotification
         {
-            Header = header, Message = msg, NotificationType = NotificationStyle.Success
+            Header = header,
+            Message = msg,
+            NotificationType = NotificationStyle.Success,
         });
     }
 
@@ -36,7 +38,9 @@ public static class MessagesExtensions
 
         model.Notifications?.Add(new BackOfficeNotification
         {
-            Header = header, Message = msg, NotificationType = NotificationStyle.Error
+            Header = header,
+            Message = msg,
+            NotificationType = NotificationStyle.Error,
         });
     }
 
@@ -49,7 +53,9 @@ public static class MessagesExtensions
 
         model.Notifications?.Add(new BackOfficeNotification
         {
-            Header = header, Message = msg, NotificationType = NotificationStyle.Warning
+            Header = header,
+            Message = msg,
+            NotificationType = NotificationStyle.Warning,
         });
     }
 
@@ -62,12 +68,13 @@ public static class MessagesExtensions
 
         model.Notifications?.Add(new BackOfficeNotification
         {
-            Header = header, Message = msg, NotificationType = NotificationStyle.Info
+            Header = header,
+            Message = msg,
+            NotificationType = NotificationStyle.Info,
         });
     }
 
-    private static bool Exists(this INotificationModel model, string? header, string message,
-        NotificationStyle notificationType) => model.Notifications?.Any(x =>
+    private static bool Exists(this INotificationModel model, string? header, string message, NotificationStyle notificationType) => model.Notifications?.Any(x =>
         (x.Header?.InvariantEquals(header) ?? false) && (x.Message?.InvariantEquals(message) ?? false) &&
         x.NotificationType == notificationType) ?? false;
 }

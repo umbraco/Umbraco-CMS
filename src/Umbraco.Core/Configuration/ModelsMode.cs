@@ -38,5 +38,5 @@ public enum ModelsMode
     ///     Generation can be triggered from the dashboard. The app does not restart.
     ///     Models are not compiled and thus are not available to the project.
     /// </remarks>
-    SourceCodeAuto
+    SourceCodeAuto,
 }

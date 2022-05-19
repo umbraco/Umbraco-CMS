@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 public class UserProfile : IProfile, IEquatable<UserProfile>
 {
@@ -7,6 +7,14 @@ public class UserProfile : IProfile, IEquatable<UserProfile>
         Id = id;
         Name = name;
     }
+
+    public int Id { get; }
+
+    public string? Name { get; }
+
+    public static bool operator ==(UserProfile left, UserProfile right) => Equals(left, right);
+
+    public static bool operator !=(UserProfile left, UserProfile right) => Equals(left, right) == false;
 
     public bool Equals(UserProfile? other)
     {
@@ -22,9 +30,6 @@ public class UserProfile : IProfile, IEquatable<UserProfile>
 
         return Id == other.Id;
     }
-
-    public int Id { get; }
-    public string? Name { get; }
 
     public override bool Equals(object? obj)
     {
@@ -47,8 +52,4 @@ public class UserProfile : IProfile, IEquatable<UserProfile>
     }
 
     public override int GetHashCode() => Id;
-
-    public static bool operator ==(UserProfile left, UserProfile right) => Equals(left, right);
-
-    public static bool operator !=(UserProfile left, UserProfile right) => Equals(left, right) == false;
 }

@@ -32,7 +32,7 @@ public class UmbracoRequestPaths
             .EnsureStartsWith('/').TrimStart(_appPath.EnsureStartsWith('/')).EnsureStartsWith('/');
 
         _mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-        _defaultUmbPaths = new List<string> {"/" + _mvcArea, "/" + _mvcArea + "/"};
+        _defaultUmbPaths = new List<string> { "/" + _mvcArea, "/" + _mvcArea + "/" };
         _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
         _previewMvcPath = "/" + _mvcArea + "/Preview/";
         _surfaceMvcPath = "/" + _mvcArea + "/Surface/";

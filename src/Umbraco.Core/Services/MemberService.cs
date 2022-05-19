@@ -25,10 +25,15 @@ public class MemberService : RepositoryService, IMemberService
 
     #region Constructor
 
-    public MemberService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService,
-        IMemberRepository memberRepository, IMemberTypeRepository memberTypeRepository,
-        IMemberGroupRepository memberGroupRepository, IAuditRepository auditRepository)
+    public MemberService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberGroupService memberGroupService,
+        IMemberRepository memberRepository,
+        IMemberTypeRepository memberTypeRepository,
+        IMemberGroupRepository memberGroupRepository,
+        IAuditRepository auditRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _memberRepository = memberRepository;
@@ -37,13 +42,6 @@ public class MemberService : RepositoryService, IMemberService
         _auditRepository = auditRepository;
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
     }
-
-    #endregion
-
-    #region Private Methods
-
-    private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Member.GetName(), message));
 
     #endregion
 
@@ -87,6 +85,13 @@ public class MemberService : RepositoryService, IMemberService
             return _memberRepository.GetCountByQuery(query);
         }
     }
+
+    #endregion
+
+    #region Private Methods
+
+    private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
+        _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Member.GetName(), message));
 
     /// <summary>
     ///     Gets the count of Members by an optional MemberType alias
@@ -178,8 +183,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue,
-        string memberTypeAlias)
+    IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
         => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
 
     /// <summary>
@@ -197,22 +201,20 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue,
-        string memberTypeAlias, bool isApproved)
+    IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
         => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
 
     public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias)
-        => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias);
+        => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias);
 
     public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
-        => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias, isApproved);
+        => CreateMemberWithIdentity(username, email, username, string.Empty, memberTypeAlias, isApproved);
 
     public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
-        => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias);
+        => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias);
 
-    public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias,
-        bool isApproved)
-        => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias, isApproved);
+    public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
+        => CreateMemberWithIdentity(username, email, name, string.Empty, memberTypeAlias, isApproved);
 
     /// <summary>
     ///     Creates and persists a Member
@@ -226,11 +228,11 @@ public class MemberService : RepositoryService, IMemberService
     /// <param name="name">Name of the Member to create</param>
     /// <param name="memberTypeAlias">Alias of the MemberType the Member should be based on</param>
     /// <param name="isApproved">Optional IsApproved of the Member to create</param>
+    /// <param name="passwordValue">Password of the Member to create</param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue,
-        string memberTypeAlias, bool isApproved = true)
+    public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, string memberTypeAlias, bool isApproved = true)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -240,7 +242,8 @@ public class MemberService : RepositoryService, IMemberService
             IMemberType memberType = GetMemberType(scope, memberTypeAlias); // + locks // + locks
             if (memberType == null)
             {
-                throw new ArgumentException("No member type with that alias.",
+                throw new ArgumentException(
+                    "No member type with that alias.",
                     nameof(memberTypeAlias)); // causes rollback // causes rollback
             }
 
@@ -255,7 +258,7 @@ public class MemberService : RepositoryService, IMemberService
     }
 
     public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
-        => CreateMemberWithIdentity(username, email, username, "", memberType);
+        => CreateMemberWithIdentity(username, email, username, string.Empty, memberType);
 
     /// <summary>
     ///     Creates and persists a Member
@@ -267,14 +270,15 @@ public class MemberService : RepositoryService, IMemberService
     /// <param name="username">Username of the Member to create</param>
     /// <param name="email">Email of the Member to create</param>
     /// <param name="memberType">MemberType the Member should be based on</param>
+    /// <param name="isApproved"></param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
     public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
-        => CreateMemberWithIdentity(username, email, username, "", memberType, isApproved);
+        => CreateMemberWithIdentity(username, email, username, string.Empty, memberType, isApproved);
 
     public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
-        => CreateMemberWithIdentity(username, email, name, "", memberType);
+        => CreateMemberWithIdentity(username, email, name, string.Empty, memberType);
 
     /// <summary>
     ///     Creates and persists a Member
@@ -287,12 +291,32 @@ public class MemberService : RepositoryService, IMemberService
     /// <param name="email">Email of the Member to create</param>
     /// <param name="name">Name of the Member to create</param>
     /// <param name="memberType">MemberType the Member should be based on</param>
+    /// <param name="isApproved"></param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType,
-        bool isApproved)
-        => CreateMemberWithIdentity(username, email, name, "", memberType, isApproved);
+    public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
+        => CreateMemberWithIdentity(username, email, name, string.Empty, memberType, isApproved);
+
+    #endregion
+
+    #region Get, Has, Is, Exists...
+
+    /// <summary>
+    ///     Gets a Member by its integer id
+    /// </summary>
+    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <returns>
+    ///     <see cref="IMember" />
+    /// </returns>
+    public IMember? GetById(int id)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            scope.ReadLock(Constants.Locks.MemberTree);
+            return _memberRepository.Get(id);
+        }
+    }
 
     /// <summary>
     ///     Creates and persists a Member
@@ -309,11 +333,11 @@ public class MemberService : RepositoryService, IMemberService
     ///     stored in the database
     /// </param>
     /// <param name="memberType">MemberType the Member should be based on</param>
+    /// <param name="isApproved"></param>
     /// <returns>
     ///     <see cref="IMember" />
     /// </returns>
-    private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue,
-        IMemberType memberType, bool isApproved = true)
+    private IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, IMemberType memberType, bool isApproved = true)
     {
         if (memberType == null)
         {
@@ -341,26 +365,6 @@ public class MemberService : RepositoryService, IMemberService
             scope.Complete();
 
             return member;
-        }
-    }
-
-    #endregion
-
-    #region Get, Has, Is, Exists...
-
-    /// <summary>
-    ///     Gets a Member by its integer id
-    /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
-    /// <returns>
-    ///     <see cref="IMember" />
-    /// </returns>
-    public IMember? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.MemberTree);
-            return _memberRepository.Get(id);
         }
     }
 
@@ -399,30 +403,47 @@ public class MemberService : RepositoryService, IMemberService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(Constants.Locks.MemberTree);
-            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null,
-                Ordering.By("LoginName"));
+            return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
     }
 
-    public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection, string? memberTypeAlias = null, string filter = "") =>
+    public IEnumerable<IMember> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        string? memberTypeAlias = null,
+        string filter = "") =>
         GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
 
-    public IEnumerable<IMember> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection, bool orderBySystemField, string? memberTypeAlias, string filter)
+    public IEnumerable<IMember> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        bool orderBySystemField,
+        string? memberTypeAlias,
+        string filter)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(Constants.Locks.MemberTree);
-            IQuery<IMember> query1 = memberTypeAlias == null
+            IQuery<IMember>? query1 = memberTypeAlias == null
                 ? null
                 : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
-            IQuery<IMember> query2 = filter == null
+            IQuery<IMember>? query2 = filter == null
                 ? null
                 : Query<IMember>()?.Where(x =>
                     (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) ||
                     x.Email.Contains(filter));
-            return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2,
+            return _memberRepository.GetPage(
+                query1,
+                pageIndex,
+                pageSize,
+                out totalRecords,
+                query2,
                 Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
     }
@@ -491,7 +512,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias)
+    public IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -508,7 +529,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId)
+    public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -565,8 +586,12 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, long pageIndex, int pageSize,
-        out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+    public IEnumerable<IMember> FindMembersByDisplayName(
+        string displayNameToMatch,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -613,8 +638,12 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize,
-        out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+    public IEnumerable<IMember> FindByEmail(
+        string emailStringToMatch,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -660,7 +689,11 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords,
+    public IEnumerable<IMember> FindByUsername(
+        string login,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
         StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
@@ -689,8 +722,7 @@ public class MemberService : RepositoryService, IMemberService
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null,
-                Ordering.By("LoginName"));
+            return _memberRepository.GetPage(query, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
         }
     }
 
@@ -706,8 +738,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, string value,
-        StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
+    public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -760,8 +791,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, int value,
-        ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+    public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -809,7 +839,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, bool value)
+    public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -833,8 +863,7 @@ public class MemberService : RepositoryService, IMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    public IEnumerable<IMember>? GetMembersByPropertyValue(string propertyTypeAlias, DateTime value,
-        ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
+    public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -971,7 +1000,7 @@ public class MemberService : RepositoryService, IMemberService
 
             foreach (IMember member in membersA)
             {
-                //trimming username and email to make sure we have no trailing space
+                // trimming username and email to make sure we have no trailing space
                 member.Username = member.Username.Trim();
                 member.Email = member.Email.Trim();
 
@@ -1016,16 +1045,6 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs,
-        IDictionary<string, object?>? notificationState = null)
-    {
-        // a member has no descendants
-        _memberRepository.Delete(member);
-        scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
-
-        // media files deleted by QueuingEventDispatcher
-    }
-
     #endregion
 
     #region Roles
@@ -1038,6 +1057,15 @@ public class MemberService : RepositoryService, IMemberService
             _memberGroupRepository.CreateIfNotExists(roleName);
             scope.Complete();
         }
+    }
+
+    private void DeleteLocked(ICoreScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object?>? notificationState = null)
+    {
+        // a member has no descendants
+        _memberRepository.Delete(member);
+        scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
+
+        // media files deleted by QueuingEventDispatcher
     }
 
     /// <summary>
@@ -1058,7 +1086,7 @@ public class MemberService : RepositoryService, IMemberService
     /// </summary>
     /// <param name="memberId"></param>
     /// <returns>A list of member roles</returns>
-    public IEnumerable<string?>? GetAllRoles(int memberId)
+    public IEnumerable<string?> GetAllRoles(int memberId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -1116,8 +1144,7 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+    public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -1158,7 +1185,7 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    public void AssignRole(string username, string roleName) => AssignRoles(new[] {username}, new[] {roleName});
+    public void AssignRole(string username, string roleName) => AssignRoles(new[] { username }, new[] { roleName });
 
     public void AssignRoles(string[] usernames, string[] roleNames)
     {
@@ -1172,7 +1199,7 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    public void DissociateRole(string username, string roleName) => DissociateRoles(new[] {username}, new[] {roleName});
+    public void DissociateRole(string username, string roleName) => DissociateRoles(new[] { username }, new[] { roleName });
 
     public void DissociateRoles(string[] usernames, string[] roleNames)
     {
@@ -1186,7 +1213,7 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    public void AssignRole(int memberId, string roleName) => AssignRoles(new[] {memberId}, new[] {roleName});
+    public void AssignRole(int memberId, string roleName) => AssignRoles(new[] { memberId }, new[] { roleName });
 
     public void AssignRoles(int[] memberIds, string[] roleNames)
     {
@@ -1199,7 +1226,7 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
-    public void DissociateRole(int memberId, string roleName) => DissociateRoles(new[] {memberId}, new[] {roleName});
+    public void DissociateRole(int memberId, string roleName) => DissociateRoles(new[] { memberId }, new[] { roleName });
 
     public void DissociateRoles(int[] memberIds, string[] roleNames)
     {
@@ -1269,39 +1296,13 @@ public class MemberService : RepositoryService, IMemberService
                 ContentTypeAlias = member.ContentTypeAlias,
                 CreateDate = member.CreateDate,
                 UpdateDate = member.UpdateDate,
-                Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
+                Properties = new List<MemberExportProperty>(GetPropertyExportItems(member)),
             };
 
             scope.Notifications.Publish(new ExportedMemberNotification(member, model));
 
             return model;
         }
-    }
-
-    private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
-    {
-        if (member == null)
-        {
-            throw new ArgumentNullException(nameof(member));
-        }
-
-        var exportProperties = new List<MemberExportProperty>();
-
-        foreach (IProperty property in member.Properties)
-        {
-            var propertyExportModel = new MemberExportProperty
-            {
-                Id = property.Id,
-                Alias = property.Alias,
-                Name = property.PropertyType.Name,
-                Value = property.GetValue(), // TODO: ignoring variants
-                CreateDate = property.CreateDate,
-                UpdateDate = property.UpdateDate
-            };
-            exportProperties.Add(propertyExportModel);
-        }
-
-        return exportProperties;
     }
 
     #endregion
@@ -1322,7 +1323,7 @@ public class MemberService : RepositoryService, IMemberService
             scope.WriteLock(Constants.Locks.MemberTree);
 
             // TODO: What about content that has the contenttype as part of its composition?
-            IQuery<IMember>? query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
+            IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
             IMember[]? members = _memberRepository.Get(query)?.ToArray();
 
@@ -1348,6 +1349,32 @@ public class MemberService : RepositoryService, IMemberService
         }
     }
 
+    private static IEnumerable<MemberExportProperty> GetPropertyExportItems(IMember member)
+    {
+        if (member == null)
+        {
+            throw new ArgumentNullException(nameof(member));
+        }
+
+        var exportProperties = new List<MemberExportProperty>();
+
+        foreach (IProperty property in member.Properties)
+        {
+            var propertyExportModel = new MemberExportProperty
+            {
+                Id = property.Id,
+                Alias = property.Alias,
+                Name = property.PropertyType.Name,
+                Value = property.GetValue(), // TODO: ignoring variants
+                CreateDate = property.CreateDate,
+                UpdateDate = property.UpdateDate,
+            };
+            exportProperties.Add(propertyExportModel);
+        }
+
+        return exportProperties;
+    }
+
     private IMemberType GetMemberType(ICoreScope scope, string memberTypeAlias)
     {
         if (memberTypeAlias == null)
@@ -1357,7 +1384,8 @@ public class MemberService : RepositoryService, IMemberService
 
         if (string.IsNullOrWhiteSpace(memberTypeAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(memberTypeAlias));
         }
 
@@ -1383,7 +1411,8 @@ public class MemberService : RepositoryService, IMemberService
 
         if (string.IsNullOrWhiteSpace(memberTypeAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(memberTypeAlias));
         }
 

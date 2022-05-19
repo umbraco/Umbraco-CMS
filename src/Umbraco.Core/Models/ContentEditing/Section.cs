@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -8,9 +8,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "section", Namespace = "")]
 public class Section
 {
-    [DataMember(Name = "name")] public string Name { get; set; } = null!;
+    [DataMember(Name = "name")]
+    public string Name { get; set; } = null!;
 
-    [DataMember(Name = "alias")] public string Alias { get; set; } = null!;
+    [DataMember(Name = "alias")]
+    public string Alias { get; set; } = null!;
 
     /// <summary>
     ///     In some cases a custom route path can be specified so that when clicking on a section it goes to this

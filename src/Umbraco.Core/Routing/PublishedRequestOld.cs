@@ -22,8 +22,7 @@ public class PublishedRequestOld // : IPublishedRequest
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
     /// </summary>
-    public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext,
-        IOptions<WebRoutingSettings> webRoutingSettings, Uri? uri = null)
+    public PublishedRequestOld(IPublishedRouter publishedRouter, IUmbracoContext umbracoContext, IOptions<WebRoutingSettings> webRoutingSettings, Uri? uri = null)
     {
         UmbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
         _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -47,10 +46,10 @@ public class PublishedRequestOld // : IPublishedRequest
     ///// <summary>
     ///// Prepares the request.
     ///// </summary>
-    //public void Prepare()
-    //{
-    //    _publishedRouter.PrepareRequest(this);
-    //}
+    // public void Prepare()
+    // {
+    //     _publishedRouter.PrepareRequest(this);
+    // }
 
     /// <summary>
     ///     Gets or sets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
@@ -66,7 +65,6 @@ public class PublishedRequestOld // : IPublishedRequest
     ///     Gets the alias of the template to use to display the requested content.
     /// </summary>
     public string? TemplateAlias => Template?.Alias;
-
 
     /// <summary>
     ///     Gets or sets the content request's domain.
@@ -113,7 +111,7 @@ public class PublishedRequestOld // : IPublishedRequest
         }
     }
 
-    //#region Events
+    // #region Events
 
     ///// <summary>
     ///// Triggers before the published content request is prepared.
@@ -121,7 +119,7 @@ public class PublishedRequestOld // : IPublishedRequest
     ///// <remarks>When the event triggers, no preparation has been done. It is still possible to
     ///// modify the request's Uri property, for example to restore its original, public-facing value
     ///// that might have been modified by an in-between equipment such as a load-balancer.</remarks>
-    //public static event EventHandler<EventArgs> Preparing;
+    // public static event EventHandler<EventArgs> Preparing;
 
     ///// <summary>
     ///// Triggers once the published content request has been prepared, but before it is processed.
@@ -129,39 +127,38 @@ public class PublishedRequestOld // : IPublishedRequest
     ///// <remarks>When the event triggers, preparation is done ie domain, culture, document, template,
     ///// rendering engine, etc. have been setup. It is then possible to change anything, before
     ///// the request is actually processed and rendered by Umbraco.</remarks>
-    //public static event EventHandler<EventArgs> Prepared;
+    // public static event EventHandler<EventArgs> Prepared;
 
     ///// <summary>
     ///// Triggers the Preparing event.
     ///// </summary>
-    //public void OnPreparing()
-    //{
-    //    Preparing?.Invoke(this, EventArgs.Empty);
-    //}
+    // public void OnPreparing()
+    // {
+    //     Preparing?.Invoke(this, EventArgs.Empty);
+    // }
 
     ///// <summary>
     ///// Triggers the Prepared event.
     ///// </summary>
-    //public void OnPrepared()
-    //{
-    //    Prepared?.Invoke(this, EventArgs.Empty);
+    // public void OnPrepared()
+    // {
+    //     Prepared?.Invoke(this, EventArgs.Empty);
 
-    //    if (HasPublishedContent == false)
-    //        Is404 = true; // safety
+    // if (HasPublishedContent == false)
+    //         Is404 = true; // safety
 
-    //    _readonly = true;
-    //}
+    // _readonly = true;
+    // }
 
-    //#endregion
-
+    // #endregion
     #region PublishedContent
 
     ///// <summary>
     ///// Gets or sets the requested content.
     ///// </summary>
     ///// <remarks>Setting the requested content clears <c>Template</c>.</remarks>
-    //public IPublishedContent PublishedContent
-    //{
+    // public IPublishedContent PublishedContent
+    // {
     //    get { return _publishedContent; }
     //    set
     //    {
@@ -170,7 +167,7 @@ public class PublishedRequestOld // : IPublishedRequest
     //        IsInternalRedirectPublishedContent = false;
     //        TemplateModel = null;
     //    }
-    //}
+    // }
 
     /// <summary>
     ///     Sets the requested content, following an internal redirect.
@@ -182,39 +179,39 @@ public class PublishedRequestOld // : IPublishedRequest
     /// </remarks>
     public void SetInternalRedirectPublishedContent(IPublishedContent content)
     {
-        //if (content == null)
-        //    throw new ArgumentNullException(nameof(content));
-        //EnsureWriteable();
+        // if (content == null)
+        //     throw new ArgumentNullException(nameof(content));
+        // EnsureWriteable();
 
         //// unless a template has been set already by the finder,
         //// template should be null at that point.
 
         //// IsInternalRedirect if IsInitial, or already IsInternalRedirect
-        //var isInternalRedirect = IsInitialPublishedContent || IsInternalRedirectPublishedContent;
+        // var isInternalRedirect = IsInitialPublishedContent || IsInternalRedirectPublishedContent;
 
         //// redirecting to self
-        //if (content.Id == PublishedContent.Id) // neither can be null
-        //{
-        //    // no need to set PublishedContent, we're done
-        //    IsInternalRedirectPublishedContent = isInternalRedirect;
-        //    return;
-        //}
+        // if (content.Id == PublishedContent.Id) // neither can be null
+        // {
+        //     // no need to set PublishedContent, we're done
+        //     IsInternalRedirectPublishedContent = isInternalRedirect;
+        //     return;
+        // }
 
         //// else
 
         //// save
-        //var template = Template;
+        // var template = Template;
 
         //// set published content - this resets the template, and sets IsInternalRedirect to false
-        //PublishedContent = content;
-        //IsInternalRedirectPublishedContent = isInternalRedirect;
+        // PublishedContent = content;
+        // IsInternalRedirectPublishedContent = isInternalRedirect;
 
         //// must restore the template if it's an internal redirect & the config option is set
-        //if (isInternalRedirect && _webRoutingSettings.InternalRedirectPreservesTemplate)
-        //{
+        // if (isInternalRedirect && _webRoutingSettings.InternalRedirectPreservesTemplate)
+        // {
         //    // restore
         //    TemplateModel = template;
-        //}
+        // }
     }
 
     /// <summary>
@@ -258,8 +255,6 @@ public class PublishedRequestOld // : IPublishedRequest
 
     // note: do we want to have an ordered list of alternate cultures,
     // to allow for fallbacks when doing dictionary lookup and such?
-
-
     #region Status
 
     /// <summary>
@@ -345,7 +340,9 @@ public class PublishedRequestOld // : IPublishedRequest
 
         RedirectUrl = url;
         IsRedirectPermanent = status == 301 || status == 308;
-        if (status != 301 && status != 302) // default redirect statuses
+
+        // default redirect statuses
+        if (status != 301 && status != 302)
         {
             ResponseStatusCode = status;
         }
@@ -393,13 +390,13 @@ public class PublishedRequestOld // : IPublishedRequest
 
     #region Response Cache
 
-    /// <summary>
-    /// Gets or sets the <c>System.Web.HttpCacheability</c>
-    /// </summary>
+    // ///  <summary>
+    // /// Gets or sets the <c>System.Web.HttpCacheability</c>
+    // /// </summary>
     // Note: we used to set a default value here but that would then be the default
     // for ALL requests, we shouldn't overwrite it though if people are using [OutputCache] for example
     // see: https://our.umbraco.com/forum/using-umbraco-and-getting-started/79715-output-cache-in-umbraco-752
-    //public HttpCacheability Cacheability { get; set; }
+    // public HttpCacheability Cacheability { get; set; }
 
     /// <summary>
     ///     Gets or sets a list of Extensions to append to the Response.Cache object.

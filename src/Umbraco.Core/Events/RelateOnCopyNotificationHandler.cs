@@ -25,12 +25,12 @@ public class RelateOnCopyNotificationHandler : INotificationHandler<ContentCopie
             return;
         }
 
-        IRelationType relationType =
-            _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+        IRelationType? relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
         if (relationType == null)
         {
-            relationType = new RelationType(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+            relationType = new RelationType(
+                Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
                 Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
                 true,
                 Constants.ObjectTypes.Document,
@@ -46,7 +46,8 @@ public class RelateOnCopyNotificationHandler : INotificationHandler<ContentCopie
         _auditService.Add(
             AuditType.Copy,
             notification.Copy.WriterId,
-            notification.Copy.Id, UmbracoObjectTypes.Document.GetName() ?? string.Empty,
+            notification.Copy.Id,
+            UmbracoObjectTypes.Document.GetName() ?? string.Empty,
             $"Copied content with Id: '{notification.Copy.Id}' related to original content with Id: '{notification.Original.Id}'");
     }
 }

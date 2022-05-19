@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Specifies the level of cache for a property value.
@@ -36,5 +36,5 @@ public enum PropertyCacheLevel
     ///     Indicates that the property value cannot be cached and has to be converted each time
     ///     it is requested.
     /// </summary>
-    None = 4
+    None = 4,
 }

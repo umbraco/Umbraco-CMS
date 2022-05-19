@@ -22,8 +22,7 @@ public static class MediaServiceExtensions
         var guids = new List<GuidUdi>();
         foreach (Udi udi in ids)
         {
-            var guidUdi = udi as GuidUdi;
-            if (guidUdi is null)
+            if (udi is not GuidUdi guidUdi)
             {
                 throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +
                                                     " which is required by media");
@@ -35,17 +34,15 @@ public static class MediaServiceExtensions
         return mediaService.GetByIds(guids.Select(x => x.Guid));
     }
 
-    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias,
-        int userId = 0)
+    public static IMedia CreateMedia(this IMediaService mediaService, string name, Udi parentId, string mediaTypeAlias, int userId = 0)
     {
-        var guidUdi = parentId as GuidUdi;
-        if (guidUdi is null)
+        if (parentId is not GuidUdi guidUdi)
         {
             throw new InvalidOperationException("The UDI provided isn't of type " + typeof(GuidUdi) +
                                                 " which is required by media");
         }
 
-        IMedia parent = mediaService.GetById(guidUdi.Guid);
+        IMedia? parent = mediaService.GetById(guidUdi.Guid);
         return mediaService.CreateMedia(name, parent, mediaTypeAlias, userId);
     }
 }

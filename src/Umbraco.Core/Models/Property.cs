@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
@@ -42,7 +42,8 @@ public class Property : EntityBase, IProperty
             }
 
             return o.Equals(o1);
-        }, o => o!.GetHashCode());
+        },
+        o => o!.GetHashCode());
 
     // _pvalue contains the invariant-neutral property value
     private IPropertyValue? _pvalue;
@@ -115,6 +116,36 @@ public class Property : EntityBase, IProperty
     public ValueStorageType ValueStorageType => PropertyType.ValueStorageType;
 
     /// <summary>
+    ///     Creates a new <see cref="Property" /> instance for existing <see cref="IProperty" />
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="propertyType"></param>
+    /// <param name="values">
+    ///     Generally will contain a published and an unpublished property values
+    /// </param>
+    /// <returns></returns>
+    public static Property CreateWithValues(int id, IPropertyType propertyType, params InitialPropertyValue[] values)
+    {
+        var property = new Property(propertyType);
+        try
+        {
+            property.DisableChangeTracking();
+            property.Id = id;
+            foreach (InitialPropertyValue value in values)
+            {
+                property.FactorySetValue(value.Culture, value.Segment, value.Published, value.Value);
+            }
+
+            property.ResetDirtyProperties(false);
+            return property;
+        }
+        finally
+        {
+            property.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
     ///     Gets the value.
     /// </summary>
     public object? GetValue(string? culture = null, string? segment = null, bool published = false)
@@ -138,7 +169,7 @@ public class Property : EntityBase, IProperty
             return null;
         }
 
-        return _vvalues.TryGetValue(new CompositeNStringNStringKey(culture, segment), out IPropertyValue pvalue)
+        return _vvalues.TryGetValue(new CompositeNStringNStringKey(culture, segment), out IPropertyValue? pvalue)
             ? GetPropertyValue(pvalue, published)
             : null;
     }
@@ -224,7 +255,7 @@ public class Property : EntityBase, IProperty
                 $"Variation \"{culture ?? "<null>"},{segment ?? "<null>"}\" is not supported by the property type.");
         }
 
-        (IPropertyValue pvalue, var change) = GetPValue(culture, segment, true);
+        (IPropertyValue? pvalue, var change) = GetPValue(culture, segment, true);
 
         if (pvalue is not null)
         {
@@ -237,34 +268,17 @@ public class Property : EntityBase, IProperty
         }
     }
 
-    /// <summary>
-    ///     Creates a new <see cref="Property" /> instance for existing <see cref="IProperty" />
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="propertyType"></param>
-    /// <param name="values">
-    ///     Generally will contain a published and an unpublished property values
-    /// </param>
-    /// <returns></returns>
-    public static Property CreateWithValues(int id, IPropertyType propertyType, params InitialPropertyValue[] values)
-    {
-        var property = new Property(propertyType);
-        try
-        {
-            property.DisableChangeTracking();
-            property.Id = id;
-            foreach (InitialPropertyValue value in values)
-            {
-                property.FactorySetValue(value.Culture, value.Segment, value.Published, value.Value);
-            }
+    public object? ConvertAssignedValue(object? value) =>
+        TryConvertAssignedValue(value, true, out var converted) ? converted : null;
 
-            property.ResetDirtyProperties(false);
-            return property;
-        }
-        finally
-        {
-            property.EnableChangeTracking();
-        }
+    protected override void PerformDeepClone(object clone)
+    {
+        base.PerformDeepClone(clone);
+
+        var clonedEntity = (Property)clone;
+
+        // need to manually assign since this is a readonly property
+        clonedEntity.PropertyType = (PropertyType)PropertyType.DeepClone();
     }
 
     private object? GetPropertyValue(IPropertyValue? pvalue, bool published)
@@ -316,7 +330,7 @@ public class Property : EntityBase, IProperty
     // bypasses all changes detection and is the *only* way to set the published value
     private void FactorySetValue(string? culture, string? segment, bool published, object? value)
     {
-        (IPropertyValue pvalue, _) = GetPValue(culture, segment, true);
+        (IPropertyValue? pvalue, _) = GetPValue(culture, segment, true);
 
         if (pvalue is not null)
         {
@@ -369,7 +383,7 @@ public class Property : EntityBase, IProperty
         }
 
         var k = new CompositeNStringNStringKey(culture, segment);
-        if (!_vvalues.TryGetValue(k, out IPropertyValue pvalue))
+        if (!_vvalues.TryGetValue(k, out IPropertyValue? pvalue))
         {
             if (!create)
             {
@@ -386,9 +400,9 @@ public class Property : EntityBase, IProperty
         return (pvalue, change);
     }
 
-    /// <inheritdoc />
-    public object? ConvertAssignedValue(object? value) =>
-        TryConvertAssignedValue(value, true, out var converted) ? converted : null;
+    private static void ThrowTypeException(object? value, Type expected, string alias) =>
+        throw new InvalidOperationException(
+            $"Cannot assign value \"{value}\" of type \"{value?.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
 
     /// <summary>
     ///     Tries to convert a value assigned to a property.
@@ -408,7 +422,6 @@ public class Property : EntityBase, IProperty
         // isOfExpectedType is true if value is null - so if false, value is *not* null
         // "garbage-in", accept what we can & convert
         // throw only if conversion is not possible
-
         var s = value?.ToString();
         converted = null;
 
@@ -436,7 +449,7 @@ public class Property : EntityBase, IProperty
 
                 if (throwOnError)
                 {
-                    ThrowTypeException(value, typeof(int), Alias ?? string.Empty);
+                    ThrowTypeException(value, typeof(int), Alias);
                 }
 
                 return false;
@@ -458,7 +471,7 @@ public class Property : EntityBase, IProperty
 
                 if (throwOnError)
                 {
-                    ThrowTypeException(value, typeof(decimal), Alias ?? string.Empty);
+                    ThrowTypeException(value, typeof(decimal), Alias);
                 }
 
                 return false;
@@ -478,7 +491,7 @@ public class Property : EntityBase, IProperty
 
                 if (throwOnError)
                 {
-                    ThrowTypeException(value, typeof(DateTime), Alias ?? string.Empty);
+                    ThrowTypeException(value, typeof(DateTime), Alias);
                 }
 
                 return false;
@@ -487,10 +500,6 @@ public class Property : EntityBase, IProperty
                 throw new NotSupportedException($"Not supported storage type \"{ValueStorageType}\".");
         }
     }
-
-    private static void ThrowTypeException(object? value, Type expected, string alias) =>
-        throw new InvalidOperationException(
-            $"Cannot assign value \"{value}\" of type \"{value?.GetType()}\" to property \"{alias}\" expecting type \"{expected}\".");
 
     /// <summary>
     ///     Determines whether a value is of the expected type for this property type.
@@ -529,17 +538,6 @@ public class Property : EntityBase, IProperty
         }
     }
 
-
-    protected override void PerformDeepClone(object clone)
-    {
-        base.PerformDeepClone(clone);
-
-        var clonedEntity = (Property)clone;
-
-        //need to manually assign since this is a readonly property
-        clonedEntity.PropertyType = (PropertyType)PropertyType.DeepClone();
-    }
-
     /// <summary>
     ///     Used for constructing a new <see cref="Property" /> instance
     /// </summary>
@@ -554,8 +552,11 @@ public class Property : EntityBase, IProperty
         }
 
         public string? Culture { get; }
+
         public string? Segment { get; }
+
         public bool Published { get; }
+
         public object? Value { get; }
     }
 
@@ -566,18 +567,8 @@ public class Property : EntityBase, IProperty
     {
         // TODO: Either we allow change tracking at this class level, or we add some special change tracking collections to the Property
         // class to deal with change tracking which variants have changed
-
         private string? _culture;
         private string? _segment;
-
-        public object DeepClone() => Clone();
-
-        public bool Equals(PropertyValue? other) =>
-            other != null &&
-            _culture == other._culture &&
-            _segment == other._segment &&
-            EqualityComparer<object>.Default.Equals(EditedValue, other.EditedValue) &&
-            EqualityComparer<object>.Default.Equals(PublishedValue, other.PublishedValue);
 
         /// <summary>
         ///     Gets or sets the culture of the property.
@@ -591,6 +582,15 @@ public class Property : EntityBase, IProperty
             get => _culture;
             set => _culture = value.IsNullOrWhiteSpace() ? null : value!.ToLowerInvariant();
         }
+
+        public object DeepClone() => Clone();
+
+        public bool Equals(PropertyValue? other) =>
+            other != null &&
+            _culture == other._culture &&
+            _segment == other._segment &&
+            EqualityComparer<object>.Default.Equals(EditedValue, other.EditedValue) &&
+            EqualityComparer<object>.Default.Equals(PublishedValue, other.PublishedValue);
 
         /// <summary>
         ///     Gets or sets the segment of the property.
@@ -621,7 +621,10 @@ public class Property : EntityBase, IProperty
         public IPropertyValue Clone()
             => new PropertyValue
             {
-                _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue
+                _culture = _culture,
+                _segment = _segment,
+                PublishedValue = PublishedValue,
+                EditedValue = EditedValue,
             };
 
         public override bool Equals(object? obj) => Equals(obj as PropertyValue);

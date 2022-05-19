@@ -191,11 +191,13 @@ public sealed class TypeLoader
         {
             // warn
             _logger.LogDebug(
-                "Running a full, " + (cache ? "" : "non-") +
-                "cached, scan for non-discoverable type {TypeName} (slow).", typeof(T).FullName);
+                "Running a full, " + (cache ? string.Empty : "non-") +
+                "cached, scan for non-discoverable type {TypeName} (slow).",
+                typeof(T).FullName);
 
             return GetTypesInternal(
-                typeof(T), null,
+                typeof(T),
+                null,
                 () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
                 "scanning assemblies",
                 cache);
@@ -203,7 +205,8 @@ public sealed class TypeLoader
 
         // get IDiscoverable and always cache
         IEnumerable<Type> discovered = GetTypesInternal(
-            typeof(IDiscoverable), null,
+            typeof(IDiscoverable),
+            null,
             () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
             "scanning assemblies",
             true);
@@ -211,15 +214,16 @@ public sealed class TypeLoader
         // warn
         if (!cache)
         {
-            _logger.LogDebug("Running a non-cached, filter for discoverable type {TypeName} (slowish).",
+            _logger.LogDebug(
+                "Running a non-cached, filter for discoverable type {TypeName} (slowish).",
                 typeof(T).FullName);
         }
 
         // filter the cached discovered types (and maybe cache the result)
         return GetTypesInternal(
-            typeof(T), null,
-            () => discovered
-                .Where(x => typeof(T).IsAssignableFrom(x)),
+            typeof(T),
+            null,
+            () => discovered.Where(x => typeof(T).IsAssignableFrom(x)),
             "filtering IDiscoverable",
             cache);
     }
@@ -233,7 +237,8 @@ public sealed class TypeLoader
     /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
     /// <returns>All class types inheriting from or implementing the specified type and marked with the specified attribute.</returns>
     /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-    public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(bool cache = true,
+    public IEnumerable<Type> GetTypesWithAttribute<T, TAttribute>(
+        bool cache = true,
         IEnumerable<Assembly>? specificAssemblies = null)
         where TAttribute : Attribute
     {
@@ -249,12 +254,14 @@ public sealed class TypeLoader
         if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
         {
             _logger.LogDebug(
-                "Running a full, " + (cache ? "" : "non-") +
+                "Running a full, " + (cache ? string.Empty : "non-") +
                 "cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).",
-                typeof(T).FullName, typeof(TAttribute).FullName);
+                typeof(T).FullName,
+                typeof(TAttribute).FullName);
 
             return GetTypesInternal(
-                typeof(T), typeof(TAttribute),
+                typeof(T),
+                typeof(TAttribute),
                 () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
                 "scanning assemblies",
                 cache);
@@ -262,7 +269,8 @@ public sealed class TypeLoader
 
         // get IDiscoverable and always cache
         IEnumerable<Type> discovered = GetTypesInternal(
-            typeof(IDiscoverable), null,
+            typeof(IDiscoverable),
+            null,
             () => TypeFinder.FindClassesOfType<IDiscoverable>(AssembliesToScan),
             "scanning assemblies",
             true);
@@ -272,12 +280,14 @@ public sealed class TypeLoader
         {
             _logger.LogDebug(
                 "Running a non-cached, filter for discoverable type {TypeName}  / attribute {AttributeName} (slowish).",
-                typeof(T).FullName, typeof(TAttribute).FullName);
+                typeof(T).FullName,
+                typeof(TAttribute).FullName);
         }
 
         // filter the cached discovered types (and maybe cache the result)
         return GetTypesInternal(
-            typeof(T), typeof(TAttribute),
+            typeof(T),
+            typeof(TAttribute),
             () => discovered
                 .Where(x => typeof(T).IsAssignableFrom(x))
                 .Where(x => x.GetCustomAttributes<TAttribute>(false).Any()),
@@ -293,7 +303,8 @@ public sealed class TypeLoader
     /// <param name="specificAssemblies">A set of assemblies for type resolution.</param>
     /// <returns>All class types marked with the specified attribute.</returns>
     /// <remarks>Caching is disabled when using specific assemblies.</remarks>
-    public IEnumerable<Type> GetAttributedTypes<TAttribute>(bool cache = true,
+    public IEnumerable<Type> GetAttributedTypes<TAttribute>(
+        bool cache = true,
         IEnumerable<Assembly>? specificAssemblies = null)
         where TAttribute : Attribute
     {
@@ -307,15 +318,24 @@ public sealed class TypeLoader
 
         if (!cache)
         {
-            _logger.LogDebug("Running a full, non-cached, scan for types / attribute {AttributeName} (slow).",
+            _logger.LogDebug(
+                "Running a full, non-cached, scan for types / attribute {AttributeName} (slow).",
                 typeof(TAttribute).FullName);
         }
 
         return GetTypesInternal(
-            typeof(object), typeof(TAttribute),
+            typeof(object),
+            typeof(TAttribute),
             () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
             "scanning assemblies",
             cache);
+    }
+
+    private static string GetName(Type? baseType, Type? attributeType)
+    {
+        var s = attributeType == null ? string.Empty : "[" + attributeType + "]";
+        s += baseType;
+        return s;
     }
 
     private IEnumerable<Type> GetTypesInternal(
@@ -329,18 +349,10 @@ public sealed class TypeLoader
         // lock at a time, and we don't have non-upgradeable readers, and quite probably the type
         // loader is mostly not going to be used in any kind of massively multi-threaded scenario - so,
         // a plain lock is enough
-
         lock (_locko)
         {
             return GetTypesInternalLocked(baseType, attributeType, finder, action, cache);
         }
-    }
-
-    private static string GetName(Type? baseType, Type? attributeType)
-    {
-        var s = attributeType == null ? string.Empty : "[" + attributeType + "]";
-        s += baseType;
-        return s;
     }
 
     private IEnumerable<Type> GetTypesInternalLocked(
@@ -388,8 +400,7 @@ public sealed class TypeLoader
                 _types[listKey] = typeList;
             }
 
-            _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType),
-                added.ToString().ToLowerInvariant());
+            _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
         }
         else
         {
@@ -418,6 +429,7 @@ public sealed class TypeLoader
         }
 
         public Type? BaseType { get; }
+
         public Type? AttributeType { get; }
 
         /// <summary>
@@ -432,7 +444,8 @@ public sealed class TypeLoader
         {
             if (BaseType?.IsAssignableFrom(type) == false)
             {
-                throw new ArgumentException("Base type " + BaseType + " is not assignable from type " + type + ".",
+                throw new ArgumentException(
+                    "Base type " + BaseType + " is not assignable from type " + type + ".",
                     nameof(type));
             }
 

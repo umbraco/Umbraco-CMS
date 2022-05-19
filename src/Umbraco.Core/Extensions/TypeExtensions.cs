@@ -17,21 +17,6 @@ public static class TypeExtensions
             ? Activator.CreateInstance(t)
             : null;
 
-    internal static MethodInfo? GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
-    {
-        IEnumerable<MethodInfo> methods = type.GetMethods().Where(method => method.Name == name);
-
-        foreach (MethodInfo method in methods)
-        {
-            if (method.HasParameters(parameterTypes))
-            {
-                return method;
-            }
-        }
-
-        return null;
-    }
-
     /// <summary>
     ///     Checks if the type is an anonymous type
     /// </summary>
@@ -47,13 +32,39 @@ public static class TypeExtensions
             throw new ArgumentNullException("type");
         }
 
-
         return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
                && type.IsGenericType && type.Name.Contains("AnonymousType")
                && (type.Name.StartsWith("<>") || type.Name.StartsWith("VB$"))
                && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
     }
 
+    public static IEnumerable<Type?> GetBaseTypes(this Type? type, bool andSelf)
+    {
+        if (andSelf)
+        {
+            yield return type;
+        }
+
+        while ((type = type?.BaseType) != null)
+        {
+            yield return type;
+        }
+    }
+
+    internal static MethodInfo? GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
+    {
+        IEnumerable<MethodInfo> methods = type.GetMethods().Where(method => method.Name == name);
+
+        foreach (MethodInfo method in methods)
+        {
+            if (method.HasParameters(parameterTypes))
+            {
+                return method;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     ///     Determines whether the specified type is enumerable.
@@ -80,22 +91,9 @@ public static class TypeExtensions
         return true;
     }
 
-    public static IEnumerable<Type?> GetBaseTypes(this Type? type, bool andSelf)
-    {
-        if (andSelf)
-        {
-            yield return type;
-        }
-
-        while ((type = type?.BaseType) != null)
-        {
-            yield return type;
-        }
-    }
-
     public static IEnumerable<MethodInfo> AllMethods(this Type target)
     {
-        //var allTypes = target.AllInterfaces().ToList();
+        // var allTypes = target.AllInterfaces().ToList();
         var allTypes = target.GetInterfaces().ToList(); // GetInterfaces is ok here
         allTypes.Add(target);
 
@@ -135,8 +133,7 @@ public static class TypeExtensions
     /// </returns>
     public static bool IsOfGenericType(this Type type, Type genericType)
     {
-        Type[]? args;
-        return type.TryGetGenericArguments(genericType, out args);
+        return type.TryGetGenericArguments(genericType, out Type[]? args);
     }
 
     /// <summary>
@@ -177,14 +174,14 @@ public static class TypeExtensions
             return null;
         };
 
-        //first, check if the type passed in is already the generic type
+        // first, check if the type passed in is already the generic type
         genericArgType = checkGenericType(type, genericType);
         if (genericArgType != null)
         {
             return true;
         }
 
-        //if we're looking for interfaces, enumerate them:
+        // if we're looking for interfaces, enumerate them:
         if (genericType.IsInterface)
         {
             foreach (Type @interface in type.GetInterfaces())
@@ -198,7 +195,7 @@ public static class TypeExtensions
         }
         else
         {
-            //loop back into the base types as long as they are generic
+            // loop back into the base types as long as they are generic
             while (type.BaseType != null && type.BaseType != typeof(object))
             {
                 genericArgType = checkGenericType(type.BaseType, genericType);
@@ -374,8 +371,7 @@ public static class TypeExtensions
     {
         AssemblyName assemblyName = type.Assembly.GetName();
 
-        return string.Concat(type.FullName, ", ",
-            assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
+        return string.Concat(type.FullName, ", ", assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
     }
 
     /// <summary>
@@ -392,7 +388,6 @@ public static class TypeExtensions
     {
         // type *can* be a generic type definition
         // c is a real type, cannot be a generic type definition
-
         if (type.IsGenericTypeDefinition == false)
         {
             return type.IsAssignableFrom(c);
@@ -400,7 +395,7 @@ public static class TypeExtensions
 
         if (c.IsInterface == false)
         {
-            Type t = c;
+            Type? t = c;
             while (t != typeof(object))
             {
                 if (t is not null && t.IsGenericType && t.GetGenericTypeDefinition() == type)
@@ -429,8 +424,8 @@ public static class TypeExtensions
         }
 
         // provided by Array
-        Type elType = type.GetElementType();
-        if (null != elType)
+        Type? elType = type.GetElementType();
+        if (elType != null)
         {
             return elType;
         }
@@ -450,7 +445,7 @@ public static class TypeExtensions
         where T : Attribute =>
         type.GetCustomAttributes<T>(inherit).SingleOrDefault();
 
-    public static IEnumerable<T> GetCustomAttributes<T>(this Type type, bool inherited)
+    public static IEnumerable<T> GetCustomAttributes<T>(this Type? type, bool inherited)
         where T : Attribute
     {
         if (type == null)
@@ -477,8 +472,7 @@ public static class TypeExtensions
     ///     Currently this will only work for ProperCase and camelCase properties, see the TODO below to enable complete case
     ///     insensitivity
     /// </remarks>
-    internal static Attempt<object> GetMemberIgnoreCase(this Type type, IShortStringHelper shortStringHelper,
-        object target, string memberName)
+    internal static Attempt<object> GetMemberIgnoreCase(this Type type, IShortStringHelper shortStringHelper, object target, string memberName)
     {
         Func<string, Attempt<object>> getMember =
             memberAlias =>
@@ -486,10 +480,9 @@ public static class TypeExtensions
                 try
                 {
                     return Attempt<object>.Succeed(
-                        type.InvokeMember(memberAlias,
-                            BindingFlags.GetProperty |
-                            BindingFlags.Instance |
-                            BindingFlags.Public,
+                        type.InvokeMember(
+                            memberAlias,
+                            BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Public,
                             null,
                             target,
                             null));
@@ -500,15 +493,17 @@ public static class TypeExtensions
                 }
             };
 
-        //try with the current casing
+        // try with the current casing
         Attempt<object> attempt = getMember(memberName);
         if (attempt.Success == false)
         {
-            //if we cannot get with the current alias, try changing it's case
+            // if we cannot get with the current alias, try changing it's case
             attempt = memberName[0].IsUpperCase()
-                ? getMember(memberName.ToCleanString(shortStringHelper,
+                ? getMember(memberName.ToCleanString(
+                    shortStringHelper,
                     CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
-                : getMember(memberName.ToCleanString(shortStringHelper,
+                : getMember(memberName.ToCleanString(
+                    shortStringHelper,
                     CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
 
             // TODO: If this still fails then we should get a list of properties from the object and then compare - doing the above without listing

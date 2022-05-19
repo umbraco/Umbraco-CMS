@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 public class PartialViewMacroModel : IContentModel
 {
-    public PartialViewMacroModel(IPublishedContent page,
+    public PartialViewMacroModel(
+        IPublishedContent page,
         int macroId,
         string? macroAlias,
         string? macroName,
@@ -21,8 +22,11 @@ public class PartialViewMacroModel : IContentModel
     }
 
     public string? MacroName { get; }
+
     public string? MacroAlias { get; }
+
     public int MacroId { get; }
+
     public IDictionary<string, object?> MacroParameters { get; }
 
     public IPublishedContent Content { get; }

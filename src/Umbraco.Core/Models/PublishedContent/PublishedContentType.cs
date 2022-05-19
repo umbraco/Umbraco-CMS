@@ -16,15 +16,15 @@ public class PublishedContentType : IPublishedContentType
     // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
     private static readonly Dictionary<string, int> BuiltinMemberProperties = new()
     {
-        {nameof(IMember.Email), Constants.DataTypes.Textbox},
-        {nameof(IMember.Username), Constants.DataTypes.Textbox},
-        {nameof(IMember.Comments), Constants.DataTypes.Textbox},
-        {nameof(IMember.IsApproved), Constants.DataTypes.Boolean},
-        {nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean},
-        {nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime},
-        {nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime},
-        {nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime},
-        {nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime}
+        { nameof(IMember.Email), Constants.DataTypes.Textbox },
+        { nameof(IMember.Username), Constants.DataTypes.Textbox },
+        { nameof(IMember.Comments), Constants.DataTypes.Textbox },
+        { nameof(IMember.IsApproved), Constants.DataTypes.Boolean },
+        { nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean },
+        { nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime },
+        { nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime },
+        { nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime },
+        { nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime },
     };
 
     // fast alias-to-index xref containing both the raw alias and its lowercase version
@@ -35,8 +35,7 @@ public class PublishedContentType : IPublishedContentType
     ///     Initializes a new instance of the <see cref="PublishedContentType" /> class with a content type.
     /// </summary>
     public PublishedContentType(IContentTypeComposition contentType, IPublishedContentTypeFactory factory)
-        : this(contentType.Key, contentType.Id, contentType.Alias, contentType.GetItemType(),
-            contentType.CompositionAliases(), contentType.Variations, contentType.IsElement)
+        : this(contentType.Key, contentType.Id, contentType.Alias, contentType.GetItemType(), contentType.CompositionAliases(), contentType.Variations, contentType.IsElement)
     {
         var propertyTypes = contentType.CompositionPropertyTypes
             .Select(x => factory.CreatePropertyType(this, x))
@@ -58,9 +57,15 @@ public class PublishedContentType : IPublishedContentType
     /// <remarks>
     ///     <para>Values are assumed to be consistent and are not checked.</para>
     /// </remarks>
-    public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType,
-        IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes,
-        ContentVariation variations, bool isElement = false)
+    public PublishedContentType(
+        Guid key,
+        int id,
+        string alias,
+        PublishedItemType itemType,
+        IEnumerable<string> compositionAliases,
+        IEnumerable<PublishedPropertyType> propertyTypes,
+        ContentVariation variations,
+        bool isElement = false)
         : this(key, id, alias, itemType, compositionAliases, variations, isElement)
     {
         PublishedPropertyType[] propertyTypesA = propertyTypes.ToArray();
@@ -75,9 +80,14 @@ public class PublishedContentType : IPublishedContentType
     }
 
     [Obsolete("Use the overload specifying a key instead")]
-    public PublishedContentType(int id, string alias, PublishedItemType itemType,
-        IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes,
-        ContentVariation variations, bool isElement = false)
+    public PublishedContentType(
+        int id,
+        string alias,
+        PublishedItemType itemType,
+        IEnumerable<string> compositionAliases,
+        IEnumerable<PublishedPropertyType> propertyTypes,
+        ContentVariation variations,
+        bool isElement = false)
         : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
     {
         PublishedPropertyType[] propertyTypesA = propertyTypes.ToArray();
@@ -97,9 +107,14 @@ public class PublishedContentType : IPublishedContentType
     /// <remarks>
     ///     <para>Values are assumed to be consistent and are not checked.</para>
     /// </remarks>
-    public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType,
+    public PublishedContentType(
+        Guid key,
+        int id,
+        string alias,
+        PublishedItemType itemType,
         IEnumerable<string> compositionAliases,
-        Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations,
+        Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes,
+        ContentVariation variations,
         bool isElement = false)
         : this(key, id, alias, itemType, compositionAliases, variations, isElement)
     {
@@ -109,9 +124,13 @@ public class PublishedContentType : IPublishedContentType
     }
 
     [Obsolete("Use the overload specifying a key instead")]
-    public PublishedContentType(int id, string alias, PublishedItemType itemType,
+    public PublishedContentType(
+        int id,
+        string alias,
+        PublishedItemType itemType,
         IEnumerable<string> compositionAliases,
-        Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations,
+        Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes,
+        ContentVariation variations,
         bool isElement = false)
         : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
     {
@@ -120,8 +139,7 @@ public class PublishedContentType : IPublishedContentType
         InitializeIndexes();
     }
 
-    private PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType,
-        IEnumerable<string> compositionAliases, ContentVariation variations, bool isElement)
+    private PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, ContentVariation variations, bool isElement)
     {
         Key = key;
         Id = id;
@@ -131,6 +149,11 @@ public class PublishedContentType : IPublishedContentType
         Variations = variations;
         IsElement = isElement;
     }
+
+    #region Content type
+
+    /// <inheritdoc />
+    public Guid Key { get; }
 
     private void InitializeIndexes()
     {
@@ -151,12 +174,13 @@ public class PublishedContentType : IPublishedContentType
     // Members have properties such as IMember LastLoginDate which are plain C# properties and not content
     // properties; they are exposed as pseudo content properties, as long as a content property with the
     // same alias does not exist already.
-    private void EnsureMemberProperties(List<IPublishedPropertyType> propertyTypes,
+    private void EnsureMemberProperties(
+        List<IPublishedPropertyType> propertyTypes,
         IPublishedContentTypeFactory factory)
     {
         var aliases = new HashSet<string?>(propertyTypes.Select(x => x.Alias), StringComparer.OrdinalIgnoreCase);
 
-        foreach (var (alias, dataTypeId) in BuiltinMemberProperties)
+        foreach ((string alias, int dataTypeId) in BuiltinMemberProperties)
         {
             if (aliases.Contains(alias))
             {
@@ -166,11 +190,6 @@ public class PublishedContentType : IPublishedContentType
             propertyTypes.Add(factory.CreateCorePropertyType(this, alias, dataTypeId, ContentVariation.Nothing));
         }
     }
-
-    #region Content type
-
-    /// <inheritdoc />
-    public Guid Key { get; }
 
     /// <inheritdoc />
     public int Id { get; }
@@ -195,6 +214,9 @@ public class PublishedContentType : IPublishedContentType
     public IEnumerable<IPublishedPropertyType> PropertyTypes => _propertyTypes;
 
     /// <inheritdoc />
+    public bool IsElement { get; }
+
+    /// <inheritdoc />
     public int GetPropertyIndex(string alias)
     {
         if (_indexes.TryGetValue(alias, out var index))
@@ -212,6 +234,7 @@ public class PublishedContentType : IPublishedContentType
 
     // virtual for unit tests
     // TODO: explain why
+
     /// <inheritdoc />
     public virtual IPublishedPropertyType? GetPropertyType(string alias)
     {
@@ -221,12 +244,10 @@ public class PublishedContentType : IPublishedContentType
 
     // virtual for unit tests
     // TODO: explain why
+
     /// <inheritdoc />
     public virtual IPublishedPropertyType? GetPropertyType(int index) =>
         index >= 0 && _propertyTypes is not null && index < _propertyTypes.Length ? _propertyTypes[index] : null;
-
-    /// <inheritdoc />
-    public bool IsElement { get; }
 
     #endregion
 }

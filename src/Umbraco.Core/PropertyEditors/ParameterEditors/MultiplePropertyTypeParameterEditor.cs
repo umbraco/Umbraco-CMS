@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors;
+namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors;
 
 [DataEditor(
     "propertyTypePickerMultiple",
@@ -14,7 +14,8 @@ public class MultiplePropertyTypeParameterEditor : DataEditor
         // configure
         DefaultConfiguration.Add("multiple", "1");
         DefaultConfiguration.Add("entityType", "PropertyType");
-        //don't publish the id for a property type, publish its alias
+
+        // don't publish the id for a property type, publish its alias
         DefaultConfiguration.Add("publishBy", "alias");
     }
 }

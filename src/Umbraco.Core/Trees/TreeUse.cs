@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Trees;
+namespace Umbraco.Cms.Core.Trees;
 
 /// <summary>
 ///     Defines tree uses.
@@ -19,5 +19,5 @@ public enum TreeUse
     /// <summary>
     ///     The tree is used as a dialog.
     /// </summary>
-    Dialog = 2
+    Dialog = 2,
 }

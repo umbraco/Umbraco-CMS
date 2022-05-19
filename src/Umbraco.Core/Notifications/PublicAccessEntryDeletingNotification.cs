@@ -8,12 +8,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class PublicAccessEntryDeletingNotification : DeletingNotification<PublicAccessEntry>
 {
-    public PublicAccessEntryDeletingNotification(PublicAccessEntry target, EventMessages messages) : base(target,
+    public PublicAccessEntryDeletingNotification(PublicAccessEntry target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public PublicAccessEntryDeletingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages) : base(
+    public PublicAccessEntryDeletingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

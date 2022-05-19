@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Editors;
+namespace Umbraco.Cms.Core.Models.Editors;
 
 /// <summary>
 ///     Used to track reference to other entities in a property value
@@ -28,12 +28,15 @@ public struct UmbracoEntityReference : IEquatable<UmbracoEntityReference>
         }
     }
 
+    public Udi Udi { get; }
+
     public static UmbracoEntityReference Empty() => _empty;
 
     public static bool IsEmpty(UmbracoEntityReference reference) => reference == Empty();
 
-    public Udi Udi { get; }
     public string RelationTypeAlias { get; }
+
+    public static bool operator ==(UmbracoEntityReference left, UmbracoEntityReference right) => left.Equals(right);
 
     public override bool Equals(object? obj) => obj is UmbracoEntityReference reference && Equals(reference);
 
@@ -48,8 +51,6 @@ public struct UmbracoEntityReference : IEquatable<UmbracoEntityReference>
         hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(RelationTypeAlias);
         return hashCode;
     }
-
-    public static bool operator ==(UmbracoEntityReference left, UmbracoEntityReference right) => left.Equals(right);
 
     public static bool operator !=(UmbracoEntityReference left, UmbracoEntityReference right) => !(left == right);
 }

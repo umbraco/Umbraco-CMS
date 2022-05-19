@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class ScriptDeletedNotification : DeletedNotification<IScript>
 {
-    public ScriptDeletedNotification(IScript target, EventMessages messages) : base(target, messages)
+    public ScriptDeletedNotification(IScript target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

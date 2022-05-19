@@ -50,8 +50,10 @@ public static partial class UmbracoBuilderExtensions
         where TNotification : INotification
     {
         // Register the handler as transient. This ensures that anything can be injected into it.
-        var descriptor = new UniqueServiceDescriptor(typeof(INotificationHandler<TNotification>),
-            typeof(TNotificationHandler), ServiceLifetime.Transient);
+        var descriptor = new UniqueServiceDescriptor(
+            typeof(INotificationHandler<TNotification>),
+            typeof(TNotificationHandler),
+            ServiceLifetime.Transient);
 
         if (!services.Contains(descriptor))
         {
@@ -67,8 +69,10 @@ public static partial class UmbracoBuilderExtensions
         where TNotification : INotification
     {
         // Register the handler as transient. This ensures that anything can be injected into it.
-        var descriptor = new ServiceDescriptor(typeof(INotificationAsyncHandler<TNotification>),
-            typeof(TNotificationAsyncHandler), ServiceLifetime.Transient);
+        var descriptor = new ServiceDescriptor(
+            typeof(INotificationAsyncHandler<TNotification>),
+            typeof(TNotificationAsyncHandler),
+            ServiceLifetime.Transient);
 
         if (!services.Contains(descriptor))
         {

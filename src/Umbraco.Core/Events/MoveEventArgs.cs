@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<MoveEventArgs<TEntity>>
 {
@@ -21,7 +21,8 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
 
         MoveInfoCollection = moveInfo;
-        //assign the legacy props
+
+        // assign the legacy props
         EventObject = moveInfo.First().Entity;
     }
 
@@ -41,7 +42,8 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
 
         MoveInfoCollection = moveInfo;
-        //assign the legacy props
+
+        // assign the legacy props
         EventObject = moveInfo.First().Entity;
     }
 
@@ -61,7 +63,8 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
 
         MoveInfoCollection = moveInfo;
-        //assign the legacy props
+
+        // assign the legacy props
         EventObject = moveInfo.First().Entity;
     }
 
@@ -80,10 +83,10 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         }
 
         MoveInfoCollection = moveInfo;
-        //assign the legacy props
+
+        // assign the legacy props
         EventObject = moveInfo.First().Entity;
     }
-
 
     /// <summary>
     ///     Gets all MoveEventInfo objects used to create the object
@@ -93,7 +96,7 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
         get => _moveInfoCollection;
         set
         {
-            MoveEventInfo<TEntity> first = value?.FirstOrDefault();
+            MoveEventInfo<TEntity>? first = value?.FirstOrDefault();
             if (first is null)
             {
                 throw new InvalidOperationException("MoveInfoCollection must have at least one item");
@@ -101,10 +104,12 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
 
             _moveInfoCollection = value;
 
-            //assign the legacy props
+            // assign the legacy props
             EventObject = first.Entity;
         }
     }
+
+    public static bool operator ==(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right) => Equals(left, right);
 
     public bool Equals(MoveEventArgs<TEntity>? other)
     {
@@ -153,8 +158,6 @@ public class MoveEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEqua
             return base.GetHashCode() * 397;
         }
     }
-
-    public static bool operator ==(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right) => Equals(left, right);
 
     public static bool operator !=(MoveEventArgs<TEntity> left, MoveEventArgs<TEntity> right) => !Equals(left, right);
 }

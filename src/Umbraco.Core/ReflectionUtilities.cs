@@ -128,20 +128,18 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(fieldName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(fieldName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(fieldName));
         }
 
         // get the field
-        FieldInfo field = typeof(TDeclaring).GetField(fieldName,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        FieldInfo? field = typeof(TDeclaring).GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         if (field == null)
         {
             throw new InvalidOperationException($"Could not find field {typeof(TDeclaring)}.{fieldName}.");
         }
 
         // validate field type
-        if (field.FieldType != typeof(TValue)) // strict
+        if (field.FieldType != typeof(TValue))
         {
             throw new ArgumentException(
                 $"Value type {typeof(TValue)} does not match field {typeof(TDeclaring)}.{fieldName} type {field.FieldType}.");
@@ -154,7 +152,7 @@ public static class ReflectionUtilities
     {
         // emit
         (DynamicMethod dm, ILGenerator ilgen) =
-            CreateIlGenerator(field.DeclaringType?.Module, new[] {typeof(TDeclaring)}, typeof(TValue));
+            CreateIlGenerator(field.DeclaringType?.Module, new[] { typeof(TDeclaring) }, typeof(TValue));
         ilgen.Emit(OpCodes.Ldarg_0);
         ilgen.Emit(OpCodes.Ldfld, field);
         ilgen.Return();
@@ -165,8 +163,7 @@ public static class ReflectionUtilities
     private static Action<TDeclaring, TValue> EmitFieldSetter<TDeclaring, TValue>(FieldInfo field)
     {
         // emit
-        (DynamicMethod dm, ILGenerator ilgen) = CreateIlGenerator(field.DeclaringType?.Module,
-            new[] {typeof(TDeclaring), typeof(TValue)}, typeof(void));
+        (DynamicMethod dm, ILGenerator ilgen) = CreateIlGenerator(field.DeclaringType?.Module, new[] { typeof(TDeclaring), typeof(TValue) }, typeof(void));
         ilgen.Emit(OpCodes.Ldarg_0);
         ilgen.Emit(OpCodes.Ldarg_1);
         ilgen.Emit(OpCodes.Stfld, field);
@@ -201,8 +198,7 @@ public static class ReflectionUtilities
     ///     Could not find property getter for <typeparamref name="TDeclaring" />.
     ///     <paramref name="propertyName" />.
     /// </exception>
-    public static Func<TDeclaring, TValue>? EmitPropertyGetter<TDeclaring, TValue>(string propertyName,
-        bool mustExist = true)
+    public static Func<TDeclaring, TValue>? EmitPropertyGetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
     {
         if (propertyName == null)
         {
@@ -211,12 +207,10 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(propertyName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(propertyName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
         }
 
-        PropertyInfo property = typeof(TDeclaring).GetProperty(propertyName,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        PropertyInfo? property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         if (property?.GetMethod != null)
         {
@@ -253,8 +247,7 @@ public static class ReflectionUtilities
     ///     Could not find property setter for <typeparamref name="TDeclaring" />.
     ///     <paramref name="propertyName" />.
     /// </exception>
-    public static Action<TDeclaring, TValue>? EmitPropertySetter<TDeclaring, TValue>(string propertyName,
-        bool mustExist = true)
+    public static Action<TDeclaring, TValue>? EmitPropertySetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
     {
         if (propertyName == null)
         {
@@ -263,12 +256,10 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(propertyName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(propertyName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
         }
 
-        PropertyInfo property = typeof(TDeclaring).GetProperty(propertyName,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        PropertyInfo? property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         if (property?.SetMethod != null)
         {
@@ -315,12 +306,10 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(propertyName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(propertyName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
         }
 
-        PropertyInfo property = typeof(TDeclaring).GetProperty(propertyName,
-            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        PropertyInfo? property = typeof(TDeclaring).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         if (property?.GetMethod != null && property.SetMethod != null)
         {
@@ -486,12 +475,11 @@ public static class ReflectionUtilities
         }
         else if (!lambdaReturned.IsAssignableFrom(declaring))
         {
-            throw new ArgumentException($"Type {lambdaReturned} is not assignable from type {declaring}.",
-                nameof(declaring));
+            throw new ArgumentException($"Type {lambdaReturned} is not assignable from type {declaring}.", nameof(declaring));
         }
 
         // get the constructor infos
-        ConstructorInfo ctor = declaring.GetConstructor(
+        ConstructorInfo? ctor = declaring.GetConstructor(
             BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
         if (ctor == null)
         {
@@ -534,7 +522,7 @@ public static class ReflectionUtilities
     private static TLambda EmitConstructorSafe<TLambda>(Type[] lambdaParameters, Type returned, ConstructorInfo ctor)
     {
         // get type and args
-        Type ctorDeclaring = ctor.DeclaringType;
+        Type? ctorDeclaring = ctor.DeclaringType;
         Type[] ctorParameters = ctor.GetParameters().Select(x => x.ParameterType).ToArray();
 
         // validate arguments
@@ -668,16 +656,14 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(methodName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(methodName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
         }
 
-        (Type lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
+        (Type? lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
             AnalyzeLambda<TLambda>(true, out var isFunction);
 
         // get the method infos
-        MethodInfo method = declaring.GetMethod(methodName,
-            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static, null, lambdaParameters, null);
+        MethodInfo? method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static, null, lambdaParameters, null);
         if (method == null || (isFunction && !lambdaReturned.IsAssignableFrom(method.ReturnType)))
         {
             if (!mustExist)
@@ -712,12 +698,12 @@ public static class ReflectionUtilities
         }
 
         // get type and args
-        Type methodDeclaring = method.DeclaringType;
+        Type? methodDeclaring = method.DeclaringType;
         Type methodReturned = method.ReturnType;
         Type[] methodParameters = method.GetParameters().Select(x => x.ParameterType).ToArray();
 
         var isStatic = method.IsStatic;
-        (Type lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
+        (Type? lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
             AnalyzeLambda<TLambda>(isStatic, out var isFunction);
 
         // if not static, then the first lambda arg must be the method declaring type
@@ -768,7 +754,7 @@ public static class ReflectionUtilities
         }
 
         var isStatic = method.IsStatic;
-        (Type lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
+        (Type? lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
 
         // emit - unsafe - use lambda's args and assume they are correct
         return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
@@ -805,17 +791,15 @@ public static class ReflectionUtilities
 
         if (string.IsNullOrWhiteSpace(methodName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(methodName));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
         }
 
         // validate lambda type
-        (Type lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
+        (Type? lambdaDeclaring, Type[] lambdaParameters, Type lambdaReturned) =
             AnalyzeLambda<TLambda>(false, out var isFunction);
 
         // get the method infos
-        MethodInfo method = lambdaDeclaring?.GetMethod(methodName,
-            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
+        MethodInfo? method = lambdaDeclaring?.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
         if (method == null || (isFunction && method.ReturnType != lambdaReturned))
         {
             if (!mustExist)
@@ -833,8 +817,7 @@ public static class ReflectionUtilities
 
     // lambdaReturned = the lambda returned type (can be void)
     // lambdaArgTypes = the lambda argument types
-    private static TLambda EmitMethod<TLambda>(Type? lambdaDeclaring, Type lambdaReturned, Type[] lambdaParameters,
-        MethodInfo method)
+    private static TLambda EmitMethod<TLambda>(Type? lambdaDeclaring, Type lambdaReturned, Type[] lambdaParameters, MethodInfo method)
     {
         // non-static methods need the declaring type as first arg
         Type[] parameters = lambdaParameters;
@@ -868,12 +851,11 @@ public static class ReflectionUtilities
     //  hence, when !isStatic, the lambda cannot be a simple Action, as it requires at least one generic argument
     // when isFunction, the last generic argument of the lambda is the returned type
     // everything in between is parameters
-    private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic,
-        bool isFunction)
+    private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, bool isFunction)
     {
         Type typeLambda = typeof(TLambda);
 
-        (Type declaring, Type[] parameters, Type returned) = AnalyzeLambda<TLambda>(isStatic, out var maybeFunction);
+        (Type? declaring, Type[] parameters, Type returned) = AnalyzeLambda<TLambda>(isStatic, out var maybeFunction);
 
         if (isFunction)
         {
@@ -897,8 +879,7 @@ public static class ReflectionUtilities
     //  hence, when !isStatic, the lambda cannot be a simple Action, as it requires at least one generic argument
     // when isFunction, the last generic argument of the lambda is the returned type
     // everything in between is parameters
-    private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic,
-        out bool isFunction)
+    private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, out bool isFunction)
     {
         isFunction = false;
 
@@ -917,7 +898,7 @@ public static class ReflectionUtilities
             return (null, Array.Empty<Type>(), typeof(void));
         }
 
-        Type genericDefinition = typeLambda.IsGenericType ? typeLambda.GetGenericTypeDefinition() : null;
+        Type? genericDefinition = typeLambda.IsGenericType ? typeLambda.GetGenericTypeDefinition() : null;
         var name = genericDefinition?.FullName;
 
         if (name == null)
@@ -1006,7 +987,7 @@ public static class ReflectionUtilities
     // emits args
     private static void EmitLdargs(ILGenerator ilgen, Type[] lambdaArgTypes, Type[] methodArgTypes)
     {
-        OpCode[] ldargOpCodes = new[] {OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3};
+        OpCode[] ldargOpCodes = new[] { OpCodes.Ldarg_0, OpCodes.Ldarg_1, OpCodes.Ldarg_2, OpCodes.Ldarg_3 };
 
         if (lambdaArgTypes.Length != methodArgTypes.Length)
         {
@@ -1024,7 +1005,7 @@ public static class ReflectionUtilities
                 ilgen.Emit(OpCodes.Ldarg, i);
             }
 
-            //var local = false;
+            // var local = false;
             EmitInputAdapter(ilgen, lambdaArgTypes[i], methodArgTypes[i] /*, ref local*/);
         }
     }
@@ -1057,49 +1038,40 @@ public static class ReflectionUtilities
             // parameter is value type, but input is reference type
             // unbox the input to the parameter value type
             // this is more or less equivalent to the ToT method below
-
             Label unbox = ilgen.DefineLabel();
 
-            //if (!local)
-            //{
+            // if (!local)
+            // {
             //    ilgen.DeclareLocal(typeof(object)); // declare local var for st/ld loc_0
             //    local = true;
-            //}
+            // }
 
             // stack: value
 
             // following code can be replaced with .Dump (and then we don't need the local variable anymore)
-            //ilgen.Emit(OpCodes.Stloc_0); // pop value into loc.0
+            // ilgen.Emit(OpCodes.Stloc_0); // pop value into loc.0
             //// stack:
-            //ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
-            //ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
-
+            // ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
+            // ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
             ilgen.Emit(OpCodes.Dup); // duplicate top of stack
 
             // stack: value ; value
-
-            ilgen.Emit(OpCodes.Isinst,
-                methodParamType); // test, pops value, and pushes either a null ref, or an instance of the type
+            ilgen.Emit(OpCodes.Isinst, methodParamType); // test, pops value, and pushes either a null ref, or an instance of the type
 
             // stack: inst|null ; value
-
             ilgen.Emit(OpCodes.Ldnull); // push null
 
             // stack: null ; inst|null ; value
-
             ilgen.Emit(OpCodes
                 .Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
 
             // stack: 0|1 ; value
-
             ilgen.Emit(OpCodes.Brtrue_S, unbox); // pops value, branches to unbox if true, ie nonzero
 
             // stack: value
-
             ilgen.Convert(methodParamType); // convert
 
             // stack: value|converted
-
             ilgen.MarkLabel(unbox);
             ilgen.Emit(OpCodes.Unbox_Any, methodParamType);
         }
@@ -1119,11 +1091,10 @@ public static class ReflectionUtilities
         }
     }
 
-    //private static T ToT<T>(object o)
-    //{
-    //    return o is T t ? t : (T) System.Convert.ChangeType(o, typeof(T));
-    //}
-
+    // private static T ToT<T>(object o)
+    // {
+    //     return o is T t ? t : (T) System.Convert.ChangeType(o, typeof(T));
+    // }
     private static MethodInfo? _convertMethod;
     private static MethodInfo? _getTypeFromHandle;
 
@@ -1131,14 +1102,12 @@ public static class ReflectionUtilities
     {
         if (_getTypeFromHandle == null)
         {
-            _getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.Static,
-                null, new[] {typeof(RuntimeTypeHandle)}, null);
+            _getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeTypeHandle) }, null);
         }
 
         if (_convertMethod == null)
         {
-            _convertMethod = typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null,
-                new[] {typeof(object), typeof(Type)}, null);
+            _convertMethod = typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(object), typeof(Type) }, null);
         }
 
         ilgen.Emit(OpCodes.Ldtoken, type);
@@ -1165,7 +1134,6 @@ public static class ReflectionUtilities
         // as an object, when emitting the method as a Func<..., object> - anything else
         // is pointless really - so we box value types, and ensure that non value types
         // can be assigned
-
         if (methodReturnedType.IsValueType)
         {
             if (outputType.IsValueType)

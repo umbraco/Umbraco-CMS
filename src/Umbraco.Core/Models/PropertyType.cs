@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
@@ -66,8 +66,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     /// <summary>
     ///     Initializes a new instance of the <see cref="PropertyType" /> class.
     /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias,
-        ValueStorageType valueStorageType)
+    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType)
         : this(shortStringHelper, propertyEditorAlias, valueStorageType, false)
     {
     }
@@ -75,8 +74,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     /// <summary>
     ///     Initializes a new instance of the <see cref="PropertyType" /> class.
     /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias,
-        ValueStorageType valueStorageType, string propertyTypeAlias)
+    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
         : this(shortStringHelper, propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
     {
     }
@@ -88,8 +86,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     ///     Set <paramref name="forceValueStorageType" /> to true to force the value storage type. Values assigned to
     ///     the property, eg from the underlying datatype, will be ignored.
     /// </remarks>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias,
-        ValueStorageType valueStorageType, bool forceValueStorageType, string? propertyTypeAlias = null)
+    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string? propertyTypeAlias = null)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditorAlias = propertyEditorAlias;
@@ -99,10 +96,6 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         _variations = ContentVariation.Nothing;
         _name = string.Empty;
     }
-
-    /// <inheritdoc />
-    public bool Equals(PropertyType? other) =>
-        other != null && (base.Equals(other) || (Alias?.InvariantEquals(other.Alias) ?? false));
 
     /// <summary>
     ///     Gets a value indicating whether the content type owning this property type is publishing.
@@ -129,6 +122,10 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     ///     </para>
     /// </remarks>
     public bool SupportsPublishing { get; set; }
+
+    /// <inheritdoc />
+    public bool Equals(PropertyType? other) =>
+        other != null && (base.Equals(other) || (Alias?.InvariantEquals(other.Alias) ?? false));
 
     /// <inheritdoc />
     [DataMember]
@@ -210,7 +207,6 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
     }
 
-
     /// <inheritdoc />
     [DataMember]
     public string? MandatoryMessage
@@ -243,7 +239,6 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
     }
 
-
     /// <summary>
     ///     Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
     /// </summary>
@@ -263,32 +258,22 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
 
     /// <inheritdoc />
     public bool SupportsVariation(string? culture, string? segment, bool wildcards = false) =>
+
         // exact validation: cannot accept a 'null' culture if the property type varies
         //  by culture, and likewise for segment
         // wildcard validation: can accept a '*' culture or segment
         Variations.ValidateVariation(culture, segment, true, wildcards, false);
 
-    /// <summary>
-    ///     Sanitizes a property type alias.
-    /// </summary>
-    private string SanitizeAlias(string value) =>
-        //NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
-        // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
-        // which is used internally
-        value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
-            ? value
-            : value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
-
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        //Get hash code for the Name field if it is not null.
+        // Get hash code for the Name field if it is not null.
         var baseHash = base.GetHashCode();
 
-        //Get hash code for the Alias field.
+        // Get hash code for the Alias field.
         var hashAlias = Alias?.ToLowerInvariant().GetHashCode();
 
-        //Calculate the hash code for the product.
+        // Calculate the hash code for the product.
         return baseHash ^ hashAlias ?? baseHash;
     }
 
@@ -298,10 +283,23 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
         base.PerformDeepClone(clone);
 
         var clonedEntity = (PropertyType)clone;
-        //need to manually assign the Lazy value as it will not be automatically mapped
+
+        // need to manually assign the Lazy value as it will not be automatically mapped
         if (PropertyGroupId != null)
         {
             clonedEntity._propertyGroupId = new Lazy<int>(() => PropertyGroupId.Value);
         }
     }
+
+    /// <summary>
+    ///     Sanitizes a property type alias.
+    /// </summary>
+    private string SanitizeAlias(string value) =>
+
+        // NOTE: WE are doing this because we don't want to do a ToSafeAlias when the alias is the special case of
+        // being prefixed with Constants.PropertyEditors.InternalGenericPropertiesPrefix
+        // which is used internally
+        value.StartsWith(Constants.PropertyEditors.InternalGenericPropertiesPrefix)
+            ? value
+            : value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase);
 }

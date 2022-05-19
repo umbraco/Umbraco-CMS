@@ -50,7 +50,7 @@ internal class TelemetryService : ITelemetryService
             Id = telemetryId,
             Version = GetVersion(),
             Packages = GetPackageTelemetry(),
-            Detailed = _usageInformationService.GetDetailed()
+            Detailed = _usageInformationService.GetDetailed(),
         };
         return true;
     }
@@ -84,7 +84,8 @@ internal class TelemetryService : ITelemetryService
 
             packages.Add(new PackageTelemetry
             {
-                Name = manifest.PackageName, Version = manifest.Version ?? string.Empty
+                Name = manifest.PackageName,
+                Version = manifest.Version ?? string.Empty,
             });
         }
 

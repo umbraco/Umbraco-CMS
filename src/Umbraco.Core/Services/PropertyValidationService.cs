@@ -35,21 +35,20 @@ public class PropertyValidationService : IPropertyValidationService
             throw new ArgumentNullException(nameof(propertyType));
         }
 
-        IDataType dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
+        IDataType? dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
         if (dataType == null)
         {
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
         }
 
-        IDataEditor editor = _propertyEditors[propertyType.PropertyEditorAlias];
+        IDataEditor? editor = _propertyEditors[propertyType.PropertyEditorAlias];
         if (editor == null)
         {
             throw new InvalidOperationException("No property editor found by alias " +
                                                 propertyType.PropertyEditorAlias);
         }
 
-        return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory,
-            propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
+        return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
     }
 
     /// <inheritdoc />
@@ -66,9 +65,9 @@ public class PropertyValidationService : IPropertyValidationService
         // if set with custom ones if they've been provided for a given property.
         var requiredDefaultMessages = new[]
         {
-            _textService.Localize("validation", "invalidNull"), _textService.Localize("validation", "invalidEmpty")
+            _textService.Localize("validation", "invalidNull"), _textService.Localize("validation", "invalidEmpty"),
         };
-        var formatDefaultMessages = new[] {_textService.Localize("validation", "invalidPattern")};
+        var formatDefaultMessages = new[] { _textService.Localize("validation", "invalidPattern") };
 
         IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
         foreach (ValidationResult validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
@@ -125,7 +124,6 @@ public class PropertyValidationService : IPropertyValidationService
             // if either
             // - it is impacted (default culture), or
             // - there is no published version of the content - maybe non-default culture, but no published version
-
             var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
             return alsoInvariant && !IsPropertyValid(x, null);
         }).ToArray();
@@ -136,9 +134,8 @@ public class PropertyValidationService : IPropertyValidationService
     /// <inheritdoc />
     public bool IsPropertyValid(IProperty property, string? culture = "*", string? segment = "*")
     {
-        //NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
+        // NOTE - the pvalue and vvalues logic in here is borrowed directly from the Property.Values setter so if you are wondering what that's all about, look there.
         // The underlying Property._pvalue and Property._vvalues are not exposed but we can re-create these values ourselves which is what it's doing.
-
         culture = culture?.NullOrWhiteSpaceAsNull();
         segment = segment?.NullOrWhiteSpaceAsNull();
 
@@ -206,7 +203,7 @@ public class PropertyValidationService : IPropertyValidationService
     /// </summary>
     private bool IsPropertyValueValid(IPropertyType propertyType, object? value)
     {
-        IDataEditor editor = _propertyEditors[propertyType.PropertyEditorAlias];
+        IDataEditor? editor = _propertyEditors[propertyType.PropertyEditorAlias];
         if (editor == null)
         {
             // nothing much we can do validation wise if the property editor has been removed.

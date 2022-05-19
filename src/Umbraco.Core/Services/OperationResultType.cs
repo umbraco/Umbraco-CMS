@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     A value indicating the result of an operation.
@@ -38,7 +38,7 @@ public enum OperationResultType : byte
     /// <summary>
     ///     No operation has been executed because it was not needed (eg deleting an item that doesn't exist).
     /// </summary>
-    NoOperation = Failed | 6 // TODO: shouldn't it be a success?
+    NoOperation = Failed | 6, // TODO: shouldn't it be a success?
 
     // TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
 }

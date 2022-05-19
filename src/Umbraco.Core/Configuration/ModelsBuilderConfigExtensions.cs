@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 
@@ -8,7 +8,8 @@ public static class ModelsBuilderConfigExtensions
 {
     private static string? _modelsDirectoryAbsolute;
 
-    public static string ModelsDirectoryAbsolute(this ModelsBuilderSettings modelsBuilderConfig,
+    public static string ModelsDirectoryAbsolute(
+        this ModelsBuilderSettings modelsBuilderConfig,
         IHostingEnvironment hostingEnvironment)
     {
         if (_modelsDirectoryAbsolute is null)
@@ -28,7 +29,6 @@ public static class ModelsBuilderConfigExtensions
     {
         // making sure it is safe, ie under the website root,
         // unless AcceptUnsafeModelsDirectory and then everything is OK.
-
         if (!Path.IsPathRooted(root))
         {
             throw new ConfigurationException($"Root is not rooted \"{root}\".");

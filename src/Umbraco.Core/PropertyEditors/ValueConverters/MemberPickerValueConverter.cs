@@ -33,8 +33,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase
     public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         => typeof(IPublishedContent);
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -56,8 +55,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase
         return null;
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel cacheLevel, object? source, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         if (source == null)
         {
@@ -82,8 +80,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase
         }
         else
         {
-            var sourceUdi = source as GuidUdi;
-            if (sourceUdi is null)
+            if (source is not GuidUdi sourceUdi)
             {
                 return null;
             }

@@ -23,13 +23,14 @@ public sealed class PublicAccessHandler :
     {
         foreach (IMemberGroup grp in affectedEntities)
         {
-            //check if the name has changed
+            // check if the name has changed
             if ((grp.AdditionalData?.ContainsKey("previousName") ?? false)
                 && grp.AdditionalData["previousName"] != null
                 && grp.AdditionalData["previousName"]?.ToString().IsNullOrWhiteSpace() == false
                 && grp.AdditionalData["previousName"]?.ToString() != grp.Name)
             {
-                _publicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"]?.ToString(),
+                _publicAccessService.RenameMemberGroupRoleRules(
+                    grp.AdditionalData["previousName"]?.ToString(),
                     grp.Name);
             }
         }

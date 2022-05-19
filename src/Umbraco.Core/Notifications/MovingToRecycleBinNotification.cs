@@ -7,12 +7,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public abstract class MovingToRecycleBinNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
 {
-    protected MovingToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] {target},
+    protected MovingToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages)
+        : base(
+        new[] { target },
         messages)
     {
     }
 
-    protected MovingToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(
+    protected MovingToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

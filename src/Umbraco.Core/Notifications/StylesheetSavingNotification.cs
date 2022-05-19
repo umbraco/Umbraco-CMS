@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class StylesheetSavingNotification : SavingNotification<IStylesheet>
 {
-    public StylesheetSavingNotification(IStylesheet target, EventMessages messages) : base(target, messages)
+    public StylesheetSavingNotification(IStylesheet target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public StylesheetSavingNotification(IEnumerable<IStylesheet> target, EventMessages messages) : base(target,
+    public StylesheetSavingNotification(IEnumerable<IStylesheet> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

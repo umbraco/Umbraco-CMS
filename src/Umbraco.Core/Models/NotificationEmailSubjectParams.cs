@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class NotificationEmailSubjectParams
 {
@@ -10,6 +10,8 @@ public class NotificationEmailSubjectParams
     }
 
     public string SiteUrl { get; }
+
     public string Action { get; }
+
     public string ItemName { get; }
 }

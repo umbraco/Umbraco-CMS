@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Media.Exif;
+namespace Umbraco.Cms.Core.Media.Exif;
 
 /// <summary>
 ///     Represents a TIFF Header.
@@ -36,8 +36,7 @@ internal struct TIFFHeader
     ///     start of the TIFF header.
     /// </param>
     /// <param name="headerByteOrder">The byte order of the TIFF header itself.</param>
-    public TIFFHeader(BitConverterEx.ByteOrder byteOrder, byte id, uint ifdOffset,
-        BitConverterEx.ByteOrder headerByteOrder)
+    public TIFFHeader(BitConverterEx.ByteOrder byteOrder, byte id, uint ifdOffset, BitConverterEx.ByteOrder headerByteOrder)
     {
         if (id != 42)
         {
@@ -58,7 +57,7 @@ internal struct TIFFHeader
     /// <returns>A <see cref="TIFFHeader" /> initialized from the given byte data.</returns>
     public static TIFFHeader FromBytes(byte[] data, int offset)
     {
-        var header = new TIFFHeader();
+        var header = default(TIFFHeader);
 
         // TIFF header
         if (data[offset] == 0x49 && data[offset + 1] == 0x49)

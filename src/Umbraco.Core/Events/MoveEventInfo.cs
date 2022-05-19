@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class MoveEventInfo<TEntity> : IEquatable<MoveEventInfo<TEntity>>
 {
@@ -10,8 +10,12 @@ public class MoveEventInfo<TEntity> : IEquatable<MoveEventInfo<TEntity>>
     }
 
     public TEntity Entity { get; set; }
+
     public string OriginalPath { get; set; }
+
     public int NewParentId { get; set; }
+
+    public static bool operator ==(MoveEventInfo<TEntity> left, MoveEventInfo<TEntity> right) => Equals(left, right);
 
     public bool Equals(MoveEventInfo<TEntity>? other)
     {
@@ -61,8 +65,6 @@ public class MoveEventInfo<TEntity> : IEquatable<MoveEventInfo<TEntity>>
             return hashCode;
         }
     }
-
-    public static bool operator ==(MoveEventInfo<TEntity> left, MoveEventInfo<TEntity> right) => Equals(left, right);
 
     public static bool operator !=(MoveEventInfo<TEntity> left, MoveEventInfo<TEntity> right) => !Equals(left, right);
 }

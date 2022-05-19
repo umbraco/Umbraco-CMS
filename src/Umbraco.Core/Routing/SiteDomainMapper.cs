@@ -8,7 +8,16 @@ namespace Umbraco.Cms.Core.Routing;
 /// </summary>
 public class SiteDomainMapper : ISiteDomainMapper, IDisposable
 {
+    // these are for validation
+    // private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
+    private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
+
+    #region Configure
+
+    private readonly ReaderWriterLockSlim _configLock = new();
+
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -27,20 +36,14 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
         }
     }
 
-    #region Configure
-
-    private readonly ReaderWriterLockSlim _configLock = new();
     private Dictionary<string, Dictionary<string, string[]>>? _qualifiedSites;
     private bool _disposedValue;
 
     internal Dictionary<string, string[]>? Sites { get; private set; }
+
     internal Dictionary<string, List<string>>? Bindings { get; private set; }
 
-    // these are for validation
-    //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
-    private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
-
-    private static readonly Regex s_domainValidation =
+    private static readonly Regex DomainValidation =
         new(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
@@ -65,12 +68,38 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
         }
     }
 
+    /// <summary>
+    ///     Adds a site.
+    /// </summary>
+    /// <param name="key">A key uniquely identifying the site.</param>
+    /// <param name="domains">The site domains.</param>
+    /// <remarks>At the moment there is no public way to remove a site. Clear and reconfigure.</remarks>
+    public void AddSite(string key, IEnumerable<string> domains)
+    {
+        try
+        {
+            _configLock.EnterWriteLock();
+
+            Sites ??= new Dictionary<string, string[]>();
+            Sites[key] = ValidateDomains(domains).ToArray();
+            _qualifiedSites = null;
+        }
+        finally
+        {
+            if (_configLock.IsWriteLockHeld)
+            {
+                _configLock.ExitWriteLock();
+            }
+        }
+    }
+
     private IEnumerable<string> ValidateDomains(IEnumerable<string> domains) =>
+
         // must use authority format w/optional scheme and port, but no path
         // any domain should appear only once
         domains.Select(domain =>
         {
-            if (!s_domainValidation.IsMatch(domain))
+            if (!DomainValidation.IsMatch(domain))
             {
                 throw new ArgumentOutOfRangeException(nameof(domains), $"Invalid domain: \"{domain}\".");
             }
@@ -84,13 +113,13 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
     /// <param name="key">A key uniquely identifying the site.</param>
     /// <param name="domains">The site domains.</param>
     /// <remarks>At the moment there is no public way to remove a site. Clear and reconfigure.</remarks>
-    public void AddSite(string key, IEnumerable<string> domains)
+    public void AddSite(string key, params string[] domains)
     {
         try
         {
             _configLock.EnterWriteLock();
 
-            Sites = Sites ?? new Dictionary<string, string[]>();
+            Sites ??= new Dictionary<string, string[]>();
             Sites[key] = ValidateDomains(domains).ToArray();
             _qualifiedSites = null;
         }
@@ -104,20 +133,43 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
     }
 
     /// <summary>
-    ///     Adds a site.
+    ///     Binds some sites.
     /// </summary>
-    /// <param name="key">A key uniquely identifying the site.</param>
-    /// <param name="domains">The site domains.</param>
-    /// <remarks>At the moment there is no public way to remove a site. Clear and reconfigure.</remarks>
-    public void AddSite(string key, params string[] domains)
+    /// <param name="keys">The keys uniquely identifying the sites to bind.</param>
+    /// <remarks>
+    ///     <para>At the moment there is no public way to unbind sites. Clear and reconfigure.</para>
+    ///     <para>If site1 is bound to site2 and site2 is bound to site3 then site1 is bound to site3.</para>
+    /// </remarks>
+    public void BindSites(params string[] keys)
     {
         try
         {
             _configLock.EnterWriteLock();
 
-            Sites = Sites ?? new Dictionary<string, string[]>();
-            Sites[key] = ValidateDomains(domains).ToArray();
-            _qualifiedSites = null;
+            foreach (var key in keys.Where(key => !Sites?.ContainsKey(key) ?? false))
+            {
+                throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
+            }
+
+            Bindings ??= new Dictionary<string, List<string>>();
+
+            var allkeys = Bindings
+                .Where(kvp => keys.Contains(kvp.Key))
+                .SelectMany(kvp => kvp.Value)
+                .Union(keys)
+                .ToArray();
+
+            foreach (var key in allkeys)
+            {
+                if (!Bindings.ContainsKey(key))
+                {
+                    Bindings[key] = new List<string>();
+                }
+
+                var xkey = key;
+                IEnumerable<string> addKeys = allkeys.Where(k => k != xkey).Except(Bindings[key]);
+                Bindings[key].AddRange(addKeys);
+            }
         }
         finally
         {
@@ -178,61 +230,12 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
         }
     }
 
-    /// <summary>
-    ///     Binds some sites.
-    /// </summary>
-    /// <param name="keys">The keys uniquely identifying the sites to bind.</param>
-    /// <remarks>
-    ///     <para>At the moment there is no public way to unbind sites. Clear and reconfigure.</para>
-    ///     <para>If site1 is bound to site2 and site2 is bound to site3 then site1 is bound to site3.</para>
-    /// </remarks>
-    public void BindSites(params string[] keys)
-    {
-        try
-        {
-            _configLock.EnterWriteLock();
-
-            foreach (var key in keys.Where(key => !Sites?.ContainsKey(key) ?? false))
-            {
-                throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
-            }
-
-            Bindings = Bindings ?? new Dictionary<string, List<string>>();
-
-            var allkeys = Bindings
-                .Where(kvp => keys.Contains(kvp.Key))
-                .SelectMany(kvp => kvp.Value)
-                .Union(keys)
-                .ToArray();
-
-            foreach (var key in allkeys)
-            {
-                if (!Bindings.ContainsKey(key))
-                {
-                    Bindings[key] = new List<string>();
-                }
-
-                var xkey = key;
-                IEnumerable<string> addKeys = allkeys.Where(k => k != xkey).Except(Bindings[key]);
-                Bindings[key].AddRange(addKeys);
-            }
-        }
-        finally
-        {
-            if (_configLock.IsWriteLockHeld)
-            {
-                _configLock.ExitWriteLock();
-            }
-        }
-    }
-
     #endregion
 
     #region Map domains
 
     /// <inheritdoc />
-    public virtual DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current,
-        string? culture, string? defaultCulture)
+    public virtual DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture, string? defaultCulture)
     {
         var currentAuthority = current.GetLeftPart(UriPartial.Authority);
         Dictionary<string, string[]>? qualifiedSites = GetQualifiedSites(current);
@@ -241,11 +244,9 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris,
-        Uri current, bool excludeDefault, string? culture, string? defaultCulture)
+    public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture)
     {
         // TODO: ignoring cultures entirely?
-
         var currentAuthority = current.GetLeftPart(UriPartial.Authority);
         KeyValuePair<string, string[]>[]? candidateSites = null;
         IEnumerable<DomainAndUri> ret = domainAndUris;
@@ -273,8 +274,7 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
                 {
                     // it is illegal to call MapDomain if domainAndUris is empty
                     // also, domainAndUris should NOT contain current, hence the test on hinted
-                    DomainAndUri? mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture,
-                        defaultCulture); // what GetUrl would get
+                    DomainAndUri? mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture, defaultCulture); // what GetUrl would get
                     ret = ret.Where(d => d != mainDomain);
                 }
             }
@@ -291,10 +291,9 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
 
             // if current belongs to a site, pick every element from domainAndUris that also belong
             // to that site -- or to any site bound to that site
-
             if (!currentSite.Equals(default(KeyValuePair<string, string[]>)))
             {
-                candidateSites = new[] {currentSite};
+                candidateSites = new[] { currentSite };
                 if (Bindings != null && Bindings.ContainsKey(currentSite.Key))
                 {
                     IEnumerable<KeyValuePair<string, string[]>> boundSites =
@@ -354,7 +353,7 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
             return _qualifiedSites[current.Scheme];
         }
 
-        _qualifiedSites = _qualifiedSites ?? new Dictionary<string, Dictionary<string, string[]>>();
+        _qualifiedSites ??= new Dictionary<string, Dictionary<string, string[]>>();
 
         // convert sites into authority sites based upon current scheme
         // because some domains in the sites might not have a scheme -- and cache
@@ -364,16 +363,19 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
                 kvp => kvp.Value.Select(d =>
                         new Uri(UriUtilityCore.StartWithScheme(d, current.Scheme))
                             .GetLeftPart(UriPartial.Authority))
-                    .ToArray()
-            );
+                    .ToArray());
 
         // .ToDictionary will evaluate and create the dictionary immediately
         // the new value is .ToArray so it will also be evaluated immediately
         // therefore it is safe to return and exit the configuration lock
     }
 
-    private DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris,
-        Dictionary<string, string[]>? qualifiedSites, string currentAuthority, string? culture, string? defaultCulture)
+    private DomainAndUri? MapDomain(
+        IReadOnlyCollection<DomainAndUri> domainAndUris,
+        Dictionary<string, string[]>? qualifiedSites,
+        string currentAuthority,
+        string? culture,
+        string? defaultCulture)
     {
         if (domainAndUris == null)
         {
@@ -408,14 +410,14 @@ public class SiteDomainMapper : ISiteDomainMapper, IDisposable
         // a bit arbitrary.
 
         // look through sites in order and pick the first domainAndUri that belongs to a site
-        ret = ret ?? qualifiedSites
+        ret ??= qualifiedSites
             .Where(site => site.Key != currentSite.Key)
             .Select(site => domainAndUris.FirstOrDefault(domainAndUri =>
                 site.Value.Contains(domainAndUri.Uri.GetLeftPart(UriPartial.Authority))))
             .FirstOrDefault(domainAndUri => domainAndUri != null);
 
         // random, really
-        ret = ret ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture)) ?? domainAndUris.First();
+        ret ??= domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture)) ?? domainAndUris.First();
 
         return ret;
     }

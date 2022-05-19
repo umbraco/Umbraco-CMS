@@ -14,7 +14,7 @@ public class RuntimeUnattendedUpgradeNotification : INotification
         NotRequired = 0,
         HasErrors = 1,
         CoreUpgradeComplete = 100,
-        PackageMigrationComplete = 101
+        PackageMigrationComplete = 101,
     }
 
     /// <summary>

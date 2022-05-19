@@ -1,4 +1,4 @@
-﻿using System.Xml.Linq;
+using System.Xml.Linq;
 
 namespace Umbraco.Cms.Core.Media.TypeDetector;
 

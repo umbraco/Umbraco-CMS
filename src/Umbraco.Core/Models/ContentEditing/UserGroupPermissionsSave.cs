@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
@@ -13,7 +13,6 @@ public class UserGroupPermissionsSave
     public UserGroupPermissionsSave() => AssignedPermissions = new Dictionary<int, IEnumerable<string>>();
 
     // TODO: we should have an option to clear the permissions assigned to this node and instead just have them inherit - yes once we actually have inheritance!
-
     [DataMember(Name = "contentId", IsRequired = true)]
     [Required]
     public int ContentId { get; set; }
@@ -29,7 +28,7 @@ public class UserGroupPermissionsSave
     {
         if (AssignedPermissions.SelectMany(x => x.Value).Any(x => x.IsNullOrWhiteSpace()))
         {
-            yield return new ValidationResult("A permission value cannot be null or empty", new[] {"Permissions"});
+            yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
         }
     }
 }

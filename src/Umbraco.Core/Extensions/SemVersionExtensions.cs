@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Semver;
@@ -14,6 +14,6 @@ public static class SemVersionExtensions
     {
         var version = semVersion.ToSemanticString();
         var indexOfBuild = version.IndexOf('+');
-        return indexOfBuild >= 0 ? version.Substring(0, indexOfBuild) : version;
+        return indexOfBuild >= 0 ? version[..indexOfBuild] : version;
     }
 }

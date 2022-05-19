@@ -1,12 +1,14 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class SendToPublishEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>
 {
-    public SendToPublishEventArgs(TEntity eventObject, bool canCancel) : base(eventObject, canCancel)
+    public SendToPublishEventArgs(TEntity eventObject, bool canCancel)
+        : base(eventObject, canCancel)
     {
     }
 
-    public SendToPublishEventArgs(TEntity eventObject) : base(eventObject)
+    public SendToPublishEventArgs(TEntity eventObject)
+        : base(eventObject)
     {
     }
 

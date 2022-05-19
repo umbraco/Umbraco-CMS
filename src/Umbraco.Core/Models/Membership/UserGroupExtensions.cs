@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Extensions;
@@ -7,16 +7,14 @@ public static class UserGroupExtensions
 {
     public static IReadOnlyUserGroup ToReadOnlyGroup(this IUserGroup group)
     {
-        //this will generally always be the case
-        var readonlyGroup = group as IReadOnlyUserGroup;
-        if (readonlyGroup != null)
+        // this will generally always be the case
+        if (group is IReadOnlyUserGroup readonlyGroup)
         {
             return readonlyGroup;
         }
 
-        //otherwise create one
-        return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId,
-            group.Alias, group.AllowedSections, group.Permissions);
+        // otherwise create one
+        return new ReadOnlyUserGroup(group.Id, group.Name, group.Icon, group.StartContentId, group.StartMediaId, group.Alias, group.AllowedSections, group.Permissions);
     }
 
     public static bool IsSystemUserGroup(this IUserGroup group) =>

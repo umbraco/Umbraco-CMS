@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquatable<NewEventArgs<TEntity>>
 {
@@ -30,8 +30,8 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         Parent = parent;
     }
 
-
-    public NewEventArgs(TEntity eventObject, bool canCancel, string alias, int parentId) : base(eventObject, canCancel)
+    public NewEventArgs(TEntity eventObject, bool canCancel, string alias, int parentId)
+        : base(eventObject, canCancel)
     {
         Alias = alias;
         ParentId = parentId;
@@ -44,7 +44,8 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
         Parent = parent;
     }
 
-    public NewEventArgs(TEntity eventObject, string alias, int parentId) : base(eventObject)
+    public NewEventArgs(TEntity eventObject, string alias, int parentId)
+        : base(eventObject)
     {
         Alias = alias;
         ParentId = parentId;
@@ -76,6 +77,8 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
     ///     Gets or Sets the parent IContent object.
     /// </summary>
     public TEntity? Parent { get; }
+
+    public static bool operator ==(NewEventArgs<TEntity> left, NewEventArgs<TEntity> right) => Equals(left, right);
 
     public bool Equals(NewEventArgs<TEntity>? other)
     {
@@ -128,8 +131,6 @@ public class NewEventArgs<TEntity> : CancellableObjectEventArgs<TEntity>, IEquat
             return hashCode;
         }
     }
-
-    public static bool operator ==(NewEventArgs<TEntity> left, NewEventArgs<TEntity> right) => Equals(left, right);
 
     public static bool operator !=(NewEventArgs<TEntity> left, NewEventArgs<TEntity> right) => !Equals(left, right);
 }

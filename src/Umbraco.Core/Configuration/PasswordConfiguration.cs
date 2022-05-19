@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Configuration;
+namespace Umbraco.Cms.Core.Configuration;
 
 public abstract class PasswordConfiguration : IPasswordConfiguration
 {

@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Core.Routing;
 /// </summary>
 public class UrlProvider : IPublishedUrlProvider
 {
+    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
     #region Ctor and configuration
 
     /// <summary>
@@ -23,9 +25,7 @@ public class UrlProvider : IPublishedUrlProvider
     /// <param name="mediaUrlProviders">The list of media URL providers.</param>
     /// <param name="variationContextAccessor">The current variation accessor.</param>
     /// <param name="propertyEditorCollection"></param>
-    public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings,
-        UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders,
-        IVariationContextAccessor variationContextAccessor)
+    public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -36,7 +36,6 @@ public class UrlProvider : IPublishedUrlProvider
         Mode = routingSettings.Value.UrlProviderMode;
     }
 
-    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IEnumerable<IUrlProvider> _urlProviders;
     private readonly IEnumerable<IMediaUrlProvider> _mediaUrlProviders;
     private readonly IVariationContextAccessor _variationContextAccessor;
@@ -45,6 +44,17 @@ public class UrlProvider : IPublishedUrlProvider
     ///     Gets or sets the provider URL mode.
     /// </summary>
     public UrlMode Mode { get; set; }
+
+    /// <summary>
+    ///     Gets the URL of a published content.
+    /// </summary>
+    /// <param name="id">The published content identifier.</param>
+    /// <param name="mode">The URL mode.</param>
+    /// <param name="culture">A culture.</param>
+    /// <param name="current">The current absolute URL.</param>
+    /// <returns>The URL for the published content.</returns>
+    public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
+        => GetUrl(GetDocument(id), mode, culture, current);
 
     #endregion
 
@@ -76,17 +86,6 @@ public class UrlProvider : IPublishedUrlProvider
     /// <param name="culture">A culture.</param>
     /// <param name="current">The current absolute URL.</param>
     /// <returns>The URL for the published content.</returns>
-    public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
-        => GetUrl(GetDocument(id), mode, culture, current);
-
-    /// <summary>
-    ///     Gets the URL of a published content.
-    /// </summary>
-    /// <param name="id">The published content identifier.</param>
-    /// <param name="mode">The URL mode.</param>
-    /// <param name="culture">A culture.</param>
-    /// <param name="current">The current absolute URL.</param>
-    /// <returns>The URL for the published content.</returns>
     public string GetUrl(int id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
         => GetUrl(GetDocument(id), mode, culture, current);
 
@@ -106,8 +105,7 @@ public class UrlProvider : IPublishedUrlProvider
     ///     </para>
     ///     <para>If the provider is unable to provide a URL, it returns "#".</para>
     /// </remarks>
-    public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null,
-        Uri? current = null)
+    public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
     {
         if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
         {
@@ -126,7 +124,7 @@ public class UrlProvider : IPublishedUrlProvider
         {
             if (culture == null)
             {
-                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
             }
         }
 
@@ -136,8 +134,7 @@ public class UrlProvider : IPublishedUrlProvider
             current = umbracoContext.CleanedUmbracoUrl;
         }
 
-
-        UrlInfo url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
+        UrlInfo? url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
             .FirstOrDefault(u => u is not null);
         return url?.Text ?? "#"; // legacy wants this
     }
@@ -145,7 +142,7 @@ public class UrlProvider : IPublishedUrlProvider
     public string GetUrlFromRoute(int id, string? route, string? culture)
     {
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        DefaultUrlProvider provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
+        DefaultUrlProvider? provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
         var url = provider == null
             ? route // what else?
             : provider.GetUrlFromRoute(route, umbracoContext, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)
@@ -203,8 +200,7 @@ public class UrlProvider : IPublishedUrlProvider
     /// <param name="propertyAlias"></param>
     /// <param name="current"></param>
     /// <returns></returns>
-    public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null,
-        string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
+    public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
         => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
 
     /// <summary>
@@ -222,10 +218,9 @@ public class UrlProvider : IPublishedUrlProvider
     ///         If the media is multi-lingual, gets the URL for the specified culture or,
     ///         when no culture is specified, the current culture.
     ///     </para>
-    ///     <para>If the provider is unable to provide a URL, it returns <see cref="String.Empty" />.</para>
+    ///     <para>If the provider is unable to provide a URL, it returns <see cref="string.Empty" />.</para>
     /// </remarks>
-    public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null,
-        string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
+    public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
     {
         if (propertyAlias == null)
         {
@@ -234,7 +229,7 @@ public class UrlProvider : IPublishedUrlProvider
 
         if (content == null)
         {
-            return "";
+            return string.Empty;
         }
 
         if (mode == UrlMode.Default)
@@ -249,7 +244,7 @@ public class UrlProvider : IPublishedUrlProvider
         {
             if (culture == null)
             {
-                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
             }
         }
 
@@ -259,12 +254,11 @@ public class UrlProvider : IPublishedUrlProvider
             current = umbracoContext.CleanedUmbracoUrl;
         }
 
-
-        UrlInfo url = _mediaUrlProviders.Select(provider =>
+        UrlInfo? url = _mediaUrlProviders.Select(provider =>
                 provider.GetMediaUrl(content, propertyAlias, mode, culture, current))
             .FirstOrDefault(u => u is not null);
 
-        return url?.Text ?? "";
+        return url?.Text ?? string.Empty;
     }
 
     #endregion

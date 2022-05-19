@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
@@ -29,6 +29,11 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
     public PropertyCollection(IEnumerable<IProperty> properties)
         : this() =>
         Reset(properties);
+
+    /// <summary>
+    ///     Occurs when the collection changes.
+    /// </summary>
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     /// <summary>
     ///     Gets the property with the specified PropertyType.
@@ -66,24 +71,18 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
                 }
             }
 
-            //collection events will be raised in InsertItem with Add
+            // collection events will be raised in InsertItem with Add
             base.Add(property);
         }
     }
 
-    public bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
+    public new bool TryGetValue(string propertyTypeAlias, [MaybeNullWhen(false)] out IProperty property)
     {
         property = this.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
         return property != null;
     }
 
-    /// <summary>
-    ///     Occurs when the collection changes.
-    /// </summary>
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
-
 
     /// <inheritdoc />
     public void EnsurePropertyTypes(IEnumerable<IPropertyType> propertyTypes)
@@ -98,7 +97,6 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
             Add(new Property(propertyType));
         }
     }
-
 
     /// <inheritdoc />
     public void EnsureCleanPropertyTypes(IEnumerable<IPropertyType> propertyTypes)
@@ -121,7 +119,6 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
             }
         }
 
-
         foreach (IPropertyType propertyType in propertyTypesA)
         {
             Add(new Property(propertyType));
@@ -143,21 +140,6 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
     }
 
     /// <summary>
-    ///     Replaces all properties, whilst maintaining validation delegates.
-    /// </summary>
-    private void Reset(IEnumerable<IProperty> properties)
-    {
-        //collection events will be raised in each of these calls
-        Clear();
-
-        //collection events will be raised in each of these calls
-        foreach (IProperty property in properties)
-        {
-            Add(property);
-        }
-    }
-
-    /// <summary>
     ///     Replaces the property at the specified index with the specified property.
     /// </summary>
     protected override void SetItem(int index, IProperty property)
@@ -166,6 +148,21 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
         base.SetItem(index, property);
         OnCollectionChanged(
             new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, property, oldItem));
+    }
+
+    /// <summary>
+    ///     Replaces all properties, whilst maintaining validation delegates.
+    /// </summary>
+    private void Reset(IEnumerable<IProperty> properties)
+    {
+        // collection events will be raised in each of these calls
+        Clear();
+
+        // collection events will be raised in each of these calls
+        foreach (IProperty property in properties)
+        {
+            Add(property);
+        }
     }
 
     /// <summary>
@@ -196,6 +193,8 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
+    protected override string GetKeyForItem(IProperty item) => item.Alias;
+
     /// <summary>
     ///     Gets the index for a specified property alias.
     /// </summary>
@@ -211,8 +210,6 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
 
         return -1;
     }
-
-    protected override string GetKeyForItem(IProperty item) => item.Alias!;
 
     protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);

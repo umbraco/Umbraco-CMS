@@ -53,7 +53,7 @@ public static class UriExtensions
 
         if (query == "?")
         {
-            query = "";
+            query = string.Empty;
         }
 
         return uri.IsAbsoluteUri
@@ -81,7 +81,7 @@ public static class UriExtensions
         var posq = s.IndexOf("?", StringComparison.Ordinal);
         var posf = s.IndexOf("#", StringComparison.Ordinal);
         var pos = posq > 0 ? posq : posf > 0 ? posf : 0;
-        var path = pos > 0 ? s.Substring(0, pos) : s;
+        var path = pos > 0 ? s[..pos] : s;
         return path;
     }
 
@@ -172,6 +172,14 @@ public static class UriExtensions
         return new Uri(baseUri.GetLeftPart(UriPartial.Authority) + uri.GetSafeAbsolutePath() + uri.GetSafeQuery());
     }
 
+    /// <summary>
+    ///     Removes the port from the uri.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <returns>The same uri, without its port.</returns>
+    public static Uri WithoutPort(this Uri uri) =>
+        new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
+
     private static string? GetSafeQuery(this Uri uri)
     {
         if (uri.IsAbsoluteUri)
@@ -183,18 +191,10 @@ public static class UriExtensions
         var s = uri.OriginalString;
         var posq = s.IndexOf("?", StringComparison.Ordinal);
         var posf = s.IndexOf("#", StringComparison.Ordinal);
-        var query = posq < 0 ? null : posf < 0 ? s.Substring(posq) : s.Substring(posq, posf - posq);
+        var query = posq < 0 ? null : posf < 0 ? s[posq..] : s[posq..posf];
 
         return query;
     }
-
-    /// <summary>
-    ///     Removes the port from the uri.
-    /// </summary>
-    /// <param name="uri">The uri.</param>
-    /// <returns>The same uri, without its port.</returns>
-    public static Uri WithoutPort(this Uri uri) =>
-        new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
 
     /// <summary>
     ///     Replaces the host of a uri.
@@ -202,5 +202,5 @@ public static class UriExtensions
     /// <param name="uri">The uri.</param>
     /// <param name="host">A replacement host.</param>
     /// <returns>The same uri, with its host replaced.</returns>
-    public static Uri ReplaceHost(this Uri uri, string host) => new UriBuilder(uri) {Host = host}.Uri;
+    public static Uri ReplaceHost(this Uri uri, string host) => new UriBuilder(uri) { Host = host }.Uri;
 }

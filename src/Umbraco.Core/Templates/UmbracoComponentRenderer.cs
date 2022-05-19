@@ -22,8 +22,7 @@ public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoComponentRenderer" /> class.
     /// </summary>
-    public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer,
-        ITemplateRenderer templateRenderer)
+    public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _macroRenderer = macroRenderer;
@@ -57,8 +56,7 @@ public class UmbracoComponentRenderer : IUmbracoComponentRenderer
         await RenderMacroAsync(contentId, alias, parameters.ToDictionary<object>());
 
     /// <inheritdoc />
-    public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias,
-        IDictionary<string, object>? parameters)
+    public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object>? parameters)
     {
         if (contentId == default)
         {
@@ -66,7 +64,7 @@ public class UmbracoComponentRenderer : IUmbracoComponentRenderer
         }
 
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-        IPublishedContent content = umbracoContext.Content?.GetById(contentId);
+        IPublishedContent? content = umbracoContext.Content?.GetById(contentId);
 
         if (content == null)
         {
@@ -77,8 +75,7 @@ public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     }
 
     /// <inheritdoc />
-    public async Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias,
-        IDictionary<string, object>? parameters)
+    public async Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object>? parameters)
     {
         if (content == null)
         {
@@ -91,8 +88,7 @@ public class UmbracoComponentRenderer : IUmbracoComponentRenderer
     /// <summary>
     ///     Renders the macro with the specified alias, passing in the specified parameters.
     /// </summary>
-    private async Task<IHtmlEncodedString> RenderMacroAsync(IPublishedContent content, string alias,
-        IDictionary<string, object>? parameters)
+    private async Task<IHtmlEncodedString> RenderMacroAsync(IPublishedContent content, string alias, IDictionary<string, object>? parameters)
     {
         if (content == null)
         {

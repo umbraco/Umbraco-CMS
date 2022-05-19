@@ -14,12 +14,11 @@ public class MultiUrlPickerConfigurationEditor : ConfigurationEditor<MultiUrlPic
     [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
     public MultiUrlPickerConfigurationEditor(IIOHelper ioHelper)
         : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
-
     {
     }
 
-    public MultiUrlPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) :
-        base(ioHelper, editorConfigurationParser)
+    public MultiUrlPickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 }

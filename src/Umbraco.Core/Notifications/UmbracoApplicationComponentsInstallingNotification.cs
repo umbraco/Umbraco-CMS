@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Notifications;
+
 // TODO (V10): Remove this class.
 
 /// <summary>

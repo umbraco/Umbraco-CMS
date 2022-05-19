@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Security;
+namespace Umbraco.Cms.Core.Security;
 
 public class UpdateMemberProfileResult
 {
@@ -11,8 +11,8 @@ public class UpdateMemberProfileResult
     public string? ErrorMessage { get; private set; }
 
     public static UpdateMemberProfileResult Success() =>
-        new UpdateMemberProfileResult {Status = UpdateMemberProfileStatus.Success};
+        new UpdateMemberProfileResult { Status = UpdateMemberProfileStatus.Success };
 
     public static UpdateMemberProfileResult Error(string message) =>
-        new UpdateMemberProfileResult {Status = UpdateMemberProfileStatus.Error, ErrorMessage = message};
+        new UpdateMemberProfileResult { Status = UpdateMemberProfileStatus.Error, ErrorMessage = message };
 }

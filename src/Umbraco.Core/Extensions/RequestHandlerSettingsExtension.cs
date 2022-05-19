@@ -28,14 +28,16 @@ public static class RequestHandlerSettingsExtension
             return RequestHandlerSettings.DefaultCharCollection;
         }
 
-        return MergeUnique(requestHandlerSettings.UserDefinedCharCollection,
+        return MergeUnique(
+            requestHandlerSettings.UserDefinedCharCollection,
             RequestHandlerSettings.DefaultCharCollection);
     }
 
     /// <summary>
     ///     Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection
     /// </summary>
-    internal static void MergeReplacements(this RequestHandlerSettings requestHandlerSettings,
+    internal static void MergeReplacements(
+        this RequestHandlerSettings requestHandlerSettings,
         IConfiguration configuration)
     {
         var sectionKey = $"{Constants.Configuration.ConfigRequestHandler}:";
@@ -62,7 +64,7 @@ public static class RequestHandlerSettingsExtension
         {
             var @char = section.GetValue<string>(nameof(CharItem.Char));
             var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
-            replacements.Add(new CharItem {Char = @char, Replacement = replacement});
+            replacements.Add(new CharItem { Char = @char, Replacement = replacement });
         }
 
         return replacements;

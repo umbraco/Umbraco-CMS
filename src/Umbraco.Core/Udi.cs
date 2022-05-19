@@ -32,7 +32,6 @@ public abstract class Udi : IComparable<Udi>
 
     public Uri UriValue { get; }
 
-
     /// <summary>
     ///     Gets the entity type part of the identifier.
     /// </summary>
@@ -44,14 +43,20 @@ public abstract class Udi : IComparable<Udi>
     /// <remarks>A root Udi points to the "root of all things" for a given entity type, e.g. the content tree root.</remarks>
     public abstract bool IsRoot { get; }
 
-    public int CompareTo(Udi? other) => string.Compare(UriValue.ToString(), other?.UriValue.ToString(),
-        StringComparison.OrdinalIgnoreCase);
+    public static bool operator ==(Udi? udi1, Udi? udi2)
+    {
+        if (ReferenceEquals(udi1, udi2))
+        {
+            return true;
+        }
 
-    public override string ToString() =>
-        // UriValue is created in the ctor and is never null
-        // use AbsoluteUri here and not ToString else it's not encoded!
-        UriValue.AbsoluteUri;
+        if (udi1 is null || udi2 is null)
+        {
+            return false;
+        }
 
+        return udi1.Equals(udi2);
+    }
 
     /// <summary>
     ///     Creates a root Udi for an entity type.
@@ -59,6 +64,14 @@ public abstract class Udi : IComparable<Udi>
     /// <param name="entityType">The entity type.</param>
     /// <returns>The root Udi for the entity type.</returns>
     public static Udi Create(string entityType) => UdiParser.GetRootUdi(entityType);
+
+    public int CompareTo(Udi? other) => string.Compare(UriValue.ToString(), other?.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
+
+    public override string ToString() =>
+
+        // UriValue is created in the ctor and is never null
+        // use AbsoluteUri here and not ToString else it's not encoded!
+        UriValue.AbsoluteUri;
 
     /// <summary>
     ///     Creates a string Udi.
@@ -80,7 +93,8 @@ public abstract class Udi : IComparable<Udi>
 
         if (udiType != UdiType.StringUdi)
         {
-            throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have string udis.",
+            throw new InvalidOperationException(string.Format(
+                "Entity type \"{0}\" does not have string udis.",
                 entityType));
         }
 
@@ -102,7 +116,8 @@ public abstract class Udi : IComparable<Udi>
 
         if (udiType != UdiType.GuidUdi)
         {
-            throw new InvalidOperationException(string.Format("Entity type \"{0}\" does not have guid udis.",
+            throw new InvalidOperationException(string.Format(
+                "Entity type \"{0}\" does not have guid udis.",
                 entityType));
         }
 
@@ -118,7 +133,6 @@ public abstract class Udi : IComparable<Udi>
     {
         // if it's a know type go fast and use ctors
         // else fallback to parsing the string (and guess the type)
-
         if (UdiParser.UdiTypes.TryGetValue(uri.Host, out UdiType udiType) == false)
         {
             throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", uri.Host), "uri");
@@ -167,21 +181,6 @@ public abstract class Udi : IComparable<Udi>
     }
 
     public override int GetHashCode() => UriValue.GetHashCode();
-
-    public static bool operator ==(Udi? udi1, Udi? udi2)
-    {
-        if (ReferenceEquals(udi1, udi2))
-        {
-            return true;
-        }
-
-        if ((object?)udi1 == null || (object?)udi2 == null)
-        {
-            return false;
-        }
-
-        return udi1.Equals(udi2);
-    }
 
     public static bool operator !=(Udi? udi1, Udi? udi2) => udi1 == udi2 == false;
 }

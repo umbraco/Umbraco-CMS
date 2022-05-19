@@ -7,11 +7,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public abstract class MovingNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
 {
-    protected MovingNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] {target}, messages)
+    protected MovingNotification(MoveEventInfo<T> target, EventMessages messages)
+        : base(new[] { target }, messages)
     {
     }
 
-    protected MovingNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
+    protected MovingNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

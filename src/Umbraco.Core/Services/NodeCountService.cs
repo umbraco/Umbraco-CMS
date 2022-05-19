@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 

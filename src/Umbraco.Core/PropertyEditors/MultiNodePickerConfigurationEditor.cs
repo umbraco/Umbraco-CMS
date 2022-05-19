@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +23,7 @@ public class MultiNodePickerConfigurationEditor : ConfigurationEditor<MultiNodeP
     public MultiNodePickerConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
         : base(ioHelper, editorConfigurationParser) =>
         Field(nameof(MultiNodePickerConfiguration.TreeSource))
-            .Config = new Dictionary<string, object> {{"idType", "udi"}};
+            .Config = new Dictionary<string, object> { { "idType", "udi" } };
 
     /// <inheritdoc />
     public override Dictionary<string, object> ToConfigurationEditor(MultiNodePickerConfiguration? configuration)

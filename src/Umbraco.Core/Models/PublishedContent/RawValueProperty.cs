@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -20,11 +20,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 public class RawValueProperty : PublishedPropertyBase
 {
     private readonly Lazy<object?> _objectValue;
-    private readonly object _sourceValue; //the value in the db
+    private readonly object _sourceValue; // the value in the db
     private readonly Lazy<object?> _xpathValue;
 
-    public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue,
-        bool isPreviewing = false)
+    public RawValueProperty(IPublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
         : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
     {
         if (propertyType.Variations != ContentVariation.Nothing)
@@ -44,7 +43,6 @@ public class RawValueProperty : PublishedPropertyBase
 
     // RawValueProperty does not (yet?) support variants,
     // only manages the current "default" value
-
     public override object? GetSourceValue(string? culture = null, string? segment = null)
         => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _sourceValue : null;
 

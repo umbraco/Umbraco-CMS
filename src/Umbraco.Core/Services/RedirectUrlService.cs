@@ -10,7 +10,9 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 {
     private readonly IRedirectUrlRepository _redirectUrlRepository;
 
-    public RedirectUrlService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    public RedirectUrlService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IRedirectUrlRepository redirectUrlRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
@@ -20,14 +22,14 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            IRedirectUrl redir = _redirectUrlRepository.Get(url, contentKey, culture);
+            IRedirectUrl? redir = _redirectUrlRepository.Get(url, contentKey, culture);
             if (redir != null)
             {
                 redir.CreateDateUtc = DateTime.UtcNow;
             }
             else
             {
-                redir = new RedirectUrl {Key = Guid.NewGuid(), Url = url, ContentKey = contentKey, Culture = culture};
+                redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey, Culture = culture };
             }
 
             _redirectUrlRepository.Save(redir);

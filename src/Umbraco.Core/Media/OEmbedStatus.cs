@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Media;
+namespace Umbraco.Cms.Core.Media;
 
 public enum OEmbedStatus
 {
     NotSupported,
     Error,
-    Success
+    Success,
 }

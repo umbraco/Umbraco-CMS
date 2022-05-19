@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
@@ -29,9 +29,11 @@ public class UserDisplay : UserBasic
     [DataMember(Name = "availableCultures")]
     public IDictionary<string, string> AvailableCultures { get; set; }
 
-    [DataMember(Name = "startContentIds")] public IEnumerable<EntityBasic> StartContentIds { get; set; }
+    [DataMember(Name = "startContentIds")]
+    public IEnumerable<EntityBasic> StartContentIds { get; set; }
 
-    [DataMember(Name = "startMediaIds")] public IEnumerable<EntityBasic> StartMediaIds { get; set; }
+    [DataMember(Name = "startMediaIds")]
+    public IEnumerable<EntityBasic> StartMediaIds { get; set; }
 
     /// <summary>
     ///     If the password is reset on save, this value will be populated

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -14,5 +14,6 @@ public class PagedResult<T> : PagedResult
     {
     }
 
-    [DataMember(Name = "items")] public IEnumerable<T>? Items { get; set; }
+    [DataMember(Name = "items")]
+    public IEnumerable<T>? Items { get; set; }
 }

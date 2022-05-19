@@ -62,7 +62,6 @@ public class ModelsBuilderSettings
     [DefaultValue(StaticModelsDirectory)]
     public string ModelsDirectory { get; set; } = StaticModelsDirectory;
 
-
     /// <summary>
     ///     Gets or sets a value indicating whether to accept an unsafe value for ModelsDirectory.
     /// </summary>

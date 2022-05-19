@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class PublicAccessEntryDeletedNotification : DeletedNotification<PublicAccessEntry>
 {
-    public PublicAccessEntryDeletedNotification(PublicAccessEntry target, EventMessages messages) : base(target,
+    public PublicAccessEntryDeletedNotification(PublicAccessEntry target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

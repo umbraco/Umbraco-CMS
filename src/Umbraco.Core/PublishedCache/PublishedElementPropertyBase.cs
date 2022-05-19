@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Core.PublishedCache;
 
 internal class PublishedElementPropertyBase : PublishedPropertyBase
 {
+    protected readonly IPublishedElement Element;
+
     // define constant - determines whether to use cache when previewing
     // to store eg routes, property converted values, anything - caching
     // means faster execution, but uses memory - not sure if we want it
@@ -15,8 +17,6 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     private readonly object _locko = new();
     private readonly IPublishedSnapshotAccessor? _publishedSnapshotAccessor;
     private readonly object? _sourceValue;
-
-    protected readonly IPublishedElement Element;
     protected readonly bool IsMember;
     protected readonly bool IsPreviewing;
     private CacheValues? _cacheValues;
@@ -25,8 +25,12 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
     private object? _interValue;
     private string? _valuesCacheKey;
 
-    public PublishedElementPropertyBase(IPublishedPropertyType propertyType, IPublishedElement element, bool previewing,
-        PropertyCacheLevel referenceCacheLevel, object? sourceValue = null,
+    public PublishedElementPropertyBase(
+        IPublishedPropertyType propertyType,
+        IPublishedElement element,
+        bool previewing,
+        PropertyCacheLevel referenceCacheLevel,
+        object? sourceValue = null,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor = null)
         : base(propertyType, referenceCacheLevel)
     {
@@ -39,10 +43,12 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
 
     // used to cache the CacheValues of this property
     // ReSharper disable InconsistentlySynchronizedField
-    internal string ValuesCacheKey => _valuesCacheKey
-                                      ?? (_valuesCacheKey = PropertyCacheValues(Element.Key, Alias, IsPreviewing));
-    // ReSharper restore InconsistentlySynchronizedField
+    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(Element.Key, Alias, IsPreviewing);
 
+    public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) =>
+        "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
+
+    // ReSharper restore InconsistentlySynchronizedField
     public override bool HasValue(string? culture = null, string? segment = null)
     {
         var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
@@ -75,8 +81,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         }
     }
 
-    public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) =>
-        "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
+    public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
 
     private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
     {
@@ -92,7 +97,6 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         // currently (reference) caching at published snapshot, property specifies
         // elements, ok to use element. OTOH, currently caching at elements,
         // property specifies snapshot, need to use snapshot.
-        //
         if (PropertyType.CacheLevel > ReferenceCacheLevel || PropertyType.CacheLevel == PropertyCacheLevel.None)
         {
             cacheLevel = PropertyType.CacheLevel;
@@ -116,7 +120,7 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
             return null;
         }
 
-        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot))
+        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot))
         {
             return null;
         }
@@ -137,18 +141,19 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
                 break;
             case PropertyCacheLevel.Element:
                 // cache within the property object itself, ie within the content object
-                cacheValues = _cacheValues ?? (_cacheValues = new CacheValues());
+                cacheValues = _cacheValues ??= new CacheValues();
                 break;
             case PropertyCacheLevel.Elements:
                 // cache within the elements  cache, depending...
-                IAppCache snapshotCache = GetSnapshotCache();
+                IAppCache? snapshotCache = GetSnapshotCache();
                 cacheValues = (CacheValues?)snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
                               new CacheValues();
                 break;
             case PropertyCacheLevel.Snapshot:
-                IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor?.GetRequiredPublishedSnapshot();
+                IPublishedSnapshot? publishedSnapshot = _publishedSnapshotAccessor?.GetRequiredPublishedSnapshot();
+
                 // cache within the snapshot cache
-                IAppCache facadeCache = publishedSnapshot?.SnapshotCache;
+                IAppCache? facadeCache = publishedSnapshot?.SnapshotCache;
                 cacheValues = (CacheValues?)facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ??
                               new CacheValues();
                 break;
@@ -170,8 +175,6 @@ internal class PublishedElementPropertyBase : PublishedPropertyBase
         _interInitialized = true;
         return _interValue;
     }
-
-    public override object? GetSourceValue(string? culture = null, string? segment = null) => _sourceValue;
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {

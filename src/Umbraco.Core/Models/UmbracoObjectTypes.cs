@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.CodeAnnotations;
+using Umbraco.Cms.Core.CodeAnnotations;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -12,11 +12,11 @@ public enum UmbracoObjectTypes
     /// </summary>
     Unknown,
 
-
     /// <summary>
     ///     Root
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.SystemRoot)] [FriendlyName("Root")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.SystemRoot)]
+    [FriendlyName("Root")]
     ROOT,
 
     /// <summary>
@@ -78,7 +78,8 @@ public enum UmbracoObjectTypes
     /// <summary>
     ///     Recycle Bin
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentRecycleBin)] [FriendlyName("Recycle Bin")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentRecycleBin)]
+    [FriendlyName("Recycle Bin")]
     RecycleBin,
 
     /// <summary>
@@ -132,25 +133,29 @@ public enum UmbracoObjectTypes
     /// <summary>
     ///     Forms Form
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsForm)] [FriendlyName("Form")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsForm)]
+    [FriendlyName("Form")]
     FormsForm,
 
     /// <summary>
     ///     Forms PreValue
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsPreValue)] [FriendlyName("PreValue")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsPreValue)]
+    [FriendlyName("PreValue")]
     FormsPreValue,
 
     /// <summary>
     ///     Forms DataSource
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsDataSource)] [FriendlyName("DataSource")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.FormsDataSource)]
+    [FriendlyName("DataSource")]
     FormsDataSource,
 
     /// <summary>
     ///     Language
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.Language)] [FriendlyName("Language")]
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.Language)]
+    [FriendlyName("Language")]
     Language,
 
     /// <summary>
@@ -164,6 +169,7 @@ public enum UmbracoObjectTypes
     /// <summary>
     ///     Reserved Identifier
     /// </summary>
-    [UmbracoObjectType(Constants.ObjectTypes.Strings.IdReservation)] [FriendlyName("Identifier Reservation")]
-    IdReservation
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.IdReservation)]
+    [FriendlyName("Identifier Reservation")]
+    IdReservation,
 }

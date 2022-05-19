@@ -7,9 +7,9 @@ public struct ReadOnlyContentBaseAdapter : IReadOnlyContentBase
     private ReadOnlyContentBaseAdapter(IContentBase content) =>
         _content = content ?? throw new ArgumentNullException(nameof(content));
 
-    public static ReadOnlyContentBaseAdapter Create(IContentBase content) => new(content);
-
     public int Id => _content.Id;
+
+    public static ReadOnlyContentBaseAdapter Create(IContentBase content) => new(content);
 
     public Guid Key => _content.Key;
 

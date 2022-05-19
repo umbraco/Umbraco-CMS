@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Routing;
 
@@ -42,6 +42,13 @@ public class UrlInfo : IEquatable<UrlInfo>
     [DataMember(Name = "text")]
     public string Text { get; }
 
+    public static bool operator ==(UrlInfo left, UrlInfo right) => Equals(left, right);
+
+    /// <summary>
+    ///     Creates a <see cref="UrlInfo" /> instance representing a true URL.
+    /// </summary>
+    public static UrlInfo Url(string text, string? culture = null) => new(text, true, culture);
+
     /// <summary>
     ///     Checks equality
     /// </summary>
@@ -66,11 +73,6 @@ public class UrlInfo : IEquatable<UrlInfo>
         return string.Equals(Culture, other.Culture, StringComparison.InvariantCultureIgnoreCase) &&
                IsUrl == other.IsUrl && string.Equals(Text, other.Text, StringComparison.InvariantCultureIgnoreCase);
     }
-
-    /// <summary>
-    ///     Creates a <see cref="UrlInfo" /> instance representing a true URL.
-    /// </summary>
-    public static UrlInfo Url(string text, string? culture = null) => new(text, true, culture);
 
     /// <summary>
     ///     Creates a <see cref="UrlInfo" /> instance representing a message.
@@ -108,8 +110,6 @@ public class UrlInfo : IEquatable<UrlInfo>
             return hashCode;
         }
     }
-
-    public static bool operator ==(UrlInfo left, UrlInfo right) => Equals(left, right);
 
     public static bool operator !=(UrlInfo left, UrlInfo right) => !Equals(left, right);
 

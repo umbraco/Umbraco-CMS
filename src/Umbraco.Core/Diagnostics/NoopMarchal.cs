@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Diagnostics;
+namespace Umbraco.Cms.Core.Diagnostics;
 
 internal class NoopMarchal : IMarchal
 {

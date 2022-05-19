@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -7,12 +7,17 @@ namespace Umbraco.Cms.Core.Cache;
 /// </summary>
 public class NoAppCache : IAppPolicyCache, IRequestCache
 {
-    protected NoAppCache() { }
+    protected NoAppCache()
+    {
+    }
 
     /// <summary>
     ///     Gets the singleton instance.
     /// </summary>
     public static NoAppCache Instance { get; } = new();
+
+    /// <inheritdoc />
+    public bool IsAvailable => false;
 
     /// <inheritdoc />
     public virtual object? Get(string cacheKey) => null;
@@ -27,12 +32,10 @@ public class NoAppCache : IAppPolicyCache, IRequestCache
     public IEnumerable<object> SearchByRegex(string regex) => Enumerable.Empty<object>();
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false,
-        string[]? dependentFiles = null) => factory();
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null) => factory();
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false,
-        string[]? dependentFiles = null)
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
     {
     }
 
@@ -70,9 +73,6 @@ public class NoAppCache : IAppPolicyCache, IRequestCache
     public virtual void ClearByRegex(string regex)
     {
     }
-
-    /// <inheritdoc />
-    public bool IsAvailable => false;
 
     public bool Set(string key, object? value) => false;
 

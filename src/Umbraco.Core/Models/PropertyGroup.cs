@@ -14,16 +14,15 @@ namespace Umbraco.Cms.Core.Models;
 [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
 public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 {
+    [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "This field is for internal use only (to allow changing item keys).")]
+    internal PropertyGroupCollection? Collection;
+
     private string _alias;
     private string? _name;
     private PropertyTypeCollection? _propertyTypes;
     private int _sortOrder;
 
     private PropertyGroupType _type;
-
-    [SuppressMessage("Style", "IDE1006:Naming Styles",
-        Justification = "This field is for internal use only (to allow changing item keys).")]
-    internal PropertyGroupCollection? Collection;
 
     public PropertyGroup(bool isPublishing)
         : this(new PropertyTypeCollection(isPublishing))
@@ -135,9 +134,6 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     public bool Equals(PropertyGroup? other) =>
         base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
 
-    private void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
-        OnPropertyChanged(nameof(PropertyTypes));
-
     public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
     protected override void PerformDeepClone(object clone)
@@ -149,10 +145,13 @@ public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
 
         if (clonedEntity._propertyTypes != null)
         {
-            clonedEntity._propertyTypes.ClearCollectionChangedEvents(); //clear this event handler if any
-            clonedEntity._propertyTypes = (PropertyTypeCollection)_propertyTypes!.DeepClone(); //manually deep clone
+            clonedEntity._propertyTypes.ClearCollectionChangedEvents(); // clear this event handler if any
+            clonedEntity._propertyTypes = (PropertyTypeCollection)_propertyTypes!.DeepClone(); // manually deep clone
             clonedEntity._propertyTypes.CollectionChanged +=
-                clonedEntity.PropertyTypesChanged; //re-assign correct event handler
+                clonedEntity.PropertyTypesChanged; // re-assign correct event handler
         }
     }
+
+    private void PropertyTypesChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
+        OnPropertyChanged(nameof(PropertyTypes));
 }

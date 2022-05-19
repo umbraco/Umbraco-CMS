@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Editors;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
@@ -18,5 +18,6 @@ public class PostedFiles : IHaveUploadedFiles, INotificationModel
 
     public List<ContentPropertyFile> UploadedFiles { get; }
 
-    [DataMember(Name = "notifications")] public List<BackOfficeNotification> Notifications { get; private set; }
+    [DataMember(Name = "notifications")]
+    public List<BackOfficeNotification> Notifications { get; private set; }
 }

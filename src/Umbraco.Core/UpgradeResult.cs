@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 public class UpgradeResult
 {
@@ -10,6 +10,8 @@ public class UpgradeResult
     }
 
     public string UpgradeType { get; }
+
     public string Comment { get; }
+
     public string UpgradeUrl { get; }
 }

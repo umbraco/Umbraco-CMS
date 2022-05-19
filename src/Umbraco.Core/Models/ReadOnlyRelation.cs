@@ -16,16 +16,22 @@ public class ReadOnlyRelation
         Comment = comment;
     }
 
-    public ReadOnlyRelation(int parentId, int childId, int relationTypeId) : this(0, parentId, childId, relationTypeId,
+    public ReadOnlyRelation(int parentId, int childId, int relationTypeId)
+        : this(0, parentId, childId, relationTypeId,
         DateTime.Now, string.Empty)
     {
     }
 
     public int Id { get; }
+
     public int ParentId { get; }
+
     public int ChildId { get; }
+
     public int RelationTypeId { get; }
+
     public DateTime CreateDate { get; }
+
     public string Comment { get; }
 
     public bool HasIdentity => Id != 0;

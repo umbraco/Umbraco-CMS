@@ -23,5 +23,5 @@ public enum ServerRole : byte
     /// <summary>
     ///     In a multi-servers environment, the server is the Scheduling Publisher.
     /// </summary>
-    SchedulingPublisher = 3
+    SchedulingPublisher = 3,
 }

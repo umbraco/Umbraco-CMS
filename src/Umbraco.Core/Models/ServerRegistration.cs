@@ -30,9 +30,8 @@ public class ServerRegistration : EntityBase, IServerRegistration
     /// <param name="registered">The date and time the registration was created.</param>
     /// <param name="accessed">The date and time the registration was last accessed.</param>
     /// <param name="isActive">A value indicating whether the registration is active.</param>
-    /// <param name="isMaster">A value indicating whether the registration is master.</param>
-    public ServerRegistration(int id, string? serverAddress, string? serverIdentity, DateTime registered,
-        DateTime accessed, bool isActive, bool isSchedulingPublisher)
+    /// <param name="isSchedulingPublisher">A value indicating whether the registration is scheduling publisher.</param>
+    public ServerRegistration(int id, string? serverAddress, string? serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isSchedulingPublisher)
     {
         UpdateDate = accessed;
         CreateDate = registered;
@@ -117,6 +116,5 @@ public class ServerRegistration : EntityBase, IServerRegistration
     ///     Converts the value of this instance to its equivalent string representation.
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress,
-        ServerIdentity, IsActive ? "" : "!", IsSchedulingPublisher ? "" : "!");
+    public override string ToString() => string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? string.Empty : "!", IsSchedulingPublisher ? string.Empty : "!");
 }

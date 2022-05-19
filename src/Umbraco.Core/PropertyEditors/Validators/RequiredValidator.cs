@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -27,8 +27,9 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
     {
         if (value == null)
         {
-            yield return new ValidationResult(_textService?.Localize("validation", "invalidNull") ?? ValueCannotBeNull,
-                new[] {"value"});
+            yield return new ValidationResult(
+                _textService?.Localize("validation", "invalidNull") ?? ValueCannotBeNull,
+                new[] { "value" });
             yield break;
         }
 
@@ -37,7 +38,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
             if (value.ToString()?.DetectIsEmptyJson() ?? false)
             {
                 yield return new ValidationResult(
-                    _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] {"value"});
+                    _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
             }
 
             yield break;
@@ -46,7 +47,7 @@ public sealed class RequiredValidator : IValueRequiredValidator, IManifestValueV
         if (value.ToString().IsNullOrWhiteSpace())
         {
             yield return new ValidationResult(
-                _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] {"value"});
+                _textService?.Localize("validation", "invalidEmpty") ?? ValueCannotBeEmpty, new[] { "value" });
         }
     }
 }

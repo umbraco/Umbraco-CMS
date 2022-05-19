@@ -61,8 +61,7 @@ public class UploadAutoFillProperties
     /// <remarks>The <paramref name="filepath" /> parameter is the path relative to the filesystem.</remarks>
     /// <param name="culture">Variation language.</param>
     /// <param name="segment">Variation segment.</param>
-    public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath,
-        string? culture, string? segment)
+    public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, string? culture, string? segment)
     {
         if (content == null)
         {
@@ -110,8 +109,7 @@ public class UploadAutoFillProperties
     /// <param name="filestream">The stream containing the file data.</param>
     /// <param name="culture">Variation language.</param>
     /// <param name="segment">Variation segment.</param>
-    public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath,
-        Stream filestream, string culture, string segment)
+    public void Populate(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string culture, string segment)
     {
         if (content == null)
         {
@@ -134,21 +132,7 @@ public class UploadAutoFillProperties
         }
     }
 
-    private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath,
-        Stream? filestream, string? culture, string? segment)
-    {
-        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
-
-        Size? size = _imageUrlGenerator.IsSupportedImageFormat(extension)
-            ? _imageDimensionExtractor.GetDimensions(filestream) ??
-              (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
-            : null;
-
-        SetProperties(content, autoFillConfig, size, filestream?.Length, extension, culture, segment);
-    }
-
-    private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size,
-        long? length, string extension, string? culture, string? segment)
+    private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size, long? length, string extension, string? culture, string? segment)
     {
         if (content == null)
         {
@@ -187,8 +171,19 @@ public class UploadAutoFillProperties
         }
     }
 
-    private static void ResetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig,
-        string? culture, string? segment)
+    private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream? filestream, string? culture, string? segment)
+    {
+        var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
+
+        Size? size = _imageUrlGenerator.IsSupportedImageFormat(extension)
+            ? _imageDimensionExtractor.GetDimensions(filestream) ??
+              (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
+            : null;
+
+        SetProperties(content, autoFillConfig, size, filestream?.Length, extension, culture, segment);
+    }
+
+    private static void ResetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string? culture, string? segment)
     {
         if (content == null)
         {

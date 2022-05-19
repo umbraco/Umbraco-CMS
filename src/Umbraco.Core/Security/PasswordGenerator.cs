@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Extensions;
 
@@ -64,7 +64,7 @@ public class PasswordGenerator
     private static class PasswordStore
     {
         private static readonly char[] Punctuations = "!@#$%^&*()_-+=[{]};:>|./?".ToCharArray();
-        private static readonly char[] StartingChars = {'<', '&'};
+        private static readonly char[] StartingChars = { '<', '&' };
 
         /// <summary>Generates a random password of the specified length.</summary>
         /// <returns>A random password of the specified length.</returns>
@@ -89,12 +89,12 @@ public class PasswordGenerator
 
             if (numberOfNonAlphanumericCharacters > length || numberOfNonAlphanumericCharacters < 0)
             {
-                throw new ArgumentException("min required non alphanumeric characters incorrect",
+                throw new ArgumentException(
+                    "min required non alphanumeric characters incorrect",
                     nameof(numberOfNonAlphanumericCharacters));
             }
 
             string s;
-            int matchIndex;
             do
             {
                 var data = new byte[length];
@@ -132,24 +132,26 @@ public class PasswordGenerator
                         do
                         {
                             index2 = random.Next(0, length);
-                        } while (!char.IsLetterOrDigit(chArray[index2]));
+                        }
+                        while (!char.IsLetterOrDigit(chArray[index2]));
 
                         chArray[index2] = Punctuations[random.Next(0, Punctuations.Length)];
                     }
                 }
 
                 s = new string(chArray);
-            } while (IsDangerousString(s, out matchIndex));
+            }
+            while (IsDangerousString(s, out int matchIndex));
 
             return s;
         }
 
         private static bool IsDangerousString(string s, out int matchIndex)
         {
-            //bool inComment = false;
+            // bool inComment = false;
             matchIndex = 0;
 
-            for (var i = 0;;)
+            for (var i = 0; ;)
             {
                 // Look for the start of one of our patterns
                 var n = s.IndexOfAny(StartingChars, i);

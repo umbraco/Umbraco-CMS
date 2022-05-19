@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -23,15 +23,13 @@ public class QueuingEventDispatcher : QueuingEventDispatcherBase
         // this is probably far from perfect, because if eg a content is saved in a list
         // and then as a single content, the two events will probably not be de-duplicated,
         // but it's better than nothing
-
         foreach (IEventDefinition e in GetEvents(EventDefinitionFilter.LastIn))
         {
             e.RaiseEvent();
 
             // separating concerns means that this should probably not be here,
             // but then where should it be (without making things too complicated)?
-            var delete = e.Args as IDeletingMediaFilesEventArgs;
-            if (delete != null && delete.MediaFilesToDelete.Count > 0)
+            if (e.Args is IDeletingMediaFilesEventArgs delete && delete.MediaFilesToDelete.Count > 0)
             {
                 _mediaFileManager.DeleteMediaFiles(delete.MediaFilesToDelete);
             }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
@@ -22,13 +22,17 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     [Required]
     public override string Alias { get; set; } = string.Empty;
 
-    [DataMember(Name = "sections")] public IEnumerable<string>? Sections { get; set; }
+    [DataMember(Name = "sections")]
+    public IEnumerable<string>? Sections { get; set; }
 
-    [DataMember(Name = "users")] public IEnumerable<int>? Users { get; set; }
+    [DataMember(Name = "users")]
+    public IEnumerable<int>? Users { get; set; }
 
-    [DataMember(Name = "startContentId")] public int? StartContentId { get; set; }
+    [DataMember(Name = "startContentId")]
+    public int? StartContentId { get; set; }
 
-    [DataMember(Name = "startMediaId")] public int? StartMediaId { get; set; }
+    [DataMember(Name = "startMediaId")]
+    public int? StartMediaId { get; set; }
 
     /// <summary>
     ///     The list of letters (permission codes) to assign as the default for the user group
@@ -55,7 +59,7 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     {
         if (DefaultPermissions?.Any(x => x.IsNullOrWhiteSpace()) ?? false)
         {
-            yield return new ValidationResult("A permission value cannot be null or empty", new[] {"Permissions"});
+            yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
         }
 
         if (AssignedPermissions is not null)
@@ -66,8 +70,9 @@ public class UserGroupSave : EntityBasic, IValidatableObject
                 {
                     if (permission.IsNullOrWhiteSpace())
                     {
-                        yield return new ValidationResult("A permission value cannot be null or empty",
-                            new[] {"AssignedPermissions"});
+                        yield return new ValidationResult(
+                            "A permission value cannot be null or empty",
+                            new[] { "AssignedPermissions" });
                     }
                 }
             }

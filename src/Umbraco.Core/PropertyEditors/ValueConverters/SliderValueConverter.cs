@@ -15,6 +15,8 @@ public class SliderValueConverter : PropertyValueConverterBase
     public SliderValueConverter(IDataTypeService dataTypeService) => _dataTypeService =
         dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
 
+    public static void ClearCaches() => Storages.Clear();
+
     public override bool IsConverter(IPublishedPropertyType propertyType)
         => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Slider);
 
@@ -24,8 +26,7 @@ public class SliderValueConverter : PropertyValueConverterBase
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Element;
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel cacheLevel, object? source, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         if (source == null)
         {
@@ -40,7 +41,7 @@ public class SliderValueConverter : PropertyValueConverterBase
 
             if (minimumAttempt.Success && maximumAttempt.Success)
             {
-                return new Range<decimal> {Maximum = maximumAttempt.Result, Minimum = minimumAttempt.Result};
+                return new Range<decimal> { Maximum = maximumAttempt.Result, Minimum = minimumAttempt.Result };
             }
         }
 
@@ -64,16 +65,15 @@ public class SliderValueConverter : PropertyValueConverterBase
     ///     The <see cref="bool" />.
     /// </returns>
     private bool IsRangeDataType(int dataTypeId) =>
+
         // GetPreValuesCollectionByDataTypeId is cached at repository level;
         // still, the collection is deep-cloned so this is kinda expensive,
         // better to cache here + trigger refresh in DataTypeCacheRefresher
         // TODO: this is cheap now, remove the caching
         Storages.GetOrAdd(dataTypeId, id =>
         {
-            IDataType dataType = _dataTypeService.GetDataType(id);
-            SliderConfiguration configuration = dataType?.ConfigurationAs<SliderConfiguration>();
+            IDataType? dataType = _dataTypeService.GetDataType(id);
+            SliderConfiguration? configuration = dataType?.ConfigurationAs<SliderConfiguration>();
             return configuration?.EnableRange ?? false;
         });
-
-    public static void ClearCaches() => Storages.Clear();
 }

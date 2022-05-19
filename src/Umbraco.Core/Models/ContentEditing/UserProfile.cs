@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,7 +16,6 @@ public class UserProfile : IComparable
     [DataMember(Name = "name", IsRequired = true)]
     [Required]
     public string? Name { get; set; }
-
 
     int IComparable.CompareTo(object? obj) => string.Compare(Name, ((UserProfile?)obj)?.Name, StringComparison.Ordinal);
 }

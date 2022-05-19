@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -16,35 +16,60 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
     private readonly IMemberTypeRepository _memberTypeRepository;
 
     [Obsolete("Please use the constructor taking all parameters. This constructor will be removed in V12.")]
-    public MemberTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository,
-        IEntityRepository entityRepository, IEventAggregator eventAggregator)
-        : this(provider, loggerFactory, eventMessagesFactory, memberService, memberTypeRepository, auditRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberTypeContainerRepository>(), entityRepository,
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberService,
+            memberTypeRepository,
+            auditRepository,
+            StaticServiceProvider.Instance.GetRequiredService<IMemberTypeContainerRepository>(),
+            entityRepository,
             eventAggregator)
     {
     }
 
-    public MemberTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
-        IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository,
-        IMemberTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository,
+    public MemberTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IMemberService memberService,
+        IMemberTypeRepository memberTypeRepository,
+        IAuditRepository auditRepository,
+        IMemberTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository,
-            entityContainerRepository, entityRepository, eventAggregator)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            memberTypeRepository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator)
     {
         MemberService = memberService;
         _memberTypeRepository = memberTypeRepository;
     }
 
     // beware! order is important to avoid deadlocks
-    protected override int[] ReadLockIds { get; } = {Constants.Locks.MemberTypes};
-    protected override int[] WriteLockIds { get; } = {Constants.Locks.MemberTree, Constants.Locks.MemberTypes};
+    protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
 
-    private IMemberService MemberService { get; }
+    protected override int[] WriteLockIds { get; } = { Constants.Locks.MemberTree, Constants.Locks.MemberTypes };
 
     protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberType;
+
+    private IMemberService MemberService { get; }
 
     public string GetDefault()
     {
@@ -80,28 +105,36 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
 
     #region Notifications
 
-    protected override SavingNotification<IMemberType> GetSavingNotification(IMemberType item,
+    protected override SavingNotification<IMemberType> GetSavingNotification(
+        IMemberType item,
         EventMessages eventMessages) => new MemberTypeSavingNotification(item, eventMessages);
 
-    protected override SavingNotification<IMemberType> GetSavingNotification(IEnumerable<IMemberType> items,
+    protected override SavingNotification<IMemberType> GetSavingNotification(
+        IEnumerable<IMemberType> items,
         EventMessages eventMessages) => new MemberTypeSavingNotification(items, eventMessages);
 
-    protected override SavedNotification<IMemberType> GetSavedNotification(IMemberType item,
+    protected override SavedNotification<IMemberType> GetSavedNotification(
+        IMemberType item,
         EventMessages eventMessages) => new MemberTypeSavedNotification(item, eventMessages);
 
-    protected override SavedNotification<IMemberType> GetSavedNotification(IEnumerable<IMemberType> items,
+    protected override SavedNotification<IMemberType> GetSavedNotification(
+        IEnumerable<IMemberType> items,
         EventMessages eventMessages) => new MemberTypeSavedNotification(items, eventMessages);
 
-    protected override DeletingNotification<IMemberType> GetDeletingNotification(IMemberType item,
+    protected override DeletingNotification<IMemberType> GetDeletingNotification(
+        IMemberType item,
         EventMessages eventMessages) => new MemberTypeDeletingNotification(item, eventMessages);
 
-    protected override DeletingNotification<IMemberType> GetDeletingNotification(IEnumerable<IMemberType> items,
+    protected override DeletingNotification<IMemberType> GetDeletingNotification(
+        IEnumerable<IMemberType> items,
         EventMessages eventMessages) => new MemberTypeDeletingNotification(items, eventMessages);
 
-    protected override DeletedNotification<IMemberType> GetDeletedNotification(IEnumerable<IMemberType> items,
+    protected override DeletedNotification<IMemberType> GetDeletedNotification(
+        IEnumerable<IMemberType> items,
         EventMessages eventMessages) => new MemberTypeDeletedNotification(items, eventMessages);
 
-    protected override MovingNotification<IMemberType> GetMovingNotification(MoveEventInfo<IMemberType> moveInfo,
+    protected override MovingNotification<IMemberType> GetMovingNotification(
+        MoveEventInfo<IMemberType> moveInfo,
         EventMessages eventMessages) => new MemberTypeMovingNotification(moveInfo, eventMessages);
 
     protected override MovedNotification<IMemberType> GetMovedNotification(

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Strings;
+namespace Umbraco.Cms.Core.Strings;
 
 /// <summary>
 ///     Provides methods to convert Utf8 text to Ascii.
@@ -23,14 +23,13 @@ public static class Utf8ToAsciiConverter
 
         // this is faster although it uses more memory
         // but... we should be filtering short strings only...
-
         var output = new char[input.Length * 3]; // *3 because of things such as OE
         var len = ToAscii(input, output, fail);
         return new string(output, 0, len);
 
-        //var output = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
-        //ToAscii(input, output);
-        //return output.ToString();
+        // var output = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
+        // ToAscii(input, output);
+        // return output.ToString();
     }
 
     /// <summary>
@@ -45,18 +44,17 @@ public static class Utf8ToAsciiConverter
 
         // this is faster although it uses more memory
         // but... we should be filtering short strings only...
-
         var output = new char[input.Length * 3]; // *3 because of things such as OE
         var len = ToAscii(input, output, fail);
         var array = new char[len];
         Array.Copy(output, array, len);
         return array;
 
-        //var temp = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
-        //ToAscii(input, temp);
-        //var output = new char[temp.Length];
-        //temp.CopyTo(0, output, 0, temp.Length);
-        //return output;
+        // var temp = new StringBuilder(input.Length + 16); // default is 16, start with at least input length + little extra
+        // ToAscii(input, temp);
+        // var output = new char[temp.Length];
+        // temp.CopyTo(0, output, 0, temp.Length);
+        // return output;
     }
 
     /// <summary>
@@ -88,11 +86,11 @@ public static class Utf8ToAsciiConverter
         return opos;
     }
 
-    //private static void ToAscii(char[] input, StringBuilder output)
-    //{
+    // private static void ToAscii(char[] input, StringBuilder output)
+    // {
     //    var chars = new char[5];
 
-    //    for (var ipos = 0; ipos < input.Length; ipos++)
+    // for (var ipos = 0; ipos < input.Length; ipos++)
     //    {
     //        var opos = 0;
     //        if (char.IsSurrogate(input[ipos]))
@@ -103,7 +101,7 @@ public static class Utf8ToAsciiConverter
     //            output.Append(chars, 0, opos);
     //        }
     //    }
-    //}
+    // }
 
     /// <summary>
     ///     Converts the character at position <paramref name="ipos" /> in input array of Utf8 characters
@@ -136,8 +134,9 @@ public static class Utf8ToAsciiConverter
 
             // we don't want them
         }
-        //else if (char.IsSeparator(c))
-        //{
+
+        // else if (char.IsSeparator(c))
+        // {
         //    // The Unicode standard recognizes three subcategories of separators:
         //    // - Space separators (the UnicodeCategory.SpaceSeparator category), which includes characters such as \u0020.
         //    // - Line separators (the UnicodeCategory.LineSeparator category), which includes \u2028.
@@ -146,8 +145,8 @@ public static class Utf8ToAsciiConverter
         //    // Note: The Unicode standard classifies the characters \u000A (LF), \u000C (FF), and \u000A (CR) as control
         //    // characters (members of the UnicodeCategory.Control category), not as separator characters.
 
-        //    // better do it via WhiteSpace
-        //}
+        // // better do it via WhiteSpace
+        // }
         else if (char.IsWhiteSpace(c))
         {
             // White space characters are the following Unicode characters:
@@ -3325,7 +3324,6 @@ public static class Utf8ToAsciiConverter
 
                 // BEGIN CUSTOM TRANSLITERATION OF CYRILIC CHARS
 
-                #region Cyrillic chars
 
                 // russian uppercase "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
                 // russian lowercase "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я"
@@ -3343,7 +3341,6 @@ public static class Utf8ToAsciiConverter
                 // TODO: transliterates Анастасия as Anastasiya, and not Anastasia
                 // Ольга --> Ol'ga, Татьяна --> Tat'yana -- that's bad (?)
                 // Note: should ä (German umlaut) become a or ae ?
-
                 case '\u0410': // А
                     output[opos++] = 'A';
                     break;
@@ -3557,7 +3554,6 @@ public static class Utf8ToAsciiConverter
                     output[opos++] = 'a';
                     break;
 
-                #endregion
 
                 // BEGIN EXTRA
                 /*
@@ -3580,12 +3576,12 @@ public static class Utf8ToAsciiConverter
                 break;
                 */
                 default:
-                    //if (ToMoreAscii(input, ipos, output, ref opos))
+                    // if (ToMoreAscii(input, ipos, output, ref opos))
                     //    break;
 
-                    //if (!char.IsLetterOrDigit(c)) // that would not catch eg 汉 unfortunately
+                    // if (!char.IsLetterOrDigit(c)) // that would not catch eg 汉 unfortunately
                     //    output[opos++] = '?';
-                    //else
+                    // else
                     //    output[opos++] = c;
 
                     // strict ASCII
@@ -3596,11 +3592,11 @@ public static class Utf8ToAsciiConverter
         }
     }
 
-    //private static bool ToMoreAscii(char[] input, int ipos, char[] output, ref int opos)
-    //{
+    // private static bool ToMoreAscii(char[] input, int ipos, char[] output, ref int opos)
+    // {
     //    var c = input[ipos];
 
-    //    switch (c)
+    // switch (c)
     //    {
     //        case '£':
     //            output[opos++] = 'G';
@@ -3608,22 +3604,22 @@ public static class Utf8ToAsciiConverter
     //            output[opos++] = 'P';
     //            break;
 
-    //        case '€':
+    // case '€':
     //            output[opos++] = 'E';
     //            output[opos++] = 'U';
     //            output[opos++] = 'R';
     //            break;
 
-    //        case '©':
+    // case '©':
     //            output[opos++] = '(';
     //            output[opos++] = 'C';
     //            output[opos++] = ')';
     //            break;
 
-    //        default:
+    // default:
     //            return false;
     //    }
 
-    //    return true;
-    //}
+    // return true;
+    // }
 }

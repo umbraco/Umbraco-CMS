@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Persistence.Querying;
+namespace Umbraco.Cms.Core.Persistence.Querying;
 
 /// <summary>
 ///     Determines how to match a string property value
@@ -10,6 +10,6 @@ public enum StringPropertyMatchType
     StartsWith,
     EndsWith,
 
-    //Deals with % as wildcard chars in a string
-    Wildcard
+    // Deals with % as wildcard chars in a string
+    Wildcard,
 }

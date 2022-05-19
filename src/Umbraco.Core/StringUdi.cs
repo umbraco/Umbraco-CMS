@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core;
 
@@ -33,7 +33,14 @@ public class StringUdi : Udi
     /// <inheritdoc />
     public override bool IsRoot => Id == string.Empty;
 
+    public StringUdi EnsureClosed()
+    {
+        EnsureNotRoot();
+        return this;
+    }
+
     private static string EscapeUriString(string s) =>
+
         // Uri.EscapeUriString preserves / but also [ and ] which is bad
         // Uri.EscapeDataString does not preserve / which is bad
         // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
@@ -41,10 +48,4 @@ public class StringUdi : Udi
         // we want to preserve the / and the unreserved
         // so...
         string.Join("/", s.Split(Constants.CharArrays.ForwardSlash).Select(Uri.EscapeDataString));
-
-    public StringUdi EnsureClosed()
-    {
-        EnsureNotRoot();
-        return this;
-    }
 }

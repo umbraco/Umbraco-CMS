@@ -34,7 +34,7 @@ public class MenuItemList : List<MenuItem>
     public MenuItem? Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
         where T : IAction
     {
-        MenuItem item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
+        MenuItem? item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
         if (item != null)
         {
             Add(item);
@@ -44,11 +44,10 @@ public class MenuItemList : List<MenuItem>
         return null;
     }
 
-    private MenuItem? CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false,
-        bool opensDialog = false)
+    private MenuItem? CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
         where T : IAction
     {
-        T item = _actionCollection.GetAction<T>();
+        T? item = _actionCollection.GetAction<T>();
         if (item == null)
         {
             return null;
@@ -59,7 +58,9 @@ public class MenuItemList : List<MenuItem>
 
         var menuItem = new MenuItem(item, textService.Localize("actions", item.Alias))
         {
-            SeparatorBefore = hasSeparator, OpensDialog = opensDialog, TextDescription = textDescription
+            SeparatorBefore = hasSeparator,
+            OpensDialog = opensDialog,
+            TextDescription = textDescription,
         };
 
         return menuItem;

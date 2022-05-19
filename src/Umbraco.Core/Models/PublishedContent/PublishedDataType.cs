@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 

@@ -120,7 +120,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     public PackageDefinition? GetById(int id)
     {
         XDocument packagesXml = EnsureStorage(out var packageFile);
-        XElement packageXml = packagesXml?.Root?.Elements("package")
+        XElement? packageXml = packagesXml?.Root?.Elements("package")
             .FirstOrDefault(x => x.AttributeValue<int>("id") == id);
         return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
     }
@@ -128,7 +128,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     public void Delete(int id)
     {
         XDocument packagesXml = EnsureStorage(out var packagesFile);
-        XElement packageXml = packagesXml?.Root?.Elements("package")
+        XElement? packageXml = packagesXml?.Root?.Elements("package")
             .FirstOrDefault(x => x.AttributeValue<int>("id") == id);
         if (packageXml == null)
         {
@@ -154,12 +154,12 @@ public class PackagesRepository : ICreatedPackagesRepository
             return false;
         }
 
-        //ensure it's valid
+        // ensure it's valid
         ValidatePackage(definition);
 
         if (definition.Id == default)
         {
-            //need to gen an id and persist
+            // need to gen an id and persist
             // Find max id
             var maxId = packagesXml.Root.Elements("package").Max(x => x.AttributeValue<int?>("id")) ?? 0;
             var newId = maxId + 1;
@@ -170,8 +170,8 @@ public class PackagesRepository : ICreatedPackagesRepository
         }
         else
         {
-            //existing
-            XElement packageXml = packagesXml.Root.Elements("package")
+            // existing
+            XElement? packageXml = packagesXml.Root.Elements("package")
                 .FirstOrDefault(x => x.AttributeValue<int>("id") == definition.Id);
             if (packageXml == null)
             {
@@ -201,10 +201,10 @@ public class PackagesRepository : ICreatedPackagesRepository
                 "the package definition does not have a GUID, it must be saved before being exported");
         }
 
-        //ensure it's valid
+        // ensure it's valid
         ValidatePackage(definition);
 
-        //Create a folder for building this package
+        // Create a folder for building this package
         var temporaryPath =
             _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
         if (Directory.Exists(temporaryPath) == false)
@@ -214,10 +214,10 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         try
         {
-            //Init package file
+            // Init package file
             XDocument compiledPackageXml = CreateCompiledPackageXml(out XElement root);
 
-            //Info section
+            // Info section
             root.Add(GetPackageInfoXml(definition));
 
             PackageDocumentsAndTags(definition, root);
@@ -274,7 +274,8 @@ public class PackagesRepository : ICreatedPackagesRepository
             }
 
             var directoryName =
-                _hostingEnvironment.MapPathContentRoot(Path.Combine(_createdPackagesFolderPath,
+                _hostingEnvironment.MapPathContentRoot(Path.Combine(
+                    _createdPackagesFolderPath,
                     definition.Name.Replace(' ', '_')));
             Directory.CreateDirectory(directoryName);
 
@@ -297,6 +298,32 @@ public class PackagesRepository : ICreatedPackagesRepository
             // Clean up
             Directory.Delete(temporaryPath, true);
         }
+    }
+
+    public void DeleteLocalRepositoryFiles()
+    {
+        var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
+        if (File.Exists(packagesFile))
+        {
+            File.Delete(packagesFile);
+        }
+
+        var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
+        if (Directory.Exists(packagesFolder))
+        {
+            Directory.Delete(packagesFolder);
+        }
+    }
+
+    private static XElement GetPackageInfoXml(PackageDefinition definition)
+    {
+        var info = new XElement("info");
+
+        // Package info
+        var package = new XElement("package");
+        package.Add(new XElement("name", definition.Name));
+        info.Add(package);
+        return info;
     }
 
     private void ValidatePackage(PackageDefinition definition)
@@ -322,7 +349,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IDataType dataType = _dataTypeService.GetDataType(outInt);
+            IDataType? dataType = _dataTypeService.GetDataType(outInt);
             if (dataType == null)
             {
                 continue;
@@ -344,7 +371,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ILanguage lang = _languageService.GetLanguageById(outInt);
+            ILanguage? lang = _languageService.GetLanguageById(outInt);
             if (lang == null)
             {
                 continue;
@@ -417,14 +444,17 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         root.Add(rootDictionaryItems);
 
-        static void AppendDictionaryElement(XElement rootDictionaryItems,
+        static void AppendDictionaryElement(
+            XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
             Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
         {
             // track it
             processed.Add(key, serializedDictionaryValue);
+
             // append it
             rootDictionaryItems.Add(serializedDictionaryValue);
+
             // remove it so its not re-processed
             items.Remove(key);
         }
@@ -459,7 +489,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
         IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource is not null)
             .Where(x => x.MacroSource!.StartsWith(Constants.SystemDirectories.MacroPartials))
-            .Select(x => x.MacroSource!.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+            .Select(x => x.MacroSource![Constants.SystemDirectories.MacroPartials.Length..].Replace('/', '\\'));
         PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
     }
 
@@ -530,7 +560,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate template = _fileService.GetTemplate(outInt);
+            ITemplate? template = _fileService.GetTemplate(outInt);
             if (template == null)
             {
                 continue;
@@ -553,7 +583,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IContentType contentType = _contentTypeService.Get(outInt);
+            IContentType? contentType = _contentTypeService.Get(outInt);
             if (contentType == null)
             {
                 continue;
@@ -581,7 +611,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IMediaType mediaType = _mediaTypeService.Get(outInt);
+            IMediaType? mediaType = _mediaTypeService.Get(outInt);
             if (mediaType == null)
             {
                 continue;
@@ -600,63 +630,65 @@ public class PackagesRepository : ICreatedPackagesRepository
 
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
-        //Documents and tags
-        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId,
+        // Documents and tags
+        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
+            definition.ContentNodeId,
                 NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
         {
             if (contentNodeId > 0)
             {
-                //load content from umbraco.
-                IContent content = _contentService.GetById(contentNodeId);
+                // load content from umbraco.
+                IContent? content = _contentService.GetById(contentNodeId);
                 if (content != null)
                 {
                     XElement contentXml = definition.ContentLoadChildNodes
                         ? content.ToDeepXml(_serializer)
                         : content.ToXml(_serializer);
 
-                    //Create the Documents/DocumentSet node
-
+                    // Create the Documents/DocumentSet node
                     root.Add(
-                        new XElement("Documents",
-                            new XElement("DocumentSet",
+                        new XElement(
+                            "Documents",
+                            new XElement(
+                                "DocumentSet",
                                 new XAttribute("importMode", "root"),
                                 contentXml)));
 
                     // TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
                     ////Create the TagProperties node - this is used to store a definition for all
                     //// document properties that are tags, this ensures that we can re-import tags properly
-                    //XmlNode tagProps = new XElement("TagProperties");
+                    // XmlNode tagProps = new XElement("TagProperties");
 
                     ////before we try to populate this, we'll do a quick lookup to see if any of the documents
                     //// being exported contain published tags.
-                    //var allExportedIds = documents.SelectNodes("//@id").Cast<XmlNode>()
+                    // var allExportedIds = documents.SelectNodes("//@id").Cast<XmlNode>()
                     //    .Select(x => x.Value.TryConvertTo<int>())
                     //    .Where(x => x.Success)
                     //    .Select(x => x.Result)
                     //    .ToArray();
-                    //var allContentTags = new List<ITag>();
-                    //foreach (var exportedId in allExportedIds)
-                    //{
+                    // var allContentTags = new List<ITag>();
+                    // foreach (var exportedId in allExportedIds)
+                    // {
                     //    allContentTags.AddRange(
                     //        Current.Services.TagService.GetTagsForEntity(exportedId));
-                    //}
+                    // }
 
                     ////This is pretty round-about but it works. Essentially we need to get the properties that are tagged
                     //// but to do that we need to lookup by a tag (string)
-                    //var allTaggedEntities = new List<TaggedEntity>();
-                    //foreach (var group in allContentTags.Select(x => x.Group).Distinct())
-                    //{
+                    // var allTaggedEntities = new List<TaggedEntity>();
+                    // foreach (var group in allContentTags.Select(x => x.Group).Distinct())
+                    // {
                     //    allTaggedEntities.AddRange(
                     //        Current.Services.TagService.GetTaggedContentByTagGroup(group));
-                    //}
+                    // }
 
                     ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
-                    //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
+                    // var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
                     //    .DistinctBy(x => x.EntityId)
                     //    .OrderBy(x => x.EntityId);
 
-                    //foreach (var taggedEntity in allExportedTaggedEntities)
-                    //{
+                    // foreach (var taggedEntity in allExportedTaggedEntities)
+                    // {
                     //    foreach (var taggedProperty in taggedEntity.TaggedProperties.Where(x => x.Tags.Any()))
                     //    {
                     //        XmlNode tagProp = new XElement("TagProperty");
@@ -664,27 +696,26 @@ public class PackagesRepository : ICreatedPackagesRepository
                     //        docId.Value = taggedEntity.EntityId.ToString(CultureInfo.InvariantCulture);
                     //        tagProp.Attributes.Append(docId);
 
-                    //        var propertyAlias = packageManifest.CreateAttribute("propertyAlias", "");
+                    // var propertyAlias = packageManifest.CreateAttribute("propertyAlias", "");
                     //        propertyAlias.Value = taggedProperty.PropertyTypeAlias;
                     //        tagProp.Attributes.Append(propertyAlias);
 
-                    //        var group = packageManifest.CreateAttribute("group", "");
+                    // var group = packageManifest.CreateAttribute("group", "");
                     //        group.Value = taggedProperty.Tags.First().Group;
                     //        tagProp.Attributes.Append(group);
 
-                    //        tagProp.AppendChild(packageManifest.CreateCDataSection(
+                    // tagProp.AppendChild(packageManifest.CreateCDataSection(
                     //            JsonConvert.SerializeObject(taggedProperty.Tags.Select(x => x.Text).ToArray())));
 
-                    //        tagProps.AppendChild(tagProp);
+                    // tagProps.AppendChild(tagProp);
                     //    }
-                    //}
+                    // }
 
-                    //manifestRoot.Add(tagProps);
+                    // manifestRoot.Add(tagProps);
                 }
             }
         }
     }
-
 
     private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
     {
@@ -726,6 +757,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     }
 
     // TODO: Delete this
+
     /// <summary>
     private XElement? GetMacroXml(int macroId, out IMacro? macro)
     {
@@ -765,7 +797,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     {
         if (dt.ParentId > 0)
         {
-            IContentType parent = _contentTypeService.Get(dt.ParentId);
+            IContentType? parent = _contentTypeService.Get(dt.ParentId);
             if (parent != null) // could be a container
             {
                 AddDocumentType(parent, dtl);
@@ -782,7 +814,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     {
         if (mediaType.ParentId > 0)
         {
-            IMediaType parent = _mediaTypeService.Get(mediaType.ParentId);
+            IMediaType? parent = _mediaTypeService.Get(mediaType.ParentId);
             if (parent != null) // could be a container
             {
                 AddMediaType(parent, mediaTypes);
@@ -793,17 +825,6 @@ public class PackagesRepository : ICreatedPackagesRepository
         {
             mediaTypes.Add(mediaType);
         }
-    }
-
-    private static XElement GetPackageInfoXml(PackageDefinition definition)
-    {
-        var info = new XElement("info");
-
-        //Package info
-        var package = new XElement("package");
-        package.Add(new XElement("name", definition.Name));
-        info.Add(package);
-        return info;
     }
 
     private static XDocument CreateCompiledPackageXml(out XElement root)
@@ -829,20 +850,5 @@ public class PackagesRepository : ICreatedPackagesRepository
 
         var packagesXml = XDocument.Load(packagesFile);
         return packagesXml;
-    }
-
-    public void DeleteLocalRepositoryFiles()
-    {
-        var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
-        if (File.Exists(packagesFile))
-        {
-            File.Delete(packagesFile);
-        }
-
-        var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
-        if (Directory.Exists(packagesFolder))
-        {
-            Directory.Delete(packagesFolder);
-        }
     }
 }

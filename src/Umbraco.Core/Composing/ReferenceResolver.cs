@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using System.Security;
 using Microsoft.Extensions.Logging;
@@ -20,8 +20,7 @@ internal class ReferenceResolver
     private readonly List<Assembly> _lookup = new();
     private readonly HashSet<string> _umbracoAssemblies;
 
-    public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies,
-        ILogger<ReferenceResolver> logger)
+    public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies, ILogger<ReferenceResolver> logger)
     {
         _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
         _assemblies = entryPointAssemblies;
@@ -32,6 +31,14 @@ internal class ReferenceResolver
         {
             _lookup.Add(item);
         }
+    }
+
+    protected enum Classification
+    {
+        Unknown,
+        DoesNotReferenceUmbraco,
+        ReferencesUmbraco,
+        IsUmbraco,
     }
 
     /// <summary>
@@ -108,6 +115,29 @@ internal class ReferenceResolver
         return applicationParts;
     }
 
+    protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
+    {
+        foreach (AssemblyName referenceName in assembly.GetReferencedAssemblies())
+        {
+            // don't include if this is excluded
+            if (TypeFinder.KnownAssemblyExclusionFilter.Any(f =>
+                    referenceName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                continue;
+            }
+
+            var reference = Assembly.Load(referenceName);
+
+            if (!_lookup.Contains(reference))
+            {
+                // A dependency references an item that isn't referenced by this project.
+                // We'll add this reference so that we can calculate the classification.
+                _lookup.Add(reference);
+            }
+
+            yield return reference;
+        }
+    }
 
     private IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
         assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
@@ -115,7 +145,7 @@ internal class ReferenceResolver
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs
     private string GetAssemblyLocation(Assembly assembly)
     {
-        if (Uri.TryCreate(assembly.CodeBase, UriKind.Absolute, out Uri result) &&
+        if (Uri.TryCreate(assembly.Location, UriKind.Absolute, out Uri? result) &&
             result.IsFile && string.IsNullOrWhiteSpace(result.Fragment))
         {
             return result.LocalPath;
@@ -165,38 +195,5 @@ internal class ReferenceResolver
         Debug.Assert(classification != Classification.Unknown);
         _classifications[assembly] = classification;
         return classification;
-    }
-
-    protected virtual IEnumerable<Assembly> GetReferences(Assembly assembly)
-    {
-        foreach (AssemblyName referenceName in assembly.GetReferencedAssemblies())
-        {
-            // don't include if this is excluded
-            if (TypeFinder.KnownAssemblyExclusionFilter.Any(f =>
-                    referenceName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                continue;
-            }
-
-            var reference = Assembly.Load(referenceName);
-
-            if (!_lookup.Contains(reference))
-            {
-                // A dependency references an item that isn't referenced by this project.
-                // We'll add this reference so that we can calculate the classification.
-
-                _lookup.Add(reference);
-            }
-
-            yield return reference;
-        }
-    }
-
-    protected enum Classification
-    {
-        Unknown,
-        DoesNotReferenceUmbraco,
-        ReferencesUmbraco,
-        IsUmbraco
     }
 }

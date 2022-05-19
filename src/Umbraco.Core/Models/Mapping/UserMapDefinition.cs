@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
@@ -30,8 +30,7 @@ public class UserMapDefinition : IMapDefinition
     private readonly ILocalizedTextService _textService;
     private readonly IUserService _userService;
 
-    public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService,
-        ISectionService sectionService,
+    public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
         AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings,
         MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
         IImageUrlGenerator imageUrlGenerator)
@@ -51,14 +50,16 @@ public class UserMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<UserGroupSave, IUserGroup>(
-            (source, context) => new UserGroup(_shortStringHelper) {CreateDate = DateTime.UtcNow}, Map);
+            (source, context) => new UserGroup(_shortStringHelper) { CreateDate = DateTime.UtcNow }, Map);
         mapper.Define<UserInvite, IUser>(Map);
         mapper.Define<IProfile, UserProfile>((source, context) => new UserProfile(), Map);
         mapper.Define<IReadOnlyUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);
         mapper.Define<IUserGroup, UserGroupBasic>((source, context) => new UserGroupBasic(), Map);
-        mapper.Define<IUserGroup, AssignedUserGroupPermissions>((source, context) => new AssignedUserGroupPermissions(),
+        mapper.Define<IUserGroup, AssignedUserGroupPermissions>(
+            (source, context) => new AssignedUserGroupPermissions(),
             Map);
-        mapper.Define<EntitySlim, AssignedContentPermissions>((source, context) => new AssignedContentPermissions(),
+        mapper.Define<EntitySlim, AssignedContentPermissions>(
+            (source, context) => new AssignedContentPermissions(),
             Map);
         mapper.Define<IUserGroup, UserGroupDisplay>((source, context) => new UserGroupDisplay(), Map);
         mapper.Define<IUser, UserBasic>((source, context) => new UserBasic(), Map);
@@ -73,7 +74,6 @@ public class UserMapDefinition : IMapDefinition
     }
 
     // mappers
-
     private static void Map(UserGroupSave source, IUserGroup target, MapperContext context)
     {
         if (!(target is UserGroup ttarget))
@@ -109,6 +109,52 @@ public class UserMapDefinition : IMapDefinition
                 target.AddAllowedSection(section);
             }
         }
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(IProfile source, UserProfile target, MapperContext context)
+    {
+        target.Name = source.Name;
+        target.UserId = source.Id;
+    }
+
+    // Umbraco.Code.MapAll -Trashed -Alias -AssignedPermissions
+    private static void Map(EntitySlim source, AssignedContentPermissions target, MapperContext context)
+    {
+        target.Icon = MapContentTypeIcon(source);
+        target.Id = source.Id;
+        target.Key = source.Key;
+        target.Name = source.Name;
+        target.ParentId = source.ParentId;
+        target.Path = source.Path;
+        target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
+
+        if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
+        {
+            target.Icon = Constants.Icons.Member;
+        }
+    }
+
+    private static string? MapContentTypeIcon(IEntitySlim entity)
+        => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+
+    private static int GetIntId(object? id)
+    {
+        if (id is string strId &&
+            int.TryParse(strId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
+        {
+            return asInt;
+        }
+
+        Attempt<int> result = id.TryConvertTo<int>();
+        if (result.Success == false)
+        {
+            throw new InvalidOperationException(
+                "Cannot convert the profile to a " + typeof(UserDetail).Name +
+                " object since the id is not an integer");
+        }
+
+        return result.Result;
     }
 
     // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -156,13 +202,6 @@ public class UserMapDefinition : IMapDefinition
         {
             target.AddGroup(group.ToReadOnlyGroup());
         }
-    }
-
-    // Umbraco.Code.MapAll
-    private static void Map(IProfile source, UserProfile target, MapperContext context)
-    {
-        target.Name = source.Name;
-        target.UserId = source.Id;
     }
 
     // Umbraco.Code.MapAll -ContentStartNode -UserCount -MediaStartNode -Key -Sections
@@ -216,23 +255,6 @@ public class UserMapDefinition : IMapDefinition
         }
     }
 
-    // Umbraco.Code.MapAll -Trashed -Alias -AssignedPermissions
-    private static void Map(EntitySlim source, AssignedContentPermissions target, MapperContext context)
-    {
-        target.Icon = MapContentTypeIcon(source);
-        target.Id = source.Id;
-        target.Key = source.Key;
-        target.Name = source.Name;
-        target.ParentId = source.ParentId;
-        target.Path = source.Path;
-        target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
-
-        if (source.NodeObjectType == Constants.ObjectTypes.Member && target.Icon.IsNullOrWhiteSpace())
-        {
-            target.Icon = Constants.Icons.Member;
-        }
-    }
-
     // Umbraco.Code.MapAll -ContentStartNode -MediaStartNode -Sections -Notifications -Udi
     // Umbraco.Code.MapAll -Trashed -AdditionalData -Users -AssignedPermissions
     private void Map(IUserGroup source, UserGroupDisplay target, MapperContext context)
@@ -250,13 +272,12 @@ public class UserMapDefinition : IMapDefinition
 
         MapUserGroupBasic(target, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
-        //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
+        // Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
         // this will cause an N+1 and we'll need to change how this works.
         IEnumerable<IUser> users = _userService.GetAllInGroup(source.Id);
         target.Users = context.MapEnumerable<IUser, UserBasic>(users).WhereNotNull();
 
-        //Deal with assigned permissions:
-
+        // Deal with assigned permissions:
         var allContentPermissions = _userService.GetPermissions(source, true)
             .ToDictionary(x => x.EntityId, x => x);
 
@@ -270,7 +291,6 @@ public class UserMapDefinition : IMapDefinition
             // a group can end up with way more than 2000 assigned permissions,
             // so we need to break them into groups in order to avoid breaking
             // the entity service due to too many Sql parameters.
-
             var list = new List<IEntitySlim>();
             foreach (IEnumerable<int> idGroup in allContentPermissions.Keys.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
@@ -285,7 +305,7 @@ public class UserMapDefinition : IMapDefinition
         {
             EntityPermission contentPermissions = allContentPermissions[entity.Id];
 
-            AssignedContentPermissions assignedContentPermissions = context.Map<AssignedContentPermissions>(entity);
+            AssignedContentPermissions? assignedContentPermissions = context.Map<AssignedContentPermissions>(entity);
             if (assignedContentPermissions is null)
             {
                 continue;
@@ -294,13 +314,14 @@ public class UserMapDefinition : IMapDefinition
             assignedContentPermissions.AssignedPermissions =
                 AssignedUserGroupPermissions.ClonePermissions(target.DefaultPermissions);
 
-            //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
-            //and we'll re-check it if it's one of the explicitly assigned ones
+            // since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
+            // and we'll re-check it if it's one of the explicitly assigned ones
             foreach (Permission permission in assignedContentPermissions.AssignedPermissions.SelectMany(x => x.Value))
             {
                 permission.Checked = false;
                 permission.Checked =
-                    contentPermissions.AssignedPermissions.Contains(permission.PermissionCode,
+                    contentPermissions.AssignedPermissions.Contains(
+                        permission.PermissionCode,
                         StringComparer.InvariantCulture);
             }
 
@@ -317,10 +338,8 @@ public class UserMapDefinition : IMapDefinition
         target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
         target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.CalculatedStartContentIds =
-            GetStartNodes(source.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document,
-                "content", "contentRoot", context);
-        target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService, _appCaches),
-            UmbracoObjectTypes.Media, "media", "mediaRoot", context);
+            GetStartNodes(source.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document, "content", "contentRoot", context);
+        target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media, "media", "mediaRoot", context);
         target.CreateDate = source.CreateDate;
         target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
         target.Email = source.Email;
@@ -335,10 +354,8 @@ public class UserMapDefinition : IMapDefinition
         target.Navigation = CreateUserEditorNavigation();
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
-        target.StartContentIds = GetStartNodes(source.StartContentIds?.ToArray(), UmbracoObjectTypes.Document,
-            "content", "contentRoot", context);
-        target.StartMediaIds = GetStartNodes(source.StartMediaIds?.ToArray(), UmbracoObjectTypes.Media, "media",
-            "mediaRoot", context);
+        target.StartContentIds = GetStartNodes(source.StartContentIds?.ToArray(), UmbracoObjectTypes.Document, "content", "contentRoot", context);
+        target.StartMediaIds = GetStartNodes(source.StartMediaIds?.ToArray(), UmbracoObjectTypes.Media, "media", "mediaRoot", context);
         target.UpdateDate = source.UpdateDate;
         target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups).WhereNotNull();
         target.Username = source.Username;
@@ -348,9 +365,9 @@ public class UserMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Notifications -IsCurrentUser -Udi -Icon -Trashed -Alias -AdditionalData
     private void Map(IUser source, UserBasic target, MapperContext context)
     {
-        //Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
-        //Alternatively, if this is annoying the back office UI would need to be updated to request the avatars for the list of users separately so it doesn't look
-        //like the load time is waiting.
+        // Loading in the user avatar's requires an external request if they don't have a local file avatar, this means that initial load of paging may incur a cost
+        // Alternatively, if this is annoying the back office UI would need to be updated to request the avatars for the list of users separately so it doesn't look
+        // like the load time is waiting.
         target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
         target.Email = source.Email;
@@ -379,16 +396,14 @@ public class UserMapDefinition : IMapDefinition
         target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
         target.UserId = source.Id;
 
-        //we need to map the legacy UserType
-        //the best we can do here is to return the user's first user group as a IUserType object
-        //but we should attempt to return any group that is the built in ones first
+        // we need to map the legacy UserType
+        // the best we can do here is to return the user's first user group as a IUserType object
+        // but we should attempt to return any group that is the built in ones first
         target.UserGroups = source.Groups.Select(x => x.Alias).ToArray();
     }
 
     // helpers
-
-    private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections,
-        int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
+    private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
     {
         IEnumerable<ISection> allSections = _sectionService.GetSections();
         target.Sections = context
@@ -428,7 +443,8 @@ public class UserMapDefinition : IMapDefinition
             return new()
             {
                 Category = action.Category.IsNullOrWhiteSpace()
-                    ? _textService.Localize("actionCategories",
+                    ? _textService.Localize(
+                        "actionCategories",
                         Constants.Conventions.PermissionCategories.OtherCategory)
                     : _textService.Localize("actionCategories", action.Category),
                 Name = _textService.Localize("actions", action.Alias),
@@ -436,7 +452,7 @@ public class UserMapDefinition : IMapDefinition
                 Icon = action.Icon,
                 Checked = source.Permissions != null &&
                           source.Permissions.Contains(action.Letter.ToString(CultureInfo.InvariantCulture)),
-                PermissionCode = action.Letter.ToString(CultureInfo.InvariantCulture)
+                PermissionCode = action.Letter.ToString(CultureInfo.InvariantCulture),
             };
         }
 
@@ -447,11 +463,7 @@ public class UserMapDefinition : IMapDefinition
             .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
     }
 
-    private static string? MapContentTypeIcon(IEntitySlim entity)
-        => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
-
-    private IEnumerable<EntityBasic> GetStartNodes(int[]? startNodeIds, UmbracoObjectTypes objectType,
-        string localizedArea, string localizedAlias, MapperContext context)
+    private IEnumerable<EntityBasic> GetStartNodes(int[]? startNodeIds, UmbracoObjectTypes objectType, string localizedArea, string localizedAlias, MapperContext context)
     {
         if (startNodeIds is null || startNodeIds.Length <= 0)
         {
@@ -478,28 +490,9 @@ public class UserMapDefinition : IMapDefinition
                 Alias = "details",
                 Icon = "icon-umb-users",
                 Name = _textService.Localize("general", "user"),
-                View = "views/users/views/user/details.html"
-            }
+                View = "views/users/views/user/details.html",
+            },
         };
-
-    private static int GetIntId(object? id)
-    {
-        if (id is string strId &&
-            int.TryParse(strId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
-        {
-            return asInt;
-        }
-
-        Attempt<int> result = id.TryConvertTo<int>();
-        if (result.Success == false)
-        {
-            throw new InvalidOperationException(
-                "Cannot convert the profile to a " + typeof(UserDetail).Name +
-                " object since the id is not an integer");
-        }
-
-        return result.Result;
-    }
 
     private EntityBasic CreateRootNode(string name) =>
         new EntityBasic
@@ -509,6 +502,6 @@ public class UserMapDefinition : IMapDefinition
             Icon = "icon-folder",
             Id = -1,
             Trashed = false,
-            ParentId = -1
+            ParentId = -1,
         };
 }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -16,25 +16,30 @@ public enum ValueStorageType
     /// <summary>
     ///     Store property value as NText.
     /// </summary>
-    [EnumMember] Ntext,
+    [EnumMember]
+    Ntext,
 
     /// <summary>
     ///     Store property value as NVarChar.
     /// </summary>
-    [EnumMember] Nvarchar,
+    [EnumMember]
+    Nvarchar,
 
     /// <summary>
     ///     Store property value as Integer.
     /// </summary>
-    [EnumMember] Integer,
+    [EnumMember]
+    Integer,
 
     /// <summary>
     ///     Store property value as Date.
     /// </summary>
-    [EnumMember] Date,
+    [EnumMember]
+    Date,
 
     /// <summary>
     ///     Store property value as Decimal.
     /// </summary>
-    [EnumMember] Decimal
+    [EnumMember]
+    Decimal,
 }

@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class PartialViewCreatingNotification : CreatingNotification<IPartialView>
 {
-    public PartialViewCreatingNotification(IPartialView target, EventMessages messages) : base(target, messages)
+    public PartialViewCreatingNotification(IPartialView target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

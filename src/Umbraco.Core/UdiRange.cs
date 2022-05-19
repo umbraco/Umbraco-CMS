@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core;
+namespace Umbraco.Cms.Core;
 
 /// <summary>
 ///     Represents a <see cref="Core.Udi" /> range.
@@ -57,18 +57,33 @@ public class UdiRange
     /// </summary>
     public string EntityType => Udi.EntityType;
 
+    public static bool operator ==(UdiRange? range1, UdiRange? range2)
+    {
+        if (ReferenceEquals(range1, range2))
+        {
+            return true;
+        }
+
+        if (range1 is null || range2 is null)
+        {
+            return false;
+        }
+
+        return range1.Equals(range2);
+    }
+
+    public static bool operator !=(UdiRange range1, UdiRange range2) => !(range1 == range2);
+
     public static UdiRange Parse(string s)
     {
-        Uri? uri;
-
         if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
-            || Uri.TryCreate(s, UriKind.Absolute, out uri) == false)
+            || Uri.TryCreate(s, UriKind.Absolute, out Uri? uri) == false)
         {
-            //if (tryParse) return false;
+            // if (tryParse) return false;
             throw new FormatException(string.Format("String \"{0}\" is not a valid udi range.", s));
         }
 
-        Uri udiUri = uri.Query == string.Empty ? uri : new UriBuilder(uri) {Query = string.Empty}.Uri;
+        Uri udiUri = uri.Query == string.Empty ? uri : new UriBuilder(uri) { Query = string.Empty }.Uri;
         return new UdiRange(Udi.Create(udiUri), uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
     }
 
@@ -78,21 +93,4 @@ public class UdiRange
         obj is UdiRange other && GetType() == other.GetType() && _uriValue == other._uriValue;
 
     public override int GetHashCode() => _uriValue.GetHashCode();
-
-    public static bool operator ==(UdiRange range1, UdiRange range2)
-    {
-        if (ReferenceEquals(range1, range2))
-        {
-            return true;
-        }
-
-        if ((object)range1 == null || (object)range2 == null)
-        {
-            return false;
-        }
-
-        return range1.Equals(range2);
-    }
-
-    public static bool operator !=(UdiRange range1, UdiRange range2) => !(range1 == range2);
 }

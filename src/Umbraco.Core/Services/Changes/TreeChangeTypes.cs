@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services.Changes;
+namespace Umbraco.Cms.Core.Services.Changes;
 
 [Flags]
 public enum TreeChangeTypes : byte
@@ -18,5 +18,5 @@ public enum TreeChangeTypes : byte
 
     // an item node has been removed
     // never to return
-    Remove = 8
+    Remove = 8,
 }

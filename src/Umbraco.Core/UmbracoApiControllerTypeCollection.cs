@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core;
 
 public class UmbracoApiControllerTypeCollection : BuilderCollectionBase<Type>
 {
-    public UmbracoApiControllerTypeCollection(Func<IEnumerable<Type>> items) : base(items)
+    public UmbracoApiControllerTypeCollection(Func<IEnumerable<Type>> items)
+        : base(items)
     {
     }
 }

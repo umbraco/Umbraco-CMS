@@ -1,14 +1,15 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Xml;
 using System.Xml.XPath;
 
 // source: mvpxml.codeplex.com
-
 namespace Umbraco.Cms.Core.Xml;
 
 public class XmlNodeListFactory
 {
-    private XmlNodeListFactory() { }
+    private XmlNodeListFactory()
+    {
+    }
 
     #region Public members
 
@@ -80,7 +81,6 @@ public class XmlNodeListFactory
             return _nodes[index];
         }
 
-
         /// <summary>
         ///     Reads the entire iterator.
         /// </summary>
@@ -88,9 +88,8 @@ public class XmlNodeListFactory
         {
             while (_iterator is not null && _iterator.MoveNext())
             {
-                var node = _iterator.Current as IHasXmlNode;
                 // Check IHasXmlNode interface.
-                if (node == null)
+                if (_iterator.Current is not IHasXmlNode node)
                 {
                     throw new ArgumentException("IHasXmlNode is missing.");
                 }
@@ -111,9 +110,8 @@ public class XmlNodeListFactory
             {
                 if (_iterator is not null && _iterator.MoveNext())
                 {
-                    var node = _iterator.Current as IHasXmlNode;
                     // Check IHasXmlNode interface.
-                    if (node == null)
+                    if (_iterator.Current is not IHasXmlNode node)
                     {
                         throw new ArgumentException("IHasXmlNode is missing.");
                     }
@@ -137,10 +135,11 @@ public class XmlNodeListFactory
 
             public XmlNodeListEnumerator(XmlNodeListIterator iterator) => _iterator = iterator;
 
+            object? IEnumerator.Current => _iterator[_position];
+
             #region IEnumerator Members
 
             void IEnumerator.Reset() => _position = -1;
-
 
             bool IEnumerator.MoveNext()
             {
@@ -156,8 +155,6 @@ public class XmlNodeListFactory
 
                 return true;
             }
-
-            object? IEnumerator.Current => _iterator[_position];
 
             #endregion
         }

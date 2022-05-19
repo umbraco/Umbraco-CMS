@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Trees;
+namespace Umbraco.Cms.Core.Trees;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class SearchableTreeAttribute : Attribute
@@ -46,7 +46,8 @@ public sealed class SearchableTreeAttribute : Attribute
 
         if (string.IsNullOrWhiteSpace(serviceName))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(serviceName));
         }
 

@@ -42,7 +42,7 @@ public enum SecureSocketOptions
     ///     Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the
     ///     server, but only if the server supports the STARTTLS extension.
     /// </summary>
-    StartTlsWhenAvailable = 4
+    StartTlsWhenAvailable = 4,
 }
 
 /// <summary>

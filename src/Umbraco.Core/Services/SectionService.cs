@@ -25,7 +25,7 @@ public class SectionService : ISectionService
     /// <inheritdoc />
     public IEnumerable<ISection> GetAllowedSections(int userId)
     {
-        IUser user = _userService.GetUserById(userId);
+        IUser? user = _userService.GetUserById(userId);
         if (user == null)
         {
             throw new InvalidOperationException("No user found with id " + userId);

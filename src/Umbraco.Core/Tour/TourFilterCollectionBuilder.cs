@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Extensions;
 
@@ -12,14 +12,14 @@ public class TourFilterCollectionBuilder : CollectionBuilderBase<TourFilterColle
 {
     private readonly HashSet<BackOfficeTourFilter> _instances = new();
 
-    /// <inheritdoc />
-    protected override IEnumerable<BackOfficeTourFilter> CreateItems(IServiceProvider factory) =>
-        base.CreateItems(factory).Concat(_instances);
-
     /// <summary>
     ///     Adds a filter instance.
     /// </summary>
     public void AddFilter(BackOfficeTourFilter filter) => _instances.Add(filter);
+
+    /// <inheritdoc />
+    protected override IEnumerable<BackOfficeTourFilter> CreateItems(IServiceProvider factory) =>
+        base.CreateItems(factory).Concat(_instances);
 
     /// <summary>
     ///     Removes a filter instance.

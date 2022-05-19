@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -17,7 +17,8 @@ public class UserBasic : EntityBasic, INotificationModel
         UserGroups = new List<UserGroupBasic>();
     }
 
-    [DataMember(Name = "username")] public string? Username { get; set; }
+    [DataMember(Name = "username")]
+    public string? Username { get; set; }
 
     /// <summary>
     ///     The MD5 lowercase hash of the email which can be used by gravatar
@@ -25,7 +26,8 @@ public class UserBasic : EntityBasic, INotificationModel
     [DataMember(Name = "emailHash")]
     public string? EmailHash { get; set; }
 
-    [DataMember(Name = "lastLoginDate")] public DateTime? LastLoginDate { get; set; }
+    [DataMember(Name = "lastLoginDate")]
+    public DateTime? LastLoginDate { get; set; }
 
     /// <summary>
     ///     Returns a list of different size avatars
@@ -33,7 +35,8 @@ public class UserBasic : EntityBasic, INotificationModel
     [DataMember(Name = "avatars")]
     public string[]? Avatars { get; set; }
 
-    [DataMember(Name = "userState")] public UserState UserState { get; set; }
+    [DataMember(Name = "userState")]
+    public UserState UserState { get; set; }
 
     [DataMember(Name = "culture", IsRequired = true)]
     public string? Culture { get; set; }

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings.Css;
@@ -11,7 +11,8 @@ public class StylesheetHelper
     public static IEnumerable<StylesheetRule> ParseRules(string? input)
     {
         var rules = new List<StylesheetRule>();
-        var ruleRegex = new Regex(string.Format(RuleRegexFormat, @"[^\*\r\n]*"),
+        var ruleRegex = new Regex(
+            string.Format(RuleRegexFormat, @"[^\*\r\n]*"),
             RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         if (input is not null)
@@ -23,7 +24,7 @@ public class StylesheetHelper
             {
                 var name = match.Groups["Name"].Value;
 
-                //If this name already exists, only use the first one
+                // If this name already exists, only use the first one
                 if (rules.Any(x => x.Name == name))
                 {
                     continue;
@@ -33,14 +34,15 @@ public class StylesheetHelper
                 {
                     Name = match.Groups["Name"].Value,
                     Selector = match.Groups["Selector"].Value,
+
                     // Only match first selector when chained together
-                    Styles = string.Join(Environment.NewLine,
-                        match.Groups["Styles"].Value.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None)
-                            .Select(x => x.Trim()).ToArray())
+                    Styles = string.Join(
+                        Environment.NewLine,
+                        match.Groups["Styles"].Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
+                            .Select(x => x.Trim()).ToArray()),
                 });
             }
         }
-
 
         return rules;
     }
@@ -50,9 +52,10 @@ public class StylesheetHelper
         var contents = input;
         if (contents is not null)
         {
-            var ruleRegex = new Regex(string.Format(RuleRegexFormat, oldRuleName.EscapeRegexSpecialCharacters()),
+            var ruleRegex = new Regex(
+                string.Format(RuleRegexFormat, oldRuleName.EscapeRegexSpecialCharacters()),
                 RegexOptions.IgnoreCase | RegexOptions.Singleline);
-            contents = ruleRegex.Replace(contents, rule != null ? rule.ToString() : "");
+            contents = ruleRegex.Replace(contents, rule != null ? rule.ToString() : string.Empty);
         }
 
         return contents;

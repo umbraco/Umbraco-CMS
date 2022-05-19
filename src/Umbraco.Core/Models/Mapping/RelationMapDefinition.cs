@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -22,6 +22,23 @@ public class RelationMapDefinition : IMapDefinition
         mapper.Define<IRelationType, RelationTypeDisplay>((source, context) => new RelationTypeDisplay(), Map);
         mapper.Define<IRelation, RelationDisplay>((source, context) => new RelationDisplay(), Map);
         mapper.Define<RelationTypeSave, IRelationType>(Map);
+    }
+
+    // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
+    private static void Map(RelationTypeSave source, IRelationType target, MapperContext context)
+    {
+        target.Alias = source.Alias;
+        target.ChildObjectType = source.ChildObjectType;
+        target.Id = source.Id.TryConvertTo<int>().Result;
+        target.IsBidirectional = source.IsBidirectional;
+        if (target is IRelationTypeWithIsDependency targetWithIsDependency)
+        {
+            targetWithIsDependency.IsDependency = source.IsDependency;
+        }
+
+        target.Key = source.Key;
+        target.Name = source.Name;
+        target.ParentObjectType = source.ParentObjectType;
     }
 
     // Umbraco.Code.MapAll -Icon -Trashed -AdditionalData
@@ -68,29 +85,12 @@ public class RelationMapDefinition : IMapDefinition
         target.CreateDate = source.CreateDate;
         target.ParentId = source.ParentId;
 
-        Tuple<IUmbracoEntity, IUmbracoEntity> entities = _relationService.GetEntitiesFromRelation(source);
+        Tuple<IUmbracoEntity, IUmbracoEntity>? entities = _relationService.GetEntitiesFromRelation(source);
 
         if (entities is not null)
         {
             target.ParentName = entities.Item1.Name;
             target.ChildName = entities.Item2.Name;
         }
-    }
-
-    // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
-    private static void Map(RelationTypeSave source, IRelationType target, MapperContext context)
-    {
-        target.Alias = source.Alias;
-        target.ChildObjectType = source.ChildObjectType;
-        target.Id = source.Id.TryConvertTo<int>().Result;
-        target.IsBidirectional = source.IsBidirectional;
-        if (target is IRelationTypeWithIsDependency targetWithIsDependency)
-        {
-            targetWithIsDependency.IsDependency = source.IsDependency;
-        }
-
-        target.Key = source.Key;
-        target.Name = source.Name;
-        target.ParentObjectType = source.ParentObjectType;
     }
 }

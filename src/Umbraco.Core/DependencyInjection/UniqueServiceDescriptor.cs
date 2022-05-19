@@ -24,14 +24,17 @@ public sealed class UniqueServiceDescriptor : ServiceDescriptor, IEquatable<Uniq
 
     /// <inheritdoc />
     public bool Equals(UniqueServiceDescriptor? other) => other != null && Lifetime == other.Lifetime &&
-                                                          EqualityComparer<Type>.Default.Equals(ServiceType,
+                                                          EqualityComparer<Type>.Default.Equals(
+                                                              ServiceType,
                                                               other.ServiceType) &&
-                                                          EqualityComparer<Type?>.Default.Equals(ImplementationType,
+                                                          EqualityComparer<Type?>.Default.Equals(
+                                                              ImplementationType,
                                                               other.ImplementationType) &&
                                                           EqualityComparer<object?>.Default.Equals(
                                                               ImplementationInstance, other.ImplementationInstance) &&
                                                           EqualityComparer<Func<IServiceProvider, object>?>.Default
-                                                              .Equals(ImplementationFactory,
+                                                              .Equals(
+                                                                  ImplementationFactory,
                                                                   other.ImplementationFactory);
 
     /// <inheritdoc />

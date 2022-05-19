@@ -21,15 +21,14 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
 {
     private readonly bool _raiseCancelable;
 
-    //events will be enlisted in the order they are raised
+    // events will be enlisted in the order they are raised
     private List<IEventDefinition>? _events;
 
     protected QueuingEventDispatcherBase(bool raiseCancelable) => _raiseCancelable = raiseCancelable;
 
-    private List<IEventDefinition> Events => _events ?? (_events = new List<IEventDefinition>());
+    private List<IEventDefinition> Events => _events ??= new List<IEventDefinition>();
 
-    public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args,
-        string? eventName = null)
+    public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args, string? eventName = null)
     {
         if (eventHandler == null)
         {
@@ -45,8 +44,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return args.Cancel;
     }
 
-    public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args,
-        string? eventName = null)
+    public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
         if (eventHandler == null)
@@ -63,8 +61,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return args.Cancel;
     }
 
-    public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender,
-        TArgs args, string? eventName = null)
+    public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
         if (eventHandler == null)
@@ -101,8 +98,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         Events.Add(new EventDefinition<TArgs>(eventHandler, sender, args, eventName));
     }
 
-    public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args,
-        string? eventName = null)
+    public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args, string? eventName = null)
     {
         if (eventHandler == null)
         {
@@ -196,7 +192,8 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         // eagerly fetch superseded arg types for each arg type
         var argTypeSuperceeding = events.Select(x => x.Args.GetType())
             .Distinct()
-            .ToDictionary(x => x,
+            .ToDictionary(
+                x => x,
                 x => x.GetCustomAttributes<SupersedeEventAttribute>(false).Select(y => y.SupersededEventArgsType)
                     .ToArray());
 
@@ -211,7 +208,8 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
 
             var infos = new EventDefinitionInfos
             {
-                EventDefinition = def, SupersedeTypes = argTypeSuperceeding[def.Args.GetType()]
+                EventDefinition = def,
+                SupersedeTypes = argTypeSuperceeding[def.Args.GetType()],
             };
 
             var args = def.Args as CancellableObjectEventArgs;
@@ -224,13 +222,12 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
             {
                 // event object can either be a single object or an enumerable of objects
                 // try to get as an enumerable, get null if it's not
-                IList eventObjects = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
+                IList? eventObjects = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
                 if (eventObjects == null)
                 {
                     // single object, cast as an IEntity
                     // if cannot cast, cannot filter, nothing - just include event definition in result
-                    var eventEntity = args.EventObject as IEntity;
-                    if (eventEntity == null)
+                    if (args.EventObject is not IEntity eventEntity)
                     {
                         result.Add(def);
                         continue;
@@ -257,8 +254,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
                     {
                         // extract the event object, cast as an IEntity
                         // if cannot cast, cannot filter, nothing to do - just leave it in the list & continue
-                        var eventEntity = eventObject as IEntity;
-                        if (eventEntity == null)
+                        if (eventObject is not IEntity eventEntity)
                         {
                             continue;
                         }
@@ -308,8 +304,11 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         return result;
     }
 
+    protected abstract void ScopeExitCompleted();
+
     // edits event args to use the latest instance of each entity
-    private static void UpdateToLatestEntities(IEnumerable<Tuple<IEntity, EventDefinitionInfos>> entities,
+    private static void UpdateToLatestEntities(
+        IEnumerable<Tuple<IEntity, EventDefinitionInfos>> entities,
         IEnumerable<CancellableObjectEventArgs> args)
     {
         // get the latest entities
@@ -325,13 +324,13 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         {
             // event object can either be a single object or an enumerable of objects
             // try to get as an enumerable, get null if it's not
-            IList eventObjects = TypeHelper.CreateGenericEnumerableFromObject(arg.EventObject);
+            IList? eventObjects = TypeHelper.CreateGenericEnumerableFromObject(arg.EventObject);
             if (eventObjects == null)
             {
                 // single object
                 // look for a more recent entity for that object, and replace if any
                 // works by "equalling" entities ie the more recent one "equals" this one (though different object)
-                IEntity foundEntity = latestEntities.FirstOrDefault(x => Equals(x, arg.EventObject));
+                IEntity? foundEntity = latestEntities.FirstOrDefault(x => Equals(x, arg.EventObject));
                 if (foundEntity != null)
                 {
                     arg.EventObject = foundEntity;
@@ -344,7 +343,7 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
                 var updated = false;
                 for (var i = 0; i < eventObjects.Count; i++)
                 {
-                    IEntity foundEntity = latestEntities.FirstOrDefault(x => Equals(x, eventObjects[i]));
+                    IEntity? foundEntity = latestEntities.FirstOrDefault(x => Equals(x, eventObjects[i]));
                     if (foundEntity == null)
                     {
                         continue;
@@ -365,11 +364,10 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
     // determines if a given entity, appearing in a given event definition, should be filtered out,
     // considering the entities that have already been visited - an entity is filtered out if it
     // appears in another even definition, which supersedes this event definition.
-    private static bool IsSuperceeded(IEntity entity, EventDefinitionInfos infos,
-        List<Tuple<IEntity, EventDefinitionInfos>> entities)
+    private static bool IsSuperceeded(IEntity entity, EventDefinitionInfos infos, List<Tuple<IEntity, EventDefinitionInfos>> entities)
     {
-        //var argType = meta.EventArgsType;
-        Type argType = infos.EventDefinition?.Args.GetType();
+        // var argType = meta.EventArgsType;
+        Type? argType = infos.EventDefinition?.Args.GetType();
 
         // look for other instances of the same entity, coming from an event args that supersedes other event args,
         // ie is marked with the attribute, and is not this event args (cannot supersede itself)
@@ -396,11 +394,13 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         if (argType?.IsGenericType ?? false)
         {
             // generic, must compare type arguments
-            Tuple<IEntity, EventDefinitionInfos> supercededBy = superceeding.FirstOrDefault(x =>
+            Tuple<IEntity, EventDefinitionInfos>? supercededBy = superceeding.FirstOrDefault(x =>
                 x.Item2.SupersedeTypes?.Any(y =>
+
                     // superseding a generic type which has the same generic type definition
                     // (but ... no matter the generic type parameters? could be different?)
                     (y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition())
+
                     // or superceeding a non-generic type which is ... (but... how is this ever possible? argType *is* generic?
                     || (y.IsGenericTypeDefinition == false && y == argType)) ?? false);
             return supercededBy != null;
@@ -408,17 +408,16 @@ public abstract class QueuingEventDispatcherBase : IEventDispatcher
         else
         {
             // non-generic, can compare types 1:1
-            Tuple<IEntity, EventDefinitionInfos> supercededBy = superceeding.FirstOrDefault(x =>
+            Tuple<IEntity, EventDefinitionInfos>? supercededBy = superceeding.FirstOrDefault(x =>
                 x.Item2.SupersedeTypes?.Any(y => y == argType) ?? false);
             return supercededBy != null;
         }
     }
 
-    protected abstract void ScopeExitCompleted();
-
     private class EventDefinitionInfos
     {
         public IEventDefinition? EventDefinition { get; set; }
+
         public Type[]? SupersedeTypes { get; set; }
     }
 }

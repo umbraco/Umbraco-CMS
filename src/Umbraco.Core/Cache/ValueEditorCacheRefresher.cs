@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 
@@ -15,10 +15,12 @@ public sealed class ValueEditorCacheRefresher : PayloadCacheRefresherBase<DataTy
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
-        IValueEditorCache valueEditorCache) : base(appCaches, serializer, eventAggregator, factory) =>
+        IValueEditorCache valueEditorCache)
+        : base(appCaches, serializer, eventAggregator, factory) =>
         _valueEditorCache = valueEditorCache;
 
     public override Guid RefresherUniqueId => UniqueId;
+
     public override string Name => "ValueEditorCacheRefresher";
 
     public override void Refresh(DataTypeCacheRefresher.JsonPayload[] payloads)
@@ -29,7 +31,6 @@ public sealed class ValueEditorCacheRefresher : PayloadCacheRefresherBase<DataTy
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();

@@ -27,8 +27,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
     // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
     private readonly string _rootUrl;
 
-    public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment,
-        ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
+    public PhysicalFileSystem(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILogger<PhysicalFileSystem> logger, string rootPath, string rootUrl)
     {
         _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -73,6 +72,8 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
         _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd(Constants.CharArrays.ForwardSlash);
     }
+
+    public bool CanAddPhysical => true;
 
     /// <summary>
     ///     Gets directories in a directory.
@@ -288,14 +289,14 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
         {
-            return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            return path[_rootPathFwd.Length..].TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         // if it starts with the root URL, strip it and trim the starting slash to make it relative
         // eg "/Media/1234/img.jpg" => "1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
         {
-            return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+            return path[_rootUrl.Length..].TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         // unchanged - what else?
@@ -411,8 +412,6 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         return file.Exists ? file.Length : -1;
     }
 
-    public bool CanAddPhysical => true;
-
     public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
     {
         var fullPath = GetFullPath(path);
@@ -445,6 +444,9 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         }
     }
 
+    /// <inheritdoc />
+    public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
+
     #region Helper Methods
 
     protected virtual void EnsureDirectory(string path)
@@ -474,7 +476,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         const int count = 10;
         const int pausems = 100;
 
-        for (var i = 0;; i++)
+        for (var i = 0; ; i++)
         {
             try
             {
@@ -502,9 +504,6 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
             Thread.Sleep(pausems);
         }
     }
-
-    /// <inheritdoc />
-    public IFileProvider Create() => new PhysicalFileProvider(_rootPath);
 
     #endregion
 }

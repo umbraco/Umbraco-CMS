@@ -13,15 +13,15 @@ public class SimpleMainDom : IMainDom, IDisposable
     private bool _disposedValue;
     private bool _isStopping;
 
+    /// <inheritdoc />
+    public bool IsMainDom { get; private set; } = true;
+
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    /// <inheritdoc />
-    public bool IsMainDom { get; private set; } = true;
 
     // always acquire
     public bool Acquire(IApplicationShutdownRegistry hostingEnvironment) => true;

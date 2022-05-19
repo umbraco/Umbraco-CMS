@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -22,7 +22,7 @@ internal class MemberEditorContentAppFactory : IContentAppFactory
                     Name = "Member",
                     Icon = "icon-user",
                     View = "views/member/apps/membership/membership.html",
-                    Weight = Weight
+                    Weight = Weight,
                 };
 
             default:

@@ -11,8 +11,10 @@ public static class PublishedContentExtensionsForModels
     ///     Creates a strongly typed published content model for an internal published content.
     /// </summary>
     /// <param name="content">The internal published content.</param>
+    /// <param name="publishedModelFactory">The published model factory</param>
     /// <returns>The strongly typed published content model.</returns>
-    public static IPublishedContent? CreateModel(this IPublishedContent content,
+    public static IPublishedContent? CreateModel(
+        this IPublishedContent? content,
         IPublishedModelFactory? publishedModelFactory)
     {
         if (publishedModelFactory == null)

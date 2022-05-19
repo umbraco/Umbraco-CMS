@@ -40,15 +40,17 @@ public class UserSave : EntityBasic, IValidatableObject
     [Required]
     public IEnumerable<string> UserGroups { get; set; } = null!;
 
-    [DataMember(Name = "startContentIds")] public int[]? StartContentIds { get; set; }
+    [DataMember(Name = "startContentIds")]
+    public int[]? StartContentIds { get; set; }
 
-    [DataMember(Name = "startMediaIds")] public int[]? StartMediaIds { get; set; }
+    [DataMember(Name = "startMediaIds")]
+    public int[]? StartMediaIds { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (UserGroups.Any() == false)
         {
-            yield return new ValidationResult("A user must be assigned to at least one group", new[] {"UserGroups"});
+            yield return new ValidationResult("A user must be assigned to at least one group", new[] { "UserGroups" });
         }
     }
 }

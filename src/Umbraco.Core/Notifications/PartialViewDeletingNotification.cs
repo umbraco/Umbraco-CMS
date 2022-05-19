@@ -8,11 +8,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class PartialViewDeletingNotification : DeletingNotification<IPartialView>
 {
-    public PartialViewDeletingNotification(IPartialView target, EventMessages messages) : base(target, messages)
+    public PartialViewDeletingNotification(IPartialView target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public PartialViewDeletingNotification(IEnumerable<IPartialView> target, EventMessages messages) : base(target,
+    public PartialViewDeletingNotification(IEnumerable<IPartialView> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

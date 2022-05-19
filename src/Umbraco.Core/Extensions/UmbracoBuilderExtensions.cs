@@ -70,8 +70,7 @@ public static class UmbracoBuilderExtensions
             .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(INotificationAsyncHandler<>))
             .ToList();
 
-    private static void RegisterNotificationHandler(IUmbracoBuilder self, Type notificationHandlerType,
-        Type implementingHandlerType)
+    private static void RegisterNotificationHandler(IUmbracoBuilder self, Type notificationHandlerType, Type implementingHandlerType)
     {
         var descriptor =
             new UniqueServiceDescriptor(notificationHandlerType, implementingHandlerType, ServiceLifetime.Transient);
@@ -98,7 +97,7 @@ public static class UmbracoBuilderExtensions
             return true;
         }
 
-        Type baseType = givenType.BaseType;
+        Type? baseType = givenType.BaseType;
         return baseType != null && IsAssignableToGenericType(baseType, genericType);
     }
 }

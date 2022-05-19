@@ -5,7 +5,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class MemberGroupDeletedNotification : DeletedNotification<IMemberGroup>
 {
-    public MemberGroupDeletedNotification(IMemberGroup target, EventMessages messages) : base(target, messages)
+    public MemberGroupDeletedNotification(IMemberGroup target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

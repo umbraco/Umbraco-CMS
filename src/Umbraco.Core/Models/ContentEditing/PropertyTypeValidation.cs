@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -8,12 +8,15 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract(Name = "propertyValidation", Namespace = "")]
 public class PropertyTypeValidation
 {
-    [DataMember(Name = "mandatory")] public bool Mandatory { get; set; }
+    [DataMember(Name = "mandatory")]
+    public bool Mandatory { get; set; }
 
     [DataMember(Name = "mandatoryMessage")]
     public string? MandatoryMessage { get; set; }
 
-    [DataMember(Name = "pattern")] public string? Pattern { get; set; }
+    [DataMember(Name = "pattern")]
+    public string? Pattern { get; set; }
 
-    [DataMember(Name = "patternMessage")] public string? PatternMessage { get; set; }
+    [DataMember(Name = "patternMessage")]
+    public string? PatternMessage { get; set; }
 }

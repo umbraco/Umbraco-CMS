@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core.Routing;
 
 public class MediaUrlProviderCollection : BuilderCollectionBase<IMediaUrlProvider>
 {
-    public MediaUrlProviderCollection(Func<IEnumerable<IMediaUrlProvider>> items) : base(items)
+    public MediaUrlProviderCollection(Func<IEnumerable<IMediaUrlProvider>> items)
+        : base(items)
     {
     }
 }

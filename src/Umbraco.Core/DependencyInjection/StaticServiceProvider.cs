@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Web.Common.DependencyInjection;
 

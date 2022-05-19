@@ -1,4 +1,4 @@
-﻿using Umbraco.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -70,12 +70,11 @@ public class SimpleContentType : ISimpleContentType
     public bool IsElement { get; }
 
     public bool SupportsPropertyVariation(string? culture, string segment, bool wildcards = false) =>
+
         // non-exact validation: can accept a 'null' culture if the property type varies
         //  by culture, and likewise for segment
         // wildcard validation: can accept a '*' culture or segment
         Variations.ValidateVariation(culture, segment, false, wildcards, false);
-
-    protected bool Equals(SimpleContentType other) => string.Equals(Alias, other.Alias) && Id == other.Id;
 
     public override bool Equals(object? obj)
     {
@@ -96,6 +95,8 @@ public class SimpleContentType : ISimpleContentType
 
         return Equals((SimpleContentType)obj);
     }
+
+    protected bool Equals(SimpleContentType other) => string.Equals(Alias, other.Alias) && Id == other.Id;
 
     public override int GetHashCode()
     {

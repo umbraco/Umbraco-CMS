@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -11,12 +11,14 @@ public class UserGroupBasic : EntityBasic, INotificationModel
         Sections = Enumerable.Empty<Section>();
     }
 
-    [DataMember(Name = "sections")] public IEnumerable<Section> Sections { get; set; }
+    [DataMember(Name = "sections")]
+    public IEnumerable<Section> Sections { get; set; }
 
     [DataMember(Name = "contentStartNode")]
     public EntityBasic? ContentStartNode { get; set; }
 
-    [DataMember(Name = "mediaStartNode")] public EntityBasic? MediaStartNode { get; set; }
+    [DataMember(Name = "mediaStartNode")]
+    public EntityBasic? MediaStartNode { get; set; }
 
     /// <summary>
     ///     The number of users assigned to this group

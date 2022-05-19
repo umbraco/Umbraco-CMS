@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -22,8 +22,7 @@ public class Template : File, ITemplate
     {
     }
 
-    public Template(IShortStringHelper shortStringHelper, string? name, string? alias,
-        Func<File, string?>? getFileContent)
+    public Template(IShortStringHelper shortStringHelper, string? name, string? alias, Func<File, string?>? getFileContent)
         : base(string.Empty, getFileContent)
     {
         _shortStringHelper = shortStringHelper;

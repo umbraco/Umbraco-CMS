@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings.Css;
@@ -21,6 +21,7 @@ public class StylesheetRule
         sb.Append(Selector);
         sb.Append(" {");
         sb.Append(Environment.NewLine);
+
         // append nicely formatted style rules
         // - using tabs because the back office code editor uses tabs
         if (Styles.IsNullOrWhiteSpace() == false)

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -33,11 +33,13 @@ public class PublishedPropertyType : IPublishedPropertyType
     /// <remarks>
     ///     <para>The new published property type belongs to the published content type.</para>
     /// </remarks>
-    public PublishedPropertyType(IPublishedContentType contentType, IPropertyType propertyType,
-        PropertyValueConverterCollection propertyValueConverters, IPublishedModelFactory publishedModelFactory,
+    public PublishedPropertyType(
+        IPublishedContentType contentType,
+        IPropertyType propertyType,
+        PropertyValueConverterCollection propertyValueConverters,
+        IPublishedModelFactory publishedModelFactory,
         IPublishedContentTypeFactory factory)
-        : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters,
-            publishedModelFactory, factory) =>
+        : this(propertyType.Alias, propertyType.DataTypeId, true, propertyType.Variations, propertyValueConverters, publishedModelFactory, factory) =>
         ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
 
     /// <summary>
@@ -47,11 +49,16 @@ public class PublishedPropertyType : IPublishedPropertyType
     ///     <para>Values are assumed to be consisted and are not checked.</para>
     ///     <para>The new published property type belongs to the published content type.</para>
     /// </remarks>
-    public PublishedPropertyType(IPublishedContentType contentType, string propertyTypeAlias, int dataTypeId,
-        bool isUserProperty, ContentVariation variations, PropertyValueConverterCollection propertyValueConverters,
-        IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
-        : this(propertyTypeAlias, dataTypeId, isUserProperty, variations, propertyValueConverters,
-            publishedModelFactory, factory) =>
+    public PublishedPropertyType(
+        IPublishedContentType contentType,
+        string propertyTypeAlias,
+        int dataTypeId,
+        bool isUserProperty,
+        ContentVariation variations,
+        PropertyValueConverterCollection propertyValueConverters,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory factory)
+        : this(propertyTypeAlias, dataTypeId, isUserProperty, variations, propertyValueConverters, publishedModelFactory, factory) =>
         ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
 
     /// <summary>
@@ -61,9 +68,14 @@ public class PublishedPropertyType : IPublishedPropertyType
     ///     <para>Values are assumed to be consistent and are not checked.</para>
     ///     <para>The new published property type does not belong to a published content type.</para>
     /// </remarks>
-    public PublishedPropertyType(string propertyTypeAlias, int dataTypeId, bool isUserProperty,
-        ContentVariation variations, PropertyValueConverterCollection propertyValueConverters,
-        IPublishedModelFactory publishedModelFactory, IPublishedContentTypeFactory factory)
+    public PublishedPropertyType(
+        string propertyTypeAlias,
+        int dataTypeId,
+        bool isUserProperty,
+        ContentVariation variations,
+        PropertyValueConverterCollection propertyValueConverters,
+        IPublishedModelFactory publishedModelFactory,
+        IPublishedContentTypeFactory factory)
     {
         _publishedModelFactory =
             publishedModelFactory ?? throw new ArgumentNullException(nameof(publishedModelFactory));
@@ -84,7 +96,8 @@ public class PublishedPropertyType : IPublishedPropertyType
 
     /// <inheritdoc />
     public IPublishedContentType?
-        ContentType { get; internal set; } // internally set by PublishedContentType constructor
+        ContentType
+    { get; internal set; } // internally set by PublishedContentType constructor
 
     /// <inheritdoc />
     public PublishedDataType DataType { get; }
@@ -100,6 +113,52 @@ public class PublishedPropertyType : IPublishedPropertyType
 
     /// <inheritdoc />
     public ContentVariation Variations { get; }
+
+    /// <inheritdoc />
+    public PropertyCacheLevel CacheLevel
+    {
+        get
+        {
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            return _cacheLevel;
+        }
+    }
+
+    /// <inheritdoc />
+    public Type ModelClrType
+    {
+        get
+        {
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            return _modelClrType!;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool? IsValue(object? value, PropertyValueLevel level)
+    {
+        if (!_initialized)
+        {
+            Initialize();
+        }
+
+        // if we have a converter, use the converter
+        if (_converter != null)
+        {
+            return _converter.IsValue(value, level);
+        }
+
+        // otherwise use the old magic null & string comparisons
+        return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
+    }
 
     #endregion
 
@@ -164,8 +223,10 @@ public class PublishedPropertyType : IPublishedPropertyType
                             "Type '{2}' cannot be an IPropertyValueConverter"
                             + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
                             + " for that property, and only one converter can exist for a property.",
-                            ContentType?.Alias, Alias,
-                            converter.GetType().FullName, _converter.GetType().FullName));
+                            ContentType?.Alias,
+                            Alias,
+                            converter.GetType().FullName,
+                            _converter.GetType().FullName));
                     }
                 }
                 else
@@ -184,49 +245,20 @@ public class PublishedPropertyType : IPublishedPropertyType
                 else
                 {
                     // previous was non-default, and got another non-default - bad
-                    throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                    throw new InvalidOperationException(string.Format(
+                        "Type '{2}' cannot be an IPropertyValueConverter"
                                                                       + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
                                                                       + " for that property, and only one converter can exist for a property.",
-                        ContentType?.Alias, Alias,
-                        converter.GetType().FullName, _converter.GetType().FullName));
+                        ContentType?.Alias,
+                        Alias,
+                        converter.GetType().FullName,
+                        _converter.GetType().FullName));
                 }
             }
         }
 
         _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
         _modelClrType = _converter == null ? typeof(object) : _converter.GetPropertyValueType(this);
-    }
-
-    /// <inheritdoc />
-    public bool? IsValue(object? value, PropertyValueLevel level)
-    {
-        if (!_initialized)
-        {
-            Initialize();
-        }
-
-        // if we have a converter, use the converter
-        if (_converter != null)
-        {
-            return _converter.IsValue(value, level);
-        }
-
-        // otherwise use the old magic null & string comparisons
-        return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
-    }
-
-    /// <inheritdoc />
-    public PropertyCacheLevel CacheLevel
-    {
-        get
-        {
-            if (!_initialized)
-            {
-                Initialize();
-            }
-
-            return _cacheLevel;
-        }
     }
 
     /// <inheritdoc />
@@ -244,8 +276,7 @@ public class PublishedPropertyType : IPublishedPropertyType
     }
 
     /// <inheritdoc />
-    public object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter,
-        bool preview)
+    public object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (!_initialized)
         {
@@ -259,8 +290,7 @@ public class PublishedPropertyType : IPublishedPropertyType
     }
 
     /// <inheritdoc />
-    public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter,
-        bool preview)
+    public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         if (!_initialized)
         {
@@ -285,20 +315,6 @@ public class PublishedPropertyType : IPublishedPropertyType
         }
 
         return inter.ToString()?.Trim();
-    }
-
-    /// <inheritdoc />
-    public Type ModelClrType
-    {
-        get
-        {
-            if (!_initialized)
-            {
-                Initialize();
-            }
-
-            return _modelClrType!;
-        }
     }
 
     /// <inheritdoc />

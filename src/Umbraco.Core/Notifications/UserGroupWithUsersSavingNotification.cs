@@ -7,12 +7,15 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class UserGroupWithUsersSavingNotification : SavingNotification<UserGroupWithUsers>
 {
-    public UserGroupWithUsersSavingNotification(UserGroupWithUsers target, EventMessages messages) : base(target,
+    public UserGroupWithUsersSavingNotification(UserGroupWithUsers target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }
 
-    public UserGroupWithUsersSavingNotification(IEnumerable<UserGroupWithUsers> target, EventMessages messages) : base(
+    public UserGroupWithUsersSavingNotification(IEnumerable<UserGroupWithUsers> target, EventMessages messages)
+        : base(
         target, messages)
     {
     }

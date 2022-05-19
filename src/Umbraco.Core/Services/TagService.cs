@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -17,9 +17,7 @@ public class TagService : RepositoryService, ITagService
 {
     private readonly ITagRepository _tagRepository;
 
-    public TagService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        ITagRepository tagRepository)
+    public TagService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, ITagRepository tagRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _tagRepository = tagRepository;
 
@@ -132,8 +130,7 @@ public class TagService : RepositoryService, ITagService
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null)
+    public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null, string? culture = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -151,8 +148,7 @@ public class TagService : RepositoryService, ITagService
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
-        string? culture = null)
+    public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null, string? culture = null)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {

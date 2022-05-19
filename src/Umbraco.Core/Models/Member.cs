@@ -31,14 +31,14 @@ public class Member : ContentBase, IMember
     /// </summary>
     /// <param name="contentType">ContentType for the current Content object</param>
     public Member(IMemberType contentType)
-        : base("", -1, contentType, new PropertyCollection())
+        : base(string.Empty, -1, contentType, new PropertyCollection())
     {
         IsApproved = true;
 
         // this cannot be null but can be empty
-        _rawPasswordValue = "";
-        _email = "";
-        _username = "";
+        _rawPasswordValue = string.Empty;
+        _email = string.Empty;
+        _username = string.Empty;
     }
 
     /// <summary>
@@ -57,16 +57,17 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
         IsApproved = true;
 
         // this cannot be null but can be empty
-        _rawPasswordValue = "";
-        _email = "";
-        _username = "";
+        _rawPasswordValue = string.Empty;
+        _email = string.Empty;
+        _username = string.Empty;
     }
 
     /// <summary>
@@ -77,6 +78,7 @@ public class Member : ContentBase, IMember
     /// <param name="email"></param>
     /// <param name="username"></param>
     /// <param name="contentType"></param>
+    /// <param name="isApproved"></param>
     public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
         : base(name, -1, contentType, new PropertyCollection())
     {
@@ -87,7 +89,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -98,7 +101,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(email));
         }
 
@@ -109,7 +113,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(username))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(username));
         }
 
@@ -118,7 +123,7 @@ public class Member : ContentBase, IMember
         IsApproved = isApproved;
 
         // this cannot be null but can be empty
-        _rawPasswordValue = "";
+        _rawPasswordValue = string.Empty;
     }
 
     /// <summary>
@@ -131,8 +136,7 @@ public class Member : ContentBase, IMember
     /// <param name="contentType"></param>
     /// <param name="userId"></param>
     /// <param name="isApproved"></param>
-    public Member(string name, string email, string username, IMemberType contentType, int userId,
-        bool isApproved = true)
+    public Member(string name, string email, string username, IMemberType contentType, int userId, bool isApproved = true)
         : base(name, -1, contentType, new PropertyCollection())
     {
         if (name == null)
@@ -142,7 +146,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -153,7 +158,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(email))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(email));
         }
 
@@ -164,7 +170,8 @@ public class Member : ContentBase, IMember
 
         if (string.IsNullOrWhiteSpace(username))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(username));
         }
 
@@ -173,8 +180,8 @@ public class Member : ContentBase, IMember
         CreatorId = userId;
         IsApproved = isApproved;
 
-        //this cannot be null but can be empty
-        _rawPasswordValue = "";
+        // this cannot be null but can be empty
+        _rawPasswordValue = string.Empty;
     }
 
     /// <summary>
@@ -210,8 +217,7 @@ public class Member : ContentBase, IMember
     /// </param>
     /// <param name="contentType"></param>
     /// <param name="isApproved"></param>
-    public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType,
-        bool isApproved)
+    public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
         : base(name, -1, contentType, new PropertyCollection())
     {
         _email = email;
@@ -233,8 +239,7 @@ public class Member : ContentBase, IMember
     /// <param name="contentType"></param>
     /// <param name="isApproved"></param>
     /// <param name="userId"></param>
-    public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType,
-        bool isApproved, int userId)
+    public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved, int userId)
         : base(name, -1, contentType, new PropertyCollection())
     {
         _email = email;
@@ -288,8 +293,8 @@ public class Member : ContentBase, IMember
         {
             if (value == null)
             {
-                //special case, this is used to ensure that the password is not updated when persisting, in this case
-                //we don't want to track changes either
+                // special case, this is used to ensure that the password is not updated when persisting, in this case
+                // we don't want to track changes either
                 _rawPasswordValue = null;
             }
             else
@@ -322,8 +327,7 @@ public class Member : ContentBase, IMember
     {
         get
         {
-            Attempt<string> a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, nameof(Comments),
-                default(string));
+            Attempt<string?> a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, nameof(Comments), default(string));
             if (a.Success == false)
             {
                 return a.Result;
@@ -333,6 +337,7 @@ public class Member : ContentBase, IMember
                 ? string.Empty
                 : Properties[Constants.Conventions.Member.Comments]?.GetValue()?.ToString();
         }
+
         set
         {
             if (WarnIfPropertyTypeNotFoundOnSet(
@@ -443,7 +448,6 @@ public class Member : ContentBase, IMember
         set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
     }
 
-
     /// <summary>
     ///     Internal/Experimental - only used for mapping queries.
     /// </summary>
@@ -507,8 +511,7 @@ public class Member : ContentBase, IMember
     /// <inheritdoc />
     [DataMember]
     [DoNotClone]
-    public IDictionary<string, object?>? AdditionalData =>
-        _additionalData ?? (_additionalData = new Dictionary<string, object?>());
+    public IDictionary<string, object?> AdditionalData => _additionalData ??= new Dictionary<string, object?>();
 
     /// <inheritdoc />
     [IgnoreDataMember]
@@ -516,7 +519,7 @@ public class Member : ContentBase, IMember
 
     private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
     {
-        void DoLog(string logPropertyAlias, string logPropertyName)
+        static void DoLog(string logPropertyAlias, string logPropertyName)
         {
             StaticApplicationLogging.Logger.LogWarning(
                 "Trying to access the '{PropertyName}' property on '{MemberType}' " +
@@ -545,7 +548,7 @@ public class Member : ContentBase, IMember
 
     private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
     {
-        void DoLog(string logPropertyAlias, string logPropertyName)
+        static void DoLog(string logPropertyAlias, string logPropertyName)
         {
             StaticApplicationLogging.Logger.LogWarning(
                 "An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.TemplateQuery;
+namespace Umbraco.Cms.Core.Models.TemplateQuery;
 
 public class OperatorTerm
 {
@@ -6,7 +6,7 @@ public class OperatorTerm
     {
         Name = "is";
         Operator = Operator.Equals;
-        AppliesTo = new[] {"string"};
+        AppliesTo = new[] { "string" };
     }
 
     public OperatorTerm(string name, Operator @operator, IEnumerable<string> appliesTo)
@@ -17,6 +17,8 @@ public class OperatorTerm
     }
 
     public string Name { get; set; }
+
     public Operator Operator { get; set; }
+
     public IEnumerable<string> AppliesTo { get; set; }
 }

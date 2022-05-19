@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Notifications;
+
 // TODO (V10): Remove this class.
 
 /// <summary>
@@ -16,7 +17,6 @@ public class UmbracoApplicationMainDomAcquiredNotification : INotification
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoApplicationMainDomAcquiredNotification" /> class.
     /// </summary>
-    /// <param name="runtimeLevel">The runtime level</param>
     public UmbracoApplicationMainDomAcquiredNotification()
     {
     }

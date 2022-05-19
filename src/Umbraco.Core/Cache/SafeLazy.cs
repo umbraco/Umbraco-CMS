@@ -1,4 +1,4 @@
-﻿using System.Runtime.ExceptionServices;
+using System.Runtime.ExceptionServices;
 
 namespace Umbraco.Cms.Core.Cache;
 
@@ -8,6 +8,7 @@ public static class SafeLazy
     internal static readonly object ValueNotCreated = new();
 
     public static Lazy<object?> GetSafeLazy(Func<object?> getCacheItem) =>
+
         // try to generate the value and if it fails,
         // wrap in an ExceptionHolder - would be much simpler
         // to just use lazy.IsValueFaulted alas that field is

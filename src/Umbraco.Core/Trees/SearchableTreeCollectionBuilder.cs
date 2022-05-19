@@ -8,6 +8,6 @@ public class SearchableTreeCollectionBuilder : LazyCollectionBuilderBase<Searcha
 {
     protected override SearchableTreeCollectionBuilder This => this;
 
-    //per request because generally an instance of ISearchableTree is a controller
+    // per request because generally an instance of ISearchableTree is a controller
     protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Scoped;
 }

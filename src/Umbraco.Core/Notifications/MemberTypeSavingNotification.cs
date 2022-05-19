@@ -5,11 +5,14 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class MemberTypeSavingNotification : SavingNotification<IMemberType>
 {
-    public MemberTypeSavingNotification(IMemberType target, EventMessages messages) : base(target, messages)
+    public MemberTypeSavingNotification(IMemberType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MemberTypeSavingNotification(IEnumerable<IMemberType> target, EventMessages messages) : base(target,
+    public MemberTypeSavingNotification(IEnumerable<IMemberType> target, EventMessages messages)
+        : base(
+        target,
         messages)
     {
     }

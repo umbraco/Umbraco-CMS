@@ -22,6 +22,6 @@ public class UmbracoPluginSettings
         ".eot", ".ttf", ".woff", // fonts
         ".xml", ".json", ".config", // configurations
         ".lic", // license
-        ".map" // js map files
+        ".map", // js map files
     });
 }

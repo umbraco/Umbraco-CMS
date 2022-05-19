@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -18,7 +18,7 @@ public class MemberGroup : EntityBase, IMemberGroup
     [DataMember]
     [DoNotClone]
     public IDictionary<string, object?> AdditionalData =>
-        _additionalData ?? (_additionalData = new Dictionary<string, object?>());
+_additionalData ??= new Dictionary<string, object?>();
 
     /// <inheritdoc />
     [IgnoreDataMember]
@@ -32,9 +32,9 @@ public class MemberGroup : EntityBase, IMemberGroup
         {
             if (_name != value)
             {
-                //if the name has changed, add the value to the additional data,
-                //this is required purely for event handlers to know the previous name of the group
-                //so we can keep the public access up to date.
+                // if the name has changed, add the value to the additional data,
+                // this is required purely for event handlers to know the previous name of the group
+                // so we can keep the public access up to date.
                 AdditionalData["previousName"] = _name;
             }
 

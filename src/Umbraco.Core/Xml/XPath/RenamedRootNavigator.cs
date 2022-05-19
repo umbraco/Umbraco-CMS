@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 using System.Xml.XPath;
 
 namespace Umbraco.Cms.Core.Xml.XPath;
@@ -23,7 +23,6 @@ public class RenamedRootNavigator : XPathNavigator
         get
         {
             // local name without prefix
-
             XPathNavigator nav = _navigator.Clone();
             if (nav.MoveToParent() && nav.MoveToParent())
             {
@@ -39,7 +38,6 @@ public class RenamedRootNavigator : XPathNavigator
         get
         {
             // qualified name with prefix
-
             XPathNavigator nav = _navigator.Clone();
             if (nav.MoveToParent() && nav.MoveToParent())
             {
@@ -48,7 +46,7 @@ public class RenamedRootNavigator : XPathNavigator
 
             var name = _navigator.Name;
             var pos = name.IndexOf(':');
-            return pos < 0 ? _rootName : name.Substring(0, pos + 1) + _rootName;
+            return pos < 0 ? _rootName : name[..(pos + 1)] + _rootName;
         }
     }
 

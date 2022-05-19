@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Represents the variation context.
@@ -10,8 +10,8 @@ public class VariationContext
     /// </summary>
     public VariationContext(string? culture = null, string? segment = null)
     {
-        Culture = culture ?? ""; // cannot be null, default to invariant
-        Segment = segment ?? ""; // cannot be null, default to neutral
+        Culture = culture ?? string.Empty; // cannot be null, default to invariant
+        Segment = segment ?? string.Empty; // cannot be null, default to neutral
     }
 
     /// <summary>

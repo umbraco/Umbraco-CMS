@@ -7,7 +7,7 @@ public static class PublishedSnapshotAccessorExtensions
     public static IPublishedSnapshot GetRequiredPublishedSnapshot(
         this IPublishedSnapshotAccessor publishedSnapshotAccessor)
     {
-        if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot))
+        if (publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot))
         {
             return publishedSnapshot!;
         }

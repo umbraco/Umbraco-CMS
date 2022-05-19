@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.Membership;
 [DataContract(IsReference = true)]
 public class User : EntityBase, IUser, IProfile
 {
-    //Custom comparer for enumerable
+    // Custom comparer for enumerable
     private static readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
@@ -55,8 +55,9 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = new int[] { };
         _startMediaIds = new int[] { };
-        //cannot be null
-        _rawPasswordValue = "";
+
+        // cannot be null
+        _rawPasswordValue = string.Empty;
         _username = string.Empty;
         _email = string.Empty;
         _name = string.Empty;
@@ -69,6 +70,7 @@ public class User : EntityBase, IUser, IProfile
     /// <param name="email"></param>
     /// <param name="username"></param>
     /// <param name="rawPasswordValue"></param>
+    /// <param name="globalSettings"></param>
     public User(GlobalSettings globalSettings, string? name, string email, string username, string rawPasswordValue)
         : this(globalSettings)
     {
@@ -115,12 +117,21 @@ public class User : EntityBase, IUser, IProfile
     /// <param name="userGroups"></param>
     /// <param name="startContentIds"></param>
     /// <param name="startMediaIds"></param>
-    public User(GlobalSettings globalSettings, int id, string? name, string email, string? username,
-        string? rawPasswordValue, string? passwordConfig,
-        IEnumerable<IReadOnlyUserGroup> userGroups, int[] startContentIds, int[] startMediaIds)
+    /// <param name="globalSettings"></param>
+    public User(
+        GlobalSettings globalSettings,
+        int id,
+        string? name,
+        string email,
+        string? username,
+        string? rawPasswordValue,
+        string? passwordConfig,
+        IEnumerable<IReadOnlyUserGroup> userGroups,
+        int[] startContentIds,
+        int[] startMediaIds)
         : this(globalSettings)
     {
-        //we allow whitespace for this value so just check null
+        // we allow whitespace for this value so just check null
         if (rawPasswordValue == null)
         {
             throw new ArgumentNullException(nameof(rawPasswordValue));
@@ -129,16 +140,6 @@ public class User : EntityBase, IUser, IProfile
         if (userGroups == null)
         {
             throw new ArgumentNullException(nameof(userGroups));
-        }
-
-        if (startContentIds == null)
-        {
-            throw new ArgumentNullException(nameof(startContentIds));
-        }
-
-        if (startMediaIds == null)
-        {
-            throw new ArgumentNullException(nameof(startMediaIds));
         }
 
         if (string.IsNullOrWhiteSpace(name))
@@ -160,10 +161,9 @@ public class User : EntityBase, IUser, IProfile
         _userGroups = new HashSet<IReadOnlyUserGroup>(userGroups);
         _isApproved = true;
         _isLockedOut = false;
-        _startContentIds = startContentIds;
-        _startMediaIds = startMediaIds;
+        _startContentIds = startContentIds ?? throw new ArgumentNullException(nameof(startContentIds));
+        _startMediaIds = startMediaIds ?? throw new ArgumentNullException(nameof(startMediaIds));
     }
-
 
     [DataMember]
     public DateTime? EmailConfirmedDate
@@ -249,7 +249,8 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _failedLoginAttempts, nameof(FailedPasswordAttempts));
     }
 
-    [IgnoreDataMember] public string? Comments { get; set; }
+    [IgnoreDataMember]
+    public string? Comments { get; set; }
 
     public UserState UserState
     {
@@ -287,9 +288,8 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
     }
 
-    public IEnumerable<string> AllowedSections => _allowedSections ??
-                                                  (_allowedSections = new List<string>(_userGroups
-                                                      .SelectMany(x => x.AllowedSections).Distinct()));
+    public IEnumerable<string> AllowedSections => _allowedSections ??= new List<string>(_userGroups
+                                                      .SelectMany(x => x.AllowedSections).Distinct());
 
     public IProfile ProfileData => new WrappedUserProfile(this);
 
@@ -344,8 +344,7 @@ public class User : EntityBase, IUser, IProfile
     public int[]? StartContentIds
     {
         get => _startContentIds;
-        set => SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds),
-            IntegerEnumerableComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _startContentIds, nameof(StartContentIds), IntegerEnumerableComparer);
     }
 
     /// <summary>
@@ -359,8 +358,7 @@ public class User : EntityBase, IUser, IProfile
     public int[]? StartMediaIds
     {
         get => _startMediaIds;
-        set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds),
-            IntegerEnumerableComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), IntegerEnumerableComparer);
     }
 
     [DataMember]
@@ -383,7 +381,8 @@ public class User : EntityBase, IUser, IProfile
             if (userGroup.Alias == group)
             {
                 _userGroups.Remove(userGroup);
-                //reset this flag so it's rebuilt with the assigned groups
+
+                // reset this flag so it's rebuilt with the assigned groups
                 _allowedSections = null;
                 OnPropertyChanged(nameof(Groups));
             }
@@ -395,7 +394,8 @@ public class User : EntityBase, IUser, IProfile
         if (_userGroups.Count > 0)
         {
             _userGroups.Clear();
-            //reset this flag so it's rebuilt with the assigned groups
+
+            // reset this flag so it's rebuilt with the assigned groups
             _allowedSections = null;
             OnPropertyChanged(nameof(Groups));
         }
@@ -405,7 +405,7 @@ public class User : EntityBase, IUser, IProfile
     {
         if (_userGroups.Add(group))
         {
-            //reset this flag so it's rebuilt with the assigned groups
+            // reset this flag so it's rebuilt with the assigned groups
             _allowedSections = null;
             OnPropertyChanged(nameof(Groups));
         }
@@ -417,10 +417,11 @@ public class User : EntityBase, IUser, IProfile
 
         var clonedEntity = (User)clone;
 
-        //manually clone the start node props
+        // manually clone the start node props
         clonedEntity._startContentIds = _startContentIds?.ToArray();
         clonedEntity._startMediaIds = _startMediaIds?.ToArray();
-        //need to create new collections otherwise they'll get copied by ref
+
+        // need to create new collections otherwise they'll get copied by ref
         clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
         clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
     }
@@ -437,8 +438,6 @@ public class User : EntityBase, IUser, IProfile
         public int Id => _user.Id;
 
         public string? Name => _user.Name;
-
-        private bool Equals(WrappedUserProfile other) => _user.Equals(other._user);
 
         public override bool Equals(object? obj)
         {
@@ -459,6 +458,8 @@ public class User : EntityBase, IUser, IProfile
 
             return Equals((WrappedUserProfile)obj);
         }
+
+        private bool Equals(WrappedUserProfile other) => _user.Equals(other._user);
 
         public override int GetHashCode() => _user.GetHashCode();
     }

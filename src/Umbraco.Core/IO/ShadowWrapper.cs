@@ -17,8 +17,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     private string? _shadowDir;
     private ShadowFileSystem? _shadowFileSystem;
 
-    public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment,
-        ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
+    public ShadowWrapper(IFileSystem innerFileSystem, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, string shadowPath, Func<bool?>? isScoped = null)
     {
         InnerFileSystem = innerFileSystem;
         _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
@@ -29,6 +28,8 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     }
 
     public IFileSystem InnerFileSystem { get; }
+
+    public bool CanAddPhysical => FileSystem.CanAddPhysical;
 
     private IFileSystem FileSystem
     {
@@ -93,11 +94,6 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
 
     public long GetSize(string path) => FileSystem.GetSize(path);
 
-    public bool CanAddPhysical => FileSystem.CanAddPhysical;
-
-    public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false) =>
-        FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
-
     public static string CreateShadowId(IHostingEnvironment hostingEnvironment)
     {
         const int retries = 50; // avoid infinite loop
@@ -107,7 +103,6 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
         // with an existing directory or not - if it does, try again, and
         // we should end up with a unique identifier eventually - but just
         // detect infinite loops (just in case)
-
         for (var i = 0; i < retries; i++)
         {
             var id = GuidUtils.ToBase32String(Guid.NewGuid(), idLength);
@@ -126,23 +121,24 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
         throw new Exception($"Could not get a shadow identifier (tried {retries} times)");
     }
 
+    public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false) =>
+        FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
+
     internal void Shadow(string id)
     {
         // note: no thread-safety here, because ShadowFs is thread-safe due to the check
         // on ShadowFileSystemsScope.None - and if None is false then we should be running
         // in a single thread anyways
-
         var virt = Path.Combine(ShadowFsPath, id, _shadowPath);
         _shadowDir = _hostingEnvironment.MapPathContentRoot(virt);
         Directory.CreateDirectory(_shadowDir);
-        var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment,
-            _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
+        var tempfs = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, _loggerFactory.CreateLogger<PhysicalFileSystem>(), _shadowDir, _hostingEnvironment.ToAbsolute(virt));
         _shadowFileSystem = new ShadowFileSystem(InnerFileSystem, tempfs);
     }
 
     internal void UnShadow(bool complete)
     {
-        ShadowFileSystem shadowFileSystem = _shadowFileSystem;
+        ShadowFileSystem? shadowFileSystem = _shadowFileSystem;
         var dir = _shadowDir;
         _shadowFileSystem = null;
         _shadowDir = null;
@@ -168,7 +164,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
                 var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                 while (pos > min)
                 {
-                    dir = dir.Substring(0, pos);
+                    dir = dir[..pos];
                     if (Directory.EnumerateFileSystemEntries(dir).Any() == false)
                     {
                         Directory.Delete(dir, true);

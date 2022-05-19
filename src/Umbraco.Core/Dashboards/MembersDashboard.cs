@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
@@ -7,7 +7,7 @@ public class MembersDashboard : IDashboard
 {
     public string Alias => "memberIntro";
 
-    public string[] Sections => new[] {"member"};
+    public string[] Sections => new[] { "member" };
 
     public string View => "views/dashboard/members/membersdashboardvideos.html";
 

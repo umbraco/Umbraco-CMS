@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class UserSavedNotification : SavedNotification<IUser>
 {
-    public UserSavedNotification(IUser target, EventMessages messages) : base(target, messages)
+    public UserSavedNotification(IUser target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public UserSavedNotification(IEnumerable<IUser> target, EventMessages messages) : base(target, messages)
+    public UserSavedNotification(IEnumerable<IUser> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

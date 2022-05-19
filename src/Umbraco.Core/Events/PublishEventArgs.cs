@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>,
     IEquatable<PublishEventArgs<TEntity>>
@@ -30,7 +30,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     /// <param name="eventObject"></param>
     /// <param name="eventMessages"></param>
     public PublishEventArgs(TEntity eventObject, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, eventMessages)
+        : base(new List<TEntity> { eventObject }, eventMessages)
     {
     }
 
@@ -41,7 +41,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     /// <param name="canCancel"></param>
     /// <param name="eventMessages"></param>
     public PublishEventArgs(TEntity eventObject, bool canCancel, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, canCancel, eventMessages)
+        : base(new List<TEntity> { eventObject }, canCancel, eventMessages)
     {
     }
 
@@ -70,7 +70,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     /// </summary>
     /// <param name="eventObject"></param>
     public PublishEventArgs(TEntity eventObject)
-        : base(new List<TEntity> {eventObject})
+        : base(new List<TEntity> { eventObject })
     {
     }
 
@@ -81,7 +81,7 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     /// <param name="canCancel"></param>
     /// <param name="isAllPublished"></param>
     public PublishEventArgs(TEntity eventObject, bool canCancel, bool isAllPublished)
-        : base(new List<TEntity> {eventObject}, canCancel)
+        : base(new List<TEntity> { eventObject }, canCancel)
     {
     }
 
@@ -89,6 +89,9 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
     ///     Returns all entities that were published during the operation
     /// </summary>
     public IEnumerable<TEntity>? PublishedEntities => EventObject;
+
+    public static bool operator ==(PublishEventArgs<TEntity> left, PublishEventArgs<TEntity> right) =>
+        Equals(left, right);
 
     public bool Equals(PublishEventArgs<TEntity>? other)
     {
@@ -132,9 +135,6 @@ public class PublishEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TE
             return base.GetHashCode() * 397;
         }
     }
-
-    public static bool operator ==(PublishEventArgs<TEntity> left, PublishEventArgs<TEntity> right) =>
-        Equals(left, right);
 
     public static bool operator !=(PublishEventArgs<TEntity> left, PublishEventArgs<TEntity> right) =>
         !Equals(left, right);

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEntity>
 {
@@ -9,8 +9,7 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// <param name="canCancel"></param>
     /// <param name="messages"></param>
     /// <param name="additionalData"></param>
-    public SaveEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages messages,
-        IDictionary<string, object> additionalData)
+    public SaveEventArgs(IEnumerable<TEntity> eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
         : base(eventObject, canCancel, messages, additionalData)
     {
     }
@@ -43,9 +42,8 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// <param name="canCancel"></param>
     /// <param name="messages"></param>
     /// <param name="additionalData"></param>
-    public SaveEventArgs(TEntity eventObject, bool canCancel, EventMessages messages,
-        IDictionary<string, object> additionalData)
-        : base(new List<TEntity> {eventObject}, canCancel, messages, additionalData)
+    public SaveEventArgs(TEntity eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+        : base(new List<TEntity> { eventObject }, canCancel, messages, additionalData)
     {
     }
 
@@ -55,7 +53,7 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// <param name="eventObject"></param>
     /// <param name="eventMessages"></param>
     public SaveEventArgs(TEntity eventObject, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, eventMessages)
+        : base(new List<TEntity> { eventObject }, eventMessages)
     {
     }
 
@@ -66,10 +64,9 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// <param name="canCancel"></param>
     /// <param name="eventMessages"></param>
     public SaveEventArgs(TEntity eventObject, bool canCancel, EventMessages eventMessages)
-        : base(new List<TEntity> {eventObject}, canCancel, eventMessages)
+        : base(new List<TEntity> { eventObject }, canCancel, eventMessages)
     {
     }
-
 
     /// <summary>
     ///     Constructor accepting multiple entities that are used in the saving operation
@@ -95,7 +92,7 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// </summary>
     /// <param name="eventObject"></param>
     public SaveEventArgs(TEntity eventObject)
-        : base(new List<TEntity> {eventObject})
+        : base(new List<TEntity> { eventObject })
     {
     }
 
@@ -105,7 +102,7 @@ public class SaveEventArgs<TEntity> : CancellableEnumerableObjectEventArgs<TEnti
     /// <param name="eventObject"></param>
     /// <param name="canCancel"></param>
     public SaveEventArgs(TEntity eventObject, bool canCancel)
-        : base(new List<TEntity> {eventObject}, canCancel)
+        : base(new List<TEntity> { eventObject }, canCancel)
     {
     }
 

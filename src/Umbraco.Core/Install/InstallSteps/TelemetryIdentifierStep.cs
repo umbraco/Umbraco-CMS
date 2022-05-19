@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -9,8 +9,11 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Install.InstallSteps;
 
-[InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-    "TelemetryIdConfiguration", 0, "",
+[InstallSetupStep(
+    InstallationType.NewInstall | InstallationType.Upgrade,
+    "TelemetryIdConfiguration",
+    0,
+    "",
     PerformsAppRestart = false)]
 public class TelemetryIdentifierStep : InstallSetupStep<object>
 {

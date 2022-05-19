@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Scoping;
+namespace Umbraco.Cms.Core.Scoping;
 
 /// <summary>
 ///     Specifies the cache mode of repositories.
@@ -31,5 +31,5 @@ public enum RepositoryCacheMode
     ///     <para>Bypasses caches entirely.</para>
     ///     <para>Upon scope completion, clears the global L2 cache.</para>
     /// </remarks>
-    None = 3
+    None = 3,
 }

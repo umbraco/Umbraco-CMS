@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace Umbraco.Cms.Core;
@@ -25,8 +25,7 @@ internal class UdiTypeConverter : TypeConverter
     {
         if (value is string)
         {
-            Udi? udi;
-            if (UdiParser.TryParse((string)value, out udi))
+            if (UdiParser.TryParse((string)value, out Udi? udi))
             {
                 return udi;
             }

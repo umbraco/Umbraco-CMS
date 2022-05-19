@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
 {
-    public ReadOnlyUserGroup(int id, string? name, string? icon, int? startContentId, int? startMediaId, string? alias,
-        IEnumerable<string> allowedSections, IEnumerable<string>? permissions)
+    public ReadOnlyUserGroup(int id, string? name, string? icon, int? startContentId, int? startMediaId, string? alias, IEnumerable<string> allowedSections, IEnumerable<string>? permissions)
     {
         Name = name ?? string.Empty;
         Icon = icon;
@@ -12,10 +11,12 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         AllowedSections = allowedSections.ToArray();
         Permissions = permissions?.ToArray();
 
-        //Zero is invalid and will be treated as Null
+        // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
     }
+
+    public int Id { get; }
 
     public bool Equals(ReadOnlyUserGroup? other)
     {
@@ -32,11 +33,14 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         return string.Equals(Alias, other.Alias);
     }
 
-    public int Id { get; }
     public string Name { get; }
+
     public string? Icon { get; }
+
     public int? StartContentId { get; }
+
     public int? StartMediaId { get; }
+
     public string Alias { get; }
 
     /// <summary>
@@ -49,6 +53,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public IEnumerable<string>? Permissions { get; set; }
 
     public IEnumerable<string> AllowedSections { get; }
+
+    public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);
 
     public override bool Equals(object? obj)
     {
@@ -71,8 +77,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     }
 
     public override int GetHashCode() => Alias?.GetHashCode() ?? base.GetHashCode();
-
-    public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);
 
     public static bool operator !=(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => !Equals(left, right);
 }

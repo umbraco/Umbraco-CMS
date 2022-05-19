@@ -35,7 +35,8 @@ public class PackageManifest
         set => _packageName = value;
     }
 
-    [DataMember(Name = "packageView")] public string? PackageView { get; set; }
+    [DataMember(Name = "packageView")]
+    public string? PackageView { get; set; }
 
     /// <summary>
     ///     Gets the source path of the manifest.
@@ -61,7 +62,8 @@ public class PackageManifest
     [DataMember(Name = "allowPackageTelemetry")]
     public bool AllowPackageTelemetry { get; set; } = true;
 
-    [DataMember(Name = "bundleOptions")] public BundleOptions BundleOptions { get; set; }
+    [DataMember(Name = "bundleOptions")]
+    public BundleOptions BundleOptions { get; set; }
 
     /// <summary>
     ///     Gets or sets the scripts listed in the manifest.

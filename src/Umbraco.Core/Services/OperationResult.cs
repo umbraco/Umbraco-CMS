@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Services;
+
 // TODO: no need for Attempt<OperationResult> - the operation result SHOULD KNOW if it's a success or a failure!
 // but then each WhateverResultType must
 
@@ -141,7 +142,8 @@ public class OperationResult : OperationResult<OperationResultType>
             Succeed<TValue>(EventMessages eventMessages, TValue value) => Core.Attempt.Succeed(
             new OperationResult<OperationResultType, TValue>(OperationResultType.Success, eventMessages, value));
 
-        public static Attempt<OperationResult<TStatusType>?> Succeed<TStatusType>(TStatusType statusType,
+        public static Attempt<OperationResult<TStatusType>?> Succeed<TStatusType>(
+            TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Succeed(new OperationResult<TStatusType>(statusType, eventMessages));
@@ -169,13 +171,13 @@ public class OperationResult : OperationResult<OperationResultType>
 
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Cancel<TValue>(EventMessages eventMessages) => Core.Attempt.Fail(
-            new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent,
+            new OperationResult<OperationResultType, TValue>(
+                OperationResultType.FailedCancelledByEvent,
                 eventMessages));
 
         public static Attempt<OperationResult<OperationResultType, TValue>?>
             Cancel<TValue>(EventMessages eventMessages, TValue value) => Core.Attempt.Fail(
-            new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent, eventMessages,
-                value));
+            new OperationResult<OperationResultType, TValue>(OperationResultType.FailedCancelledByEvent, eventMessages, value));
 
         /// <summary>
         ///     Creates a failed operation attempt indicating that an exception was thrown during the operation.
@@ -185,8 +187,9 @@ public class OperationResult : OperationResult<OperationResultType>
         /// <returns>A new attempt instance.</returns>
         public static Attempt<OperationResult?> Fail(EventMessages eventMessages, Exception exception)
         {
-            eventMessages.Add(new EventMessage("", exception.Message, EventMessageType.Error));
-            return Core.Attempt.Fail(new OperationResult(OperationResultType.FailedExceptionThrown, eventMessages),
+            eventMessages.Add(new EventMessage(string.Empty, exception.Message, EventMessageType.Error));
+            return Core.Attempt.Fail(
+                new OperationResult(OperationResultType.FailedExceptionThrown, eventMessages),
                 exception);
         }
 
@@ -195,33 +198,44 @@ public class OperationResult : OperationResult<OperationResultType>
             new OperationResult<OperationResultType, TValue>(OperationResultType.FailedExceptionThrown, eventMessages),
             exception);
 
-        public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(TStatusType statusType,
+        public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(
+            TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages));
 
-        public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(TStatusType statusType,
-            EventMessages eventMessages, Exception exception)
+        public static Attempt<OperationResult<TStatusType>?> Fail<TStatusType>(
+            TStatusType statusType,
+            EventMessages eventMessages,
+            Exception exception)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType>(statusType, eventMessages), exception);
 
-        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType,
+        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
+            TStatusType statusType,
             EventMessages eventMessages)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages));
 
-        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType,
-            EventMessages eventMessages, TValue value)
+        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
+            TStatusType statusType,
+            EventMessages eventMessages,
+            TValue value)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value));
 
-        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType,
-            EventMessages eventMessages, Exception exception)
+        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
+            TStatusType statusType,
+            EventMessages eventMessages,
+            Exception exception)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages), exception);
 
-        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(TStatusType statusType,
-            EventMessages eventMessages, TValue value, Exception exception)
+        public static Attempt<OperationResult<TStatusType, TValue>?> Fail<TStatusType, TValue>(
+            TStatusType statusType,
+            EventMessages eventMessages,
+            TValue value,
+            Exception exception)
             where TStatusType : struct =>
             Core.Attempt.Fail(new OperationResult<TStatusType, TValue>(statusType, eventMessages, value), exception);
 

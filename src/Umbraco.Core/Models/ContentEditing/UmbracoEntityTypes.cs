@@ -93,5 +93,5 @@ public enum UmbracoEntityTypes
     /// <summary>
     ///     Dictionary Item
     /// </summary>
-    DictionaryItem
+    DictionaryItem,
 }

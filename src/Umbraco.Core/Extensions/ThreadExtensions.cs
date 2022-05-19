@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -41,7 +41,6 @@ public static class ThreadExtensions
         // granted, that comparison should probably be a .Equals comparison, but who knows
         // how many times the framework assumes that it can do a reference comparison? So,
         // better fix the cultures.
-
         if (ReferenceEquals(invariantCulture, CultureInfo.InvariantCulture))
         {
             return;
@@ -49,7 +48,6 @@ public static class ThreadExtensions
 
         // if we do not have equality, fix cultures by replacing them with a culture with
         // the same name, but obtained here and now, with a proper invariant top culture
-
         thread.CurrentCulture = CultureInfo.GetCultureInfo(thread.CurrentCulture.Name);
         thread.CurrentUICulture = CultureInfo.GetCultureInfo(thread.CurrentUICulture.Name);
     }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class RolesEventArgs : EventArgs
 {
@@ -9,5 +9,6 @@ public class RolesEventArgs : EventArgs
     }
 
     public int[] MemberIds { get; set; }
+
     public string[] Roles { get; set; }
 }

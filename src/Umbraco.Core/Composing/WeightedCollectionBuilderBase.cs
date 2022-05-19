@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Composing;
+namespace Umbraco.Cms.Core.Composing;
 
 /// <summary>
 ///     Implements a weighted collection builder.
@@ -12,9 +12,10 @@ public abstract class
     where TCollection : class, IBuilderCollection<TItem>
 {
     private readonly Dictionary<Type, int> _customWeights = new();
-    protected abstract TBuilder This { get; }
 
     public virtual int DefaultWeight { get; set; } = 100;
+
+    protected abstract TBuilder This { get; }
 
     /// <summary>
     ///     Clears all types in the collection.
@@ -128,7 +129,8 @@ public abstract class
     /// <typeparam name="T">The type of item</typeparam>
     /// <param name="weight">The new weight</param>
     /// <returns></returns>
-    public TBuilder SetWeight<T>(int weight) where T : TItem
+    public TBuilder SetWeight<T>(int weight)
+        where T : TItem
     {
         _customWeights[typeof(T)] = weight;
         return This;
@@ -148,7 +150,7 @@ public abstract class
             return _customWeights[type];
         }
 
-        WeightAttribute attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>()
+        WeightAttribute? attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>()
             .SingleOrDefault();
         return attr?.Weight ?? DefaultWeight;
     }

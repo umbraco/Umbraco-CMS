@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Diagnostics;
@@ -10,8 +10,7 @@ namespace Umbraco.Cms.Core.Trees;
 [DebuggerDisplay("Tree - {SectionAlias}/{TreeAlias}")]
 public class Tree : ITree
 {
-    public Tree(int sortOrder, string applicationAlias, string? group, string alias, string? title, TreeUse use,
-        Type treeControllerType, bool isSingleNodeTree)
+    public Tree(int sortOrder, string applicationAlias, string? group, string alias, string? title, TreeUse use, Type treeControllerType, bool isSingleNodeTree)
     {
         SortOrder = sortOrder;
         SectionAlias = applicationAlias ?? throw new ArgumentNullException(nameof(applicationAlias));

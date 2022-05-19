@@ -43,8 +43,7 @@ public sealed class UserNotificationsHandler :
 
     public void Handle(AssignedUserGroupPermissionsNotification notification)
     {
-        IContent[] entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId))
-            ?.ToArray();
+        IContent[]? entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId)).ToArray();
         if (entities?.Any() == false)
         {
             return;
@@ -59,7 +58,8 @@ public sealed class UserNotificationsHandler :
     public void Handle(ContentMovedNotification notification)
     {
         // notify about the move for all moved items
-        _notifier.Notify(_actions.GetAction<ActionMove>(),
+        _notifier.Notify(
+            _actions.GetAction<ActionMove>(),
             notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
 
         // for any items being moved from the recycle bin (restored), explicitly notify about that too
@@ -87,18 +87,18 @@ public sealed class UserNotificationsHandler :
         var newEntities = new List<IContent>();
         var updatedEntities = new List<IContent>();
 
-        //need to determine if this is updating or if it is new
+        // need to determine if this is updating or if it is new
         foreach (IContent entity in notification.SavedEntities)
         {
             var dirty = (IRememberBeingDirty)entity;
             if (dirty.WasPropertyDirty("Id"))
             {
-                //it's new
+                // it's new
                 newEntities.Add(entity);
             }
             else
             {
-                //it's updating
+                // it's updating
                 updatedEntities.Add(entity);
             }
         }
@@ -125,7 +125,7 @@ public sealed class UserNotificationsHandler :
             return;
         }
 
-        IContent parent = _contentService.GetById(parentId[0]);
+        IContent? parent = _contentService.GetById(parentId[0]);
         if (parent == null)
         {
             return; // this shouldn't happen
@@ -139,14 +139,13 @@ public sealed class UserNotificationsHandler :
 
     public void Handle(PublicAccessEntrySavedNotification notification)
     {
-        IContent[] entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId))
-            ?.ToArray();
-        if (entities?.Any() == false)
+        IContent[] entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
+        if (entities.Any() == false)
         {
             return;
         }
 
-        _notifier.Notify(_actions.GetAction<ActionProtect>(), entities!);
+        _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
     }
 
     /// <summary>
@@ -187,9 +186,9 @@ public sealed class UserNotificationsHandler :
 
         public void Notify(IAction? action, params IContent[] entities)
         {
-            IUser user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
+            IUser? user = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser;
 
-            //if there is no current user, then use the admin
+            // if there is no current user, then use the admin
             if (user == null)
             {
                 _logger.LogDebug(
@@ -220,7 +219,7 @@ public sealed class UserNotificationsHandler :
                 return;
             }
 
-            //group by the content type variation since the emails will be different
+            // group by the content type variation since the emails will be different
             foreach (IGrouping<ContentVariation, IContent> contentVariantGroup in entities.GroupBy(x =>
                          x.ContentType.Variations))
             {
@@ -232,26 +231,24 @@ public sealed class UserNotificationsHandler :
                     siteUri,
                     x
                         => _textService.Localize(
-                            "notifications", "mailSubject",
-                            x.user.GetUserCulture(_textService, _globalSettings),
-                            new[] {x.subject.SiteUrl, x.subject.Action, x.subject.ItemName}),
+                            "notifications", "mailSubject", x.user.GetUserCulture(_textService, _globalSettings), new[] { x.subject.SiteUrl, x.subject.Action, x.subject.ItemName }),
                     x
                         => _textService.Localize(
-                            "notifications", x.isHtml ? "mailBodyHtml" : "mailBody",
+                            "notifications",
+                            x.isHtml ? "mailBodyHtml" : "mailBody",
                             x.user.GetUserCulture(_textService, _globalSettings),
                             new[]
                             {
                                 x.body.RecipientName, x.body.Action, x.body.ItemName, x.body.EditedUser, x.body.SiteUrl,
                                 x.body.ItemId,
-                                //format the summary depending on if it's variant or not
+
+                                // format the summary depending on if it's variant or not
                                 contentVariantGroup.Key == ContentVariation.Culture
                                     ? x.isHtml
-                                        ? _textService.Localize("notifications", "mailBodyVariantHtmlSummary",
-                                            new[] {x.body.Summary})
-                                        : _textService.Localize("notifications", "mailBodyVariantSummary",
-                                            new[] {x.body.Summary})
+                                        ? _textService.Localize("notifications", "mailBodyVariantHtmlSummary", new[] { x.body.Summary })
+                                        : _textService.Localize("notifications", "mailBodyVariantSummary", new[] { x.body.Summary })
                                     : x.body.Summary,
-                                x.body.ItemUrl
+                                x.body.ItemUrl,
                             }));
             }
         }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
@@ -11,7 +11,6 @@ public class UserDataService : IUserDataService
 {
     private readonly ILocalizationService _localizationService;
     private readonly IUmbracoVersion _version;
-
 
     public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
     {
@@ -28,10 +27,8 @@ public class UserDataService : IUserDataService
             new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
             new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
             new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-            new("Current Webserver", GetCurrentWebServer())
+            new("Current Webserver", GetCurrentWebServer()),
         };
-
-    private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 
     public bool IsRunningInProcessIIS()
     {
@@ -43,4 +40,6 @@ public class UserDataService : IUserDataService
         var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
         return processName.Contains("w3wp") || processName.Contains("iisexpress");
     }
+
+    private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 }

@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class ScopedEntityRemoveNotification : ObjectNotification<IContentBase>
 {
-    public ScopedEntityRemoveNotification(IContentBase target, EventMessages messages) : base(target, messages)
+    public ScopedEntityRemoveNotification(IContentBase target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

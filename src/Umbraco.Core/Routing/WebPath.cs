@@ -35,7 +35,7 @@ public class WebPath
             }
 
             // always trim end
-            if (path[path.Length - 1] == PathSeparator)
+            if (path[^1] == PathSeparator)
             {
                 count = path.Length - 1;
             }

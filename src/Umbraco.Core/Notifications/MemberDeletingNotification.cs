@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public sealed class MemberDeletingNotification : DeletingNotification<IMember>
 {
-    public MemberDeletingNotification(IMember target, EventMessages messages) : base(target, messages)
+    public MemberDeletingNotification(IMember target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MemberDeletingNotification(IEnumerable<IMember> target, EventMessages messages) : base(target, messages)
+    public MemberDeletingNotification(IEnumerable<IMember> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

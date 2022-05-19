@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -10,8 +10,7 @@ public static class VersionExtensions
 {
     public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
     {
-        var build = 0;
-        int.TryParse(semVersion.Build, NumberStyles.Integer, CultureInfo.InvariantCulture, out build);
+        int.TryParse(semVersion.Build, NumberStyles.Integer, CultureInfo.InvariantCulture, out int build);
 
         if (maxParts >= 4)
         {
@@ -28,9 +27,9 @@ public static class VersionExtensions
 
     public static Version SubtractRevision(this Version version)
     {
-        var parts = new List<int>(new[] {version.Major, version.Minor, version.Build, version.Revision});
+        var parts = new List<int>(new[] { version.Major, version.Minor, version.Build, version.Revision });
 
-        //remove all prefixed zero parts
+        // remove all prefixed zero parts
         while (parts[0] <= 0)
         {
             parts.RemoveAt(0);
@@ -50,7 +49,7 @@ public static class VersionExtensions
             }
             else
             {
-                //break when there isn't a zero part
+                // break when there isn't a zero part
                 break;
             }
         }
@@ -62,16 +61,16 @@ public static class VersionExtensions
 
         var lastNonZero = parts.FindLastIndex(i => i > 0);
 
-        //subtract 1 from the last non-zero
+        // subtract 1 from the last non-zero
         parts[lastNonZero] = parts[lastNonZero] - 1;
 
-        //the last non zero is actually the revision so we can just return
+        // the last non zero is actually the revision so we can just return
         if (lastNonZero == parts.Count - 1)
         {
             return FromList(parts);
         }
 
-        //the last non zero isn't the revision so the remaining zero's need to be replaced with int.max
+        // the last non zero isn't the revision so the remaining zero's need to be replaced with int.max
         for (var i = lastNonZero + 1; i < parts.Count; i++)
         {
             parts[i] = int.MaxValue;

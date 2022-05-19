@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Extensions;
@@ -9,7 +9,6 @@ public static class WaitHandleExtensions
     // http://blog.nerdbank.net/2011/07/c-await-for-waithandle.html
     // F# has a AwaitWaitHandle method that accepts a time out... and seems pretty complex...
     // version below should be OK
-
     public static Task WaitOneAsync(this WaitHandle handle, int millisecondsTimeout = Timeout.Infinite)
     {
         var tcs = new TaskCompletionSource<object?>();
@@ -17,13 +16,13 @@ public static class WaitHandleExtensions
         lock (callbackHandleInitLock)
         {
             RegisteredWaitHandle? callbackHandle = null;
+
             // ReSharper disable once RedundantAssignment
             callbackHandle = ThreadPool.RegisterWaitForSingleObject(
                 handle,
                 (state, timedOut) =>
                 {
-                    //TODO: We aren't checking if this is timed out
-
+                    // TODO: We aren't checking if this is timed out
                     tcs.SetResult(null);
 
                     // we take a lock here to make sure the outer method has completed setting the local variable callbackHandle.

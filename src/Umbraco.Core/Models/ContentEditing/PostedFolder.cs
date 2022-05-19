@@ -8,7 +8,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 [DataContract]
 public class PostedFolder
 {
-    [DataMember(Name = "parentId")] public string? ParentId { get; set; }
+    [DataMember(Name = "parentId")]
+    public string? ParentId { get; set; }
 
-    [DataMember(Name = "name")] public string? Name { get; set; }
+    [DataMember(Name = "name")]
+    public string? Name { get; set; }
 }

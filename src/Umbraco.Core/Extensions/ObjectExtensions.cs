@@ -27,10 +27,10 @@ public static class ObjectExtensions
     private static readonly ConcurrentDictionary<CompositeTypeTypeKey, bool> AssignableTypeCache = new();
     private static readonly ConcurrentDictionary<Type, bool> BoolConvertCache = new();
 
-    private static readonly char[] NumberDecimalSeparatorsToNormalize = {'.', ','};
+    private static readonly char[] NumberDecimalSeparatorsToNormalize = { '.', ',' };
     private static readonly CustomBooleanTypeConverter CustomBooleanTypeConverter = new();
 
-    //private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
+    // private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
 
     /// <summary>
     /// </summary>
@@ -158,7 +158,7 @@ public static class ObjectExtensions
             // Any other generic types need to fall through
             if (target.IsGenericType)
             {
-                Type underlying = GetCachedGenericNullableType(target);
+                Type? underlying = GetCachedGenericNullableType(target);
                 if (underlying != null)
                 {
                     // Special case for empty strings for bools/dates which should return null if an empty string.
@@ -173,7 +173,7 @@ public static class ObjectExtensions
                     }
 
                     // Recursively call into this method with the inner (not-nullable) type and handle the outcome
-                    Attempt<object> inner = input.TryConvertTo(underlying);
+                    Attempt<object?> inner = input.TryConvertTo(underlying);
 
                     // And if successful, fall on through to rewrap in a nullable; if failed, pass on the exception
                     if (inner.Success)
@@ -189,13 +189,12 @@ public static class ObjectExtensions
             else
             {
                 // target is not a generic type
-
                 if (input is string inputString)
                 {
                     // Try convert from string, returns an Attempt if the string could be
                     // processed (either succeeded or failed), else null if we need to try
                     // other methods
-                    Attempt<object>? result = TryConvertToFromString(inputString, target);
+                    Attempt<object?>? result = TryConvertToFromString(inputString, target);
                     if (result.HasValue)
                     {
                         return result.Value;
@@ -218,13 +217,13 @@ public static class ObjectExtensions
                 }
             }
 
-            TypeConverter inputConverter = GetCachedSourceTypeConverter(inputType, target);
+            TypeConverter? inputConverter = GetCachedSourceTypeConverter(inputType, target);
             if (inputConverter != null)
             {
                 return Attempt.Succeed(inputConverter.ConvertTo(input, target));
             }
 
-            TypeConverter outputConverter = GetCachedTargetTypeConverter(inputType, target);
+            TypeConverter? outputConverter = GetCachedTargetTypeConverter(inputType, target);
             if (outputConverter != null)
             {
                 return Attempt.Succeed(outputConverter.ConvertFrom(input!));
@@ -250,6 +249,94 @@ public static class ObjectExtensions
         }
 
         return Attempt<object?>.Fail();
+    }
+
+    // public enum PropertyNamesCaseType
+    // {
+    //    CamelCase,
+    //    CaseInsensitive
+    // }
+
+    ///// <summary>
+    ///// Convert an object to a JSON string with camelCase formatting
+    ///// </summary>
+    ///// <param name="obj"></param>
+    ///// <returns></returns>
+    // public static string ToJsonString(this object obj)
+    // {
+    //    return obj.ToJsonString(PropertyNamesCaseType.CamelCase);
+    // }
+
+    ///// <summary>
+    ///// Convert an object to a JSON string with the specified formatting
+    ///// </summary>
+    ///// <param name="obj">The obj.</param>
+    ///// <param name="propertyNamesCaseType">Type of the property names case.</param>
+    ///// <returns></returns>
+    // public static string ToJsonString(this object obj, PropertyNamesCaseType propertyNamesCaseType)
+    // {
+    //    var type = obj.GetType();
+    //    var dateTimeStyle = "yyyy-MM-dd HH:mm:ss";
+
+    // if (type.IsPrimitive || typeof(string).IsAssignableFrom(type))
+    //    {
+    //        return obj.ToString();
+    //    }
+
+    // if (typeof(DateTime).IsAssignableFrom(type) || typeof(DateTimeOffset).IsAssignableFrom(type))
+    //    {
+    //        return Convert.ToDateTime(obj).ToString(dateTimeStyle);
+    //    }
+
+    // var serializer = new JsonSerializer();
+
+    // switch (propertyNamesCaseType)
+    //    {
+    //        case PropertyNamesCaseType.CamelCase:
+    //            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
+    //            break;
+    //    }
+
+    // var dateTimeConverter = new IsoDateTimeConverter
+    //        {
+    //            DateTimeStyles = System.Globalization.DateTimeStyles.None,
+    //            DateTimeFormat = dateTimeStyle
+    //        };
+
+    // if (typeof(IDictionary).IsAssignableFrom(type))
+    //    {
+    //        return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
+    //    }
+
+    // if (type.IsArray || (typeof(IEnumerable).IsAssignableFrom(type)))
+    //    {
+    //        return JArray.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
+    //    }
+
+    // return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
+    // }
+
+    /// <summary>
+    ///     Converts an object into a dictionary
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TProperty"></typeparam>
+    /// <typeparam name="TVal"> </typeparam>
+    /// <param name="o"></param>
+    /// <param name="ignoreProperties"></param>
+    /// <returns></returns>
+    public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(
+        this T o,
+        params Expression<Func<T, TProperty>>[] ignoreProperties) => o?.ToDictionary<TVal>(ignoreProperties
+        .Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
+
+    internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
+    {
+        // TODO: Localize this exception
+        if (isDisposed)
+        {
+            throw new ObjectDisposedException(objectname);
+        }
     }
 
     /// <summary>
@@ -321,7 +408,6 @@ public static class ObjectExtensions
             }
 
             // TODO: Should we do the decimal trick for short, byte, unsigned?
-
             if (target == typeof(bool))
             {
                 if (bool.TryParse(input, out var value))
@@ -405,99 +491,12 @@ public static class ObjectExtensions
         }
         else if (input != null && target == typeof(Version))
         {
-            return Attempt<object?>.If(Version.TryParse(input, out Version value), value);
+            return Attempt<object?>.If(Version.TryParse(input, out Version? value), value);
         }
 
         // E_NOTIMPL IPAddress, BigInteger
         return null; // we can't decide...
     }
-
-    internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
-    {
-        // TODO: Localize this exception
-        if (isDisposed)
-        {
-            throw new ObjectDisposedException(objectname);
-        }
-    }
-
-    //public enum PropertyNamesCaseType
-    //{
-    //    CamelCase,
-    //    CaseInsensitive
-    //}
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with camelCase formatting
-    ///// </summary>
-    ///// <param name="obj"></param>
-    ///// <returns></returns>
-    //public static string ToJsonString(this object obj)
-    //{
-    //    return obj.ToJsonString(PropertyNamesCaseType.CamelCase);
-    //}
-
-    ///// <summary>
-    ///// Convert an object to a JSON string with the specified formatting
-    ///// </summary>
-    ///// <param name="obj">The obj.</param>
-    ///// <param name="propertyNamesCaseType">Type of the property names case.</param>
-    ///// <returns></returns>
-    //public static string ToJsonString(this object obj, PropertyNamesCaseType propertyNamesCaseType)
-    //{
-    //    var type = obj.GetType();
-    //    var dateTimeStyle = "yyyy-MM-dd HH:mm:ss";
-
-    //    if (type.IsPrimitive || typeof(string).IsAssignableFrom(type))
-    //    {
-    //        return obj.ToString();
-    //    }
-
-    //    if (typeof(DateTime).IsAssignableFrom(type) || typeof(DateTimeOffset).IsAssignableFrom(type))
-    //    {
-    //        return Convert.ToDateTime(obj).ToString(dateTimeStyle);
-    //    }
-
-    //    var serializer = new JsonSerializer();
-
-    //    switch (propertyNamesCaseType)
-    //    {
-    //        case PropertyNamesCaseType.CamelCase:
-    //            serializer.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    //            break;
-    //    }
-
-    //    var dateTimeConverter = new IsoDateTimeConverter
-    //        {
-    //            DateTimeStyles = System.Globalization.DateTimeStyles.None,
-    //            DateTimeFormat = dateTimeStyle
-    //        };
-
-    //    if (typeof(IDictionary).IsAssignableFrom(type))
-    //    {
-    //        return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    //    if (type.IsArray || (typeof(IEnumerable).IsAssignableFrom(type)))
-    //    {
-    //        return JArray.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //    }
-
-    //    return JObject.FromObject(obj, serializer).ToString(Formatting.None, dateTimeConverter);
-    //}
-
-    /// <summary>
-    ///     Converts an object into a dictionary
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TProperty"></typeparam>
-    /// <typeparam name="TVal"> </typeparam>
-    /// <param name="o"></param>
-    /// <param name="ignoreProperties"></param>
-    /// <returns></returns>
-    public static IDictionary<string, TVal>? ToDictionary<T, TProperty, TVal>(this T o,
-        params Expression<Func<T, TProperty>>[] ignoreProperties) => o?.ToDictionary<TVal>(ignoreProperties
-        .Select(e => o.GetPropertyInfo(e)).Select(propInfo => propInfo.Name).ToArray());
 
     /// <summary>
     ///     Turns object into dictionary
@@ -527,99 +526,6 @@ public static class ObjectExtensions
         return new Dictionary<string, TVal>();
     }
 
-
-    internal static string? ToDebugString(this object? obj, int levels = 0)
-    {
-        if (obj == null)
-        {
-            return "{null}";
-        }
-
-        try
-        {
-            if (obj is string)
-            {
-                return "\"{0}\"".InvariantFormat(obj);
-            }
-
-            if (obj is int || obj is short || obj is long || obj is float || obj is double || obj is bool ||
-                obj is int? || obj is short? || obj is long? || obj is float? || obj is double? || obj is bool?)
-            {
-                return "{0}".InvariantFormat(obj);
-            }
-
-            if (obj is Enum)
-            {
-                return "[{0}]".InvariantFormat(obj);
-            }
-
-            if (obj is IEnumerable enumerable)
-            {
-                var items = (from object enumItem in enumerable
-                    let value = GetEnumPropertyDebugString(enumItem, levels)
-                    where value != null
-                    select value).Take(10).ToList();
-
-                return items.Any()
-                    ? "{{ {0} }}".InvariantFormat(string.Join(", ", items))
-                    : null;
-            }
-
-            PropertyInfo[] props = obj.GetType().GetProperties();
-            if (props.Length == 2 && props[0].Name == "Key" && props[1].Name == "Value" && levels > -2)
-            {
-                try
-                {
-                    var key = props[0].GetValue(obj, null) as string;
-                    var value = props[1].GetValue(obj, null).ToDebugString(levels - 1);
-                    return "{0}={1}".InvariantFormat(key, value);
-                }
-                catch (Exception)
-                {
-                    return "[KeyValuePropertyException]";
-                }
-            }
-
-            if (levels > -1)
-            {
-                var items =
-                    (from propertyInfo in props
-                        let value = GetPropertyDebugString(propertyInfo, obj, levels)
-                        where value != null
-                        select "{0}={1}".InvariantFormat(propertyInfo.Name, value)).ToArray();
-
-                return items.Any()
-                    ? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, string.Join(", ", items))
-                    : null;
-            }
-        }
-        catch (Exception ex)
-        {
-            return "[Exception:{0}]".InvariantFormat(ex.Message);
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     Attempts to serialize the value to an XmlString using ToXmlString
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    internal static Attempt<string?> TryConvertToXmlString(this object value, Type type)
-    {
-        try
-        {
-            var output = value.ToXmlString(type);
-            return Attempt.Succeed(output);
-        }
-        catch (NotSupportedException ex)
-        {
-            return Attempt<string?>.Fail(ex);
-        }
-    }
-
     /// <summary>
     ///     Returns an XmlSerialized safe string representation for the value
     /// </summary>
@@ -635,7 +541,7 @@ public static class ObjectExtensions
 
         if (type == typeof(string))
         {
-            return value.ToString().IsNullOrWhiteSpace() ? "" : value.ToString()!;
+            return value.ToString().IsNullOrWhiteSpace() ? string.Empty : value.ToString()!;
         }
 
         if (type == typeof(bool))
@@ -727,6 +633,98 @@ public static class ObjectExtensions
                                         " to a string using ToXmlString as it is not supported by XmlConvert");
     }
 
+    internal static string? ToDebugString(this object? obj, int levels = 0)
+    {
+        if (obj == null)
+        {
+            return "{null}";
+        }
+
+        try
+        {
+            if (obj is string)
+            {
+                return "\"{0}\"".InvariantFormat(obj);
+            }
+
+            if (obj is int || obj is short || obj is long || obj is float || obj is double || obj is bool ||
+                obj is int? || obj is short? || obj is long? || obj is float? || obj is double? || obj is bool?)
+            {
+                return "{0}".InvariantFormat(obj);
+            }
+
+            if (obj is Enum)
+            {
+                return "[{0}]".InvariantFormat(obj);
+            }
+
+            if (obj is IEnumerable enumerable)
+            {
+                var items = (from object enumItem in enumerable
+                             let value = GetEnumPropertyDebugString(enumItem, levels)
+                             where value != null
+                             select value).Take(10).ToList();
+
+                return items.Any()
+                    ? "{{ {0} }}".InvariantFormat(string.Join(", ", items))
+                    : null;
+            }
+
+            PropertyInfo[] props = obj.GetType().GetProperties();
+            if (props.Length == 2 && props[0].Name == "Key" && props[1].Name == "Value" && levels > -2)
+            {
+                try
+                {
+                    var key = props[0].GetValue(obj, null) as string;
+                    var value = props[1].GetValue(obj, null).ToDebugString(levels - 1);
+                    return "{0}={1}".InvariantFormat(key, value);
+                }
+                catch (Exception)
+                {
+                    return "[KeyValuePropertyException]";
+                }
+            }
+
+            if (levels > -1)
+            {
+                var items =
+                    (from propertyInfo in props
+                     let value = GetPropertyDebugString(propertyInfo, obj, levels)
+                     where value != null
+                     select "{0}={1}".InvariantFormat(propertyInfo.Name, value)).ToArray();
+
+                return items.Any()
+                    ? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, string.Join(", ", items))
+                    : null;
+            }
+        }
+        catch (Exception ex)
+        {
+            return "[Exception:{0}]".InvariantFormat(ex.Message);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Attempts to serialize the value to an XmlString using ToXmlString
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    internal static Attempt<string?> TryConvertToXmlString(this object value, Type type)
+    {
+        try
+        {
+            var output = value.ToXmlString(type);
+            return Attempt.Succeed(output);
+        }
+        catch (NotSupportedException ex)
+        {
+            return Attempt<string?>.Fail(ex);
+        }
+    }
+
     /// <summary>
     ///     Returns an XmlSerialized safe string representation for the value and type
     /// </summary>
@@ -734,6 +732,8 @@ public static class ObjectExtensions
     /// <param name="value"></param>
     /// <returns></returns>
     public static string ToXmlString<T>(this object value) => value.ToXmlString(typeof(T));
+
+    public static Guid AsGuid(this object value) => value is Guid guid ? guid : Guid.Empty;
 
     private static string? GetEnumPropertyDebugString(object enumItem, int levels)
     {
@@ -759,8 +759,6 @@ public static class ObjectExtensions
         }
     }
 
-    public static Guid AsGuid(this object value) => value is Guid guid ? guid : Guid.Empty;
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string NormalizeNumberDecimalSeparator(string s)
     {
@@ -774,7 +772,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (InputTypeConverterCache.TryGetValue(key, out TypeConverter typeConverter))
+        if (InputTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -795,7 +793,7 @@ public static class ObjectExtensions
     {
         var key = new CompositeTypeTypeKey(source, target);
 
-        if (DestinationTypeConverterCache.TryGetValue(key, out TypeConverter typeConverter))
+        if (DestinationTypeConverterCache.TryGetValue(key, out TypeConverter? typeConverter))
         {
             return typeConverter;
         }
@@ -814,7 +812,7 @@ public static class ObjectExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Type? GetCachedGenericNullableType(Type type)
     {
-        if (NullableGenericCache.TryGetValue(type, out Type underlyingType))
+        if (NullableGenericCache.TryGetValue(type, out Type? underlyingType))
         {
             return underlyingType;
         }

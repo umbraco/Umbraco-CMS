@@ -10,8 +10,10 @@ public class TrackedReferencesService : ITrackedReferencesService
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITrackedReferencesRepository _trackedReferencesRepository;
 
-    public TrackedReferencesService(ITrackedReferencesRepository trackedReferencesRepository,
-        ICoreScopeProvider scopeProvider, IEntityService entityService)
+    public TrackedReferencesService(
+        ITrackedReferencesRepository trackedReferencesRepository,
+        ICoreScopeProvider scopeProvider,
+        IEntityService entityService)
     {
         _trackedReferencesRepository = trackedReferencesRepository;
         _scopeProvider = scopeProvider;
@@ -22,34 +24,29 @@ public class TrackedReferencesService : ITrackedReferencesService
     ///     Gets a paged result of items which are in relation with the current item.
     ///     Basically, shows the items which depend on the current item.
     /// </summary>
-    public PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency)
+    public PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize,
-            filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) {Items = items};
+        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
     }
 
     /// <summary>
     ///     Gets a paged result of items used in any kind of relation from selected integer ids.
     /// </summary>
-    public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency)
+    public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex,
-            pageSize, filterMustBeIsDependency, out var totalItems);
+        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) {Items = items};
+        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
     }
 
     /// <summary>
     ///     Gets a paged result of the descending items that have any references, given a parent id.
     /// </summary>
-    public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency)
+    public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
 
@@ -59,6 +56,6 @@ public class TrackedReferencesService : ITrackedReferencesService
             pageSize,
             filterMustBeIsDependency,
             out var totalItems);
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) {Items = items};
+        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
     }
 }

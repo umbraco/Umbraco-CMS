@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -114,7 +114,8 @@ public static class UdiGetterExtensions
         }
         else
         {
-            throw new NotSupportedException(string.Format("Composition type {0} is not supported.",
+            throw new NotSupportedException(string.Format(
+                "Composition type {0} is not supported.",
                 entity.GetType().FullName));
         }
 
@@ -163,7 +164,8 @@ public static class UdiGetterExtensions
         }
         else
         {
-            throw new NotSupportedException(string.Format("Contained object type {0} is not supported.",
+            throw new NotSupportedException(string.Format(
+                "Contained object type {0} is not supported.",
                 entity.ContainedObjectType));
         }
 
@@ -230,7 +232,8 @@ public static class UdiGetterExtensions
             throw new ArgumentNullException("entity");
         }
 
-        return new StringUdi(Constants.UdiEntityType.Stylesheet,
+        return new StringUdi(
+            Constants.UdiEntityType.Stylesheet,
             entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
     }
 
@@ -327,7 +330,8 @@ public static class UdiGetterExtensions
         }
         else
         {
-            throw new NotSupportedException(string.Format("ContentBase type {0} is not supported.",
+            throw new NotSupportedException(string.Format(
+                "ContentBase type {0} is not supported.",
                 entity.GetType().FullName));
         }
 
@@ -378,117 +382,97 @@ public static class UdiGetterExtensions
 
         // entity could eg be anything implementing IThing
         // so we have to go through casts here
-
-        var template = entity as ITemplate;
-        if (template != null)
+        if (entity is ITemplate template)
         {
             return template.GetUdi();
         }
 
-        var contentType = entity as IContentType;
-        if (contentType != null)
+        if (entity is IContentType contentType)
         {
             return contentType.GetUdi();
         }
 
-        var mediaType = entity as IMediaType;
-        if (mediaType != null)
+        if (entity is IMediaType mediaType)
         {
             return mediaType.GetUdi();
         }
 
-        var memberType = entity as IMemberType;
-        if (memberType != null)
+        if (entity is IMemberType memberType)
         {
             return memberType.GetUdi();
         }
 
-        var memberGroup = entity as IMemberGroup;
-        if (memberGroup != null)
+        if (entity is IMemberGroup memberGroup)
         {
             return memberGroup.GetUdi();
         }
 
-        var contentTypeComposition = entity as IContentTypeComposition;
-        if (contentTypeComposition != null)
+        if (entity is IContentTypeComposition contentTypeComposition)
         {
             return contentTypeComposition.GetUdi();
         }
 
-        var dataTypeComposition = entity as IDataType;
-        if (dataTypeComposition != null)
+        if (entity is IDataType dataTypeComposition)
         {
             return dataTypeComposition.GetUdi();
         }
 
-        var container = entity as EntityContainer;
-        if (container != null)
+        if (entity is EntityContainer container)
         {
             return container.GetUdi();
         }
 
-        var media = entity as IMedia;
-        if (media != null)
+        if (entity is IMedia media)
         {
             return media.GetUdi();
         }
 
-        var content = entity as IContent;
-        if (content != null)
+        if (entity is IContent content)
         {
             return content.GetUdi();
         }
 
-        var member = entity as IMember;
-        if (member != null)
+        if (entity is IMember member)
         {
             return member.GetUdi();
         }
 
-        var stylesheet = entity as Stylesheet;
-        if (stylesheet != null)
+        if (entity is Stylesheet stylesheet)
         {
             return stylesheet.GetUdi();
         }
 
-        var script = entity as Script;
-        if (script != null)
+        if (entity is Script script)
         {
             return script.GetUdi();
         }
 
-        var dictionaryItem = entity as IDictionaryItem;
-        if (dictionaryItem != null)
+        if (entity is IDictionaryItem dictionaryItem)
         {
             return dictionaryItem.GetUdi();
         }
 
-        var macro = entity as IMacro;
-        if (macro != null)
+        if (entity is IMacro macro)
         {
             return macro.GetUdi();
         }
 
-        var partialView = entity as IPartialView;
-        if (partialView != null)
+        if (entity is IPartialView partialView)
         {
             return partialView.GetUdi();
         }
 
-        var contentBase = entity as IContentBase;
-        if (contentBase != null)
+        if (entity is IContentBase contentBase)
         {
             return contentBase.GetUdi();
         }
 
-        var relationType = entity as IRelationType;
-        if (relationType != null)
+        if (entity is IRelationType relationType)
         {
             return relationType.GetUdi();
         }
 
-        var language = entity as ILanguage;
-        if (language != null)
+        if (entity is ILanguage language)
         {
             return language.GetUdi();
         }

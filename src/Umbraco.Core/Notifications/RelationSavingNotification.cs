@@ -8,11 +8,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class RelationSavingNotification : SavingNotification<IRelation>
 {
-    public RelationSavingNotification(IRelation target, EventMessages messages) : base(target, messages)
+    public RelationSavingNotification(IRelation target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public RelationSavingNotification(IEnumerable<IRelation> target, EventMessages messages) : base(target, messages)
+    public RelationSavingNotification(IEnumerable<IRelation> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

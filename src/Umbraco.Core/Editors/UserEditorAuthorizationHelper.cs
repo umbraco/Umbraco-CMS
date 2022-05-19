@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Cache;
@@ -17,8 +17,7 @@ public class UserEditorAuthorizationHelper
     private readonly IEntityService _entityService;
     private readonly IMediaService _mediaService;
 
-    public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService,
-        IEntityService entityService, AppCaches appCaches)
+    public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
     {
         _contentService = contentService;
         _mediaService = mediaService;
@@ -35,15 +34,16 @@ public class UserEditorAuthorizationHelper
     /// <param name="startMediaIds">The start media ids of the user being saved (can be null or empty)</param>
     /// <param name="userGroupAliases">The user aliases of the user being saved (can be null or empty)</param>
     /// <returns></returns>
-    public Attempt<string?> IsAuthorized(IUser? currentUser,
+    public Attempt<string?> IsAuthorized(
+        IUser? currentUser,
         IUser? savingUser,
-        IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds,
+        IEnumerable<int>? startContentIds,
+        IEnumerable<int>? startMediaIds,
         IEnumerable<string>? userGroupAliases)
     {
         var currentIsAdmin = currentUser?.IsAdmin() ?? false;
 
         // a) A non-admin cannot save an admin
-
         if (savingUser != null)
         {
             if (savingUser.IsAdmin() && currentIsAdmin == false)
@@ -54,21 +54,20 @@ public class UserEditorAuthorizationHelper
 
         // b) If a start node is changing, a user cannot set a start node on another user that they don't have access to, this even goes for admins
 
-        //only validate any start nodes that have changed.
-        //a user can remove any start nodes and add start nodes that they have access to
-        //but they cannot add a start node that they do not have access to
-
-        IEnumerable<int> changedStartContentIds = savingUser == null
+        // only validate any start nodes that have changed.
+        // a user can remove any start nodes and add start nodes that they have access to
+        // but they cannot add a start node that they do not have access to
+        IEnumerable<int>? changedStartContentIds = savingUser == null
             ? startContentIds
             : startContentIds == null || savingUser.StartContentIds is null
                 ? null
                 : startContentIds.Except(savingUser.StartContentIds).ToArray();
-        IEnumerable<int> changedStartMediaIds = savingUser == null
+        IEnumerable<int>? changedStartMediaIds = savingUser == null
             ? startMediaIds
             : startMediaIds == null || savingUser.StartMediaIds is null
                 ? null
                 : startMediaIds.Except(savingUser.StartMediaIds).ToArray();
-        Attempt<string> pathResult = currentUser is null
+        Attempt<string?> pathResult = currentUser is null
             ? Attempt<string?>.Fail()
             : AuthorizePath(currentUser, changedStartContentIds, changedStartMediaIds);
         if (pathResult == false)
@@ -77,10 +76,9 @@ public class UserEditorAuthorizationHelper
         }
 
         // c) an admin can manage any group or section access
-
         if (currentIsAdmin)
         {
-            return Attempt<string>.Succeed();
+            return Attempt<string?>.Succeed();
         }
 
         if (userGroupAliases != null)
@@ -101,11 +99,10 @@ public class UserEditorAuthorizationHelper
                                     "', the current user is not part of them or admin");
             }
 
-            //only validate any groups that have changed.
-            //a non-admin user can remove groups and add groups that they have access to
-            //but they cannot add a group that they do not have access to or that grants them
-            //path or section access that they don't have access to.
-
+            // only validate any groups that have changed.
+            // a non-admin user can remove groups and add groups that they have access to
+            // but they cannot add a group that they do not have access to or that grants them
+            // path or section access that they don't have access to.
             var newGroups = savingUser == null
                 ? savingGroupAliases
                 : savingGroupAliases.Except(savingUser.Groups.Select(x => x.Alias)).ToArray();
@@ -129,8 +126,7 @@ public class UserEditorAuthorizationHelper
         return Attempt<string?>.Succeed();
     }
 
-    private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds,
-        IEnumerable<int>? startMediaIds)
+    private Attempt<string?> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
     {
         if (startContentIds != null)
         {
@@ -138,7 +134,8 @@ public class UserEditorAuthorizationHelper
             {
                 if (contentId == Constants.System.Root)
                 {
-                    var hasAccess = ContentPermissions.HasPathAccess("-1",
+                    var hasAccess = ContentPermissions.HasPathAccess(
+                        "-1",
                         currentUser.CalculateContentStartNodeIds(_entityService, _appCaches),
                         Constants.System.RecycleBinContent);
                     if (hasAccess == false)
@@ -148,7 +145,7 @@ public class UserEditorAuthorizationHelper
                 }
                 else
                 {
-                    IContent content = _contentService.GetById(contentId);
+                    IContent? content = _contentService.GetById(contentId);
                     if (content == null)
                     {
                         continue;
@@ -170,7 +167,8 @@ public class UserEditorAuthorizationHelper
             {
                 if (mediaId == Constants.System.Root)
                 {
-                    var hasAccess = ContentPermissions.HasPathAccess("-1",
+                    var hasAccess = ContentPermissions.HasPathAccess(
+                        "-1",
                         currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches),
                         Constants.System.RecycleBinMedia);
                     if (hasAccess == false)
@@ -180,7 +178,7 @@ public class UserEditorAuthorizationHelper
                 }
                 else
                 {
-                    IMedia media = _mediaService.GetById(mediaId);
+                    IMedia? media = _mediaService.GetById(mediaId);
                     if (media == null)
                     {
                         continue;

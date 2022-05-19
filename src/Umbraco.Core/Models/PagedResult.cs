@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -25,13 +25,17 @@ public abstract class PagedResult
         }
     }
 
-    [DataMember(Name = "pageNumber")] public long PageNumber { get; private set; }
+    [DataMember(Name = "pageNumber")]
+    public long PageNumber { get; private set; }
 
-    [DataMember(Name = "pageSize")] public long PageSize { get; private set; }
+    [DataMember(Name = "pageSize")]
+    public long PageSize { get; private set; }
 
-    [DataMember(Name = "totalPages")] public long TotalPages { get; private set; }
+    [DataMember(Name = "totalPages")]
+    public long TotalPages { get; private set; }
 
-    [DataMember(Name = "totalItems")] public long TotalItems { get; private set; }
+    [DataMember(Name = "totalItems")]
+    public long TotalItems { get; private set; }
 
     /// <summary>
     ///     Calculates the skip size based on the paged parameters specified

@@ -26,6 +26,16 @@ public sealed class UriUtility
     // will be "" or "/foo"
     public string? AppPathPrefix => _appPathPrefix;
 
+    // adds the virtual directory if any
+    // see also VirtualPathUtility.ToAbsolute
+    // TODO: Does this do anything differently than IHostingEnvironment.ToAbsolute? Seems it does less, maybe should be removed?
+    public string ToAbsolute(string url)
+    {
+        // return ResolveUrl(url);
+        url = url.TrimStart(Constants.CharArrays.Tilde);
+        return _appPathPrefix + url;
+    }
+
     // internal for unit testing only
     internal void SetAppDomainAppVirtualPath(string appPath)
     {
@@ -40,16 +50,6 @@ public sealed class UriUtility
     internal void ResetAppDomainAppVirtualPath(IHostingEnvironment hostingEnvironment) =>
         SetAppDomainAppVirtualPath(hostingEnvironment.ApplicationVirtualPath);
 
-    // adds the virtual directory if any
-    // see also VirtualPathUtility.ToAbsolute
-    // TODO: Does this do anything differently than IHostingEnvironment.ToAbsolute? Seems it does less, maybe should be removed?
-    public string ToAbsolute(string url)
-    {
-        //return ResolveUrl(url);
-        url = url.TrimStart(Constants.CharArrays.Tilde);
-        return _appPathPrefix + url;
-    }
-
     // strips the virtual directory if any
     // see also VirtualPathUtility.ToAppRelative
     public string ToAppRelative(string virtualPath)
@@ -58,7 +58,7 @@ public sealed class UriUtility
                                        && (virtualPath.Length == _appPathPrefix.Length ||
                                            virtualPath[_appPathPrefix.Length] == '/'))
         {
-            virtualPath = virtualPath.Substring(_appPathPrefix.Length);
+            virtualPath = virtualPath[_appPathPrefix.Length..];
         }
 
         if (virtualPath.Length == 0)
@@ -123,7 +123,6 @@ public sealed class UriUtility
     // if browsing http://example.com/sub/page1.aspx then
     // ResolveUrl("page2.aspx") returns "/page2.aspx"
     // Page.ResolveUrl("page2.aspx") returns "/sub/page2.aspx" (relative...)
-    //
     public string ResolveUrl(string relativeUrl)
     {
         if (relativeUrl == null)
@@ -148,7 +147,7 @@ public sealed class UriUtility
 
         var sbUrl = new StringBuilder();
         sbUrl.Append(_appPathPrefix);
-        if (sbUrl.Length == 0 || sbUrl[sbUrl.Length - 1] != '/')
+        if (sbUrl.Length == 0 || sbUrl[^1] != '/')
         {
             sbUrl.Append('/');
         }
@@ -160,7 +159,7 @@ public sealed class UriUtility
             && relativeUrl[0] == '~'
             && (relativeUrl[1] == '/' || relativeUrl[1] == '\\'))
         {
-            relativeUrl = relativeUrl.Substring(2);
+            relativeUrl = relativeUrl[2..];
             foundSlash = true;
         }
         else
@@ -204,7 +203,6 @@ public sealed class UriUtility
     }
 
     #endregion
-
 
     /// <summary>
     ///     Returns an full URL with the host, port, etc...

@@ -17,7 +17,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     private static readonly List<string> PropertiesToExclude = new()
     {
         Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
-        Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
+        Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture),
     };
 
     private readonly IMemberService _memberService;
@@ -46,8 +46,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
             ? typeof(IPublishedContent)
             : typeof(IEnumerable<IPublishedContent>);
 
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-        object? source, bool preview)
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
         {
@@ -56,7 +55,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
 
         if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
         {
-            Udi[] nodeIds = source.ToString()?
+            Udi[]? nodeIds = source.ToString()?
                 .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(UdiParser.Parse)
                 .ToArray();
@@ -66,8 +65,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
         return null;
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-        PropertyCacheLevel cacheLevel, object? source, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
         if (source == null)
         {
@@ -90,8 +88,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
                     IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                     foreach (Udi udi in udis)
                     {
-                        var guidUdi = udi as GuidUdi;
-                        if (guidUdi is null)
+                        if (udi is not GuidUdi guidUdi)
                         {
                             continue;
                         }
@@ -100,17 +97,25 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
                         switch (udi.EntityType)
                         {
                             case Constants.UdiEntityType.Document:
-                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType,
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
                                     UmbracoObjectTypes.Document,
                                     id => publishedSnapshot.Content?.GetById(guidUdi.Guid));
                                 break;
                             case Constants.UdiEntityType.Media:
-                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType,
-                                    UmbracoObjectTypes.Media, id => publishedSnapshot.Media?.GetById(guidUdi.Guid));
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
+                                    UmbracoObjectTypes.Media,
+                                    id => publishedSnapshot.Media?.GetById(guidUdi.Guid));
                                 break;
                             case Constants.UdiEntityType.Member:
-                                multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType,
-                                    UmbracoObjectTypes.Member, id =>
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
+                                    UmbracoObjectTypes.Member,
+                                    id =>
                                     {
                                         IMember? m = _memberService.GetByKey(guidUdi.Guid);
                                         if (m == null)
@@ -151,6 +156,9 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
         return source;
     }
 
+    private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
+        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
+
     /// <summary>
     ///     Attempt to get an IPublishedContent instance based on ID and content type
     /// </summary>
@@ -162,8 +170,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     ///     The requested content, or null if either it does not exist or <paramref name="actualType" /> does not match
     ///     <paramref name="expectedType" />
     /// </returns>
-    private IPublishedContent? GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType,
-        UmbracoObjectTypes expectedType, Func<T, IPublishedContent?> contentFetcher)
+    private IPublishedContent? GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent?> contentFetcher)
     {
         // is the actual type supported by the content fetcher?
         if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
@@ -173,7 +180,7 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
         }
 
         // attempt to get the content
-        IPublishedContent content = contentFetcher(nodeId);
+        IPublishedContent? content = contentFetcher(nodeId);
         if (content != null)
         {
             // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
@@ -182,7 +189,4 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
 
         return content;
     }
-
-    private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
-        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
 }

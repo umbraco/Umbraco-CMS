@@ -18,6 +18,10 @@ namespace Umbraco.Cms.Core.Services;
 
 public class NotificationService : INotificationService
 {
+    // manage notifications
+    // ideally, would need to use IBackgroundTasks - but they are not part of Core!
+    private static readonly object Locker = new();
+
     private readonly IContentService _contentService;
     private readonly ContentSettings _contentSettings;
     private readonly IEmailSender _emailSender;
@@ -29,10 +33,17 @@ public class NotificationService : INotificationService
     private readonly ICoreScopeProvider _uowProvider;
     private readonly IUserService _userService;
 
-    public NotificationService(ICoreScopeProvider provider, IUserService userService, IContentService contentService,
+    public NotificationService(
+        ICoreScopeProvider provider,
+        IUserService userService,
+        IContentService contentService,
         ILocalizationService localizationService,
-        ILogger<NotificationService> logger, IIOHelper ioHelper, INotificationsRepository notificationsRepository,
-        IOptions<GlobalSettings> globalSettings, IOptions<ContentSettings> contentSettings, IEmailSender emailSender)
+        ILogger<NotificationService> logger,
+        IIOHelper ioHelper,
+        INotificationsRepository notificationsRepository,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<ContentSettings> contentSettings,
+        IEmailSender emailSender)
     {
         _notificationsRepository = notificationsRepository;
         _globalSettings = globalSettings.Value;
@@ -56,20 +67,24 @@ public class NotificationService : INotificationService
     /// <param name="siteUri"></param>
     /// <param name="createSubject"></param>
     /// <param name="createBody"></param>
-    public void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string? action,
-        string? actionName, Uri siteUri,
+    public void SendNotifications(
+        IUser operatingUser,
+        IEnumerable<IContent> entities,
+        string? action,
+        string? actionName,
+        Uri siteUri,
         Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
         Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody)
     {
         var entitiesL = entities.ToList();
 
-        //exit if there are no entities
+        // exit if there are no entities
         if (entitiesL.Count == 0)
         {
             return;
         }
 
-        //put all entity's paths into a list with the same indices
+        // put all entity's paths into a list with the same indices
         var paths = entitiesL.Select(x =>
                 x.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                     .ToArray())
@@ -85,8 +100,7 @@ public class NotificationService : INotificationService
         {
             // users are returned ordered by id, notifications are returned ordered by user id
             var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-            var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(),
-                Constants.ObjectTypes.Document)?.ToList();
+            var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document)?.ToList();
             if (notifications is null || notifications.Count == 0)
             {
                 break;
@@ -118,8 +132,7 @@ public class NotificationService : INotificationService
                     }
 
                     // queue notification
-                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, content,
-                        prevVersionDictionary[content.Id], actionName, siteUri, createSubject, createBody);
+                    NotificationRequest req = CreateNotificationRequest(operatingUser, user, content, prevVersionDictionary[content.Id], actionName, siteUri, createSubject, createBody);
                     Enqueue(req);
                 }
 
@@ -128,7 +141,8 @@ public class NotificationService : INotificationService
                 do
                 {
                     i++;
-                } while (i < notifications.Count && notifications[i].UserId == user.Id);
+                }
+                while (i < notifications.Count && notifications[i].UserId == user.Id);
 
                 if (i >= notifications.Count)
                 {
@@ -138,7 +152,8 @@ public class NotificationService : INotificationService
 
             // load more users if any
             id = users.Count == pagesz ? users.Last().Id + 1 : -1;
-        } while (id > 0);
+        }
+        while (id > 0);
     }
 
     /// <summary>
@@ -171,7 +186,7 @@ public class NotificationService : INotificationService
             return null;
         }
 
-        IEnumerable<Notification> userNotifications = GetUserNotifications(user);
+        IEnumerable<Notification>? userNotifications = GetUserNotifications(user);
         return FilterUserNotificationsByPath(userNotifications, path);
     }
 
@@ -269,6 +284,21 @@ public class NotificationService : INotificationService
     }
 
     /// <summary>
+    ///     Filters a userNotifications collection by a path
+    /// </summary>
+    /// <param name="userNotifications"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public IEnumerable<Notification>? FilterUserNotificationsByPath(
+        IEnumerable<Notification>? userNotifications,
+        string path)
+    {
+        var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+        return userNotifications
+            ?.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
+    }
+
+    /// <summary>
     ///     Gets the previous version to the latest version of the content item if there is one
     /// </summary>
     /// <param name="contentId"></param>
@@ -283,8 +313,7 @@ public class NotificationService : INotificationService
         return _contentService.GetVersion(allVersions[prevVersionIndex]);
     }
 
-    private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action,
-        IEnumerable<int> nodeIds, Guid objectType)
+    private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
         using (ICoreScope scope = _uowProvider.CreateCoreScope(autoComplete: true))
         {
@@ -293,17 +322,22 @@ public class NotificationService : INotificationService
     }
 
     /// <summary>
-    ///     Filters a userNotifications collection by a path
+    ///     Replaces the HTML symbols with the character equivalent.
     /// </summary>
-    /// <param name="userNotifications"></param>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    public IEnumerable<Notification>? FilterUserNotificationsByPath(IEnumerable<Notification>? userNotifications,
-        string path)
+    /// <param name="oldString">The old string.</param>
+    private static void ReplaceHtmlSymbols(ref string? oldString)
     {
-        var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
-        return userNotifications
-            ?.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
+        if (oldString.IsNullOrWhiteSpace())
+        {
+            return;
+        }
+
+        oldString = oldString!.Replace("&nbsp;", " ");
+        oldString = oldString.Replace("&rsquo;", "'");
+        oldString = oldString.Replace("&amp;", "&");
+        oldString = oldString.Replace("&ldquo;", "“");
+        oldString = oldString.Replace("&rdquo;", "”");
+        oldString = oldString.Replace("&quot;", "\"");
     }
 
     #region private methods
@@ -322,7 +356,10 @@ public class NotificationService : INotificationService
     /// <param name="siteUri"></param>
     /// <param name="createSubject">Callback to create the mail subject</param>
     /// <param name="createBody">Callback to create the mail body</param>
-    private NotificationRequest CreateNotificationRequest(IUser performingUser, IUser mailingUser, IContent content,
+    private NotificationRequest CreateNotificationRequest(
+        IUser performingUser,
+        IUser mailingUser,
+        IContent content,
         IContentBase? oldDoc,
         string? actionName,
         Uri siteUri,
@@ -366,29 +403,28 @@ public class NotificationService : INotificationService
         {
             if (!_contentSettings.Notifications.DisableHtmlEmail)
             {
-                //create the HTML summary for invariant content
+                // create the HTML summary for invariant content
 
-                //list all of the property values like we used to
+                // list all of the property values like we used to
                 summary.Append("<table style=\"width: 100 %; \">");
                 foreach (IProperty p in content.Properties)
                 {
                     // TODO: doesn't take into account variants
-
-                    var newText = p.GetValue() != null ? p.GetValue()?.ToString() : "";
+                    var newText = p.GetValue() != null ? p.GetValue()?.ToString() : string.Empty;
                     var oldText = newText;
 
                     // check if something was changed and display the changes otherwise display the fields
                     if (oldDoc?.Properties.Contains(p.PropertyType.Alias) ?? false)
                     {
-                        IProperty oldProperty = oldDoc.Properties[p.PropertyType.Alias];
-                        oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : "";
+                        IProperty? oldProperty = oldDoc.Properties[p.PropertyType.Alias];
+                        oldText = oldProperty?.GetValue() != null ? oldProperty.GetValue()?.ToString() : string.Empty;
 
                         // replace HTML with char equivalent
                         ReplaceHtmlSymbols(ref oldText);
                         ReplaceHtmlSymbols(ref newText);
                     }
 
-                    //show the values
+                    // show the values
                     summary.Append("<tr>");
                     summary.Append(
                         "<th style='text-align: left; vertical-align: top; width: 25%;border-bottom: 1px solid #CCC'>");
@@ -405,13 +441,11 @@ public class NotificationService : INotificationService
         }
         else if (content.ContentType.VariesByCulture())
         {
-            //it's variant, so detect what cultures have changed
-
+            // it's variant, so detect what cultures have changed
             if (!_contentSettings.Notifications.DisableHtmlEmail)
             {
-                //Create the HTML based summary (ul of culture names)
-
-                IEnumerable<string> culturesChanged = content.CultureInfos?.Values.Where(x => x.WasDirty())
+                // Create the HTML based summary (ul of culture names)
+                IEnumerable<string>? culturesChanged = content.CultureInfos?.Values.Where(x => x.WasDirty())
                     .Select(x => x.Culture)
                     .Select(_localizationService.GetLanguageByIsoCode)
                     .WhereNotNull()
@@ -431,8 +465,7 @@ public class NotificationService : INotificationService
             }
             else
             {
-                //Create the text based summary (csv of culture names)
-
+                // Create the text based summary (csv of culture names)
                 var culturesChanged = string.Join(", ", content.CultureInfos!.Values.Where(x => x.WasDirty())
                     .Select(x => x.Culture)
                     .Select(_localizationService.GetLanguageByIsoCode)
@@ -446,7 +479,7 @@ public class NotificationService : INotificationService
         }
         else
         {
-            //not supported yet...
+            // not supported yet...
             throw new NotSupportedException();
         }
 
@@ -462,8 +495,10 @@ public class NotificationService : INotificationService
             actionName,
             content.Name,
             content.Id.ToString(CultureInfo.InvariantCulture),
-            string.Format("{2}://{0}/{1}",
+            string.Format(
+                "{2}://{0}/{1}",
                 string.Concat(siteUri.Authority),
+
                 // TODO: RE-enable this so we can have a nice URL
                 /*umbraco.library.NiceUrl(documentObject.Id))*/
                 string.Concat(content.Id, ".aspx"),
@@ -475,7 +510,7 @@ public class NotificationService : INotificationService
         var fromMail = _contentSettings.Notifications.Email ?? _globalSettings.Smtp?.From;
 
         var subject = createSubject((mailingUser, subjectVars));
-        var body = "";
+        var body = string.Empty;
         var isBodyHtml = false;
 
         if (_contentSettings.Notifications.DisableHtmlEmail)
@@ -486,7 +521,8 @@ public class NotificationService : INotificationService
         {
             isBodyHtml = true;
             body =
-                string.Concat(@"<html><head>
+                string.Concat(
+                    @"<html><head>
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
 ", createBody((user: mailingUser, body: bodyVars, true)));
@@ -519,29 +555,6 @@ public class NotificationService : INotificationService
         return text;
     }
 
-    /// <summary>
-    ///     Replaces the HTML symbols with the character equivalent.
-    /// </summary>
-    /// <param name="oldString">The old string.</param>
-    private static void ReplaceHtmlSymbols(ref string? oldString)
-    {
-        if (oldString.IsNullOrWhiteSpace())
-        {
-            return;
-        }
-
-        oldString = oldString!.Replace("&nbsp;", " ");
-        oldString = oldString.Replace("&rsquo;", "'");
-        oldString = oldString.Replace("&amp;", "&");
-        oldString = oldString.Replace("&ldquo;", "“");
-        oldString = oldString.Replace("&rdquo;", "”");
-        oldString = oldString.Replace("&quot;", "\"");
-    }
-
-    // manage notifications
-    // ideally, would need to use IBackgroundTasks - but they are not part of Core!
-
-    private static readonly object Locker = new();
     private static readonly BlockingCollection<NotificationRequest> Queue = new();
     private static volatile bool _running;
 
@@ -565,40 +578,20 @@ public class NotificationService : INotificationService
         }
     }
 
-    private class NotificationRequest
-    {
-        public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
-        {
-            Mail = mail;
-            Action = action;
-            UserName = userName;
-            Email = email;
-        }
-
-        public EmailMessage Mail { get; }
-
-        public string? Action { get; }
-
-        public string? UserName { get; }
-
-        public string? Email { get; }
-    }
-
     private void Process(BlockingCollection<NotificationRequest> notificationRequests) =>
         ThreadPool.QueueUserWorkItem(state =>
         {
             _logger.LogDebug("Begin processing notifications.");
             while (true)
             {
-                NotificationRequest? request;
-                while (notificationRequests.TryTake(out request, 8 * 1000)) // stay on for 8s
+                // stay on for 8s
+                while (notificationRequests.TryTake(out NotificationRequest? request, 8 * 1000))
                 {
                     try
                     {
                         _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
                             .GetResult();
-                        _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action,
-                            request.UserName, request.Email);
+                        _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                     }
                     catch (Exception ex)
                     {
@@ -620,6 +613,25 @@ public class NotificationService : INotificationService
 
             _logger.LogDebug("Done processing notifications.");
         });
+
+    private class NotificationRequest
+    {
+        public NotificationRequest(EmailMessage mail, string? action, string? userName, string? email)
+        {
+            Mail = mail;
+            Action = action;
+            UserName = userName;
+            Email = email;
+        }
+
+        public EmailMessage Mail { get; }
+
+        public string? Action { get; }
+
+        public string? UserName { get; }
+
+        public string? Email { get; }
+    }
 
     #endregion
 }

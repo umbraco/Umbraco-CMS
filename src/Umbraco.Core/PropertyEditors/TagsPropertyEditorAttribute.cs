@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -53,6 +53,6 @@ public class TagsPropertyEditorAttribute : Attribute
     /// <summary>
     ///     Gets the type of the dynamic configuration provider.
     /// </summary>
-    //TODO: This is not used and should be implemented in a nicer way, see https://github.com/umbraco/Umbraco-CMS/issues/6017#issuecomment-516253562
+    // TODO: This is not used and should be implemented in a nicer way, see https://github.com/umbraco/Umbraco-CMS/issues/6017#issuecomment-516253562
     public Type? TagsConfigurationProviderType { get; }
 }

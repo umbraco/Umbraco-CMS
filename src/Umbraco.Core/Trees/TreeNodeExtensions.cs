@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Trees;
@@ -8,14 +8,6 @@ namespace Umbraco.Extensions;
 public static class TreeNodeExtensions
 {
     internal const string LegacyJsCallbackKey = "jsClickCallback";
-
-    /// <summary>
-    ///     Legacy tree node's assign a JS method callback for when an item is clicked, this method facilitates that.
-    /// </summary>
-    /// <param name="treeNode"></param>
-    /// <param name="jsCallback"></param>
-    internal static void AssignLegacyJsCallback(this TreeNode treeNode, string jsCallback) =>
-        treeNode.AdditionalData[LegacyJsCallbackKey] = jsCallback;
 
     /// <summary>
     ///     Sets the node style to show that it is a container type
@@ -28,6 +20,14 @@ public static class TreeNodeExtensions
             treeNode.CssClasses.Add("is-container");
         }
     }
+
+    /// <summary>
+    ///     Legacy tree node's assign a JS method callback for when an item is clicked, this method facilitates that.
+    /// </summary>
+    /// <param name="treeNode"></param>
+    /// <param name="jsCallback"></param>
+    internal static void AssignLegacyJsCallback(this TreeNode treeNode, string jsCallback) =>
+        treeNode.AdditionalData[LegacyJsCallbackKey] = jsCallback;
 
     /// <summary>
     ///     Sets the node style to show that it is currently protected publicly

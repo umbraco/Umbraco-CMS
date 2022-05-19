@@ -6,12 +6,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public static class RepositoryCacheKeys
 {
     // used to cache keys so we don't keep allocating strings
-    private static readonly Dictionary<Type, string> s_keys = new();
+    private static readonly Dictionary<Type, string> Keys = new();
 
     public static string GetKey<T>()
     {
         Type type = typeof(T);
-        return s_keys.TryGetValue(type, out var key) ? key : s_keys[type] = "uRepo_" + type.Name + "_";
+        return Keys.TryGetValue(type, out var key) ? key : Keys[type] = "uRepo_" + type.Name + "_";
     }
 
     public static string GetKey<T, TId>(TId? id)

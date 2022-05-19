@@ -36,7 +36,8 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -112,10 +113,8 @@ public class XmlHelper
         // to be returned as a DynamicXml and element names such as "value-item" are
         // invalid and must be converted to "valueitem". But we don't have that sort of
         // problem here - and we don't need to bother with dashes nor dots, etc.
-
         doc = null;
-        var xml = value as string;
-        if (xml == null)
+        if (value is not string xml)
         {
             return false; // no a string
         }
@@ -138,19 +137,17 @@ public class XmlHelper
         XPathNavigator nav = doc!.CreateNavigator();
         if (nav.MoveToFirstChild())
         {
-            //SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
+            // SD: This used to do this but the razor macros and the entire razor macros section is gone, it was all legacy, it seems this method isn't even
             // used apart from for tests so don't think this matters. In any case, we no longer check for this!
 
-            //var name = nav.LocalName; // must not match an excluded tag
-            //if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
-
+            // var name = nav.LocalName; // must not match an excluded tag
+            // if (UmbracoConfig.For.UmbracoSettings().Scripting.NotDynamicXmlDocumentElements.All(x => x.Element.InvariantEquals(name) == false)) return true;
             return true;
         }
 
         doc = null;
         return false;
     }
-
 
     /// <summary>
     ///     Sorts the children of a parentNode.
@@ -163,7 +160,7 @@ public class XmlHelper
         string childNodesXPath,
         Func<XmlNode, int> orderBy)
     {
-        XmlNode[] sortedChildNodes = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
+        XmlNode[]? sortedChildNodes = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
             .OrderBy(orderBy)
             .ToArray();
 
@@ -177,7 +174,6 @@ public class XmlHelper
             }
         }
     }
-
 
     /// <summary>
     ///     Sorts a single child node of a parentNode.
@@ -198,7 +194,7 @@ public class XmlHelper
         Func<XmlNode, int> orderBy)
     {
         var nodeSortOrder = orderBy(node);
-        Tuple<XmlNode, int>[] childNodesAndOrder = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
+        Tuple<XmlNode, int>[]? childNodesAndOrder = parentNode.SelectNodes(childNodesXPath)?.Cast<XmlNode>()
             .Select(x => Tuple.Create(x, orderBy(x))).ToArray();
 
         // only one node = node is in the right place already, obviously
@@ -240,23 +236,23 @@ public class XmlHelper
         return false;
     }
 
-
     /// <summary>
     ///     Opens a file as a XmlDocument.
     /// </summary>
     /// <param name="filePath">The relative file path. ie. /config/umbraco.config</param>
-    /// <param name="ioHelper"></param>
+    /// <param name="hostingEnvironment"></param>
     /// <returns>Returns a XmlDocument class</returns>
     public static XmlDocument OpenAsXmlDocument(string filePath, IHostingEnvironment hostingEnvironment)
     {
         using (var reader =
                new XmlTextReader(hostingEnvironment.MapPathContentRoot(filePath))
                {
-                   WhitespaceHandling = WhitespaceHandling.All
+                   WhitespaceHandling = WhitespaceHandling.All,
                })
         {
             var xmlDoc = new XmlDocument();
-            //Load the file into the XmlDocument
+
+            // Load the file into the XmlDocument
             xmlDoc.Load(reader);
 
             return xmlDoc;
@@ -284,7 +280,8 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
@@ -314,11 +311,12 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
-        XmlNode temp = xd.CreateNode(XmlNodeType.Element, name, "");
+        XmlNode temp = xd.CreateNode(XmlNodeType.Element, name, string.Empty);
         temp.AppendChild(xd.CreateTextNode(value));
         return temp;
     }
@@ -350,11 +348,12 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
-        XmlNode child = parent.SelectSingleNode(name);
+        XmlNode? child = parent.SelectSingleNode(name);
         if (child != null)
         {
             child.InnerText = value;
@@ -391,11 +390,12 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
-        XmlNode child = parent.SelectSingleNode(name) ?? xd.CreateNode(XmlNodeType.Element, name, "");
+        XmlNode child = parent.SelectSingleNode(name) ?? xd.CreateNode(XmlNodeType.Element, name, string.Empty);
         child.InnerXml = value;
         return child;
     }
@@ -421,11 +421,12 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
-        XmlNode temp = xd.CreateNode(XmlNodeType.Element, name, "");
+        XmlNode temp = xd.CreateNode(XmlNodeType.Element, name, string.Empty);
         temp.AppendChild(xd.CreateCDataSection(value));
         return temp;
     }
@@ -457,11 +458,12 @@ public class XmlHelper
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(name));
         }
 
-        XmlNode child = parent.SelectSingleNode(name);
+        XmlNode? child = parent.SelectSingleNode(name);
         if (child != null)
         {
             child.InnerXml = "<![CDATA[" + value + "]]>";
@@ -514,10 +516,11 @@ public class XmlHelper
     public static Dictionary<string, string> GetAttributesFromElement(string tag)
     {
         MatchCollection m =
-            Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
-                RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            Regex.Matches(tag, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+
         // fix for issue 14862: return lowercase attributes for case insensitive matching
-        var d = m.ToDictionary(attributeSet => attributeSet.Groups["attributeName"].Value.ToString().ToLower(),
+        var d = m.ToDictionary(
+            attributeSet => attributeSet.Groups["attributeName"].Value.ToString().ToLower(),
             attributeSet => attributeSet.Groups["attributeValue"].Value.ToString());
         return d;
     }

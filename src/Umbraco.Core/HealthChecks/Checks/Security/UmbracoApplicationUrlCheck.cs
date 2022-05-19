@@ -18,7 +18,8 @@ public class UmbracoApplicationUrlCheck : HealthCheck
     private readonly ILocalizedTextService _textService;
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
 
-    public UmbracoApplicationUrlCheck(ILocalizedTextService textService,
+    public UmbracoApplicationUrlCheck(
+        ILocalizedTextService textService,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
     {
         _textService = textService;
@@ -52,7 +53,7 @@ public class UmbracoApplicationUrlCheck : HealthCheck
         }
         else
         {
-            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", new[] {url});
+            resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", new[] { url });
             resultType = StatusResultType.Success;
             success = true;
         }
@@ -62,7 +63,7 @@ public class UmbracoApplicationUrlCheck : HealthCheck
             ResultType = resultType,
             ReadMoreLink = success
                 ? null
-                : Constants.HealthChecks.DocumentationLinks.Security.UmbracoApplicationUrlCheck
+                : Constants.HealthChecks.DocumentationLinks.Security.UmbracoApplicationUrlCheck,
         };
     }
 }

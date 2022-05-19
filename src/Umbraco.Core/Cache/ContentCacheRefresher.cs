@@ -39,7 +39,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // we could try to have a mechanism to notify the PublishedCachesService
         // and figure out whether published items were modified or not... keep it
         // simple for now, just clear the whole thing
-
         appCaches.ClearPartialViewCache();
 
         appCaches.IsolatedCaches.ClearCache<PublicAccessEntry>();
@@ -70,9 +69,10 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         foreach (JsonPayload payload in payloads.Where(x => x.Id != default))
         {
-            //By INT Id
+            // By INT Id
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
-            //By GUID Key
+
+            // By GUID Key
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
             _idKeyMap.ClearCache(payload.Id);
@@ -84,7 +84,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
 
-            //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
+            // if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
@@ -101,8 +101,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 // TODO: this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
                 // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
                 // DomainCacheRefresher?
-
                 ClearAllIsolatedCacheByEntityType<IDomain>();
+
                 // note: must do what's above FIRST else the repositories still have the old cached
                 // content and when the PublishedCachesService is notified of changes it does not see
                 // the new content...
@@ -118,9 +118,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         // TODO: what about this?
         // should rename it, and then, this is only for Deploy, and then, ???
-        //if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
-        //  ...
-
+        // if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
+        //   ...
         NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
 
         base.Refresh(payloads);
@@ -128,7 +127,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();
@@ -148,8 +146,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <param name="service"></param>
     /// <param name="appCaches"></param>
     /// <param name="payloads"></param>
-    internal static void NotifyPublishedSnapshotService(IPublishedSnapshotService service, AppCaches appCaches,
-        JsonPayload[] payloads)
+    internal static void NotifyPublishedSnapshotService(IPublishedSnapshotService service, AppCaches appCaches, JsonPayload[] payloads)
     {
         service.Notify(payloads, out _, out var publishedChanged);
 
@@ -170,7 +167,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
 
         public int Id { get; }
+
         public Guid? Key { get; }
+
         public TreeChangeTypes ChangeTypes { get; }
     }
 

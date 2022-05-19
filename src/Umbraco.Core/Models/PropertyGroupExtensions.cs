@@ -4,12 +4,21 @@ public static class PropertyGroupExtensions
 {
     private const char AliasSeparator = '/';
 
+    /// <summary>
+    ///     Gets the local alias.
+    /// </summary>
+    /// <param name="propertyGroup">The property group.</param>
+    /// <returns>
+    ///     The local alias.
+    /// </returns>
+    public static string? GetLocalAlias(this PropertyGroup propertyGroup) => GetLocalAlias(propertyGroup.Alias);
+
     internal static string? GetLocalAlias(string alias)
     {
         var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;
         if (lastIndex != -1)
         {
-            return alias?.Substring(lastIndex + 1);
+            return alias?[(lastIndex + 1)..];
         }
 
         return alias;
@@ -23,17 +32,8 @@ public static class PropertyGroupExtensions
             return null;
         }
 
-        return alias?.Substring(0, lastIndex);
+        return alias?[..lastIndex];
     }
-
-    /// <summary>
-    ///     Gets the local alias.
-    /// </summary>
-    /// <param name="propertyGroup">The property group.</param>
-    /// <returns>
-    ///     The local alias.
-    /// </returns>
-    public static string? GetLocalAlias(this PropertyGroup propertyGroup) => GetLocalAlias(propertyGroup.Alias);
 
     /// <summary>
     ///     Updates the local alias.

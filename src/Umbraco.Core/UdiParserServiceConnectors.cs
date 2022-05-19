@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Deploy;
 using Umbraco.Extensions;
 
@@ -6,14 +6,14 @@ namespace Umbraco.Cms.Core;
 
 public static class UdiParserServiceConnectors
 {
+    private static readonly object ScanLocker = new();
+
     // notes - see U4-10409
     // if this class is used during application pre-start it cannot scans the assemblies,
     // this is addressed by lazily-scanning, with the following caveats:
     // - parsing a root udi still requires a scan and therefore still breaks
     // - parsing an invalid udi ("umb://should-be-guid/<not-a-guid>") corrupts KnowUdiTypes
-
     private static volatile bool _scanned;
-    private static readonly object ScanLocker = new();
 
     /// <summary>
     ///     Scan for deploy <see cref="IServiceConnector" /> in assemblies for known UDI types.

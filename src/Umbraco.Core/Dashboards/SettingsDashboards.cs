@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
@@ -7,7 +7,7 @@ public class SettingsDashboard : IDashboard
 {
     public string Alias => "settingsWelcome";
 
-    public string[] Sections => new[] {"settings"};
+    public string[] Sections => new[] { "settings" };
 
     public string View => "views/dashboard/settings/settingsdashboardintro.html";
 

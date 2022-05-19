@@ -7,5 +7,5 @@ public enum ProvidedValueValidation
 {
     None = 1,
     Email = 2,
-    Regex = 3
+    Regex = 3,
 }

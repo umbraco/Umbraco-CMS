@@ -8,11 +8,10 @@ namespace Umbraco.Cms.Core.Packaging;
 /// </summary>
 public class PackageDefinitionXmlParser
 {
-    private static readonly IList<string> s_emptyStringList = new List<string>();
-    private static readonly IList<GuidUdi> s_emptyGuidUdiList = new List<GuidUdi>();
+    private static readonly IList<string> EmptyStringList = new List<string>();
+    private static readonly IList<GuidUdi> EmptyGuidUdiList = new List<GuidUdi>();
 
-
-    public PackageDefinition? ToPackageDefinition(XElement xml)
+    public PackageDefinition? ToPackageDefinition(XElement? xml)
     {
         if (xml == null)
         {
@@ -29,46 +28,46 @@ public class PackageDefinitionXmlParser
             ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
             MediaUdis =
                 xml.Element("media")?.Elements("nodeUdi").Select(x => (GuidUdi)UdiParser.Parse(x.Value)).ToList() ??
-                s_emptyGuidUdiList,
+                EmptyGuidUdiList,
             MediaLoadChildNodes = xml.Element("media")?.AttributeValue<bool>("loadChildNodes") ?? false,
             Macros =
                 xml.Element("macros")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             Templates =
                 xml.Element("templates")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             Stylesheets =
                 xml.Element("stylesheets")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             Scripts =
                 xml.Element("scripts")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             PartialViews =
                 xml.Element("partialViews")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             DocumentTypes =
                 xml.Element("documentTypes")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             MediaTypes =
-                xml.Element("mediaTypes")?.Value.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
-                    .ToList() ?? s_emptyStringList,
+                xml.Element("mediaTypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToList() ?? EmptyStringList,
             Languages =
                 xml.Element("languages")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             DictionaryItems =
                 xml.Element("dictionaryitems")?.Value
                     .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                s_emptyStringList,
+                EmptyStringList,
             DataTypes = xml.Element("datatypes")?.Value
                             .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ??
-                        s_emptyStringList
+                        EmptyStringList,
         };
 
         return retVal;
@@ -76,13 +75,15 @@ public class PackageDefinitionXmlParser
 
     public XElement ToXml(PackageDefinition def)
     {
-        var packageXml = new XElement("package",
+        var packageXml = new XElement(
+            "package",
             new XAttribute("id", def.Id),
             new XAttribute("name", def.Name ?? string.Empty),
             new XAttribute("packagePath", def.PackagePath ?? string.Empty),
             new XAttribute("packageGuid", def.PackageId),
             new XElement("datatypes", string.Join(",", def.DataTypes ?? Array.Empty<string>())),
-            new XElement("content",
+            new XElement(
+                "content",
                 new XAttribute("nodeId", def.ContentNodeId ?? string.Empty),
                 new XAttribute("loadChildNodes", def.ContentLoadChildNodes)),
             new XElement("templates", string.Join(",", def.Templates ?? Array.Empty<string>())),
@@ -97,8 +98,7 @@ public class PackageDefinitionXmlParser
             new XElement(
                 "media",
                 def.MediaUdis.Select(x => (object)new XElement("nodeUdi", x))
-                    .Union(new[] {new XAttribute("loadChildNodes", def.MediaLoadChildNodes)}))
-        );
+                    .Union(new[] { new XAttribute("loadChildNodes", def.MediaLoadChildNodes) })));
         return packageXml;
     }
 }

@@ -64,9 +64,7 @@ public static class UrlProviderExtensions
 
         // get all URLs for all cultures
         // in a HashSet, so de-duplicates too
-        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter,
-                     umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility,
-                     publishedUrlProvider))
+        foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider))
         {
             urls.Add(cultureUrl);
         }
@@ -155,8 +153,7 @@ public static class UrlProviderExtensions
                 // got a URL, deal with collisions, add URL
                 default:
                     // detect collisions, etc
-                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture,
-                        umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
+                    Attempt<UrlInfo?> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
                     if (hasCollision.Success && hasCollision.Result is not null)
                     {
                         result.Add(hasCollision.Result);
@@ -173,8 +170,7 @@ public static class UrlProviderExtensions
         return result;
     }
 
-    private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService,
-        ILocalizedTextService textService)
+    private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
     {
         // document has a published version yet its URL is "#" => a parent must be
         // unpublished, walk up the tree until we find it, and report.
@@ -182,7 +178,8 @@ public static class UrlProviderExtensions
         do
         {
             parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
-        } while (parent != null && parent.Published &&
+        }
+        while (parent != null && parent.Published &&
                  (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 
         if (parent == null)
@@ -194,11 +191,12 @@ public static class UrlProviderExtensions
         if (!parent.Published)
         {
             // totally not published
-            return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] {parent.Name}), culture);
+            return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
         }
 
         // culture not published
-        return UrlInfo.Message(textService.Localize("content", "parentCultureNotPublished", new[] {parent.Name}),
+        return UrlInfo.Message(
+            textService.Localize("content", "parentCultureNotPublished", new[] { parent.Name }),
             culture);
     }
 
@@ -253,7 +251,7 @@ public static class UrlProviderExtensions
             l.Reverse();
             var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent?.Id + ")";
 
-            var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] {s}), culture);
+            var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
             return Attempt.Succeed(urlInfo);
         }
 

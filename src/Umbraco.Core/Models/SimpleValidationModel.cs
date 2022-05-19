@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 public class SimpleValidationModel
 {
@@ -9,5 +9,6 @@ public class SimpleValidationModel
     }
 
     public string Message { get; }
+
     public IDictionary<string, object> ModelState { get; }
 }

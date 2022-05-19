@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using Umbraco.Cms.Core.Exceptions;
 
@@ -24,7 +24,8 @@ public class ModelType : Type
 
         if (string.IsNullOrWhiteSpace(contentTypeAlias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(contentTypeAlias));
         }
 
@@ -64,10 +65,6 @@ public class ModelType : Type
     /// <inheritdoc />
     public override string AssemblyQualifiedName => Name;
 
-    /// <inheritdoc />
-    public override string ToString()
-        => Name;
-
     /// <summary>
     ///     Gets the model type for a published element type.
     /// </summary>
@@ -75,6 +72,10 @@ public class ModelType : Type
     /// <returns>The model type for the published element type.</returns>
     public static ModelType For(string? alias)
         => new(alias);
+
+    /// <inheritdoc />
+    public override string ToString()
+        => Name;
 
     /// <summary>
     ///     Gets the actual CLR type by replacing model types, if any.
@@ -95,7 +96,7 @@ public class ModelType : Type
 
         if (type is ModelType modelType)
         {
-            if (modelTypes?.TryGetValue(modelType.ContentTypeAlias, out Type actualType) ?? false)
+            if (modelTypes?.TryGetValue(modelType.ContentTypeAlias, out Type? actualType) ?? false)
             {
                 return actualType;
             }
@@ -106,7 +107,7 @@ public class ModelType : Type
 
         if (type is ModelTypeArrayType arrayType)
         {
-            if (modelTypes?.TryGetValue(arrayType.ContentTypeAlias, out Type actualType) ?? false)
+            if (modelTypes?.TryGetValue(arrayType.ContentTypeAlias, out Type? actualType) ?? false)
             {
                 return actualType.MakeArrayType();
             }
@@ -138,52 +139,6 @@ public class ModelType : Type
     /// <returns>The actual CLR type name.</returns>
     public static string MapToName(Type type, Dictionary<string, string> map)
         => MapToName(type, map, false);
-
-    private static string MapToName(Type type, Dictionary<string, string> map, bool dictionaryIsInvariant)
-    {
-        // it may be that senders forgot to send an invariant dictionary (garbage-in)
-        if (!dictionaryIsInvariant)
-        {
-            map = new Dictionary<string, string>(map, StringComparer.InvariantCultureIgnoreCase);
-        }
-
-        if (type is ModelType modelType)
-        {
-            if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
-            {
-                return actualTypeName;
-            }
-
-            throw new InvalidOperationException(
-                $"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
-        }
-
-        if (type is ModelTypeArrayType arrayType)
-        {
-            if (map.TryGetValue(arrayType.ContentTypeAlias, out var actualTypeName))
-            {
-                return actualTypeName + "[]";
-            }
-
-            throw new InvalidOperationException(
-                $"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
-        }
-
-        if (type.IsGenericType == false)
-        {
-            return type.FullName!;
-        }
-
-        Type def = type.GetGenericTypeDefinition();
-        if (def == null)
-        {
-            throw new PanicException($"The type {type} has not generic type definition");
-        }
-
-        var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
-        var defFullName = def.FullName?.Substring(0, def.FullName.IndexOf('`'));
-        return defFullName + "<" + string.Join(", ", args) + ">";
-    }
 
     /// <summary>
     ///     Gets a value indicating whether two <see cref="Type" /> instances are equal.
@@ -234,21 +189,71 @@ public class ModelType : Type
     }
 
     /// <inheritdoc />
-    protected override TypeAttributes GetAttributeFlagsImpl()
-        => TypeAttributes.Class;
-
-    /// <inheritdoc />
     public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
         => Array.Empty<ConstructorInfo>();
 
     /// <inheritdoc />
-    protected override ConstructorInfo? GetConstructorImpl(BindingFlags bindingAttr, Binder? binder,
-        CallingConventions callConvention, Type[] types, ParameterModifier[]? modifiers)
-        => null;
-
-    /// <inheritdoc />
     public override Type[] GetInterfaces()
         => Array.Empty<Type>();
+
+    private static string MapToName(Type type, Dictionary<string, string> map, bool dictionaryIsInvariant)
+    {
+        // it may be that senders forgot to send an invariant dictionary (garbage-in)
+        if (!dictionaryIsInvariant)
+        {
+            map = new Dictionary<string, string>(map, StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        if (type is ModelType modelType)
+        {
+            if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
+            {
+                return actualTypeName;
+            }
+
+            throw new InvalidOperationException(
+                $"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
+        }
+
+        if (type is ModelTypeArrayType arrayType)
+        {
+            if (map.TryGetValue(arrayType.ContentTypeAlias, out var actualTypeName))
+            {
+                return actualTypeName + "[]";
+            }
+
+            throw new InvalidOperationException(
+                $"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
+        }
+
+        if (type.IsGenericType == false)
+        {
+            return type.FullName!;
+        }
+
+        Type def = type.GetGenericTypeDefinition();
+        if (def == null)
+        {
+            throw new PanicException($"The type {type} has not generic type definition");
+        }
+
+        var args = type.GetGenericArguments().Select(x => MapToName(x, map, true)).ToArray();
+        var defFullName = def.FullName?[..def.FullName.IndexOf('`')];
+        return defFullName + "<" + string.Join(", ", args) + ">";
+    }
+
+    /// <inheritdoc />
+    protected override TypeAttributes GetAttributeFlagsImpl()
+        => TypeAttributes.Class;
+
+    /// <inheritdoc />
+    protected override ConstructorInfo? GetConstructorImpl(
+        BindingFlags bindingAttr,
+        Binder? binder,
+        CallingConventions callConvention,
+        Type[] types,
+        ParameterModifier[]? modifiers)
+        => null;
 
     /// <inheritdoc />
     public override Type? GetInterface(string name, bool ignoreCase)
@@ -275,22 +280,32 @@ public class ModelType : Type
         => Array.Empty<PropertyInfo>();
 
     /// <inheritdoc />
-    protected override PropertyInfo? GetPropertyImpl(string name, BindingFlags bindingAttr, Binder? binder,
-        Type? returnType, Type[]? types, ParameterModifier[]? modifiers)
-        => null;
-
-    /// <inheritdoc />
     public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
         => Array.Empty<MethodInfo>();
 
     /// <inheritdoc />
-    protected override MethodInfo? GetMethodImpl(string name, BindingFlags bindingAttr, Binder? binder,
-        CallingConventions callConvention, Type[]? types, ParameterModifier[]? modifiers)
+    public override FieldInfo[] GetFields(BindingFlags bindingAttr)
+        => Array.Empty<FieldInfo>();
+
+    /// <inheritdoc />
+    protected override PropertyInfo? GetPropertyImpl(
+        string name,
+        BindingFlags bindingAttr,
+        Binder? binder,
+        Type? returnType,
+        Type[]? types,
+        ParameterModifier[]? modifiers)
         => null;
 
     /// <inheritdoc />
-    public override FieldInfo[] GetFields(BindingFlags bindingAttr)
-        => Array.Empty<FieldInfo>();
+    protected override MethodInfo? GetMethodImpl(
+        string name,
+        BindingFlags bindingAttr,
+        Binder? binder,
+        CallingConventions callConvention,
+        Type[]? types,
+        ParameterModifier[]? modifiers)
+        => null;
 
     /// <inheritdoc />
     public override FieldInfo? GetField(string name, BindingFlags bindingAttr)
@@ -317,6 +332,18 @@ public class ModelType : Type
         => null;
 
     /// <inheritdoc />
+    public override object InvokeMember(
+        string name,
+        BindingFlags invokeAttr,
+        Binder? binder,
+        object? target,
+        object?[]? args,
+        ParameterModifier[]? modifiers,
+        CultureInfo? culture,
+        string[]? namedParameters)
+        => throw new NotSupportedException();
+
+    /// <inheritdoc />
     protected override bool HasElementTypeImpl()
         => false;
 
@@ -339,11 +366,6 @@ public class ModelType : Type
     /// <inheritdoc />
     protected override bool IsCOMObjectImpl()
         => false;
-
-    /// <inheritdoc />
-    public override object InvokeMember(string name, BindingFlags invokeAttr, Binder? binder, object? target,
-        object?[]? args, ParameterModifier[]? modifiers, CultureInfo? culture, string[]? namedParameters)
-        => throw new NotSupportedException();
 
     /// <inheritdoc />
     public override Type MakeArrayType()
@@ -364,31 +386,42 @@ internal class ModelTypeArrayType : Type
     public string ContentTypeAlias { get; }
 
     public override Type UnderlyingSystemType => this;
+
     public override Type? BaseType => null;
 
     public override string Name { get; }
+
     public override Guid GUID { get; } = Guid.NewGuid();
+
     public override Module Module => GetType().Module; // hackish but FullName requires something
+
     public override Assembly Assembly => GetType().Assembly; // hackish but FullName requires something
+
     public override string FullName => Name;
+
     public override string Namespace => string.Empty;
+
     public override string AssemblyQualifiedName => Name;
 
     public override string ToString()
         => Name;
 
-    protected override TypeAttributes GetAttributeFlagsImpl()
-        => TypeAttributes.Class;
-
     public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr)
         => Array.Empty<ConstructorInfo>();
 
-    protected override ConstructorInfo? GetConstructorImpl(BindingFlags bindingAttr, Binder? binder,
-        CallingConventions callConvention, Type[] types, ParameterModifier[]? modifiers)
-        => null;
-
     public override Type[] GetInterfaces()
         => Array.Empty<Type>();
+
+    protected override TypeAttributes GetAttributeFlagsImpl()
+        => TypeAttributes.Class;
+
+    protected override ConstructorInfo? GetConstructorImpl(
+        BindingFlags bindingAttr,
+        Binder? binder,
+        CallingConventions callConvention,
+        Type[] types,
+        ParameterModifier[]? modifiers)
+        => null;
 
     public override Type? GetInterface(string name, bool ignoreCase)
         => null;
@@ -408,19 +441,29 @@ internal class ModelTypeArrayType : Type
     public override PropertyInfo[] GetProperties(BindingFlags bindingAttr)
         => Array.Empty<PropertyInfo>();
 
-    protected override PropertyInfo? GetPropertyImpl(string name, BindingFlags bindingAttr, Binder? binder,
-        Type? returnType, Type[]? types, ParameterModifier[]? modifiers)
-        => null;
-
     public override MethodInfo[] GetMethods(BindingFlags bindingAttr)
         => Array.Empty<MethodInfo>();
 
-    protected override MethodInfo? GetMethodImpl(string name, BindingFlags bindingAttr, Binder? binder,
-        CallingConventions callConvention, Type[]? types, ParameterModifier[]? modifiers)
-        => null;
-
     public override FieldInfo[] GetFields(BindingFlags bindingAttr)
         => Array.Empty<FieldInfo>();
+
+    protected override PropertyInfo? GetPropertyImpl(
+        string name,
+        BindingFlags bindingAttr,
+        Binder? binder,
+        Type? returnType,
+        Type[]? types,
+        ParameterModifier[]? modifiers)
+        => null;
+
+    protected override MethodInfo? GetMethodImpl(
+        string name,
+        BindingFlags bindingAttr,
+        Binder? binder,
+        CallingConventions callConvention,
+        Type[]? types,
+        ParameterModifier[]? modifiers)
+        => null;
 
     public override FieldInfo? GetField(string name, BindingFlags bindingAttr)
         => null;
@@ -440,6 +483,17 @@ internal class ModelTypeArrayType : Type
     public override Type GetElementType()
         => _elementType;
 
+    public override object InvokeMember(
+        string name,
+        BindingFlags invokeAttr,
+        Binder? binder,
+        object? target,
+        object?[]? args,
+        ParameterModifier[]? modifiers,
+        CultureInfo? culture,
+        string[]? namedParameters) =>
+        throw new NotSupportedException();
+
     protected override bool HasElementTypeImpl()
         => true;
 
@@ -457,10 +511,6 @@ internal class ModelTypeArrayType : Type
 
     protected override bool IsCOMObjectImpl()
         => false;
-
-    public override object InvokeMember(string name, BindingFlags invokeAttr, Binder? binder, object? target,
-        object?[]? args, ParameterModifier[]? modifiers, CultureInfo? culture, string[]? namedParameters) =>
-        throw new NotSupportedException();
 
     public override int GetArrayRank()
         => 1;

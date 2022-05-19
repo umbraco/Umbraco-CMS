@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -20,22 +20,26 @@ public class PropertyTypeBasic
     public bool Inherited { get; set; }
 
     // needed - so we can handle alias renames
-    [DataMember(Name = "id")] public int Id { get; set; }
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
 
     [Required]
     [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
     [DataMember(Name = "alias")]
     public string Alias { get; set; } = null!;
 
-    [DataMember(Name = "description")] public string? Description { get; set; }
+    [DataMember(Name = "description")]
+    public string? Description { get; set; }
 
-    [DataMember(Name = "validation")] public PropertyTypeValidation? Validation { get; set; }
+    [DataMember(Name = "validation")]
+    public PropertyTypeValidation? Validation { get; set; }
 
     [DataMember(Name = "label")]
     [Required]
     public string Label { get; set; } = null!;
 
-    [DataMember(Name = "sortOrder")] public int SortOrder { get; set; }
+    [DataMember(Name = "sortOrder")]
+    public int SortOrder { get; set; }
 
     [DataMember(Name = "dataTypeId")]
     [Required]
@@ -53,8 +57,9 @@ public class PropertyTypeBasic
     [ReadOnly(true)]
     public string? DataTypeIcon { get; set; }
 
-    //SD: Is this really needed ?
-    [DataMember(Name = "groupId")] public int GroupId { get; set; }
+    // SD: Is this really needed ?
+    [DataMember(Name = "groupId")]
+    public int GroupId { get; set; }
 
     [DataMember(Name = "allowCultureVariant")]
     public bool AllowCultureVariant { get; set; }
@@ -62,5 +67,6 @@ public class PropertyTypeBasic
     [DataMember(Name = "allowSegmentVariant")]
     public bool AllowSegmentVariant { get; set; }
 
-    [DataMember(Name = "labelOnTop")] public bool LabelOnTop { get; set; }
+    [DataMember(Name = "labelOnTop")]
+    public bool LabelOnTop { get; set; }
 }

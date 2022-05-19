@@ -8,7 +8,8 @@ public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyV
     private readonly object _locker = new();
     private Dictionary<IPropertyValueConverter, Type[]>? _defaultConverters;
 
-    public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items) : base(items)
+    public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items)
+        : base(items)
     {
     }
 
@@ -27,8 +28,7 @@ public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyV
 
                 foreach (IPropertyValueConverter converter in this)
                 {
-                    DefaultPropertyValueConverterAttribute attr = converter.GetType()
-                        .GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false);
+                    DefaultPropertyValueConverterAttribute? attr = converter.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false);
                     if (attr != null)
                     {
                         _defaultConverters[converter] = attr.DefaultConvertersToShadow;

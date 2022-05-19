@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Extensions;
 
@@ -29,7 +29,8 @@ public class TreeNode : EntityBasic
 
         if (string.IsNullOrWhiteSpace(nodeId))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(nodeId));
         }
 
@@ -38,7 +39,8 @@ public class TreeNode : EntityBasic
         ChildNodesUrl = getChildNodesUrl;
         MenuUrl = menuUrl;
         CssClasses = new List<string>();
-        //default
+
+        // default
         Icon = "icon-folder-close";
         Path = "-1";
     }
@@ -97,8 +99,7 @@ public class TreeNode : EntityBasic
                 return false;
             }
 
-
-            //if it starts with a '.' or doesn't contain a '.' at all then it is a class
+            // if it starts with a '.' or doesn't contain a '.' at all then it is a class
             return Icon.StartsWith(".") || Icon.Contains(".") == false;
         }
     }
@@ -109,7 +110,7 @@ public class TreeNode : EntityBasic
     [DataMember(Name = "iconFilePath")]
     public string IconFilePath => string.Empty;
 
-    //TODO Figure out how to do this, without the model has to know a bout services and config.
+    // TODO Figure out how to do this, without the model has to know a bout services and config.
     //
     // if (IconIsClass)
     //     return string.Empty;
@@ -120,6 +121,7 @@ public class TreeNode : EntityBasic
     //
     // //legacy icon path
     // return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
+
     /// <summary>
     ///     A list of additional/custom css classes to assign to the node
     /// </summary>

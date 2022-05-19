@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     Represents a strongly-typed published content.
@@ -14,6 +14,7 @@ public abstract class PublishedContentModel : PublishedContentWrapped
     ///     an original <see cref="IPublishedContent" /> instance.
     /// </summary>
     /// <param name="content">The original content.</param>
+    /// <param name="publishedValueFallback">the PublishedValueFallback</param>
     protected PublishedContentModel(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
         : base(content, publishedValueFallback)
     {

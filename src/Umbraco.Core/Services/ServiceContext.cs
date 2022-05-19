@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Services;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     Represents the Umbraco Service context, which provides access to all services.
@@ -36,19 +36,34 @@ public class ServiceContext
     /// <summary>
     ///     Initializes a new instance of the <see cref="ServiceContext" /> class with lazy services.
     /// </summary>
-    public ServiceContext(Lazy<IPublicAccessService>? publicAccessService, Lazy<IDomainService>? domainService,
-        Lazy<IAuditService>? auditService, Lazy<ILocalizedTextService>? localizedTextService,
-        Lazy<ITagService>? tagService, Lazy<IContentService>? contentService, Lazy<IUserService>? userService,
-        Lazy<IMemberService>? memberService, Lazy<IMediaService>? mediaService,
-        Lazy<IContentTypeService>? contentTypeService, Lazy<IMediaTypeService>? mediaTypeService,
-        Lazy<IDataTypeService>? dataTypeService, Lazy<IFileService>? fileService,
-        Lazy<ILocalizationService>? localizationService, Lazy<IPackagingService>? packagingService,
-        Lazy<IServerRegistrationService>? serverRegistrationService, Lazy<IEntityService>? entityService,
-        Lazy<IRelationService>? relationService, Lazy<IMacroService>? macroService,
-        Lazy<IMemberTypeService>? memberTypeService, Lazy<IMemberGroupService>? memberGroupService,
-        Lazy<INotificationService>? notificationService, Lazy<IExternalLoginService>? externalLoginService,
-        Lazy<IRedirectUrlService>? redirectUrlService, Lazy<IConsentService>? consentService,
-        Lazy<IKeyValueService>? keyValueService, Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
+    public ServiceContext(
+        Lazy<IPublicAccessService>? publicAccessService,
+        Lazy<IDomainService>? domainService,
+        Lazy<IAuditService>? auditService,
+        Lazy<ILocalizedTextService>? localizedTextService,
+        Lazy<ITagService>? tagService,
+        Lazy<IContentService>? contentService,
+        Lazy<IUserService>? userService,
+        Lazy<IMemberService>? memberService,
+        Lazy<IMediaService>? mediaService,
+        Lazy<IContentTypeService>? contentTypeService,
+        Lazy<IMediaTypeService>? mediaTypeService,
+        Lazy<IDataTypeService>? dataTypeService,
+        Lazy<IFileService>? fileService,
+        Lazy<ILocalizationService>? localizationService,
+        Lazy<IPackagingService>? packagingService,
+        Lazy<IServerRegistrationService>? serverRegistrationService,
+        Lazy<IEntityService>? entityService,
+        Lazy<IRelationService>? relationService,
+        Lazy<IMacroService>? macroService,
+        Lazy<IMemberTypeService>? memberTypeService,
+        Lazy<IMemberGroupService>? memberGroupService,
+        Lazy<INotificationService>? notificationService,
+        Lazy<IExternalLoginService>? externalLoginService,
+        Lazy<IRedirectUrlService>? redirectUrlService,
+        Lazy<IConsentService>? consentService,
+        Lazy<IKeyValueService>? keyValueService,
+        Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
     {
         _publicAccessService = publicAccessService;
         _domainService = domainService;
@@ -281,7 +296,6 @@ public class ServiceContext
             Lazy(redirectUrlService),
             Lazy(consentService),
             Lazy(keyValueService),
-            Lazy(contentTypeBaseServiceProvider)
-        );
+            Lazy(contentTypeBaseServiceProvider));
     }
 }

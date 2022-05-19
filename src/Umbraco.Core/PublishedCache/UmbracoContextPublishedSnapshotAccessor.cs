@@ -18,7 +18,7 @@ public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccesso
     {
         get
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
             {
                 return null;
             }
@@ -31,7 +31,7 @@ public class UmbracoContextPublishedSnapshotAccessor : IPublishedSnapshotAccesso
 
     public bool TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot)
     {
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
             publishedSnapshot = null;
             return false;

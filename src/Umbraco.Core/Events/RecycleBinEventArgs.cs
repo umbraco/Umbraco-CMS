@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEventArgs>
 {
@@ -30,6 +30,8 @@ public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEv
     ///     Boolean indicating whether this event was fired for the Media's Recycle Bin.
     /// </summary>
     public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
+
+    public static bool operator ==(RecycleBinEventArgs left, RecycleBinEventArgs right) => Equals(left, right);
 
     public bool Equals(RecycleBinEventArgs? other)
     {
@@ -77,8 +79,6 @@ public class RecycleBinEventArgs : CancellableEventArgs, IEquatable<RecycleBinEv
             return hashCode;
         }
     }
-
-    public static bool operator ==(RecycleBinEventArgs left, RecycleBinEventArgs right) => Equals(left, right);
 
     public static bool operator !=(RecycleBinEventArgs left, RecycleBinEventArgs right) => !Equals(left, right);
 }

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models;
+namespace Umbraco.Cms.Core.Models;
 
 /// <summary>
 ///     Enum representing the taggable object types
@@ -8,5 +8,5 @@ public enum TaggableObjectTypes
     All,
     Content,
     Media,
-    Member
+    Member,
 }

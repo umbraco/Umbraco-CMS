@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Core.Composing;
 /// <inheritdoc cref="ITypeFinder" />
 public class TypeFinder : ITypeFinder
 {
-    private static readonly ConcurrentDictionary<string, Type?> s_typeNamesCache = new();
-
     // TODO: Kill this
 
     /// <summary>
@@ -36,8 +34,10 @@ public class TypeFinder : ITypeFinder
         "ServiceStack.", "SqlCE4Umbraco,", "Superpower,", // used by Serilog
         "System.", "TidyNet,", "TidyNet.", "WebDriver,", "itextsharp,", "mscorlib,", "NUnit,", "NUnit.", "NUnit3.",
         "Selenium.", "ImageProcessor", "MiniProfiler.", "Owin,", "SQLite",
-        "ReSharperTestRunner32" // used by resharper testrunner
+        "ReSharperTestRunner32", // used by resharper testrunner
     };
+
+    private static readonly ConcurrentDictionary<string, Type?> TypeNamesCache = new();
 
     private readonly IAssemblyProvider _assemblyProvider;
     private readonly object _localFilteredAssemblyCacheLocker = new();
@@ -49,12 +49,30 @@ public class TypeFinder : ITypeFinder
     private string[]? _assembliesAcceptingLoadExceptions;
     private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
 
-    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider,
-        ITypeFinderConfig? typeFinderConfig = null)
+    public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _assemblyProvider = assemblyProvider;
         _typeFinderConfig = typeFinderConfig;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Assembly> AssembliesToScan
+    {
+        get
+        {
+            lock (_localFilteredAssemblyCacheLocker)
+            {
+                if (_localFilteredAssemblyCache != null)
+                {
+                    return _localFilteredAssemblyCache;
+                }
+
+                IEnumerable<Assembly> assemblies = GetFilteredAssemblies(null, KnownAssemblyExclusionFilter);
+                _localFilteredAssemblyCache = new HashSet<Assembly>(assemblies);
+                return _localFilteredAssemblyCache;
+            }
+        }
     }
 
     // used for benchmark tests
@@ -77,25 +95,6 @@ public class TypeFinder : ITypeFinder
         }
     }
 
-    /// <inheritdoc />
-    public IEnumerable<Assembly> AssembliesToScan
-    {
-        get
-        {
-            lock (_localFilteredAssemblyCacheLocker)
-            {
-                if (_localFilteredAssemblyCache != null)
-                {
-                    return _localFilteredAssemblyCache;
-                }
-
-                IEnumerable<Assembly> assemblies = GetFilteredAssemblies(null, KnownAssemblyExclusionFilter);
-                _localFilteredAssemblyCache = new HashSet<Assembly>(assemblies);
-                return _localFilteredAssemblyCache;
-            }
-        }
-    }
-
     /// <summary>
     ///     Finds any classes derived from the assignTypeFrom Type that contain the attribute TAttribute
     /// </summary>
@@ -113,7 +112,8 @@ public class TypeFinder : ITypeFinder
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
 
         return GetClassesWithBaseType(assignTypeFrom, assemblyList, onlyConcreteClasses,
-            //the additional filter will ensure that any found types also have the attribute applied.
+
+            // the additional filter will ensure that any found types also have the attribute applied.
             t => t.GetCustomAttributes(attributeType, false).Any());
     }
 
@@ -124,8 +124,7 @@ public class TypeFinder : ITypeFinder
     /// <param name="assemblies"></param>
     /// <param name="onlyConcreteClasses"></param>
     /// <returns></returns>
-    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null,
-        bool onlyConcreteClasses = true)
+    public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null, bool onlyConcreteClasses = true)
     {
         IEnumerable<Assembly> assemblyList = assemblies ?? AssembliesToScan;
 
@@ -156,9 +155,8 @@ public class TypeFinder : ITypeFinder
     /// <returns></returns>
     public virtual Type? GetTypeByName(string name)
     {
-        //NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded
-        //into the appdomain.
-
+        // NOTE: This will not find types in dynamic assemblies unless those assemblies are already loaded
+        // into the appdomain.
 
         // This is exactly what the BuildManager does, if the type is an assembly qualified type
         // name it will find it.
@@ -168,12 +166,16 @@ public class TypeFinder : ITypeFinder
         }
 
         // It didn't parse, so try loading from each already loaded assembly and cache it
-        return s_typeNamesCache.GetOrAdd(name, s =>
+        return TypeNamesCache.GetOrAdd(name, s =>
             AppDomain.CurrentDomain.GetAssemblies()
                 .Select(x => x.GetType(s))
                 .FirstOrDefault(x => x != null));
     }
 
+    #region Private methods
+
+    // borrowed from aspnet System.Web.UI.Util
+    private static bool TypeNameContainsAssembly(string typeName) => CommaIndexInTypeName(typeName) > 0;
 
     private bool AcceptsLoadExceptions(Assembly a)
     {
@@ -209,7 +211,6 @@ public class TypeFinder : ITypeFinder
         });
     }
 
-
     private IEnumerable<Assembly> GetAllAssemblies() => _assemblyProvider.Assemblies;
 
     /// <summary>
@@ -235,14 +236,8 @@ public class TypeFinder : ITypeFinder
 
         return GetAllAssemblies()
             .Where(x => excludeFromResults.Contains(x) == false
-                        && x.GlobalAssemblyCache == false
                         && exclusionFilter.Any(f => x.FullName?.StartsWith(f) ?? false) == false);
     }
-
-    #region Private methods
-
-    // borrowed from aspnet System.Web.UI.Util
-    private static bool TypeNameContainsAssembly(string typeName) => CommaIndexInTypeName(typeName) > 0;
 
     // borrowed from aspnet System.Web.UI.Util
     private static int CommaIndexInTypeName(string typeName)
@@ -260,6 +255,15 @@ public class TypeFinder : ITypeFinder
         }
 
         return typeName.IndexOf(',', num2 + 1);
+    }
+
+    private static void AppendCouldNotLoad(StringBuilder sb, Assembly a, bool getAll)
+    {
+        sb.Append("Could not load ");
+        sb.Append(getAll ? "all" : "exported");
+        sb.Append(" types from \"");
+        sb.Append(a.FullName);
+        sb.AppendLine("\" due to LoaderExceptions, skipping:");
     }
 
     private IEnumerable<Type> GetClassesWithAttribute(
@@ -303,7 +307,8 @@ public class TypeFinder : ITypeFinder
                 }
                 catch (TypeLoadException ex)
                 {
-                    _logger.LogError(ex,
+                    _logger.LogError(
+                        ex,
                         "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version",
                         assembly);
                     continue;
@@ -388,7 +393,8 @@ public class TypeFinder : ITypeFinder
                 }
                 catch (TypeLoadException ex)
                 {
-                    _logger.LogError(ex,
+                    _logger.LogError(
+                        ex,
                         "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version",
                         assembly);
                     continue;
@@ -423,7 +429,7 @@ public class TypeFinder : ITypeFinder
 
     private IEnumerable<Type> GetTypesWithFormattedException(Assembly a)
     {
-        //if the assembly is dynamic, do not try to scan it
+        // if the assembly is dynamic, do not try to scan it
         if (a.IsDynamic)
         {
             return Enumerable.Empty<Type>();
@@ -433,20 +439,24 @@ public class TypeFinder : ITypeFinder
 
         try
         {
-            //we need to detect if an assembly is partially trusted, if so we cannot go interrogating all of it's types
-            //only its exported types, otherwise we'll get exceptions.
+            // we need to detect if an assembly is partially trusted, if so we cannot go interrogating all of it's types
+            // only its exported types, otherwise we'll get exceptions.
             return getAll ? a.GetTypes() : a.GetExportedTypes();
         }
-        catch (TypeLoadException ex) // GetExportedTypes *can* throw TypeLoadException!
+
+        // GetExportedTypes *can* throw TypeLoadException!
+        catch (TypeLoadException ex)
         {
             var sb = new StringBuilder();
             AppendCouldNotLoad(sb, a, getAll);
             AppendLoaderException(sb, ex);
 
             // rethrow as ReflectionTypeLoadException (for consistency) with new message
-            throw new ReflectionTypeLoadException(new Type[0], new Exception[] {ex}, sb.ToString());
+            throw new ReflectionTypeLoadException(new Type[0], new Exception[] { ex }, sb.ToString());
         }
-        catch (ReflectionTypeLoadException rex) // GetTypes throws ReflectionTypeLoadException
+
+        // GetTypes throws ReflectionTypeLoadException
+        catch (ReflectionTypeLoadException rex)
         {
             var sb = new StringBuilder();
             AppendCouldNotLoad(sb, a, getAll);
@@ -475,15 +485,6 @@ public class TypeFinder : ITypeFinder
 
             return rex.Types.WhereNotNull().ToArray();
         }
-    }
-
-    private static void AppendCouldNotLoad(StringBuilder sb, Assembly a, bool getAll)
-    {
-        sb.Append("Could not load ");
-        sb.Append(getAll ? "all" : "exported");
-        sb.Append(" types from \"");
-        sb.Append(a.FullName);
-        sb.AppendLine("\" due to LoaderExceptions, skipping:");
     }
 
     private static void AppendLoaderException(StringBuilder sb, Exception loaderException)

@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Core.Sections;
 
 public class SectionCollection : BuilderCollectionBase<ISection>
 {
-    public SectionCollection(Func<IEnumerable<ISection>> items) : base(items)
+    public SectionCollection(Func<IEnumerable<ISection>> items)
+        : base(items)
     {
     }
 }

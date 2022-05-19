@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core.Tour;
 /// </summary>
 public class TourFilterCollection : BuilderCollectionBase<BackOfficeTourFilter>
 {
-    public TourFilterCollection(Func<IEnumerable<BackOfficeTourFilter>> items) : base(items)
+    public TourFilterCollection(Func<IEnumerable<BackOfficeTourFilter>> items)
+        : base(items)
     {
     }
 }

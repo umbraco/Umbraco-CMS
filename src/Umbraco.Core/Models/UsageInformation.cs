@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -11,7 +11,9 @@ public class UsageInformation
         Data = data;
     }
 
-    [DataMember(Name = "name")] public string Name { get; }
+    [DataMember(Name = "name")]
+    public string Name { get; }
 
-    [DataMember(Name = "data")] public object Data { get; }
+    [DataMember(Name = "data")]
+    public object Data { get; }
 }

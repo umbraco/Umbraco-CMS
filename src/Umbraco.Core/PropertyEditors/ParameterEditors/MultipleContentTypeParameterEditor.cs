@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors;
+namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors;
 
 [DataEditor(
     "contentTypeMultiple",

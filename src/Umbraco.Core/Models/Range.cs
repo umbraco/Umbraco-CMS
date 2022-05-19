@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -37,15 +37,15 @@ public class Range<T> : IEquatable<Range<T>>
     public bool Equals(Range<T>? other) => other != null && Equals(other.Minimum, other.Maximum);
 
     /// <summary>
-    ///     Returns a <see cref="System.String" /> that represents this instance.
+    ///     Returns a <see cref="string" /> that represents this instance.
     /// </summary>
     /// <returns>
-    ///     A <see cref="System.String" /> that represents this instance.
+    ///     A <see cref="string" /> that represents this instance.
     /// </returns>
     public override string ToString() => ToString("{0},{1}", CultureInfo.InvariantCulture);
 
     /// <summary>
-    ///     Returns a <see cref="System.String" /> that represents this instance.
+    ///     Returns a <see cref="string" /> that represents this instance.
     /// </summary>
     /// <param name="format">
     ///     A composite format string for a single value (minimum and maximum are equal). Use {0} for the
@@ -57,13 +57,13 @@ public class Range<T> : IEquatable<Range<T>>
     /// </param>
     /// <param name="provider">An object that supplies culture-specific formatting information.</param>
     /// <returns>
-    ///     A <see cref="System.String" /> that represents this instance.
+    ///     A <see cref="string" /> that represents this instance.
     /// </returns>
     public string ToString(string format, string formatRange, IFormatProvider? provider = null) =>
         ToString(Minimum?.CompareTo(Maximum) == 0 ? format : formatRange, provider);
 
     /// <summary>
-    ///     Returns a <see cref="System.String" /> that represents this instance.
+    ///     Returns a <see cref="string" /> that represents this instance.
     /// </summary>
     /// <param name="format">
     ///     A composite format string for the range values. Use {0} for the minimum and {1} for the maximum
@@ -71,7 +71,7 @@ public class Range<T> : IEquatable<Range<T>>
     /// </param>
     /// <param name="provider">An object that supplies culture-specific formatting information.</param>
     /// <returns>
-    ///     A <see cref="System.String" /> that represents this instance.
+    ///     A <see cref="string" /> that represents this instance.
     /// </returns>
     public string ToString(string format, IFormatProvider? provider = null) =>
         string.Format(provider, format, Minimum, Maximum);
@@ -114,11 +114,11 @@ public class Range<T> : IEquatable<Range<T>>
         IsValid() && range.IsValid() && ContainsValue(range.Minimum) && ContainsValue(range.Maximum);
 
     /// <summary>
-    ///     Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+    ///     Determines whether the specified <see cref="object" />, is equal to this instance.
     /// </summary>
-    /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+    /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
     /// <returns>
-    ///     <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+    ///     <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
     /// </returns>
     public override bool Equals(object? obj) => obj is Range<T> other && Equals(other);
 

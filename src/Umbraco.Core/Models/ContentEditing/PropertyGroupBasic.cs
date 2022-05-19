@@ -30,19 +30,25 @@ public abstract class PropertyGroupBasic
     public bool Inherited { get; set; }
 
     // needed - so we can handle alias renames
-    [DataMember(Name = "id")] public int Id { get; set; }
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
 
-    [DataMember(Name = "key")] public Guid Key { get; set; }
+    [DataMember(Name = "key")]
+    public Guid Key { get; set; }
 
-    [DataMember(Name = "type")] public PropertyGroupType Type { get; set; }
+    [DataMember(Name = "type")]
+    public PropertyGroupType Type { get; set; }
 
-    [Required] [DataMember(Name = "name")] public string? Name { get; set; }
+    [Required]
+    [DataMember(Name = "name")]
+    public string? Name { get; set; }
 
     [Required]
     [DataMember(Name = "alias")]
     public string Alias { get; set; } = null!;
 
-    [DataMember(Name = "sortOrder")] public int SortOrder { get; set; }
+    [DataMember(Name = "sortOrder")]
+    public int SortOrder { get; set; }
 }
 
 [DataContract(Name = "propertyGroup", Namespace = "")]
@@ -51,5 +57,6 @@ public class PropertyGroupBasic<TPropertyType> : PropertyGroupBasic
 {
     public PropertyGroupBasic() => Properties = new List<TPropertyType>();
 
-    [DataMember(Name = "properties")] public IEnumerable<TPropertyType> Properties { get; set; }
+    [DataMember(Name = "properties")]
+    public IEnumerable<TPropertyType> Properties { get; set; }
 }

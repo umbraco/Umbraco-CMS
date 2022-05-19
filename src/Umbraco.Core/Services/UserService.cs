@@ -27,9 +27,13 @@ internal class UserService : RepositoryService, IUserService
     private readonly IUserGroupRepository _userGroupRepository;
     private readonly IUserRepository _userRepository;
 
-    public UserService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
-        IUserRepository userRepository, IUserGroupRepository userGroupRepository,
+    public UserService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IRuntimeState runtimeState,
+        IUserRepository userRepository,
+        IUserGroupRepository userGroupRepository,
         IOptions<GlobalSettings> globalSettings)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
@@ -42,6 +46,38 @@ internal class UserService : RepositoryService, IUserService
 
     private bool IsUpgrading =>
         _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
+
+    /// <summary>
+    ///     Checks in a set of permissions associated with a user for those related to a given nodeId
+    /// </summary>
+    /// <param name="permissions">The set of permissions</param>
+    /// <param name="nodeId">The node Id</param>
+    /// <param name="assignedPermissions">The permissions to return</param>
+    /// <returns>True if permissions for the given path are found</returns>
+    public static bool TryGetAssignedPermissionsForNode(
+        IList<EntityPermission> permissions,
+        int nodeId,
+        out string assignedPermissions)
+    {
+        if (permissions.Any(x => x.EntityId == nodeId))
+        {
+            EntityPermission found = permissions.First(x => x.EntityId == nodeId);
+            var assignedPermissionsArray = found.AssignedPermissions.ToList();
+
+            // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
+            // and we need to get the most permissive set
+            foreach (EntityPermission permission in permissions.Where(x => x.EntityId == nodeId).Skip(1))
+            {
+                AddAdditionalPermissions(assignedPermissionsArray, permission.AssignedPermissions);
+            }
+
+            assignedPermissions = string.Join(string.Empty, assignedPermissionsArray);
+            return true;
+        }
+
+        assignedPermissions = string.Empty;
+        return false;
+    }
 
     #region Implementation of IMembershipUserService
 
@@ -83,8 +119,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue,
-        string memberTypeAlias) => CreateUserWithIdentity(username, email, passwordValue);
+    IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias) => CreateUserWithIdentity(username, email, passwordValue);
 
     /// <summary>
     ///     Creates and persists a new <see cref="IUser" />
@@ -100,8 +135,22 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue,
-        string memberTypeAlias, bool isApproved) => CreateUserWithIdentity(username, email, passwordValue, isApproved);
+    IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved) => CreateUserWithIdentity(username, email, passwordValue, isApproved);
+
+    /// <summary>
+    ///     Gets a User by its integer id
+    /// </summary>
+    /// <param name="id"><see cref="System.int" /> Id</param>
+    /// <returns>
+    ///     <see cref="IUser" />
+    /// </returns>
+    public IUser? GetById(int id)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userRepository.Get(id);
+        }
+    }
 
     /// <summary>
     ///     Creates and persists a Member
@@ -129,14 +178,14 @@ internal class UserService : RepositoryService, IUserService
 
         if (string.IsNullOrWhiteSpace(username))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(username));
         }
 
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         // TODO: PUT lock here!!
-
         User user;
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -154,7 +203,7 @@ internal class UserService : RepositoryService, IUserService
                 RawPasswordValue = passwordValue,
                 Username = username,
                 IsLockedOut = false,
-                IsApproved = isApproved
+                IsApproved = isApproved,
             };
 
             var savingNotification = new UserSavingNotification(user, evtMsgs);
@@ -171,21 +220,6 @@ internal class UserService : RepositoryService, IUserService
         }
 
         return user;
-    }
-
-    /// <summary>
-    ///     Gets a User by its integer id
-    /// </summary>
-    /// <param name="id"><see cref="System.int" /> Id</param>
-    /// <returns>
-    ///     <see cref="IUser" />
-    /// </returns>
-    public IUser? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userRepository.Get(id);
-        }
     }
 
     /// <summary>
@@ -245,7 +279,7 @@ internal class UserService : RepositoryService, IUserService
                 // be better BUT requires that the app restarts after the upgrade!
                 if (IsUpgrading)
                 {
-                    //NOTE: this will not be cached
+                    // NOTE: this will not be cached
                     return _userRepository.GetByUsername(username, false);
                 }
 
@@ -260,7 +294,7 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="membershipUser"><see cref="IUser" /> to disable</param>
     public void Delete(IUser membershipUser)
     {
-        //disable
+        // disable
         membershipUser.IsApproved = false;
 
         Save(membershipUser);
@@ -347,7 +381,8 @@ internal class UserService : RepositoryService, IUserService
                     throw;
                 }
 
-                _logger.LogWarning(ex,
+                _logger.LogWarning(
+                    ex,
                     "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
 
                 // we don't want the uow to rollback its scope!
@@ -393,7 +428,7 @@ internal class UserService : RepositoryService, IUserService
             scope.Notifications.Publish(
                 new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
 
-            //commit the whole lot in one go
+            // commit the whole lot in one go
             scope.Complete();
         }
     }
@@ -418,8 +453,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IEnumerable{IUser}" />
     /// </returns>
-    public IEnumerable<IUser> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize,
-        out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+    public IEnumerable<IUser> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -446,8 +480,7 @@ internal class UserService : RepositoryService, IUserService
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords,
-                dto => dto.Email);
+            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
         }
     }
 
@@ -465,8 +498,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>
     ///     <see cref="IEnumerable{IUser}" />
     /// </returns>
-    public IEnumerable<IUser> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+    public IEnumerable<IUser> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -493,8 +525,7 @@ internal class UserService : RepositoryService, IUserService
                     throw new ArgumentOutOfRangeException(nameof(matchType));
             }
 
-            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords,
-                dto => dto.Username);
+            return _userRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
         }
     }
 
@@ -582,8 +613,7 @@ internal class UserService : RepositoryService, IUserService
         }
     }
 
-    public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy,
-        Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
+    public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy, Direction orderDirection, UserState[]? userState = null, string[]? userGroups = null, string? filter = null)
     {
         IQuery<IUser>? filterQuery = null;
         if (filter.IsNullOrWhiteSpace() == false)
@@ -592,13 +622,19 @@ internal class UserService : RepositoryService, IUserService
                 (x.Name != null && x.Name.Contains(filter!)) || x.Username.Contains(filter!));
         }
 
-        return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null,
-            filterQuery);
+        return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, userState, userGroups, null, filterQuery);
     }
 
-    public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords, string orderBy,
-        Direction orderDirection, UserState[]? userState = null, string[]? includeUserGroups = null,
-        string[]? excludeUserGroups = null, IQuery<IUser>? filter = null)
+    public IEnumerable<IUser> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
+        UserState[]? userState = null,
+        string[]? includeUserGroups = null,
+        string[]? excludeUserGroups = null,
+        IQuery<IUser>? filter = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -639,8 +675,7 @@ internal class UserService : RepositoryService, IUserService
                     throw new IndexOutOfRangeException("The orderBy parameter " + orderBy + " is not valid");
             }
 
-            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort,
-                orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
+            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, sort, orderDirection, includeUserGroups, excludeUserGroups, userState, filter);
         }
     }
 
@@ -657,8 +692,7 @@ internal class UserService : RepositoryService, IUserService
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords,
-                member => member.Name);
+            return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Name);
         }
     }
 
@@ -718,8 +752,8 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IProfile? GetProfileById(int id)
     {
-        //This is called a TON. Go get the full user from cache which should already be IProfile
-        IUser fullUser = GetUserById(id);
+        // This is called a TON. Go get the full user from cache which should already be IProfile
+        IUser? fullUser = GetUserById(id);
         if (fullUser == null)
         {
             return null;
@@ -767,7 +801,7 @@ internal class UserService : RepositoryService, IUserService
                 // be better BUT requires that the app restarts after the upgrade!
                 if (IsUpgrading)
                 {
-                    //NOTE: this will not be cached
+                    // NOTE: this will not be cached
                     return _userRepository.Get(id, false);
                 }
 
@@ -843,7 +877,7 @@ internal class UserService : RepositoryService, IUserService
             _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
             scope.Complete();
 
-            var assigned = new[] {permission.ToString(CultureInfo.InvariantCulture)};
+            var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
             EntityPermission[] entityPermissions =
                 entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
             scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
@@ -1023,8 +1057,8 @@ internal class UserService : RepositoryService, IUserService
             IEnumerable<IUserGroup> assignedGroups = _userGroupRepository.GetGroupsAssignedToSection(sectionAlias);
             foreach (IUserGroup group in assignedGroups)
             {
-                //now remove the section for each user and commit
-                //now remove the section for each user and commit
+                // now remove the section for each user and commit
+                // now remove the section for each user and commit
                 group.RemoveAllowedSection(sectionAlias);
                 _userGroupRepository.Save(group);
             }
@@ -1050,6 +1084,32 @@ internal class UserService : RepositoryService, IUserService
     /// <summary>
     ///     Get explicitly assigned permissions for a group and optional node Ids
     /// </summary>
+    /// <param name="groups"></param>
+    /// <param name="fallbackToDefaultPermissions">
+    ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
+    ///     permissions set
+    /// </param>
+    /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
+    /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
+    public EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+    {
+        if (groups == null)
+        {
+            throw new ArgumentNullException(nameof(groups));
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _userGroupRepository.GetPermissions(
+                groups.WhereNotNull().Select(x => x.ToReadOnlyGroup()).ToArray(),
+                fallbackToDefaultPermissions,
+                nodeIds);
+        }
+    }
+
+    /// <summary>
+    ///     Get explicitly assigned permissions for a group and optional node Ids
+    /// </summary>
     /// <param name="groups">Groups to retrieve permissions for</param>
     /// <param name="fallbackToDefaultPermissions">
     ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
@@ -1057,8 +1117,7 @@ internal class UserService : RepositoryService, IUserService
     /// </param>
     /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
     /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
-    private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions,
-        params int[] nodeIds)
+    private IEnumerable<EntityPermission> GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
     {
         if (groups == null)
         {
@@ -1068,31 +1127,6 @@ internal class UserService : RepositoryService, IUserService
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.GetPermissions(groups, fallbackToDefaultPermissions, nodeIds);
-        }
-    }
-
-    /// <summary>
-    ///     Get explicitly assigned permissions for a group and optional node Ids
-    /// </summary>
-    /// <param name="groups"></param>
-    /// <param name="fallbackToDefaultPermissions">
-    ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
-    ///     permissions set
-    /// </param>
-    /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
-    /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
-    public EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions,
-        params int[] nodeIds)
-    {
-        if (groups == null)
-        {
-            throw new ArgumentNullException(nameof(groups));
-        }
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _userGroupRepository.GetPermissions(groups.WhereNotNull().Select(x => x.ToReadOnlyGroup()).ToArray(),
-                fallbackToDefaultPermissions, nodeIds);
         }
     }
 
@@ -1110,7 +1144,7 @@ internal class UserService : RepositoryService, IUserService
             return EntityPermissionSet.Empty();
         }
 
-        //collect all permissions structures for all nodes for all groups belonging to the user
+        // collect all permissions structures for all nodes for all groups belonging to the user
         EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
@@ -1126,8 +1160,7 @@ internal class UserService : RepositoryService, IUserService
     ///     permissions set
     /// </param>
     /// <returns>String indicating permissions for provided user and path</returns>
-    public EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path,
-        bool fallbackToDefaultPermissions = false)
+    public EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path, bool fallbackToDefaultPermissions = false)
     {
         var nodeIds = path.GetIdsFromPathReversed();
 
@@ -1136,29 +1169,11 @@ internal class UserService : RepositoryService, IUserService
             return EntityPermissionSet.Empty();
         }
 
-        //collect all permissions structures for all nodes for all groups
+        // collect all permissions structures for all nodes for all groups
         EntityPermission[] groupPermissions =
             GetPermissionsForPath(groups.Select(x => x.ToReadOnlyGroup()).ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
-    }
-
-    private EntityPermissionCollection GetPermissionsForPath(IReadOnlyUserGroup[] groups, int[] pathIds,
-        bool fallbackToDefaultPermissions = false)
-    {
-        if (pathIds.Length == 0)
-        {
-            return new EntityPermissionCollection(Enumerable.Empty<EntityPermission>());
-        }
-
-        //get permissions for all nodes in the path by group
-        IEnumerable<IGrouping<int, EntityPermission>> permissions =
-            GetPermissions(groups, fallbackToDefaultPermissions, pathIds)
-                .GroupBy(x => x.UserGroupId);
-
-        return new EntityPermissionCollection(
-            permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions))
-                .Where(x => x is not null)!);
     }
 
     /// <summary>
@@ -1178,48 +1193,47 @@ internal class UserService : RepositoryService, IUserService
             return EntityPermissionSet.Empty();
         }
 
-        //The actual entity id being looked at (deepest part of the path)
+        // The actual entity id being looked at (deepest part of the path)
         var entityId = pathIds[0];
 
         var resultPermissions = new EntityPermissionCollection();
 
-        //create a grouped by dictionary of another grouped by dictionary
+        // create a grouped by dictionary of another grouped by dictionary
         var permissionsByGroup = groupPermissions
             .GroupBy(x => x.UserGroupId)
             .ToDictionary(
                 x => x.Key,
                 x => x.GroupBy(a => a.EntityId).ToDictionary(a => a.Key, a => a.ToArray()));
 
-        //iterate through each group
+        // iterate through each group
         foreach (KeyValuePair<int, Dictionary<int, EntityPermission[]>> byGroup in permissionsByGroup)
         {
             var added = false;
 
-            //iterate deepest to shallowest
+            // iterate deepest to shallowest
             foreach (var pathId in pathIds)
             {
-                EntityPermission[]? permissionsForNodeAndGroup;
-                if (byGroup.Value.TryGetValue(pathId, out permissionsForNodeAndGroup) == false)
+                if (byGroup.Value.TryGetValue(pathId, out EntityPermission[]? permissionsForNodeAndGroup) == false)
                 {
                     continue;
                 }
 
-                //In theory there will only be one EntityPermission in this group
+                // In theory there will only be one EntityPermission in this group
                 // but there's nothing stopping the logic of this method
                 // from having more so we deal with it here
                 foreach (EntityPermission entityPermission in permissionsForNodeAndGroup)
                 {
                     if (entityPermission.IsDefaultPermissions == false)
                     {
-                        //explicit permission found so we'll append it and move on, the collection is a hashset anyways
-                        //so only supports adding one element per groupid/contentid
+                        // explicit permission found so we'll append it and move on, the collection is a hashset anyways
+                        // so only supports adding one element per groupid/contentid
                         resultPermissions.Add(entityPermission);
                         added = true;
                         break;
                     }
                 }
 
-                //if the permission has been added for this group and this branch then we can exit this loop
+                // if the permission has been added for this group and this branch then we can exit this loop
                 if (added)
                 {
                     break;
@@ -1228,14 +1242,31 @@ internal class UserService : RepositoryService, IUserService
 
             if (added == false && byGroup.Value.Count > 0)
             {
-                //if there was no explicit permissions assigned in this branch for this group, then we will
-                //add the group's default permissions
+                // if there was no explicit permissions assigned in this branch for this group, then we will
+                // add the group's default permissions
                 resultPermissions.Add(byGroup.Value[entityId][0]);
             }
         }
 
         var permissionSet = new EntityPermissionSet(entityId, resultPermissions);
         return permissionSet;
+    }
+
+    private EntityPermissionCollection GetPermissionsForPath(IReadOnlyUserGroup[] groups, int[] pathIds, bool fallbackToDefaultPermissions = false)
+    {
+        if (pathIds.Length == 0)
+        {
+            return new EntityPermissionCollection(Enumerable.Empty<EntityPermission>());
+        }
+
+        // get permissions for all nodes in the path by group
+        IEnumerable<IGrouping<int, EntityPermission>> permissions =
+            GetPermissions(groups, fallbackToDefaultPermissions, pathIds)
+                .GroupBy(x => x.UserGroupId);
+
+        return new EntityPermissionCollection(
+            permissions.Select(x => GetPermissionsForPathForGroup(x, pathIds, fallbackToDefaultPermissions))
+                .Where(x => x is not null)!);
     }
 
     /// <summary>
@@ -1256,16 +1287,15 @@ internal class UserService : RepositoryService, IUserService
         int[] pathIds,
         bool fallbackToDefaultPermissions = false)
     {
-        //get permissions for all nodes in the path
+        // get permissions for all nodes in the path
         var permissionsByEntityId = pathPermissions.ToDictionary(x => x.EntityId, x => x);
 
-        //then the permissions assigned to the path will be the 'deepest' node found that has permissions
+        // then the permissions assigned to the path will be the 'deepest' node found that has permissions
         foreach (var id in pathIds)
         {
-            EntityPermission? permission;
-            if (permissionsByEntityId.TryGetValue(id, out permission))
+            if (permissionsByEntityId.TryGetValue(id, out EntityPermission? permission))
             {
-                //don't return the default permissions if that is the one assigned here (we'll do that below if nothing was found)
+                // don't return the default permissions if that is the one assigned here (we'll do that below if nothing was found)
                 if (permission.IsDefaultPermissions == false)
                 {
                     return permission;
@@ -1273,44 +1303,13 @@ internal class UserService : RepositoryService, IUserService
             }
         }
 
-        //if we've made it here it means that no implicit/inherited permissions were found so we return the defaults if that is specified
+        // if we've made it here it means that no implicit/inherited permissions were found so we return the defaults if that is specified
         if (fallbackToDefaultPermissions == false)
         {
             return null;
         }
 
         return permissionsByEntityId[pathIds[0]];
-    }
-
-    /// <summary>
-    ///     Checks in a set of permissions associated with a user for those related to a given nodeId
-    /// </summary>
-    /// <param name="permissions">The set of permissions</param>
-    /// <param name="nodeId">The node Id</param>
-    /// <param name="assignedPermissions">The permissions to return</param>
-    /// <returns>True if permissions for the given path are found</returns>
-    public static bool TryGetAssignedPermissionsForNode(IList<EntityPermission> permissions,
-        int nodeId,
-        out string assignedPermissions)
-    {
-        if (permissions.Any(x => x.EntityId == nodeId))
-        {
-            EntityPermission found = permissions.First(x => x.EntityId == nodeId);
-            var assignedPermissionsArray = found.AssignedPermissions.ToList();
-
-            // Working with permissions assigned directly to a user AND to their groups, so maybe several per node
-            // and we need to get the most permissive set
-            foreach (EntityPermission permission in permissions.Where(x => x.EntityId == nodeId).Skip(1))
-            {
-                AddAdditionalPermissions(assignedPermissionsArray, permission.AssignedPermissions);
-            }
-
-            assignedPermissions = string.Join("", assignedPermissionsArray);
-            return true;
-        }
-
-        assignedPermissions = string.Empty;
-        return false;
     }
 
     private static void AddAdditionalPermissions(List<string> assignedPermissions, string[] additionalPermissions)

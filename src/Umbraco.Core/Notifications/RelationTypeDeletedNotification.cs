@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class RelationTypeDeletedNotification : DeletedNotification<IRelationType>
 {
-    public RelationTypeDeletedNotification(IRelationType target, EventMessages messages) : base(target, messages)
+    public RelationTypeDeletedNotification(IRelationType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

@@ -13,8 +13,7 @@ public abstract class TabsAndPropertiesMapper
     {
     }
 
-    protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService,
-        IEnumerable<string> ignoreProperties)
+    protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
     {
         CultureDictionary = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
         LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
@@ -22,7 +21,9 @@ public abstract class TabsAndPropertiesMapper
     }
 
     protected ICultureDictionary CultureDictionary { get; }
+
     protected ILocalizedTextService LocalizedTextService { get; }
+
     protected IEnumerable<string?> IgnoreProperties { get; set; }
 
     /// <summary>
@@ -42,8 +43,7 @@ public abstract class TabsAndPropertiesMapper
     ///     The generic properties tab is responsible for
     ///     setting up the properties such as Created date, updated date, template selected, etc...
     /// </remarks>
-    protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs,
-        MapperContext context)
+    protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, MapperContext context)
     {
         // add the generic properties tab, for properties that don't belong to a tab
         // get the properties, map and translate them, then add the tab
@@ -51,7 +51,6 @@ public abstract class TabsAndPropertiesMapper
             .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
             .ToList();
         List<ContentPropertyDisplay> genericProperties = MapProperties(content, noGroupProperties, context);
-
 
         IEnumerable<ContentPropertyDisplay> customProperties = GetCustomGenericProperties(content);
         if (customProperties != null)
@@ -66,7 +65,7 @@ public abstract class TabsAndPropertiesMapper
                 Id = 0,
                 Label = LocalizedTextService.Localize("general", "properties"),
                 Alias = "Generic properties",
-                Properties = genericProperties
+                Properties = genericProperties,
             });
         }
     }
@@ -78,8 +77,7 @@ public abstract class TabsAndPropertiesMapper
     /// <param name="properties"></param>
     /// <param name="context"></param>
     /// <returns></returns>
-    protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties,
-        MapperContext context) =>
+    protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context) =>
         context.MapEnumerable<IProperty, ContentPropertyDisplay>(properties.OrderBy(x => x.PropertyType?.SortOrder))
             .WhereNotNull().ToList();
 }
@@ -92,8 +90,7 @@ public class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
 {
     private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
 
-    public TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService,
-        IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
+    public TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider)
         : base(cultureDictionary, localizedTextService) =>
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ??
                                           throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
@@ -103,10 +100,10 @@ public class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
         var tabs = new List<Tab<ContentPropertyDisplay>>();
 
         // Property groups only exist on the content type (as it's only used for display purposes)
-        IContentTypeComposition contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
+        IContentTypeComposition? contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
 
         // Merge the groups, as compositions can introduce duplicate aliases
-        PropertyGroup[] groups = contentType?.CompositionPropertyGroups.OrderBy(x => x.SortOrder).ToArray();
+        PropertyGroup[]? groups = contentType?.CompositionPropertyGroups.OrderBy(x => x.SortOrder).ToArray();
         var parentAliases = groups?.Select(x => x.GetParentAlias()).Distinct().ToArray();
         if (groups is not null)
         {
@@ -141,7 +138,7 @@ public class TabsAndPropertiesMapper<TSource> : TabsAndPropertiesMapper
                     Type = g.Type.ToString(),
                     Alias = g.Alias,
                     Label = LocalizedTextService.UmbracoDictionaryTranslate(CultureDictionary, g.Name),
-                    Properties = mappedProperties
+                    Properties = mappedProperties,
                 });
             }
         }

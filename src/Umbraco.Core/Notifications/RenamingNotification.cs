@@ -7,11 +7,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public abstract class RenamingNotification<T> : CancelableEnumerableObjectNotification<T>
 {
-    protected RenamingNotification(T target, EventMessages messages) : base(target, messages)
+    protected RenamingNotification(T target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    protected RenamingNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+    protected RenamingNotification(IEnumerable<T> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

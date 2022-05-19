@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 [Serializable]
 [DataContract]
+
 // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
 public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
 {
@@ -26,6 +27,8 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
     /// <param name="groups">The groups.</param>
     public PropertyGroupCollection(IEnumerable<PropertyGroup> groups) => Reset(groups);
 
+    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
     public object DeepClone()
     {
         var clone = new PropertyGroupCollection();
@@ -37,7 +40,48 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         return clone;
     }
 
-    public event NotifyCollectionChangedEventHandler? CollectionChanged;
+    public new void Add(PropertyGroup item)
+    {
+        // Ensure alias is set
+        if (string.IsNullOrEmpty(item.Alias))
+        {
+            throw new InvalidOperationException("Set an alias before adding the property group.");
+        }
+
+        // Note this is done to ensure existing groups can be renamed
+        if (item.HasIdentity && item.Id > 0)
+        {
+            var index = IndexOfKey(item.Id);
+            if (index != -1)
+            {
+                var keyExists = Contains(item.Alias);
+                if (keyExists)
+                {
+                    throw new ArgumentException(
+                        $"Naming conflict: changing the alias of property group '{item.Name}' would result in duplicates.");
+                }
+
+                // Collection events will be raised in SetItem
+                SetItem(index, item);
+                return;
+            }
+        }
+        else
+        {
+            var index = IndexOfKey(item.Alias);
+            if (index != -1)
+            {
+                // Collection events will be raised in SetItem
+                SetItem(index, item);
+                return;
+            }
+        }
+
+        // Collection events will be raised in InsertItem
+        base.Add(item);
+    }
+
+    public bool Contains(int id) => IndexOfKey(id) != -1;
 
     /// <summary>
     ///     Resets the collection to only contain the <see cref="PropertyGroup" /> instances referenced in the
@@ -100,61 +144,18 @@ public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, I
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
-    public new void Add(PropertyGroup item)
-    {
-        // Ensure alias is set
-        if (string.IsNullOrEmpty(item.Alias))
-        {
-            throw new InvalidOperationException("Set an alias before adding the property group.");
-        }
-
-        // Note this is done to ensure existing groups can be renamed
-        if (item.HasIdentity && item.Id > 0)
-        {
-            var index = IndexOfKey(item.Id);
-            if (index != -1)
-            {
-                var keyExists = Contains(item.Alias);
-                if (keyExists)
-                {
-                    throw new ArgumentException(
-                        $"Naming conflict: changing the alias of property group '{item.Name}' would result in duplicates.");
-                }
-
-                // Collection events will be raised in SetItem
-                SetItem(index, item);
-                return;
-            }
-        }
-        else
-        {
-            var index = IndexOfKey(item.Alias);
-            if (index != -1)
-            {
-                // Collection events will be raised in SetItem
-                SetItem(index, item);
-                return;
-            }
-        }
-
-        // Collection events will be raised in InsertItem
-        base.Add(item);
-    }
-
     internal void ChangeKey(PropertyGroup item, string newKey) => ChangeItemKey(item, newKey);
-
-    public bool Contains(int id) => IndexOfKey(id) != -1;
 
     public int IndexOfKey(string key) => this.FindIndex(x => x.Alias == key);
 
     public int IndexOfKey(int id) => this.FindIndex(x => x.Id == id);
 
-    protected override string GetKeyForItem(PropertyGroup item) => item.Alias;
-
     /// <summary>
     ///     Clears all <see cref="CollectionChanged" /> event handlers
     /// </summary>
     public void ClearCollectionChangedEvents() => CollectionChanged = null;
+
+    protected override string GetKeyForItem(PropertyGroup item) => item.Alias;
 
     protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);

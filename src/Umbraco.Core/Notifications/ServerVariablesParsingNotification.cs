@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Notifications;
+namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
 ///     A notification for when server variables are parsing

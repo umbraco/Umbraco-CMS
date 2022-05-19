@@ -6,5 +6,5 @@ public enum PublicAccessStatus
     AccessDenied,
     NotApproved,
     LockedOut,
-    AccessAccepted
+    AccessAccepted,
 }

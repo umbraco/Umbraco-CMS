@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -25,6 +25,8 @@ public class UserTourStatus : IEquatable<UserTourStatus>
     /// </summary>
     [DataMember(Name = "disabled")]
     public bool Disabled { get; set; }
+
+    public static bool operator ==(UserTourStatus? left, UserTourStatus? right) => Equals(left, right);
 
     public bool Equals(UserTourStatus? other)
     {
@@ -62,8 +64,6 @@ public class UserTourStatus : IEquatable<UserTourStatus>
     }
 
     public override int GetHashCode() => Alias.GetHashCode();
-
-    public static bool operator ==(UserTourStatus? left, UserTourStatus? right) => Equals(left, right);
 
     public static bool operator !=(UserTourStatus? left, UserTourStatus? right) => !Equals(left, right);
 }

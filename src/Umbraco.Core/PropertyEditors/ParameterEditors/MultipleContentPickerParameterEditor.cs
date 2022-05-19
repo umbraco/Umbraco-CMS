@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -34,14 +34,19 @@ public class MultipleContentPickerParameterEditor : DataEditor
 
     internal class MultipleContentPickerParamateterValueEditor : MultiplePickerParamateterValueEditorBase
     {
-        public MultipleContentPickerParamateterValueEditor(ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, IIOHelper ioHelper,
-            DataEditorAttribute attribute, IEntityService entityService) : base(localizedTextService, shortStringHelper,
-            jsonSerializer, ioHelper, attribute, entityService)
+        public MultipleContentPickerParamateterValueEditor(
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            DataEditorAttribute attribute,
+            IEntityService entityService)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute, entityService)
         {
         }
 
         public override string UdiEntityType { get; } = Constants.UdiEntityType.Document;
+
         public override UmbracoObjectTypes UmbracoObjectType { get; } = UmbracoObjectTypes.Document;
     }
 }

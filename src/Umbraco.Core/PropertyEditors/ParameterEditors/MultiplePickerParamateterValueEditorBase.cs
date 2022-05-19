@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
@@ -22,6 +22,7 @@ internal abstract class MultiplePickerParamateterValueEditorBase : DataValueEdit
         _entityService = entityService;
 
     public abstract string UdiEntityType { get; }
+
     public abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)

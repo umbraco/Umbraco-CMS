@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.CodeAnnotations;
+namespace Umbraco.Cms.Core.CodeAnnotations;
 
 [AttributeUsage(AttributeTargets.Field)]
 public class UmbracoUdiTypeAttribute : Attribute

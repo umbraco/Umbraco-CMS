@@ -25,12 +25,19 @@ public class ViewHelper : IViewHelper
                                       throw new ArgumentNullException(nameof(defaultViewContentProvider));
     }
 
-    public bool ViewExists(ITemplate t) => t.Alias is not null && _viewFileSystem.FileExists(ViewPath(t.Alias));
+    [Obsolete("Inject IDefaultViewContentProvider instead")]
+    public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null, string? modelNamespace = null, string? modelNamespaceAlias = null)
+    {
+        IDefaultViewContentProvider viewContentProvider =
+            StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
+        return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace, modelNamespaceAlias);
+    }
 
+    public bool ViewExists(ITemplate t) => t.Alias is not null && _viewFileSystem.FileExists(ViewPath(t.Alias));
 
     public string GetFileContents(ITemplate t)
     {
-        var viewContent = "";
+        var viewContent = string.Empty;
         var path = ViewPath(t.Alias ?? string.Empty);
 
         if (_viewFileSystem.FileExists(path))
@@ -72,7 +79,7 @@ public class ViewHelper : IViewHelper
 
         if (string.IsNullOrEmpty(currentAlias) == false && currentAlias != t.Alias)
         {
-            //then kill the old file..
+            // then kill the old file..
             var oldFile = ViewPath(currentAlias);
             if (_viewFileSystem.FileExists(oldFile))
             {
@@ -91,17 +98,7 @@ public class ViewHelper : IViewHelper
         return t.Content;
     }
 
-    public string ViewPath(string alias) => _viewFileSystem.GetRelativePath(alias.Replace(" ", "") + ".cshtml");
-
-    [Obsolete("Inject IDefaultViewContentProvider instead")]
-    public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null,
-        string? modelNamespace = null, string? modelNamespaceAlias = null)
-    {
-        IDefaultViewContentProvider viewContentProvider =
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
-        return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
-            modelNamespaceAlias);
-    }
+    public string ViewPath(string alias) => _viewFileSystem.GetRelativePath(alias.Replace(" ", string.Empty) + ".cshtml");
 
     private string SaveTemplateToFile(ITemplate template)
     {

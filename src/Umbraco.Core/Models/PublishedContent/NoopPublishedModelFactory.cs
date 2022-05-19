@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 

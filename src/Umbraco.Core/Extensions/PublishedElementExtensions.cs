@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core;
@@ -68,10 +68,9 @@ public static class PublishedElementExtensions
     ///     Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is
     ///     <c>true</c>.
     /// </remarks>
-    public static bool HasValue(this IPublishedElement content, string alias, string? culture = null,
-        string? segment = null)
+    public static bool HasValue(this IPublishedElement content, string alias, string? culture = null, string? segment = null)
     {
-        IPublishedProperty prop = content.GetProperty(alias);
+        IPublishedProperty? prop = content.GetProperty(alias);
         return prop != null && prop.HasValue(culture, segment);
     }
 
@@ -105,11 +104,16 @@ public static class PublishedElementExtensions
     ///     </para>
     ///     <para>The alias is case-insensitive.</para>
     /// </remarks>
-    public static object? Value(this IPublishedElement content, IPublishedValueFallback publishedValueFallback,
-        string alias, string? culture = null, string? segment = null, Fallback fallback = default,
+    public static object? Value(
+        this IPublishedElement content,
+        IPublishedValueFallback publishedValueFallback,
+        string alias,
+        string? culture = null,
+        string? segment = null,
+        Fallback fallback = default,
         object? defaultValue = default)
     {
-        IPublishedProperty property = content.GetProperty(alias);
+        IPublishedProperty? property = content.GetProperty(alias);
 
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
@@ -159,11 +163,16 @@ public static class PublishedElementExtensions
     ///     </para>
     ///     <para>The alias is case-insensitive.</para>
     /// </remarks>
-    public static T? Value<T>(this IPublishedElement content, IPublishedValueFallback publishedValueFallback,
-        string alias, string? culture = null, string? segment = null, Fallback fallback = default,
+    public static T? Value<T>(
+        this IPublishedElement content,
+        IPublishedValueFallback publishedValueFallback,
+        string alias,
+        string? culture = null,
+        string? segment = null,
+        Fallback fallback = default,
         T? defaultValue = default)
     {
-        IPublishedProperty property = content.GetProperty(alias);
+        IPublishedProperty? property = content.GetProperty(alias);
 
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
@@ -172,7 +181,7 @@ public static class PublishedElementExtensions
         }
 
         // else let fallback try to get a value
-        if (publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out T value))
+        if (publishedValueFallback.TryGetValue(content, alias, culture, segment, fallback, defaultValue, out T? value))
         {
             return value;
         }
@@ -214,6 +223,7 @@ public static class PublishedElementExtensions
     ///     the content is visible.
     /// </remarks>
     public static bool IsVisible(this IPublishedElement content, IPublishedValueFallback publishedValueFallback) =>
+
         // rely on the property converter - will return default bool value, ie false, if property
         // is not defined, or has no value, else will return its value.
         content.Value<bool>(publishedValueFallback, Constants.Conventions.Content.NaviHide) == false;
@@ -238,8 +248,12 @@ public static class PublishedElementExtensions
     ///         specified culture. Otherwise, it is the invariant url.
     ///     </para>
     /// </remarks>
-    public static string MediaUrl(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider,
-        string? culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
+    public static string MediaUrl(
+        this IPublishedContent content,
+        IPublishedUrlProvider publishedUrlProvider,
+        string? culture = null,
+        UrlMode mode = UrlMode.Default,
+        string propertyAlias = Constants.Conventions.Media.File)
     {
         if (publishedUrlProvider == null)
         {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Events;
+namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
 ///     An IEventDispatcher that immediately raise all events.
@@ -9,8 +9,7 @@
 /// </remarks>
 internal class PassThroughEventDispatcher : IEventDispatcher
 {
-    public bool DispatchCancelable(EventHandler eventHandler, object sender, CancellableEventArgs args,
-        string? eventName = null)
+    public bool DispatchCancelable(EventHandler? eventHandler, object sender, CancellableEventArgs args, string? eventName = null)
     {
         if (eventHandler == null)
         {
@@ -21,8 +20,7 @@ internal class PassThroughEventDispatcher : IEventDispatcher
         return args.Cancel;
     }
 
-    public bool DispatchCancelable<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args,
-        string? eventName = null)
+    public bool DispatchCancelable<TArgs>(EventHandler<TArgs>? eventHandler, object sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
         if (eventHandler == null)
@@ -34,8 +32,7 @@ internal class PassThroughEventDispatcher : IEventDispatcher
         return args.Cancel;
     }
 
-    public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender,
-        TArgs args, string? eventName = null)
+    public bool DispatchCancelable<TSender, TArgs>(TypedEventHandler<TSender, TArgs>? eventHandler, TSender sender, TArgs args, string? eventName = null)
         where TArgs : CancellableEventArgs
     {
         if (eventHandler == null)
@@ -47,14 +44,12 @@ internal class PassThroughEventDispatcher : IEventDispatcher
         return args.Cancel;
     }
 
-    public void Dispatch(EventHandler eventHandler, object sender, EventArgs args, string? eventName = null) =>
+    public void Dispatch(EventHandler? eventHandler, object sender, EventArgs args, string? eventName = null) =>
         eventHandler?.Invoke(sender, args);
 
-    public void Dispatch<TArgs>(EventHandler<TArgs> eventHandler, object sender, TArgs args,
-        string? eventName = null) => eventHandler?.Invoke(sender, args);
+    public void Dispatch<TArgs>(EventHandler<TArgs>? eventHandler, object sender, TArgs args, string? eventName = null) => eventHandler?.Invoke(sender, args);
 
-    public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs> eventHandler, TSender sender, TArgs args,
-        string? eventName = null) => eventHandler?.Invoke(sender, args);
+    public void Dispatch<TSender, TArgs>(TypedEventHandler<TSender, TArgs>? eventHandler, TSender sender, TArgs args, string? eventName = null) => eventHandler?.Invoke(sender, args);
 
     public IEnumerable<IEventDefinition> GetEvents(EventDefinitionFilter filter) =>
         Enumerable.Empty<IEventDefinition>();

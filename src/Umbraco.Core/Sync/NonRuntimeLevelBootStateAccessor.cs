@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 /// <summary>
 ///     Boot state implementation for when umbraco is not in the run state

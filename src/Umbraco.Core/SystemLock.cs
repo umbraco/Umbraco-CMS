@@ -1,4 +1,4 @@
-﻿using System.Runtime.ConstrainedExecution;
+using System.Runtime.ConstrainedExecution;
 
 namespace Umbraco.Cms.Core;
 
@@ -35,13 +35,11 @@ public class SystemLock
         // Release() increments count
         // initial count: the initial count value
         // maximum count: the max value of count, and then Release() throws
-
         if (string.IsNullOrWhiteSpace(name))
         {
             // anonymous semaphore
             // use one unique releaser, that will not release the semaphore when finalized
             // because the semaphore is destroyed anyway if the app goes down
-
             _semaphore = new SemaphoreSlim(1, 1); // create a local (to the app domain) semaphore
             _releaser = new SemaphoreSlimReleaser(_semaphore);
             _releaserTask = Task.FromResult(_releaser);
@@ -51,16 +49,9 @@ public class SystemLock
             // named semaphore
             // use dedicated releasers, that will release the semaphore when finalized
             // because the semaphore is system-wide and we cannot leak counts
-
             _semaphore2 = new Semaphore(1, 1, name); // create a system-wide named semaphore
         }
     }
-
-    private IDisposable? CreateReleaser() =>
-        // for anonymous semaphore, use the unique releaser, else create a new one
-        _semaphore != null
-            ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
-            : new NamedSemaphoreReleaser(_semaphore2);
 
     public IDisposable? Lock()
     {
@@ -75,6 +66,13 @@ public class SystemLock
 
         return _releaser ?? CreateReleaser(); // anonymous vs named
     }
+
+    private IDisposable? CreateReleaser() =>
+
+        // for anonymous semaphore, use the unique releaser, else create a new one
+        _semaphore != null
+            ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
+            : new NamedSemaphoreReleaser(_semaphore2);
 
     public IDisposable? Lock(int millisecondsTimeout)
     {
@@ -91,18 +89,44 @@ public class SystemLock
 
     // note - before making those classes some structs, read
     // about "impure methods" and mutating readonly structs...
-
     private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
     {
         private readonly Semaphore? _semaphore;
 
-        internal NamedSemaphoreReleaser(Semaphore? semaphore) => _semaphore = semaphore;
-
         #region IDisposable Support
 
         // This code added to correctly implement the disposable pattern.
-
         private bool disposedValue; // To detect redundant calls
+
+        internal NamedSemaphoreReleaser(Semaphore? semaphore) => _semaphore = semaphore;
+
+        // we WANT to release the semaphore because it's a system object, ie a critical
+        // non-managed resource - and if it is not released then noone else can acquire
+        // the lock - so we inherit from CriticalFinalizerObject which means that the
+        // finalizer "should" run in all situations - there is always a chance that it
+        // does not run and the semaphore remains "acquired" but then chances are the
+        // whole process (w3wp.exe...) is going down, at which point the semaphore will
+        // be destroyed by Windows.
+
+        // however, the semaphore is a managed object, and so when the finalizer runs it
+        // might have been finalized already, and then we get a, ObjectDisposedException
+        // in the finalizer - which is bad.
+
+        // in order to prevent this we do two things
+        // - use a GCHandler to ensure the semaphore is still there when the finalizer
+        //   runs, so we can actually release it
+        // - wrap the finalizer code in a try...catch to make sure it never throws
+        ~NamedSemaphoreReleaser()
+        {
+            try
+            {
+                Dispose(false);
+            }
+            catch
+            {
+                // we do NOT want the finalizer to throw - never ever
+            }
+        }
 
         public void Dispose()
         {
@@ -124,39 +148,12 @@ public class SystemLock
                     {
                         _semaphore?.Dispose();
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                 }
 
                 disposedValue = true;
-            }
-        }
-
-        // we WANT to release the semaphore because it's a system object, ie a critical
-        // non-managed resource - and if it is not released then noone else can acquire
-        // the lock - so we inherit from CriticalFinalizerObject which means that the
-        // finalizer "should" run in all situations - there is always a chance that it
-        // does not run and the semaphore remains "acquired" but then chances are the
-        // whole process (w3wp.exe...) is going down, at which point the semaphore will
-        // be destroyed by Windows.
-
-        // however, the semaphore is a managed object, and so when the finalizer runs it
-        // might have been finalized already, and then we get a, ObjectDisposedException
-        // in the finalizer - which is bad.
-
-        // in order to prevent this we do two things
-        // - use a GCHandler to ensure the semaphore is still there when the finalizer
-        //   runs, so we can actually release it
-        // - wrap the finalizer code in a try...catch to make sure it never throws
-
-        ~NamedSemaphoreReleaser()
-        {
-            try
-            {
-                Dispose(false);
-            }
-            catch
-            {
-                // we do NOT want the finalizer to throw - never ever
             }
         }
 
@@ -168,6 +165,8 @@ public class SystemLock
         private readonly SemaphoreSlim _semaphore;
 
         internal SemaphoreSlimReleaser(SemaphoreSlim semaphore) => _semaphore = semaphore;
+
+        ~SemaphoreSlimReleaser() => Dispose(false);
 
         public void Dispose()
         {
@@ -183,7 +182,5 @@ public class SystemLock
                 _semaphore.Release();
             }
         }
-
-        ~SemaphoreSlimReleaser() => Dispose(false);
     }
 }

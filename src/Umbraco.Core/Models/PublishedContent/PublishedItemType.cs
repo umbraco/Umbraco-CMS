@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.PublishedContent;
+namespace Umbraco.Cms.Core.Models.PublishedContent;
 
 /// <summary>
 ///     The type of published element.
@@ -29,5 +29,5 @@ public enum PublishedItemType
     /// <summary>
     ///     A member.
     /// </summary>
-    Member
+    Member,
 }

@@ -16,6 +16,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     ///     Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
     /// </summary>
     public ObjectCacheAppCache() =>
+
         // the MemoryCache is created with name "in-memory". That name is
         // used to retrieve configuration options. It does not identify the memory cache, i.e.
         // each instance of this class has its own, independent, memory cache.
@@ -102,11 +103,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false,
-        string[]? dependentFiles = null)
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
     {
         // see notes in HttpRuntimeAppCache
-
         Lazy<object?>? result;
 
         try
@@ -114,9 +113,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             _locker.EnterUpgradeableReadLock();
 
             result = MemoryCache.Get(key) as Lazy<object?>;
-            if (result == null ||
-                SafeLazy.GetSafeLazyValue(result, true) ==
-                null) // get non-created as NonCreatedValue & exceptions as null
+
+            // get non-created as NonCreatedValue & exceptions as null
+            if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
                 CacheItemPolicy policy = GetPolicy(timeout, isSliding, dependentFiles);
@@ -124,7 +123,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
                 try
                 {
                     _locker.EnterWriteLock();
-                    //NOTE: This does an add or update
+
+                    // NOTE: This does an add or update
                     MemoryCache.Set(key, result, policy);
                 }
                 finally
@@ -144,8 +144,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             }
         }
 
-        //return result.Value;
-
+        // return result.Value;
         var value = result.Value; // will not throw (safe lazy)
         if (value is SafeLazy.ExceptionHolder eh)
         {
@@ -156,13 +155,11 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false,
-        string[]? dependentFiles = null)
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
     {
         // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
         // and make sure we don't store a null value.
-
-        Lazy<object> result = SafeLazy.GetSafeLazy(factory);
+        Lazy<object?> result = SafeLazy.GetSafeLazy(factory);
         var value = result.Value; // force evaluation now
         if (value == null)
         {
@@ -170,7 +167,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         CacheItemPolicy policy = GetPolicy(timeout, isSliding, dependentFiles);
-        //NOTE: This does an add or update
+
+        // NOTE: This does an add or update
         MemoryCache.Set(key, result, policy);
     }
 
@@ -226,6 +224,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterWriteLock();
+
+            // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x =>
                          {
@@ -240,7 +240,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
                                     (isInterface ? type.IsInstanceOfType(value) : value.GetType() == type);
                          })
                          .Select(x => x.Key)
-                         .ToArray()) // ToArray required to remove
+                         .ToArray())
             {
                 MemoryCache.Remove(key);
             }
@@ -262,6 +262,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             _locker.EnterWriteLock();
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
+
+            // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x =>
                          {
@@ -275,7 +277,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
                              return value == null || (isInterface ? value is T : value.GetType() == typeOfT);
                          })
                          .Select(x => x.Key)
-                         .ToArray()) // ToArray required to remove
+                         .ToArray())
             {
                 MemoryCache.Remove(key);
             }
@@ -297,6 +299,8 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             _locker.EnterWriteLock();
             Type typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
+
+            // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x =>
                          {
@@ -315,7 +319,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
                                     && predicate(x.Key, (T)value);
                          })
                          .Select(x => x.Key)
-                         .ToArray()) // ToArray required to remove
+                         .ToArray())
             {
                 MemoryCache.Remove(key);
             }
@@ -335,10 +339,12 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterWriteLock();
+
+            // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
                          .Select(x => x.Key)
-                         .ToArray()) // ToArray required to remove
+                         .ToArray())
             {
                 MemoryCache.Remove(key);
             }
@@ -360,10 +366,12 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterWriteLock();
+
+            // ToArray required to remove
             foreach (var key in MemoryCache
                          .Where(x => compiled.IsMatch(x.Key))
                          .Select(x => x.Key)
-                         .ToArray()) // ToArray required to remove
+                         .ToArray())
             {
                 MemoryCache.Remove(key);
             }
@@ -378,27 +386,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     public void Dispose() =>
+
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
-
-    private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false,
-        string[]? dependentFiles = null)
-    {
-        DateTimeOffset absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration :
-            timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value);
-        TimeSpan sliding = isSliding == false
-            ? ObjectCache.NoSlidingExpiration
-            : timeout ?? ObjectCache.NoSlidingExpiration;
-
-        var policy = new CacheItemPolicy {AbsoluteExpiration = absolute, SlidingExpiration = sliding};
-
-        if (dependentFiles != null && dependentFiles.Any())
-        {
-            policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
-        }
-
-        return policy;
-    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -411,5 +401,23 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 
             _disposedValue = true;
         }
+    }
+
+    private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+    {
+        DateTimeOffset absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration :
+            timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value);
+        TimeSpan sliding = isSliding == false
+            ? ObjectCache.NoSlidingExpiration
+            : timeout ?? ObjectCache.NoSlidingExpiration;
+
+        var policy = new CacheItemPolicy { AbsoluteExpiration = absolute, SlidingExpiration = sliding };
+
+        if (dependentFiles != null && dependentFiles.Any())
+        {
+            policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
+        }
+
+        return policy;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.Membership;
 [DataContract(IsReference = true)]
 public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
 {
-    //Custom comparer for enumerable
+    // Custom comparer for enumerable
     private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
@@ -46,8 +46,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="name"></param>
     /// <param name="permissions"></param>
     /// <param name="icon"></param>
-    public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name,
-        IEnumerable<string> permissions, string? icon)
+    /// <param name="shortStringHelper"></param>
+    public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name, IEnumerable<string> permissions, string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
@@ -83,8 +83,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _alias;
         set => SetPropertyValueAndDetectChanges(
-            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!,
-            nameof(Alias));
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!, nameof(Alias));
     }
 
     [DataMember]
@@ -110,6 +109,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
 
     public IEnumerable<string> AllowedSections => _sectionCollection;
 
+    public int UserCount { get; }
+
     public void RemoveAllowedSection(string sectionAlias)
     {
         if (_sectionCollection.Contains(sectionAlias))
@@ -128,15 +129,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
 
     public void ClearAllowedSections() => _sectionCollection.Clear();
 
-    public int UserCount { get; }
-
     protected override void PerformDeepClone(object clone)
     {
         base.PerformDeepClone(clone);
 
         var clonedEntity = (UserGroup)clone;
 
-        //manually clone the start node props
+        // manually clone the start node props
         clonedEntity._sectionCollection = new List<string>(_sectionCollection);
     }
 }

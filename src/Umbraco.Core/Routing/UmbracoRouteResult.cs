@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Routing;
+namespace Umbraco.Cms.Core.Routing;
 
 public enum UmbracoRouteResult
 {
@@ -15,5 +15,5 @@ public enum UmbracoRouteResult
     /// <summary>
     ///     Nothing matched
     /// </summary>
-    NotFound
+    NotFound,
 }

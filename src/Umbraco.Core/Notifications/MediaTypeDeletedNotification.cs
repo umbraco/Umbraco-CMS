@@ -5,11 +5,13 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class MediaTypeDeletedNotification : DeletedNotification<IMediaType>
 {
-    public MediaTypeDeletedNotification(IMediaType target, EventMessages messages) : base(target, messages)
+    public MediaTypeDeletedNotification(IMediaType target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public MediaTypeDeletedNotification(IEnumerable<IMediaType> target, EventMessages messages) : base(target, messages)
+    public MediaTypeDeletedNotification(IEnumerable<IMediaType> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 }

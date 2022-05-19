@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Reflection;
@@ -18,7 +18,6 @@ public static class TypeHelper
     private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new();
 
     private static readonly Assembly[] EmptyAssemblies = new Assembly[0];
-
 
     /// <summary>
     ///     Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also
@@ -43,24 +42,27 @@ public static class TypeHelper
                 || genericTypeDef == typeof(Collection<>)
                 || genericTypeDef == typeof(IList<>)
                 || genericTypeDef == typeof(List<>)
-                //this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
+
+                // this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
                 || obj is IEnumerable)
             {
-                //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
+                // if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
                 Type genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
-                //pass in obj to fill the list
+
+                // pass in obj to fill the list
                 return (IList?)Activator.CreateInstance(genericType, obj);
             }
         }
 
         if (type.IsArray)
         {
-            //if its an array, we'll use a List<>
-            Type typeArguments = type.GetElementType();
+            // if its an array, we'll use a List<>
+            Type? typeArguments = type.GetElementType();
             if (typeArguments is not null)
             {
                 Type genericType = typeof(List<>).MakeGenericType(typeArguments);
-                //pass in obj to fill the list
+
+                // pass in obj to fill the list
                 return (IList?)Activator.CreateInstance(genericType, obj);
             }
         }
@@ -91,7 +93,6 @@ public static class TypeHelper
         {
             return EmptyAssemblies;
         }
-
 
         // find all assembly references that are referencing the current type's assembly since we
         // should only be scanning those assemblies because any other assembly will definitely not
@@ -151,7 +152,7 @@ public static class TypeHelper
     {
         if (types.Length == 0)
         {
-            return Attempt<Type>.Fail();
+            return Attempt<Type?>.Fail();
         }
 
         if (types.Length == 1)
@@ -161,12 +162,12 @@ public static class TypeHelper
 
         foreach (Type curr in types)
         {
-            IEnumerable<Type> others = types.Except(new[] {curr});
+            IEnumerable<Type> others = types.Except(new[] { curr });
 
-            //is the current type a common denominator for all others ?
+            // is the current type a common denominator for all others ?
             var isBase = others.All(curr.IsAssignableFrom);
 
-            //if this type is the base for all others
+            // if this type is the base for all others
             if (isBase)
             {
                 return Attempt.Succeed(curr);
@@ -239,7 +240,9 @@ public static class TypeHelper
     /// <param name="includeIndexed"></param>
     /// <param name="caseSensitive"> </param>
     /// <returns></returns>
-    public static PropertyInfo? GetProperty(Type type, string name,
+    public static PropertyInfo? GetProperty(
+        Type type,
+        string name,
         bool mustRead = true,
         bool mustWrite = true,
         bool includeIndexed = false,
@@ -270,8 +273,7 @@ public static class TypeHelper
     /// <param name="mustWrite">true if the properties discovered are writable</param>
     /// <param name="includeIndexed">true if the properties discovered are indexable</param>
     /// <returns></returns>
-    public static PropertyInfo[] CachedDiscoverableProperties(Type type, bool mustRead = true, bool mustWrite = true,
-        bool includeIndexed = false) =>
+    public static PropertyInfo[] CachedDiscoverableProperties(Type type, bool mustRead = true, bool mustWrite = true, bool includeIndexed = false) =>
         GetPropertiesCache.GetOrAdd(
             new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
             x => type
@@ -280,6 +282,9 @@ public static class TypeHelper
                             && (mustWrite == false || y.CanWrite)
                             && (includeIndexed || y.GetIndexParameters().Any() == false))
                 .ToArray());
+
+    public static bool MatchType(Type implementation, Type contract) =>
+        MatchType(implementation, contract, new Dictionary<string, Type>());
 
     #region Match Type
 
@@ -291,13 +296,11 @@ public static class TypeHelper
     // http://stackoverflow.com/questions/8401738/c-sharp-casting-generics-covariance-and-contravariance
     // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
     // http://stackoverflow.com/questions/74616/how-to-detect-if-type-is-another-generic-type/1075059#1075059
-
     private static bool MatchGeneric(Type implementation, Type contract, IDictionary<string, Type> bindings)
     {
         // trying to match eg List<int> with List<T>
         // or List<List<List<int>>> with List<ListList<T>>>
         // classes are NOT invariant so List<string> does not match List<object>
-
         if (implementation.IsGenericType == false)
         {
             return false;
@@ -334,11 +337,7 @@ public static class TypeHelper
         return true;
     }
 
-    public static bool MatchType(Type implementation, Type contract) =>
-        MatchType(implementation, contract, new Dictionary<string, Type>());
-
-    public static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings,
-        bool variance = true)
+    public static bool MatchType(Type implementation, Type contract, IDictionary<string, Type> bindings, bool variance = true)
     {
         if (contract.IsGenericType)
         {
@@ -359,7 +358,7 @@ public static class TypeHelper
             }
 
             // try to match an ancestor of implementation against contract
-            Type t = implementation.BaseType;
+            Type? t = implementation.BaseType;
             while (t != null)
             {
                 if (MatchGeneric(t, contract, bindings))
@@ -377,7 +376,6 @@ public static class TypeHelper
         if (contract.IsGenericParameter)
         {
             // eg <T>
-
             if (bindings.ContainsKey(contract.Name))
             {
                 // already bound: ensure it's compatible
@@ -394,7 +392,6 @@ public static class TypeHelper
         // about primitive types, value types, etc:
         // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
         // if it's a primitive type... it needs to be ==
-
         if (implementation == contract)
         {
             return true;

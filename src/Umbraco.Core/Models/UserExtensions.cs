@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Security.Cryptography;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -19,11 +19,11 @@ public static class UserExtensions
     /// <param name="user"></param>
     /// <param name="cache"></param>
     /// <param name="mediaFileManager"></param>
+    /// <param name="imageUrlGenerator"></param>
     /// <returns>
     ///     A list of 5 different sized avatar URLs
     /// </returns>
-    public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager,
-        IImageUrlGenerator imageUrlGenerator)
+    public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
     {
         // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
         // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
@@ -39,16 +39,19 @@ public static class UserExtensions
             var gravatarHash = user.Email?.GenerateHash<MD5>();
             var gravatarUrl = "https://www.gravatar.com/avatar/" + gravatarHash + "?d=404";
 
-            //try Gravatar
+            // try Gravatar
             var gravatarAccess = cache.GetCacheItem("UserAvatar" + user.Id, () =>
             {
                 // Test if we can reach this URL, will fail when there's network or firewall errors
                 var request = (HttpWebRequest)WebRequest.Create(gravatarUrl);
+
                 // Require response within 10 seconds
                 request.Timeout = 10000;
                 try
                 {
-                    using ((HttpWebResponse)request.GetResponse()) { }
+                    using ((HttpWebResponse)request.GetResponse())
+                    {
+                    }
                 }
                 catch (Exception)
                 {
@@ -64,68 +67,76 @@ public static class UserExtensions
                 return new[]
                 {
                     gravatarUrl + "&s=30", gravatarUrl + "&s=60", gravatarUrl + "&s=90", gravatarUrl + "&s=150",
-                    gravatarUrl + "&s=300"
+                    gravatarUrl + "&s=300",
                 };
             }
 
             return new string[0];
         }
 
-        //use the custom avatar
+        // use the custom avatar
         var avatarUrl = mediaFileManager.FileSystem.GetUrl(user.Avatar);
         return new[]
         {
             imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl)
             {
-                ImageCropMode = ImageCropMode.Crop, Width = 30, Height = 30
+                ImageCropMode = ImageCropMode.Crop, Width = 30, Height = 30,
             }),
             imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl)
             {
-                ImageCropMode = ImageCropMode.Crop, Width = 60, Height = 60
+                ImageCropMode = ImageCropMode.Crop, Width = 60, Height = 60,
             }),
             imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl)
             {
-                ImageCropMode = ImageCropMode.Crop, Width = 90, Height = 90
+                ImageCropMode = ImageCropMode.Crop, Width = 90, Height = 90,
             }),
             imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl)
             {
-                ImageCropMode = ImageCropMode.Crop, Width = 150, Height = 150
+                ImageCropMode = ImageCropMode.Crop, Width = 150, Height = 150,
             }),
             imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl)
             {
-                ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300
-            })
+                ImageCropMode = ImageCropMode.Crop, Width = 300, Height = 300,
+            }),
         }.WhereNotNull().ToArray();
     }
 
-
-    internal static bool HasContentRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
-        ContentPermissions.HasPathAccess(Constants.System.RootString,
-            user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
-
-    internal static bool HasContentBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
-        ContentPermissions.HasPathAccess(Constants.System.RecycleBinContentString,
-            user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
-
-    internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
-        ContentPermissions.HasPathAccess(Constants.System.RootString,
-            user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
-
-    internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
-        ContentPermissions.HasPathAccess(Constants.System.RecycleBinMediaString,
-            user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
-
-    public static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService,
-        AppCaches appCaches)
+    public static bool HasPathAccess(this IUser user, IContent content, IEntityService entityService, AppCaches appCaches)
     {
         if (content == null)
         {
             throw new ArgumentNullException(nameof(content));
         }
 
-        return ContentPermissions.HasPathAccess(content.Path,
-            user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        return ContentPermissions.HasPathAccess(
+            content.Path,
+            user.CalculateContentStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinContent);
     }
+
+    internal static bool HasContentRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RootString,
+            user.CalculateContentStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinContent);
+
+    internal static bool HasContentBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RecycleBinContentString,
+            user.CalculateContentStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinContent);
+
+    internal static bool HasMediaRootAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RootString,
+            user.CalculateMediaStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinMedia);
+
+    internal static bool HasMediaBinAccess(this IUser user, IEntityService entityService, AppCaches appCaches) =>
+        ContentPermissions.HasPathAccess(
+            Constants.System.RecycleBinMediaString,
+            user.CalculateMediaStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinMedia);
 
     public static bool HasPathAccess(this IUser user, IMedia? media, IEntityService entityService, AppCaches appCaches)
     {
@@ -134,32 +145,30 @@ public static class UserExtensions
             throw new ArgumentNullException(nameof(media));
         }
 
-        return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches),
-            Constants.System.RecycleBinMedia);
+        return ContentPermissions.HasPathAccess(media.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
     }
 
-    public static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService,
-        AppCaches appCaches)
+    public static bool HasContentPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
     {
         if (entity == null)
         {
             throw new ArgumentNullException(nameof(entity));
         }
 
-        return ContentPermissions.HasPathAccess(entity.Path,
-            user.CalculateContentStartNodeIds(entityService, appCaches), Constants.System.RecycleBinContent);
+        return ContentPermissions.HasPathAccess(
+            entity.Path,
+            user.CalculateContentStartNodeIds(entityService, appCaches),
+            Constants.System.RecycleBinContent);
     }
 
-    public static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService,
-        AppCaches appCaches)
+    public static bool HasMediaPathAccess(this IUser user, IUmbracoEntity entity, IEntityService entityService, AppCaches appCaches)
     {
         if (entity == null)
         {
             throw new ArgumentNullException(nameof(entity));
         }
 
-        return ContentPermissions.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService, appCaches),
-            Constants.System.RecycleBinMedia);
+        return ContentPermissions.HasPathAccess(entity.Path, user.CalculateMediaStartNodeIds(entityService, appCaches), Constants.System.RecycleBinMedia);
     }
 
     /// <summary>
@@ -179,12 +188,13 @@ public static class UserExtensions
     /// <summary>
     ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
     /// </summary>
-    public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService,
-        AppCaches appCaches)
+    public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
-        var result = runtimeCache.GetCacheItem(cacheKey, () =>
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
         {
             // This returns a nullable array even though we're checking if items have value and there cannot be null
             // We use Cast<int> to recast into non-nullable array
@@ -198,7 +208,9 @@ public static class UserExtensions
             }
 
             return null;
-        }, TimeSpan.FromMinutes(2), true);
+        },
+            TimeSpan.FromMinutes(2),
+            true);
 
         return result;
     }
@@ -208,13 +220,15 @@ public static class UserExtensions
     /// </summary>
     /// <param name="user"></param>
     /// <param name="entityService"></param>
-    /// <param name="runtimeCache"></param>
+    /// <param name="appCaches"></param>
     /// <returns></returns>
     public static int[]? CalculateMediaStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = CacheKeys.UserAllMediaStartNodesPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
-        var result = runtimeCache.GetCacheItem(cacheKey, () =>
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
         {
             var gsn = user.Groups.Where(x => x.StartMediaId.HasValue).Select(x => x.StartMediaId!.Value).Distinct()
                 .ToArray();
@@ -226,7 +240,9 @@ public static class UserExtensions
             }
 
             return null;
-        }, TimeSpan.FromMinutes(2), true);
+        },
+            TimeSpan.FromMinutes(2),
+            true);
 
         return result;
     }
@@ -235,12 +251,16 @@ public static class UserExtensions
     {
         var cacheKey = CacheKeys.UserMediaStartNodePathsPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
-        var result = runtimeCache.GetCacheItem(cacheKey, () =>
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
         {
             var startNodeIds = user.CalculateMediaStartNodeIds(entityService, appCaches);
             var vals = entityService.GetAllPaths(UmbracoObjectTypes.Media, startNodeIds).Select(x => x.Path).ToArray();
             return vals;
-        }, TimeSpan.FromMinutes(2), true);
+        },
+            TimeSpan.FromMinutes(2),
+            true);
 
         return result;
     }
@@ -249,43 +269,24 @@ public static class UserExtensions
     {
         var cacheKey = CacheKeys.UserContentStartNodePathsPrefix + user.Id;
         IAppPolicyCache runtimeCache = appCaches.IsolatedCaches.GetOrCreate<IUser>();
-        var result = runtimeCache.GetCacheItem(cacheKey, () =>
+        var result = runtimeCache.GetCacheItem(
+            cacheKey,
+            () =>
         {
             var startNodeIds = user.CalculateContentStartNodeIds(entityService, appCaches);
             var vals = entityService.GetAllPaths(UmbracoObjectTypes.Document, startNodeIds).Select(x => x.Path)
                 .ToArray();
             return vals;
-        }, TimeSpan.FromMinutes(2), true);
+        },
+            TimeSpan.FromMinutes(2),
+            true);
 
         return result;
     }
 
-    private static bool StartsWithPath(string test, string path) =>
-        test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
-
-    private static string GetBinPath(UmbracoObjectTypes objectType)
-    {
-        var binPath = Constants.System.RootString + ",";
-        switch (objectType)
-        {
-            case UmbracoObjectTypes.Document:
-                binPath += Constants.System.RecycleBinContentString;
-                break;
-            case UmbracoObjectTypes.Media:
-                binPath += Constants.System.RecycleBinMediaString;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(objectType));
-        }
-
-        return binPath;
-    }
-
-    internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn,
-        IEntityService entityService)
+    internal static int[] CombineStartNodes(UmbracoObjectTypes objectType, int[] groupSn, int[] userSn, IEntityService entityService)
     {
         // assume groupSn and userSn each don't contain duplicates
-
         var asn = groupSn.Concat(userSn).Distinct().ToArray();
         Dictionary<int, string> paths = asn.Length > 0
             ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
@@ -349,5 +350,26 @@ public static class UserExtensions
         }
 
         return lsn.ToArray();
+    }
+
+    private static bool StartsWithPath(string test, string path) =>
+        test.StartsWith(path) && test.Length > path.Length && test[path.Length] == ',';
+
+    private static string GetBinPath(UmbracoObjectTypes objectType)
+    {
+        var binPath = Constants.System.RootString + ",";
+        switch (objectType)
+        {
+            case UmbracoObjectTypes.Document:
+                binPath += Constants.System.RecycleBinContentString;
+                break;
+            case UmbracoObjectTypes.Media:
+                binPath += Constants.System.RecycleBinMediaString;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(objectType));
+        }
+
+        return binPath;
     }
 }

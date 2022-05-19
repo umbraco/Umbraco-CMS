@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -36,7 +36,7 @@ public class ValueEditorCache : IValueEditorCache
             }
 
             valueEditor = editor.GetValueEditor(dataType.Configuration);
-            _valueEditorCache[editor.Alias] = new Dictionary<int, IDataValueEditor> {[dataType.Id] = valueEditor};
+            _valueEditorCache[editor.Alias] = new Dictionary<int, IDataValueEditor> { [dataType.Id] = valueEditor };
             return valueEditor;
         }
     }

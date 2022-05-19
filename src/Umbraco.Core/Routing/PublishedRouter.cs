@@ -95,7 +95,8 @@ public class PublishedRouter : IPublishedRouter
     }
 
     /// <inheritdoc />
-    public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder builder,
+    public async Task<IPublishedRequest> RouteRequestAsync(
+        IPublishedRequestBuilder builder,
         RouteRequestOptions options)
     {
         // outbound routing performs different/simpler logic
@@ -117,7 +118,8 @@ public class PublishedRouter : IPublishedRouter
     }
 
     /// <inheritdoc />
-    public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request,
+    public async Task<IPublishedRequest> UpdateRequestAsync(
+        IPublishedRequest request,
         IPublishedContent? publishedContent)
     {
         // store the original (if any)
@@ -151,6 +153,32 @@ public class PublishedRouter : IPublishedRouter
         }
 
         return BuildRequest(builder);
+    }
+
+    /// <summary>
+    ///     This method finalizes/builds the PCR with the values assigned.
+    /// </summary>
+    /// <returns>
+    ///     Returns false if the request was not successfully configured
+    /// </returns>
+    /// <remarks>
+    ///     This method logic has been put into it's own method in case developers have created a custom PCR or are assigning
+    ///     their own values
+    ///     but need to finalize it themselves.
+    /// </remarks>
+    internal IPublishedRequest BuildRequest(IPublishedRequestBuilder builder)
+    {
+        IPublishedRequest result = builder.Build();
+
+        if (!builder.HasPublishedContent())
+        {
+            return result;
+        }
+
+        // set the culture -- again, 'cos it might have changed in the event handler
+        SetVariationContext(result.Culture);
+
+        return result;
     }
 
     private async Task<IPublishedRequest> TryRouteRequest(IPublishedRequestBuilder request)
@@ -241,32 +269,6 @@ public class PublishedRouter : IPublishedRouter
     }
 
     /// <summary>
-    ///     This method finalizes/builds the PCR with the values assigned.
-    /// </summary>
-    /// <returns>
-    ///     Returns false if the request was not successfully configured
-    /// </returns>
-    /// <remarks>
-    ///     This method logic has been put into it's own method in case developers have created a custom PCR or are assigning
-    ///     their own values
-    ///     but need to finalize it themselves.
-    /// </remarks>
-    internal IPublishedRequest BuildRequest(IPublishedRequestBuilder builder)
-    {
-        IPublishedRequest result = builder.Build();
-
-        if (!builder.HasPublishedContent())
-        {
-            return result;
-        }
-
-        // set the culture -- again, 'cos it might have changed in the event handler
-        SetVariationContext(result.Culture);
-
-        return result;
-    }
-
-    /// <summary>
     ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
     /// </summary>
     /// <returns>A value indicating whether a domain was found.</returns>
@@ -322,7 +324,8 @@ public class PublishedRouter : IPublishedRouter
             // matching an existing domain
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}",
+                _logger.LogDebug(
+                    "{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}",
                     tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
             }
 
@@ -384,7 +387,8 @@ public class PublishedRouter : IPublishedRouter
             request.SetCulture(domain.Culture);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}",
+                _logger.LogDebug(
+                    "{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}",
                     tracePrefix, domain.ContentId, request.Culture);
             }
         }
@@ -408,8 +412,8 @@ public class PublishedRouter : IPublishedRouter
         if (pos > 0)
         {
             // recurse
-            DirectoryInfo? subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
-            alias = alias.Substring(pos + 1);
+            DirectoryInfo? subdir = directory.GetDirectories(alias[..pos]).FirstOrDefault();
+            alias = alias[(pos + 1)..];
             return subdir != null && FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
         }
 
@@ -535,7 +539,8 @@ public class PublishedRouter : IPublishedRouter
             // loop while we don't have page, ie the redirect or access
             // got us to nowhere and now we need to run the notFoundLookup again
             // as long as it's not running out of control ie infinite loop of some sort
-        } while (request.PublishedContent == null && i++ < maxLoop);
+        }
+        while (request.PublishedContent == null && i++ < maxLoop);
 
         if (i == maxLoop || j == maxLoop)
         {
@@ -578,7 +583,8 @@ public class PublishedRouter : IPublishedRouter
         var redirect = false;
         var valid = false;
         IPublishedContent? internalRedirectNode = null;
-        var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback,
+        var internalRedirectId = request.PublishedContent.Value(
+            _publishedValueFallback,
             Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
@@ -590,7 +596,8 @@ public class PublishedRouter : IPublishedRouter
         }
         else
         {
-            GuidUdi? udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(_publishedValueFallback,
+            GuidUdi? udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(
+                _publishedValueFallback,
                 Constants.Conventions.Content.InternalRedirectId);
             if (udiInternalRedirectId is not null)
             {
@@ -709,7 +716,8 @@ public class PublishedRouter : IPublishedRouter
             {
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                    _logger.LogDebug(
+                        "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
                         template.Id, template.Alias);
                 }
             }
@@ -754,7 +762,8 @@ public class PublishedRouter : IPublishedRouter
                     request.SetTemplate(template);
                     if (_logger.IsEnabled(LogLevel.Debug))
                     {
-                        _logger.LogDebug("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
+                        _logger.LogDebug(
+                            "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
                             template.Id, template.Alias);
                     }
                 }
@@ -773,13 +782,15 @@ public class PublishedRouter : IPublishedRouter
                 _logger.LogWarning(
                     "FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.",
                     altTemplate, request.PublishedContent.Id);
+
                 // no allowed, back to default
                 var templateId = request.PublishedContent.TemplateId;
                 ITemplate? template = GetTemplate(templateId);
                 request.SetTemplate(template);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
+                    _logger.LogDebug(
+                        "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
                         template?.Id, template?.Alias);
                 }
             }
@@ -869,7 +880,8 @@ public class PublishedRouter : IPublishedRouter
         {
             // might be a UDI instead of an int Id
             GuidUdi? redirectUdi =
-                request.PublishedContent.Value<GuidUdi>(_publishedValueFallback,
+                request.PublishedContent.Value<GuidUdi>(
+                    _publishedValueFallback,
                     Constants.Conventions.Content.Redirect);
             if (redirectUdi is not null)
             {

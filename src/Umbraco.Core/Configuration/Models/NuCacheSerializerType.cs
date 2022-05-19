@@ -9,5 +9,5 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 public enum NuCacheSerializerType
 {
     MessagePack = 1, // Default
-    JSON = 2
+    JSON = 2,
 }

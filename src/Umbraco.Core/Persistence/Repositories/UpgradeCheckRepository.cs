@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Serialization;
 
@@ -21,20 +21,19 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
                 _httpClient = new HttpClient();
             }
 
-            var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8,
-                "application/json");
+            var content = new StringContent(_jsonSerializer.Serialize(new CheckUpgradeDto(version)), Encoding.UTF8, "application/json");
 
             _httpClient.Timeout = TimeSpan.FromSeconds(1);
             HttpResponseMessage task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, content);
             var json = await task.Content.ReadAsStringAsync();
-            UpgradeResult result = _jsonSerializer.Deserialize<UpgradeResult>(json);
+            UpgradeResult? result = _jsonSerializer.Deserialize<UpgradeResult>(json);
 
-            return result ?? new UpgradeResult("None", "", "");
+            return result ?? new UpgradeResult("None", string.Empty, string.Empty);
         }
         catch (HttpRequestException)
         {
             // this occurs if the server for Our is down or cannot be reached
-            return new UpgradeResult("None", "", "");
+            return new UpgradeResult("None", string.Empty, string.Empty);
         }
     }
 
@@ -49,8 +48,11 @@ public class UpgradeCheckRepository : IUpgradeCheckRepository
         }
 
         public int VersionMajor { get; }
+
         public int VersionMinor { get; }
+
         public int VersionPatch { get; }
+
         public string VersionComment { get; }
     }
 }

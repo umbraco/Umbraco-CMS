@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync;
+namespace Umbraco.Cms.Core.Sync;
 
 public enum SyncBootState
 {
@@ -15,5 +15,5 @@ public enum SyncBootState
     /// <summary>
     ///     Warm boot. Sync state present
     /// </summary>
-    WarmBoot = 2
+    WarmBoot = 2,
 }

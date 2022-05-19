@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Xml.XPath;
@@ -18,8 +18,7 @@ public static class XPathNavigatorExtensions
     /// <param name="expression">An XPath expression.</param>
     /// <param name="variables">A set of XPathVariables.</param>
     /// <returns>An iterator over the nodes matching the specified expression.</returns>
-    public static XPathNodeIterator Select(this XPathNavigator navigator, string expression,
-        params XPathVariable[] variables)
+    public static XPathNodeIterator Select(this XPathNavigator navigator, string expression, params XPathVariable[] variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
         {
@@ -51,8 +50,7 @@ public static class XPathNavigatorExtensions
     /// <param name="expression">An XPath expression.</param>
     /// <param name="variables">A set of XPathVariables.</param>
     /// <returns>An iterator over the nodes matching the specified expression.</returns>
-    public static XPathNodeIterator Select(this XPathNavigator navigator, XPathExpression expression,
-        params XPathVariable[] variables)
+    public static XPathNodeIterator Select(this XPathNavigator navigator, XPathExpression expression, params XPathVariable[] variables)
     {
         if (variables == null || variables.Length == 0 || variables[0] == null)
         {

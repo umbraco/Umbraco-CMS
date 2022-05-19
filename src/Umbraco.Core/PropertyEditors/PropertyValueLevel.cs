@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors;
+namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Indicates the level of a value.
@@ -18,5 +18,5 @@ public enum PropertyValueLevel
     /// <summary>
     ///     The converted value.
     /// </summary>
-    Object
+    Object,
 }

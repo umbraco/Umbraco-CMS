@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Cms.Core.Events;
 
@@ -12,6 +12,8 @@ public class UserGroupWithUsers
     }
 
     public IUserGroup UserGroup { get; }
+
     public IUser[] AddedUsers { get; }
+
     public IUser[] RemovedUsers { get; }
 }

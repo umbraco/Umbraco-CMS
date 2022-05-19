@@ -13,29 +13,6 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
-    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder,
-        Action<OptionsBuilder<TOptions>>? configure = null)
-        where TOptions : class
-    {
-        UmbracoOptionsAttribute umbracoOptionsAttribute =
-            typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
-        if (umbracoOptionsAttribute is null)
-        {
-            throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
-        }
-
-        OptionsBuilder<TOptions> optionsBuilder = builder.Services.AddOptions<TOptions>()
-            .Bind(
-                builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
-                o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties
-            )
-            .ValidateDataAnnotations();
-
-        configure?.Invoke(optionsBuilder);
-
-        return builder;
-    }
-
     /// <summary>
     ///     Add Umbraco configuration services and options
     /// </summary>
@@ -108,6 +85,28 @@ public static partial class UmbracoBuilderExtensions
                 $"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
         builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(
+        this IUmbracoBuilder builder,
+        Action<OptionsBuilder<TOptions>>? configure = null)
+        where TOptions : class
+    {
+        UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
+        if (umbracoOptionsAttribute is null)
+        {
+            throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
+        }
+
+        OptionsBuilder<TOptions> optionsBuilder = builder.Services.AddOptions<TOptions>()
+            .Bind(
+                builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
+                o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
+            .ValidateDataAnnotations();
+
+        configure?.Invoke(optionsBuilder);
 
         return builder;
     }

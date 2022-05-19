@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Cache;
+namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
 ///     Specifies how a repository cache policy should cache entities.

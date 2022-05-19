@@ -64,7 +64,8 @@ public abstract class OEmbedProviderBase : IEmbedProvider
         }
     }
 
-    public virtual T? GetJsonResponse<T>(string url) where T : class
+    public virtual T? GetJsonResponse<T>(string url)
+        where T : class
     {
         var response = DownloadResponse(url);
         return _jsonSerializer.Deserialize<T>(response);
@@ -81,7 +82,7 @@ public abstract class OEmbedProviderBase : IEmbedProvider
 
     public virtual string GetXmlProperty(XmlDocument doc, string property)
     {
-        XmlNode selectSingleNode = doc.SelectSingleNode(property);
+        XmlNode? selectSingleNode = doc.SelectSingleNode(property);
         return selectSingleNode != null ? selectSingleNode.InnerText : string.Empty;
     }
 }

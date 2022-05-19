@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
-//
+
 // we cannot implement strongly-typed content by inheriting from some sort
 // of "master content" because that master content depends on the actual content cache
 // that is being used. It can be an XmlPublishedContent with the XmlPublishedCache,
@@ -46,6 +46,11 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// <inheritdoc />
     public Guid Key => _content.Key;
 
+    #region PublishedContent
+
+    /// <inheritdoc />
+    public virtual int Id => _content.Id;
+
     #endregion
 
     /// <summary>
@@ -53,11 +58,6 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// </summary>
     /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
     public IPublishedContent Unwrap() => _content;
-
-    #region PublishedContent
-
-    /// <inheritdoc />
-    public virtual int Id => _content.Id;
 
     /// <inheritdoc />
     public virtual string? Name => _content.Name;
@@ -95,18 +95,18 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// <inheritdoc />
     public virtual PublishedItemType ItemType => _content.ItemType;
 
-    /// <inheritdoc />
-    public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
-
-    /// <inheritdoc />
-    public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
-
     #endregion
 
     #region Tree
 
     /// <inheritdoc />
     public virtual IPublishedContent? Parent => _content.Parent;
+
+    /// <inheritdoc />
+    public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
+
+    /// <inheritdoc />
+    public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
     /// <inheritdoc />
     public virtual IEnumerable<IPublishedContent>? Children => _content.Children;

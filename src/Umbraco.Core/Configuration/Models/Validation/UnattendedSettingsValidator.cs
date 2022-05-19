@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Options;
@@ -32,7 +32,7 @@ public class UnattendedSettingsValidator
                 setValues++;
             }
 
-            if (0 < setValues && setValues < 3)
+            if (setValues > 0 && setValues < 3)
             {
                 return ValidateOptionsResult.Fail(
                     $"Configuration entry {Constants.Configuration.ConfigUnattended} contains invalid values.\nIf any of the {nameof(options.UnattendedUserName)}, {nameof(options.UnattendedUserEmail)}, {nameof(options.UnattendedUserPassword)} are set, all of them are required.");

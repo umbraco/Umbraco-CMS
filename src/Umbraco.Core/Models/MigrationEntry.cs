@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Core.Models;

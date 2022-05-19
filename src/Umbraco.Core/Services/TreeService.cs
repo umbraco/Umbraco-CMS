@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.Trees;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -21,11 +21,13 @@ public class TreeService : ITreeService
 
     /// <inheritdoc />
     public IEnumerable<Tree> GetAll(TreeUse use = TreeUse.Main)
+
         // use HasFlagAny: if use is Main|Dialog, we want to return Main *and* Dialog trees
         => _treeCollection.Where(x => x.TreeUse.HasFlagAny(use));
 
     /// <inheritdoc />
     public IEnumerable<Tree> GetBySection(string sectionAlias, TreeUse use = TreeUse.Main)
+
         // use HasFlagAny: if use is Main|Dialog, we want to return Main *and* Dialog trees
         => _treeCollection.Where(x => x.SectionAlias.InvariantEquals(sectionAlias) && x.TreeUse.HasFlagAny(use))
             .OrderBy(x => x.SortOrder).ToList();
@@ -34,6 +36,6 @@ public class TreeService : ITreeService
     public IDictionary<string, IEnumerable<Tree>>
         GetBySectionGrouped(string sectionAlias, TreeUse use = TreeUse.Main) =>
         GetBySection(sectionAlias, use).GroupBy(x => x.TreeGroup).ToDictionary(
-            x => x.Key ?? "",
+            x => x.Key ?? string.Empty,
             x => (IEnumerable<Tree>)x.ToArray());
 }

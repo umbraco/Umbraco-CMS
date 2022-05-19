@@ -27,6 +27,13 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
+    ///     Gets the actions collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    public static ActionCollectionBuilder? Actions(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ActionCollectionBuilder>();
+
+    /// <summary>
     ///     Adds all core collection builders
     /// </summary>
     internal static void AddAllCoreCollectionBuilders(this IUmbracoBuilder builder)
@@ -66,6 +73,7 @@ public static partial class UmbracoBuilderExtensions
             .Append<DefaultUrlProvider>();
         builder.MediaUrlProviders()?
             .Append<DefaultMediaUrlProvider>();
+
         // register back office sections in the order we want them rendered
         builder.Sections()?
             .Append<ContentSection>()
@@ -77,6 +85,7 @@ public static partial class UmbracoBuilderExtensions
             .Append<FormsSection>()
             .Append<TranslationSection>();
         builder.Components();
+
         // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards
         builder.Dashboards()?
             .Add<ContentDashboard>()
@@ -103,6 +112,7 @@ public static partial class UmbracoBuilderExtensions
             .Add<DecimalValidator>();
         builder.ManifestFilters();
         builder.MediaUrlGenerators();
+
         // register OEmbed providers - no type scanning - all explicit opt-in of adding types, IEmbedProvider is not IDiscoverable
         builder.EmbedProviders()?
             .Append<YouTube>()
@@ -122,13 +132,6 @@ public static partial class UmbracoBuilderExtensions
         builder.SearchableTrees()?.Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
         builder.BackOfficeAssets();
     }
-
-    /// <summary>
-    ///     Gets the actions collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static ActionCollectionBuilder? Actions(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ActionCollectionBuilder>();
 
     /// <summary>
     ///     Gets the content apps collection builder.
@@ -245,18 +248,18 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>();
 
     /// <summary>
-    ///     Gets the validators collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    internal static ManifestValueValidatorCollectionBuilder? ManifestValueValidators(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
-
-    /// <summary>
     ///     Gets the manifest filter collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
     public static ManifestFilterCollectionBuilder? ManifestFilters(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
+
+    /// <summary>
+    ///     Gets the validators collection builder.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    internal static ManifestValueValidatorCollectionBuilder? ManifestValueValidators(this IUmbracoBuilder builder)
+        => builder.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
 
     /// <summary>
     ///     Gets the content finders collection builder.

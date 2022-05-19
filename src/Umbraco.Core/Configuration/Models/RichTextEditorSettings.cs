@@ -12,125 +12,125 @@ public class RichTextEditorSettings
 
     internal const string StaticInvalidElements = "font";
 
-    private static readonly string[] s_default_plugins =
+    private static readonly string[] Default_plugins =
     {
         "paste", "anchor", "charmap", "table", "lists", "advlist", "hr", "autolink", "directionality", "tabfocus",
-        "searchreplace"
+        "searchreplace",
     };
 
-    private static readonly RichTextEditorCommand[] s_default_commands =
+    private static readonly RichTextEditorCommand[] Default_commands =
     {
         new RichTextEditorCommand
         {
-            Alias = "ace", Name = "Source code editor", Mode = RichTextEditorCommandMode.Insert
+            Alias = "ace", Name = "Source code editor", Mode = RichTextEditorCommandMode.Insert,
         },
         new RichTextEditorCommand
         {
-            Alias = "removeformat", Name = "Remove format", Mode = RichTextEditorCommandMode.Selection
+            Alias = "removeformat", Name = "Remove format", Mode = RichTextEditorCommandMode.Selection,
         },
-        new RichTextEditorCommand {Alias = "undo", Name = "Undo", Mode = RichTextEditorCommandMode.Insert},
-        new RichTextEditorCommand {Alias = "redo", Name = "Redo", Mode = RichTextEditorCommandMode.Insert},
-        new RichTextEditorCommand {Alias = "cut", Name = "Cut", Mode = RichTextEditorCommandMode.Selection},
-        new RichTextEditorCommand {Alias = "copy", Name = "Copy", Mode = RichTextEditorCommandMode.Selection},
-        new RichTextEditorCommand {Alias = "paste", Name = "Paste", Mode = RichTextEditorCommandMode.All},
+        new RichTextEditorCommand { Alias = "undo", Name = "Undo", Mode = RichTextEditorCommandMode.Insert },
+        new RichTextEditorCommand { Alias = "redo", Name = "Redo", Mode = RichTextEditorCommandMode.Insert },
+        new RichTextEditorCommand { Alias = "cut", Name = "Cut", Mode = RichTextEditorCommandMode.Selection },
+        new RichTextEditorCommand { Alias = "copy", Name = "Copy", Mode = RichTextEditorCommandMode.Selection },
+        new RichTextEditorCommand { Alias = "paste", Name = "Paste", Mode = RichTextEditorCommandMode.All },
         new RichTextEditorCommand
         {
-            Alias = "styleselect", Name = "Style select", Mode = RichTextEditorCommandMode.All
+            Alias = "styleselect", Name = "Style select", Mode = RichTextEditorCommandMode.All,
         },
-        new RichTextEditorCommand {Alias = "bold", Name = "Bold", Mode = RichTextEditorCommandMode.Selection},
-        new RichTextEditorCommand {Alias = "italic", Name = "Italic", Mode = RichTextEditorCommandMode.Selection},
+        new RichTextEditorCommand { Alias = "bold", Name = "Bold", Mode = RichTextEditorCommandMode.Selection },
+        new RichTextEditorCommand { Alias = "italic", Name = "Italic", Mode = RichTextEditorCommandMode.Selection },
         new RichTextEditorCommand
         {
-            Alias = "underline", Name = "Underline", Mode = RichTextEditorCommandMode.Selection
-        },
-        new RichTextEditorCommand
-        {
-            Alias = "strikethrough", Name = "Strikethrough", Mode = RichTextEditorCommandMode.Selection
+            Alias = "underline", Name = "Underline", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "alignleft", Name = "Justify left", Mode = RichTextEditorCommandMode.Selection
+            Alias = "strikethrough", Name = "Strikethrough", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "aligncenter", Name = "Justify center", Mode = RichTextEditorCommandMode.Selection
+            Alias = "alignleft", Name = "Justify left", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "alignright", Name = "Justify right", Mode = RichTextEditorCommandMode.Selection
+            Alias = "aligncenter", Name = "Justify center", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "alignjustify", Name = "Justify full", Mode = RichTextEditorCommandMode.Selection
-        },
-        new RichTextEditorCommand {Alias = "bullist", Name = "Bullet list", Mode = RichTextEditorCommandMode.All},
-        new RichTextEditorCommand {Alias = "numlist", Name = "Numbered list", Mode = RichTextEditorCommandMode.All},
-        new RichTextEditorCommand
-        {
-            Alias = "outdent", Name = "Decrease indent", Mode = RichTextEditorCommandMode.All
+            Alias = "alignright", Name = "Justify right", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "indent", Name = "Increase indent", Mode = RichTextEditorCommandMode.All
+            Alias = "alignjustify", Name = "Justify full", Mode = RichTextEditorCommandMode.Selection,
         },
-        new RichTextEditorCommand {Alias = "link", Name = "Insert/edit link", Mode = RichTextEditorCommandMode.All},
+        new RichTextEditorCommand { Alias = "bullist", Name = "Bullet list", Mode = RichTextEditorCommandMode.All },
+        new RichTextEditorCommand { Alias = "numlist", Name = "Numbered list", Mode = RichTextEditorCommandMode.All },
         new RichTextEditorCommand
         {
-            Alias = "unlink", Name = "Remove link", Mode = RichTextEditorCommandMode.Selection
-        },
-        new RichTextEditorCommand {Alias = "anchor", Name = "Anchor", Mode = RichTextEditorCommandMode.Selection},
-        new RichTextEditorCommand
-        {
-            Alias = "umbmediapicker", Name = "Image", Mode = RichTextEditorCommandMode.Insert
-        },
-        new RichTextEditorCommand {Alias = "umbmacro", Name = "Macro", Mode = RichTextEditorCommandMode.All},
-        new RichTextEditorCommand {Alias = "table", Name = "Table", Mode = RichTextEditorCommandMode.Insert},
-        new RichTextEditorCommand
-        {
-            Alias = "umbembeddialog", Name = "Embed", Mode = RichTextEditorCommandMode.Insert
-        },
-        new RichTextEditorCommand {Alias = "hr", Name = "Horizontal rule", Mode = RichTextEditorCommandMode.Insert},
-        new RichTextEditorCommand
-        {
-            Alias = "subscript", Name = "Subscript", Mode = RichTextEditorCommandMode.Selection
+            Alias = "outdent", Name = "Decrease indent", Mode = RichTextEditorCommandMode.All,
         },
         new RichTextEditorCommand
         {
-            Alias = "superscript", Name = "Superscript", Mode = RichTextEditorCommandMode.Selection
+            Alias = "indent", Name = "Increase indent", Mode = RichTextEditorCommandMode.All,
+        },
+        new RichTextEditorCommand { Alias = "link", Name = "Insert/edit link", Mode = RichTextEditorCommandMode.All },
+        new RichTextEditorCommand
+        {
+            Alias = "unlink", Name = "Remove link", Mode = RichTextEditorCommandMode.Selection,
+        },
+        new RichTextEditorCommand { Alias = "anchor", Name = "Anchor", Mode = RichTextEditorCommandMode.Selection },
+        new RichTextEditorCommand
+        {
+            Alias = "umbmediapicker", Name = "Image", Mode = RichTextEditorCommandMode.Insert,
+        },
+        new RichTextEditorCommand { Alias = "umbmacro", Name = "Macro", Mode = RichTextEditorCommandMode.All },
+        new RichTextEditorCommand { Alias = "table", Name = "Table", Mode = RichTextEditorCommandMode.Insert },
+        new RichTextEditorCommand
+        {
+            Alias = "umbembeddialog", Name = "Embed", Mode = RichTextEditorCommandMode.Insert,
+        },
+        new RichTextEditorCommand { Alias = "hr", Name = "Horizontal rule", Mode = RichTextEditorCommandMode.Insert },
+        new RichTextEditorCommand
+        {
+            Alias = "subscript", Name = "Subscript", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "charmap", Name = "Character map", Mode = RichTextEditorCommandMode.Insert
+            Alias = "superscript", Name = "Superscript", Mode = RichTextEditorCommandMode.Selection,
         },
         new RichTextEditorCommand
         {
-            Alias = "rtl", Name = "Right to left", Mode = RichTextEditorCommandMode.Selection
+            Alias = "charmap", Name = "Character map", Mode = RichTextEditorCommandMode.Insert,
         },
         new RichTextEditorCommand
         {
-            Alias = "ltr", Name = "Left to right", Mode = RichTextEditorCommandMode.Selection
-        }
+            Alias = "rtl", Name = "Right to left", Mode = RichTextEditorCommandMode.Selection,
+        },
+        new RichTextEditorCommand
+        {
+            Alias = "ltr", Name = "Left to right", Mode = RichTextEditorCommandMode.Selection,
+        },
     };
 
-    private static readonly IDictionary<string, string> s_default_custom_config =
-        new Dictionary<string, string> {["entity_encoding"] = "raw"};
+    private static readonly IDictionary<string, string> Default_custom_config =
+        new Dictionary<string, string> { ["entity_encoding"] = "raw" };
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Commands
     /// </summary>
     /// WB-TODO Custom Array of objects
-    public RichTextEditorCommand[] Commands { get; set; } = s_default_commands;
+    public RichTextEditorCommand[] Commands { get; set; } = Default_commands;
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Plugins
     /// </summary>
-    public string[] Plugins { get; set; } = s_default_plugins;
+    public string[] Plugins { get; set; } = Default_plugins;
 
     /// <summary>
     ///     HTML RichText Editor TinyMCE Custom Config
     /// </summary>
     /// WB-TODO Custom Dictionary
-    public IDictionary<string, string> CustomConfig { get; set; } = s_default_custom_config;
+    public IDictionary<string, string> CustomConfig { get; set; } = Default_custom_config;
 
     /// <summary>
     /// </summary>
@@ -145,10 +145,13 @@ public class RichTextEditorSettings
 
     public class RichTextEditorCommand
     {
-        [Required] public string Alias { get; set; } = null!;
+        [Required]
+        public string Alias { get; set; } = null!;
 
-        [Required] public string Name { get; set; } = null!;
+        [Required]
+        public string Name { get; set; } = null!;
 
-        [Required] public RichTextEditorCommandMode Mode { get; set; }
+        [Required]
+        public RichTextEditorCommandMode Mode { get; set; }
     }
 }

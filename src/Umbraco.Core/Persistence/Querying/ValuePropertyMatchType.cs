@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Persistence.Querying;
+namespace Umbraco.Cms.Core.Persistence.Querying;
 
 /// <summary>
 ///     Determine how to match a number or data value
@@ -9,5 +9,5 @@ public enum ValuePropertyMatchType
     GreaterThan,
     LessThan,
     GreaterThanOrEqualTo,
-    LessThanOrEqualTo
+    LessThanOrEqualTo,
 }

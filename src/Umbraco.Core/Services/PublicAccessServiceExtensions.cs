@@ -12,8 +12,7 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class PublicAccessServiceExtensions
 {
-    public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename,
-        string? newRolename)
+    public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename, string? newRolename)
     {
         var hasChange = false;
         if (oldRolename == newRolename)
@@ -25,14 +24,14 @@ public static class PublicAccessServiceExtensions
 
         foreach (PublicAccessEntry entry in allEntries)
         {
-            //get rules that match
+            // get rules that match
             IEnumerable<PublicAccessRule> roleRules = entry.Rules
                 .Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
                 .Where(x => x.RuleValue == oldRolename);
             var save = false;
             foreach (PublicAccessRule roleRule in roleRules)
             {
-                //a rule is being updated so flag this entry to be saved
+                // a rule is being updated so flag this entry to be saved
                 roleRule.RuleValue = newRolename ?? string.Empty;
                 save = true;
             }
@@ -47,16 +46,15 @@ public static class PublicAccessServiceExtensions
         return hasChange;
     }
 
-    public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId,
-        IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
+    public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
     {
-        IContent content = contentService.GetById(documentId);
+        IContent? content = contentService.GetById(documentId);
         if (content == null)
         {
             return true;
         }
 
-        PublicAccessEntry entry = publicAccessService.GetEntryForContent(content);
+        PublicAccessEntry? entry = publicAccessService.GetEntryForContent(content);
         if (entry == null)
         {
             return true;
@@ -74,8 +72,7 @@ public static class PublicAccessServiceExtensions
     /// <param name="username"></param>
     /// <param name="rolesCallback">A callback to retrieve the roles for this member</param>
     /// <returns></returns>
-    public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, string path,
-        string username, Func<Task<IEnumerable<string>>> rolesCallback)
+    public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, string path, string username, Func<Task<IEnumerable<string>>> rolesCallback)
     {
         if (rolesCallback == null)
         {
@@ -92,7 +89,7 @@ public static class PublicAccessServiceExtensions
             throw new ArgumentException("Value cannot be null or whitespace.", "path");
         }
 
-        PublicAccessEntry entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
+        PublicAccessEntry? entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
         if (entry == null)
         {
             return true;
@@ -123,7 +120,6 @@ public static class PublicAccessServiceExtensions
         return entry.Rules.Any(x =>
             (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType &&
              username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
-            || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))
-        );
+            || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue)));
     }
 }

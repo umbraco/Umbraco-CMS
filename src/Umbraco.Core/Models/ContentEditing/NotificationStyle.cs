@@ -28,5 +28,5 @@ public enum NotificationStyle
     /// <summary>
     ///     Warning icon
     /// </summary>
-    Warning = 4
+    Warning = 4,
 }

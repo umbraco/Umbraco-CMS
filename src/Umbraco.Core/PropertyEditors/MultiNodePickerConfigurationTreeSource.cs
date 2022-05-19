@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -8,9 +8,12 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataContract]
 public class MultiNodePickerConfigurationTreeSource
 {
-    [DataMember(Name = "type")] public string? ObjectType { get; set; }
+    [DataMember(Name = "type")]
+    public string? ObjectType { get; set; }
 
-    [DataMember(Name = "query")] public string? StartNodeQuery { get; set; }
+    [DataMember(Name = "query")]
+    public string? StartNodeQuery { get; set; }
 
-    [DataMember(Name = "id")] public Udi? StartNodeId { get; set; }
+    [DataMember(Name = "id")]
+    public Udi? StartNodeId { get; set; }
 }

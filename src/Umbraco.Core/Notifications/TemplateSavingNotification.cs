@@ -8,27 +8,28 @@ namespace Umbraco.Cms.Core.Notifications;
 
 public class TemplateSavingNotification : SavingNotification<ITemplate>
 {
-    private const string s_templateForContentTypeKey = "CreateTemplateForContentType";
-    private const string s_contentTypeAliasKey = "ContentTypeAlias";
+    private const string TemplateForContentTypeKey = "CreateTemplateForContentType";
+    private const string ContentTypeAliasKey = "ContentTypeAlias";
 
-    public TemplateSavingNotification(ITemplate target, EventMessages messages) : base(target, messages)
+    public TemplateSavingNotification(ITemplate target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages) : base(target, messages)
+    public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages)
+        : base(target, messages)
     {
     }
 
-    public TemplateSavingNotification(ITemplate target, EventMessages messages, bool createTemplateForContentType,
-        string contentTypeAlias) : base(target, messages)
+    public TemplateSavingNotification(ITemplate target, EventMessages messages, bool createTemplateForContentType, string contentTypeAlias)
+        : base(target, messages)
     {
         CreateTemplateForContentType = createTemplateForContentType;
         ContentTypeAlias = contentTypeAlias;
     }
 
-    public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages,
-        bool createTemplateForContentType,
-        string contentTypeAlias) : base(target, messages)
+    public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages, bool createTemplateForContentType, string contentTypeAlias)
+        : base(target, messages)
     {
         CreateTemplateForContentType = createTemplateForContentType;
         ContentTypeAlias = contentTypeAlias;
@@ -38,7 +39,7 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
     {
         get
         {
-            if (State?.TryGetValue(s_templateForContentTypeKey, out var result) ?? false)
+            if (State?.TryGetValue(TemplateForContentTypeKey, out var result) ?? false)
             {
                 if (result is not bool createTemplate)
                 {
@@ -50,11 +51,12 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
 
             return false;
         }
+
         set
         {
             if (!value is bool && State is not null)
             {
-                State[s_templateForContentTypeKey] = value;
+                State[TemplateForContentTypeKey] = value;
             }
         }
     }
@@ -63,7 +65,7 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
     {
         get
         {
-            if (State?.TryGetValue(s_contentTypeAliasKey, out var result) ?? false)
+            if (State?.TryGetValue(ContentTypeAliasKey, out var result) ?? false)
             {
                 return result as string;
             }
@@ -75,7 +77,7 @@ public class TemplateSavingNotification : SavingNotification<ITemplate>
         {
             if (value is not null && State is not null)
             {
-                State[s_contentTypeAliasKey] = value;
+                State[ContentTypeAliasKey] = value;
             }
         }
     }

@@ -50,9 +50,8 @@ public class MetricsConsentService : IMetricsConsentService
 
     public void SetConsentLevel(TelemetryLevel telemetryLevel)
     {
-        IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-        _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel,
-            currentUser?.Username);
+        IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
         _keyValueService.SetValue(Key, telemetryLevel.ToString());
     }
 }

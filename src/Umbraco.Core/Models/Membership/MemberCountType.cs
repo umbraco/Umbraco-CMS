@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Membership;
+namespace Umbraco.Cms.Core.Models.Membership;
 
 /// <summary>
 ///     The types of members to count
@@ -7,5 +7,5 @@ public enum MemberCountType
 {
     All,
     LockedOut,
-    Approved
+    Approved,
 }

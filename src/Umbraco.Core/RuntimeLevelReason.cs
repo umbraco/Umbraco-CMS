@@ -73,5 +73,5 @@ public enum RuntimeLevelReason
     /// <summary>
     ///     Umbraco is running.
     /// </summary>
-    Run
+    Run,
 }

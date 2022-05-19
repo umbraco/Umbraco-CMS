@@ -25,10 +25,10 @@ public class SearchableTreeCollection : BuilderCollectionBase<ISearchableTree>
         ISearchableTree[] searchableTrees = this.ToArray();
         foreach (Tree appTree in appTrees)
         {
-            ISearchableTree found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.TreeAlias));
+            ISearchableTree? found = searchableTrees.FirstOrDefault(x => x.TreeAlias.InvariantEquals(appTree.TreeAlias));
             if (found != null)
             {
-                SearchableTreeAttribute searchableTreeAttribute =
+                SearchableTreeAttribute? searchableTreeAttribute =
                     found.GetType().GetCustomAttribute<SearchableTreeAttribute>(false);
                 dictionary[found.TreeAlias] = new SearchableApplicationTree(
                     appTree.SectionAlias,
@@ -36,8 +36,7 @@ public class SearchableTreeCollection : BuilderCollectionBase<ISearchableTree>
                     searchableTreeAttribute?.SortOrder ?? SearchableTreeAttribute.DefaultSortOrder,
                     searchableTreeAttribute?.ServiceName ?? string.Empty,
                     searchableTreeAttribute?.MethodName ?? string.Empty,
-                    found
-                );
+                    found);
             }
         }
 

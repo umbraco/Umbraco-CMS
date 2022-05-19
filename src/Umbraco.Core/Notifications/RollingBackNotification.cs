@@ -5,9 +5,11 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public abstract class RollingBackNotification<T> : CancelableObjectNotification<T> where T : class
+public abstract class RollingBackNotification<T> : CancelableObjectNotification<T>
+    where T : class
 {
-    protected RollingBackNotification(T target, EventMessages messages) : base(target, messages)
+    protected RollingBackNotification(T target, EventMessages messages)
+        : base(target, messages)
     {
     }
 

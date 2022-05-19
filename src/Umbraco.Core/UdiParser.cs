@@ -9,6 +9,7 @@ public sealed class UdiParser
     private static readonly ConcurrentDictionary<string, Udi> RootUdis = new();
 
     static UdiParser() =>
+
         // initialize with known (built-in) Udi types
         // we will add scanned types later on
         UdiTypes = new ConcurrentDictionary<string, UdiType>(GetKnownUdiTypes());
@@ -28,7 +29,7 @@ public sealed class UdiParser
     /// <returns>An Udi instance that contains the value that was parsed.</returns>
     public static Udi Parse(string s)
     {
-        ParseInternal(s, false, false, out Udi udi);
+        ParseInternal(s, false, false, out Udi? udi);
         return udi!;
     }
 
@@ -51,7 +52,7 @@ public sealed class UdiParser
     /// </remarks>
     public static Udi Parse(string s, bool knownTypes)
     {
-        ParseInternal(s, false, knownTypes, out Udi udi);
+        ParseInternal(s, false, knownTypes, out Udi? udi);
         return udi!;
     }
 
@@ -72,7 +73,7 @@ public sealed class UdiParser
     public static bool TryParse<T>(string? s, [MaybeNullWhen(false)] out T udi)
         where T : Udi?
     {
-        var result = ParseInternal(s, true, false, out Udi parsed);
+        var result = ParseInternal(s, true, false, out Udi? parsed);
         if (result && parsed is T)
         {
             udi = (T)parsed;
@@ -104,11 +105,31 @@ public sealed class UdiParser
     public static bool TryParse(string? s, bool knownTypes, [MaybeNullWhen(false)] out Udi udi) =>
         ParseInternal(s, true, knownTypes, out udi);
 
+    /// <summary>
+    ///     Registers a custom entity type.
+    /// </summary>
+    /// <param name="entityType"></param>
+    /// <param name="udiType"></param>
+    public static void RegisterUdiType(string entityType, UdiType udiType) => UdiTypes.TryAdd(entityType, udiType);
+
+    internal static Udi GetRootUdi(string entityType) =>
+        RootUdis.GetOrAdd(entityType, x =>
+        {
+            if (UdiTypes.TryGetValue(x, out UdiType udiType) == false)
+            {
+                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType));
+            }
+
+            return udiType == UdiType.StringUdi
+                ? new StringUdi(entityType, string.Empty)
+                : new GuidUdi(entityType, Guid.Empty);
+        });
+
     private static bool ParseInternal(string? s, bool tryParse, bool knownTypes, [MaybeNullWhen(false)] out Udi udi)
     {
         udi = null;
         if (Uri.IsWellFormedUriString(s, UriKind.Absolute) == false
-            || Uri.TryCreate(s, UriKind.Absolute, out Uri uri) == false)
+            || Uri.TryCreate(s, UriKind.Absolute, out Uri? uri) == false)
         {
             if (tryParse)
             {
@@ -175,61 +196,40 @@ public sealed class UdiParser
         throw new InvalidOperationException(string.Format("Invalid udi type \"{0}\".", udiType));
     }
 
-    internal static Udi GetRootUdi(string entityType) =>
-        RootUdis.GetOrAdd(entityType, x =>
-        {
-            if (UdiTypes.TryGetValue(x, out UdiType udiType) == false)
-            {
-                throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType));
-            }
-
-            return udiType == UdiType.StringUdi
-                ? new StringUdi(entityType, string.Empty)
-                : new GuidUdi(entityType, Guid.Empty);
-        });
-
-
-    /// <summary>
-    ///     Registers a custom entity type.
-    /// </summary>
-    /// <param name="entityType"></param>
-    /// <param name="udiType"></param>
-    public static void RegisterUdiType(string entityType, UdiType udiType) => UdiTypes.TryAdd(entityType, udiType);
-
     public static Dictionary<string, UdiType> GetKnownUdiTypes() =>
         new()
         {
-            {Constants.UdiEntityType.Unknown, UdiType.Unknown},
-            {Constants.UdiEntityType.AnyGuid, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Element, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Document, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Media, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Member, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DictionaryItem, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Macro, UdiType.GuidUdi},
-            {Constants.UdiEntityType.Template, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DocumentType, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DocumentTypeBluePrints, UdiType.GuidUdi},
-            {Constants.UdiEntityType.MediaType, UdiType.GuidUdi},
-            {Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DataType, UdiType.GuidUdi},
-            {Constants.UdiEntityType.DataTypeContainer, UdiType.GuidUdi},
-            {Constants.UdiEntityType.MemberType, UdiType.GuidUdi},
-            {Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi},
-            {Constants.UdiEntityType.RelationType, UdiType.GuidUdi},
-            {Constants.UdiEntityType.FormsForm, UdiType.GuidUdi},
-            {Constants.UdiEntityType.FormsPreValue, UdiType.GuidUdi},
-            {Constants.UdiEntityType.FormsDataSource, UdiType.GuidUdi},
-            {Constants.UdiEntityType.AnyString, UdiType.StringUdi},
-            {Constants.UdiEntityType.Language, UdiType.StringUdi},
-            {Constants.UdiEntityType.MacroScript, UdiType.StringUdi},
-            {Constants.UdiEntityType.MediaFile, UdiType.StringUdi},
-            {Constants.UdiEntityType.TemplateFile, UdiType.StringUdi},
-            {Constants.UdiEntityType.Script, UdiType.StringUdi},
-            {Constants.UdiEntityType.PartialView, UdiType.StringUdi},
-            {Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi},
-            {Constants.UdiEntityType.Stylesheet, UdiType.StringUdi}
+            { Constants.UdiEntityType.Unknown, UdiType.Unknown },
+            { Constants.UdiEntityType.AnyGuid, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Element, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Document, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DocumentBlueprint, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Media, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Member, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DictionaryItem, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Macro, UdiType.GuidUdi },
+            { Constants.UdiEntityType.Template, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DocumentType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DocumentTypeContainer, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DocumentTypeBluePrints, UdiType.GuidUdi },
+            { Constants.UdiEntityType.MediaType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.MediaTypeContainer, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DataType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.DataTypeContainer, UdiType.GuidUdi },
+            { Constants.UdiEntityType.MemberType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.MemberGroup, UdiType.GuidUdi },
+            { Constants.UdiEntityType.RelationType, UdiType.GuidUdi },
+            { Constants.UdiEntityType.FormsForm, UdiType.GuidUdi },
+            { Constants.UdiEntityType.FormsPreValue, UdiType.GuidUdi },
+            { Constants.UdiEntityType.FormsDataSource, UdiType.GuidUdi },
+            { Constants.UdiEntityType.AnyString, UdiType.StringUdi },
+            { Constants.UdiEntityType.Language, UdiType.StringUdi },
+            { Constants.UdiEntityType.MacroScript, UdiType.StringUdi },
+            { Constants.UdiEntityType.MediaFile, UdiType.StringUdi },
+            { Constants.UdiEntityType.TemplateFile, UdiType.StringUdi },
+            { Constants.UdiEntityType.Script, UdiType.StringUdi },
+            { Constants.UdiEntityType.PartialView, UdiType.StringUdi },
+            { Constants.UdiEntityType.PartialViewMacro, UdiType.StringUdi },
+            { Constants.UdiEntityType.Stylesheet, UdiType.StringUdi },
         };
 }

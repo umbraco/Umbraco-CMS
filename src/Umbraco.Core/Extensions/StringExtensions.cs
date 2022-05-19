@@ -17,12 +17,19 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class StringExtensions
 {
+    internal static readonly Lazy<Regex> Whitespace = new(() => new Regex(@"\s+", RegexOptions.Compiled));
+
     private const char DefaultEscapedStringEscapeChar = '\\';
     private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
     private static readonly char[] ToCSharpEscapeChars;
+    internal static readonly string[] JsonEmpties = { "[]", "{}" };
 
-    internal static readonly Lazy<Regex> Whitespace = new(() => new Regex(@"\s+", RegexOptions.Compiled));
-    internal static readonly string[] JsonEmpties = {"[]", "{}"};
+    /// <summary>
+    ///     The namespace for URLs (from RFC 4122, Appendix C).
+    ///     See <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>
+    /// </summary>
+    internal static readonly Guid UrlNamespace = new("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
+
     private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
     // From: http://stackoverflow.com/a/961504/5018
@@ -32,15 +39,9 @@ public static class StringExtensions
             @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
             RegexOptions.Compiled));
 
-    /// <summary>
-    ///     The namespace for URLs (from RFC 4122, Appendix C).
-    ///     See <a href="http://www.ietf.org/rfc/rfc4122.txt">RFC 4122</a>
-    /// </summary>
-    internal static readonly Guid UrlNamespace = new("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
-
     static StringExtensions()
     {
-        var escapes = new[] {"\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00"};
+        var escapes = new[] { "\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00" };
         ToCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
         foreach (var escape in escapes)
         {
@@ -76,7 +77,7 @@ public static class StringExtensions
 
     public static string StripFileExtension(this string fileName)
     {
-        //filenames cannot contain line breaks
+        // filenames cannot contain line breaks
         if (fileName.Contains(Environment.NewLine) || fileName.Contains("\r") || fileName.Contains("\n"))
         {
             return fileName;
@@ -85,14 +86,15 @@ public static class StringExtensions
         var lastIndex = fileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = fileName.Substring(lastIndex);
-            //file extensions cannot contain whitespace
+            var ext = fileName[lastIndex..];
+
+            // file extensions cannot contain whitespace
             if (ext.Contains(" "))
             {
                 return fileName;
             }
 
-            return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
+            return string.Format("{0}", fileName[..fileName.IndexOf(ext, StringComparison.Ordinal)]);
         }
 
         return fileName;
@@ -105,7 +107,7 @@ public static class StringExtensions
     /// <returns>Extension of the file</returns>
     public static string GetFileExtension(this string file)
     {
-        //Find any characters between the last . and the start of a query string or the end of the string
+        // Find any characters between the last . and the start of a query string or the end of the string
         const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
         Match match = Regex.Match(file, pattern);
         return match.Success
@@ -136,7 +138,7 @@ public static class StringExtensions
 
     public static string ReplaceNonAlphanumericChars(this string input, string replacement)
     {
-        //any character that is not alphanumeric, convert to a hyphen
+        // any character that is not alphanumeric, convert to a hyphen
         var mName = input;
         foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
         {
@@ -166,9 +168,10 @@ public static class StringExtensions
     /// <returns></returns>
     public static string CleanForXss(this string input, params char[] ignoreFromClean)
     {
-        //remove any HTML
+        // remove any HTML
         input = input.StripHtml();
-        //strip out any potential chars involved with XSS
+
+        // strip out any potential chars involved with XSS
         return input.ExceptChars(new HashSet<char>(CleanForXssChars.Except(ignoreFromClean)));
     }
 
@@ -181,6 +184,35 @@ public static class StringExtensions
         }
 
         return sb.ToString();
+    }
+
+    /// <summary>
+    ///     This will append the query string to the URL
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="queryStrings"></param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
+    ///     delimited properly with '&'
+    /// </remarks>
+    public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
+    {
+        // remove any prefixed '&' or '?'
+        for (var i = 0; i < queryStrings.Length; i++)
+        {
+            queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
+                .TrimEnd(Constants.CharArrays.Ampersand);
+        }
+
+        var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
+
+        if (url.Contains("?"))
+        {
+            return url + string.Join("&", nonEmpty).EnsureStartsWith('&');
+        }
+
+        return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
     }
 
     /// <summary>
@@ -198,37 +230,7 @@ public static class StringExtensions
         return stream;
     }
 
-    /// <summary>
-    ///     This will append the query string to the URL
-    /// </summary>
-    /// <param name="url"></param>
-    /// <param name="queryStrings"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
-    ///     delimited properly with '&'
-    /// </remarks>
-    public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
-    {
-        //remove any prefixed '&' or '?'
-        for (var i = 0; i < queryStrings.Length; i++)
-        {
-            queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand)
-                .TrimEnd(Constants.CharArrays.Ampersand);
-        }
-
-        var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
-
-        if (url.Contains("?"))
-        {
-            return url + string.Join("&", nonEmpty).EnsureStartsWith('&');
-        }
-
-        return url + string.Join("&", nonEmpty).EnsureStartsWith('?');
-    }
-
-
-    //this is from SqlMetal and just makes it a bit of fun to allow pluralization
+    // this is from SqlMetal and just makes it a bit of fun to allow pluralization
     public static string MakePluralName(this string name)
     {
         if (name.EndsWith("x", StringComparison.OrdinalIgnoreCase) ||
@@ -236,21 +238,21 @@ public static class StringExtensions
             name.EndsWith("s", StringComparison.OrdinalIgnoreCase) ||
             name.EndsWith("sh", StringComparison.OrdinalIgnoreCase))
         {
-            name = name + "es";
+            name += "es";
             return name;
         }
 
         if (name.EndsWith("y", StringComparison.OrdinalIgnoreCase) && name.Length > 1 &&
-            !IsVowel(name[name.Length - 2]))
+            !IsVowel(name[^2]))
         {
             name = name.Remove(name.Length - 1, 1);
-            name = name + "ies";
+            name += "ies";
             return name;
         }
 
         if (!name.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
-            name = name + "s";
+            name += "s";
         }
 
         return name;
@@ -375,7 +377,7 @@ public static class StringExtensions
 
         while (value.StartsWith(forRemoving, StringComparison.InvariantCultureIgnoreCase))
         {
-            value = value.Substring(forRemoving.Length);
+            value = value[forRemoving.Length..];
         }
 
         return value;
@@ -428,7 +430,7 @@ public static class StringExtensions
     [SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "By design")]
     public static IList<string> ToDelimitedList(this string list, string delimiter = ",")
     {
-        var delimiters = new[] {delimiter};
+        var delimiters = new[] { delimiter };
         return !list.IsNullOrWhiteSpace()
             ? list.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
                 .Select(i => i.Trim())
@@ -494,7 +496,7 @@ public static class StringExtensions
 
         var convertToHex = input.ConvertToHex();
         var hexLength = convertToHex.Length < 32 ? convertToHex.Length : 32;
-        var hex = convertToHex.Substring(0, hexLength).PadLeft(32, '0');
+        var hex = convertToHex[..hexLength].PadLeft(32, '0');
         Guid output = Guid.Empty;
         return Guid.TryParse(hex, out output) ? output : Guid.Empty;
     }
@@ -522,11 +524,11 @@ public static class StringExtensions
 
     public static string DecodeFromHex(this string hexValue)
     {
-        var strValue = "";
+        var strValue = string.Empty;
         while (hexValue.Length > 0)
         {
-            strValue += Convert.ToChar(Convert.ToUInt32(hexValue.Substring(0, 2), 16)).ToString();
-            hexValue = hexValue.Substring(2, hexValue.Length - 2);
+            strValue += Convert.ToChar(Convert.ToUInt32(hexValue[..2], 16)).ToString();
+            hexValue = hexValue[2..];
         }
 
         return strValue;
@@ -549,7 +551,7 @@ public static class StringExtensions
             return string.Empty;
         }
 
-        //return Convert.ToBase64String(bytes).Replace(".", "-").Replace("/", "_").Replace("=", ",");
+        // return Convert.ToBase64String(bytes).Replace(".", "-").Replace("/", "_").Replace("=", ",");
         var bytes = Encoding.UTF8.GetBytes(input);
         return UrlTokenEncode(bytes);
     }
@@ -566,11 +568,10 @@ public static class StringExtensions
             throw new ArgumentNullException(nameof(input));
         }
 
-        //if (input.IsInvalidBase64()) return null;
-
+        // if (input.IsInvalidBase64()) return null;
         try
         {
-            //var decodedBytes = Convert.FromBase64String(input.Replace("-", ".").Replace("_", "/").Replace(",", "="));
+            // var decodedBytes = Convert.FromBase64String(input.Replace("-", ".").Replace("_", "/").Replace(",", "="));
             var decodedBytes = UrlTokenDecode(input);
             return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
         }
@@ -625,7 +626,6 @@ public static class StringExtensions
     public static int InvariantLastIndexOf(this string s, string value) =>
         s.LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
 
-
     /// <summary>
     ///     Tries to parse a string into the supplied type by finding and using the Type's "Parse" method
     /// </summary>
@@ -675,52 +675,6 @@ public static class StringExtensions
     /// <param name="stringToConvert">refers to itself</param>
     /// <returns>The SHA1 hashed string</returns>
     public static string ToSHA1(this string stringToConvert) => stringToConvert.GenerateHash("SHA1");
-
-    /// <summary>
-    ///     Generate a hash of a string based on the hashType passed in
-    /// </summary>
-    /// <param name="str">Refers to itself</param>
-    /// <param name="hashType">
-    ///     String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a
-    ///     list of possible values.
-    /// </param>
-    /// <returns>The hashed string</returns>
-    private static string GenerateHash(this string str, string? hashType)
-    {
-        HashAlgorithm? hasher = null;
-        //create an instance of the correct hashing provider based on the type passed in
-        if (hashType is not null)
-        {
-            hasher = HashAlgorithm.Create(hashType);
-        }
-
-        if (hasher == null)
-        {
-            throw new InvalidOperationException("No hashing type found by name " + hashType);
-        }
-
-        using (hasher)
-        {
-            //convert our string into byte array
-            var byteArray = Encoding.UTF8.GetBytes(str);
-
-            //get the hashed values created by our selected provider
-            var hashedByteArray = hasher.ComputeHash(byteArray);
-
-            //create a StringBuilder object
-            var stringBuilder = new StringBuilder();
-
-            //loop to each byte
-            foreach (var b in hashedByteArray)
-            {
-                //append it to our StringBuilder
-                stringBuilder.Append(b.ToString("x2"));
-            }
-
-            //return the hashed value
-            return stringBuilder.ToString();
-        }
-    }
 
     /// <summary>
     ///     Decodes a string that was encoded with UrlTokenEncode
@@ -777,6 +731,53 @@ public static class StringExtensions
     }
 
     /// <summary>
+    ///     Generate a hash of a string based on the hashType passed in
+    /// </summary>
+    /// <param name="str">Refers to itself</param>
+    /// <param name="hashType">
+    ///     String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a
+    ///     list of possible values.
+    /// </param>
+    /// <returns>The hashed string</returns>
+    private static string GenerateHash(this string str, string? hashType)
+    {
+        HashAlgorithm? hasher = null;
+
+        // create an instance of the correct hashing provider based on the type passed in
+        if (hashType is not null)
+        {
+            hasher = HashAlgorithm.Create(hashType);
+        }
+
+        if (hasher == null)
+        {
+            throw new InvalidOperationException("No hashing type found by name " + hashType);
+        }
+
+        using (hasher)
+        {
+            // convert our string into byte array
+            var byteArray = Encoding.UTF8.GetBytes(str);
+
+            // get the hashed values created by our selected provider
+            var hashedByteArray = hasher.ComputeHash(byteArray);
+
+            // create a StringBuilder object
+            var stringBuilder = new StringBuilder();
+
+            // loop to each byte
+            foreach (var b in hashedByteArray)
+            {
+                // append it to our StringBuilder
+                stringBuilder.Append(b.ToString("x2"));
+            }
+
+            // return the hashed value
+            return stringBuilder.ToString();
+        }
+    }
+
+    /// <summary>
     ///     Encodes a string so that it is 'safe' for URLs, files, etc..
     /// </summary>
     /// <param name="input"></param>
@@ -795,7 +796,6 @@ public static class StringExtensions
 
         // base-64 digits are A-Z, a-z, 0-9, + and /
         // the = char is used for trailing padding
-
         var str = Convert.ToBase64String(input);
 
         var pos = str.IndexOf('=');
@@ -870,7 +870,7 @@ public static class StringExtensions
             return truncatedString;
         }
 
-        truncatedString = text.Substring(0, strLength);
+        truncatedString = text[..strLength];
         truncatedString = truncatedString.TrimEnd();
         truncatedString += suffix;
 
@@ -882,7 +882,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="input">The input.</param>
     /// <returns></returns>
-    public static string StripNewLines(this string input) => input.Replace("\r", "").Replace("\n", "");
+    public static string StripNewLines(this string input) => input.Replace("\r", string.Empty).Replace("\n", string.Empty);
 
     /// <summary>
     ///     Converts to single line by replacing line breaks with spaces.
@@ -913,7 +913,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper() + input.Substring(1);
+            : input[..1].ToUpper() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase.
@@ -923,7 +923,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower() + input.Substring(1);
+            : input[..1].ToLower() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -935,7 +935,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpper(culture) + input.Substring(1);
+            : input[..1].ToUpper(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -947,7 +947,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input, CultureInfo culture) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLower(culture) + input.Substring(1);
+            : input[..1].ToLower(culture) + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
@@ -958,7 +958,7 @@ public static class StringExtensions
     public static string ToFirstUpperInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToUpperInvariant() + input.Substring(1);
+            : input[..1].ToUpperInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
@@ -969,7 +969,7 @@ public static class StringExtensions
     public static string ToFirstLowerInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input.Substring(0, 1).ToLowerInvariant() + input.Substring(1);
+            : input[..1].ToLowerInvariant() + input[1..];
 
     /// <summary>
     ///     Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
@@ -988,7 +988,6 @@ public static class StringExtensions
         {
             throw new ArgumentNullException(nameof(replacements));
         }
-
 
         foreach (KeyValuePair<string, string> item in replacements)
         {
@@ -1016,7 +1015,6 @@ public static class StringExtensions
         {
             throw new ArgumentNullException(nameof(chars));
         }
-
 
         for (var i = 0; i < chars.Length; i++)
         {
@@ -1048,9 +1046,8 @@ public static class StringExtensions
             return text;
         }
 
-        return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        return text[..pos] + replace + text[(pos + search.Length)..];
     }
-
 
     /// <summary>
     ///     An extension method that returns a new string in which all occurrences of a
@@ -1062,8 +1059,7 @@ public static class StringExtensions
     /// <param name="newString">Specified string to inject</param>
     /// <param name="stringComparison">String Comparison object to specify search type</param>
     /// <returns>Updated string</returns>
-    public static string Replace(this string source, string oldString, string newString,
-        StringComparison stringComparison)
+    public static string Replace(this string source, string oldString, string newString, StringComparison stringComparison)
     {
         // This initialization ensures the first check starts at index zero of the source. On successive checks for
         // a match, the source is skipped to immediately after the last replaced occurrence for efficiency
@@ -1096,16 +1092,15 @@ public static class StringExtensions
         }
 
         // http://stackoverflow.com/questions/323640/can-i-convert-a-c-sharp-string-value-to-an-escaped-string-literal
-
         var sb = new StringBuilder(s.Length + 2);
         for (var rp = 0; rp < s.Length; rp++)
         {
             var c = s[rp];
-            if (c < ToCSharpEscapeChars.Length && '\0' != ToCSharpEscapeChars[c])
+            if (c < ToCSharpEscapeChars.Length && ToCSharpEscapeChars[c] != '\0')
             {
                 sb.Append('\\').Append(ToCSharpEscapeChars[c]);
             }
-            else if ('~' >= c && c >= ' ')
+            else if (c <= '~' && c >= ' ')
             {
                 sb.Append(c);
             }
@@ -1136,22 +1131,22 @@ public static class StringExtensions
     {
         var regexSpecialCharacters = new Dictionary<string, string>
         {
-            {".", @"\."},
-            {"(", @"\("},
-            {")", @"\)"},
-            {"]", @"\]"},
-            {"[", @"\["},
-            {"{", @"\{"},
-            {"}", @"\}"},
-            {"?", @"\?"},
-            {"!", @"\!"},
-            {"$", @"\$"},
-            {"^", @"\^"},
-            {"+", @"\+"},
-            {"*", @"\*"},
-            {"|", @"\|"},
-            {"<", @"\<"},
-            {">", @"\>"}
+            { ".", @"\." },
+            { "(", @"\(" },
+            { ")", @"\)" },
+            { "]", @"\]" },
+            { "[", @"\[" },
+            { "{", @"\{" },
+            { "}", @"\}" },
+            { "?", @"\?" },
+            { "!", @"\!" },
+            { "$", @"\$" },
+            { "^", @"\^" },
+            { "+", @"\+" },
+            { "*", @"\*" },
+            { "|", @"\|" },
+            { "<", @"\<" },
+            { ">", @"\>" },
         };
         return ReplaceMany(text, regexSpecialCharacters);
     }
@@ -1167,8 +1162,7 @@ public static class StringExtensions
     /// </param>
     /// <returns>True if any of the needles are contained with haystack; otherwise returns false</returns>
     /// Added fix to ensure the comparison is used - see http://issues.umbraco.org/issue/U4-11313
-    public static bool ContainsAny(this string haystack, IEnumerable<string> needles,
-        StringComparison comparison = StringComparison.CurrentCulture)
+    public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
     {
         if (haystack == null)
         {
@@ -1218,7 +1212,6 @@ public static class StringExtensions
         return fileName;
     }
 
-
     /// <summary>
     ///     An extension method that returns a new string in which all occurrences of an
     ///     unicode characters that are invalid in XML files are replaced with an empty string.
@@ -1229,7 +1222,7 @@ public static class StringExtensions
     ///     removes any unusual unicode characters that can't be encoded into XML
     /// </summary>
     public static string ToValidXmlString(this string text) =>
-        string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Value.Replace(text, "");
+        string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Value.Replace(text, string.Empty);
 
     /// <summary>
     ///     Converts a string to a Guid - WARNING, depending on the string, this may not be unique
@@ -1237,11 +1230,17 @@ public static class StringExtensions
     /// <param name="text"></param>
     /// <returns></returns>
     public static Guid ToGuid(this string text) =>
-        CreateGuidFromHash(UrlNamespace,
+        CreateGuidFromHash(
+            UrlNamespace,
             text,
-            CryptoConfig.AllowOnlyFipsAlgorithms
-                ? 5 // SHA1
+            CryptoConfig.AllowOnlyFipsAlgorithms ? 5 // SHA1
                 : 3); // MD5
+
+    /// <summary>
+    ///     Turns an null-or-whitespace string into a null string.
+    /// </summary>
+    public static string? NullOrWhiteSpaceAsNull(this string text)
+        => string.IsNullOrWhiteSpace(text) ? null : text;
 
     /// <summary>
     ///     Creates a name-based UUID using the algorithm from RFC 4122 §4.3.
@@ -1322,13 +1321,6 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Turns an null-or-whitespace string into a null string.
-    /// </summary>
-    public static string? NullOrWhiteSpaceAsNull(this string text)
-        => string.IsNullOrWhiteSpace(text) ? null : text;
-
-
-    /// <summary>
     ///     Checks if a given path is a full path including drive letter
     /// </summary>
     /// <param name="path"></param>
@@ -1366,7 +1358,7 @@ public static class StringExtensions
             return a;
         }
 
-        return char.ToLowerInvariant(a[0]) + a.Substring(1);
+        return char.ToLowerInvariant(a[0]) + a[1..];
     }
 
     /// <summary>
@@ -1378,7 +1370,6 @@ public static class StringExtensions
     /// <returns>The safe alias.</returns>
     public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper, string culture) =>
         shortStringHelper.CleanStringForSafeAlias(alias, culture);
-
 
     // the new methods to get a url segment
 
@@ -1397,7 +1388,8 @@ public static class StringExtensions
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(text));
         }
 
@@ -1421,13 +1413,13 @@ public static class StringExtensions
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
+            throw new ArgumentException(
+                "Value can't be empty or consist only of white-space characters.",
                 nameof(text));
         }
 
         return shortStringHelper.CleanStringForUrlSegment(text, culture);
     }
-
 
     /// <summary>
     ///     Cleans a string.
@@ -1440,8 +1432,7 @@ public static class StringExtensions
     /// </param>
     /// <returns>The clean string.</returns>
     /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
-    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper,
-        CleanStringType stringType) => shortStringHelper.CleanString(text, stringType);
+    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType) => shortStringHelper.CleanString(text, stringType);
 
     /// <summary>
     ///     Cleans a string, using a specified separator.
@@ -1455,8 +1446,7 @@ public static class StringExtensions
     /// <param name="separator">The separator.</param>
     /// <returns>The clean string.</returns>
     /// <remarks>The string is cleaned in the context of the ICurrent.ShortStringHelper default culture.</remarks>
-    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper,
-        CleanStringType stringType, char separator) => shortStringHelper.CleanString(text, stringType, separator);
+    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator) => shortStringHelper.CleanString(text, stringType, separator);
 
     /// <summary>
     ///     Cleans a string in the context of a specified culture.
@@ -1469,8 +1459,7 @@ public static class StringExtensions
     /// </param>
     /// <param name="culture">The culture.</param>
     /// <returns>The clean string.</returns>
-    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper,
-        CleanStringType stringType, string culture) => shortStringHelper.CleanString(text, stringType, culture);
+    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, string culture) => shortStringHelper.CleanString(text, stringType, culture);
 
     /// <summary>
     ///     Cleans a string in the context of a specified culture, using a specified separator.
@@ -1484,8 +1473,7 @@ public static class StringExtensions
     /// <param name="separator">The separator.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>The clean string.</returns>
-    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper,
-        CleanStringType stringType, char separator, string culture) =>
+    public static string ToCleanString(this string text, IShortStringHelper shortStringHelper, CleanStringType stringType, char separator, string culture) =>
         shortStringHelper.CleanString(text, stringType, separator, culture);
 
     // note: LegacyCurrent.ShortStringHelper will produce 100% backward-compatible output for SplitPascalCasing.
@@ -1500,14 +1488,6 @@ public static class StringExtensions
     public static string SplitPascalCasing(this string phrase, IShortStringHelper shortStringHelper) =>
         shortStringHelper.SplitPascalCasing(phrase, ' ');
 
-    //NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
-    // it basically is yet another version of SplitPascalCasing
-    // plugging string extensions here to be 99% compatible
-    // the only diff. is with numbers, Number6Is was "Number6 Is", and the new string helper does it too,
-    // but the legacy one does "Number6Is"... assuming it is not a big deal.
-    internal static string SpaceCamelCasing(this string phrase, IShortStringHelper shortStringHelper) =>
-        phrase.Length < 2 ? phrase : phrase.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
-
     /// <summary>
     ///     Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a
     ///     filename,
@@ -1518,6 +1498,14 @@ public static class StringExtensions
     /// <returns>The safe filename.</returns>
     public static string ToSafeFileName(this string text, IShortStringHelper shortStringHelper) =>
         shortStringHelper.CleanStringForSafeFileName(text);
+
+    // NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
+    // it basically is yet another version of SplitPascalCasing
+    // plugging string extensions here to be 99% compatible
+    // the only diff. is with numbers, Number6Is was "Number6 Is", and the new string helper does it too,
+    // but the legacy one does "Number6Is"... assuming it is not a big deal.
+    internal static string SpaceCamelCasing(this string phrase, IShortStringHelper shortStringHelper) =>
+        phrase.Length < 2 ? phrase : phrase.SplitPascalCasing(shortStringHelper).ToFirstUpperInvariant();
 
     /// <summary>
     ///     Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a
@@ -1538,8 +1526,7 @@ public static class StringExtensions
     /// <param name="splitChar">The character to split on</param>
     /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
     /// <returns>The string split into substrings delimited by the split character</returns>
-    public static IEnumerable<string> EscapedSplit(this string value, char splitChar,
-        char escapeChar = DefaultEscapedStringEscapeChar)
+    public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
     {
         if (value == null)
         {
