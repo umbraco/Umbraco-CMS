@@ -1,4 +1,4 @@
- namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -62,7 +62,9 @@
 
             public const string UmbracoDefaultDatabaseName = "Umbraco";
 
-            public const string UmbracoConnectionName = "umbracoDbDSN";public const string DefaultUmbracoPath = "~/umbraco";
+            public const string UmbracoConnectionName = "umbracoDbDSN";
+
+            public const string DefaultUmbracoPath = "~/umbraco";
         }
     }
 }
