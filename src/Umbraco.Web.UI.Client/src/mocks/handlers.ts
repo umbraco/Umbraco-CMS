@@ -67,7 +67,7 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        sections: ['Content', 'Media', 'Members', 'Settings', 'Packages']
+        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings']
       } as components['schemas']['AllowedSectionsResponse']),
     );
   }),
