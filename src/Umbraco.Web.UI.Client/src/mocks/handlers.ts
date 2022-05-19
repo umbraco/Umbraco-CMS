@@ -9,7 +9,7 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
-      } as components['schemas']['InitResponse']),
+      } as components['schemas']['InitResponse'])
     );
   }),
 
@@ -18,8 +18,8 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(200),
       ctx.json({
-        version: '13.0.0'
-      } as components['schemas']['VersionResponse']),
+        version: '13.0.0',
+      } as components['schemas']['VersionResponse'])
     );
   }),
 
@@ -58,8 +58,8 @@ export const handlers = [
       ctx.status(200),
       ctx.json({
         username: 'admin',
-        role: 'administrator'
-      } as components['schemas']['UserResponse']),
+        role: 'administrator',
+      } as components['schemas']['UserResponse'])
     );
   }),
 
@@ -67,8 +67,8 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings']
-      } as components['schemas']['AllowedSectionsResponse']),
+        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings'],
+      } as components['schemas']['AllowedSectionsResponse'])
     );
   }),
 
@@ -87,26 +87,27 @@ export const handlers = [
               consentLevels: [
                 {
                   level: 'Minimal',
-                  description: 'We will only send an anonymized site ID to let us know that the site exists.'
+                  description: 'We will only send an anonymized site ID to let us know that the site exists.',
                 },
                 {
                   level: 'Basic',
-                  description: 'We will send an anonymized site ID, umbraco version, and packages installed'
+                  description: 'We will send an anonymized site ID, umbraco version, and packages installed',
                 },
                 {
                   level: 'Detailed',
-                  description: 'We will send:\n          <br>- Anonymized site ID, umbraco version, and packages installed.\n          <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.\n          <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.\n          <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.\n          <br>\n          <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing \'Detailed\' you agree to current and future anonymized information being collected.</i>'
-                }
+                  description:
+                    "We will send:\n          <br>- Anonymized site ID, umbraco version, and packages installed.\n          <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.\n          <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.\n          <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.\n          <br>\n          <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.\n          <br>By choosing 'Detailed' you agree to current and future anonymized information being collected.</i>",
+                },
               ],
               quickInstallSettings: {
                 displayName: 'SQLite',
                 defaultDatabaseName: 'Umbraco',
-              }
+              },
             },
             view: 'user',
             name: 'User',
             description: '',
-            serverOrder: 20
+            serverOrder: 20,
           },
           {
             model: {
@@ -123,7 +124,7 @@ export const handlers = [
                   serverPlaceholder: null,
                   requiresCredentials: false,
                   supportsIntegratedAuthentication: false,
-                  requiresConnectionTest: false
+                  requiresConnectionTest: false,
                 },
                 {
                   id: '2',
@@ -137,7 +138,7 @@ export const handlers = [
                   serverPlaceholder: '(local)\\SQLEXPRESS',
                   requiresCredentials: true,
                   supportsIntegratedAuthentication: true,
-                  requiresConnectionTest: true
+                  requiresConnectionTest: true,
                 },
                 {
                   id: '42c0eafd-1650-4bdb-8cf6-d226e8941698',
@@ -151,23 +152,23 @@ export const handlers = [
                   serverPlaceholder: null,
                   requiresCredentials: false,
                   supportsIntegratedAuthentication: false,
-                  requiresConnectionTest: true
-                }
-              ]
+                  requiresConnectionTest: true,
+                },
+              ],
             },
             view: 'database',
             name: 'Database',
             description: '',
-            serverOrder: 10
+            serverOrder: 10,
           },
           {
             name: 'UmbracoVersion',
             view: '',
             model: null,
             description: 'Installation is complete! Get ready to be redirected to your new CMS.',
-            serverOrder: 50
-          }
-        ]
+            serverOrder: 50,
+          },
+        ],
       } as components['schemas']['UmbracoInstaller'])
     );
   }),

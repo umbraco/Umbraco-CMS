@@ -80,28 +80,28 @@ export class UmbBackofficeHeader extends LitElement {
     {
       type: 'section',
       alias: 'Umb.Section.Content',
-      name: 'Content'
+      name: 'Content',
     },
     {
       type: 'section',
       alias: 'Umb.Section.Media',
-      name: 'Media'
+      name: 'Media',
     },
     {
       type: 'section',
       alias: 'Umb.Section.Members',
-      name: 'Members'
+      name: 'Members',
     },
     {
       type: 'section',
       alias: 'Umb.Section.Settings',
-      name: 'Settings'
+      name: 'Settings',
     },
     {
       type: 'section',
       alias: 'Umb.Section.Packages',
-      name: 'Packages'
-    }
+      name: 'Packages',
+    },
   ];
 
   @state()
@@ -148,29 +148,36 @@ export class UmbBackofficeHeader extends LitElement {
     const { data } = await getUserSections({});
 
     this._availableSections = data.sections;
-    this._visibleSections = this._sections.filter(section => this._availableSections.includes(section.alias)).map(section => section.name);
+    this._visibleSections = this._sections
+      .filter((section) => this._availableSections.includes(section.alias))
+      .map((section) => section.name);
     this._activeSection = this._visibleSections?.[0];
   }
 
   private _renderExtraSections() {
-    return when(this._extraSections.length > 0, () => html`
-      <uui-tab id="moreTab" @click="${this._handleTabClick}">
-        <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
-          <uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
-            <uui-symbol-more></uui-symbol-more>
-          </uui-button>
+    return when(
+      this._extraSections.length > 0,
+      () => html`
+        <uui-tab id="moreTab" @click="${this._handleTabClick}">
+          <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
+            <uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
+              <uui-symbol-more></uui-symbol-more>
+            </uui-button>
 
-          <div slot="popover" id="dropdown">
-            ${this._extraSections.map((section) => html`
-                <uui-menu-item
-                  ?active="${this._activeSection === section}"
-                  label="${section}"
-                  @click-label="${this._handleLabelClick}"></uui-menu-item>
-              `)}
-          </div>
-        </uui-popover>
-      </uui-tab>
-    `);
+            <div slot="popover" id="dropdown">
+              ${this._extraSections.map(
+                (section) => html`
+                  <uui-menu-item
+                    ?active="${this._activeSection === section}"
+                    label="${section}"
+                    @click-label="${this._handleLabelClick}"></uui-menu-item>
+                `
+              )}
+            </div>
+          </uui-popover>
+        </uui-tab>
+      `
+    );
   }
 
   render() {
@@ -182,12 +189,14 @@ export class UmbBackofficeHeader extends LitElement {
 
         <div id="sections">
           <uui-tab-group id="tabs">
-            ${this._visibleSections.map((section) => html`
-              <uui-tab
-                ?active="${this._activeSection === section}"
-                label="${section}"
-                @click="${this._handleTabClick}"></uui-tab>
-            `)}
+            ${this._visibleSections.map(
+              (section) => html`
+                <uui-tab
+                  ?active="${this._activeSection === section}"
+                  label="${section}"
+                  @click="${this._handleTabClick}"></uui-tab>
+              `
+            )}
             ${this._renderExtraSections()}
           </uui-tab-group>
         </div>

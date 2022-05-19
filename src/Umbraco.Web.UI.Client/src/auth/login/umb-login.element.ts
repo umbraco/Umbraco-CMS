@@ -48,7 +48,9 @@ export class UmbLogin extends LitElement {
       await postUserLogin({ username, password, persist });
       this._loggingIn = false;
       // TODO: Change to redirect when router has been added.
-      this.dispatchEvent(new CustomEvent('login', { bubbles: true, composed: true, detail: { username, password, persist } }));
+      this.dispatchEvent(
+        new CustomEvent('login', { bubbles: true, composed: true, detail: { username, password, persist } })
+      );
     } catch (error) {
       console.log(error);
       this._loggingIn = false;

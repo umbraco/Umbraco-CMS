@@ -55,8 +55,8 @@ export class UmbInstallerUser extends LitElement {
           connectionString: '',
           databaseProviderMetadataId: '1',
           integratedAuth: false,
-          providerName: 'SQLite'
-        }
+          providerName: 'SQLite',
+        },
       });
 
       // TODO: Change to redirect when router has been added.
