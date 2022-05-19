@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -41,7 +41,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <JsonSchemaPath>$(ProjectDir)umbraco/config/appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaPath>$(ProjectDir)appsettings-schema.json</JsonSchemaPath>
+    <JsonSchemaProjectPath>$(ProjectDir)../JsonSchema/JsonSchema.csproj</JsonSchemaProjectPath>
   </PropertyGroup>
   
   <Target Name="CheckPreconditions" BeforeTargets="Build">
@@ -58,7 +59,8 @@
  
   
   <Target Name="JsonSchemaBuild">
-    <!-- <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" /> -->
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o $(ProjectDir)appsettings-schema.json" />
+    <Exec Command="dotnet run -c Release --project $(JsonSchemaProjectPath) -o &quot;$(ProjectDir)appsettings-schema.json&quot;" />
   </Target>
   
   <Target Name="AppsettingsBuild">
