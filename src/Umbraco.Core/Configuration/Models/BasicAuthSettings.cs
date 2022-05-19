@@ -31,7 +31,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
     public class SharedSecret
     {
-        public string? HeaderName { get; set; } = "X-Authentication-Shared-Secret";
+        private const string StaticHeaderName =  "X-Authentication-Shared-Secret";
+
+        [DefaultValue(StaticHeaderName)]
+        public string? HeaderName { get; set; } = StaticHeaderName;
         public string? Value { get; set; }
     }
 }
