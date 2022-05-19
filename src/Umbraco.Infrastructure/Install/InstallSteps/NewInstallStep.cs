@@ -1,14 +1,17 @@
 using System.Collections.Specialized;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -35,6 +38,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IBackOfficeUserManager _userManager;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IMetricsConsentService _metricsConsentService;
 
         public NewInstallStep(
             IUserService userService,
@@ -46,7 +51,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             ICookieManager cookieManager,
             IBackOfficeUserManager userManager,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+            ILocalizedTextService localizedTextService,
+            IMetricsConsentService metricsConsentService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
@@ -58,6 +65,37 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _databaseProviderMetadata = databaseProviderMetadata;
+            _localizedTextService = localizedTextService;
+            _metricsConsentService = metricsConsentService;
+        }
+
+        // Scheduled for removal in V12
+        [Obsolete("Please use constructor that takes an IMetricsConsentService and ILocalizedTextService instead")]
+        public NewInstallStep(
+            IUserService userService,
+            DatabaseBuilder databaseBuilder,
+            IHttpClientFactory httpClientFactory,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<SecuritySettings> securitySettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            ICookieManager cookieManager,
+            IBackOfficeUserManager userManager,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+        : this(
+            userService,
+            databaseBuilder,
+            httpClientFactory,
+            passwordConfiguration,
+            securitySettings,
+            connectionStrings,
+            cookieManager,
+            userManager,
+            dbProviderFactoryCreator,
+            databaseProviderMetadata,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IMetricsConsentService>())
+        {
         }
 
         public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
@@ -88,6 +126,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+
+            _metricsConsentService.SetConsentLevel(user.TelemetryLevel);
 
             if (user.SubscribeToNewsLetter)
             {
@@ -126,7 +166,12 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                     quickInstallSettings,
-                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
+                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
+                    consentLevels = Enum.GetValues(typeof(TelemetryLevel)).Cast<TelemetryLevel>().ToList().Select(level => new
+                    {
+                        level,
+                        description = GetTelemetryLevelDescription(level),
+                    }),
                 };
             }
         }
@@ -142,6 +187,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     : "continueinstall";
             }
         }
+
+        private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
+        {
+            TelemetryLevel.Minimal => _localizedTextService.Localize("analytics", "minimalLevelDescription"),
+            TelemetryLevel.Basic => _localizedTextService.Localize("analytics", "basicLevelDescription"),
+            TelemetryLevel.Detailed => _localizedTextService.Localize("analytics", "detailedLevelDescription"),
+            _ => throw new ArgumentOutOfRangeException(nameof(telemetryLevel), $"Did not expect telemetry level of {telemetryLevel}")
+        };
 
         private InstallState GetInstallState()
         {
