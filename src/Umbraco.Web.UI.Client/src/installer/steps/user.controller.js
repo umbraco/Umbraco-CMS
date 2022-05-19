@@ -3,7 +3,7 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   $scope.majorVersion = Umbraco.Sys.ServerVariables.application.version;
   $scope.passwordPattern = /.*/;
   $scope.installer.current.model.subscribeToNewsLetter = $scope.installer.current.model.subscribeToNewsLetter || false;
-  $scope.installer.current.model.telemetryLevel = $scope.installer.current.model.consentLevels[1].level;
+  $scope.installer.current.model.telemetryLevel = $scope.installer.current.model.telemetryLevel || $scope.installer.current.model.consentLevels[1].level;
 
   if ($scope.installer.current.model.minNonAlphaNumericLength > 0) {
     var exp = "";
@@ -20,31 +20,37 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
     event: null
   };
 
-  const sliderOptions =
-  {
-    "start": 2,
-    "step": 1,
-    "tooltips": [false],
-    "range": {
-      "min": 1,
-      "max": 3
-    },
-    pips: {
-      mode: 'values',
-      density: 50,
-      values: [1, 2, 3],
-      "format": {
-        to: function (value) {
-          return $scope.installer.current.model.consentLevels[value - 1].level;
-        },
-        from: function (value) {
-          return Number(value);
+  if ('noUiSlider' in window) {
+    let consentSliderStartLevel = 2;
+    const initialConsentLevel = $scope.installer.current.model.consentLevels.findIndex(x => x.level === $scope.installer.current.model.telemetryLevel);
+    if (initialConsentLevel !== -1) {
+      consentSliderStartLevel = initialConsentLevel + 1;
+    }
+
+    const sliderOptions =
+    {
+      "start": consentSliderStartLevel,
+      "step": 1,
+      "tooltips": [false],
+      "range": {
+        "min": 1,
+        "max": 3
+      },
+      pips: {
+        mode: 'values',
+        density: 50,
+        values: [1, 2, 3],
+        "format": {
+          to: function (value) {
+            return $scope.installer.current.model.consentLevels[value - 1].level;
+          },
+          from: function (value) {
+            return Number(value);
+          }
         }
       }
-    }
-  };
+    };
 
-  if ('noUiSlider' in window) {
     const consentSlider = document.getElementById("consentSlider");
     if (consentSlider) {
       window.noUiSlider.create(consentSlider, sliderOptions);
