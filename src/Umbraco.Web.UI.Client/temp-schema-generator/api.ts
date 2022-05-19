@@ -2,7 +2,7 @@ import './installer';
 
 import { api, body, defaultResponse, endpoint, request, response } from '@airtasker/spot';
 
-import { ErrorResponse, InitResponse, UserLoginRequest, UserResponse } from './models';
+import { ErrorResponse, InitResponse, UserLoginRequest, UserResponse, VersionResponse } from './models';
 
 /* eslint-disable */
 @api({ name: "umbraco-backoffice-api", version: "1.0.0" })
@@ -15,6 +15,18 @@ class Api { }
 class GetInit {
   @response({ status: 200 })
   success(@body body: InitResponse) { }
+
+  @defaultResponse
+  default(@body body: ErrorResponse) { }
+}
+
+@endpoint({
+  method: "GET",
+  path: "/version",
+})
+class GetVersion {
+  @response({ status: 200 })
+  success(@body body: VersionResponse) { }
 
   @defaultResponse
   default(@body body: ErrorResponse) { }

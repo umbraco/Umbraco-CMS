@@ -8,9 +8,18 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(200),
       ctx.json({
-        version: '13.0.0',
         installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
-      })
+      } as components['schemas']['InitResponse']),
+    );
+  }),
+
+  rest.get('/umbraco/backoffice/version', (_req, res, ctx) => {
+    return res(
+      // Respond with a 200 status code
+      ctx.status(200),
+      ctx.json({
+        version: '13.0.0'
+      } as components['schemas']['VersionResponse']),
     );
   }),
 

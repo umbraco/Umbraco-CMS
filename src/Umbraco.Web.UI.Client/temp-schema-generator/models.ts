@@ -1,6 +1,9 @@
 export interface InitResponse {
-    version: string;
     installed: boolean;
+}
+
+export interface VersionResponse {
+    version: string;
 }
 
 export interface UserResponse {

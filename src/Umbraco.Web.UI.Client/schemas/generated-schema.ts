@@ -7,6 +7,9 @@ export interface paths {
   "/init": {
     get: operations["GetInit"];
   };
+  "/version": {
+    get: operations["GetVersion"];
+  };
   "/user/login": {
     post: operations["PostUserLogin"];
   };
@@ -25,11 +28,13 @@ export interface paths {
 export interface components {
   schemas: {
     InitResponse: {
-      version: string;
       installed: boolean;
     };
     ErrorResponse: {
       errorMessage: string;
+    };
+    VersionResponse: {
+      version: string;
     };
     UserLoginRequest: {
       username: string;
@@ -96,6 +101,22 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["InitResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  GetVersion: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["VersionResponse"];
         };
       };
       /** default response */

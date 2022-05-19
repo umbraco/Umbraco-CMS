@@ -19,6 +19,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /version:
+    get:
+      operationId: GetVersion
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /user/login:
     post:
       operationId: PostUserLogin
@@ -99,12 +115,9 @@ components:
     InitResponse:
       type: object
       properties:
-        version:
-          type: string
         installed:
           type: boolean
       required:
-        - version
         - installed
     ErrorResponse:
       type: object
@@ -113,6 +126,13 @@ components:
           type: string
       required:
         - errorMessage
+    VersionResponse:
+      type: object
+      properties:
+        version:
+          type: string
+      required:
+        - version
     UserLoginRequest:
       type: object
       properties:
