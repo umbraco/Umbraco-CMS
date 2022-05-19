@@ -4,11 +4,14 @@ import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
 import { postUserLogin } from '../../api/fetcher';
+import { UmbContextInjectMixin } from '../../core/context';
+import { UmbRouter } from '../../core/router';
 
 // create custom element with lit-element named 'umb-login'
 
 @customElement('umb-login')
-export class UmbLogin extends LitElement {
+// TODO: maybe rename the mixin to UmbContextRequestMixin?
+export class UmbLogin extends UmbContextInjectMixin(LitElement) {
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
@@ -21,6 +24,26 @@ export class UmbLogin extends LitElement {
 
   @state()
   private _loggingIn = false;
+
+  _router?: UmbRouter;
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    // TODO: find solution for magic string
+    // TODO: can we use a property decorator and a callback?
+    this.requestContext('umbRouter');
+  }
+
+  // TODO: maybe rename this callback to contextReceived?
+  /* TODO: this callback is called every time a new context is received. 
+    Maybe is would make sense to return the updated contexts (like updatedProperties) so unnecessary code is not run because a new context is added to the map.
+  */
+  contextInjected(contexts: Map<string, any>): void {
+    if (contexts.has('umbRouter')) {
+      this._router = contexts.get('umbRouter');
+    }
+  }
 
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
@@ -47,10 +70,8 @@ export class UmbLogin extends LitElement {
     try {
       await postUserLogin({ username, password, persist });
       this._loggingIn = false;
-      // TODO: Change to redirect when router has been added.
-      this.dispatchEvent(
-        new CustomEvent('login', { bubbles: true, composed: true, detail: { username, password, persist } })
-      );
+      // TODO: how do we know where to go?
+      this._router?.push('/section/content');
     } catch (error) {
       console.log(error);
       this._loggingIn = false;
