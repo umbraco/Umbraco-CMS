@@ -1,17 +1,9 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-
-import { postInstall } from '../api/fetcher';
-
 @customElement('umb-installer-installing')
 export class UmbInstallerInstalling extends LitElement {
   static styles: CSSResultGroup = [
     css`
-      uui-input,
-      uui-input-password {
-        width: 100%;
-      }
-
       #log {
         border: 1px solid #b3b3b3;
         margin-top: 16px;
@@ -29,38 +21,6 @@ export class UmbInstallerInstalling extends LitElement {
       }
     `,
   ];
-
-  private _handleSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
-
-    const form = e.target as HTMLFormElement;
-    if (!form) return;
-
-    const isValid = form.checkValidity();
-    if (!isValid) return;
-
-    const formData = new FormData(form);
-
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const news = formData.has('news');
-
-    this._install(name, email, password, news);
-  };
-
-  private async _install(name: string, email: string, password: string, news: boolean) {
-    console.log('Installing', name, email, password, news);
-
-    try {
-      await postInstall({});
-
-      // TODO: Change to redirect when router has been added.
-      this.dispatchEvent(new CustomEvent('install', { bubbles: true, composed: true }));
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   render() {
     return html` <div class="uui-text">
