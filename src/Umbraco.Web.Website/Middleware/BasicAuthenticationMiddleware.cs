@@ -53,6 +53,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         if (_runtimeState.Level < RuntimeLevel.Run
+            || !_basicAuthService.IsBasicAuthEnabled()
             || context.Request.IsBackOfficeRequest()
             || context.Request.IsClientSideRequest()
             || AllowedClientRequest(context)
