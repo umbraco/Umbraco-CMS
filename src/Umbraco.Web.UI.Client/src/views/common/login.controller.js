@@ -14,7 +14,9 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
             path = decodeURIComponent(locationObj.returnPath);
         }
 
-        //TODO: check path validity.
+        // Ensure path is not absolute
+        path = path.replace(/^.*\/\/[^\/]+/, '')
+
         window.location.href = path;
     });
 
