@@ -1,9 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { postInstall } from '../api/fetcher';
-
-import { UUISelectElement } from '@umbraco-ui/uui-select/lib';
+import { UUISelectElement } from '@umbraco-ui/uui';
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends LitElement {
   static styles: CSSResultGroup = [
@@ -140,7 +138,6 @@ export class UmbInstallerDatabase extends LitElement {
   `;
 
   private _handleDatabaseTypeChange = (e: CustomEvent) => {
-    // TODO: this is a hack, we need to find a better way to do this.
     this.databaseType = (e.target as UUISelectElement).value.toString();
   };
 
