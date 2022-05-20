@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _logger = logger;
 
                 // Change: We would need to make a DataConverter that can handle child layout items (Specific to Block Grid Editor)
-                _blockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(), contentTypeService, _logger);
+                _blockEditorValues = new BlockEditorValues(new BlockGridEditorDataConverter(jsonSerializer), contentTypeService, _logger);
                 Validators.Add(new BlockEditorValidator(propertyValidationService, _blockEditorValues,contentTypeService));
                 // Change: Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
@@ -263,7 +263,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 yield break;
                 /*
-                
+
                 // Change: We are not interested in using the List validation, we properly need grid validation of some sort.
 
                 var blockConfig = (BlockListConfiguration)dataTypeConfiguration;
