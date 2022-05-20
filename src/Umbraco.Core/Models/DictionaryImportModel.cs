@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models
@@ -7,7 +6,7 @@ namespace Umbraco.Cms.Core.Models
     public class DictionaryImportModel
     {
         [DataMember(Name = "dictionaryItems")]
-        public List<string>? DictionaryItems { get; set; }
+        public List<DictionaryPreviewImportModel>? DictionaryItems { get; set; }
 
         [DataMember(Name = "tempFileName")]
         public string? TempFileName { get; set; }

@@ -30,11 +30,35 @@
           <localize key="dictionaryListCaption">Dictionary items</localize>
           :
         </strong>
-        <span ng-repeat="dictionaryItem in vm.model.dictionaryItems"><br />{{dictionaryItem}}</span>       
-        <br/>
-        <br/>
+        <div ng-repeat="dictionaryItem in vm.model.dictionaryItems" style="padding-left:{{dictionaryItem.level * 20}}px;">{{dictionaryItem.name}}</div>
+        <br />
+        <br />
+
+        <div>
+
+          <hr />
+
+          <p>
+            <strong>
+              <localize key="actions_chooseWhereToMove">Choose where to move </localize> <localize key="dictionaryListCaption">Dictionary items</localize>&nbsp;<localize key="contentTypeEditor_structureBelow">to in the tree structure below</localize>
+            </strong>
+            (optinal)
+          </p>
+
+          <umb-tree section="translation"
+                    treealias="dictionary"
+                    customtreeparams="foldersonly=1"
+                    hideheader="false"
+                    hideoptions="true"
+                    isdialog="true"
+                    api="dialogTreeApi"
+                    on-init="onTreeInit()"
+                    enablecheckboxes="true">
+          </umb-tree>
+        </div>
+
         <button class="btn btn-primary" ng-click="import()">
-          <localize key="actions_importDocumentType">Import</localize>
+          <localize key="general_import">Import</localize>
         </button>
       </div>
       <div ng-if="vm.state === 'done'">
@@ -42,7 +66,7 @@
           <localize key="speechBubbles_dictionaryItemImported"> The following dictionary item(s) has been imported!</localize>
          
         </strong>
-        <span ng-repeat="dictionaryItem in vm.model.dictionaryItems"><br />{{dictionaryItem}}</span>
+        <span ng-repeat="dictionaryItem in vm.model.dictionaryItems"><br />{{dictionaryItem.name}}</span>
       </div>
     </div>
   </div>

@@ -219,13 +219,13 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
         * @returns {Promise} resourcePromise object.
         *
         */
-    function importItem(file) {
+    function importItem(file, parentId) {
         if (!file) {
             throw "file cannot be null";
         }
 
-        return umbRequestHelper.resourcePromise(
-            $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "ImportDictionary", { file: file })),
+      return umbRequestHelper.resourcePromise(
+        $http.post(umbRequestHelper.getApiUrl("dictionaryApiBaseUrl", "ImportDictionary", { file: file, parentId: parentId })),
             "Failed to import dictionary item " + file
         );
     }

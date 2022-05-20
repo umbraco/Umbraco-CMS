@@ -383,9 +383,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName);
         }
 
-        public IActionResult ImportDictionary(string file)
+        public IActionResult ImportDictionary(string file, int parentId)
         {
-            if (string.IsNullOrEmpty(file))
+            if (string.IsNullOrWhiteSpace(file))
                 return NotFound();
 
             var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
@@ -398,7 +398,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0;
             var element = XElement.Parse(xd.InnerXml);
 
-            var dictionaryItems = _packageDataInstallation.ImportDictionaryItem(element, userId);
+            var parentDictionaryItem = _localizationService.GetDictionaryItemById(parentId);
+            var dictionaryItems = _packageDataInstallation.ImportDictionaryItem(element, userId, parentDictionaryItem?.Key);
 
             // Try to clean up the temporary file.
             try
@@ -411,7 +412,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItems.FirstOrDefault());
-
             return Content(model!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
@@ -433,17 +433,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                      _localizedTextService.Localize("media", "failedFileUpload"),
                     _localizedTextService.Localize("media", "invalidFileName"));
 
-
-            using (var stream = System.IO.File.Create(tempPath))
-            {
-                file.CopyToAsync(stream).GetAwaiter().GetResult();
-            }
-
             if (!ext.InvariantEquals("udt"))
                 return ValidationProblem(
                      _localizedTextService.Localize("media", "failedFileUpload"),
                     _localizedTextService.Localize("media", "disallowedFileType"));
 
+            using (var stream = System.IO.File.Create(tempPath))
+            {
+                file.CopyToAsync(stream).GetAwaiter().GetResult();
+            }
 
             var xd = new XmlDocument
             {
@@ -459,14 +457,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             DictionaryImportModel model = new DictionaryImportModel()
             {
                 TempFileName = tempPath,
-                DictionaryItems = new List<string>()
+                DictionaryItems = new List<DictionaryPreviewImportModel>()
             };
 
+            int level = 1;
+            string curentParrent = string.Empty;
             foreach (XmlNode dictionaryItem in xd.GetElementsByTagName("DictionaryItem"))
             {
                 var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
-                if (!string.IsNullOrEmpty(name))
-                    model.DictionaryItems.Add(name);
+                var parentKey = dictionaryItem?.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
+
+                if (parentKey != curentParrent || level == 1)
+                {
+                    level += 1;
+                    curentParrent = parentKey;
+                }
+
+                model.DictionaryItems.Add(new DictionaryPreviewImportModel()
+                {
+                    Level = level,
+                    Name = name
+                });
             }
   
             if (!model.DictionaryItems.Any())
