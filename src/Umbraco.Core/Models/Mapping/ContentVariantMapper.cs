@@ -16,13 +16,13 @@ public class ContentVariantMapper
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
     }
 
-    public IEnumerable<TVariant>? Map<TVariant>(IContent source, MapperContext context)
+    public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context)
         where TVariant : ContentVariantDisplay
     {
         var variesByCulture = source.ContentType.VariesByCulture();
         var variesBySegment = source.ContentType.VariesBySegment();
 
-        IList<TVariant>? variants = new List<TVariant>();
+        List<TVariant> variants = new ();
 
         if (!variesByCulture && !variesBySegment)
         {
@@ -36,7 +36,7 @@ public class ContentVariantMapper
         else if (variesByCulture && !variesBySegment)
         {
             IEnumerable<ContentEditing.Language> languages = GetLanguages(context);
-            variants = languages?
+            variants = languages
                 .Select(language => CreateVariantDisplay<TVariant>(context, source, language, null))
                 .WhereNotNull()
                 .ToList();
@@ -45,7 +45,7 @@ public class ContentVariantMapper
         {
             // Segment only
             IEnumerable<string?> segments = GetSegments(source);
-            variants = segments?
+            variants = segments
                 .Select(segment => CreateVariantDisplay<TVariant>(context, source, null, segment))
                 .WhereNotNull()
                 .ToList();
@@ -62,7 +62,7 @@ public class ContentVariantMapper
                 throw new InvalidOperationException("No languages or segments available");
             }
 
-            variants = languages?
+            variants = languages
                 .SelectMany(language => segments
                     .Select(segment => CreateVariantDisplay<TVariant>(context, source, language, segment)))
                 .WhereNotNull()
@@ -74,10 +74,10 @@ public class ContentVariantMapper
 
     private static bool IsDefaultSegment(ContentVariantDisplay variant) => variant.Segment == null;
 
-    private IList<TVariant>? SortVariants<TVariant>(IList<TVariant>? variants)
+    private IList<TVariant> SortVariants<TVariant>(IList<TVariant> variants)
         where TVariant : ContentVariantDisplay
     {
-        if (variants == null || variants.Count <= 1)
+        if ( variants.Count <= 1)
         {
             return variants;
         }

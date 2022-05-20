@@ -1,18 +1,17 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Umbraco.Cms.Web.Common.Formatters
+namespace Umbraco.Cms.Web.Common.Formatters;
+
+public class IgnoreRequiredAttributesResolver : DefaultContractResolver
 {
-    public class IgnoreRequiredAttributesResolver : DefaultContractResolver
+    protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
     {
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            var property = base.CreateProperty(member, memberSerialization);
+        JsonProperty property = base.CreateProperty(member, memberSerialization);
 
-            property.Required = Required.Default;
+        property.Required = Required.Default;
 
-            return property;
-        }
+        return property;
     }
 }

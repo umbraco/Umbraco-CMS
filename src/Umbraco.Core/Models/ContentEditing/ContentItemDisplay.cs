@@ -70,7 +70,7 @@ public class
     ///     variants
     /// </remarks>
     [DataMember(Name = "variants")]
-    public IEnumerable<TVariant>? Variants { get; set; }
+    public IEnumerable<TVariant> Variants { get; set; }
 
     [DataMember(Name = "owner")]
     public UserProfile? Owner { get; set; }

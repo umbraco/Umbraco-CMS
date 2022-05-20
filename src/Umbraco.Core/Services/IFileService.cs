@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public interface IFileService : IService
 {
-    IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
+    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
 
     void CreatePartialViewFolder(string folderPath);
 
@@ -208,13 +208,13 @@ public interface IFileService : IService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    IEnumerable<ITemplate>? GetTemplates(params string[] aliases);
+    IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
     /// <summary>
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    IEnumerable<ITemplate>? GetTemplates(int masterTemplateId);
+    IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
     /// <summary>
     ///     Gets a <see cref="ITemplate" /> object by its alias.
@@ -307,12 +307,13 @@ public interface IFileService : IService
     /// </summary>
     /// <param name="snippetName">The name of the snippet</param>
     /// <returns></returns>
-    string GetPartialViewMacroSnippetContent(string snippetName);
+    [Obsolete("Please use SnippetCollection.GetPartialViewMacroSnippetContent instead. Scheduled for removal in V12.")]
+        string GetPartialViewMacroSnippetContent(string snippetName);
 
     /// <summary>
     ///     Gets the content of a partial view snippet as a string.
     /// </summary>
     /// <param name="snippetName">The name of the snippet</param>
     /// <returns>The content of the partial view.</returns>
-    string GetPartialViewSnippetContent(string snippetName);
+    [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]string GetPartialViewSnippetContent(string snippetName);
 }

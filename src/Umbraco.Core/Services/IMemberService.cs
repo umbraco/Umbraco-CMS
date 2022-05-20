@@ -166,7 +166,7 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByMemberType(string memberTypeAlias);
+    IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
 
     /// <summary>
     ///     Gets all Members for the MemberType id
@@ -175,7 +175,7 @@ public interface IMemberService : IMembershipMemberService
     /// <returns>
     ///     <see cref="IEnumerable{IMember}" />
     /// </returns>
-    IEnumerable<IMember>? GetMembersByMemberType(int memberTypeId);
+    IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
 
     /// <summary>
     ///     Gets all Members within the specified MemberGroup name

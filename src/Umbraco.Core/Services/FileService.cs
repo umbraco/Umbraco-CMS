@@ -433,11 +433,11 @@ public class FileService : RepositoryService, IFileService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    public IEnumerable<ITemplate>? GetTemplates(params string[] aliases)
+    public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetAll(aliases)?.OrderBy(x => x.Name);
+            return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
         }
     }
 
@@ -445,11 +445,11 @@ public class FileService : RepositoryService, IFileService
     ///     Gets a list of all <see cref="ITemplate" /> objects
     /// </summary>
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
-    public IEnumerable<ITemplate>? GetTemplates(int masterTemplateId)
+    public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            return _templateRepository.GetChildren(masterTemplateId)?.OrderBy(x => x.Name);
+            return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
         }
     }
 

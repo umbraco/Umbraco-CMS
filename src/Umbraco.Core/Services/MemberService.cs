@@ -1086,17 +1086,17 @@ public class MemberService : RepositoryService, IMemberService
     /// </summary>
     /// <param name="memberId"></param>
     /// <returns>A list of member roles</returns>
-    public IEnumerable<string?> GetAllRoles(int memberId)
+    public IEnumerable<string> GetAllRoles(int memberId)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             scope.ReadLock(Constants.Locks.MemberTree);
             IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
-            return result.Select(x => x.Name).Distinct();
+            return result.Select(x => x.Name).WhereNotNull().Distinct();
         }
     }
 
-    public IEnumerable<string> GetAllRoles(string? username)
+    public IEnumerable<string> GetAllRoles(string username)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
         {
@@ -1292,7 +1292,7 @@ public class MemberService : RepositoryService, IMemberService
                 Name = member.Name,
                 Username = member.Username,
                 Email = member.Email,
-                Groups = GetAllRoles(member.Id)?.ToList(),
+                Groups = GetAllRoles(member.Id).ToList(),
                 ContentTypeAlias = member.ContentTypeAlias,
                 CreateDate = member.CreateDate,
                 UpdateDate = member.UpdateDate,

@@ -6,7 +6,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Configuration;
 
 /// <summary>
-///     Configures ConnectionStrings.
+///     Configures the <see cref="ConnectionStrings" /> named option.
 /// </summary>
 public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrings>
 {
@@ -15,14 +15,17 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConfigureConnectionStrings" /> class.
     /// </summary>
-    public ConfigureConnectionStrings(IConfiguration configuration) => _configuration = configuration;
+    /// <param name="configuration">The configuration.</param>
+    public ConfigureConnectionStrings(IConfiguration configuration)
+        => _configuration = configuration;
 
     /// <inheritdoc />
-    public void Configure(ConnectionStrings options) => Configure(Constants.System.UmbracoConnectionName, options);
+    public void Configure(ConnectionStrings options) => Configure(Options.DefaultName, options);
 
     /// <inheritdoc />
     public void Configure(string name, ConnectionStrings options)
     {
+        // Default to using UmbracoConnectionName
         if (name == Options.DefaultName)
         {
             name = Constants.System.UmbracoConnectionName;
@@ -34,8 +37,8 @@ public class ConfigureConnectionStrings : IConfigureNamedOptions<ConnectionStrin
         }
 
         options.Name = name;
-        options.ConnectionString = _configuration.GetConnectionString(name);
-        options.ProviderName = _configuration.GetConnectionString($"{name}{ConnectionStrings.ProviderNamePostfix}") ??
+        options.ConnectionString = _configuration.GetUmbracoConnectionString(name, out string? providerName);
+        options.ProviderName = providerName ??
                                ConnectionStrings.DefaultProviderName;
     }
 }

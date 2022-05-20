@@ -42,5 +42,5 @@ public interface IArtifactSignature
     /// <summary>
     ///     Gets the dependencies of this artifact.
     /// </summary>
-    IEnumerable<ArtifactDependency>? Dependencies { get; }
+    IEnumerable<ArtifactDependency> Dependencies { get; }
 }

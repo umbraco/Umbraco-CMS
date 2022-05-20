@@ -1,0 +1,16 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaFilePath>$(MSBuildThisFileDirectory)..\appsettings-schema.json</SchemaFilePath>
+  </PropertyGroup>
+
+  <Target Name="CopyUmbracoSchema" BeforeTargets="Build">
+    <ItemGroup>
+      <SchemaFile Include="$(SchemaFilePath)"/>
+    </ItemGroup>
+
+    <Message Text="Copying Umbraco json schema file" Importance="high"/>
+    <Copy SourceFiles="@(SchemaFile)"
+          DestinationFolder="$(MSBuildProjectDirectory)"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

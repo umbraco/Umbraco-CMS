@@ -26,12 +26,12 @@ public interface IDataTypeConfigurationConnector
     /// </summary>
     /// <param name="dataType">The datatype.</param>
     /// <param name="dependencies">The dependencies.</param>
-    string ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
+    string? ToArtifact(IDataType dataType, ICollection<ArtifactDependency> dependencies);
 
     /// <summary>
     ///     Gets the actual datatype configuration corresponding to the artifact configuration.
     /// </summary>
     /// <param name="dataType">The datatype.</param>
     /// <param name="configuration">The artifact configuration.</param>
-    object FromArtifact(IDataType dataType, string configuration);
+    object? FromArtifact(IDataType dataType, string? configuration);
 }

@@ -36,7 +36,7 @@ public interface IUmbracoBuilder
 
     AppCaches AppCaches { get; }
 
-    TBuilder? WithCollectionBuilder<TBuilder>()
+    TBuilder WithCollectionBuilder<TBuilder>()
         where TBuilder : ICollectionBuilder;
 
     void Build();

@@ -1,32 +1,30 @@
-using System;
 using Smidge;
 using Smidge.Nuglify;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.Extensions;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Extensions;
+
+public static partial class UmbracoApplicationBuilderExtensions
 {
-    public static partial class UmbracoApplicationBuilderExtensions
+    /// <summary>
+    ///     Enables runtime minification for Umbraco
+    /// </summary>
+    public static IUmbracoEndpointBuilderContext UseUmbracoRuntimeMinificationEndpoints(
+        this IUmbracoEndpointBuilderContext app)
     {
-        /// <summary>
-        /// Enables runtime minification for Umbraco
-        /// </summary>
-        public static IUmbracoEndpointBuilderContext UseUmbracoRuntimeMinificationEndpoints(this IUmbracoEndpointBuilderContext app)
+        if (app == null)
         {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
+            throw new ArgumentNullException(nameof(app));
+        }
 
-            if (!app.RuntimeState.UmbracoCanBoot())
-            {
-                return app;
-            }
-
-            app.AppBuilder.UseSmidge();
-            app.AppBuilder.UseSmidgeNuglify();
-
+        if (!app.RuntimeState.UmbracoCanBoot())
+        {
             return app;
         }
+
+        app.AppBuilder.UseSmidge();
+        app.AppBuilder.UseSmidgeNuglify();
+
+        return app;
     }
 }

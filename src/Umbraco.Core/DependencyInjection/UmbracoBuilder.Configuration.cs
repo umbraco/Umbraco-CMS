@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -9,12 +10,32 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.DependencyInjection;
 
 /// <summary>
-///     Extension methods for <see cref="IUmbracoBuilder" />
+/// Extension methods for <see cref="IUmbracoBuilder" />
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
+        where TOptions : class
+    {
+        var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
+        if (umbracoOptionsAttribute is null)
+        {
+            throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
+        }
+
+        var optionsBuilder = builder.Services.AddOptions<TOptions>()
+            .Bind(
+                builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
+                o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
+            .ValidateDataAnnotations();
+
+        configure?.Invoke(optionsBuilder);
+
+        return builder;
+    }
+
     /// <summary>
-    ///     Add Umbraco configuration services and options
+    /// Add Umbraco configuration services and options
     /// </summary>
     public static IUmbracoBuilder AddConfiguration(this IUmbracoBuilder builder)
     {
@@ -28,7 +49,6 @@ public static partial class UmbracoBuilderExtensions
         // Register configuration sections.
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
-            .AddUmbracoOptions<ConnectionStrings>()
             .AddUmbracoOptions<ActiveDirectorySettings>()
             .AddUmbracoOptions<ContentSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
@@ -69,44 +89,18 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,
-            builder.Config.GetSection(
-                $"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.Languages}"));
+            builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.Languages}"));
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes,
-            builder.Config.GetSection(
-                $"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes}"));
+            builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.DataTypes}"));
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes,
-            builder.Config.GetSection(
-                $"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes}"));
+            builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MediaTypes}"));
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
-            builder.Config.GetSection(
-                $"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
+            builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
         builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
-
-        return builder;
-    }
-
-    private static IUmbracoBuilder AddUmbracoOptions<TOptions>(
-        this IUmbracoBuilder builder,
-        Action<OptionsBuilder<TOptions>>? configure = null)
-        where TOptions : class
-    {
-        UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
-        if (umbracoOptionsAttribute is null)
-        {
-            throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
-        }
-
-        OptionsBuilder<TOptions> optionsBuilder = builder.Services.AddOptions<TOptions>()
-            .Bind(
-                builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
-                o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
-            .ValidateDataAnnotations();
-
-        configure?.Invoke(optionsBuilder);
 
         return builder;
     }

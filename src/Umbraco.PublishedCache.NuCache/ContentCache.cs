@@ -164,10 +164,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // walk up from that node until we hit a node with a domain,
             // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
-            IPublishedContent? n = node;
-            var urlSegment = n.UrlSegment(_variationContextAccessor, culture);
-            var hasDomains = _domainCache.GetAssignedWithCulture(culture, n.Id);
-            while (hasDomains == false && n != null) // n is null at root
+            IPublishedContent? content = node;
+            var urlSegment = content.UrlSegment(_variationContextAccessor, culture);
+            var hasDomains = _domainCache.GetAssignedWithCulture(culture, content.Id);
+            while (hasDomains == false && content != null) // content is null at root
             {
                 // no segment indicates this is not published when this is a variant
                 if (urlSegment.IsNullOrWhiteSpace())
@@ -178,13 +178,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 pathParts.Add(urlSegment!);
 
                 // move to parent node
-                n = n.Parent;
-                if (n != null)
+                content = content.Parent;
+                if (content != null)
                 {
-                    urlSegment = n.UrlSegment(_variationContextAccessor, culture);
+                    urlSegment = content.UrlSegment(_variationContextAccessor, culture);
                 }
 
-                hasDomains = n != null && _domainCache.GetAssignedWithCulture(culture, n.Id);
+                hasDomains = content != null && _domainCache.GetAssignedWithCulture(culture, content.Id);
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
             //prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
             //and is done so that we know the ID of the domain node for the path
-            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
+            var route = (content?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
 
             return route;
         }
