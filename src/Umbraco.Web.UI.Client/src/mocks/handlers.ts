@@ -3,6 +3,38 @@ import { rest } from 'msw';
 import { components } from '../../schemas/generated-schema';
 
 export const handlers = [
+  rest.get('/umbraco/backoffice/manifests', (_req, res, ctx) => {
+    return res(
+      // Respond with a 200 status code
+      ctx.status(200),
+      ctx.json({
+        manifests: [
+         {
+          type: 'section',
+          alias: 'My.Section.Custom',
+          name: 'Custom',
+          elementName: 'umb-custom-section'
+         },
+         {
+          type: 'propertyEditor',
+          alias: 'My.PropertyEditor.Custom',
+          name: 'Custom',
+          elementName: 'umb-custom-property-editor'
+         },
+         {
+          type: 'tree',
+          alias: 'My.Tree.Custom',
+          name: 'Custom',
+          elementName: 'umb-custom-tree',
+          meta: {
+            section: 'My.Section.Custom',
+          }
+         }
+        ]
+      })
+    );
+  }),
+
   rest.get('/umbraco/backoffice/init', (_req, res, ctx) => {
     return res(
       // Respond with a 200 status code
@@ -67,7 +99,7 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings'],
+        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
       } as components['schemas']['AllowedSectionsResponse'])
     );
   }),
