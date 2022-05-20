@@ -52,7 +52,8 @@ stages:
             inputs:
               key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
               restoreKeys: |
-                npm_client | "$(Agent.OS)"
+                "npm_client" | "$(Agent.OS)"
+                "npm_client"
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
@@ -367,7 +368,8 @@ stages:
             inputs:
               key: '"npm_e2e" | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
               restoreKeys: |
-                npm_e2e | "$(Agent.OS)"
+                "npm_e2e" | "$(Agent.OS)"
+                "npm_e2e"
               path: $(npm_config_cache)
           - task: PowerShell@2
             displayName: Generate Cypress.env.json
