@@ -5,9 +5,6 @@
     <PackageId>Umbraco.Cms</PackageId>
     <Title>Umbraco.Cms</Title>
     <Description>Installs Umbraco CMS in your ASP.NET Core project</Description>
-  </PropertyGroup>
-
-  
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 
@@ -41,7 +38,7 @@
   <Target Name="JsonSchemaBuild">
     <Exec WorkingDirectory="$(JsonSchemaProjectPath)" Command="dotnet run -c Release -o &quot;../Umbraco.Cms/appsettings-schema.json&quot;" />
   </Target>
-  
+
 
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
