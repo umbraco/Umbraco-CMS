@@ -25,8 +25,7 @@ public interface ISiteDomainMapper
     ///     </para>
     ///     <para>The filter _must_ return something else an exception will be thrown.</para>
     /// </remarks>
-    DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture,
-        string? defaultCulture);
+    DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture, string? defaultCulture);
 
     /// <summary>
     ///     Filters a list of <c>DomainAndUri</c> to pick those that best matches the current request.
@@ -44,6 +43,5 @@ public interface ISiteDomainMapper
     ///         to help pick the best matches.
     ///     </para>
     /// </remarks>
-    IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current,
-        bool excludeDefault, string? culture, string? defaultCulture);
+    IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture);
 }

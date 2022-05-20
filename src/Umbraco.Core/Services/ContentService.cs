@@ -1585,9 +1585,11 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedUnpublish, eventMessages, content); // bah
         }
 
-        if (publishing) // we have tried to publish
+        // we have tried to publish
+        if (publishing)
         {
-            if (publishResult?.Success ?? false) // and succeeded, trigger events
+            // and succeeded, trigger events
+            if (publishResult?.Success ?? false)
             {
                 if (isNew == false && previouslyPublished == false)
                 {
@@ -1599,7 +1601,8 @@ public class ContentService : RepositoryService, IContentService
                 }
 
                 // invalidate the node/branch
-                if (!branchOne) // for branches, handled by SaveAndPublishBranch
+                // for branches, handled by SaveAndPublishBranch
+                if (!branchOne)
                 {
                     scope.Notifications.Publish(
                         new ContentTreeChangeNotification(content, changeType, eventMessages));
@@ -1688,8 +1691,7 @@ public class ContentService : RepositoryService, IContentService
         return results;
     }
 
-    private void PerformScheduledPublishingExpiration(DateTime date, List<PublishResult> results,
-        EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
+    private void PerformScheduledPublishingExpiration(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -1726,6 +1728,7 @@ public class ContentService : RepositoryService, IContentService
                     {
                         // Clear this schedule for this culture
                         contentSchedule.Clear(c, ContentScheduleAction.Expire, date);
+
                         // set the culture to be published
                         d.UnpublishCulture(c);
                     }
@@ -1747,8 +1750,7 @@ public class ContentService : RepositoryService, IContentService
                     PublishResult result = Unpublish(d, userId: d.WriterId);
                     if (result.Success == false)
                     {
-                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.",
-                            d.Id, result.Result);
+                        _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                     }
 
                     results.Add(result);
@@ -1952,7 +1954,8 @@ public class ContentService : RepositoryService, IContentService
             var isRoot = c.Id == content.Id;
             HashSet<string>? culturesToPublish = null;
 
-            if (!c.ContentType.VariesByCulture()) // invariant content type
+            // invariant content type
+            if (!c.ContentType.VariesByCulture())
             {
                 return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
             }
@@ -1999,7 +2002,8 @@ public class ContentService : RepositoryService, IContentService
             var isRoot = c.Id == content.Id;
             HashSet<string>? culturesToPublish = null;
 
-            if (!c.ContentType.VariesByCulture()) // invariant content type
+            // invariant content type
+            if (!c.ContentType.VariesByCulture())
             {
                 return SaveAndPublishBranch_ShouldPublish(ref culturesToPublish, "*", c.Published, c.Edited, isRoot, force);
             }
@@ -2314,8 +2318,10 @@ public class ContentService : RepositoryService, IContentService
 
             scope.WriteLock(Constants.Locks.ContentTree);
             IContent? c = _documentRepository.Get(id);
+
+            // don't delete the current or published version
             if (c?.VersionId != versionId &&
-                c?.PublishedVersionId != versionId) // don't delete the current or published version
+                c?.PublishedVersionId != versionId)
             {
                 _documentRepository.DeleteVersion(versionId);
             }

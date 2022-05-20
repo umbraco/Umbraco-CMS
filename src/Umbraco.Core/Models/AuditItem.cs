@@ -7,8 +7,7 @@ public sealed class AuditItem : EntityBase, IAuditItem
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditItem" /> class.
     /// </summary>
-    public AuditItem(int objectId, AuditType type, int userId, string? entityType, string? comment = null,
-        string? parameters = null)
+    public AuditItem(int objectId, AuditType type, int userId, string? entityType, string? comment = null, string? parameters = null)
     {
         DisableChangeTracking();
 

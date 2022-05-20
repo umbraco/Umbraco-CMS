@@ -17,8 +17,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items with reference to the current item.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
     ///     Gets a page of items used in any kind of relation from selected integer ids.
@@ -32,8 +31,7 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of the items in any kind of relation.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 
     /// <summary>
     ///     Gets a page of the descending items that have any references, given a parent id.
@@ -47,6 +45,5 @@ public interface ITrackedReferencesRepository
     /// </param>
     /// <param name="totalRecords">The total count of descending items.</param>
     /// <returns>An enumerable list of <see cref="RelationItem" /> objects.</returns>
-    IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency, out long totalRecords);
+    IEnumerable<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency, out long totalRecords);
 }

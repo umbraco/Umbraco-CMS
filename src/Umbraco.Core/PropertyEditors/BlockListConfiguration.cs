@@ -7,25 +7,19 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public class BlockListConfiguration
 {
-    [ConfigurationField("blocks", "Available Blocks",
-        "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html",
-        Description = "Define the available blocks.")]
+    [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blocklist/prevalue/blocklist.blockconfiguration.html", Description = "Define the available blocks.")]
     public BlockConfiguration[] Blocks { get; set; } = null!;
 
     [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
     public NumberRange ValidationLimit { get; set; } = new();
 
-    [ConfigurationField("useLiveEditing", "Live editing mode", "boolean",
-        Description =
-            "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
+    [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
     public bool UseLiveEditing { get; set; }
 
-    [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean",
-        Description = "Use the inline editor as the default block view.")]
+    [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
     public bool UseInlineEditingAsDefault { get; set; }
 
-    [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring",
-        Description = "optional css overwrite, example: 800px or 100%")]
+    [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
     public string? MaxPropertyWidth { get; set; }
 
     [DataContract]

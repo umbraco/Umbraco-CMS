@@ -120,7 +120,8 @@ public class DataType : TreeEntityBase, IDataType
 
             // we don't support re-assigning the same object
             // configurations are kinda non-mutable, mainly because detecting changes would be a pain
-            if (_configuration == value) // reference comparison
+            // reference comparison
+            if (_configuration == value)
             {
                 throw new ArgumentException(
                     "Configurations are kinda non-mutable. Do not reassign the same object.",

@@ -79,6 +79,7 @@ public class NavigableNavigator : XPathNavigator
     /// <param name="maxDepth">The maximum depth.</param>
     /// <remarks>When no root content is supplied then the root of the source is used.</remarks>
     public NavigableNavigator(INavigableSource source, int rootId = 0, int maxDepth = int.MaxValue)
+
         // : this(source, maxDepth)
     {
         _source = source;
@@ -691,7 +692,9 @@ public class NavigableNavigator : XPathNavigator
         // navigator may be rooted below source root
         // find the navigator root id
         State state = InternalState;
-        while (state.Parent != null) // root state has no parent
+
+        // root state has no parent
+        while (state.Parent != null)
         {
             state = state.Parent;
         }
@@ -846,7 +849,8 @@ public class NavigableNavigator : XPathNavigator
                     InternalState.FieldsCount - 1 > _lastAttributeIndex)
                 {
                     // before children elements may come some property elements
-                    if (MoveToParentElement()) // pops the state
+                    // pops the state
+                    if (MoveToParentElement())
                     {
                         InternalState.FieldIndex = InternalState.FieldsCount - 1;
                         DebugState();

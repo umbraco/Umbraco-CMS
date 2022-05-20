@@ -18,8 +18,7 @@ public abstract class ConfigurationValidatorBase
     /// <param name="validValues">The set of valid values.</param>
     /// <param name="message">A message to output if the value does not match.</param>
     /// <returns>True if valid, false if not.</returns>
-    public bool ValidateStringIsOneOfValidValues(string configPath, string value, IEnumerable<string> validValues,
-        out string message)
+    public bool ValidateStringIsOneOfValidValues(string configPath, string value, IEnumerable<string> validValues, out string message)
     {
         if (!validValues.InvariantContains(value))
         {
@@ -40,8 +39,7 @@ public abstract class ConfigurationValidatorBase
     /// <param name="validationDescription">Description of validation appended to message if validation fails.</param>
     /// <param name="message">A message to output if the value does not match.</param>
     /// <returns>True if valid, false if not.</returns>
-    public bool ValidateCollection(string configPath, IEnumerable<ValidatableEntryBase> values,
-        string validationDescription, out string message)
+    public bool ValidateCollection(string configPath, IEnumerable<ValidatableEntryBase> values, string validationDescription, out string message)
     {
         if (values.Any(x => !x.IsValid()))
         {
@@ -61,8 +59,7 @@ public abstract class ConfigurationValidatorBase
     /// <param name="validationDescription">Description of validation appended to message if validation fails.</param>
     /// <param name="message">A message to output if the value does not match.</param>
     /// <returns>True if valid, false if not.</returns>
-    public bool ValidateOptionalEntry(string configPath, ValidatableEntryBase? value, string validationDescription,
-        out string message)
+    public bool ValidateOptionalEntry(string configPath, ValidatableEntryBase? value, string validationDescription, out string message)
     {
         if (value != null && !value.IsValid())
         {

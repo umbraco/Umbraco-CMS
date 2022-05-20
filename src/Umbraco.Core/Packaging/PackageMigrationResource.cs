@@ -79,8 +79,7 @@ public static class PackageMigrationResource
         return xml;
     }
 
-    public static bool TryGetEmbeddedPackageDataManifest(Type planType, out XDocument? packageXml,
-        out ZipArchive? zipArchive)
+    public static bool TryGetEmbeddedPackageDataManifest(Type planType, out XDocument? packageXml, out ZipArchive? zipArchive)
     {
         Stream? zipStream = GetEmbeddedPackageZipStream(planType);
         if (zipStream is not null)

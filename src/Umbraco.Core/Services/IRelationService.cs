@@ -169,8 +169,7 @@ public interface IRelationService : IService
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
     /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize,
-        out long totalRecords, Ordering? ordering = null);
+    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
 
     /// <summary>
     ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />
@@ -215,8 +214,7 @@ public interface IRelationService : IService
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
     /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize,
-        out long totalChildren, params UmbracoObjectTypes[] entityTypes);
+    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
     /// <summary>
     ///     Returns paged child entities for a related parent id
@@ -226,8 +224,7 @@ public interface IRelationService : IService
     /// <param name="pageSize"></param>
     /// <param name="totalChildren"></param>
     /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize,
-        out long totalChildren, params UmbracoObjectTypes[] entityTypes);
+    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
 
     /// <summary>
     ///     Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity" /> objects.

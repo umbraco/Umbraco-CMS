@@ -200,9 +200,11 @@ internal static class MathEx
 
         // Multiplication
         public static Fraction32 operator *(Fraction32 f, int n) => new(f.Numerator * n, f.Denominator * Math.Abs(n));
+
         public static Fraction32 operator *(int n, Fraction32 f) => f * n;
 
         public static Fraction32 operator *(Fraction32 f, float n) => new((float)f * n);
+
         public static Fraction32 operator *(float n, Fraction32 f) => f * n;
 
         public static Fraction32 operator *(Fraction32 f, double n) => new((double)f * n);
@@ -216,6 +218,7 @@ internal static class MathEx
         public static Fraction32 operator /(Fraction32 f, int n) => new(f.Numerator / n, f.Denominator / Math.Abs(n));
 
         public static Fraction32 operator /(Fraction32 f, float n) => new((float)f / n);
+
         public static Fraction32 operator /(Fraction32 f, double n) => new((double)f / n);
 
         public static Fraction32 operator /(Fraction32 f1, Fraction32 f2) => f1 * Inverse(f2);
@@ -226,9 +229,11 @@ internal static class MathEx
         public static Fraction32 operator +(int n, Fraction32 f) => f + n;
 
         public static Fraction32 operator +(Fraction32 f, float n) => new((float)f + n);
+
         public static Fraction32 operator +(float n, Fraction32 f) => f + n;
 
         public static Fraction32 operator +(Fraction32 f, double n) => new((double)f + n);
+
         public static Fraction32 operator +(double n, Fraction32 f) => f + n;
 
         public static Fraction32 operator +(Fraction32 f1, Fraction32 f2)
@@ -245,8 +250,11 @@ internal static class MathEx
         public static Fraction32 operator -(int n, Fraction32 f) => new Fraction32(n, 1) - f;
 
         public static Fraction32 operator -(Fraction32 f, float n) => new((float)f - n);
+
         public static Fraction32 operator -(float n, Fraction32 f) => new Fraction32(n) - f;
+
         public static Fraction32 operator -(Fraction32 f, double n) => new((double)f - n);
+
         public static Fraction32 operator -(double n, Fraction32 f) => new Fraction32(n) - f;
 
         public static Fraction32 operator -(Fraction32 f1, Fraction32 f2)
@@ -270,6 +278,7 @@ internal static class MathEx
         public static explicit operator int(Fraction32 f) => f.Numerator / f.Denominator;
 
         public static explicit operator float(Fraction32 f) => f.Numerator / (float)f.Denominator;
+
         public static explicit operator double(Fraction32 f) => f.Numerator / (double)f.Denominator;
 
         #endregion
@@ -617,6 +626,7 @@ internal static class MathEx
                 }
 
                 var err = ((cnum / (double)cden) - (num / (double)den)) / (num / (double)den);
+
                 // Are we converging?
                 if (err >= lasterr)
                 {
@@ -755,7 +765,6 @@ internal static class MathEx
             }
         }
 
-
         /// <summary>
         ///     Gets the error term.
         /// </summary>
@@ -828,6 +837,7 @@ internal static class MathEx
 
         // Multiplication
         public static UFraction32 operator *(UFraction32 f, uint n) => new(f.Numerator * n, f.Denominator * n);
+
         public static UFraction32 operator *(uint n, UFraction32 f) => f * n;
 
         public static UFraction32 operator *(UFraction32 f, float n) => new((float)f * n);
@@ -835,6 +845,7 @@ internal static class MathEx
         public static UFraction32 operator *(float n, UFraction32 f) => f * n;
 
         public static UFraction32 operator *(UFraction32 f, double n) => new((double)f * n);
+
         public static UFraction32 operator *(double n, UFraction32 f) => f * n;
 
         public static UFraction32 operator *(UFraction32 f1, UFraction32 f2) =>
@@ -844,6 +855,7 @@ internal static class MathEx
         public static UFraction32 operator /(UFraction32 f, uint n) => new(f.Numerator / n, f.Denominator / n);
 
         public static UFraction32 operator /(UFraction32 f, float n) => new((float)f / n);
+
         public static UFraction32 operator /(UFraction32 f, double n) => new((double)f / n);
 
         public static UFraction32 operator /(UFraction32 f1, UFraction32 f2) => f1 * Inverse(f2);
@@ -854,9 +866,11 @@ internal static class MathEx
         public static UFraction32 operator +(uint n, UFraction32 f) => f + n;
 
         public static UFraction32 operator +(UFraction32 f, float n) => new((float)f + n);
+
         public static UFraction32 operator +(float n, UFraction32 f) => f + n;
 
         public static UFraction32 operator +(UFraction32 f, double n) => new((double)f + n);
+
         public static UFraction32 operator +(double n, UFraction32 f) => f + n;
 
         public static UFraction32 operator +(UFraction32 f1, UFraction32 f2)
@@ -873,6 +887,7 @@ internal static class MathEx
         public static UFraction32 operator -(uint n, UFraction32 f) => new UFraction32(n, 1) - f;
 
         public static UFraction32 operator -(UFraction32 f, float n) => new((float)f - n);
+
         public static UFraction32 operator -(float n, UFraction32 f) => new UFraction32(n) - f;
 
         public static UFraction32 operator -(UFraction32 f, double n) => new((double)f - n);
@@ -1221,6 +1236,7 @@ internal static class MathEx
                 }
 
                 var err = ((cnum / (double)cden) - (num / (double)den)) / (num / (double)den);
+
                 // Are we converging?
                 if (err >= lasterr)
                 {

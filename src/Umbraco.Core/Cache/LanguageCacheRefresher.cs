@@ -30,10 +30,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         // note: must do what's above FIRST else the repositories still have the old cached
         // content and when the PublishedCachesService is notified of changes it does not see
         // the new content...
-
         DomainCacheRefresher.JsonPayload[] payloads = new[]
         {
-            new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll)
+            new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll),
         };
         _publishedSnapshotService.Notify(payloads);
     }
@@ -62,7 +61,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             /// <summary>
             ///     A language has been updated - it's culture has changed
             /// </summary>
-            ChangeCulture = 3
+            ChangeCulture = 3,
         }
 
         public JsonPayload(int id, string isoCode, LanguageChangeType changeType)
@@ -73,7 +72,9 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         }
 
         public int Id { get; }
+
         public string IsoCode { get; }
+
         public LanguageChangeType ChangeType { get; }
     }
 
@@ -102,7 +103,7 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
         var clearDictionary = false;
         var clearContent = false;
 
-        //clear all no matter what type of payload
+        // clear all no matter what type of payload
         ClearAllIsolatedCacheByEntityType<ILanguage>();
 
         foreach (JsonPayload payload in payloads)
@@ -125,17 +126,17 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
             ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
         }
 
-        //if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
+        // if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
         if (clearContent)
         {
-            //clear all domain caches
+            // clear all domain caches
             RefreshDomains();
             ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
-            //now refresh all nucache
+
+            // now refresh all nucache
             ContentCacheRefresher.JsonPayload[] clearContentPayload =
-                new[] {new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll)};
-            ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches,
-                clearContentPayload);
+                new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
+            ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
         }
 
         // then trigger event
@@ -144,7 +145,6 @@ public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageC
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();

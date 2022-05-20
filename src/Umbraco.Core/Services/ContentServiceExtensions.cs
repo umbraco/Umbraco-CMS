@@ -44,8 +44,7 @@ public static class ContentServiceExtensions
     /// <param name="contentTypeAlias"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    public static IContent CreateContent(this IContentService contentService, string name, Udi parentId,
-        string contentTypeAlias, int userId = Constants.Security.SuperUserId)
+    public static IContent CreateContent(this IContentService contentService, string name, Udi parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         if (parentId is not GuidUdi guidUdi)
         {
@@ -65,8 +64,7 @@ public static class ContentServiceExtensions
     public static void RemoveContentPermissions(this IContentService contentService, int contentId) =>
         contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
 
-    public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id,
-        string? culture = "*")
+    public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
     {
         var result = new List<string>();
         IContent? content = contentService.GetById(id);

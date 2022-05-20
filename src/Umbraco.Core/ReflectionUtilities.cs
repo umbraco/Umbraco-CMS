@@ -533,7 +533,8 @@ public static class ReflectionUtilities
 
         for (var i = 0; i < lambdaParameters.Length; i++)
         {
-            if (lambdaParameters[i] != ctorParameters[i]) // note: relax the constraint with IsAssignableFrom?
+            // note: relax the constraint with IsAssignableFrom?
+            if (lambdaParameters[i] != ctorParameters[i])
             {
                 ThrowInvalidLambda<TLambda>("ctor", ctorDeclaring, ctorParameters);
             }

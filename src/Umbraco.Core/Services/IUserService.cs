@@ -59,8 +59,12 @@ public interface IUserService : IMembershipUserService
     /// </param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection,
+    IEnumerable<IUser> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
         UserState[]? userState = null,
         string[]? includeUserGroups = null,
         string[]? excludeUserGroups = null,
@@ -80,8 +84,12 @@ public interface IUserService : IMembershipUserService
     /// </param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords,
-        string orderBy, Direction orderDirection,
+    IEnumerable<IUser> GetAll(
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        string orderBy,
+        Direction orderDirection,
         UserState[]? userState = null,
         string[]? userGroups = null,
         string? filter = null);
@@ -162,8 +170,7 @@ public interface IUserService : IMembershipUserService
     /// </param>
     /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
     /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
-    EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions,
-        params int[] nodeIds);
+    EntityPermissionCollection GetPermissions(IUserGroup?[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds);
 
     /// <summary>
     ///     Gets the implicit/inherited permissions for the user for the given path
@@ -181,8 +188,7 @@ public interface IUserService : IMembershipUserService
     ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
     ///     permissions set
     /// </param>
-    EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path,
-        bool fallbackToDefaultPermissions = false);
+    EntityPermissionSet GetPermissionsForPath(IUserGroup[] groups, string path, bool fallbackToDefaultPermissions = false);
 
     /// <summary>
     ///     Replaces the same permission set for a single group to any number of entities

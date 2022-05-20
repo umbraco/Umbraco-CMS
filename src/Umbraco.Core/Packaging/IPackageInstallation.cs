@@ -17,8 +17,7 @@ public interface IPackageInstallation
     // Possibly, we could continue to persist that file so that you could uninstall package data for an installed package in the
     // back office (but it won't actually uninstall the package until you do that via nuget). If we want that functionality we'll have
     // to restore a bunch of deleted code.
-    InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId,
-        out PackageDefinition packageDefinition);
+    InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition);
 
     /// <summary>
     ///     Reads the package xml and returns the <see cref="CompiledPackage" /> model

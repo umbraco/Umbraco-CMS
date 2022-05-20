@@ -326,7 +326,10 @@ public class PublishedRouter : IPublishedRouter
             {
                 _logger.LogDebug(
                     "{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}",
-                    tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
+                    tracePrefix,
+                    domainAndUri.Name,
+                    domainAndUri.ContentId,
+                    domainAndUri.Culture);
             }
 
             request.SetDomain(domainAndUri);
@@ -378,8 +381,7 @@ public class PublishedRouter : IPublishedRouter
         var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
         Domain? domain =
-            DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath,
-                rootNodeId);
+            DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains?.GetAll(true), nodePath, rootNodeId);
 
         // always has a contentId and a culture
         if (domain != null)
@@ -389,7 +391,9 @@ public class PublishedRouter : IPublishedRouter
             {
                 _logger.LogDebug(
                     "{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}",
-                    tracePrefix, domain.ContentId, request.Culture);
+                    tracePrefix,
+                    domain.ContentId,
+                    request.Culture);
             }
         }
         else
@@ -401,7 +405,7 @@ public class PublishedRouter : IPublishedRouter
         }
     }
 
-    internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
+    internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo? directory, string alias, string[] extensions)
     {
         if (directory == null || directory.Exists == false)
         {
@@ -585,7 +589,8 @@ public class PublishedRouter : IPublishedRouter
         IPublishedContent? internalRedirectNode = null;
         var internalRedirectId = request.PublishedContent.Value(
             _publishedValueFallback,
-            Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
+            Constants.Conventions.Content.InternalRedirectId,
+            defaultValue: -1);
         IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
         if (internalRedirectId > 0)
@@ -614,8 +619,7 @@ public class PublishedRouter : IPublishedRouter
             {
                 _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)
-                        ?.GetSourceValue());
+                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
             }
         }
 
@@ -625,8 +629,7 @@ public class PublishedRouter : IPublishedRouter
             {
                 _logger.LogDebug(
                     "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)
-                        ?.GetSourceValue());
+                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId)?.GetSourceValue());
             }
         }
         else if (internalRedirectId == request.PublishedContent.Id)
@@ -718,7 +721,8 @@ public class PublishedRouter : IPublishedRouter
                 {
                     _logger.LogDebug(
                         "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
-                        template.Id, template.Alias);
+                        template.Id,
+                        template.Alias);
                 }
             }
             else
@@ -764,7 +768,8 @@ public class PublishedRouter : IPublishedRouter
                     {
                         _logger.LogDebug(
                             "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
-                            template.Id, template.Alias);
+                            template.Id,
+                            template.Alias);
                     }
                 }
                 else
@@ -781,7 +786,8 @@ public class PublishedRouter : IPublishedRouter
             {
                 _logger.LogWarning(
                     "FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.",
-                    altTemplate, request.PublishedContent.Id);
+                    altTemplate,
+                    request.PublishedContent.Id);
 
                 // no allowed, back to default
                 var templateId = request.PublishedContent.TemplateId;
@@ -791,7 +797,8 @@ public class PublishedRouter : IPublishedRouter
                 {
                     _logger.LogDebug(
                         "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}",
-                        template?.Id, template?.Alias);
+                        template?.Id,
+                        template?.Alias);
                 }
             }
         }
@@ -845,8 +852,7 @@ public class PublishedRouter : IPublishedRouter
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
-            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id,
-                template.Alias);
+            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
         }
 
         return template;
@@ -869,8 +875,7 @@ public class PublishedRouter : IPublishedRouter
             return;
         }
 
-        var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect,
-            defaultValue: -1);
+        var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect, defaultValue: -1);
         var redirectUrl = "#";
         if (redirectId > 0)
         {

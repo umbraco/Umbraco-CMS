@@ -293,24 +293,33 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
     /// <inheritdoc />
     public void SetCultureName(string? name, string? culture)
     {
-        if (ContentType.VariesByCulture()) // set on variant content type
+        // set on variant content type
+        if (ContentType.VariesByCulture())
         {
-            if (culture.IsNullOrWhiteSpace()) // invariant is ok
+            // invariant is ok
+            if (culture.IsNullOrWhiteSpace())
             {
                 Name = name; // may be null
             }
-            else if (name.IsNullOrWhiteSpace()) // clear
+
+            // clear
+            else if (name.IsNullOrWhiteSpace())
             {
                 ClearCultureInfo(culture!);
             }
-            else // set
+
+            // set
+            else
             {
                 this.SetCultureInfo(culture!, name, DateTime.Now);
             }
         }
-        else // set on invariant content type
+
+        // set on invariant content type
+        else
         {
-            if (!culture.IsNullOrWhiteSpace()) // invariant is NOT ok
+            // invariant is NOT ok
+            if (!culture.IsNullOrWhiteSpace())
             {
                 throw new NotSupportedException("Content type does not vary by culture.");
             }
@@ -396,6 +405,7 @@ public abstract class ContentBase : TreeEntityBase, IContentBase
 
                 break;
             }
+
             case NotifyCollectionChangedAction.Replace:
             {
                 // Replace occurs when an Update occurs

@@ -37,8 +37,7 @@ public static class UserServiceExtensions
     /// </param>
     /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
     /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
-    public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup? group,
-        bool fallbackToDefaultPermissions, params int[] nodeIds) =>
+    public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup? group, bool fallbackToDefaultPermissions, params int[] nodeIds) =>
         service.GetPermissions(new[] { group }, fallbackToDefaultPermissions, nodeIds);
 
     /// <summary>
@@ -51,8 +50,7 @@ public static class UserServiceExtensions
     ///     Flag indicating if we want to include the default group permissions for each result if there are not explicit
     ///     permissions set
     /// </param>
-    public static EntityPermissionSet GetPermissionsForPath(this IUserService service, IUserGroup group, string path,
-        bool fallbackToDefaultPermissions = false) =>
+    public static EntityPermissionSet GetPermissionsForPath(this IUserService service, IUserGroup group, string path, bool fallbackToDefaultPermissions = false) =>
         service.GetPermissionsForPath(new[] { group }, path, fallbackToDefaultPermissions);
 
     /// <summary>

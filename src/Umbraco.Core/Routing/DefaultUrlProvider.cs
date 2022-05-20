@@ -193,7 +193,8 @@ public class DefaultUrlProvider : IUrlProvider
         Uri uri;
 
         // ignore vdir at that point, UriFromUmbraco will do it
-        if (domainUri == null) // no domain was found
+        // no domain was found
+        if (domainUri == null)
         {
             if (current == null)
             {
@@ -213,7 +214,9 @@ public class DefaultUrlProvider : IUrlProvider
                     throw new ArgumentOutOfRangeException(nameof(mode));
             }
         }
-        else // a domain was found
+
+        // a domain was found
+        else
         {
             if (mode == UrlMode.Auto)
             {

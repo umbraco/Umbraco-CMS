@@ -4,7 +4,6 @@ using System.Xml.XPath;
 using System.Xml.Xsl;
 
 // source: mvpxml.codeplex.com
-
 namespace Umbraco.Cms.Core.Xml;
 
 /// <summary>
@@ -89,6 +88,7 @@ public class DynamicContext : XsltContext
                         try
                         {
                             _value = Convert.ToDouble(value);
+
                             // We succeeded, so it's a number.
                             _type = XPathResultType.Number;
                         }
@@ -176,6 +176,7 @@ public class DynamicContext : XsltContext
         foreach (string prefix in context)
         {
             var uri = context.LookupNamespace(prefix);
+
             // Use fast object reference comparison to omit forbidden namespace declarations.
             if (Equals(uri, xml) || Equals(uri, xmlns))
             {
@@ -299,7 +300,7 @@ public class DynamicContext : XsltContext
     {
         IXsltContextVariable var;
         _variables.TryGetValue(name, out var!);
-        return var!;
+        return var;
     }
 
     #endregion Variable Handling Code

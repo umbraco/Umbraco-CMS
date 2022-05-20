@@ -30,9 +30,16 @@ public class UserMapDefinition : IMapDefinition
     private readonly ILocalizedTextService _textService;
     private readonly IUserService _userService;
 
-    public UserMapDefinition(ILocalizedTextService textService, IUserService userService, IEntityService entityService, ISectionService sectionService,
-        AppCaches appCaches, ActionCollection actions, IOptions<GlobalSettings> globalSettings,
-        MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
+    public UserMapDefinition(
+        ILocalizedTextService textService,
+        IUserService userService,
+        IEntityService entityService,
+        ISectionService sectionService,
+        AppCaches appCaches,
+        ActionCollection actions,
+        IOptions<GlobalSettings> globalSettings,
+        MediaFileManager mediaFileManager,
+        IShortStringHelper shortStringHelper,
         IImageUrlGenerator imageUrlGenerator)
     {
         _sectionService = sectionService;

@@ -94,17 +94,15 @@ public class DefaultShortStringHelper : IShortStringHelper
 
     // see notes for CleanAsciiString
     //// beware! the order is quite important here!
-    //const string ValidStringCharactersSource = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    //readonly static char[] ValidStringCharacters;
-
+    // const string ValidStringCharactersSource = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    // readonly static char[] ValidStringCharacters;
     private readonly DefaultShortStringHelperConfig _config;
 
     // see notes for CleanAsciiString
-    //static DefaultShortStringHelper()
-    //{
+    // static DefaultShortStringHelper()
+    // {
     //    ValidStringCharacters = ValidStringCharactersSource.ToCharArray();
-    //}
-
+    // }
     #endregion
 
     #region Filters
@@ -197,7 +195,7 @@ public class DefaultShortStringHelper : IShortStringHelper
             return string.Empty;
         }
 
-        culture = culture ?? "";
+        culture = culture ?? string.Empty;
         text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
 
         var name = Path.GetFileNameWithoutExtension(text);
@@ -233,7 +231,6 @@ public class DefaultShortStringHelper : IShortStringHelper
     // Our additional stuff:
     // - Leading digits are removed.
     // - Many consecutive separators are folded into one unique separator.
-
     private const byte StateBreak = 1;
     private const byte StateUp = 2;
     private const byte StateWord = 3;
@@ -301,7 +298,7 @@ public class DefaultShortStringHelper : IShortStringHelper
             throw new ArgumentNullException(nameof(text));
         }
 
-        culture = culture ?? "";
+        culture = culture ?? string.Empty;
 
         // get config
         DefaultShortStringHelperConfig.Config config = _config.For(stringType, culture);
@@ -328,7 +325,7 @@ public class DefaultShortStringHelper : IShortStringHelper
         }
 
         // apply replacements
-        //if (config.Replacements != null)
+        // if (config.Replacements != null)
         //    text = ReplaceMany(text, config.Replacements);
 
         // recode
@@ -373,7 +370,9 @@ public class DefaultShortStringHelper : IShortStringHelper
         for (var ipos = 0; ipos < input.Length; ipos++)
         {
             var c = input[ipos];
-            if (char.IsSurrogate(c)) // ignore high surrogate
+
+            // ignore high surrogate
+            if (char.IsSurrogate(c))
             {
                 ipos++; // and skip low surrogate
                 output[opos++] = '?';
@@ -392,13 +391,12 @@ public class DefaultShortStringHelper : IShortStringHelper
     // that the utf8 version. Micro-optimizing sometimes isn't such a good idea.
 
     // note: does NOT support surrogate pairs in text
-    internal string CleanCodeString(string text, CleanStringType caseType, char separator, string culture,
-        DefaultShortStringHelperConfig.Config config)
+    internal string CleanCodeString(string text, CleanStringType caseType, char separator, string culture, DefaultShortStringHelperConfig.Config config)
     {
         int opos = 0, ipos = 0;
         var state = StateBreak;
 
-        culture = culture ?? "";
+        culture = culture ?? string.Empty;
         caseType &= CleanStringType.CaseMask;
 
         // if we apply global ToUpper or ToLower to text here
@@ -412,13 +410,15 @@ public class DefaultShortStringHelper : IShortStringHelper
         for (var i = 0; i < ilen; i++)
         {
             var c = input[i];
+
             // leading as long as StateBreak and ipos still zero
             var leading = state == StateBreak && ipos == 0;
             var isTerm = config.IsTerm(c, leading);
 
-            //var isDigit = char.IsDigit(c);
+            // var isDigit = char.IsDigit(c);
             var isUpper = char.IsUpper(c); // false for digits, symbols...
-            //var isLower = char.IsLower(c); // false for digits, symbols...
+
+            // var isLower = char.IsLower(c); // false for digits, symbols...
 
             // what should I do with surrogates? - E.g emojis like 🎈
             // no idea, really, so they are not supported at the moment and we just continue
@@ -427,7 +427,6 @@ public class DefaultShortStringHelper : IShortStringHelper
             {
                 continue;
             }
-
 
             switch (state)
             {
@@ -477,7 +476,8 @@ public class DefaultShortStringHelper : IShortStringHelper
                             i -= 1; // handle that char again, in another state - not part of the acronym
                         }
 
-                        if (i - ipos > 1) // single-char can't be an acronym
+                        // single-char can't be an acronym
+                        if (i - ipos > 1)
                         {
                             CopyTerm(input, ipos, output, ref opos, i - ipos, caseType, culture, true);
                             ipos = i;
@@ -492,7 +492,9 @@ public class DefaultShortStringHelper : IShortStringHelper
                             state = StateWord;
                         }
                     }
-                    else if (isUpper == false) // isTerm == true
+
+                    // isTerm == true
+                    else if (isUpper == false)
                     {
                         // it's a term char and we don't cut...
                         // keep moving forward as a word
@@ -544,8 +546,7 @@ public class DefaultShortStringHelper : IShortStringHelper
     }
 
     // note: supports surrogate pairs in input string
-    internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len,
-        CleanStringType caseType, string culture, bool isAcronym)
+    internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len, CleanStringType caseType, string culture, bool isAcronym)
     {
         var term = input.Substring(ipos, len);
         CultureInfo cultureInfo = string.IsNullOrEmpty(culture)
@@ -564,14 +565,13 @@ public class DefaultShortStringHelper : IShortStringHelper
 
         // note: MSDN seems to imply that ToUpper or ToLower preserve the length
         // of the string, but that this behavior is not guaranteed and could change.
-
         char c;
         int i;
         string s;
         switch (caseType)
         {
-            //case CleanStringType.LowerCase:
-            //case CleanStringType.UpperCase:
+            // case CleanStringType.LowerCase:
+            // case CleanStringType.UpperCase:
             case CleanStringType.Unchanged:
                 term.CopyTo(0, output, opos, len);
                 opos += len;

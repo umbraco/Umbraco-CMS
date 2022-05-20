@@ -171,8 +171,7 @@ public interface IMembershipMemberService<T> : IService
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    IEnumerable<T> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+    IEnumerable<T> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
     /// <summary>
     ///     Finds a list of <see cref="IMembershipUser" /> objects by a partial username
@@ -189,8 +188,7 @@ public interface IMembershipMemberService<T> : IService
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    IEnumerable<T> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+    IEnumerable<T> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
     /// <summary>
     ///     Gets a list of paged <see cref="IMembershipUser" /> objects

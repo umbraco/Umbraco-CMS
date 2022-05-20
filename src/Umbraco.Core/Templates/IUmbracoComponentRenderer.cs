@@ -49,6 +49,5 @@ public interface IUmbracoComponentRenderer
     ///     Currently only used when the node is unpublished and unable to get the contentId item from the
     ///     content cache as its unpublished. This deals with taking in a preview/draft version of the content node
     /// </remarks>
-    Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias,
-        IDictionary<string, object>? parameters);
+    Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object>? parameters);
 }

@@ -12,8 +12,7 @@ internal class JPEGSection
     ///     Returns a string representation of the current section.
     /// </summary>
     /// <returns>A System.String that represents the current section.</returns>
-    public override string ToString() => string.Format("{0} => Header: {1} bytes, Entropy Data: {2} bytes", Marker,
-        Header.Length, EntropyData.Length);
+    public override string ToString() => string.Format("{0} => Header: {1} bytes, Entropy Data: {2} bytes", Marker, Header.Length, EntropyData.Length);
 
     #endregion
 

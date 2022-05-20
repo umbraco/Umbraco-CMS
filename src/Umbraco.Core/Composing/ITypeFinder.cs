@@ -36,8 +36,7 @@ public interface ITypeFinder
     /// <param name="assemblies"></param>
     /// <param name="onlyConcreteClasses"></param>
     /// <returns></returns>
-    IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null,
-        bool onlyConcreteClasses = true);
+    IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null, bool onlyConcreteClasses = true);
 
     /// <summary>
     ///     Finds any classes with the attribute.

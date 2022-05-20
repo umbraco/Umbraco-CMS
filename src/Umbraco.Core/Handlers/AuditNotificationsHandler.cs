@@ -99,10 +99,13 @@ public sealed class AuditNotificationsHandler :
             var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
             IEntitySlim? entity = _entityService.Get(perm.EntityId);
 
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
+                -1,
+                $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
                 "umbraco/user-group/permissions-change",
                 $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity?.Name}\"");
         }
@@ -113,11 +116,15 @@ public sealed class AuditNotificationsHandler :
         IUser performingUser = CurrentPerformingUser;
         IMember member = notification.Member;
 
-        _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+        _auditService.Write(
+            performingUser.Id,
+            $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
             PerformingIp,
             DateTime.UtcNow,
-            -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
-            "umbraco/member/exported", "exported member data");
+            -1,
+            $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+            "umbraco/member/exported",
+            "exported member data");
     }
 
     public void Handle(MemberDeletedNotification notification)
@@ -126,11 +133,15 @@ public sealed class AuditNotificationsHandler :
         IEnumerable<IMember> members = notification.DeletedEntities;
         foreach (IMember member in members)
         {
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
-                "umbraco/member/delete", $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
+                -1,
+                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                "umbraco/member/delete",
+                $"delete member id:{member.Id} \"{member.Name}\" {FormatEmail(member)}");
         }
     }
 
@@ -142,11 +153,15 @@ public sealed class AuditNotificationsHandler :
         {
             var dp = string.Join(", ", ((Member)member).GetWereDirtyProperties());
 
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
-                "umbraco/member/save", $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
+                -1,
+                $"Member {member.Id} \"{member.Name}\" {FormatEmail(member)}",
+                "umbraco/member/save",
+                $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}");
         }
     }
 
@@ -158,11 +173,15 @@ public sealed class AuditNotificationsHandler :
         foreach (var id in notification.MemberIds)
         {
             members.TryGetValue(id, out IMember? member);
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
-                "umbraco/member/roles/removed", $"roles modified, removed {roles}");
+                -1,
+                $"Member {id} \"{member?.Name ?? "(unknown)"}\" {FormatEmail(member)}",
+                "umbraco/member/roles/removed",
+                $"roles modified, removed {roles}");
         }
     }
 
@@ -172,11 +191,15 @@ public sealed class AuditNotificationsHandler :
         IEnumerable<IUser> affectedUsers = notification.DeletedEntities;
         foreach (IUser affectedUser in affectedUsers)
         {
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
-                "umbraco/user/delete", "delete user");
+                affectedUser.Id,
+                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+                "umbraco/user/delete",
+                "delete user");
         }
     }
 
@@ -212,29 +235,39 @@ public sealed class AuditNotificationsHandler :
                 sb.Append($"default perms: {perms}");
             }
 
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
-                "umbraco/user-group/save", $"{sb}");
+                -1,
+                $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
+                "umbraco/user-group/save",
+                $"{sb}");
 
             // now audit the users that have changed
             foreach (IUser user in groupWithUser.RemovedUsers)
             {
-                _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+                _auditService.Write(
+                    performingUser.Id,
+                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                     PerformingIp,
                     DateTime.UtcNow,
-                    user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
+                    user.Id,
+                    $"User \"{user.Name}\" {FormatEmail(user)}",
                     "umbraco/user-group/save",
                     $"Removed user \"{user.Name}\" {FormatEmail(user)} from group {group.Id} \"{group.Name}\" ({group.Alias})");
             }
 
             foreach (IUser user in groupWithUser.AddedUsers)
             {
-                _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+                _auditService.Write(
+                    performingUser.Id,
+                    $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                     PerformingIp,
                     DateTime.UtcNow,
-                    user.Id, $"User \"{user.Name}\" {FormatEmail(user)}",
+                    user.Id,
+                    $"User \"{user.Name}\" {FormatEmail(user)}",
                     "umbraco/user-group/save",
                     $"Added user \"{user.Name}\" {FormatEmail(user)} to group {group.Id} \"{group.Name}\" ({group.Alias})");
             }
@@ -253,10 +286,13 @@ public sealed class AuditNotificationsHandler :
 
             var dp = string.Join(", ", ((User)affectedUser).GetWereDirtyProperties());
 
-            _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
+            _auditService.Write(
+                performingUser.Id,
+                $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}",
                 PerformingIp,
                 DateTime.UtcNow,
-                affectedUser.Id, $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
+                affectedUser.Id,
+                $"User \"{affectedUser.Name}\" {FormatEmail(affectedUser)}",
                 "umbraco/user/save",
                 $"updating {(string.IsNullOrWhiteSpace(dp) ? "(nothing)" : dp)}{(groups == null ? string.Empty : "; groups assigned: " + groups)}");
         }
@@ -265,6 +301,5 @@ public sealed class AuditNotificationsHandler :
     private string FormatEmail(IMember? member) =>
         member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{member.Email}>";
 
-    private string FormatEmail(IUser user) =>
-        user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
+    private string FormatEmail(IUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? string.Empty : $"<{user.Email}>";
 }

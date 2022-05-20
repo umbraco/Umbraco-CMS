@@ -49,13 +49,17 @@ public class PackagesRepository : ICreatedPackagesRepository
     /// <param name="languageService"></param>
     /// <param name="hostingEnvironment"></param>
     /// <param name="serializer"></param>
-    /// <param name="logger"></param>
+    /// <param name="globalSettings"></param>
     /// <param name="packageRepositoryFileName">
     ///     The file name for storing the package definitions (i.e. "createdPackages.config")
     /// </param>
     /// <param name="tempFolderPath"></param>
     /// <param name="packagesFolderPath"></param>
     /// <param name="mediaFolderPath"></param>
+    /// <param name="mediaService"></param>
+    /// <param name="mediaTypeService"></param>
+    /// <param name="mediaFileManager"></param>
+    /// <param name="fileSystems"></param>
     public PackagesRepository(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -226,8 +230,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             PackageTemplates(definition, root);
             PackageStylesheets(definition, root);
             PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
-            PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View",
-                _fileSystems.PartialViewsFileSystem);
+            PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
             PackageMacros(definition, root);
             PackageDictionaryItems(definition, root);
             PackageLanguages(definition, root);
@@ -424,8 +427,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                     if (processed.ContainsKey(dictionaryItem.ParentId.Value))
                     {
                         // we've processed this parent element already so we can just append this xml child to it
-                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key,
-                            serializedDictionaryValue);
+                        AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
                     }
                     else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                     {
@@ -447,7 +449,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         static void AppendDictionaryElement(
             XElement rootDictionaryItems,
             Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
-            Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
+            Dictionary<Guid, XElement> processed,
+            Guid key,
+            XElement serializedDictionaryValue)
         {
             // track it
             processed.Add(key, serializedDictionaryValue);
@@ -631,9 +635,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
     {
         // Documents and tags
-        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(
-            definition.ContentNodeId,
-                NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
+        if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
         {
             if (contentNodeId > 0)
             {
@@ -757,8 +759,6 @@ public class PackagesRepository : ICreatedPackagesRepository
     }
 
     // TODO: Delete this
-
-    /// <summary>
     private XElement? GetMacroXml(int macroId, out IMacro? macro)
     {
         macro = _macroService.GetById(macroId);
@@ -798,7 +798,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         if (dt.ParentId > 0)
         {
             IContentType? parent = _contentTypeService.Get(dt.ParentId);
-            if (parent != null) // could be a container
+
+            // could be a container
+            if (parent != null)
             {
                 AddDocumentType(parent, dtl);
             }
@@ -815,7 +817,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         if (mediaType.ParentId > 0)
         {
             IMediaType? parent = _mediaTypeService.Get(mediaType.ParentId);
-            if (parent != null) // could be a container
+
+            // could be a container
+            if (parent != null)
             {
                 AddMediaType(parent, mediaTypes);
             }

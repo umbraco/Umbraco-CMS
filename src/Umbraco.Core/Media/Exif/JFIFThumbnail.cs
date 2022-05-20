@@ -11,7 +11,7 @@ internal class JFIFThumbnail
     {
         JPEG,
         BMPPalette,
-        BMP24Bit
+        BMP24Bit,
     }
 
     #endregion

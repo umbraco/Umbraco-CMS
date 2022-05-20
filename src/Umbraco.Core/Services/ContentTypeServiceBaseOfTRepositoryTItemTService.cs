@@ -23,9 +23,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     private readonly IEntityRepository _entityRepository;
     private readonly IEventAggregator _eventAggregator;
 
-    protected ContentTypeServiceBase(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    protected ContentTypeServiceBase(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository,
+        TRepository repository,
+        IAuditRepository auditRepository,
+        IEntityContainerRepository containerRepository,
         IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
         : base(provider, loggerFactory, eventMessagesFactory)
@@ -38,7 +42,9 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     protected TRepository Repository { get; }
+
     protected abstract int[] WriteLockIds { get; }
+
     protected abstract int[] ReadLockIds { get; }
 
     #region Move
@@ -98,8 +104,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     #region Audit
 
     private void Audit(AuditType type, int userId, int objectId) =>
-        _auditRepository.Save(new AuditItem(objectId, type, userId,
-            ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
+        _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetUmbracoObjectType(ContainedObjectType).GetName()));
 
     #endregion
 
@@ -107,32 +112,27 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     protected abstract SavingNotification<TItem> GetSavingNotification(TItem item, EventMessages eventMessages);
 
-    protected abstract SavingNotification<TItem> GetSavingNotification(IEnumerable<TItem> items,
-        EventMessages eventMessages);
+    protected abstract SavingNotification<TItem> GetSavingNotification(IEnumerable<TItem> items, EventMessages eventMessages);
 
     protected abstract SavedNotification<TItem> GetSavedNotification(TItem item, EventMessages eventMessages);
 
-    protected abstract SavedNotification<TItem> GetSavedNotification(IEnumerable<TItem> items,
-        EventMessages eventMessages);
+    protected abstract SavedNotification<TItem> GetSavedNotification(IEnumerable<TItem> items, EventMessages eventMessages);
 
     protected abstract DeletingNotification<TItem> GetDeletingNotification(TItem item, EventMessages eventMessages);
 
-    protected abstract DeletingNotification<TItem> GetDeletingNotification(IEnumerable<TItem> items,
-        EventMessages eventMessages);
+    protected abstract DeletingNotification<TItem> GetDeletingNotification(IEnumerable<TItem> items, EventMessages eventMessages);
 
-    protected abstract DeletedNotification<TItem> GetDeletedNotification(IEnumerable<TItem> items,
-        EventMessages eventMessages);
+    protected abstract DeletedNotification<TItem> GetDeletedNotification(IEnumerable<TItem> items, EventMessages eventMessages);
 
-    protected abstract MovingNotification<TItem> GetMovingNotification(MoveEventInfo<TItem> moveInfo,
-        EventMessages eventMessages);
+    protected abstract MovingNotification<TItem> GetMovingNotification(MoveEventInfo<TItem> moveInfo, EventMessages eventMessages);
 
-    protected abstract MovedNotification<TItem> GetMovedNotification(IEnumerable<MoveEventInfo<TItem>> moveInfo,
-        EventMessages eventMessages);
+    protected abstract MovedNotification<TItem> GetMovedNotification(IEnumerable<MoveEventInfo<TItem>> moveInfo, EventMessages eventMessages);
 
     protected abstract ContentTypeChangeNotification<TItem> GetContentTypeChangedNotification(
         IEnumerable<ContentTypeChange<TItem>> changes, EventMessages eventMessages);
 
     // This notification is identical to GetTypeChangeNotification, however it needs to be a different notification type because it's published within the transaction
+
     /// The purpose of this notification being published within the transaction is so that listeners can perform database
     /// operations from within the same transaction and guarantee data consistency so that if anything goes wrong
     /// the entire transaction can be rolled back. This is used by Nucache.
@@ -168,7 +168,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         // eg maybe a property has been added, with an alias that's OK (no conflict with ancestors)
         // but that cannot be used (conflict with descendants)
-
         IContentTypeComposition[] allContentTypes =
             Repository.GetMany(new int[0]).Cast<IContentTypeComposition>().ToArray();
 
@@ -176,8 +175,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         IEnumerable<IContentTypeComposition> compositions =
             allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
         var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray();
-        var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type,
-            StringComparer.InvariantCultureIgnoreCase);
+        var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type, StringComparer.InvariantCultureIgnoreCase);
         IEnumerable<IContentTypeComposition> indirectReferences =
             allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
         var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x?.Id == y?.Id, x => x.Id);
@@ -249,10 +247,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         if (duplicatePropertyTypeAliases.Count > 0 || invalidPropertyGroupAliases.Count > 0)
-
         {
-            throw new InvalidCompositionException(compositionContentType.Alias, null,
-                duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
+            throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
         }
     }
 
@@ -274,7 +270,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // note
         // this is meant to run *after* uow.Commit() so must use WasPropertyDirty() everywhere
         // instead of IsPropertyDirty() since dirty properties have been reset already
-
         var changes = new List<ContentTypeChange<TItem>>();
 
         foreach (TItem contentType in contentTypes)
@@ -350,8 +345,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     }
 
     // ensures changes contains no duplicates
-    private static void AddChange(ICollection<ContentTypeChange<TItem>> changes, TItem contentType,
-        ContentTypeChangeTypes changeTypes)
+    private static void AddChange(ICollection<ContentTypeChange<TItem>> changes, TItem contentType, ContentTypeChangeTypes changeTypes)
     {
         ContentTypeChange<TItem>? change = changes.FirstOrDefault(x => x.Item == contentType);
         if (change == null)
@@ -413,7 +407,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-
         {
             scope.ReadLock(ReadLockIds);
             return Repository.GetMany(ids.ToArray());
@@ -578,7 +571,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
@@ -666,7 +658,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
             _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-            ;
 
             scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
@@ -720,7 +711,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 reference.AllowedContentTypes = reference.AllowedContentTypes?.Where(p => p.Id.Value != item.Id);
                 var changedRef =
-                    new List<ContentTypeChange<TItem>> {new(reference, ContentTypeChangeTypes.RefreshMain)};
+                    new List<ContentTypeChange<TItem>> { new(reference, ContentTypeChangeTypes.RefreshMain) };
+
                 // Fire change event
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
             }
@@ -736,8 +728,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             ContentTypeChange<TItem>[] changes = descendantsAndSelf
                 .Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                 .Concat(changed.Select(x =>
-                    new ContentTypeChange<TItem>(x,
-                        ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+                    new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
                 .ToArray();
 
             // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
@@ -797,8 +788,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             ContentTypeChange<TItem>[] changes = allDescendantsAndSelf
                 .Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                 .Concat(changed.Select(x =>
-                    new ContentTypeChange<TItem>(x,
-                        ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+                    new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
                 .ToArray();
 
             // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
@@ -851,8 +841,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
         if (string.IsNullOrWhiteSpace(alias))
         {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.",
-                nameof(alias));
+            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
         }
 
         if (parent != null && parent.HasIdentity == false)
@@ -861,30 +850,30 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         // this is illegal
-        //var originalb = (ContentTypeCompositionBase)original;
+        // var originalb = (ContentTypeCompositionBase)original;
         // but we *know* it has to be a ContentTypeCompositionBase anyways
         var originalb = (ContentTypeCompositionBase)(object)original;
         var clone = (TItem)(object)originalb.DeepCloneWithResetIdentities(alias);
 
         clone.Name = name;
 
-        //remove all composition that is not it's current alias
-        var compositionAliases = clone.CompositionAliases().Except(new[] {alias}).ToList();
+        // remove all composition that is not it's current alias
+        var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
         foreach (var a in compositionAliases)
         {
             clone.RemoveContentType(a);
         }
 
-        //if a parent is specified set it's composition and parent
+        // if a parent is specified set it's composition and parent
         if (parent != null)
         {
-            //add a new parent composition
+            // add a new parent composition
             clone.AddContentType(parent);
             clone.ParentId = parent.Id;
         }
         else
         {
-            //set to root
+            // set to root
             clone.ParentId = -1;
         }
 
@@ -916,7 +905,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 var alias = Repository.GetUniqueAlias(copying.Alias);
 
                 // this is illegal
-                //var copyingb = (ContentTypeCompositionBase) copying;
+                // var copyingb = (ContentTypeCompositionBase) copying;
                 // but we *know* it has to be a ContentTypeCompositionBase anyways
                 var copyingb = (ContentTypeCompositionBase)(object)copying;
                 copy = (TItem)(object)copyingb.DeepCloneWithResetIdentities(alias);
@@ -940,8 +929,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
             catch (DataOperationException<MoveOperationStatusType> ex)
             {
-                return OperationResult.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation,
-                    evtMsgs); // causes rollback
+                return OperationResult.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, evtMsgs); // causes rollback
             }
         }
 
@@ -956,8 +944,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-    public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key,
-        string name, int userId = Constants.Security.SuperUserId)
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -968,7 +955,10 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 var container = new EntityContainer(ContainedObjectType)
                 {
-                    Name = name, ParentId = parentId, CreatorId = userId, Key = key
+                    Name = name,
+                    ParentId = parentId,
+                    CreatorId = userId,
+                    Key = key,
                 };
 
                 var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
@@ -984,8 +974,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                 var savedNotification = new EntityContainerSavedNotification(container, eventMessages);
                 savedNotification.WithStateFrom(savingNotification);
                 scope.Notifications.Publish(savedNotification);
-                // TODO: Audit trail ?
 
+                // TODO: Audit trail ?
                 return OperationResult.Attempt.Succeed(eventMessages, container);
             }
             catch (Exception ex)
@@ -997,8 +987,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
     }
 
-    public Attempt<OperationResult?> SaveContainer(EntityContainer container,
-        int userId = Constants.Security.SuperUserId)
+    public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -1036,7 +1025,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         // TODO: Audit trail ?
-
         return OperationResult.Attempt.Succeed(eventMessages);
     }
 
@@ -1130,12 +1118,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             scope.Notifications.Publish(deletedNotification);
 
             return OperationResult.Attempt.Succeed(eventMessages);
+
             // TODO: Audit trail ?
         }
     }
 
-    public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name,
-        int userId = Constants.Security.SuperUserId)
+    public Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
@@ -1146,7 +1134,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             {
                 EntityContainer? container = _containerRepository?.Get(id);
 
-                //throw if null, this will be caught by the catch and a failed returned
+                // throw if null, this will be caught by the catch and a failed returned
                 if (container == null)
                 {
                     throw new InvalidOperationException("No container found with id " + id);

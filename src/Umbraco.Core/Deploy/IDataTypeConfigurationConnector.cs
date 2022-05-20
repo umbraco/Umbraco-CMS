@@ -10,9 +10,10 @@ namespace Umbraco.Cms.Core.Deploy;
 ///     Configuration may contain values such as content identifiers, that would be local
 ///     to one environment, and need to be converted in order to be deployed.
 /// </remarks>
-[SuppressMessage("ReSharper", "UnusedMember.Global",
-    Justification =
-        "This is actual only used by Deploy, but we don't want third parties to have references on deploy, that's why this interface is part of core.")]
+[SuppressMessage(
+    "ReSharper",
+    "UnusedMember.Global",
+    Justification = "This is actual only used by Deploy, but we don't want third parties to have references on deploy, that's why this interface is part of core.")]
 public interface IDataTypeConfigurationConnector
 {
     /// <summary>

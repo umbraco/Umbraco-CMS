@@ -14,7 +14,7 @@ internal class BitConverterEx
     public enum ByteOrder
     {
         LittleEndian = 1,
-        BigEndian = 2
+        BigEndian = 2,
     }
 
     #endregion

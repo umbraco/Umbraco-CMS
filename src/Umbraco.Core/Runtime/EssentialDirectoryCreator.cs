@@ -13,8 +13,7 @@ public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplication
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IIOHelper _ioHelper;
 
-    public EssentialDirectoryCreator(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment,
-        IOptions<GlobalSettings> globalSettings)
+    public EssentialDirectoryCreator(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IOptions<GlobalSettings> globalSettings)
     {
         _ioHelper = ioHelper;
         _hostingEnvironment = hostingEnvironment;

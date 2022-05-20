@@ -40,7 +40,8 @@ namespace Umbraco.Cms.Core.Semver
 #endif
     {
         private static Regex parseEx =
-            new(@"^(?<major>\d+)" +
+            new(
+                @"^(?<major>\d+)" +
                 @"(\.(?<minor>\d+))?" +
                 @"(\.(?<patch>\d+))?" +
                 @"(\-(?<pre>[0-9A-Za-z\-\.]+))?" +
@@ -88,8 +89,8 @@ namespace Umbraco.Cms.Core.Semver
             Minor = minor;
             Patch = patch;
 
-            Prerelease = prerelease ?? "";
-            Build = build ?? "";
+            Prerelease = prerelease ?? string.Empty;
+            Build = build ?? string.Empty;
         }
 
         /// <summary>
@@ -252,8 +253,7 @@ namespace Umbraco.Cms.Core.Semver
         /// <param name="prerelease">The prerelease text.</param>
         /// <param name="build">The build text.</param>
         /// <returns>The new version object.</returns>
-        public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
-            string? prerelease = null, string? build = null) =>
+        public SemVersion Change(int? major = null, int? minor = null, int? patch = null, string? prerelease = null, string? build = null) =>
             new(
                 major ?? Major,
                 minor ?? Minor,
@@ -309,7 +309,7 @@ namespace Umbraco.Cms.Core.Semver
         /// </returns>
         public override string ToString()
         {
-            var version = "" + Major + "." + Minor + "." + Patch;
+            var version = string.Empty + Major + "." + Minor + "." + Patch;
             if (!string.IsNullOrEmpty(Prerelease))
             {
                 version += "-" + Prerelease;

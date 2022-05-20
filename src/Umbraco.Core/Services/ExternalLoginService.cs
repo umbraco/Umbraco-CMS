@@ -13,18 +13,17 @@ public class ExternalLoginService : RepositoryService, IExternalLoginService, IE
 {
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
 
-    public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    public ExternalLoginService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IExternalLoginWithKeyRepository externalLoginRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _externalLoginRepository = externalLoginRepository;
 
     [Obsolete("Use ctor injecting IExternalLoginWithKeyRepository")]
-    public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IExternalLoginRepository externalLoginRepository)
-        : this(provider, loggerFactory, eventMessagesFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyRepository>())
+    public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IExternalLoginRepository externalLoginRepository)
+        : this(provider, loggerFactory, eventMessagesFactory, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyRepository>())
     {
     }
 
@@ -53,7 +52,6 @@ public class ExternalLoginService : RepositoryService, IExternalLoginService, IE
     public void DeleteUserLogins(int userId)
         => DeleteUserLogins(userId.ToGuid());
 
-    /// <inheritdoc />
     public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))

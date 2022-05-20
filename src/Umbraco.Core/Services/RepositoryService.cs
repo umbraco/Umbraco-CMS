@@ -10,8 +10,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public abstract class RepositoryService : IService
 {
-    protected RepositoryService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory)
+    protected RepositoryService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
     {
         EventMessagesFactory = eventMessagesFactory ?? throw new ArgumentNullException(nameof(eventMessagesFactory));
         ScopeProvider = provider ?? throw new ArgumentNullException(nameof(provider));

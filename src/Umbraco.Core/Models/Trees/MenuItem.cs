@@ -33,8 +33,7 @@ public class MenuItem
     {
         Alias = alias;
         Name = textService.Localize("actions", Alias);
-        TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description",
-            Thread.CurrentThread.CurrentUICulture);
+        TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
     }
 
     /// <summary>
@@ -56,7 +55,8 @@ public class MenuItem
 
     #region Properties
 
-    [IgnoreDataMember] public IAction? Action { get; set; }
+    [IgnoreDataMember]
+    public IAction? Action { get; set; }
 
     /// <summary>
     ///     A dictionary to support any additional meta data that should be rendered for the node which is
@@ -77,7 +77,8 @@ public class MenuItem
     [Required]
     public string? Alias { get; set; }
 
-    [DataMember(Name = "textDescription")] public string? TextDescription { get; set; }
+    [DataMember(Name = "textDescription")]
+    public string? TextDescription { get; set; }
 
     /// <summary>
     ///     Ensures a menu separator will exist before this menu item
@@ -85,7 +86,8 @@ public class MenuItem
     [DataMember(Name = "separator")]
     public bool SeparatorBefore { get; set; }
 
-    [DataMember(Name = "cssclass")] public string Icon { get; set; }
+    [DataMember(Name = "cssclass")]
+    public string Icon { get; set; }
 
     /// <summary>
     ///     Used in the UI to inform the user that the menu item will open a dialog/confirmation

@@ -18,8 +18,7 @@ public class IdentityUserToken : EntityBase, IIdentityUserToken
     /// <summary>
     ///     Initializes a new instance of the <see cref="IdentityUserToken" /> class.
     /// </summary>
-    public IdentityUserToken(int id, string? loginProvider, string? name, string? value, string userId,
-        DateTime createDate)
+    public IdentityUserToken(int id, string? loginProvider, string? name, string? value, string userId, DateTime createDate)
     {
         Id = id;
         LoginProvider = loginProvider ?? throw new ArgumentNullException(nameof(loginProvider));

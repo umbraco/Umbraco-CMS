@@ -142,8 +142,7 @@ public sealed class CultureImpact
     /// <param name="savingCultures"></param>
     /// <param name="defaultCulture"></param>
     /// <returns></returns>
-    public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures,
-        string? defaultCulture)
+    public static string? GetCultureForInvariantErrors(IContent? content, string?[] savingCultures, string? defaultCulture)
     {
         if (content == null)
         {
@@ -229,8 +228,7 @@ public sealed class CultureImpact
     /// <remarks>
     ///     <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail,
-        out CultureImpact? impact)
+    internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail, out CultureImpact? impact)
     {
         impact = null;
 

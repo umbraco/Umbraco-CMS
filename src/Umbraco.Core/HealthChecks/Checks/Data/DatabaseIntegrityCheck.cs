@@ -108,8 +108,7 @@ public class DatabaseIntegrityCheck : HealthCheck
             fix,
             () => _contentService.CheckDataIntegrity(new ContentDataIntegrityReportOptions { FixIssues = fix }));
 
-    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport,
-        Func<ContentDataIntegrityReport> doCheck)
+    private HealthCheckStatus CheckPaths(string actionAlias, string actionName, string entityType, bool detailedReport, Func<ContentDataIntegrityReport> doCheck)
     {
         ContentDataIntegrityReport report = doCheck();
 

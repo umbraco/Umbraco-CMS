@@ -8,7 +8,7 @@ public class DefaultShortStringHelperConfig
 {
     private readonly Dictionary<string, Dictionary<CleanStringType, Config>> _configs = new();
 
-    public string DefaultCulture { get; set; } = ""; // invariant
+    public string DefaultCulture { get; set; } = string.Empty; // invariant
 
     public Dictionary<string, string>? UrlReplaceCharacters { get; set; }
 
@@ -16,7 +16,8 @@ public class DefaultShortStringHelperConfig
     {
         var config = new DefaultShortStringHelperConfig
         {
-            DefaultCulture = DefaultCulture, UrlReplaceCharacters = UrlReplaceCharacters
+            DefaultCulture = DefaultCulture,
+            UrlReplaceCharacters = UrlReplaceCharacters,
         };
 
         foreach (KeyValuePair<string, Dictionary<CleanStringType, Config>> kvp1 in _configs)
@@ -38,14 +39,14 @@ public class DefaultShortStringHelperConfig
     public DefaultShortStringHelperConfig WithConfig(CleanStringType stringRole, Config config) =>
         WithConfig(DefaultCulture, stringRole, config);
 
-    public DefaultShortStringHelperConfig WithConfig(string culture, CleanStringType stringRole, Config config)
+    public DefaultShortStringHelperConfig WithConfig(string? culture, CleanStringType stringRole, Config config)
     {
         if (config == null)
         {
             throw new ArgumentNullException(nameof(config));
         }
 
-        culture = culture ?? "";
+        culture = culture ?? string.Empty;
 
         if (_configs.ContainsKey(culture) == false)
         {
@@ -86,14 +87,14 @@ public class DefaultShortStringHelperConfig
             IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
             StringType = urlSegmentConvertTo | CleanStringType.LowerCase,
             BreakTermsOnUpper = false,
-            Separator = '-'
+            Separator = '-',
         }).WithConfig(CleanStringType.FileName, new Config
         {
             PreFilter = ApplyUrlReplaceCharacters,
             IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
             StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
             BreakTermsOnUpper = false,
-            Separator = '-'
+            Separator = '-',
         }).WithConfig(CleanStringType.Alias, new Config
         {
             PreFilter = ApplyUrlReplaceCharacters,
@@ -101,39 +102,42 @@ public class DefaultShortStringHelperConfig
                 ? char.IsLetter(c) // only letters
                 : char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
             StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
-            BreakTermsOnUpper = false
+            BreakTermsOnUpper = false,
         }).WithConfig(CleanStringType.UnderscoreAlias, new Config
         {
             PreFilter = ApplyUrlReplaceCharacters,
             IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
             StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
-            BreakTermsOnUpper = false
+            BreakTermsOnUpper = false,
         }).WithConfig(CleanStringType.ConvertCase, new Config
         {
             PreFilter = null,
             IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
             StringType = CleanStringType.Ascii,
-            BreakTermsOnUpper = true
+            BreakTermsOnUpper = true,
         });
     }
 
     // internal: we don't want ppl to retrieve a config and modify it
     // (the helper uses a private clone to prevent modifications)
-    internal Config For(CleanStringType stringType, string culture)
+    internal Config For(CleanStringType stringType, string? culture)
     {
-        culture = culture ?? "";
+        culture = culture ?? string.Empty;
         stringType = stringType & CleanStringType.RoleMask;
 
         Dictionary<CleanStringType, Config> config;
         if (_configs.ContainsKey(culture))
         {
             config = _configs[culture];
-            if (config.ContainsKey(stringType)) // have we got a config for _that_ role?
+
+            // have we got a config for _that_ role?
+            if (config.ContainsKey(stringType))
             {
                 return config[stringType];
             }
 
-            if (config.ContainsKey(CleanStringType.RoleMask)) // have we got a generic config for _all_ roles?
+            // have we got a generic config for _all_ roles?
+            if (config.ContainsKey(CleanStringType.RoleMask))
             {
                 return config[CleanStringType.RoleMask];
             }
@@ -141,12 +145,15 @@ public class DefaultShortStringHelperConfig
         else if (_configs.ContainsKey(DefaultCulture))
         {
             config = _configs[DefaultCulture];
-            if (config.ContainsKey(stringType)) // have we got a config for _that_ role?
+
+            // have we got a config for _that_ role?
+            if (config.ContainsKey(stringType))
             {
                 return config[stringType];
             }
 
-            if (config.ContainsKey(CleanStringType.RoleMask)) // have we got a generic config for _all_ roles?
+            // have we got a generic config for _all_ roles?
+            if (config.ContainsKey(CleanStringType.RoleMask))
             {
                 return config[CleanStringType.RoleMask];
             }
@@ -183,7 +190,9 @@ public class DefaultShortStringHelperConfig
         }
 
         public Func<string, string>? PreFilter { get; set; }
+
         public Func<string, string>? PostFilter { get; set; }
+
         public Func<char, bool, bool> IsTerm { get; set; }
 
         public CleanStringType StringType { get; set; }
@@ -215,14 +224,14 @@ public class DefaultShortStringHelperConfig
                 BreakTermsOnUpper = BreakTermsOnUpper,
                 CutAcronymOnNonUpper = CutAcronymOnNonUpper,
                 GreedyAcronyms = GreedyAcronyms,
-                Separator = Separator
+                Separator = Separator,
             };
 
         // extends the config
         public CleanStringType StringTypeExtend(CleanStringType stringType)
         {
             CleanStringType st = StringType;
-            foreach (CleanStringType mask in new[] {CleanStringType.CaseMask, CleanStringType.CodeMask})
+            foreach (CleanStringType mask in new[] { CleanStringType.CaseMask, CleanStringType.CodeMask })
             {
                 CleanStringType a = stringType & mask;
                 if (a == 0)

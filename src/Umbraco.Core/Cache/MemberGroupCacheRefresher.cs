@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Core.Cache;
 public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresherNotification,
     MemberGroupCacheRefresher.JsonPayload>
 {
-    public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer,
-        IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+    public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, jsonSerializer, eventAggregator, factory)
     {
     }
@@ -25,6 +24,7 @@ public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<Member
         }
 
         public string Name { get; }
+
         public int Id { get; }
     }
 
@@ -61,6 +61,7 @@ public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<Member
     }
 
     private void ClearCache() =>
+
         // Since we cache by group name, it could be problematic when renaming to
         // previously existing names - see http://issues.umbraco.org/issue/U4-10846.
         // To work around this, just clear all the cache items

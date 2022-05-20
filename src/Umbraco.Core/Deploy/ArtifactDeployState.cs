@@ -30,8 +30,7 @@ public abstract class ArtifactDeployState
     /// <param name="connector">The service connector deploying the artifact.</param>
     /// <param name="nextPass">The next pass number.</param>
     /// <returns>A deploying artifact.</returns>
-    public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity entity,
-        IServiceConnector connector, int nextPass)
+    public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity entity, IServiceConnector connector, int nextPass)
         where TArtifact : IArtifact =>
         new ArtifactDeployState<TArtifact, TEntity>(art, entity, connector, nextPass);
 

@@ -8,10 +8,20 @@ public class PublishedRequest : IPublishedRequest
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequest" /> class.
     /// </summary>
-    public PublishedRequest(Uri uri, string absolutePathDecoded, IPublishedContent? publishedContent,
-        bool isInternalRedirect, ITemplate? template, DomainAndUri? domain, string? culture, string? redirectUrl,
-        int? responseStatusCode, IReadOnlyList<string>? cacheExtensions, IReadOnlyDictionary<string, string>? headers,
-        bool setNoCacheHeader, bool ignorePublishedContentCollisions)
+    public PublishedRequest(
+        Uri uri,
+        string absolutePathDecoded,
+        IPublishedContent? publishedContent,
+        bool isInternalRedirect,
+        ITemplate? template,
+        DomainAndUri? domain,
+        string? culture,
+        string? redirectUrl,
+        int? responseStatusCode,
+        IReadOnlyList<string>? cacheExtensions,
+        IReadOnlyDictionary<string, string>? headers,
+        bool setNoCacheHeader,
+        bool ignorePublishedContentCollisions)
     {
         Uri = uri ?? throw new ArgumentNullException(nameof(uri));
         AbsolutePathDecoded = absolutePathDecoded ?? throw new ArgumentNullException(nameof(absolutePathDecoded));

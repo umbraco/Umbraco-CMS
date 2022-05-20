@@ -34,6 +34,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
     }
 
     protected Dictionary<TKey, int> Indecies { get; }
+
     protected Func<TValue, TKey> KeySelector { get; }
 
     public bool Remove(TKey key)
@@ -65,7 +66,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         get => this[Indecies[key]];
         set
         {
-            //confirm key matches
+            // confirm key matches
             if (!KeySelector(value)!.Equals(key))
             {
                 throw new InvalidOperationException("Key of new value does not match.");
@@ -101,7 +102,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
             return false;
         }
 
-        //confirm key matches
+        // confirm key matches
         if (!KeySelector(value)!.Equals(key))
         {
             throw new InvalidOperationException("Key of new value does not match.");
@@ -140,8 +141,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
         if (ContainsKey(newKey))
         {
-            throw new ArgumentException($"An element with the same key '{newKey}' already exists in the dictionary.",
-                nameof(newKey));
+            throw new ArgumentException($"An element with the same key '{newKey}' already exists in the dictionary.", nameof(newKey));
         }
 
         var currentIndex = Indecies[currentKey];
@@ -157,8 +157,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
         TKey key = KeySelector(item);
         if (Indecies.ContainsKey(key))
         {
-            throw new ArgumentException($"An element with the same key '{key}' already exists in the dictionary.",
-                nameof(item));
+            throw new ArgumentException($"An element with the same key '{key}' already exists in the dictionary.", nameof(item));
         }
 
         if (index != Count)
@@ -222,7 +221,7 @@ public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, 
 
     ICollection<TKey> IDictionary<TKey, TValue>.Keys => Indecies.Keys;
 
-    //this will never be used
+    // this will never be used
     ICollection<TValue> IDictionary<TKey, TValue>.Values => Values.ToList();
 
     bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;

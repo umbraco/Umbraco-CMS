@@ -26,6 +26,7 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
 
     /// <inheritdoc />
     public virtual IEnumerable<string> GetDirtyProperties() =>
+
         // ReSharper disable once MergeConditionalExpression
         _currentChanges == null
             ? Enumerable.Empty<string>()
@@ -48,6 +49,7 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
 
     /// <inheritdoc />
     public virtual void ResetWereDirtyProperties() =>
+
         // note: cannot .Clear() because when memberwise-cloning this will be the SAME
         // instance as the one on the clone, so we need to create a new instance.
         _savedChanges = null;
@@ -68,6 +70,7 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
 
     /// <inheritdoc />
     public virtual IEnumerable<string> GetWereDirtyProperties() =>
+
         // ReSharper disable once MergeConditionalExpression
         _savedChanges == null
             ? Enumerable.Empty<string>()
@@ -120,8 +123,7 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
     /// <param name="valueRef">A reference to the value to set.</param>
     /// <param name="propertyName">The property name.</param>
     /// <param name="comparer">A comparer to compare property values.</param>
-    protected void SetPropertyValueAndDetectChanges<T>(T? value, ref T? valueRef, string propertyName,
-        IEqualityComparer<T>? comparer = null)
+    protected void SetPropertyValueAndDetectChanges<T>(T? value, ref T? valueRef, string propertyName, IEqualityComparer<T>? comparer = null)
     {
         if (comparer == null)
         {
@@ -130,8 +132,7 @@ public abstract class BeingDirtyBase : IRememberBeingDirty
             Type typeofT = typeof(T);
             if (!(typeofT == typeof(string)) && typeof(IEnumerable).IsAssignableFrom(typeofT))
             {
-                throw new ArgumentNullException(nameof(comparer),
-                    "A custom comparer must be supplied for IEnumerable values.");
+                throw new ArgumentNullException(nameof(comparer), "A custom comparer must be supplied for IEnumerable values.");
             }
 
             comparer = EqualityComparer<T>.Default;

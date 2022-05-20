@@ -13,13 +13,17 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
 {
-    public ContentTypeService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory, IContentService contentService,
-        IContentTypeRepository repository, IAuditRepository auditRepository,
-        IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository,
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
         IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository,
-            entityRepository, eventAggregator) =>
+        : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) =>
         ContentService = contentService;
 
     // beware! order is important to avoid deadlocks

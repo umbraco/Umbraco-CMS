@@ -73,8 +73,7 @@ public static class Attempt
     /// <param name="result">The result of the attempt.</param>
     /// <param name="exception">The exception causing the failure of the attempt.</param>
     /// <returns>The failed attempt.</returns>
-    public static Attempt<TResult, TStatus> FailWithStatus<TResult, TStatus>(TStatus status, TResult result,
-        Exception exception) => Attempt<TResult, TStatus>.Fail(status, result, exception);
+    public static Attempt<TResult, TStatus> FailWithStatus<TResult, TStatus>(TStatus status, TResult result, Exception exception) => Attempt<TResult, TStatus>.Fail(status, result, exception);
 
     /// <summary>
     ///     Creates a successful or a failed attempt, with a result.
@@ -96,6 +95,14 @@ public static class Attempt
     /// <param name="failStatus">The status of the failed attempt.</param>
     /// <param name="result">The result of the attempt.</param>
     /// <returns>The attempt.</returns>
-    public static Attempt<TResult, TStatus> IfWithStatus<TResult, TStatus>(bool condition, TStatus succStatus,
-        TStatus failStatus, TResult result) => Attempt<TResult, TStatus>.If(condition, succStatus, failStatus, result);
+    public static Attempt<TResult, TStatus> IfWithStatus<TResult, TStatus>(
+        bool condition,
+        TStatus succStatus,
+        TStatus failStatus,
+        TResult result) =>
+        Attempt<TResult, TStatus>.If(
+            condition,
+            succStatus,
+            failStatus,
+            result);
 }

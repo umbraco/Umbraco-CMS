@@ -65,9 +65,16 @@ public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
     /// <param name="userState">Optional parameter to filter by specified user state</param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser>? query, long pageIndex, int pageSize, out long totalRecords,
-        Expression<Func<IUser, object?>> orderBy, Direction orderDirection = Direction.Ascending,
-        string[]? includeUserGroups = null, string[]? excludeUserGroups = null, UserState[]? userState = null,
+    IEnumerable<IUser> GetPagedResultsByQuery(
+        IQuery<IUser>? query,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        Expression<Func<IUser, object?>> orderBy,
+        Direction orderDirection = Direction.Ascending,
+        string[]? includeUserGroups = null,
+        string[]? excludeUserGroups = null,
+        UserState[]? userState = null,
         IQuery<IUser>? filter = null);
 
     /// <summary>

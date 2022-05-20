@@ -21,15 +21,13 @@ public class HistoryCleanup : BeingDirtyBase
     public int? KeepAllVersionsNewerThanDays
     {
         get => _keepAllVersionsNewerThanDays;
-        set => SetPropertyValueAndDetectChanges(value, ref _keepAllVersionsNewerThanDays,
-            nameof(KeepAllVersionsNewerThanDays));
+        set => SetPropertyValueAndDetectChanges(value, ref _keepAllVersionsNewerThanDays, nameof(KeepAllVersionsNewerThanDays));
     }
 
     [DataMember(Name = "keepLatestVersionPerDayForDays")]
     public int? KeepLatestVersionPerDayForDays
     {
         get => _keepLatestVersionPerDayForDays;
-        set => SetPropertyValueAndDetectChanges(value, ref _keepLatestVersionPerDayForDays,
-            nameof(KeepLatestVersionPerDayForDays));
+        set => SetPropertyValueAndDetectChanges(value, ref _keepLatestVersionPerDayForDays, nameof(KeepLatestVersionPerDayForDays));
     }
 }

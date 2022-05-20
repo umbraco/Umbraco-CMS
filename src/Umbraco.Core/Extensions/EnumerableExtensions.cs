@@ -80,7 +80,8 @@ public static class EnumerableExtensions
 
     public static IEnumerable<TResult> SelectByGroups<TResult, TSource>(
         this IEnumerable<TSource> source,
-        Func<IEnumerable<TSource>, IEnumerable<TResult>> selector, int groupSize)
+        Func<IEnumerable<TSource>, IEnumerable<TResult>> selector,
+        int groupSize)
     {
         // don't want to use a SelectMany(x => x) here - isn't this better?
         // ReSharper disable once LoopCanBeConvertedToQuery
@@ -193,7 +194,8 @@ public static class EnumerableExtensions
 
     public static IEnumerable<TSource> SelectRecursive<TSource>(
         this IEnumerable<TSource> source,
-        Func<TSource, IEnumerable<TSource>> recursiveSelector, int maxRecusionDepth = 100)
+        Func<TSource, IEnumerable<TSource>> recursiveSelector,
+        int maxRecusionDepth = 100)
     {
         var stack = new Stack<IEnumerator<TSource>>();
         stack.Push(source.GetEnumerator());
@@ -390,7 +392,8 @@ public static class EnumerableExtensions
 
     public static IOrderedEnumerable<TSource> OrderBy<TSource, TKey>(
         this IEnumerable<TSource> source,
-        Func<TSource, TKey> keySelector, Direction sortOrder) => sortOrder == Direction.Ascending
+        Func<TSource, TKey> keySelector,
+        Direction sortOrder) => sortOrder == Direction.Ascending
         ? source.OrderBy(keySelector)
         : source.OrderByDescending(keySelector);
 }

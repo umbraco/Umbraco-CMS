@@ -17,8 +17,7 @@ public static class ModelsBuilderConfigExtensions
             var modelsDirectory = modelsBuilderConfig.ModelsDirectory;
             var root = hostingEnvironment.MapPathContentRoot("~/");
 
-            _modelsDirectoryAbsolute = GetModelsDirectory(root, modelsDirectory,
-                modelsBuilderConfig.AcceptUnsafeModelsDirectory);
+            _modelsDirectoryAbsolute = GetModelsDirectory(root, modelsDirectory, modelsBuilderConfig.AcceptUnsafeModelsDirectory);
         }
 
         return _modelsDirectoryAbsolute;

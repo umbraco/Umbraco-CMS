@@ -44,7 +44,8 @@ public class PropertyCollection : KeyedCollection<string, IProperty>, IPropertyC
     /// <inheritdoc />
     public new void Add(IProperty property)
     {
-        lock (_addLocker) // TODO: why are we locking here and not everywhere else?!
+        // TODO: why are we locking here and not everywhere else?!
+        lock (_addLocker)
         {
             var key = GetKeyForItem(property);
             if (key != null)

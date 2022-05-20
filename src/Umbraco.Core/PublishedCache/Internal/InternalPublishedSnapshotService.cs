@@ -49,8 +49,7 @@ public class InternalPublishedSnapshotService : IPublishedSnapshotService
     {
     }
 
-    public void Rebuild(IReadOnlyCollection<int>? contentTypeIds = null, IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null)
+    public void Rebuild(IReadOnlyCollection<int>? contentTypeIds = null, IReadOnlyCollection<int>? mediaTypeIds = null, IReadOnlyCollection<int>? memberTypeIds = null)
     {
     }
 }

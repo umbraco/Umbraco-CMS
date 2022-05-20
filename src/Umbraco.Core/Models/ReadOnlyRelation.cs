@@ -17,8 +17,7 @@ public class ReadOnlyRelation
     }
 
     public ReadOnlyRelation(int parentId, int childId, int relationTypeId)
-        : this(0, parentId, childId, relationTypeId,
-        DateTime.Now, string.Empty)
+        : this(0, parentId, childId, relationTypeId, DateTime.Now, string.Empty)
     {
     }
 

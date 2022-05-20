@@ -12,8 +12,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security;
 [HealthCheck(
     "F4D2B02E-28C5-4999-8463-05759FA15C3A",
     "Cross-site scripting Protection (X-XSS-Protection header)",
-    Description =
-        "This header enables the Cross-site scripting (XSS) filter in your browser. It checks for the presence of the X-XSS-Protection-header.",
+    Description = "This header enables the Cross-site scripting (XSS) filter in your browser. It checks for the presence of the X-XSS-Protection-header.",
     Group = "Security")]
 public class XssProtectionCheck : BaseHttpHeaderCheck
 {

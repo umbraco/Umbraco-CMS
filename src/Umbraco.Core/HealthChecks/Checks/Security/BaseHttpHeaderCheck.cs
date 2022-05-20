@@ -27,8 +27,7 @@ public abstract class BaseHttpHeaderCheck : HealthCheck
         string value,
         string localizedTextPrefix,
         bool metaTagOptionAvailable)
-        : this(hostingEnvironment, textService, header, localizedTextPrefix,
-        metaTagOptionAvailable)
+        : this(hostingEnvironment, textService, header, localizedTextPrefix, metaTagOptionAvailable)
     {
     }
 

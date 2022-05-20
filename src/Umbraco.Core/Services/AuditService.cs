@@ -13,9 +13,12 @@ public sealed class AuditService : RepositoryService, IAuditService
     private readonly IAuditRepository _auditRepository;
     private readonly Lazy<bool> _isAvailable;
 
-    public AuditService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IAuditRepository auditRepository, IAuditEntryRepository auditEntryRepository)
+        IAuditRepository auditRepository,
+        IAuditEntryRepository auditEntryRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
@@ -23,8 +26,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         _isAvailable = new Lazy<bool>(DetermineIsAvailable);
     }
 
-    public void Add(AuditType type, int userId, int objectId, string? entityType, string comment,
-        string? parameters = null)
+    public void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null)
     {
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
@@ -97,7 +99,10 @@ public sealed class AuditService : RepositoryService, IAuditService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    public IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize,
+    public IEnumerable<IAuditItem> GetPagedItemsByEntity(
+        int entityId,
+        long pageIndex,
+        int pageSize,
         out long totalRecords,
         Direction orderDirection = Direction.Descending,
         AuditType[]? auditTypeFilter = null,
@@ -123,8 +128,7 @@ public sealed class AuditService : RepositoryService, IAuditService
         {
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.Id == entityId);
 
-            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection,
-                auditTypeFilter, customFilter);
+            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
         }
     }
 
@@ -147,8 +151,13 @@ public sealed class AuditService : RepositoryService, IAuditService
     ///     Optional filter to be applied
     /// </param>
     /// <returns></returns>
-    public IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords,
-        Direction orderDirection = Direction.Descending, AuditType[]? auditTypeFilter = null,
+    public IEnumerable<IAuditItem> GetPagedItemsByUser(
+        int userId,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        Direction orderDirection = Direction.Descending,
+        AuditType[]? auditTypeFilter = null,
         IQuery<IAuditItem>? customFilter = null)
     {
         if (pageIndex < 0)
@@ -171,14 +180,12 @@ public sealed class AuditService : RepositoryService, IAuditService
         {
             IQuery<IAuditItem> query = Query<IAuditItem>().Where(x => x.UserId == userId);
 
-            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection,
-                auditTypeFilter, customFilter);
+            return _auditRepository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderDirection, auditTypeFilter, customFilter);
         }
     }
 
     /// <inheritdoc />
-    public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc,
-        int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
+    public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string? affectedDetails, string eventType, string eventDetails)
     {
         if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId)
         {

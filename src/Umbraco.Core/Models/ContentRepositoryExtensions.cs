@@ -310,7 +310,8 @@ public static class ContentRepositoryExtensions
         // set names
         if (impact.ImpactsAllCultures)
         {
-            foreach (var c in content.AvailableCultures) // does NOT contain the invariant culture
+            // does NOT contain the invariant culture
+            foreach (var c in content.AvailableCultures)
             {
                 var name = content.GetCultureName(c);
                 if (string.IsNullOrWhiteSpace(name))

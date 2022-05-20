@@ -44,8 +44,7 @@ internal class TIFFFile : ImageFile
         // TODO: Add support for multiple frames
         foreach (ImageFileDirectoryEntry field in IFDs[0].Fields)
         {
-            Properties.Add(ExifPropertyFactory.Get(field.Tag, field.Type, field.Count, field.Data,
-                BitConverterEx.SystemByteOrder, IFD.Zeroth, Encoding));
+            Properties.Add(ExifPropertyFactory.Get(field.Tag, field.Type, field.Count, field.Data, BitConverterEx.SystemByteOrder, IFD.Zeroth, Encoding));
         }
     }
 
@@ -77,7 +76,9 @@ internal class TIFFFile : ImageFile
         stream.Write(
             BitConverterEx.SystemByteOrder == BitConverterEx.ByteOrder.LittleEndian
                 ? new byte[] { 0x49, 0x49 }
-                : new byte[] { 0x4D, 0x4D }, 0, 2);
+                : new byte[] { 0x4D, 0x4D },
+            0,
+            2);
 
         // TIFF ID
         stream.Write(conv.GetBytes((ushort)42), 0, 2);

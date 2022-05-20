@@ -22,8 +22,7 @@ public class UmbracoContextReference : IDisposable
     /// <summary>
     ///     Initializes a new instance of the <see cref="UmbracoContextReference" /> class.
     /// </summary>
-    public UmbracoContextReference(IUmbracoContext umbracoContext, bool isRoot,
-        IUmbracoContextAccessor umbracoContextAccessor)
+    public UmbracoContextReference(IUmbracoContext umbracoContext, bool isRoot, IUmbracoContextAccessor umbracoContextAccessor)
     {
         IsRoot = isRoot;
 

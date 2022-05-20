@@ -75,7 +75,9 @@ public class AliasUrlProvider : IUrlProvider
         // look for domains, walking up the tree
         IPublishedContent? n = node;
         IEnumerable<DomainAndUri>? domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
-        while (domainUris == null && n != null) // n is null at root
+
+        // n is null at root
+        while (domainUris == null && n != null)
         {
             // move to parent node
             n = n.Parent;

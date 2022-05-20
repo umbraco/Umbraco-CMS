@@ -7,8 +7,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 
 public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
 {
-    IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize,
-        out long totalRecords, Ordering? ordering);
+    IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering);
 
     /// <summary>
     ///     Persist multiple <see cref="IRelation" /> at once
@@ -32,9 +31,7 @@ public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     /// </param>
     void DeleteByParent(int parentId, params string[] relationTypeAliases);
 
-    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize,
-        out long totalRecords, params Guid[] entityTypes);
+    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes);
 
-    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize,
-        out long totalRecords, params Guid[] entityTypes);
+    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes);
 }

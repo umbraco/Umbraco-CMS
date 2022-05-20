@@ -17,8 +17,7 @@ public interface IDocumentVersionRepository : IRepository
     /// <summary>
     ///     Gets paginated content versions for given content id paginated.
     /// </summary>
-    public IEnumerable<ContentVersionMeta>? GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize,
-        out long totalRecords, int? languageId = null);
+    public IEnumerable<ContentVersionMeta>? GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize, out long totalRecords, int? languageId = null);
 
     /// <summary>
     ///     Deletes multiple content versions by ID.

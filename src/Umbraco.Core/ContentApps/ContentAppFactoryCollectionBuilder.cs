@@ -20,9 +20,7 @@ public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<C
         ILoggerFactory loggerFactory = factory.GetRequiredService<ILoggerFactory>();
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor =
             factory.GetRequiredService<IBackOfficeSecurityAccessor>();
-        return new ContentAppFactoryCollection(
-            () => CreateItems(factory),
-            loggerFactory.CreateLogger<ContentAppFactoryCollection>(), backOfficeSecurityAccessor);
+        return new ContentAppFactoryCollection(() => CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), backOfficeSecurityAccessor);
     }
 
     protected override IEnumerable<IContentAppFactory> CreateItems(IServiceProvider factory)

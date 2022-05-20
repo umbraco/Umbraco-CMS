@@ -17,8 +17,7 @@ public class DashboardService : IDashboardService
     // TODO: Unit test all this!!! :/
     private readonly ISectionService _sectionService;
 
-    public DashboardService(ISectionService sectionService, DashboardCollection dashboardCollection,
-        ILocalizedTextService localizedText)
+    public DashboardService(ISectionService sectionService, DashboardCollection dashboardCollection, ILocalizedTextService localizedText)
     {
         _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         _dashboardCollection = dashboardCollection ?? throw new ArgumentNullException(nameof(dashboardCollection));

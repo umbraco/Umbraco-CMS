@@ -5,8 +5,7 @@ namespace Umbraco.Cms.Core.IO;
 
 public class DefaultViewContentProvider : IDefaultViewContentProvider
 {
-    public string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null,
-        string? modelNamespace = null, string? modelNamespaceAlias = null)
+    public string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null, string? modelNamespace = null, string? modelNamespaceAlias = null)
     {
         var content = new StringBuilder();
 

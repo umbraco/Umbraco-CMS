@@ -250,8 +250,7 @@ internal class ExifPropertyCollection : IDictionary<ExifTag, ExifProperty>
             items.Remove(key);
         }
 
-        items.Add(key,
-            new ExifURationalArray(key, new[] {new(d), new MathEx.UFraction32(m), new MathEx.UFraction32(s)}));
+        items.Add(key, new ExifURationalArray(key, new[] { new(d), new MathEx.UFraction32(m), new MathEx.UFraction32(s) }));
     }
 
     #endregion
@@ -411,8 +410,7 @@ internal class ExifPropertyCollection : IDictionary<ExifTag, ExifProperty>
     ///     <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.-or-Type
     ///     <paramref name="T" /> cannot be cast automatically to the type of the destination <paramref name="array" />.
     /// </exception>
-    void ICollection<KeyValuePair<ExifTag, ExifProperty>>.CopyTo(KeyValuePair<ExifTag, ExifProperty>[] array,
-        int arrayIndex)
+    void ICollection<KeyValuePair<ExifTag, ExifProperty>>.CopyTo(KeyValuePair<ExifTag, ExifProperty>[] array, int arrayIndex)
     {
         if (array == null)
         {
@@ -431,8 +429,7 @@ internal class ExifPropertyCollection : IDictionary<ExifTag, ExifProperty>
 
         if (arrayIndex >= array.Length)
         {
-            throw new ArgumentException("arrayIndex is equal to or greater than the length of destination array",
-                "array");
+            throw new ArgumentException("arrayIndex is equal to or greater than the length of destination array", "array");
         }
 
         if (arrayIndex + items.Count > array.Length)

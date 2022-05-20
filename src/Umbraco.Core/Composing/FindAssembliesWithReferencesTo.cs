@@ -29,8 +29,7 @@ internal class FindAssembliesWithReferencesTo
     /// </param>
     /// <param name="includeTargets">If true will also use the target assembly names as entry point assemblies</param>
     /// <param name="loggerFactory">Logger factory for when scanning goes wrong</param>
-    public FindAssembliesWithReferencesTo(Assembly[] referenceAssemblies, string[] targetAssemblyNames,
-        bool includeTargets, ILoggerFactory loggerFactory)
+    public FindAssembliesWithReferencesTo(Assembly[] referenceAssemblies, string[] targetAssemblyNames, bool includeTargets, ILoggerFactory loggerFactory)
     {
         _referenceAssemblies = referenceAssemblies;
         _targetAssemblies = targetAssemblyNames;
@@ -63,8 +62,7 @@ internal class FindAssembliesWithReferencesTo
             }
         }
 
-        var provider = new ReferenceResolver(_targetAssemblies, referenceItems,
-            _loggerFactory.CreateLogger<ReferenceResolver>());
+        var provider = new ReferenceResolver(_targetAssemblies, referenceItems, _loggerFactory.CreateLogger<ReferenceResolver>());
         IEnumerable<Assembly> assemblyNames = provider.ResolveAssemblies();
         return assemblyNames.ToList();
     }

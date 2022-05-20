@@ -16,8 +16,7 @@ public interface ITrackedReferencesService
     ///     dependencies (isDependency field is set to true).
     /// </param>
     /// <returns>A paged result of <see cref="RelationItem" /> objects.</returns>
-    PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency);
+    PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency);
 
     /// <summary>
     ///     Gets a paged result of the descending items that have any references, given a parent id.
@@ -30,8 +29,7 @@ public interface ITrackedReferencesService
     ///     dependencies (isDependency field is set to true).
     /// </param>
     /// <returns>A paged result of <see cref="RelationItem" /> objects.</returns>
-    PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency);
+    PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency);
 
     /// <summary>
     ///     Gets a paged result of items used in any kind of relation from selected integer ids.
@@ -44,6 +42,5 @@ public interface ITrackedReferencesService
     ///     dependencies (isDependency field is set to true).
     /// </param>
     /// <returns>A paged result of <see cref="RelationItem" /> objects.</returns>
-    PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize,
-        bool filterMustBeIsDependency);
+    PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency);
 }

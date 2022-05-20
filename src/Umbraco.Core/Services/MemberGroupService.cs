@@ -11,9 +11,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 {
     private readonly IMemberGroupRepository _memberGroupRepository;
 
-    public MemberGroupService(ICoreScopeProvider provider, ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IMemberGroupRepository memberGroupRepository)
+    public MemberGroupService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupRepository memberGroupRepository)
         : base(provider, loggerFactory, eventMessagesFactory) =>
         _memberGroupRepository = memberGroupRepository;
 

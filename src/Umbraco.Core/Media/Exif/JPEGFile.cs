@@ -47,6 +47,7 @@ internal class JPEGFile : ImageFile
             var marker = (JPEGMarker)markerbytes[1];
 
             var header = new byte[0];
+
             // SOI, EOI and RST markers do not contain any header
             if (marker != JPEGMarker.SOI && marker != JPEGMarker.EOI &&
                 !(marker >= JPEGMarker.RST0 && marker <= JPEGMarker.RST7))
@@ -98,7 +99,8 @@ internal class JPEGFile : ImageFile
                         {
                             throw new NotValidJPEGFileException();
                         }
-                    } while ((byte)nextbyte != 0xFF);
+                    }
+                    while ((byte)nextbyte != 0xFF);
 
                     // Skip filler bytes (0xFF)
                     do
@@ -108,7 +110,8 @@ internal class JPEGFile : ImageFile
                         {
                             throw new NotValidJPEGFileException();
                         }
-                    } while ((byte)nextbyte == 0xFF);
+                    }
+                    while ((byte)nextbyte == 0xFF);
 
                     // Looks like a section marker. The next byte must not be 0x00.
                     if ((byte)nextbyte != 0x00)
@@ -168,21 +171,26 @@ internal class JPEGFile : ImageFile
         ReadExifAPP1();
 
         // Process the maker note
-        makerNoteProcessed = false;
+        _makerNoteProcessed = false;
     }
 
     #endregion
 
     #region Member Variables
 
-    private JPEGSection? jfifApp0;
-    private JPEGSection? jfxxApp0;
-    private JPEGSection? exifApp1;
-    private uint makerNoteOffset;
-    private long exifIFDFieldOffset, gpsIFDFieldOffset, interopIFDFieldOffset, firstIFDFieldOffset;
-    private long thumbOffsetLocation, thumbSizeLocation;
-    private uint thumbOffsetValue, thumbSizeValue;
-    private readonly bool makerNoteProcessed;
+    private JPEGSection? _jfifApp0;
+    private JPEGSection? _jfxxApp0;
+    private JPEGSection? _exifApp1;
+    private uint _makerNoteOffset;
+    private long _exifIfdFieldOffset;
+    private long _gpsIfdFieldOffset;
+    private long _interopIfdFieldOffset;
+    private long _firstIfdFieldOffset;
+    private long _thumbOffsetLocation;
+    private long _thumbSizeLocation;
+    private uint _thumbOffsetValue;
+    private uint _thumbSizeValue;
+    private readonly bool _makerNoteProcessed;
 
     #endregion
 
@@ -210,7 +218,7 @@ internal class JPEGFile : ImageFile
     /// <summary>
     ///     Saves the JPEG/Exif image to the given stream.
     /// </summary>
-    /// <param name="filename">The path to the JPEG/Exif file.</param>
+    /// <param name="stream">The stream of the JPEG/Exif file.</param>
     /// <param name="preserveMakerNote">
     ///     Determines whether the maker note offset of
     ///     the original file will be preserved.
@@ -239,7 +247,7 @@ internal class JPEGFile : ImageFile
             }
 
             // Write section marker
-            stream.Write(new byte[] {0xFF, (byte)section.Marker}, 0, 2);
+            stream.Write(new byte[] { 0xFF, (byte)section.Marker }, 0, 2);
 
             // SOI, EOI and RST markers do not contain any header
             if (section.Marker != JPEGMarker.SOI && section.Marker != JPEGMarker.EOI &&
@@ -294,7 +302,7 @@ internal class JPEGFile : ImageFile
     /// <summary>
     ///     Saves the JPEG/Exif image to the given stream.
     /// </summary>
-    /// <param name="filename">The path to the JPEG/Exif file.</param>
+    /// <param name="stream">The stream of the JPEG/Exif file.</param>
     public override void Save(Stream stream) => Save(stream, true);
 
     #endregion
@@ -307,17 +315,17 @@ internal class JPEGFile : ImageFile
     private void ReadJFIFAPP0()
     {
         // Find the APP0 section containing JFIF metadata
-        jfifApp0 = Sections.Find(a => a.Marker == JPEGMarker.APP0 &&
+        _jfifApp0 = Sections.Find(a => a.Marker == JPEGMarker.APP0 &&
                                       a.Header.Length >= 5 &&
                                       Encoding.ASCII.GetString(a.Header, 0, 5) == "JFIF\0");
 
         // If there is no APP0 section, return.
-        if (jfifApp0 == null)
+        if (_jfifApp0 == null)
         {
             return;
         }
 
-        var header = jfifApp0.Header;
+        var header = _jfifApp0.Header;
         BitConverterEx jfifConv = BitConverterEx.BigEndian;
 
         // Version
@@ -344,8 +352,7 @@ internal class JPEGFile : ImageFile
         var n = xthumbnail * ythumbnail;
         var jfifThumbnail = new byte[n];
         Array.Copy(header, 14, jfifThumbnail, 0, n);
-        Properties.Add(new JFIFThumbnailProperty(ExifTag.JFIFThumbnail,
-            new JFIFThumbnail(JFIFThumbnail.ImageFormat.JPEG, jfifThumbnail)));
+        Properties.Add(new JFIFThumbnailProperty(ExifTag.JFIFThumbnail, new JFIFThumbnail(JFIFThumbnail.ImageFormat.JPEG, jfifThumbnail)));
     }
 
     /// <summary>
@@ -369,7 +376,6 @@ internal class JPEGFile : ImageFile
             return false;
         }
 
-
         // Create a memory stream to write the APP0 section to
         var ms = new MemoryStream();
 
@@ -392,9 +398,9 @@ internal class JPEGFile : ImageFile
         ms.Close();
 
         // Return APP0 header
-        if (jfifApp0 is not null)
+        if (_jfifApp0 is not null)
         {
-            jfifApp0.Header = ms.ToArray();
+            _jfifApp0.Header = ms.ToArray();
             return true;
         }
 
@@ -407,17 +413,17 @@ internal class JPEGFile : ImageFile
     private void ReadJFXXAPP0()
     {
         // Find the APP0 section containing JFIF metadata
-        jfxxApp0 = Sections.Find(a => a.Marker == JPEGMarker.APP0 &&
+        _jfxxApp0 = Sections.Find(a => a.Marker == JPEGMarker.APP0 &&
                                       a.Header.Length >= 5 &&
                                       Encoding.ASCII.GetString(a.Header, 0, 5) == "JFXX\0");
 
         // If there is no APP0 section, return.
-        if (jfxxApp0 == null)
+        if (_jfxxApp0 == null)
         {
             return;
         }
 
-        var header = jfxxApp0.Header;
+        var header = _jfxxApp0.Header;
 
         // Version
         var version = (JFIFExtension)header[5];
@@ -428,8 +434,7 @@ internal class JPEGFile : ImageFile
         {
             var data = new byte[header.Length - 6];
             Array.Copy(header, 6, data, 0, data.Length);
-            Properties.Add(new JFIFThumbnailProperty(ExifTag.JFXXThumbnail,
-                new JFIFThumbnail(JFIFThumbnail.ImageFormat.JPEG, data)));
+            Properties.Add(new JFIFThumbnailProperty(ExifTag.JFXXThumbnail, new JFIFThumbnail(JFIFThumbnail.ImageFormat.JPEG, data)));
         }
         else if (version == JFIFExtension.Thumbnail24BitRGB)
         {
@@ -440,8 +445,7 @@ internal class JPEGFile : ImageFile
             Properties.Add(new ExifByte(ExifTag.JFXXYThumbnail, ythumbnail));
             var data = new byte[3 * xthumbnail * ythumbnail];
             Array.Copy(header, 8, data, 0, data.Length);
-            Properties.Add(new JFIFThumbnailProperty(ExifTag.JFXXThumbnail,
-                new JFIFThumbnail(JFIFThumbnail.ImageFormat.BMP24Bit, data)));
+            Properties.Add(new JFIFThumbnailProperty(ExifTag.JFXXThumbnail, new JFIFThumbnail(JFIFThumbnail.ImageFormat.BMP24Bit, data)));
         }
         else if (version == JFIFExtension.ThumbnailPaletteRGB)
         {
@@ -500,10 +504,10 @@ internal class JPEGFile : ImageFile
 
         ms.Close();
 
-        if (jfxxApp0 is not null)
+        if (_jfxxApp0 is not null)
         {
             // Return APP0 header
-            jfxxApp0.Header = ms.ToArray();
+            _jfxxApp0.Header = ms.ToArray();
             return true;
         }
 
@@ -516,12 +520,12 @@ internal class JPEGFile : ImageFile
     private void ReadExifAPP1()
     {
         // Find the APP1 section containing Exif metadata
-        exifApp1 = Sections.Find(a => a.Marker == JPEGMarker.APP1 &&
+        _exifApp1 = Sections.Find(a => a.Marker == JPEGMarker.APP1 &&
                                       a.Header.Length >= 6 &&
                                       Encoding.ASCII.GetString(a.Header, 0, 6) == "Exif\0\0");
 
         // If there is no APP1 section, add a new one after the last APP0 section (if any).
-        if (exifApp1 == null)
+        if (_exifApp1 == null)
         {
             var insertionIndex = Sections.FindLastIndex(a => a.Marker == JPEGMarker.APP0);
             if (insertionIndex == -1)
@@ -530,8 +534,8 @@ internal class JPEGFile : ImageFile
             }
 
             insertionIndex++;
-            exifApp1 = new JPEGSection(JPEGMarker.APP1);
-            Sections.Insert(insertionIndex, exifApp1);
+            _exifApp1 = new JPEGSection(JPEGMarker.APP1);
+            Sections.Insert(insertionIndex, _exifApp1);
             if (BitConverterEx.SystemByteOrder == BitConverterEx.ByteOrder.LittleEndian)
             {
                 ByteOrder = BitConverterEx.ByteOrder.LittleEndian;
@@ -544,9 +548,9 @@ internal class JPEGFile : ImageFile
             return;
         }
 
-        var header = exifApp1.Header;
+        var header = _exifApp1.Header;
         var ifdqueue = new SortedList<int, IFD>();
-        makerNoteOffset = 0;
+        _makerNoteOffset = 0;
 
         // TIFF header
         var tiffoffset = 6;
@@ -579,14 +583,14 @@ internal class JPEGFile : ImageFile
         }
 
         // Offset to 0th IFD
-        var ifd0offset =
-            (int)BitConverterEx.ToUInt32(header, tiffoffset + 4, tiffByteOrder, BitConverterEx.SystemByteOrder);
+        var ifd0offset = (int)BitConverterEx.ToUInt32(header, tiffoffset + 4, tiffByteOrder, BitConverterEx.SystemByteOrder);
         ifdqueue.Add(ifd0offset, IFD.Zeroth);
 
         var conv = new BitConverterEx(ByteOrder, BitConverterEx.SystemByteOrder);
         var thumboffset = -1;
         var thumblength = 0;
         var thumbtype = -1;
+
         // Read IFDs
         while (ifdqueue.Count != 0)
         {
@@ -626,7 +630,7 @@ internal class JPEGFile : ImageFile
                 // Save the offset to maker note data
                 if (currentifd == IFD.EXIF && tag == 37500)
                 {
-                    makerNoteOffset = conv.ToUInt32(value, 0);
+                    _makerNoteOffset = conv.ToUInt32(value, 0);
                 }
 
                 // Calculate the bytes we need to read
@@ -676,6 +680,7 @@ internal class JPEGFile : ImageFile
                 if (currentifd == IFD.First && tag == 0x111)
                 {
                     thumbtype = 1;
+
                     // Offset to first strip
                     if (type == 3)
                     {
@@ -734,15 +739,17 @@ internal class JPEGFile : ImageFile
     private bool WriteExifApp1(bool preserveMakerNote)
     {
         // Zero out IFD field offsets. We will fill those as we write the IFD sections
-        exifIFDFieldOffset = 0;
-        gpsIFDFieldOffset = 0;
-        interopIFDFieldOffset = 0;
-        firstIFDFieldOffset = 0;
+        _exifIfdFieldOffset = 0;
+        _gpsIfdFieldOffset = 0;
+        _interopIfdFieldOffset = 0;
+        _firstIfdFieldOffset = 0;
+
         // We also do not know the location of the embedded thumbnail yet
-        thumbOffsetLocation = 0;
-        thumbOffsetValue = 0;
-        thumbSizeLocation = 0;
-        thumbSizeValue = 0;
+        _thumbOffsetLocation = 0;
+        _thumbOffsetValue = 0;
+        _thumbSizeLocation = 0;
+        _thumbSizeValue = 0;
+
         // Write thumbnail tags if they are missing, remove otherwise
         if (Thumbnail == null)
         {
@@ -843,10 +850,11 @@ internal class JPEGFile : ImageFile
         // TIFF header
         // Byte order
         var tiffoffset = ms.Position;
-        ms.Write(ByteOrder == BitConverterEx.ByteOrder.LittleEndian ? new byte[] {0x49, 0x49} : new byte[] {0x4D, 0x4D},
-            0, 2);
+        ms.Write(ByteOrder == BitConverterEx.ByteOrder.LittleEndian ? new byte[] { 0x49, 0x49 } : new byte[] { 0x4D, 0x4D }, 0, 2);
+
         // TIFF ID
         ms.Write(bceExif.GetBytes((ushort)42), 0, 2);
+
         // Offset to 0th IFD
         ms.Write(bceExif.GetBytes((uint)8), 0, 4);
 
@@ -862,57 +870,56 @@ internal class JPEGFile : ImageFile
         WriteIFD(ms, ifdfirst, IFD.First, tiffoffset, preserveMakerNote);
 
         // Now that we now the location of IFDs we can go back and write IFD offsets
-        if (exifIFDFieldOffset != 0)
+        if (_exifIfdFieldOffset != 0)
         {
-            ms.Seek(exifIFDFieldOffset, SeekOrigin.Begin);
+            ms.Seek(_exifIfdFieldOffset, SeekOrigin.Begin);
             ms.Write(bceExif.GetBytes(exififdrelativeoffset), 0, 4);
         }
 
-        if (gpsIFDFieldOffset != 0)
+        if (_gpsIfdFieldOffset != 0)
         {
-            ms.Seek(gpsIFDFieldOffset, SeekOrigin.Begin);
+            ms.Seek(_gpsIfdFieldOffset, SeekOrigin.Begin);
             ms.Write(bceExif.GetBytes(gpsifdrelativeoffset), 0, 4);
         }
 
-        if (interopIFDFieldOffset != 0)
+        if (_interopIfdFieldOffset != 0)
         {
-            ms.Seek(interopIFDFieldOffset, SeekOrigin.Begin);
+            ms.Seek(_interopIfdFieldOffset, SeekOrigin.Begin);
             ms.Write(bceExif.GetBytes(interopifdrelativeoffset), 0, 4);
         }
 
-        if (firstIFDFieldOffset != 0)
+        if (_firstIfdFieldOffset != 0)
         {
-            ms.Seek(firstIFDFieldOffset, SeekOrigin.Begin);
+            ms.Seek(_firstIfdFieldOffset, SeekOrigin.Begin);
             ms.Write(bceExif.GetBytes(firstifdrelativeoffset), 0, 4);
         }
 
         // We can write thumbnail location now
-        if (thumbOffsetLocation != 0)
+        if (_thumbOffsetLocation != 0)
         {
-            ms.Seek(thumbOffsetLocation, SeekOrigin.Begin);
-            ms.Write(bceExif.GetBytes(thumbOffsetValue), 0, 4);
+            ms.Seek(_thumbOffsetLocation, SeekOrigin.Begin);
+            ms.Write(bceExif.GetBytes(_thumbOffsetValue), 0, 4);
         }
 
-        if (thumbSizeLocation != 0)
+        if (_thumbSizeLocation != 0)
         {
-            ms.Seek(thumbSizeLocation, SeekOrigin.Begin);
-            ms.Write(bceExif.GetBytes(thumbSizeValue), 0, 4);
+            ms.Seek(_thumbSizeLocation, SeekOrigin.Begin);
+            ms.Write(bceExif.GetBytes(_thumbSizeValue), 0, 4);
         }
 
         ms.Close();
 
-        if (exifApp1 is not null)
+        if (_exifApp1 is not null)
         {
             // Return APP1 header
-            exifApp1.Header = ms.ToArray();
+            _exifApp1.Header = ms.ToArray();
             return true;
         }
 
         return false;
     }
 
-    private void WriteIFD(MemoryStream stream, Dictionary<ExifTag, ExifProperty> ifd, IFD ifdtype, long tiffoffset,
-        bool preserveMakerNote)
+    private void WriteIFD(MemoryStream stream, Dictionary<ExifTag, ExifProperty> ifd, IFD ifdtype, long tiffoffset, bool preserveMakerNote)
     {
         var conv = new BitConverterEx(BitConverterEx.SystemByteOrder, ByteOrder);
 
@@ -938,8 +945,10 @@ internal class JPEGFile : ImageFile
         var absolutedataoffset = stream.Position + (2 + (ifd.Count * 12) + 4);
 
         var makernotewritten = false;
+
         // Field count
         stream.Write(conv.GetBytes((ushort)ifd.Count), 0, 2);
+
         // Fields
         while (fieldqueue.Count != 0)
         {
@@ -950,12 +959,12 @@ internal class JPEGFile : ImageFile
 
             // Try to preserve the makernote data offset
             if (!makernotewritten &&
-                !makerNoteProcessed &&
-                makerNoteOffset != 0 &&
+                !_makerNoteProcessed &&
+                _makerNoteOffset != 0 &&
                 ifdtype == IFD.EXIF &&
                 field.Tag != ExifTag.MakerNote &&
                 interop.Data.Length > 4 &&
-                currentdataoffset + interop.Data.Length > makerNoteOffset &&
+                currentdataoffset + interop.Data.Length > _makerNoteOffset &&
                 ifd.ContainsKey(ExifTag.MakerNote))
             {
                 // Delay writing this field until we write the creator's note data
@@ -966,10 +975,11 @@ internal class JPEGFile : ImageFile
             if (field.Tag == ExifTag.MakerNote)
             {
                 makernotewritten = true;
+
                 // We may need to write filler bytes to preserve maker note offset
-                if (preserveMakerNote && !makerNoteProcessed && makerNoteOffset > currentdataoffset)
+                if (preserveMakerNote && !_makerNoteProcessed && _makerNoteOffset > currentdataoffset)
                 {
-                    fillerbytecount = makerNoteOffset - currentdataoffset;
+                    fillerbytecount = _makerNoteOffset - currentdataoffset;
                 }
                 else
                 {
@@ -979,10 +989,13 @@ internal class JPEGFile : ImageFile
 
             // Tag
             stream.Write(conv.GetBytes(interop.TagID), 0, 2);
+
             // Type
             stream.Write(conv.GetBytes(interop.TypeID), 0, 2);
+
             // Count
             stream.Write(conv.GetBytes(interop.Count), 0, 4);
+
             // Field data
             var data = interop.Data;
             if (ByteOrder != BitConverterEx.SystemByteOrder &&
@@ -1007,23 +1020,23 @@ internal class JPEGFile : ImageFile
             // Just store their offsets, we will write the values later on when we know the lengths of IFDs
             if (ifdtype == IFD.Zeroth && interop.TagID == 0x8769)
             {
-                exifIFDFieldOffset = stream.Position;
+                _exifIfdFieldOffset = stream.Position;
             }
             else if (ifdtype == IFD.Zeroth && interop.TagID == 0x8825)
             {
-                gpsIFDFieldOffset = stream.Position;
+                _gpsIfdFieldOffset = stream.Position;
             }
             else if (ifdtype == IFD.EXIF && interop.TagID == 0xa005)
             {
-                interopIFDFieldOffset = stream.Position;
+                _interopIfdFieldOffset = stream.Position;
             }
             else if (ifdtype == IFD.First && interop.TagID == 0x201)
             {
-                thumbOffsetLocation = stream.Position;
+                _thumbOffsetLocation = stream.Position;
             }
             else if (ifdtype == IFD.First && interop.TagID == 0x202)
             {
-                thumbSizeLocation = stream.Position;
+                _thumbSizeLocation = stream.Position;
             }
 
             // Write 4 byte field value or field data
@@ -1039,9 +1052,11 @@ internal class JPEGFile : ImageFile
             {
                 // Pointer to data area relative to TIFF header
                 stream.Write(conv.GetBytes(currentdataoffset + fillerbytecount), 0, 4);
+
                 // Actual data
                 var currentoffset = stream.Position;
                 stream.Seek(absolutedataoffset, SeekOrigin.Begin);
+
                 // Write filler bytes
                 for (var i = 0; i < fillerbytecount; i++)
                 {
@@ -1050,6 +1065,7 @@ internal class JPEGFile : ImageFile
 
                 stream.Write(data, 0, data.Length);
                 stream.Seek(currentoffset, SeekOrigin.Begin);
+
                 // Increment pointers
                 currentdataoffset += fillerbytecount + (uint)data.Length;
                 absolutedataoffset += fillerbytecount + data.Length;
@@ -1060,10 +1076,10 @@ internal class JPEGFile : ImageFile
         // We will write zeros for now. This will be filled after we write all IFDs
         if (ifdtype == IFD.Zeroth)
         {
-            firstIFDFieldOffset = stream.Position;
+            _firstIfdFieldOffset = stream.Position;
         }
 
-        stream.Write(new byte[] {0, 0, 0, 0}, 0, 4);
+        stream.Write(new byte[] { 0, 0, 0, 0 }, 0, 4);
 
         // Seek to end of IFD
         stream.Seek(absolutedataoffset, SeekOrigin.Begin);
@@ -1077,15 +1093,15 @@ internal class JPEGFile : ImageFile
                 Thumbnail.Save(ts);
                 ts.Close();
                 var thumb = ts.ToArray();
-                thumbOffsetValue = (uint)(stream.Position - tiffoffset);
-                thumbSizeValue = (uint)thumb.Length;
+                _thumbOffsetValue = (uint)(stream.Position - tiffoffset);
+                _thumbSizeValue = (uint)thumb.Length;
                 stream.Write(thumb, 0, thumb.Length);
                 ts.Dispose();
             }
             else
             {
-                thumbOffsetValue = 0;
-                thumbSizeValue = 0;
+                _thumbOffsetValue = 0;
+                _thumbSizeValue = 0;
             }
         }
     }

@@ -23,8 +23,7 @@ public interface IMembershipRoleService<out T>
 
     IEnumerable<T> GetMembersInRole(string roleName);
 
-    IEnumerable<T> FindMembersInRole(string roleName, string usernameToMatch,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+    IEnumerable<T> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
     bool DeleteRole(string roleName, bool throwIfBeingUsed);
 

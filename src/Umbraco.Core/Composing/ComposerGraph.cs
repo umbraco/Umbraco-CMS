@@ -315,7 +315,9 @@ internal class ComposerGraph
 
                     requirements[type]!.AddRange(implems);
                 }
-                else if (attr.Weak == false && throwOnMissing) // if explicitly set to !weak, is strong, else is weak
+
+                // if explicitly set to !weak, is strong, else is weak
+                else if (attr.Weak == false && throwOnMissing)
                 {
                     throw new Exception(
                         $"Broken composer dependency: {type.FullName} -> {attr.RequiredType.FullName}.");
@@ -335,7 +337,9 @@ internal class ComposerGraph
 
                     requirements[type]!.Add(attr.RequiredType);
                 }
-                else if (attr.Weak != true && throwOnMissing) // if not explicitly set to weak, is strong
+
+                // if not explicitly set to weak, is strong
+                else if (attr.Weak != true && throwOnMissing)
                 {
                     throw new Exception(
                         $"Broken composer dependency: {type.FullName} -> {attr.RequiredType.FullName}.");

@@ -16,8 +16,7 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// <param name="usernameToMatch"></param>
     /// <param name="matchType"></param>
     /// <returns></returns>
-    IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch,
-        StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+    IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
     /// <summary>
     ///     Get all members in a specific group

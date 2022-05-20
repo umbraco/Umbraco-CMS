@@ -111,8 +111,8 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         }
 
         if (payloads.Any(x => x.ItemType == typeof(IMemberType).Name))
-            // don't try to be clever - refresh all
         {
+            // don't try to be clever - refresh all
             MemberCacheRefresher.RefreshMemberTypes(AppCaches);
         }
 
@@ -123,7 +123,6 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         // now we can trigger the event
         base.Refresh(payloads);
     }
-
 
     public override void RefreshAll() => throw new NotSupportedException();
 

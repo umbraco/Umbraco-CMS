@@ -144,7 +144,8 @@ public static class DomainUtilities
         IReadOnlyCollection<DomainAndUri> considerForBaseDomains = domainsAndUris;
         if (cultureDomains != null)
         {
-            if (cultureDomains.Count == 1) // only 1, return
+            // only 1, return
+            if (cultureDomains.Count == 1)
             {
                 return cultureDomains.First();
             }
@@ -155,7 +156,9 @@ public static class DomainUtilities
 
         // look for domains that would be the base of the uri
         IReadOnlyCollection<DomainAndUri> baseDomains = SelectByBase(considerForBaseDomains, uri, culture);
-        if (baseDomains.Count > 0) // found, return
+
+        // found, return
+        if (baseDomains.Count > 0)
         {
             return baseDomains.First();
         }
@@ -351,7 +354,8 @@ public static class DomainUtilities
         string? defaultCulture)
     {
         // we try our best to match cultures, but may end with a bogus domain
-        if (culture != null) // try the supplied culture
+        // try the supplied culture
+        if (culture != null)
         {
             var cultureDomains = domainsAndUris.Where(x => x.Culture.InvariantEquals(culture)).ToList();
             if (cultureDomains.Count > 0)
@@ -360,7 +364,8 @@ public static class DomainUtilities
             }
         }
 
-        if (defaultCulture != null) // try the defaultCulture culture
+        // try the defaultCulture culture
+        if (defaultCulture != null)
         {
             var cultureDomains = domainsAndUris.Where(x => x.Culture.InvariantEquals(defaultCulture)).ToList();
             if (cultureDomains.Count > 0)
@@ -377,7 +382,8 @@ public static class DomainUtilities
         DomainAndUri? domainAndUri;
 
         // we try our best to match cultures, but may end with a bogus domain
-        if (culture != null) // try the supplied culture
+        // try the supplied culture
+        if (culture != null)
         {
             domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture));
             if (domainAndUri != null)
@@ -386,7 +392,8 @@ public static class DomainUtilities
             }
         }
 
-        if (defaultCulture != null) // try the defaultCulture culture
+        // try the defaultCulture culture
+        if (defaultCulture != null)
         {
             domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(defaultCulture));
             if (domainAndUri != null)

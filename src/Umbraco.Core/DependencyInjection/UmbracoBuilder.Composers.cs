@@ -17,8 +17,7 @@ public static partial class UmbracoBuilderExtensions
         IEnumerable<Attribute> enableDisable =
             builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
 
-        new ComposerGraph(builder, composerTypes, enableDisable,
-            builder.BuilderLoggerFactory.CreateLogger<ComposerGraph>()).Compose();
+        new ComposerGraph(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<ComposerGraph>()).Compose();
 
         return builder;
     }

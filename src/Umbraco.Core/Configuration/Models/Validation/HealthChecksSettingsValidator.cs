@@ -32,7 +32,8 @@ public class HealthChecksSettingsValidator : ConfigurationValidatorBase, IValida
     private bool ValidateNotificationFirstRunTime(string value, out string message) =>
         ValidateOptionalCronTab(
             $"{Constants.Configuration.ConfigHealthChecks}:{nameof(HealthChecksSettings.Notification)}:{nameof(HealthChecksSettings.Notification.FirstRunTime)}",
-            value, out message);
+            value,
+            out message);
 
     private bool ValidateOptionalCronTab(string configPath, string value, out string message)
     {

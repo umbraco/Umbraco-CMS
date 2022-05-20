@@ -525,7 +525,8 @@ public class NotificationService : INotificationService
                     @"<html><head>
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
-", createBody((user: mailingUser, body: bodyVars, true)));
+",
+                    createBody((user: mailingUser, body: bodyVars, true)));
         }
 
         // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here

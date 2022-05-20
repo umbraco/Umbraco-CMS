@@ -60,13 +60,13 @@ public sealed class
 
         // notify
         _publishedSnapshotService.Notify(payloads);
+
         // then trigger event
         base.Refresh(payloads);
     }
 
     // these events should never trigger
     // everything should be PAYLOAD/JSON
-
     public override void RefreshAll() => throw new NotSupportedException();
 
     public override void Refresh(int id) => throw new NotSupportedException();
