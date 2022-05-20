@@ -34,10 +34,14 @@ export class UmbInstallerDatabase extends LitElement {
     `,
   ];
 
-  options = ['SQLite', 'Microsoft SQL Server', 'Custom connection string'];
+  options = [
+    { name: 'SQLite', value: 'sqlite', selected: true },
+    { name: 'Microsoft SQL Server', value: 'msqls' },
+    { name: 'Custom connection string', value: 'custom' },
+  ];
 
   @state()
-  databaseType = 'SQLite';
+  databaseType = 'sqlite';
 
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
@@ -59,9 +63,9 @@ export class UmbInstallerDatabase extends LitElement {
 
   private _renderSettings() {
     switch (this.databaseType) {
-      case 'Microsoft SQL Server':
+      case 'msqls':
         return this._renderSqlServer();
-      case 'Custom connection string':
+      case 'custom':
         return this._renderCustom();
       default:
         return this._renderSQLite();
@@ -101,7 +105,7 @@ export class UmbInstallerDatabase extends LitElement {
         required
         required-message="Database name is required"></uui-input>
     </uui-form-layout-item>
-    <h4>Connection</h4>
+    <h4>Credentials</h4>
     <hr />
     <uui-form-layout-item>
       <uui-checkbox name="int-auth" label="int-auth">Use integrated authentication</uui-checkbox>
@@ -144,13 +148,7 @@ export class UmbInstallerDatabase extends LitElement {
         <form id="database-form" name="database" @submit="${this._handleSubmit}">
           <uui-form-layout-item>
             <uui-label for="database-type" slot="label" required>Database type</uui-label>
-            <uui-combobox value=${this.databaseType} @change=${this._handleDatabaseTypeChange}>
-              <uui-combobox-list>
-                ${this.options.map(
-                  (option) => html` <uui-combobox-list-option value=${option}>${option}</uui-combobox-list-option> `
-                )}
-              </uui-combobox-list>
-            </uui-combobox>
+            <uui-select .options=${this.options} @change=${this._handleDatabaseTypeChange}></uui-select>
           </uui-form-layout-item>
 
           ${this._renderSettings()}
