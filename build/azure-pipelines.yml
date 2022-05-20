@@ -95,7 +95,7 @@ stages:
                   }
                 }
 
-                dotnet pack --no-build --configuration $(buildConfiguration) umbraco.sln -o $(Build.ArtifactStagingDirectory)/nupkg
+                dotnet pack --configuration $(buildConfiguration) umbraco.sln -o $(Build.ArtifactStagingDirectory)/nupkg
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
