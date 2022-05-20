@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Blocks
 {
@@ -9,14 +10,41 @@ namespace Umbraco.Cms.Core.Models.Blocks
     /// </summary>
     public class BlockGridEditorDataConverter : BlockEditorDataConverter
     {
-        public BlockGridEditorDataConverter() : base(Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid)
+        private readonly IJsonSerializer _jsonSerializer;
+
+        public BlockGridEditorDataConverter(IJsonSerializer jsonSerializer) : base(Cms.Core.Constants.PropertyEditors.Aliases.BlockGrid)
         {
+            _jsonSerializer = jsonSerializer;
         }
 
         protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout)
         {
-            var blockListLayout = jsonLayout.ToObject<IEnumerable<BlockGridLayoutItem>>();
-            return blockListLayout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
+
+            var blockListLayouts = _jsonSerializer.Deserialize<BlockGridLayoutItem[]>(jsonLayout.ToString());
+
+            var result = new List<ContentAndSettingsReference>();
+
+            foreach (BlockGridLayoutItem blockGridLayoutItem in blockListLayouts)
+            {
+                AddToResult(blockGridLayoutItem, result);
+            }
+
+            return result;
+        }
+
+        private void AddToResult(BlockGridLayoutItem x, List<ContentAndSettingsReference> result)
+        {
+            if (x is null)
+            {
+                return;
+            }
+
+           result.Add(new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi));
+
+           foreach (var child in x.Areas.SelectMany(x=>x.Items))
+           {
+               AddToResult(child, result);
+           }
         }
     }
 }
