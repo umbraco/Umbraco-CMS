@@ -1,36 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers;
+
+public class AnalyticsController : UmbracoAuthorizedJsonController
 {
-    public class AnalyticsController : UmbracoAuthorizedJsonController
+    private readonly IMetricsConsentService _metricsConsentService;
+
+    public AnalyticsController(IMetricsConsentService metricsConsentService) =>
+        _metricsConsentService = metricsConsentService;
+
+    public TelemetryLevel GetConsentLevel() => _metricsConsentService.GetConsentLevel();
+
+    [HttpPost]
+    public IActionResult SetConsentLevel([FromBody] TelemetryResource telemetryResource)
     {
-        private readonly IMetricsConsentService _metricsConsentService;
-        public AnalyticsController(IMetricsConsentService metricsConsentService)
+        if (!ModelState.IsValid)
         {
-            _metricsConsentService = metricsConsentService;
+            return BadRequest();
         }
 
-        public TelemetryLevel GetConsentLevel()
-        {
-            return _metricsConsentService.GetConsentLevel();
-        }
-
-        [HttpPost]
-        public IActionResult SetConsentLevel([FromBody]TelemetryResource telemetryResource)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            _metricsConsentService.SetConsentLevel(telemetryResource.TelemetryLevel);
-            return Ok();
-        }
-
-        public IEnumerable<TelemetryLevel> GetAllLevels() => new[] { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
+        _metricsConsentService.SetConsentLevel(telemetryResource.TelemetryLevel);
+        return Ok();
     }
+
+    public IEnumerable<TelemetryLevel> GetAllLevels() =>
+        new[] {TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed};
 }

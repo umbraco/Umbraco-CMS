@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,130 +12,143 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees;
+
+// We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
+// dictionary items in templates, even when we dont have authorization to manage the dictionary items
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
+[PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
+[CoreTree]
+[Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
+public class DictionaryTreeController : TreeController
 {
+    private readonly ILocalizationService _localizationService;
+    private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
-    // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
-    // dictionary items in templates, even when we dont have authorization to manage the dictionary items
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessDictionaryOrTemplates)]
-    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
-    [CoreTree]
-    [Tree(Constants.Applications.Translation, Constants.Trees.Dictionary, TreeGroup = Constants.Trees.Groups.Settings)]
-    public class DictionaryTreeController : TreeController
+    public DictionaryTreeController(ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService,
+        IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection,
+        eventAggregator)
     {
-        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-        private readonly ILocalizationService _localizationService;
+        _menuItemCollectionFactory = menuItemCollectionFactory;
+        _localizationService = localizationService;
+    }
 
-        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
+    protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
+    {
+        ActionResult<TreeNode?> rootResult = base.CreateRootNode(queryStrings);
+        if (!(rootResult.Result is null))
         {
-            _menuItemCollectionFactory = menuItemCollectionFactory;
-            _localizationService = localizationService;
+            return rootResult;
         }
 
-        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
+        TreeNode? root = rootResult.Value;
+
+        // the default section is settings, falling back to this if we can't
+        // figure out where we are from the querystring parameters
+        var section = Constants.Applications.Translation;
+        if (!queryStrings["application"].ToString().IsNullOrWhiteSpace())
         {
-            var rootResult = base.CreateRootNode(queryStrings);
-            if (!(rootResult.Result is null))
-            {
-                return rootResult;
-            }
-            var root = rootResult.Value;
-
-            // the default section is settings, falling back to this if we can't
-            // figure out where we are from the querystring parameters
-            var section = Constants.Applications.Translation;
-            if (!queryStrings["application"].ToString().IsNullOrWhiteSpace())
-                section = queryStrings["application"];
-
-            if (root is not null)
-            {
-                // this will load in a custom UI instead of the dashboard for the root node
-                root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
-            }
-
-            return root;
+            section = queryStrings["application"];
         }
 
-        /// <summary>
-        /// The method called to render the contents of the tree structure
-        /// </summary>
-        /// <param name="id">The id of the tree item</param>
-        /// <param name="queryStrings">
-        /// All of the query string parameters passed from jsTree
-        /// </param>
-        /// <remarks>
-        /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
-        /// to the back end to be used in the query for model data.
-        /// </remarks>
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        if (root is not null)
         {
-            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
-            {
-                throw new InvalidOperationException("Id must be an integer");
-            }
+            // this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
+        }
 
-            var nodes = new TreeNodeCollection();
+        return root;
+    }
 
-            Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
+    /// <summary>
+    ///     The method called to render the contents of the tree structure
+    /// </summary>
+    /// <param name="id">The id of the tree item</param>
+    /// <param name="queryStrings">
+    ///     All of the query string parameters passed from jsTree
+    /// </param>
+    /// <remarks>
+    ///     We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom
+    ///     data from the front-end
+    ///     to the back end to be used in the query for model data.
+    /// </remarks>
+    protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+    {
+        if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+        {
+            throw new InvalidOperationException("Id must be an integer");
+        }
 
-            if (id == Constants.System.RootString)
-            {
-                nodes.AddRange(
-                    _localizationService.GetRootDictionaryItems()?.OrderBy(ItemSort()).Select(
-                        x => CreateTreeNode(
-                            x.Id.ToInvariantString(),
-                            id,
-                            queryStrings,
-                            x.ItemKey,
-                            Constants.Icons.Dictionary,
-                            _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ?? Enumerable.Empty<TreeNode>());
-            }
-            else
-            {
-                // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
-                var parentDictionary = _localizationService.GetDictionaryItemById(intId);
-                if (parentDictionary == null)
-                    return nodes;
+        var nodes = new TreeNodeCollection();
 
-                nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key)?.ToList().OrderBy(ItemSort()).Select(
+        Func<IDictionaryItem, string> ItemSort()
+        {
+            return item => item.ItemKey;
+        }
+
+        if (id == Constants.System.RootString)
+        {
+            nodes.AddRange(
+                _localizationService.GetRootDictionaryItems()?.OrderBy(ItemSort()).Select(
                     x => CreateTreeNode(
                         x.Id.ToInvariantString(),
                         id,
                         queryStrings,
                         x.ItemKey,
                         Constants.Icons.Dictionary,
-                        _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ?? Enumerable.Empty<TreeNode>());
-            }
-
-            return nodes;
+                        _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ??
+                Enumerable.Empty<TreeNode>());
         }
-
-        /// <summary>
-        /// Returns the menu structure for the node
-        /// </summary>
-        /// <param name="id">The id of the tree item</param>
-        /// <param name="queryStrings">
-        /// All of the query string parameters passed from jsTree
-        /// </param>
-        /// <returns></returns>
-        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
+        else
         {
-            var menu = _menuItemCollectionFactory.Create();
-
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-
-            if (id != Constants.System.RootString)
+            // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
+            IDictionaryItem? parentDictionary = _localizationService.GetDictionaryItemById(intId);
+            if (parentDictionary == null)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, true, opensDialog: true);
-                menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                return nodes;
             }
 
-
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
-
-            return menu;
+            nodes.AddRange(_localizationService.GetDictionaryItemChildren(parentDictionary.Key)?.ToList()
+                               .OrderBy(ItemSort()).Select(
+                                   x => CreateTreeNode(
+                                       x.Id.ToInvariantString(),
+                                       id,
+                                       queryStrings,
+                                       x.ItemKey,
+                                       Constants.Icons.Dictionary,
+                                       _localizationService.GetDictionaryItemChildren(x.Key)?.Any() ?? false)) ??
+                           Enumerable.Empty<TreeNode>());
         }
+
+        return nodes;
+    }
+
+    /// <summary>
+    ///     Returns the menu structure for the node
+    /// </summary>
+    /// <param name="id">The id of the tree item</param>
+    /// <param name="queryStrings">
+    ///     All of the query string parameters passed from jsTree
+    /// </param>
+    /// <returns></returns>
+    protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
+    {
+        MenuItemCollection menu = _menuItemCollectionFactory.Create();
+
+        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+
+        if (id != Constants.System.RootString)
+        {
+            menu.Items.Add<ActionDelete>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionMove>(LocalizedTextService, true, true);
+        }
+
+
+        menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
+        return menu;
     }
 }

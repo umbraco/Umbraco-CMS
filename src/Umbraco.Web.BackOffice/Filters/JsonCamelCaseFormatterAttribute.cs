@@ -6,41 +6,40 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Cms.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters;
+
+public class JsonCamelCaseFormatterAttribute : TypeFilterAttribute
 {
-    public class JsonCamelCaseFormatterAttribute : TypeFilterAttribute
+    public JsonCamelCaseFormatterAttribute() : base(typeof(JsonCamelCaseFormatterFilter)) =>
+        Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
+
+    private class JsonCamelCaseFormatterFilter : IResultFilter
     {
-        public JsonCamelCaseFormatterAttribute() : base(typeof(JsonCamelCaseFormatterFilter))
+        private readonly ArrayPool<char> _arrayPool;
+        private readonly MvcOptions _options;
+
+        public JsonCamelCaseFormatterFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
         {
-            Order = 2; //must be higher than AngularJsonOnlyConfigurationAttribute.Order
+            _arrayPool = arrayPool;
+            _options = options.Value;
         }
 
-        private class JsonCamelCaseFormatterFilter : IResultFilter
+        public void OnResultExecuted(ResultExecutedContext context)
         {
-            private readonly ArrayPool<char> _arrayPool;
-            private readonly MvcOptions _options;
+        }
 
-            public JsonCamelCaseFormatterFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
+        public void OnResultExecuting(ResultExecutingContext context)
+        {
+            if (context.Result is ObjectResult objectResult)
             {
-                _arrayPool = arrayPool;
-                _options = options.Value;
-            }
-            public void OnResultExecuted(ResultExecutedContext context)
-            {
-            }
-
-            public void OnResultExecuting(ResultExecutingContext context)
-            {
-                if (context.Result is ObjectResult objectResult)
+                var serializerSettings = new JsonSerializerSettings
                 {
-                    var serializerSettings = new JsonSerializerSettings()
-                    {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver()
-                    };
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                };
 
-                    objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
-                }
+                objectResult.Formatters.Clear();
+                objectResult.Formatters.Add(
+                    new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
             }
         }
     }
