@@ -265,7 +265,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
                     .Select(group =>
-                    {
+                    { 
                         var sqlClause = GetBaseQuery(false)
                             .Where<DictionaryDto>(x => x.Parent != null)
                             .WhereIn<DictionaryDto>(x => x.Parent, group);
@@ -283,6 +283,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (!parentId.HasValue)
             {
                 var sql = GetBaseQuery(false)
+                    .Where<DictionaryDto>(x => x.PrimaryKey > 0)
                     .OrderBy<DictionaryDto>(x => x.UniqueId);
                 return Database
                     .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
