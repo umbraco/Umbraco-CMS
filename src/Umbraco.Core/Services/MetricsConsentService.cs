@@ -10,12 +10,11 @@ namespace Umbraco.Cms.Core.Services;
 public class MetricsConsentService : IMetricsConsentService
 {
     internal const string Key = "UmbracoAnalyticsLevel";
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        private readonly IKeyValueService _keyValueService;
-        private readonly ILogger<MetricsConsentService> _logger;
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-        private readonly IUserService _userService;
+    private readonly IKeyValueService _keyValueService;
+    private readonly ILogger<MetricsConsentService> _logger;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IUserService _userService;
 
     // Scheduled for removal in V12
     [Obsolete("Please use the constructor that takes an ILogger and IBackOfficeSecurity instead")]
@@ -24,33 +23,35 @@ public class MetricsConsentService : IMetricsConsentService
             keyValueService,
             StaticServiceProvider.Instance.GetRequiredService<ILogger<MetricsConsentService>>(),
             StaticServiceProvider.Instance.GetRequiredService<IBackOfficeSecurityAccessor>(),
-    StaticServiceProvider.Instance.GetRequiredService<IUserService>()){
+            StaticServiceProvider.Instance.GetRequiredService<IUserService>())
+    {
     }
 
     // Scheduled for removal in V12
-        [Obsolete("Please use the constructor that takes an IUserService instead")]public MetricsConsentService(
+    [Obsolete("Please use the constructor that takes an IUserService instead")]
+    public MetricsConsentService(
         IKeyValueService keyValueService,
         ILogger<MetricsConsentService> logger,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-    : this(
+        : this(
             keyValueService,
             logger,
             backOfficeSecurityAccessor,
             StaticServiceProvider.Instance.GetRequiredService<IUserService>())
-        {
-        }
+    {
+    }
 
-        public MetricsConsentService(
-            IKeyValueService keyValueService,
-            ILogger<MetricsConsentService> logger,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IUserService userService
-            ){
+    public MetricsConsentService(
+        IKeyValueService keyValueService,
+        ILogger<MetricsConsentService> logger,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IUserService userService)
+    {
         _keyValueService = keyValueService;
         _logger = logger;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-    _userService = userService;
-        }
+        _userService = userService;
+    }
 
     public TelemetryLevel GetConsentLevel()
     {
@@ -69,9 +70,11 @@ public class MetricsConsentService : IMetricsConsentService
     {
         IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
         if (currentUser is null)
-            {
-                currentUser = _userService.GetUserById(Constants.Security.SuperUserId);
-            }_logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
+        {
+            currentUser = _userService.GetUserById(Constants.Security.SuperUserId);
+        }
+
+        _logger.LogInformation("Telemetry level set to {telemetryLevel} by {username}", telemetryLevel, currentUser?.Username);
         _keyValueService.SetValue(Key, telemetryLevel.ToString());
     }
 }

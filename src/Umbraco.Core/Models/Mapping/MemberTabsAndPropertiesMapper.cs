@@ -11,22 +11,21 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Models.Mapping;
 
 /// <summary>
-///     A custom tab/property resolver for members which will ensure that the built-in membership properties are or aren't
-///     displayed
-///     depending on if the member type has these properties
+/// A custom tab/property resolver for members which will ensure that the built-in membership properties are or aren't displayed
+/// depending on if the member type has these properties
 /// </summary>
 /// <remarks>
-///     This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
-///     an admin cannot actually set isLockedOut = true, they can only unlock.
+/// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
+/// an admin cannot actually set isLockedOut = true, they can only unlock.
 /// </remarks>
 public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
 {
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly ILocalizedTextService _localizedTextService;
+    private readonly IMemberTypeService _memberTypeService;
+    private readonly IMemberService _memberService;
     private readonly IMemberGroupService _memberGroupService;
     private readonly MemberPasswordConfigurationSettings _memberPasswordConfiguration;
-    private readonly IMemberService _memberService;
-    private readonly IMemberTypeService _memberTypeService;
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
     public MemberTabsAndPropertiesMapper(
@@ -41,8 +40,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         PropertyEditorCollection propertyEditorCollection)
         : base(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider)
     {
-        _backofficeSecurityAccessor = backofficeSecurityAccessor ??
-                                      throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+        _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
         _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
@@ -55,10 +53,12 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
     /// <remarks>Overridden to deal with custom member properties and permissions.</remarks>
     public override IEnumerable<Tab<ContentPropertyDisplay>> Map(IMember source, MapperContext context)
     {
+
         IMemberType? memberType = _memberTypeService.Get(source.ContentTypeId);
 
         if (memberType is not null)
         {
+
             IgnoreProperties = memberType.CompositionPropertyTypes
                 .Where(x => x.HasIdentity == false)
                 .Select(x => x.Alias)
@@ -70,151 +70,150 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         return resolved;
     }
 
-        [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
-        protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
+    [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
+    protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
+    {
+        var member = (IMember)content;
+        return MapMembershipProperties(member, null);
+    }
+
+    private Dictionary<string, object> GetPasswordConfig(IMember member)
+    {
+        var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
         {
-            var member = (IMember)content;
-            return MapMembershipProperties(member, null);
+            // the password change toggle will only be displayed if there is already a password assigned.
+            {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+        };
+
+        // This will always be true for members since we always want to allow admins to change a password - so long as that
+        // user has access to edit members (but that security is taken care of separately)
+        result["allowManuallyChangingPassword"] = true;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Overridden to assign the IsSensitive property values
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="properties"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
+    {
+        List<ContentPropertyDisplay> result = base.MapProperties(content, properties, context);
+        var member = (IMember)content;
+        IMemberType? memberType = _memberTypeService.Get(member.ContentTypeId);
+
+        // now update the IsSensitive value
+        foreach (ContentPropertyDisplay prop in result)
+        {
+            // check if this property is flagged as sensitive
+            var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
+            // check permissions for viewing sensitive data
+            if (isSensitiveProperty && _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false)
+            {
+                // mark this property as sensitive
+                prop.IsSensitive = true;
+                // mark this property as readonly so that it does not post any data
+                prop.Readonly = true;
+                // replace this editor with a sensitive value
+                prop.View = "sensitivevalue";
+                // clear the value
+                prop.Value = null;
+            }
         }
+        return result;
+    }
 
-        private Dictionary<string, object> GetPasswordConfig(IMember member)
+    /// <summary>
+    /// Returns the login property display field
+    /// </summary>
+    /// <param name="member"></param>
+    /// <param name="localizedText"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
+    /// the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not actually natively
+    /// allow that.
+    /// </remarks>
+    internal static ContentPropertyDisplay GetLoginProperty(IMember member, ILocalizedTextService localizedText)
+    {
+        var prop = new ContentPropertyDisplay
         {
-            var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
-                {
-                    // the password change toggle will only be displayed if there is already a password assigned.
-                    {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                };
+            Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
+            Label = localizedText.Localize(null,"login"),
+            Value = member.Username
+        };
 
-            // This will always be true for members since we always want to allow admins to change a password - so long as that
-            // user has access to edit members (but that security is taken care of separately)
-            result["allowManuallyChangingPassword"] = true;
+        prop.View = "textbox";
+        prop.Validation.Mandatory = true;
+        return prop;
+    }
 
+    internal IDictionary<string, bool> GetMemberGroupValue(string username)
+    {
+        IEnumerable<string> userRoles = _memberService.GetAllRoles(username);
+
+        // create a dictionary of all roles (except internal roles) + "false"
+        var result = _memberGroupService.GetAll()
+            .Select(x => x.Name!)
+            // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
+            .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(x => x, x => false);
+
+        // if user has no roles, just return the dictionary
+        if (userRoles == null)
+        {
             return result;
         }
 
-        /// <summary>
-        /// Overridden to assign the IsSensitive property values
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="properties"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
+        // else update the dictionary to "true" for the user roles (except internal roles)
+        foreach (var userRole in userRoles.Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
         {
-            var result = base.MapProperties(content, properties, context);
-            var member = (IMember)content;
-            var memberType = _memberTypeService.Get(member.ContentTypeId);
-
-            // now update the IsSensitive value
-            foreach (var prop in result)
-            {
-                // check if this property is flagged as sensitive
-                var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
-                // check permissions for viewing sensitive data
-                if (isSensitiveProperty && (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false))
-                {
-                    // mark this property as sensitive
-                    prop.IsSensitive = true;
-                    // mark this property as readonly so that it does not post any data
-                    prop.Readonly = true;
-                    // replace this editor with a sensitive value
-                    prop.View = "sensitivevalue";
-                    // clear the value
-                    prop.Value = null;
-                }
-            }
-            return result;
+            result[userRole] = true;
         }
 
-        /// <summary>
-        /// Returns the login property display field
-        /// </summary>
-        /// <param name="member"></param>
-        /// <param name="display"></param>
-        /// <param name="localizedText"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
-        /// the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not actually natively
-        /// allow that.
-        /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMember member, ILocalizedTextService localizedText)
+        return result;
+    }
+
+    public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext? context)
+    {
+        var properties = new List<ContentPropertyDisplay>
         {
-            var prop = new ContentPropertyDisplay
+            GetLoginProperty(member, _localizedTextService),
+            new()
             {
-                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-                Label = localizedText.Localize(null,"login"),
-                Value = member.Username
-            };
-
-            prop.View = "textbox";
-            prop.Validation.Mandatory = true;
-            return prop;
-        }
-
-        internal IDictionary<string, bool> GetMemberGroupValue(string username)
-        {
-            IEnumerable<string> userRoles = _memberService.GetAllRoles(username);
-
-            // create a dictionary of all roles (except internal roles) + "false"
-            var result = _memberGroupService.GetAll()
-                .Select(x => x.Name!)
-                // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
-                .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(x => x, x => false);
-
-            // if user has no roles, just return the dictionary
-            if (userRoles == null)
+                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
+                Label = _localizedTextService.Localize("general","email"),
+                Value = member.Email,
+                View = "email",
+                Validation = { Mandatory = true }
+            },
+            new()
             {
-                return result;
-            }
-
-            // else update the dictionary to "true" for the user roles (except internal roles)
-            foreach (var userRole in userRoles.Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
-            {
-                result[userRole] = true;
-            }
-
-            return result;
-        }
-
-        public IEnumerable<ContentPropertyDisplay> MapMembershipProperties(IMember member, MapperContext? context)
-        {
-            var properties = new List<ContentPropertyDisplay>
-            {
-                GetLoginProperty(member, _localizedTextService),
-                new()
+                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
+                Label = _localizedTextService.Localize(null,"password"),
+                Value = new Dictionary<string, object?>
                 {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
-                    Label = _localizedTextService.Localize("general","email"),
-                    Value = member.Email,
-                    View = "email",
-                    Validation = { Mandatory = true }
+                    // TODO: why ignoreCase, what are we doing here?!
+                    { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
                 },
-                new()
+                View = "changepassword",
+                Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
+            },
+            new()
+            {
+                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
+                Label = _localizedTextService.Localize("content","membergroup"),
+                Value = GetMemberGroupValue(member.Username),
+                View = "membergroups",
+                Config = new Dictionary<string, object>
                 {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
-                    Label = _localizedTextService.Localize(null,"password"),
-                    Value = new Dictionary<string, object?>
-                    {
-                        // TODO: why ignoreCase, what are we doing here?!
-                        { "newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) }
-                    },
-                    View = "changepassword",
-                    Config = GetPasswordConfig(member) // Initialize the dictionary with the configuration from the default membership provider
+                    { "IsRequired", true }
                 },
-                new()
-                {
-                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
-                    Label = _localizedTextService.Localize("content","membergroup"),
-                    Value = GetMemberGroupValue(member.Username),
-                    View = "membergroups",
-                    Config = new Dictionary<string, object>
-                    {
-                        { "IsRequired", true }
-                    },
-                },
+            },
 
             // These properties used to live on the member as property data, defaulting to sensitive, so we set them to sensitive here too
             new()
@@ -225,6 +224,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 View = "readonlyvalue",
                 IsSensitive = true,
             },
+
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
@@ -234,6 +234,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 IsSensitive = true,
                 Readonly = false,
             },
+
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
@@ -241,9 +242,9 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 Value = member.IsLockedOut,
                 View = "boolean",
                 IsSensitive = true,
-                Readonly = !member
-                    .IsLockedOut, // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
+                Readonly = !member.IsLockedOut, // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
             },
+
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate",
@@ -252,6 +253,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 View = "readonlyvalue",
                 IsSensitive = true,
             },
+
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate",
@@ -260,6 +262,7 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 View = "readonlyvalue",
                 IsSensitive = true,
             },
+
             new()
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate",
@@ -285,124 +288,5 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
         }
 
         return properties;
-    }
-
-    /// <summary>
-    ///     Returns the login property display field
-    /// </summary>
-    /// <param name="member"></param>
-    /// <param name="display"></param>
-    /// <param name="localizedText"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     If the membership provider installed is the umbraco membership provider, then we will allow changing the username,
-    ///     however if
-    ///     the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not
-    ///     actually natively
-    ///     allow that.
-    /// </remarks>
-    internal static ContentPropertyDisplay GetLoginProperty(IMember member, ILocalizedTextService localizedText)
-    {
-        var prop = new ContentPropertyDisplay
-        {
-            Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-            Label = localizedText.Localize(null, "login"),
-            Value = member.Username,
-        };
-
-        prop.View = "textbox";
-        prop.Validation.Mandatory = true;
-        return prop;
-    }
-
-    [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
-    protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
-    {
-        var member = (IMember)content;
-        return MapMembershipProperties(member, null);
-    }
-
-    /// <summary>
-    ///     Overridden to assign the IsSensitive property values
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="properties"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
-    {
-        List<ContentPropertyDisplay> result = base.MapProperties(content, properties, context);
-        var member = (IMember)content;
-        IMemberType? memberType = _memberTypeService.Get(member.ContentTypeId);
-
-        // now update the IsSensitive value
-        foreach (ContentPropertyDisplay prop in result)
-        {
-            // check if this property is flagged as sensitive
-            var isSensitiveProperty = memberType?.IsSensitiveProperty(prop.Alias) ?? false;
-
-            // check permissions for viewing sensitive data
-            if (isSensitiveProperty &&
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() == false)
-            {
-                // mark this property as sensitive
-                prop.IsSensitive = true;
-
-                // mark this property as readonly so that it does not post any data
-                prop.Readonly = true;
-
-                // replace this editor with a sensitive value
-                prop.View = "sensitivevalue";
-
-                // clear the value
-                prop.Value = null;
-            }
-        }
-
-        return result;
-    }
-
-    private Dictionary<string, object> GetPasswordConfig(IMember member)
-    {
-        var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
-        {
-            // the password change toggle will only be displayed if there is already a password assigned.
-            { "hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false },
-        };
-
-        // This will always be true for members since we always want to allow admins to change a password - so long as that
-        // user has access to edit members (but that security is taken care of separately)
-        result["allowManuallyChangingPassword"] = true;
-
-        return result;
-    }
-
-    internal IDictionary<string, bool> GetMemberGroupValue(string? username)
-    {
-        IEnumerable<string>? userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
-
-        // create a dictionary of all roles (except internal roles) + "false"
-        var result = _memberGroupService.GetAll()
-            .Select(x => x.Name!)
-
-            // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-            .Where(x => x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
-            .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(x => x, x => false);
-
-        // if user has no roles, just return the dictionary
-        if (userRoles == null)
-        {
-            return result;
-        }
-
-        // else update the dictionary to "true" for the user roles (except internal roles)
-        foreach (var userRole in userRoles.Where(x =>
-                     x?.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
-        {
-            result[userRole] = true;
-        }
-
-        return result;
     }
 }
