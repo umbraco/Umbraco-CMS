@@ -394,10 +394,11 @@ stages:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
               targetType: inline
               script: |
-                docker build -t $(dockerImageName) -f $(dockerfile) .
+                $sha = 'g$(Build.SourceVersion)'.substring(0, 8)
+                docker build -t $(dockerImageName):$sha -f $(dockerfile) .
                 mkdir -p $(Build.ArtifactStagingDirectory)/docker-images
-                docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).tar $(dockerImageName)
-                docker run --name $(dockerImageName) -dp 8080:5000 -e UMBRACO__CMS_GLOBAL__ID=$(UMBRACO__CMS_GLOBAL__ID) $(dockerImageName)
+                docker save -o $(Build.ArtifactStagingDirectory)/docker-images/$(dockerImageName).$sha.tar $(dockerImageName):$sha
+                docker run --name $(dockerImageName) -dp 8080:5000 -e UMBRACO__CMS_GLOBAL__ID=$(UMBRACO__CMS_GLOBAL__ID) $(dockerImageName):$sha
                 docker ps
           # Windows containers take forever.
           # --no-launch-profile stops ASPNETCORE_ENVIRONMENT=Development which breaks the users.ts tests (smtp config = invite user button)
