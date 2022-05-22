@@ -316,6 +316,7 @@ stages:
   - stage: E2E
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      CYPRESS_CACHE_FOLDER: $(Pipeline.Workspace)/cypress_binaries
     displayName: E2E Tests
     dependsOn: Build
     jobs:
@@ -347,10 +348,8 @@ stages:
               vmImage: 'ubuntu-latest'
               dockerfile: umbraco-linux.docker
               dockerImageName: umbraco-linux
-              cypressBinaries: "/home/vsts/.cache/Cypress"
             Windows:
               vmImage: 'windows-latest'
-              cypressBinaries: $(LOCALAPPDATA)/Cypress
         pool:
             vmImage: $(vmImage)
         steps:
@@ -371,6 +370,11 @@ stages:
                 "npm_e2e" | "$(Agent.OS)"
                 "npm_e2e"
               path: $(npm_config_cache)
+          - task: Cache@2
+            displayName: Cache cypress binaries
+            inputs:
+              key: '"cypress_binaries" | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
+              path: $(CYPRESS_CACHE_FOLDER)
           - task: PowerShell@2
             displayName: Generate Cypress.env.json
             inputs:
