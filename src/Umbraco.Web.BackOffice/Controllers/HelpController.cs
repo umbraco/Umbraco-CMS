@@ -22,12 +22,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILogger<HelpController> _logger;
         private HelpPageSettings? _helpPageSettings;
 
-        [Obsolete("Use constructor that takes IOptions<HelpPageSettings>")]
-        public HelpController(ILogger<HelpController> logger)
-            : this(logger, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<HelpPageSettings>>())
-        {
-        }
-
         [ActivatorUtilitiesConstructor]
         public HelpController(
             ILogger<HelpController> logger,

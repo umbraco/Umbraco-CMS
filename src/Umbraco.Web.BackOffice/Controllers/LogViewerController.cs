@@ -26,12 +26,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILogViewer _logViewer;
         private readonly ILogLevelLoader _logLevelLoader;
 
-        [Obsolete]
-        public LogViewerController(ILogViewer logViewer)
-            : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
-        {
-        }
-
         [ActivatorUtilitiesConstructor]
         public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
         {

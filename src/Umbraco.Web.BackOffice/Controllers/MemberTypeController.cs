@@ -178,18 +178,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return dto;
         }
 
-
-        /// <summary>
-        /// Returns all member types
-        /// </summary>
-        [Obsolete("Use MemberTypeQueryController.GetAllTypes instead as it only requires AuthorizationPolicies.TreeAccessMembersOrMemberTypes and not both this and AuthorizationPolicies.TreeAccessMemberTypes")]
-        [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
-        public IEnumerable<ContentTypeBasic> GetAllTypes()
-        {
-            return _memberTypeService.GetAll()
-                               .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>).WhereNotNull();
-        }
-
         public ActionResult<MemberTypeDisplay?> PostSave(MemberTypeSave contentTypeSave)
         {
             //get the persisted member type
