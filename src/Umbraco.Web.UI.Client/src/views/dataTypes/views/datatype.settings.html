@@ -8,7 +8,11 @@
 
                 <ng-form name="propertyEditorForm">
 
-                    <div ng-model="model.content.selectedEditor" name="selectedEditor" val-require-component>
+                    <div 
+                        ng-model="model.content.selectedEditor" 
+                        name="selectedEditor" 
+                        val-require-component
+                        class="umb-property-editor--limit-width">
 
                         <umb-button
                             ng-if="!model.content.selectedEditor"
@@ -35,7 +39,7 @@
                                 on-change="vm.openPropertyEditorPicker()">
                             </umb-node-preview>
 
-                            <div ng-if="vm.changePropertyEditorHelpTextIsVisible" class="mt2 umb-alert umb-alert--compact umb-alert--info" style="max-width: 800px;">
+                            <div ng-if="vm.changePropertyEditorHelpTextIsVisible" class="mt2 umb-alert umb-alert--info" style="max-width: 800px;">
                                 <localize key="editdatatype_canChangePropertyEditorHelp">
                                     Changing a property editor on a data type with a stored value is disabled.
                                 </localize>
