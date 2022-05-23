@@ -5,19 +5,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
-    /// Defines a content type that contains a history cleanup policy.
-    /// </summary>
-    [Obsolete("This will be merged into IContentType in Umbraco 10.")]
-    public interface IContentTypeWithHistoryCleanup : IContentType
-    {
-        /// <summary>
-        /// Gets or sets the history cleanup configuration.
-        /// </summary>
-        /// <value>The history cleanup configuration.</value>
-        HistoryCleanup? HistoryCleanup { get; set; }
-    }
-
-    /// <summary>
     ///     Defines a ContentType, which Content is based on
     /// </summary>
     public interface IContentType : IContentTypeComposition
@@ -70,5 +57,11 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="newAlias"></param>
         /// <returns></returns>
         IContentType DeepCloneWithResetIdentities(string newAlias);
+
+        /// <summary>
+        /// Gets or sets the history cleanup configuration.
+        /// </summary>
+        /// <value>The history cleanup configuration.</value>
+        HistoryCleanup? HistoryCleanup { get; set; }
     }
 }

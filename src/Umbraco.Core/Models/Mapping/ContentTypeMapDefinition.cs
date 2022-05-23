@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
 
-            if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
+            if (target is IContentType targetWithHistoryCleanup)
             {
                 MapHistoryCleanup(source, targetWithHistoryCleanup);
             }
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 : _fileService.GetTemplate(source.DefaultTemplate));
         }
 
-        private static void MapHistoryCleanup(DocumentTypeSave source, IContentTypeWithHistoryCleanup target)
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
         {
             // If source history cleanup is null we don't have to map all properties
             if (source.HistoryCleanup is null)
@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
-            if (source is IContentTypeWithHistoryCleanup sourceWithHistoryCleanup)
+            if (source is IContentType sourceWithHistoryCleanup)
             {
                 target.HistoryCleanup = new HistoryCleanupViewModel
                 {
