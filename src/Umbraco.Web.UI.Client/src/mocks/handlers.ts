@@ -14,21 +14,6 @@ export const handlers = [
           alias: 'My.Section.Custom',
           name: 'Custom',
           elementName: 'umb-custom-section'
-         },
-         {
-          type: 'propertyEditor',
-          alias: 'My.PropertyEditor.Custom',
-          name: 'Custom',
-          elementName: 'umb-custom-property-editor'
-         },
-         {
-          type: 'tree',
-          alias: 'My.Tree.Custom',
-          name: 'Custom',
-          elementName: 'umb-custom-tree',
-          meta: {
-            section: 'My.Section.Custom',
-          }
          }
         ]
       })
