@@ -26,20 +26,6 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         private readonly bool _metaTagOptionAvailable;
         private static HttpClient? s_httpClient;
 
-        [Obsolete("Use ctor without value.")]
-        protected BaseHttpHeaderCheck(
-            IHostingEnvironment hostingEnvironment,
-            ILocalizedTextService textService,
-            string header,
-            string value,
-            string localizedTextPrefix,
-            bool metaTagOptionAvailable) :this(hostingEnvironment, textService, header, localizedTextPrefix, metaTagOptionAvailable)
-        {
-
-        }
-
-        [Obsolete("Save ILocalizedTextService in a field on the super class instead of using this")]
-        protected ILocalizedTextService LocalizedTextService => _textService;
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseHttpHeaderCheck"/> class.
         /// </summary>
