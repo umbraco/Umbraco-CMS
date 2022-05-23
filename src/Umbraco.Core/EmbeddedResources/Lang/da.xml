@@ -1028,12 +1028,15 @@
     <key alias="resetPasswordEmailCopySubject">Umbraco: Nulstil adgangskode</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>Dit brugernavn til at logge på Umbraco backoffice er: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>her</strong></a> for at nulstille din adgangskode eller kopier/indsæt denne URL i din browser:</p><p><em>%1%</em></p>]]></key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Sikkerhedskode</key>
+    <key alias="mfaSecurityCodeMessage">Din sikkerhedskode er: %0%</key>
     <key alias="2faTitle">Sidste skridt</key>
-    <key alias="2faText">Det er påkrævet at du verificerer din identitet.</key>
-    <key alias="2faMultipleText">Vælg venligst en autentificeringsmetode</key>
+    <key alias="2faText">Det er påkrævet at du bekræfter din identitet.</key>
+    <key alias="2faMultipleText">Vælg venligst en godkendelsesmetode</key>
     <key alias="2faCodeInput">Kode</key>
-    <key alias="2faCodeInputHelp">Indtast venligst koden fra dit device</key>
-    <key alias="2faInvalidCode">Koden kunne ikke genkendes</key>
+    <key alias="2faCodeInputHelp">Indtast venligst bekræftelseskoden</key>
+    <key alias="2faInvalidCode">
+Ugyldig kode indtastet</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
