@@ -13,7 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {
-    public class ExternalLoginService : RepositoryService, IExternalLoginService, IExternalLoginWithKeyService
+    public class ExternalLoginService : RepositoryService, IExternalLoginWithKeyService
     {
         private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
 
