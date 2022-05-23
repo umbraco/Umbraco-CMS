@@ -1,4 +1,4 @@
-import { Observable, ReplaySubject } from "rxjs";
+import { Observable, ReplaySubject } from 'rxjs';
 
 export interface UmbRoute {
   path: string;
