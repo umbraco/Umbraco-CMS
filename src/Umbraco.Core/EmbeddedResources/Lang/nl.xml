@@ -1942,6 +1942,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     </key>
     <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
+    <key alias="configureTwoFactor">Configureer tweestapsverificatie</key>
     <key alias="change">Wijzig</key>
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>
