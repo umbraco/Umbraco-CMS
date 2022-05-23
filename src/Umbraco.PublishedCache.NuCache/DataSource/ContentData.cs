@@ -9,16 +9,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public class ContentData
     {
-        // Scheduled for removal in V11
-        [Obsolete("Use ctor with all params, as the pros should be immutable")]
-        public ContentData()
-        {
-            Name = string.Empty;
-            UrlSegment = string.Empty;
-            Properties = null!;
-            CultureInfos = null!;
-        }
-
         public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));

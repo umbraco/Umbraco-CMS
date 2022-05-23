@@ -16,14 +16,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         private readonly ILogLevelLoader _logLevelLoader;
         private readonly global::Serilog.ILogger _serilogLog;
 
-        [Obsolete("Please use ctor with all params instead. Scheduled for removal in V11.")]
-        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
-        {
-            _logViewerConfig = logViewerConfig;
-            _logLevelLoader = StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>();
-            _serilogLog = serilogLog;
-        }
-
         protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, global::Serilog.ILogger serilogLog)
         {
             _logViewerConfig = logViewerConfig;

@@ -30,15 +30,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             s_httpClient = new HttpClient();
         }
 
-        [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
-        public ReportSiteTask(
-            ILogger<ReportSiteTask> logger,
-            IUmbracoVersion umbracoVersion,
-            IOptions<GlobalSettings> globalSettings)
-            : this(logger, StaticServiceProvider.Instance.GetRequiredService<ITelemetryService>())
-        {
-        }
-
         /// <summary>
         /// Runs the background task to send the anonymous ID
         /// to telemetry service
