@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly Lazy<IMemberTypeService>? _memberTypeService;
         private readonly Lazy<IMemberGroupService>? _memberGroupService;
         private readonly Lazy<INotificationService>? _notificationService;
-        private readonly Lazy<IExternalLoginWithKeyService>? _externalLoginService;
+        private readonly Lazy<IExternalLoginService>? _externalLoginService;
         private readonly Lazy<IRedirectUrlService>? _redirectUrlService;
         private readonly Lazy<IConsentService>? _consentService;
         private readonly Lazy<IKeyValueService>? _keyValueService;
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceContext"/> class with lazy services.
         /// </summary>
-        public ServiceContext(Lazy<IPublicAccessService>? publicAccessService, Lazy<IDomainService>? domainService, Lazy<IAuditService>? auditService, Lazy<ILocalizedTextService>? localizedTextService, Lazy<ITagService>? tagService, Lazy<IContentService>? contentService, Lazy<IUserService>? userService, Lazy<IMemberService>? memberService, Lazy<IMediaService>? mediaService, Lazy<IContentTypeService>? contentTypeService, Lazy<IMediaTypeService>? mediaTypeService, Lazy<IDataTypeService>? dataTypeService, Lazy<IFileService>? fileService, Lazy<ILocalizationService>? localizationService, Lazy<IPackagingService>? packagingService, Lazy<IServerRegistrationService>? serverRegistrationService, Lazy<IEntityService>? entityService, Lazy<IRelationService>? relationService, Lazy<IMacroService>? macroService, Lazy<IMemberTypeService>? memberTypeService, Lazy<IMemberGroupService>? memberGroupService, Lazy<INotificationService>? notificationService, Lazy<IExternalLoginWithKeyService>? externalLoginService, Lazy<IRedirectUrlService>? redirectUrlService, Lazy<IConsentService>? consentService, Lazy<IKeyValueService>? keyValueService, Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
+        public ServiceContext(Lazy<IPublicAccessService>? publicAccessService, Lazy<IDomainService>? domainService, Lazy<IAuditService>? auditService, Lazy<ILocalizedTextService>? localizedTextService, Lazy<ITagService>? tagService, Lazy<IContentService>? contentService, Lazy<IUserService>? userService, Lazy<IMemberService>? memberService, Lazy<IMediaService>? mediaService, Lazy<IContentTypeService>? contentTypeService, Lazy<IMediaTypeService>? mediaTypeService, Lazy<IDataTypeService>? dataTypeService, Lazy<IFileService>? fileService, Lazy<ILocalizationService>? localizationService, Lazy<IPackagingService>? packagingService, Lazy<IServerRegistrationService>? serverRegistrationService, Lazy<IEntityService>? entityService, Lazy<IRelationService>? relationService, Lazy<IMacroService>? macroService, Lazy<IMemberTypeService>? memberTypeService, Lazy<IMemberGroupService>? memberGroupService, Lazy<INotificationService>? notificationService, Lazy<IExternalLoginService>? externalLoginService, Lazy<IRedirectUrlService>? redirectUrlService, Lazy<IConsentService>? consentService, Lazy<IKeyValueService>? keyValueService, Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
         {
             _publicAccessService = publicAccessService;
             _domainService = domainService;
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Services
             IDomainService? domainService = null,
             IMacroService? macroService = null,
             IPublicAccessService? publicAccessService = null,
-            IExternalLoginWithKeyService? externalLoginService = null,
+            IExternalLoginService? externalLoginService = null,
             IServerRegistrationService? serverRegistrationService = null,
             IRedirectUrlService? redirectUrlService = null,
             IConsentService? consentService = null,
@@ -250,7 +250,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the ExternalLoginService.
         /// </summary>
-        public IExternalLoginWithKeyService? ExternalLoginService => _externalLoginService?.Value;
+        public IExternalLoginService? ExternalLoginService => _externalLoginService?.Value;
 
         /// <summary>
         /// Gets the RedirectUrlService.

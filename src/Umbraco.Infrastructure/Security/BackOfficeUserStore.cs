@@ -89,6 +89,30 @@ namespace Umbraco.Cms.Core.Security
 
         }
 
+        [Obsolete("Use non obsolete ctor")]
+        public BackOfficeUserStore(
+            ICoreScopeProvider scopeProvider,
+            IUserService userService,
+            IEntityService entityService,
+            IExternalLoginService externalLoginService,
+            IOptions<GlobalSettings> globalSettings,
+            IUmbracoMapper mapper,
+            BackOfficeErrorDescriber describer,
+            AppCaches appCaches)
+            : this(
+                scopeProvider,
+                userService,
+                entityService,
+                StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
+                mapper,
+                describer,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+        {
+
+        }
+
         /// <inheritdoc />
         public override async Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user,
             CancellationToken cancellationToken = default(CancellationToken))
