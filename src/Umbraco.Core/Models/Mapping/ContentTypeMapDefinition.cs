@@ -37,20 +37,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly IShortStringHelper _shortStringHelper;
         private ContentSettings _contentSettings;
 
-
-        [Obsolete("Use ctor with all params injected")]
-        public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService, IFileService fileService,
-            IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
-            IMemberTypeService memberTypeService,
-            ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment)
-            : this(commonMapper, propertyEditors, dataTypeService, fileService, contentTypeService, mediaTypeService,
-                memberTypeService, loggerFactory, shortStringHelper, globalSettings, hostingEnvironment,
-                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-        {
-        }
-
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
