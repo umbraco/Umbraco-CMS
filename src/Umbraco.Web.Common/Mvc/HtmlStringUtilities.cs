@@ -89,7 +89,7 @@ public sealed class HtmlStringUtilities
         return sb.ToString();
     }
 
-    public string Coalesce(params object[] args)
+    public string Coalesce(params object?[] args)
     {
         var arg = args
             .Select(x => x?.ToString())
