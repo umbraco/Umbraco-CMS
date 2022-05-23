@@ -1035,8 +1035,7 @@
     <key alias="2faMultipleText">Vælg venligst en godkendelsesmetode</key>
     <key alias="2faCodeInput">Kode</key>
     <key alias="2faCodeInputHelp">Indtast venligst bekræftelseskoden</key>
-    <key alias="2faInvalidCode">
-Ugyldig kode indtastet</key>
+    <key alias="2faInvalidCode">Ugyldig kode indtastet</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
