@@ -14,13 +14,6 @@ namespace Umbraco.Cms.Core.IO
         private readonly IFileSystem _viewFileSystem;
         private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
-        [Obsolete("Use ctor with all params")]
-        public ViewHelper(IFileSystem viewFileSystem)
-        {
-            _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
-            _defaultViewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
-        }
-
         public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
         {
             _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
@@ -66,15 +59,6 @@ namespace Umbraco.Cms.Core.IO
             }
 
             return viewContent;
-        }
-
-        [Obsolete("Inject IDefaultViewContentProvider instead")]
-        public static string GetDefaultFileContent(string? layoutPageAlias = null, string? modelClassName = null,
-            string? modelNamespace = null, string? modelNamespaceAlias = null)
-        {
-            var viewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
-            return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
-                modelNamespaceAlias);
         }
 
         private string SaveTemplateToFile(ITemplate template)
