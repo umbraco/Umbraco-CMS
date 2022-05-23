@@ -1,7 +1,7 @@
-import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export type UmbExtensionType = 'startUp' | 'section' | 'tree' | 'propertyEditor';
+// TODO: how do we want to type extensions?
+export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditor';
 
 export interface UmbExtensionManifest<Meta> {
   type: UmbExtensionType;
@@ -13,11 +13,6 @@ export interface UmbExtensionManifest<Meta> {
 }
 
 export interface UmbManifestSectionMeta {
-  weight: number;
-}
-
-export interface UmbManifestTreeMeta {
-  section: string;
   weight: number;
 }
 
