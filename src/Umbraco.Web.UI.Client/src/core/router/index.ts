@@ -23,11 +23,10 @@ export class UmbRouter {
 
     // Anchor Hijacker
     this._host.addEventListener('click', async (event: any) => {
-      event.preventDefault();
-
       const target = event.composedPath()[0];
       const href = target.href;
       if (!href) return;
+      event.preventDefault();
 
       const url = new URL(href);
       const pathname = url.pathname;
