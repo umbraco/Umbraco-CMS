@@ -56,16 +56,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             return _logLevelLoader.GetLogLevelsFromSinks();
         }
 
-        /// <summary>
-        /// Get the Serilog minimum-level value from the config file.
-        /// </summary>
-        [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead. Scheduled for removal in V11.")]
-        public string GetLogLevel()
-        {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
-            return logLevel?.ToString() ?? string.Empty;
-        }
-
         public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)
         {
             var counter = new CountingFilter();

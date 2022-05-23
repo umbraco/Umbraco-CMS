@@ -43,23 +43,6 @@ namespace Umbraco.Cms.Core.Services
             _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x =>x.ProviderName);
         }
 
-        [Obsolete("Use ctor with all params - This will be removed in v11")]
-        public TwoFactorLoginService(
-            ITwoFactorLoginRepository twoFactorLoginRepository,
-            ICoreScopeProvider scopeProvider,
-            IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
-            IOptions<IdentityOptions> identityOptions,
-            IOptions<BackOfficeIdentityOptions> backOfficeIdentityOptions)
-        : this(twoFactorLoginRepository,
-            scopeProvider,
-            twoFactorSetupGenerators,
-            identityOptions,
-            backOfficeIdentityOptions,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<TwoFactorLoginService>>())
-        {
-
-        }
-
         /// <inheritdoc />
         public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
         {

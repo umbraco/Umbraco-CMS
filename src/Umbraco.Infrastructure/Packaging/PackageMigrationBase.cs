@@ -42,28 +42,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _packageMigrationsSettings = packageMigrationsSettings;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor with all params")]
-        public PackageMigrationBase(
-            IPackagingService packagingService,
-            IMediaService mediaService,
-            MediaFileManager mediaFileManager,
-            MediaUrlGeneratorCollection mediaUrlGenerators,
-            IShortStringHelper shortStringHelper,
-            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context)
-            : this(
-                packagingService,
-                mediaService,
-                mediaFileManager,
-                mediaUrlGenerators,
-                shortStringHelper,
-                contentTypeBaseServiceProvider,
-                context,
-                StaticServiceProvider.Instance.GetRequiredService<IOptions<PackageMigrationSettings>>())
-        {
-        }
-
         public IImportPackageBuilder ImportPackage => BeginBuild(
             new ImportPackageBuilder(
                 _packagingService,
