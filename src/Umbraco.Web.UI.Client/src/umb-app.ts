@@ -84,7 +84,6 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
 
   render() {
     return html`
-      <umb-backoffice></umb-backoffice>
       <div id="outlet"></div>
     `;
   }

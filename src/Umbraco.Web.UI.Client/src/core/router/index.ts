@@ -115,7 +115,7 @@ export class UmbRouter {
     if (!canEnter) return;
 
     window.history.pushState(null, '', pathname);
-    //this._render();
+    this._render();
   }
 
   private _resolve(pathname: string): UmbRouteLocation | null {

@@ -32,31 +32,29 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Content',
       name: 'Content',
       elementName: 'umb-content-section',
+      meta: {}
     },
     {
       type: 'section',
       alias: 'Umb.Section.Media',
       name: 'Media',
       elementName: 'umb-media-section',
+      meta: {}
     },
     {
       type: 'section',
       alias: 'Umb.Section.Members',
       name: 'Members',
       elementName: 'umb-members-section',
+      meta: {}
     },
     {
       type: 'section',
       alias: 'Umb.Section.Settings',
       name: 'Settings',
       elementName: 'umb-settings-section',
-    },
-    {
-      type: 'section',
-      alias: 'Umb.Section.Packages',
-      name: 'Packages',
-      elementName: 'umb-packages-section',
-    },
+      meta: {}
+    }
   ];
   manifests.forEach((manifest: UmbExtensionManifest<unknown>) => extensionRegistry.register(manifest));
 }
