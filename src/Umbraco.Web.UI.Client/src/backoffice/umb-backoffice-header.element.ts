@@ -1,11 +1,16 @@
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { getUserSections } from '../api/fetcher';
+import { UmbContextInjectMixin } from '../core/context';
+import { UmbExtensionManifest, UmbExtensionRegistry, UmbManifestSectionMeta } from '../core/extension';
+import { UmbRouter } from '../core/router';
 
 @customElement('umb-backoffice-header')
-export class UmbBackofficeHeader extends LitElement {
+export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
@@ -74,54 +79,34 @@ export class UmbBackofficeHeader extends LitElement {
   @state()
   private _open = false;
 
-  // TODO: these should come from all registered sections
   @state()
-  private _sections: Array<any> = [
-    {
-      type: 'section',
-      alias: 'Umb.Section.Content',
-      name: 'Content',
-    },
-    {
-      type: 'section',
-      alias: 'Umb.Section.Media',
-      name: 'Media',
-    },
-    {
-      type: 'section',
-      alias: 'Umb.Section.Members',
-      name: 'Members',
-    },
-    {
-      type: 'section',
-      alias: 'Umb.Section.Settings',
-      name: 'Settings',
-    },
-    {
-      type: 'section',
-      alias: 'Umb.Section.Packages',
-      name: 'Packages',
-    },
-  ];
+  private _availableSections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
 
   @state()
-  private _activeSection: string = this._sections[0];
+  private _allowedSection: Array<string> = [];
 
   @state()
-  private _availableSections: string[] = [];
+  private _sections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
 
   @state()
-  private _visibleSections: Array<string> = [];
+  private _visibleSections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
 
   @state()
-  private _extraSections: Array<string> = [];
+  private _extraSections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
+
+  @state()
+  private _activeSection = '';
+
+  private _router?: UmbRouter;
+  private _extensionRegistry?: UmbExtensionRegistry;
+  private _subscription?: Subscription;
 
   private _handleMore(e: MouseEvent) {
     e.stopPropagation();
     this._open = !this._open;
   }
 
-  private _handleTabClick(e: MouseEvent) {
+  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifest<UmbManifestSectionMeta>) {
     const tab = e.currentTarget as any;
 
     // TODO: we need to be able to prevent the tab from setting the active state
@@ -129,7 +114,9 @@ export class UmbBackofficeHeader extends LitElement {
       return;
     }
 
-    this._activeSection = tab.label;
+    // TODO: this could maybe be handled by an anchor tag
+    this._router?.push(`/section/${section.name}`);
+    this._activeSection = section.alias;
   }
 
   private _handleLabelClick(e: MouseEvent) {
@@ -146,12 +133,38 @@ export class UmbBackofficeHeader extends LitElement {
     super.connectedCallback();
 
     const { data } = await getUserSections({});
+    this._allowedSection = data.sections;
 
-    this._availableSections = data.sections;
-    this._visibleSections = this._sections
-      .filter((section) => this._availableSections.includes(section.alias))
-      .map((section) => section.name);
-    this._activeSection = this._visibleSections?.[0];
+    this.requestContext('umbRouter');
+    this.requestContext('umbExtensionRegistry');
+  }
+
+  contextInjected(contexts: Map<string, any>): void {
+    if (contexts.has('umbExtensionRegistry')) {
+      this._extensionRegistry = contexts.get('umbExtensionRegistry');
+      this._useSections();
+    }
+
+    if (contexts.has('umbRouter')) {
+      this._router = contexts.get('umbRouter');
+    }
+  }
+
+  private _useSections() {
+    this._subscription?.unsubscribe();
+
+    this._subscription = this._extensionRegistry?.extensions
+      .pipe(
+        map((extensions: Array<UmbExtensionManifest<unknown>>) =>
+        extensions.filter(extension => extension.type === 'section')
+      ))
+      .subscribe((sectionExtensions: any) => {
+        this._availableSections = [...sectionExtensions];
+        this._sections = this._availableSections.filter((section) => this._allowedSection.includes(section.alias));
+        // TODO: implement resize observer
+        this._visibleSections = this._sections;
+        this._activeSection = this._visibleSections?.[0].alias;
+      });
   }
 
   private _renderExtraSections() {
@@ -168,8 +181,8 @@ export class UmbBackofficeHeader extends LitElement {
               ${this._extraSections.map(
                 (section) => html`
                   <uui-menu-item
-                    ?active="${this._activeSection === section}"
-                    label="${section}"
+                    ?active="${this._activeSection === section.alias}"
+                    label="${section.name}"
                     @click-label="${this._handleLabelClick}"></uui-menu-item>
                 `
               )}
@@ -192,9 +205,9 @@ export class UmbBackofficeHeader extends LitElement {
             ${this._visibleSections.map(
               (section) => html`
                 <uui-tab
-                  ?active="${this._activeSection === section}"
-                  label="${section}"
-                  @click="${this._handleTabClick}"></uui-tab>
+                  ?active="${this._activeSection === section.alias}"
+                  label="${section.name}"
+                  @click="${(e: PointerEvent) => this._handleTabClick(e, section)}"></uui-tab>
               `
             )}
             ${this._renderExtraSections()}

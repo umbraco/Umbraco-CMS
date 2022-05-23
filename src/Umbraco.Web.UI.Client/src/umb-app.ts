@@ -10,7 +10,6 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { getInitStatus } from './api/fetcher';
 import { UmbRoute, UmbRouter } from './core/router';
-import { worker } from './mocks/browser';
 import { UmbContextProvideMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
@@ -47,8 +46,12 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
 
   constructor() {
     super();
-    worker.start();
     this._authorized = sessionStorage.getItem('is-authenticated') === 'true';
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.provide('umbExtensionRegistry', window.Umbraco.extensionRegistry);
   }
 
   protected async firstUpdated(): Promise<void> {
@@ -80,7 +83,9 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
   }
 
   render() {
-    return html`<div id="outlet"></div>`;
+    return html`
+      <div id="outlet"></div>
+    `;
   }
 }
 
