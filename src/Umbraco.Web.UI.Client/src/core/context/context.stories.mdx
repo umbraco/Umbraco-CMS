@@ -1,0 +1,147 @@
+
+# Context API
+
+In order to provide contextual shared logic or data we have established asystem called Context API. 
+
+This system is based on the **Provider Pattern**, This is an event-based protocol that components can use to retrieve data from any location in the DOM.
+
+This consists of a provider and a requester:
+
+**Context Requester**
+* A component requiring some data fires a ```umb:context-request``` event.
+* The event carries a context value that denotes the data requested and a callback which will receive the data.
+* Providers can attach event listeners for ```umb:context-request``` events to handle them and provide the requested data.
+* Once a provider satisfies a request it calls stopPropagation() on the event.
+
+**Context Provider**
+* New providers fires a ```umb:context-provide``` event.
+* Components can attach event listerners for ```umb:context-provide``` events to handle them and request a new context.
+* If the new provider is within the components dom tree a context request will be handled as above.
+
+## Usage
+
+### Provide context
+
+For other components to consume a context we need to provide it from a parent component. The ContextProviderMixin is a helper to provide context from an element.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UMBContextMixin } from './utils/context';
+import { UMBNotificationService } from './shell/shared/notification';
+
+class UMBAppElement extends UMBContextMixin(LitElement) {
+
+  notificationService: UMBNotificationService = new UMBNotificationService();
+
+  constructor () {
+    super();
+    this.provide('umbNotificationService', notificationService);
+  }
+
+  render() {
+    return html`<slot></slot>`;
+  }
+}
+```
+
+### Request context
+
+Contexts shared through the Context API are async. To request a new context send a context request using the ```requestContext``` method from the ```UMBContextRequesterMixin```.
+When a context is resolved the ```contextRecieved``` callback is called with all resolved contexts for that component.
+Until a requested context is resolved you should make sure to disable any functionality using that context.
+
+```ts
+import { html, LitElement } from 'lit';
+import type { UMBNotificationService } from './shell/shared/notification';
+import { UMBContextRequesterMixin } from './utils/context';
+
+class MyElement extends UMBContextRequesterMixin(LitElement) {
+
+  private _notificationService: UMBNotificationService;
+
+  constructor () {
+    super();
+    this.requestContext('umbNotificationService');
+  }
+
+  contextRecieved(identifier, api) {
+    if(identifier = 'umbNotificationService') {
+      this._notificationService = api;
+    }
+  }
+
+  private _handleClick () {
+    const data: UMBNotificationDefaultData = { message: 'Notification message' };
+    this._notificationService?.peek('positive', { data });
+  }
+
+  render() {
+    return html`<button @click="${this._handleClick}">Open Notification</button>`;
+  }
+}
+```
+
+## Using the context classes directly
+
+The following examples shows how to use the Context classes directly.
+
+### ContextProvider class
+
+This example shows how to use the ContextProvider class directly.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UMBContextProvider } from './utils/context';
+import { UMBNotificationService } from './notification.service';
+
+class UMBAppElement extends LitElement {
+
+  notificationService: UMVNotificationService = new UMBNotificationService();
+  private _notificationProvider = new UMBContextProvider(this, 'umbNotificationService', this.notificationService);
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._notificationProvider.attach();
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._notificationProvider.detach();
+  }
+
+  render() {
+    return html`<slot></slot>`;
+  }
+}
+```
+
+### ContextRequester class
+
+This example shows how to use the ContextRequester class directly.
+
+```ts
+import { html, LitElement } from 'lit';
+import { UMBNotificationService } from './notification.service';
+import { UMBContextRequester } from './utils/context';
+
+class MyElement extends LitElement {
+
+  private _notificationService: UMBNotificationService;
+  
+  connectedCallback(): void {
+    super.connectedCallback();
+
+    new UMBContextRequester(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
+      this._notificationService = _instance;
+    });
+  }
+
+  private _handleClick () {
+    this._notificationService?.positive({ title: 'Notification title' });
+  }
+
+  render() {
+    return html`<button @click="${this._handleClick}">Open Notification</button>`;
+  }
+}
+```
