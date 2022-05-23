@@ -24,18 +24,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        [Obsolete("Use method that takes guid as param")]
-        public void DeleteUserLogins(int memberId) => DeleteUserLogins(memberId.ToGuid());
-
-        /// <inheritdoc />
-        [Obsolete("Use method that takes guid as param")]
-        public void Save(int userId, IEnumerable<IExternalLogin> logins) => Save(userId.ToGuid(), logins);
-
-        /// <inheritdoc />
-        [Obsolete("Use method that takes guid as param")]
-        public void Save(int userId, IEnumerable<IExternalLoginToken> tokens) => Save(userId.ToGuid(), tokens);
-
-        /// <inheritdoc />
         public void DeleteUserLogins(Guid userOrMemberKey) => Database.Delete<ExternalLoginDto>("WHERE userOrMemberKey=@userOrMemberKey", new { userOrMemberKey });
 
         /// <inheritdoc />
