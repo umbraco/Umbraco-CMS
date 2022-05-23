@@ -73,13 +73,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return resolved;
         }
 
-        [Obsolete("Use MapMembershipProperties. Will be removed in Umbraco 10.")]
-        protected override IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
-        {
-            var member = (IMember)content;
-            return MapMembershipProperties(member, null);
-        }
-
         private Dictionary<string, object> GetPasswordConfig(IMember member)
         {
             var result = new Dictionary<string, object>(_memberPasswordConfiguration.GetConfiguration(true))
