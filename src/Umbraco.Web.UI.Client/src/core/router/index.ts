@@ -1,3 +1,5 @@
+import { Observable, ReplaySubject } from "rxjs";
+
 export interface UmbRoute {
   path: string;
   elementName: string;
@@ -16,6 +18,9 @@ export class UmbRouter {
   private _host: HTMLElement;
   private _outlet: HTMLElement;
   private _element: any;
+
+  private _location: ReplaySubject<UmbRouteLocation> = new ReplaySubject(1);
+  public readonly location: Observable<UmbRouteLocation> = this._location.asObservable();
 
   constructor(host: HTMLElement, outlet: HTMLElement) {
     this._host = host;
@@ -114,6 +119,8 @@ export class UmbRouter {
     if (!canEnter) return;
 
     window.history.pushState(null, '', pathname);
+
+    this._location.next(location);
     this._render();
   }
 

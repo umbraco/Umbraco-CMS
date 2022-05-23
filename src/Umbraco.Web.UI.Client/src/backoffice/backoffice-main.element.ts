@@ -80,9 +80,7 @@ export class UmbBackofficeMain extends LitElement {
             <uui-tab disabled>Actions</uui-tab>
           </uui-tab-group>
         </div>
-        <uui-scroll-container id="editor-content">
-          <!-- CONTENT GOES HERE -->
-        </uui-scroll-container>
+        <uui-scroll-container id="editor-content"></uui-scroll-container>
         <div id="editor-bottom">
           <uui-button>Save and preview</uui-button>
           <uui-button look="secondary">Save</uui-button>
