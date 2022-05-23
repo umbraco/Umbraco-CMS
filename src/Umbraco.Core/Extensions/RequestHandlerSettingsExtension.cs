@@ -32,26 +32,6 @@ namespace Umbraco.Extensions
             return MergeUnique(requestHandlerSettings.UserDefinedCharCollection, RequestHandlerSettings.DefaultCharCollection);
         }
 
-        /// <summary>
-        /// Merges CharCollection and UserDefinedCharCollection, prioritizing UserDefinedCharCollection
-        /// </summary>
-        internal static void MergeReplacements(this RequestHandlerSettings requestHandlerSettings, IConfiguration configuration)
-        {
-            string sectionKey = $"{Constants.Configuration.ConfigRequestHandler}:";
-
-            IEnumerable<CharItem> charCollection = GetReplacements(
-                configuration,
-                $"{sectionKey}{nameof(RequestHandlerSettings.CharCollection)}");
-
-            IEnumerable<CharItem> userDefinedCharCollection = GetReplacements(
-                configuration,
-                $"{sectionKey}{nameof(requestHandlerSettings.UserDefinedCharCollection)}");
-
-            IEnumerable<CharItem> mergedCollection = MergeUnique(userDefinedCharCollection, charCollection);
-
-            requestHandlerSettings.UserDefinedCharCollection = mergedCollection;
-        }
-
         private static IEnumerable<CharItem> GetReplacements(IConfiguration configuration, string key)
         {
             var replacements = new List<CharItem>();
