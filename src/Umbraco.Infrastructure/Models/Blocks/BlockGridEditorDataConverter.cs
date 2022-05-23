@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(JToken jsonLayout)
         {
 
-            var blockListLayouts = _jsonSerializer.Deserialize<BlockGridLayoutItem[]>(jsonLayout.ToString());
+            var blockListLayouts = _jsonSerializer.Deserialize<BlockGridLayoutItem[]>(jsonLayout.ToString())!;
 
             var result = new List<ContentAndSettingsReference>();
 

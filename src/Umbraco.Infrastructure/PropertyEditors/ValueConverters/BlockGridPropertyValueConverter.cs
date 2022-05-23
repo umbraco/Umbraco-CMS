@@ -38,30 +38,45 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Element;
 
         /// <inheritdoc />
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             return source?.ToString();
         }
 
         /// <inheritdoc />
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // NOTE: The intermediate object is just a json string, we don't actually convert from source -> intermediate since source is always just a json string
 
             using (_proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
-                var value = (string)inter;
+                var value = (string?)inter;
 
                 // Short-circuit on empty values
-                if (string.IsNullOrWhiteSpace(value)) return BlockGridModel.Empty;
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return BlockListModel.Empty;
+                }
 
                 var converted = _blockListEditorDataConverter.Deserialize(value);
-                if (converted.BlockValue.ContentData.Count == 0) return BlockGridModel.Empty;
+                if (converted.BlockValue.ContentData.Count == 0)
+                {
+                    return BlockListModel.Empty;
+                }
 
-                var blockListLayout = converted.Layout.ToObject<IEnumerable<BlockGridLayoutItem>>();
+                var blockListLayout = converted.Layout?.ToObject<IEnumerable<BlockListLayoutItem>>();
+                if (blockListLayout is null)
+                {
+                    return BlockListModel.Empty;
+                }
 
                 // Get configuration
                 var configuration = propertyType.DataType.ConfigurationAs<BlockListConfiguration>();
+                if (configuration is null)
+                {
+                    return null;
+                }
+
                 var blockConfigMap = configuration.Blocks.ToDictionary(x => x.ContentElementTypeKey);
                 var validSettingsElementTypes = blockConfigMap.Values.Select(x => x.SettingsElementTypeKey).Where(x => x.HasValue).Distinct().ToList();
 
@@ -96,15 +111,19 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 foreach (var layoutItem in blockListLayout)
                 {
                     // Get the content reference
-                    var contentGuidUdi = (GuidUdi)layoutItem.ContentUdi;
-                    if (!contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
+                    var contentGuidUdi = (GuidUdi?)layoutItem.ContentUdi;
+                    if (contentGuidUdi is null || !contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
+                    {
                         continue;
+                    }
 
                     if (!blockConfigMap.TryGetValue(contentData.ContentType.Key, out var blockConfig))
+                    {
                         continue;
+                    }
 
                     // Get the setting reference
-                    IPublishedElement settingsData = null;
+                    IPublishedElement? settingsData = null;
                     var settingGuidUdi = layoutItem.SettingsUdi != null ? (GuidUdi)layoutItem.SettingsUdi : null;
                     if (settingGuidUdi != null)
                         settingsPublishedElements.TryGetValue(settingGuidUdi.Guid, out settingsData);
@@ -123,9 +142,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var layoutType = typeof(BlockGridItem<,>).MakeGenericType(contentData.GetType(), settingsType);
-                    var layoutRef = (BlockGridItem)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
+                    var layoutRef = (BlockGridItem?)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
 
-                    layout.Add(layoutRef);
+                    layout.Add(layoutRef!);
                 }
 
                 var model = new BlockGridModel(layout);

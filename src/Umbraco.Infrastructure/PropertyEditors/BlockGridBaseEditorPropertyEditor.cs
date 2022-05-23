@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<BlockEditorPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<BlockEditorPropertyValueEditor>(Attribute!);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // Change: Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
 
-            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
             {
                 var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
@@ -110,12 +110,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment);
                 var valEditors = new Dictionary<int, IDataValueEditor>();
 
-                BlockEditorData blockEditorData;
+                BlockEditorData? blockEditorData;
                 try
                 {
                     blockEditorData = _blockEditorValues.DeserializeAndClean(val);
@@ -191,12 +191,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
                     return null;
 
-                BlockEditorData blockEditorData;
+                BlockEditorData? blockEditorData;
                 try
                 {
                     blockEditorData = _blockEditorValues.DeserializeAndClean(editorValue.Value);
@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         foreach (var prop in row.PropertyValues)
                         {
                             // Fetch the property types prevalue
-                            var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
 
                             // Lookup the property editor
                             var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
@@ -259,7 +259,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _textService = textService;
             }
 
-            public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
             {
                 yield break;
                 /*
@@ -312,7 +312,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _contentTypeService = contentTypeService;
             }
 
-            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object value)
+            protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
             {
                 var blockEditorData = _blockEditorValues.DeserializeAndClean(value);
                 if (blockEditorData != null)
@@ -367,18 +367,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _logger = logger;
             }
 
-            private IContentType GetElementType(BlockItemData item)
+            private IContentType? GetElementType(BlockItemData item)
             {
                 _contentTypes.Value.TryGetValue(item.ContentTypeKey, out var contentType);
                 return contentType;
             }
 
-            public BlockEditorData DeserializeAndClean(object propertyValue)
+            public BlockEditorData? DeserializeAndClean(object? propertyValue)
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return null;
 
-                var blockEditorData = _dataConverter.Deserialize(propertyValue.ToString());
+                var blockEditorData = _dataConverter.Deserialize(propertyValue.ToString()!);
 
                 if (blockEditorData.BlockValue.ContentData.Count == 0)
                 {

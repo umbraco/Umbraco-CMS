@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <returns>
         /// The <see cref="BlockGridItem" /> with the specified content key.
         /// </returns>
-        public BlockGridItem this[Guid contentKey] => this.FirstOrDefault(x => x.Content.Key == contentKey);
+        public BlockGridItem? this[Guid contentKey] => this.FirstOrDefault(x => x.Content.Key == contentKey);
 
         /// <summary>
         /// Gets the <see cref="BlockGridItem" /> with the specified content UDI.
@@ -58,6 +58,6 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <returns>
         /// The <see cref="BlockGridItem" /> with the specified content UDI.
         /// </returns>
-        public BlockGridItem this[Udi contentUdi] => contentUdi is GuidUdi guidUdi ? this.FirstOrDefault(x => x.Content.Key == guidUdi.Guid) : null;
+        public BlockGridItem? this[Udi contentUdi] => contentUdi is GuidUdi guidUdi ? this.FirstOrDefault(x => x.Content.Key == guidUdi.Guid) : null;
     }
 }
