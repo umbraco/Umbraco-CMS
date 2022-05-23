@@ -890,7 +890,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
-            if (contentType is IContentType withCleanup)
+            if (contentType is IContentTypeWithHistoryCleanup withCleanup)
             {
                 UpdateHistoryCleanupPolicy(withCleanup, documentType.Element("HistoryCleanupPolicy"));
             }
@@ -898,7 +898,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return contentType;
         }
 
-        private void UpdateHistoryCleanupPolicy(IContentType withCleanup, XElement? element)
+        private void UpdateHistoryCleanupPolicy(IContentTypeWithHistoryCleanup withCleanup, XElement? element)
         {
             if (element == null)
             {

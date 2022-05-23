@@ -169,6 +169,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // Acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
+            // TODO (V10): Remove this obsoleted notification publish.
+            await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
+
             // Notify for unattended install
             await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification(), cancellationToken);
             DetermineRuntimeLevel();
@@ -206,6 +209,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
                     break;
             }
+
+            // TODO (V10): Remove this obsoleted notification publish
+            await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
             // Initialize the components
             _components.Initialize();
