@@ -17,7 +17,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-    internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginRepository, IExternalLoginWithKeyRepository
+    internal class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
     {
         public ExternalLoginRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<ExternalLoginRepository> logger)
             : base(scopeAccessor, cache, logger)

@@ -34,7 +34,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddMultipleUnique<IEntityRepository, IEntityRepositoryExtended, EntityRepository>();
             builder.Services.AddUnique<ITwoFactorLoginRepository, TwoFactorLoginRepository>();
             builder.Services.AddSingleton<ExternalLoginRepository>();
-            builder.Services.AddUnique<IExternalLoginRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
             builder.Services.AddUnique<IExternalLoginWithKeyRepository>(factory => factory.GetRequiredService<ExternalLoginRepository>());
             builder.Services.AddUnique<ILanguageRepository, LanguageRepository>();
             builder.Services.AddUnique<IMacroRepository, MacroRepository>();

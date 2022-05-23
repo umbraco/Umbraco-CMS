@@ -24,13 +24,6 @@ namespace Umbraco.Cms.Core.Services
             _externalLoginRepository = externalLoginRepository;
         }
 
-        [Obsolete("Use ctor injecting IExternalLoginWithKeyRepository")]
-        public ExternalLoginService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            IExternalLoginRepository externalLoginRepository)
-            : this(provider, loggerFactory, eventMessagesFactory, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyRepository>())
-        {
-        }
-
         /// <inheritdoc />
         [Obsolete("Use overload that takes a user/member key (Guid).")]
         public IEnumerable<IIdentityUserLogin> GetExternalLogins(int userId)
