@@ -15,6 +15,12 @@ export class UmbInstaller extends LitElement {
   @state()
   step = 2;
 
+  @state()
+  user = {};
+
+  @state()
+  database = {};
+
   private _renderSection() {
     switch (this.step) {
       case 2:

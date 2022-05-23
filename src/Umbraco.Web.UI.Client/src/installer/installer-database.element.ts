@@ -65,10 +65,10 @@ export class UmbInstallerDatabase extends LitElement {
     switch (this.databaseType) {
       case 'msqls':
         return this._renderSqlServer();
-      case 'custom':
-        return this._renderCustom();
-      default:
+      case 'sqlite':
         return this._renderSQLite();
+      default:
+        return this._renderCustom();
     }
   }
   private _renderSQLite = () => html` <uui-form-layout-item>
