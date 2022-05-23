@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Models.Blocks
     {
         [JsonProperty("contentUdi", Required = Required.Always)]
         [JsonConverter(typeof(UdiJsonConverter))]
-        public Udi ContentUdi { get; set; }
+        public Udi? ContentUdi { get; set; }
 
         [JsonProperty("settingsUdi", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(UdiJsonConverter))]
-        public Udi SettingsUdi { get; set; }
+        public Udi? SettingsUdi { get; set; }
 
         [JsonProperty("columnSpan", NullValueHandling = NullValueHandling.Ignore)]
         public int? ColumnSpan { get; set; }
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
     public class BlockGridLayoutAreaItem
     {
         [JsonProperty("key", NullValueHandling = NullValueHandling.Ignore)]
-        public string Key { get; set; }
+        public string Key { get; set; } = string.Empty;
 
         [JsonProperty("items", NullValueHandling = NullValueHandling.Ignore)]
         public BlockGridLayoutItem[] Items { get; set; } = Array.Empty<BlockGridLayoutItem>();
