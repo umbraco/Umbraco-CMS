@@ -63,7 +63,7 @@ const setup = async () => {
   await registerExtensionManifestsFromServer();
   await registerInternalManifests();
   // TODO: implement loading of "startUp" extensions
-  await import('./umb-app');
+  await import('./app');
 }
 
 worker.start();
