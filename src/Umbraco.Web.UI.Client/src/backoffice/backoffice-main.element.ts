@@ -11,6 +11,7 @@ export class UmbBackofficeMain extends LitElement {
         flex: 1 1 auto;
       }
 
+      // TODO: not call this editor, I would like to reserve that name for the view of editing data, like what goes in the router-outlet or in infinite editors (or inside Nested Content)
       #editor {
         background-color: var(--uui-color-background);
         width: 100%;

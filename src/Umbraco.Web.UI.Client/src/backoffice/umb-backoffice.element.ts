@@ -29,6 +29,9 @@ export class UmbBackoffice extends LitElement {
     `,
   ];
 
+  // TODO: main div and then side and main again within? I propose the backoffice-main begin renamed to something less main-ish.
+  // TODO: I would think umb-backoffice-header would be outside the router outlet? so its always present.
+
   render() {
     return html`
       <umb-backoffice-header></umb-backoffice-header>

@@ -9,6 +9,8 @@ import { UmbContextInjectMixin } from '../core/context';
 import { UmbExtensionManifest, UmbExtensionRegistry, UmbManifestSectionMeta } from '../core/extension';
 import { UmbRouter } from '../core/router';
 
+// TODO: umb or not umb in file name?
+
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
   static styles: CSSResultGroup = [

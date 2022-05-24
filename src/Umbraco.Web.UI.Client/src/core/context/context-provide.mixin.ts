@@ -13,6 +13,7 @@ export function UmbContextProvideMixin<TBase extends Constructor>(Base: TBase) {
     provide(contextKey: string, instance: any) {
       if (this._providers.has(contextKey)) return;
       this._providers.set(contextKey, new UmbContextProvider(this, contextKey, instance));
+      // TODO: if already connected then attach the new one.
     }
 
     connectedCallback() {
