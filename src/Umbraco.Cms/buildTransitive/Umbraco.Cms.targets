@@ -27,19 +27,6 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
-    <ItemGroup>
-      <_AppPluginsFiles Include="App_Plugins\**" />
-
-      <ContentWithTargetPath
-        Include="@(_AppPluginsFiles)"
-        Exclude="@(ContentWithTargetPath)"
-        TargetPath="%(Identity)"
-        CopyToOutputDirectory="PreserveNewest"
-        CopyToPublishDirectory="PreserveNewest"/>
-    </ItemGroup>
-  </Target>
-
   <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
     <ItemGroup>
       <_UmbracoFolderFiles Include="umbraco\config\**" />
