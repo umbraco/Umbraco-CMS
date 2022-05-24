@@ -6,11 +6,12 @@ import './installer/installer.element';
 import './auth/login/login.element';
 import './auth/auth-layout.element';
 import './backoffice/backoffice.element';
+import './backoffice/node-editor.element';
 
 import { UmbSectionContext } from './section.context';
 
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 
 import { getInitStatus } from './api/fetcher';
 import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouteLocation, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
@@ -89,6 +90,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     // TODO: find a solution for magic strings
     this.provide('umbRouter', this._router);
 
+    // TODO: this is a temporary routing solution for shell elements
     try {
       const { data } = await getInitStatus({});
 

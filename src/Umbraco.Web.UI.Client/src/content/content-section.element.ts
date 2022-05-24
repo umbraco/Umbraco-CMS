@@ -6,11 +6,17 @@ import { css, html, LitElement } from 'lit';
 export class UmbContentSection extends LitElement {
   static styles = [
     UUITextStyles,
-    css``,
+    css`
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    `,
   ];
 
   render() {
-    return html`<div>Content Section</div>`;
+    return html`<umb-node-editor></umb-node-editor>`;
   }
 }
 
