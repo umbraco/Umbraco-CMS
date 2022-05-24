@@ -1,4 +1,4 @@
-import './umb-backoffice-header.element';
+import './backoffice-header.element';
 import './backoffice-sidebar.element';
 import './backoffice-main.element';
 

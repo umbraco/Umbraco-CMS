@@ -1,3 +1,5 @@
+import { Observable, ReplaySubject } from 'rxjs';
+
 export interface UmbRoute {
   path: string;
   elementName: string;
@@ -17,17 +19,19 @@ export class UmbRouter {
   private _outlet: HTMLElement;
   private _element: any;
 
+  private _location: ReplaySubject<UmbRouteLocation> = new ReplaySubject(1);
+  public readonly location: Observable<UmbRouteLocation> = this._location.asObservable();
+
   constructor(host: HTMLElement, outlet: HTMLElement) {
     this._host = host;
     this._outlet = outlet;
 
     // Anchor Hijacker
     this._host.addEventListener('click', async (event: any) => {
-      event.preventDefault();
-
       const target = event.composedPath()[0];
       const href = target.href;
       if (!href) return;
+      event.preventDefault();
 
       const url = new URL(href);
       const pathname = url.pathname;
@@ -115,6 +119,8 @@ export class UmbRouter {
     if (!canEnter) return;
 
     window.history.pushState(null, '', pathname);
+
+    this._location.next(location);
     this._render();
   }
 

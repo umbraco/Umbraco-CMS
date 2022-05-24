@@ -121,7 +121,7 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
     this._activeSection = section.alias;
   }
 
-  private _handleLabelClick(e: MouseEvent) {
+  private _handleLabelClick(e: PointerEvent) {
     const label = (e.target as any).label;
     this._activeSection = label;
 
@@ -131,11 +131,8 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
     this._open = false;
   }
 
-  async connectedCallback(): Promise<void> {
+  connectedCallback() {
     super.connectedCallback();
-
-    const { data } = await getUserSections({});
-    this._allowedSection = data.sections;
 
     this.requestContext('umbRouter');
     this.requestContext('umbExtensionRegistry');
@@ -152,8 +149,11 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
     }
   }
 
-  private _useSections() {
+  private async _useSections() {
     this._subscription?.unsubscribe();
+    
+    const { data } = await getUserSections({});
+    this._allowedSection = data.sections;
 
     this._subscription = this._extensionRegistry?.extensions
       .pipe(

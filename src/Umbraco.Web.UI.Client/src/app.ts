@@ -1,9 +1,9 @@
-import './auth/login/umb-login.element';
-import './auth/umb-auth-layout.element';
-import './backoffice/umb-backoffice.element';
-import './installer/installer.element';
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+import './auth/login/login.element';
+import './auth/auth-layout.element';
+import './backoffice/backoffice.element';
+import './installer/installer.element';
 
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -77,6 +77,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
       } else {
         this._router.push('/section/content');
       }
+
     } catch (error) {
       console.log(error);
     }

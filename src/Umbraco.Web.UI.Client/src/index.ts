@@ -63,8 +63,21 @@ const setup = async () => {
   await registerExtensionManifestsFromServer();
   await registerInternalManifests();
   // TODO: implement loading of "startUp" extensions
-  await import('./umb-app');
+  await import('./app');
 }
 
-worker.start();
+worker.start({
+  onUnhandledRequest: (req) => {
+    if (req.url.pathname.startsWith('/node_modules/')) return;
+    if (req.url.pathname.startsWith('/src/')) return;
+    if (req.destination === 'image') return;
+
+    console.warn(
+      'Found an unhandled %s request to %s',
+      req.method,
+      req.url.href,
+    )
+  }
+});
+
 setup();

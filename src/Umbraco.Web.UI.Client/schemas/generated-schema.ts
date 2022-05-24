@@ -42,19 +42,26 @@ export interface components {
     VersionResponse: {
       version: string;
     };
-    ConsentLevel: {
-      /** @enum {string} */
-      level: "Minimal" | "Basic" | "Detailed";
+    /** @enum {string} */
+    ConsentLevel: "Minimal" | "Basic" | "Detailed";
+    TelemetryModel: {
+      level: components["schemas"]["ConsentLevel"];
       description: string;
     };
-    UmbracoDatabaseConfiguration: {
+    UmbracoInstallerUserModel: {
+      /** Format: float */
+      minCharLength: number;
+      /** Format: float */
+      minNonAlphaNumericLength: number;
+      consentLevels: components["schemas"]["TelemetryModel"][];
+    };
+    UmbracoInstallerDatabaseModel: {
       id: string;
       /** Format: float */
       sortOrder: number;
       displayName: string;
       defaultDatabaseName: string;
       providerName: string | null;
-      supportsQuickInstall: boolean;
       isAvailable: boolean;
       requiresServer: boolean;
       serverPlaceholder: string | null;
@@ -62,46 +69,23 @@ export interface components {
       supportsIntegratedAuthentication: boolean;
       requiresConnectionTest: boolean;
     };
-    UmbracoDatabaseConfigurationQuickInstall: {
-      displayName: string;
-      defaultDatabaseName: string;
-    };
-    UmbracoInstallerStepModel: {
-      /** Format: float */
-      minCharLength?: number;
-      /** Format: float */
-      minNonAlphaNumericLength?: number;
-      customInstallAvailable?: boolean;
-      consentLevels?: components["schemas"]["ConsentLevel"][];
-      databases?: components["schemas"]["UmbracoDatabaseConfiguration"][];
-      quickInstallSettings?: components["schemas"]["UmbracoDatabaseConfigurationQuickInstall"];
-    };
-    UmbracoInstallerStep: {
-      model: components["schemas"]["UmbracoInstallerStepModel"] | null;
-      view: string;
-      name: string;
-      description: string;
-      /** Format: float */
-      serverOrder: number;
-    };
     UmbracoInstaller: {
-      installId: string;
-      steps: components["schemas"]["UmbracoInstallerStep"][];
+      user: components["schemas"]["UmbracoInstallerUserModel"];
+      databases: components["schemas"]["UmbracoInstallerDatabaseModel"][];
     };
-    UmbracoInstallerDatabaseConfiguration: {
+    UmbracoPerformInstallDatabaseConfiguration: {
       connectionString: string;
       providerName: string;
       integratedAuth: boolean;
       databaseProviderMetadataId: string;
     };
-    UmbracoInstallerPerformInstallRequest: {
+    UmbracoPerformInstallRequest: {
       name: string;
       email: string;
       password: string;
       subscribeToNewsletter: boolean;
-      /** @enum {string} */
-      telemetryLevel: "Minimal" | "Basic" | "Detailed";
-      database: components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
+      telemetryLevel: components["schemas"]["ConsentLevel"];
+      database: components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
     };
     UserResponse: {
       username: string;
@@ -175,7 +159,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UmbracoInstallerPerformInstallRequest"];
+        "application/json": components["schemas"]["UmbracoPerformInstallRequest"];
       };
     };
   };
@@ -193,7 +177,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UmbracoInstallerDatabaseConfiguration"];
+        "application/json": components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
       };
     };
   };
