@@ -314,7 +314,7 @@ namespace Umbraco.Cms
             private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
             {
                 var result = new List<RefreshInstruction>();
-                if (jsonInstructions is not null)
+                if (jsonInstructions is null)
                 {
                     return result;
                 }
