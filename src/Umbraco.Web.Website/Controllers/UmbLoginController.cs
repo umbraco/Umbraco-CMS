@@ -41,28 +41,6 @@ public class UmbLoginController : SurfaceController
         _twoFactorLoginService = twoFactorLoginService;
     }
 
-    [Obsolete("Use ctor with all params")]
-    public UmbLoginController(
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services,
-        AppCaches appCaches,
-        IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider,
-        IMemberSignInManager signInManager)
-        : this(
-            umbracoContextAccessor,
-            databaseFactory,
-            services,
-            appCaches,
-            profilingLogger,
-            publishedUrlProvider,
-            signInManager,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberManager>(),
-            StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
-    {
-    }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
