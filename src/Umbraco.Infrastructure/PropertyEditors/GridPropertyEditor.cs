@@ -331,7 +331,51 @@ public class GridPropertyEditor : DataEditor
             // Find all the macros
             macroValues = controls?.Where(x => x.Editor.Alias.ToLowerInvariant() == "macro");
 
-            return grid;
+                return grid;
+            }
+
+            /// <summary>
+            /// Resolve references from <see cref="IDataValueEditor"/> values
+            /// </summary>
+            /// <param name="value"></param>
+            /// <returns></returns>
+            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+            {
+                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                if (rawJson.IsNullOrWhiteSpace())
+                {
+                    yield break;
+                }
+
+                DeserializeGridValue(rawJson!, out var richTextEditorValues, out var mediaValues, out var macroValues);
+
+                if (richTextEditorValues is not null)
+                {
+                    foreach (UmbracoEntityReference umbracoEntityReference in richTextEditorValues.SelectMany(x =>
+                                 _richTextPropertyValueEditor.GetReferences(x.Value)))
+                    {
+                        yield return umbracoEntityReference;
+                    }
+                }
+
+                if (mediaValues is not null)
+                {
+                    foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value?.HasValues ?? false)
+                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value!["udi"])))
+                    {
+                        yield return umbracoEntityReference;
+                    }
+                }
+
+                if (macroValues is not null)
+                {
+                    foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
+                    {
+                        yield return umbracoEntityReference;
+                    }
+                }
+            }
         }
     }
 }

@@ -139,9 +139,8 @@ public class DatabaseBuilder
         if (databaseSettings == null)
         {
             providerMeta = _databaseProviderMetadata
-                .OrderBy(x => x.SortOrder)
-                .Where(x => x.SupportsQuickInstall)
-                .FirstOrDefault(x => x.IsAvailable);
+                .GetAvailable(true)
+                .FirstOrDefault();
 
             databaseSettings = new DatabaseModel {DatabaseName = providerMeta?.DefaultDatabaseName!};
         }

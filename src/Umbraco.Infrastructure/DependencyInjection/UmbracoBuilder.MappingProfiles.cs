@@ -16,7 +16,7 @@ public static partial class UmbracoBuilderExtensions
     {
         builder.Services.AddUnique<IUmbracoMapper, UmbracoMapper>();
 
-        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()?
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<AuditMapDefinition>()
             .Add<CodeFileMapDefinition>()
             .Add<ContentPropertyMapDefinition>()

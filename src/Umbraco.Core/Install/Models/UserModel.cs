@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Install.Models
 {
@@ -16,5 +17,8 @@ namespace Umbraco.Cms.Core.Install.Models
 
         [DataMember(Name = "subscribeToNewsLetter")]
         public bool SubscribeToNewsLetter { get; set; }
+
+        [DataMember(Name = "telemetryLevel")]
+        public TelemetryLevel TelemetryLevel { get; set; }
     }
 }

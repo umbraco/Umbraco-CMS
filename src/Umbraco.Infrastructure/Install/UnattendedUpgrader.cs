@@ -68,12 +68,12 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 case RuntimeLevelReason.UpgradePackageMigrations:
                 {
                     if (!_runtimeState.StartupState.TryGetValue(
-                        RuntimeState.PendingPacakgeMigrationsStateKey,
+                        RuntimeState.PendingPackageMigrationsStateKey,
                         out var pm)
                         || pm is not IReadOnlyList<string> pendingMigrations)
                     {
                         throw new InvalidOperationException(
-                            $"The required key {RuntimeState.PendingPacakgeMigrationsStateKey} does not exist in startup state");
+                            $"The required key {RuntimeState.PendingPackageMigrationsStateKey} does not exist in startup state");
                     }
 
                     if (pendingMigrations.Count == 0)

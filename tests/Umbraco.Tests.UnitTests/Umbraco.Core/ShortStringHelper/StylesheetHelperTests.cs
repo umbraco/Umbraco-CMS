@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings.Css;
+using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
@@ -175,7 +176,7 @@ world */p{font-size: 1em;}")]
 /**umb_name:Test2*/
 .test2 {
 #font-color: green;
-}"), result);
+}").NormalizeNewLines(), result.NormalizeNewLines());
         }
 
         [Test]
@@ -204,7 +205,7 @@ world */p{font-size: 1em;}")]
             Assert.AreEqual(".test", rules.First().Selector);
             Assert.AreEqual(
 @"font-color: red;
-margin: 1rem;", rules.First().Styles);
+margin: 1rem;".NormalizeNewLines(), rules.First().Styles.NormalizeNewLines());
 
             Assert.AreEqual("Test2", rules.Last().Name);
             Assert.AreEqual(".test2", rules.Last().Selector);

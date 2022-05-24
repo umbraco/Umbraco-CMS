@@ -33,30 +33,22 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
         _databaseProviderMetadata = databaseProviderMetadata;
     }
 
-    public override object ViewModel
-    {
-        get
-        {
-            var options = _databaseProviderMetadata
-                .Where(x => x.IsAvailable)
-                .OrderBy(x => x.SortOrder)
-                .ToList();
-
-            return new { databases = options };
-        }
-    }
-
-    public override string View => ShouldDisplayView() ? base.View : string.Empty;
-
     public override Task<InstallSetupResult?> ExecuteAsync(DatabaseModel databaseSettings)
     {
-        if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings, false))
+        if (!_databaseBuilder.ConfigureDatabaseConnection(databaseSettings, isTrialRun: false))
         {
             throw new InstallException("Could not connect to the database");
         }
 
         return Task.FromResult<InstallSetupResult?>(null);
     }
+
+    public override object ViewModel => new
+    {
+        databases = _databaseProviderMetadata.GetAvailable().ToList()
+    };
+
+    public override string View => ShouldDisplayView() ? base.View : string.Empty;
 
     public override bool RequiresExecution(DatabaseModel model) => ShouldDisplayView();
 
@@ -70,15 +62,14 @@ public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
             try
             {
                 // Since a connection string was present we verify the db can connect and query
-                _ = _databaseBuilder.ValidateSchema();
+                 _databaseBuilder.ValidateSchema();
 
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred, reconfiguring...");
-
-                // something went wrong, could not connect so probably need to reconfigure
+                // Something went wrong, could not connect so probably need to reconfigure
+                    _logger.LogError(ex, "An error occurred, reconfiguring...");
                 return true;
             }
         }

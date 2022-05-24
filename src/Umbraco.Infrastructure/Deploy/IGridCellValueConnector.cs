@@ -30,7 +30,7 @@ public interface IGridCellValueConnector
     /// <param name="dependencies">The dependencies of the property.</param>
     /// <returns>The grid cell value to be deployed.</returns>
     /// <remarks>Note that </remarks>
-    string GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
+    string? GetValue(GridValue.GridControl gridControl, ICollection<ArtifactDependency> dependencies);
 
     /// <summary>
     ///     Allows you to modify the value of a control being deployed.

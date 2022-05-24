@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime;
 
@@ -20,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime;
 /// </summary>
 public class RuntimeState : IRuntimeState
 {
-    internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
+    internal const string PendingPackageMigrationsStateKey = "PendingPackageMigrations";
     private readonly IConflictingRouteService _conflictingRouteService = null!;
     private readonly IUmbracoDatabaseFactory _databaseFactory = null!;
     private readonly IOptions<GlobalSettings> _globalSettings = null!;
@@ -28,6 +27,7 @@ public class RuntimeState : IRuntimeState
     private readonly PendingPackageMigrations _packageMigrationState = null!;
     private readonly Dictionary<string, object> _startupState = new();
     private readonly IUmbracoVersion _umbracoVersion = null!;
+        private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata =null!;
     private readonly IOptions<UnattendedSettings> _unattendedSettings = null!;
 
     public RuntimeState(
@@ -37,8 +37,8 @@ public class RuntimeState : IRuntimeState
         IUmbracoDatabaseFactory databaseFactory,
         ILogger<RuntimeState> logger,
         PendingPackageMigrations packageMigrationState,
-        IConflictingRouteService conflictingRouteService)
-    {
+        IConflictingRouteService conflictingRouteService,
+    IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata){
         _globalSettings = globalSettings;
         _unattendedSettings = unattendedSettings;
         _umbracoVersion = umbracoVersion;
@@ -46,7 +46,28 @@ public class RuntimeState : IRuntimeState
         _logger = logger;
         _packageMigrationState = packageMigrationState;
         _conflictingRouteService = conflictingRouteService;
-    }
+    _databaseProviderMetadata = databaseProviderMetadata;
+        }
+
+        [Obsolete("Use ctor with all params. This will be removed in Umbraco 12")]
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            PendingPackageMigrations packageMigrationState,
+            IConflictingRouteService conflictingRouteService)
+            : this(
+                globalSettings,
+                unattendedSettings,
+                umbracoVersion,
+                databaseFactory,
+                logger,
+                packageMigrationState,
+                StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>(),
+                StaticServiceProvider.Instance.GetServices<IDatabaseProviderMetadata>())
+        { }
 
     private RuntimeState()
     {
@@ -149,7 +170,7 @@ public class RuntimeState : IRuntimeState
                 // cannot connect to configured database, this is bad, fail
                 _logger.LogDebug("Could not connect to database.");
 
-                if (_globalSettings.Value.InstallMissingDatabase || CanAutoInstallMissingDatabase(_databaseFactory))
+                if (_globalSettings.Value.InstallMissingDatabase || _databaseProviderMetadata.CanForceCreateDatabase(_databaseFactory.ProviderName))
                 {
                     // ok to install on a configured but missing database
                     Level = RuntimeLevel.Install;
@@ -261,7 +282,7 @@ public class RuntimeState : IRuntimeState
                     _packageMigrationState.GetPendingPackageMigrations(keyValues);
                 if (packagesRequiringMigration.Count > 0)
                 {
-                    _startupState[PendingPacakgeMigrationsStateKey] = packagesRequiringMigration;
+                    _startupState[PendingPackageMigrationsStateKey] = packagesRequiringMigration;
 
                     return UmbracoDatabaseState.NeedsPackageMigration;
                 }
@@ -318,9 +339,7 @@ public class RuntimeState : IRuntimeState
             Thread.Sleep(1000);
         }
 
-        return canConnect;
+            return canConnect;
+        }
     }
-
-    private bool CanAutoInstallMissingDatabase(IUmbracoDatabaseFactory databaseFactory)
-        => databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
 }

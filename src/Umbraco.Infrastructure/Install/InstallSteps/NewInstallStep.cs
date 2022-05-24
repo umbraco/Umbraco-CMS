@@ -1,18 +1,18 @@
 using System.Collections.Specialized;
-using System.Data.Common;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
-using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
@@ -40,6 +40,8 @@ public class NewInstallStep : InstallSetupStep<UserModel>
     private readonly SecuritySettings _securitySettings;
     private readonly IBackOfficeUserManager _userManager;
     private readonly IUserService _userService;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IMetricsConsentService _metricsConsentService;
 
     public NewInstallStep(
         IUserService userService,
@@ -51,8 +53,9 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         ICookieManager cookieManager,
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
-    {
+        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
+    ILocalizedTextService localizedTextService,
+            IMetricsConsentService metricsConsentService){
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
         _httpClientFactory = httpClientFactory;
@@ -65,7 +68,38 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         _dbProviderFactoryCreator = dbProviderFactoryCreator ??
                                     throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
         _databaseProviderMetadata = databaseProviderMetadata;
-    }
+    _localizedTextService = localizedTextService;
+            _metricsConsentService = metricsConsentService;
+        }
+
+        // Scheduled for removal in V12
+        [Obsolete("Please use constructor that takes an IMetricsConsentService and ILocalizedTextService instead")]
+        public NewInstallStep(
+            IUserService userService,
+            DatabaseBuilder databaseBuilder,
+            IHttpClientFactory httpClientFactory,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<SecuritySettings> securitySettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            ICookieManager cookieManager,
+            IBackOfficeUserManager userManager,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+        : this(
+            userService,
+            databaseBuilder,
+            httpClientFactory,
+            passwordConfiguration,
+            securitySettings,
+            connectionStrings,
+            cookieManager,
+            userManager,
+            dbProviderFactoryCreator,
+            databaseProviderMetadata,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizedTextService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IMetricsConsentService>())
+        {
+        }
 
     [Flags]
     private enum InstallState : short
@@ -151,7 +185,7 @@ public class NewInstallStep : InstallSetupStep<UserModel>
                                                 string.Join(", ", resetResult.Errors.ToErrorMessage()));
         }
 
-        if (user.SubscribeToNewsLetter)
+        _metricsConsentService.SetConsentLevel(user.TelemetryLevel);if (user.SubscribeToNewsLetter)
         {
             var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
             var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
@@ -172,22 +206,47 @@ public class NewInstallStep : InstallSetupStep<UserModel>
         return null;
     }
 
-    public override bool RequiresExecution(UserModel model)
-    {
-        InstallState installState = GetInstallState();
-
-        if (installState.HasFlag(InstallState.Unknown))
+        /// <summary>
+        /// Return a custom view model for this step
+        /// </summary>
+        public override object ViewModel
         {
-            // In this one case when it's a brand new install and nothing has been configured, make sure the
-            // back office cookie is cleared so there's no old cookies lying around causing problems
-            _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
+            get
+            {
+                var quickInstallSettings = _databaseProviderMetadata.GetAvailable(true)
+                    .Select(x => new
+                    {
+                        displayName = x.DisplayName,
+                        defaultDatabaseName = x.DefaultDatabaseName,
+                    })
+                    .FirstOrDefault();
+
+                return new
+                {
+                    minCharLength = _passwordConfiguration.RequiredLength,
+                    minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
+                    quickInstallSettings,
+                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured),
+                    consentLevels = Enum.GetValues(typeof(TelemetryLevel)).Cast<TelemetryLevel>().ToList().Select(level => new
+                    {
+                        level,
+                        description = GetTelemetryLevelDescription(level),
+                    }),
+                };
+            }
         }
 
         return installState.HasFlag(InstallState.Unknown)
                || !installState.HasFlag(InstallState.HasNonDefaultUser);
     }
 
-    private InstallState GetInstallState()
+    private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
+        {
+            TelemetryLevel.Minimal => _localizedTextService.Localize("analytics", "minimalLevelDescription"),
+            TelemetryLevel.Basic => _localizedTextService.Localize("analytics", "basicLevelDescription"),
+            TelemetryLevel.Detailed => _localizedTextService.Localize("analytics", "detailedLevelDescription"),
+            _ => throw new ArgumentOutOfRangeException(nameof(telemetryLevel), $"Did not expect telemetry level of {telemetryLevel}")
+        };private InstallState GetInstallState()
     {
         InstallState installState = InstallState.Unknown;
 

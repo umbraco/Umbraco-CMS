@@ -976,6 +976,21 @@ public static class NPocoSqlExtensions
     }
 
     /// <summary>
+        /// Creates a SELECT CASE WHEN EXISTS query, which returns 1 if the sub query returns any results, and 0 if not.
+        /// </summary>
+        /// <param name="sql">The original SQL.</param>
+        /// <param name="nestedSelect">The nested select to run the query against.</param>
+        /// <returns>The updated Sql statement.</returns>
+        public static Sql<ISqlContext> SelectAnyIfExists(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedSelect)
+        {
+            sql.Append("SELECT CASE WHEN EXISTS (");
+            sql.Append(nestedSelect);
+            sql.Append(")");
+            sql.Append("THEN 1 ELSE 0 END");
+            return sql;
+        }
+
+        /// <summary>
     ///     Represents a Dto reference expression.
     /// </summary>
     /// <typeparam name="TDto">The type of the referencing Dto.</typeparam>

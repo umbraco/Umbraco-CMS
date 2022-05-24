@@ -830,7 +830,7 @@ AND cmsContentNu.nodeId IS NULL
                         dto.VersionId,
                         dto.EditVersionDate,
                         dto.EditWriterId,
-                        dto.EditTemplateId,
+                        dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
                         published,
                         deserializedContent?.PropertyData,
                         deserializedContent?.CultureData);
@@ -859,7 +859,7 @@ AND cmsContentNu.nodeId IS NULL
                         dto.VersionId,
                         dto.PubVersionDate,
                         dto.PubWriterId,
-                        dto.PubTemplateId,
+                        dto.PubTemplateId == 0 ? null : dto.PubTemplateId,
                         published,
                         deserializedContent?.PropertyData,
                         deserializedContent?.CultureData);

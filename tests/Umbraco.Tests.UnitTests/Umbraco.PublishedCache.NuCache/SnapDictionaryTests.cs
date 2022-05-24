@@ -564,12 +564,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             GC.Collect();
             await d.CollectAsync();
 
-            // in Release mode, it works, but in Debug mode, the weak reference is still alive
-            // and for some reason we need to do this to ensure it is collected
-#if DEBUG
             GC.Collect();
             await d.CollectAsync();
-#endif
 
             Assert.AreEqual(1, d.SnapCount);
             v2 = s2.Get(1);
@@ -611,12 +607,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             GC.Collect();
             await d.CollectAsync();
 
-            // in Release mode, it works, but in Debug mode, the weak reference is still alive
-            // and for some reason we need to do this to ensure it is collected
-#if DEBUG
             GC.Collect();
             await d.CollectAsync();
-#endif
 
             Assert.AreEqual(1, d.SnapCount);
             v2 = s2.Get(1);

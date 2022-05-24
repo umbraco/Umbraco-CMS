@@ -165,12 +165,10 @@ When building a custom infinite editor view you can use the same components as a
 
     function editorService(eventsService, keyboardService, $timeout) {
 
-
         let editorsKeyboardShorcuts = [];
         var editors = [];
         var isEnabled = true;
         var lastElementInFocus = null;
-
 
         // events for backdrop
         eventsService.on("appState.backdrop", function (name, args) {

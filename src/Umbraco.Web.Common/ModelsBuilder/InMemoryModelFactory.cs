@@ -22,30 +22,30 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
-        private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
+        private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
+        private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private volatile bool _hasModels; // volatile 'cos reading outside lock
-        private bool _pendingRebuild;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<InMemoryModelFactory> _logger;
         private readonly FileSystemWatcher? _watcher;
-        private int _ver;
-        private int? _skipver;
-        private readonly int _debugLevel;
-        private RoslynCompiler? _roslynCompiler;
-        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
-        private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
-        private ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly ApplicationPartManager _applicationPartManager;
-        private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
-        private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Lazy<string> _pureLiveDirectory = null!;
+        private readonly int _debugLevel;
+        private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
+        private volatile bool _hasModels; // volatile 'cos reading outside lock
+        private bool _pendingRebuild;
+        private int _ver;
+        private int? _skipver;
+        private RoslynCompiler? _roslynCompiler;
+        private UmbracoAssemblyLoadContext? _currentAssemblyLoadContext;
+        private ModelsBuilderSettings _config;
         private bool _disposedValue;
 
         public InMemoryModelFactory(
@@ -99,8 +99,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         public event EventHandler? ModelsChanged;
 
-        private UmbracoServices UmbracoServices => _umbracoServices.Value;
-
         /// <summary>
         /// Gets the currently loaded Live models assembly
         /// </summary>
@@ -111,6 +109,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         /// <inheritdoc />
         public object SyncRoot { get; } = new object();
+
+        private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         /// <summary>
         /// Gets the RoslynCompiler
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         public IPublishedElement CreateModel(IPublishedElement element)
         {
             // get models, rebuilding them if needed
-            Dictionary<string, ModelInfo>? infos = EnsureModels()?.ModelInfos;
+            Dictionary<string, ModelInfo>? infos = EnsureModels().ModelInfos;
             if (infos == null)
             {
                 return element;
@@ -169,8 +169,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             Infos infos = EnsureModels();
 
             // fail fast
-            if (infos is null ||
-                alias is null ||
+            if (alias is null ||
                 infos.ModelInfos is null ||
                 !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo) ||
                 modelInfo.ModelType is null)
@@ -196,7 +195,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             Infos infos = EnsureModels();
 
             // fail fast
-            if (infos is null || alias is null || infos.ModelInfos is null || !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo))
+            if (alias is null || infos.ModelInfos is null || !infos.ModelInfos.TryGetValue(alias, out ModelInfo? modelInfo))
             {
                 return new List<IPublishedElement>();
             }
@@ -360,9 +359,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
         }
 
-
-        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData+"/InMemoryAuto");
-
+        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData + "/InMemoryAuto");
 
         // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)
@@ -413,7 +410,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         // This is NOT thread safe but it is only called from within a lock
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-
             if (!Directory.Exists(_pureLiveDirectory.Value))
             {
                 Directory.CreateDirectory(_pureLiveDirectory.Value);
@@ -531,6 +527,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             // generate code, save
             var code = GenerateModelsCode(typeModels);
+
             // add extra attributes,
             //  IsLive=true helps identifying Assemblies that contain live models
             //  AssemblyVersion is so that we have a different version for each rebuild
@@ -544,7 +541,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             // generate proj, save
             var projFiles = new Dictionary<string, string>
             {
-                { "models.generated.cs", code }
+                { "models.generated.cs", code },
             };
             var proj = GenerateModelsProj(projFiles);
             File.WriteAllText(projFile, proj);
@@ -633,7 +630,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     File.SetLastWriteTime(projFile, DateTime.Now);
                 }
             }
-            catch { /* enough */ }
+            catch
+            { /* enough */
+            }
         }
 
         private static Infos RegisterModels(IEnumerable<Type> types)
@@ -696,7 +695,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
-
             if (!Directory.Exists(_pureLiveDirectory.Value))
             {
                 Directory.CreateDirectory(_pureLiveDirectory.Value);
@@ -715,8 +713,6 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             return code;
         }
-
-
 
         private static string GenerateModelsProj(IDictionary<string, string> files)
         {
@@ -785,11 +781,11 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             // race conditions can occur on slow Cloud filesystems and then we keep
             // rebuilding
 
-            //if (_building && OurFiles.Contains(changed))
-            //{
+            // if (_building && OurFiles.Contains(changed))
+            // {
             //    //_logger.LogInformation<InMemoryModelFactory>("Ignoring files self-changes.");
             //    return;
-            //}
+            // }
 
             // always ignore our own file changes
             if (s_ourFiles.Contains(changed))
@@ -799,7 +795,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             _logger.LogInformation("Detected files changes.");
 
-            lock (SyncRoot) // don't reset while being locked
+            // don't reset while being locked
+            lock (SyncRoot)
             {
                 ResetModels();
             }
