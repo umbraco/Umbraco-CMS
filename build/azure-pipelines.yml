@@ -240,7 +240,6 @@ stages:
     jobs:
       # Integration Tests (SQLite)
       - job:
-        timeoutInMinutes: 120
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
@@ -276,6 +275,7 @@ stages:
 
       # Integration Tests (SQL Server)
       - job:
+        timeoutInMinutes: 120
         condition: or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.sqlServerIntegrationTests}})
         displayName: Integration Tests (SQL Server)
         strategy:
