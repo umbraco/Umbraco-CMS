@@ -23,9 +23,9 @@ context('Data Types', () => {
     cy.umbracoEditorHeaderName(name);
 
 
-    cy.get('select[name="selectedEditor"]', {timeout: 5000}).select('Label');
+    cy.umbracoButtonByLabelKey('propertyEditorPicker_openPropertyEditorPicker').click();
 
-    cy.get('.umb-property-editor select').select('Time');
+    cy.get('[title="Date/Time"]').click();
 
     //Save
     cy.get('.btn-success').click();

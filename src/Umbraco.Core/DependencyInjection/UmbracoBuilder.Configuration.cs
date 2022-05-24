@@ -1,5 +1,4 @@
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -83,7 +82,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
-            .AddUmbracoOptions<HelpPageSettings>();
+            .AddUmbracoOptions<HelpPageSettings>()
+            .AddUmbracoOptions<DataTypesSettings>();
 
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
 
