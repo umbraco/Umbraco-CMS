@@ -197,8 +197,7 @@ public class AuthenticationController : UmbracoApiControllerBase
 
         if (authType == null)
         {
-            _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}",
-                unlinkLoginModel.LoginProvider);
+            _logger.LogWarning("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
         }
         else
         {
@@ -366,7 +365,7 @@ public class AuthenticationController : UmbracoApiControllerBase
 
             // create a with information to display a custom two factor send code view
             var verifyResponse =
-                new ObjectResult(new {twoFactorView = twofactorView, userId = attemptedUser?.Id})
+                new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser?.Id })
                 {
                     StatusCode = StatusCodes.Status402PaymentRequired
                 };
@@ -414,7 +413,7 @@ public class AuthenticationController : UmbracoApiControllerBase
                 var message = _textService.Localize("login", "resetPasswordEmailCopyFormat",
                     // Ensure the culture of the found user is used for the email!
                     UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings),
-                    new[] {identityUser.UserName, callbackUrl});
+                    new[] { identityUser.UserName, callbackUrl });
 
                 var subject = _textService.Localize("login", "resetPasswordEmailCopySubject",
                     // Ensure the culture of the found user is used for the email!
@@ -483,7 +482,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         var message = _textService.Localize("login", "mfaSecurityCodeMessage",
             // Ensure the culture of the found user is used for the email!
             UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings),
-            new[] {code});
+            new[] { code });
 
         if (provider == "Email")
         {
@@ -516,8 +515,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         }
 
         SignInResult result =
-            await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent,
-                model.RememberClient);
+            await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
         if (result.Succeeded)
         {
             return GetUserDetail(_userService.GetByUsername(user.UserName));
@@ -632,7 +630,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         SignOutSuccessResult args = _userManager.NotifyLogoutSuccess(User, userId);
         if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
         {
-            return new ObjectResult(new {signOutRedirectUrl = args.SignOutRedirectUrl});
+            return new ObjectResult(new { signOutRedirectUrl = args.SignOutRedirectUrl });
         }
 
         return Ok();
@@ -669,7 +667,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         var action = _linkGenerator.GetPathByAction(
             nameof(BackOfficeController.ValidatePasswordResetCode),
             ControllerExtensions.GetControllerName<BackOfficeController>(),
-            new {area = Constants.Web.Mvc.BackOfficeArea, u = userId, r = code});
+            new { area = Constants.Web.Mvc.BackOfficeArea, u = userId, r = code });
 
         // Construct full URL using configured application URL (which will fall back to current request)
         Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request

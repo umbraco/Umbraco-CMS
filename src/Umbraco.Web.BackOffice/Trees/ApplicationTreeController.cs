@@ -56,8 +56,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
     /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
     /// <param name="queryStrings">The query strings</param>
     /// <param name="use">Tree use.</param>
-    public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string? application, string? tree,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings, TreeUse use = TreeUse.Main)
+    public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string? application, string? tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings, TreeUse use = TreeUse.Main)
     {
         application = application?.CleanForXss();
 
@@ -81,8 +80,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
             // if there are no trees defined for this section but the section is defined then we can have a simple
             // full screen section without trees
             var name = _localizedTextService.Localize("sections", application);
-            return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name,
-                TreeNodeCollection.Empty, true);
+            return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
         }
 
         // handle request for a specific tree / or when there is only one tree
@@ -138,8 +136,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
 
             // otherwise it's a section with all empty trees, aka a fullscreen section
             // todo is this true? what if we just failed to TryGetRootNode on all of them? SD: Yes it's true but we should check the result of TryGetRootNode and throw?
-            return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name,
-                TreeNodeCollection.Empty, true);
+            return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
         }
 
         // for many groups
@@ -331,8 +328,7 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
     ///         filters for that action, to ensure that the user has permission to execute it.
     ///     </para>
     /// </remarks>
-    private async Task<ActionResult<object>> GetApiControllerProxy(Type controllerType, string action,
-        FormCollection? querystring)
+    private async Task<ActionResult<object>> GetApiControllerProxy(Type controllerType, string action, FormCollection? querystring)
     {
         // note: this is all required in order to execute the auth-filters for the sub request, we
         // need to "trick" mvc into thinking that it is actually executing the proxied controller.
@@ -342,7 +338,8 @@ public class ApplicationTreeController : UmbracoAuthorizedApiController
         // create proxy route data specifying the action & controller to execute
         var routeData = new RouteData(new RouteValueDictionary
         {
-            [ActionToken] = action, [ControllerToken] = controllerName
+            [ActionToken] = action,
+            [ControllerToken] = controllerName
         });
         if (!(querystring is null))
         {

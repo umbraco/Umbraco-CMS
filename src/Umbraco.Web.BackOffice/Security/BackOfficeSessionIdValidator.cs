@@ -41,8 +41,7 @@ public class BackOfficeSessionIdValidator
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeSessionIdValidator" /> class.
     /// </summary>
-    public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptionsSnapshot<GlobalSettings> globalSettings,
-        IBackOfficeUserManager userManager)
+    public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptionsSnapshot<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
     {
         _systemClock = systemClock;
         _globalSettings = globalSettings.Value;
@@ -56,8 +55,7 @@ public class BackOfficeSessionIdValidator
             return;
         }
 
-        var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager,
-            _systemClock, context.Properties.IssuedUtc, context.Principal?.Identity as ClaimsIdentity);
+        var valid = await ValidateSessionAsync(validateInterval, context.HttpContext, context.Options.CookieManager, _systemClock, context.Properties.IssuedUtc, context.Principal?.Identity as ClaimsIdentity);
 
         if (valid == false)
         {
@@ -147,7 +145,9 @@ public class BackOfficeSessionIdValidator
             DateTimeOffset.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz"),
             new CookieOptions
             {
-                HttpOnly = true, Secure = _globalSettings.UseHttps || httpContext.Request.IsHttps, Path = "/"
+                HttpOnly = true,
+                Secure = _globalSettings.UseHttps || httpContext.Request.IsHttps,
+                Path = "/"
             });
 
         return true;

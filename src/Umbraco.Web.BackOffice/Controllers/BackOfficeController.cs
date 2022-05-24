@@ -125,8 +125,7 @@ public class BackOfficeController : UmbracoController
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea,
-                nameof(Default) + ".cshtml")
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
             .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
         return await RenderDefaultOrProcessExternalLoginAsync(
@@ -185,8 +184,7 @@ public class BackOfficeController : UmbracoController
 
         if (result.Succeeded == false)
         {
-            _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}",
-                result.Errors.ToErrorMessage(), invite);
+            _logger.LogWarning("Could not verify email, Error: {Errors}, Token: {Invite}", result.Errors.ToErrorMessage(), invite);
             return new RedirectResult(Url.Action(nameof(Default)) + "#/login/false?invite=3");
         }
 
@@ -214,8 +212,7 @@ public class BackOfficeController : UmbracoController
         // force authentication to occur since this is not an authorized endpoint
         AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
-        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea,
-            nameof(AuthorizeUpgrade) + ".cshtml");
+        var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
@@ -273,9 +270,9 @@ public class BackOfficeController : UmbracoController
         var pathedValues = allValues.Select(kv =>
         {
             var slashIndex = kv.Key.IndexOf('/');
-            var areaAlias = kv.Key.Substring(0, slashIndex);
-            var valueAlias = kv.Key.Substring(slashIndex + 1);
-            return new {areaAlias, valueAlias, value = kv.Value};
+            var areaAlias = kv.Key[..slashIndex];
+            var valueAlias = kv.Key[(slashIndex + 1)..];
+            return new { areaAlias, valueAlias, value = kv.Value };
         });
 
         var nestedDictionary = pathedValues
@@ -340,16 +337,14 @@ public class BackOfficeController : UmbracoController
 
         // Configures the redirect URL and user identifier for the specified external login including xsrf data
         AuthenticationProperties properties =
-            _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl,
-                _userManager.GetUserId(User));
+            _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
 
         return Challenge(properties, provider);
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")] int userId,
-        [Bind(Prefix = "r")] string resetCode)
+    public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")] int userId, [Bind(Prefix = "r")] string resetCode)
     {
         BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
         if (user != null)
@@ -360,14 +355,14 @@ public class BackOfficeController : UmbracoController
                 //Add a flag and redirect for it to be displayed
                 TempData[ViewDataExtensions.TokenPasswordResetCode] =
                     _jsonSerializer.Serialize(
-                        new ValidatePasswordResetCodeModel {UserId = userId, ResetCode = resetCode});
+                        new ValidatePasswordResetCodeModel { UserId = userId, ResetCode = resetCode });
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
         }
 
         //Add error and redirect for it to be displayed
         TempData[ViewDataExtensions.TokenPasswordResetCode] =
-            new[] {_textService.Localize("login", "resetCodeExpired")};
+            new[] { _textService.Localize("login", "resetCodeExpired") };
         return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
     }
 
@@ -388,7 +383,7 @@ public class BackOfficeController : UmbracoController
         if (user == null)
         {
             // ... this should really not happen
-            TempData[ViewDataExtensions.TokenExternalSignInError] = new[] {"Local user does not exist"};
+            TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "Local user does not exist" };
             return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
@@ -399,7 +394,7 @@ public class BackOfficeController : UmbracoController
         {
             //Add error and redirect for it to be displayed
             TempData[ViewDataExtensions.TokenExternalSignInError] =
-                new[] {"An error occurred, could not get external login info"};
+                new[] { "An error occurred, could not get external login info" };
             return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
@@ -440,10 +435,11 @@ public class BackOfficeController : UmbracoController
         ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
         //check if there is the TempData or cookies with the any token name specified, if so, assign to view bag and render the view
-        if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(_httpContextAccessor.HttpContext,
-                ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
-            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
-            ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+        if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(
+                _httpContextAccessor.HttpContext,
+                ViewDataExtensions.TokenExternalSignInError,
+                _jsonSerializer) ||
+            ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) || ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
         {
             return defaultResponse();
         }
@@ -483,8 +479,7 @@ public class BackOfficeController : UmbracoController
         }
 
         // Sign in the user with this external login provider (which auto links, etc...)
-        SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, false,
-            _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
+        SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, false, _securitySettings.Value.UserBypassTwoFactorForExternalLogins);
 
         var errors = new List<string>();
 
@@ -519,7 +514,7 @@ public class BackOfficeController : UmbracoController
 
             // create a with information to display a custom two factor send code view
             var verifyResponse =
-                new ObjectResult(new {twoFactorView = twofactorView, userId = attemptedUser.Id})
+                new ObjectResult(new { twoFactorView = twofactorView, userId = attemptedUser.Id })
                 {
                     StatusCode = StatusCodes.Status402PaymentRequired
                 };

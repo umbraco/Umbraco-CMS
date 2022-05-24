@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Umbraco.Extensions;
 
@@ -21,7 +21,8 @@ internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTick
     public string Protect(AuthenticationTicket data, string? purpose)
     {
         // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
-        var ticket = new AuthenticationTicket(data.Principal,
+        var ticket = new AuthenticationTicket(
+            data.Principal,
             new AuthenticationProperties(data.Properties.Items)
             {
                 IssuedUtc = data.Properties.IssuedUtc,
@@ -29,7 +30,8 @@ internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTick
                 AllowRefresh = data.Properties.AllowRefresh,
                 IsPersistent = data.Properties.IsPersistent,
                 RedirectUri = data.Properties.RedirectUri
-            }, data.AuthenticationScheme);
+            },
+            data.AuthenticationScheme);
 
         return _ticketDataFormat.Protect(ticket);
     }
@@ -43,6 +45,7 @@ internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTick
     ///     Un-protects the cookie
     /// </summary>
     /// <param name="protectedText"></param>
+    /// <param name="purpose"></param>
     /// <returns></returns>
     public AuthenticationTicket? Unprotect(string? protectedText, string? purpose)
     {
@@ -67,8 +70,7 @@ internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTick
         }
 
         //return the ticket with a UmbracoBackOfficeIdentity
-        var ticket = new AuthenticationTicket(new ClaimsPrincipal(verifiedIdentity), decrypt.Properties,
-            decrypt.AuthenticationScheme);
+        var ticket = new AuthenticationTicket(new ClaimsPrincipal(verifiedIdentity), decrypt.Properties, decrypt.AuthenticationScheme);
 
         return ticket;
     }

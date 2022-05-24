@@ -156,7 +156,7 @@ public class BackOfficeServerVariables
             = _linkGenerator.GetPathByAction(
                 nameof(BackOfficeController.ServerVariables),
                 ControllerExtensions.GetControllerName<BackOfficeController>(),
-                new {area = Constants.Web.Mvc.BackOfficeArea});
+                new { area = Constants.Web.Mvc.BackOfficeArea });
 
         return defaults;
     }
@@ -181,27 +181,20 @@ public class BackOfficeServerVariables
 
                     {
                         "externalLoginsUrl",
-                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin),
-                            backOfficeControllerName,
-                            new {area = Constants.Web.Mvc.BackOfficeArea})
+                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })
                     },
                     {
                         "externalLinkLoginsUrl",
-                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName,
-                            new {area = Constants.Web.Mvc.BackOfficeArea})
+                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.LinkLogin), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })
                     },
                     {
                         "gridConfig",
-                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig),
-                            backOfficeControllerName,
-                            new {area = Constants.Web.Mvc.BackOfficeArea})
+                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.GetGridConfig), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })
                     },
                     // TODO: This is ultra confusing! this same key is used for different things, when returning the full app when authenticated it is this URL but when not auth'd it's actually the ServerVariables address
                     {
                         "serverVarsJs",
-                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application),
-                            backOfficeControllerName,
-                            new {area = Constants.Web.Mvc.BackOfficeArea})
+                        _linkGenerator.GetPathByAction(nameof(BackOfficeController.Application), backOfficeControllerName, new { area = Constants.Web.Mvc.BackOfficeArea })
                     },
                     //API URLs
                     {"packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl},
@@ -216,7 +209,7 @@ public class BackOfficeServerVariables
                     },
                     {
                         "embedApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
-                            controller => controller.GetEmbed("", 0, 0))
+                            controller => controller.GetEmbed(string.Empty, 0, 0))
                     },
                     {
                         "userApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<UsersController>(
@@ -244,7 +237,7 @@ public class BackOfficeServerVariables
                     },
                     {
                         "imagesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                            controller => controller.GetBigThumbnail(""))
+                            controller => controller.GetBigThumbnail(string.Empty))
                     },
                     {
                         "sectionApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -254,8 +247,7 @@ public class BackOfficeServerVariables
                         "treeApplicationApiBaseUrl",
                         _linkGenerator.GetUmbracoApiServiceBaseUrl<ApplicationTreeController>(
                             controller =>
-                                controller.GetApplicationTrees(string.Empty, string.Empty, FormCollection.Empty,
-                                    TreeUse.None))
+                                controller.GetApplicationTrees(string.Empty, string.Empty, FormCollection.Empty, TreeUse.None))
                     },
                     {
                         "contentTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentTypeController>(
@@ -325,8 +317,7 @@ public class BackOfficeServerVariables
                             controller => controller.GetAll())
                     },
                     {
-                        "memberTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeController>(
-                            controller => controller.GetAllTypes())
+                        "memberTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeController>(controller => controller.GetAllTypes())
                     },
                     {
                         "memberTypeQueryApiBaseUrl",
@@ -359,7 +350,7 @@ public class BackOfficeServerVariables
                     },
                     {
                         "tagsDataBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TagsDataController>(
-                            controller => controller.GetTags("", "", null))
+                            controller => controller.GetTags(string.Empty, string.Empty, null))
                     },
                     {
                         "examineMgmtBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
@@ -375,7 +366,7 @@ public class BackOfficeServerVariables
                     },
                     {
                         "codeFileApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CodeFileController>(
-                            controller => controller.GetByPath("", ""))
+                            controller => controller.GetByPath(string.Empty, string.Empty))
                     },
                     {
                         "publishedStatusBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublishedStatusController>(
@@ -392,7 +383,7 @@ public class BackOfficeServerVariables
                     },
                     {
                         "helpApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<HelpController>(
-                            controller => controller.GetContextHelpForPage("", "", ""))
+                            controller => controller.GetContextHelpForPage(string.Empty, string.Empty, string.Empty))
                     },
                     {
                         "backOfficeAssetsApiBaseUrl",
@@ -551,7 +542,7 @@ public class BackOfficeServerVariables
                 continue;
             }
 
-            yield return new PluginTree {Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName};
+            yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
         }
     }
 
@@ -567,22 +558,22 @@ public class BackOfficeServerVariables
             // add versions - see UmbracoVersion for details & differences
 
             // the complete application version (eg "8.1.2-alpha.25")
-            {"version", version},
+            { "version", version },
 
             // the assembly version (eg "8.0.0")
-            {"assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString()}
+            { "assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString() },
+            //the value is the hash of the version, cdf version and the configured state
+            { "cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash() },
+
+            //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
+            {
+                "applicationPath",
+                _httpContextAccessor.GetRequiredHttpContext().Request.PathBase.ToString().EnsureEndsWith('/')
+            },
+
+            //add the server's GMT time offset in minutes
+            { "serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes) }
         };
-
-
-        //the value is the hash of the version, cdf version and the configured state
-        app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());
-
-        //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
-        app.Add("applicationPath",
-            _httpContextAccessor.GetRequiredHttpContext().Request.PathBase.ToString().EnsureEndsWith('/'));
-
-        //add the server's GMT time offset in minutes
-        app.Add("serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes));
 
         return app;
     }
@@ -594,8 +585,10 @@ public class BackOfficeServerVariables
     [DataContract]
     private class PluginTree
     {
-        [DataMember(Name = "alias")] public string? Alias { get; set; }
+        [DataMember(Name = "alias")]
+        public string? Alias { get; set; }
 
-        [DataMember(Name = "packageFolder")] public string? PackageFolder { get; set; }
+        [DataMember(Name = "packageFolder")]
+        public string? PackageFolder { get; set; }
     }
 }

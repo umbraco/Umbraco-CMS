@@ -55,7 +55,7 @@ public class AdminUsersHandler : MustSatisfyRequirementAuthorizationHandler<Admi
         int[]? userIds;
         if (int.TryParse(queryString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var userId))
         {
-            userIds = new[] {userId};
+            userIds = new[] { userId };
         }
         else
         {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -26,5 +26,5 @@ public class AnalyticsController : UmbracoAuthorizedJsonController
     }
 
     public IEnumerable<TelemetryLevel> GetAllLevels() =>
-        new[] {TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed};
+        new[] { TelemetryLevel.Minimal, TelemetryLevel.Basic, TelemetryLevel.Detailed };
 }

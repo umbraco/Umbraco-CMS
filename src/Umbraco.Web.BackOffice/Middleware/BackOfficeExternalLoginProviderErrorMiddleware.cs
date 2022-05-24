@@ -31,10 +31,14 @@ public class BackOfficeExternalLoginProviderErrorMiddleware : IMiddleware
 
                 var serialized = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(errors)));
 
-                context.Response.Cookies.Append(ViewDataExtensions.TokenExternalSignInError, serialized,
+                context.Response.Cookies.Append(
+                    ViewDataExtensions.TokenExternalSignInError,
+                    serialized,
                     new CookieOptions
                     {
-                        Expires = DateTime.Now.AddMinutes(5), HttpOnly = true, Secure = context.Request.IsHttps
+                        Expires = DateTime.Now.AddMinutes(5),
+                        HttpOnly = true,
+                        Secure = context.Request.IsHttps
                     });
 
                 context.Response.Redirect(context.Request.GetEncodedUrl());

@@ -155,8 +155,7 @@ public class ContentController : ContentControllerBase
         // Authorize...
         var resource = new ContentPermissionsResource(content, ActionRights.ActionLetter);
         AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource,
-                AuthorizationPolicies.ContentPermissionByResource);
+            await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -172,8 +171,7 @@ public class ContentController : ContentControllerBase
         foreach (IUserGroup userGroup in allUserGroups)
         {
             //check if there's a permission set posted up for this user group
-            IEnumerable<string>? groupPermissions;
-            if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
+            if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out IEnumerable<string>? groupPermissions))
             {
                 if (groupPermissions is null)
                 {
@@ -187,8 +185,7 @@ public class ContentController : ContentControllerBase
                 if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id]
                         .AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                 {
-                    _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]),
-                        content.Id);
+                    _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
                 }
             }
         }
@@ -226,7 +223,8 @@ public class ContentController : ContentControllerBase
         return GetDetailedPermissions(content, allUserGroups);
     }
 
-    private ActionResult<IEnumerable<AssignedUserGroupPermissions?>?> GetDetailedPermissions(IContent content,
+    private ActionResult<IEnumerable<AssignedUserGroupPermissions?>?> GetDetailedPermissions(
+        IContent content,
         IEnumerable<IUserGroup> allUserGroups)
     {
         //get all user groups and map their default permissions to the AssignedUserGroupPermissions model.
@@ -257,7 +255,8 @@ public class ContentController : ContentControllerBase
             {
                 permission.Checked = false;
                 permission.Checked =
-                    assignedGroupPermission.AssignedPermissions.Contains(permission.PermissionCode,
+                    assignedGroupPermission.AssignedPermissions.Contains(
+                        permission.PermissionCode,
                         StringComparer.InvariantCulture);
             }
         }
@@ -271,9 +270,10 @@ public class ContentController : ContentControllerBase
     /// <returns></returns>
     public ActionResult<ContentItemDisplay> GetRecycleBin()
     {
-        var apps = new List<ContentApp>();
-        apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "content",
-            Constants.DataTypes.DefaultMembersListView));
+        var apps = new List<ContentApp>
+        {
+            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "content", Constants.DataTypes.DefaultMembersListView)
+        };
         apps[0].Active = true;
         var display = new ContentItemDisplay
         {
@@ -321,7 +321,7 @@ public class ContentController : ContentControllerBase
         //set a custom path since the tree that renders this has the content type id as the parent
         content.Path = string.Format("-1,{0},{1}", persistedContent?.ContentTypeId, content.Id);
 
-        content.AllowedActions = new[] {"A"};
+        content.AllowedActions = new[] { "A" };
         content.IsBlueprint = true;
 
         // TODO: exclude the content apps here
@@ -335,7 +335,6 @@ public class ContentController : ContentControllerBase
     ///     Gets the content json for the content id
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="culture"></param>
     /// <returns></returns>
     [OutgoingEditorModelEvent]
     [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
@@ -449,8 +448,7 @@ public class ContentController : ContentControllerBase
 
     private ContentItemDisplay? GetEmptyInner(IContentType contentType, int parentId)
     {
-        IContent emptyContent = _contentService.Create("", parentId, contentType.Alias,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        IContent emptyContent = _contentService.Create(string.Empty, parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
         ContentItemDisplay? mapped = MapToDisplay(emptyContent);
 
         if (mapped is null)
@@ -508,7 +506,7 @@ public class ContentController : ContentControllerBase
         {
             foreach (IContentType contentType in contentTypes)
             {
-                IContent emptyContent = _contentService.Create("", parentId, contentType, userId);
+                IContent emptyContent = _contentService.Create(string.Empty, parentId, contentType, userId);
 
                 ContentItemDisplay? mapped = MapToDisplay(emptyContent, context =>
                 {
@@ -529,7 +527,8 @@ public class ContentController : ContentControllerBase
         return result;
     }
 
-    private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[]? contentTypeKeys,
+    private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(
+        Guid[]? contentTypeKeys,
         int parentId)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
@@ -543,7 +542,8 @@ public class ContentController : ContentControllerBase
     /// <param name="contentTypeKeys"></param>
     /// <param name="parentId"></param>
     [OutgoingEditorModelEvent]
-    public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys([FromQuery] Guid[] contentTypeKeys,
+    public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys(
+        [FromQuery] Guid[] contentTypeKeys,
         [FromQuery] int parentId) => GetEmptyByKeysInternal(contentTypeKeys, parentId);
 
     /// <summary>
@@ -661,9 +661,7 @@ public class ContentController : ContentControllerBase
             }
 
             children = _contentService
-                .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren,
-                    queryFilter,
-                    Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
+                .GetPagedChildren(id, pageNumber - 1, pageSize, out totalChildren, queryFilter, Ordering.By(orderBy, orderDirection, cultureName, !orderBySystemField)).ToList();
         }
         else
         {
@@ -677,9 +675,11 @@ public class ContentController : ContentControllerBase
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
         }
 
-        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
-        pagedResult.Items = children.Select(content =>
-                _umbracoMapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
+        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize)
+        {
+            Items = children.Select(content =>
+                _umbracoMapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(
+                    content,
                     context =>
                     {
                         context.SetCulture(cultureName);
@@ -687,12 +687,14 @@ public class ContentController : ContentControllerBase
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (!includeProperties.IsNullOrWhiteSpace())
                         {
-                            context.SetIncludedProperties(includeProperties.Split(new[] {", ", ","},
+                            context.SetIncludedProperties(includeProperties.Split(
+                                new[] { ", ", "," },
                                 StringSplitOptions.RemoveEmptyEntries));
                         }
                     }))
             .WhereNotNull()
-            .ToList(); // evaluate now
+            .ToList() // evaluate now
+        };
 
         return pagedResult;
     }
@@ -704,7 +706,8 @@ public class ContentController : ContentControllerBase
     /// <param name="name">The name of the blueprint</param>
     /// <returns></returns>
     [HttpPost]
-    public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent([FromQuery] int contentId,
+    public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent(
+        [FromQuery] int contentId,
         [FromQuery] string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -723,17 +726,16 @@ public class ContentController : ContentControllerBase
             return ValidationProblem(ModelState);
         }
 
-        IContent blueprint = _contentService.CreateContentFromBlueprint(content, name,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        IContent blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
-        _contentService.SaveBlueprint(blueprint,
+        _contentService.SaveBlueprint(
+            blueprint,
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         var notificationModel = new SimpleNotificationModel();
         notificationModel.AddSuccessNotification(
             _localizedTextService.Localize("blueprints", "createdBlueprintHeading"),
-            _localizedTextService.Localize("blueprints", "createdBlueprintMessage", new[] {content.Name})
-        );
+            _localizedTextService.Localize("blueprints", "createdBlueprintMessage", new[] { content.Name }));
 
         return notificationModel;
     }
@@ -748,8 +750,7 @@ public class ContentController : ContentControllerBase
         IEnumerable<IContent>? existing = _contentService.GetBlueprintsForContentTypes(content.ContentTypeId);
         if (existing?.Any(x => x.Name == name && x.Id != content.Id) ?? false)
         {
-            ModelState.AddModelError(modelName,
-                _localizedTextService.Localize("blueprints", "duplicateBlueprintMessage"));
+            ModelState.AddModelError(modelName, _localizedTextService.Localize("blueprints", "duplicateBlueprintMessage"));
             return false;
         }
 
@@ -773,8 +774,7 @@ public class ContentController : ContentControllerBase
                     return OperationResult.Cancel(new EventMessages());
                 }
 
-                _contentService.SaveBlueprint(contentItem.PersistedContent,
-                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                _contentService.SaveBlueprint(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
                 // we need to reuse the underlying logic so return the result that it wants
                 return OperationResult.Succeed(new EventMessages());
@@ -804,15 +804,15 @@ public class ContentController : ContentControllerBase
     {
         ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>?> contentItemDisplay = await PostSaveInternal(
             contentItem,
-            (content, contentSchedule) => _contentService.Save(content,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id, contentSchedule),
+            (content, contentSchedule) => _contentService.Save(content, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id, contentSchedule),
             MapToDisplayWithSchedule);
 
         return contentItemDisplay;
     }
 
     private async Task<ActionResult<ContentItemDisplay<TVariant>?>> PostSaveInternal<TVariant>(
-        ContentItemSave contentItem, Func<IContent, ContentScheduleCollection?, OperationResult>? saveMethod,
+        ContentItemSave contentItem,
+        Func<IContent, ContentScheduleCollection?, OperationResult>? saveMethod,
         Func<IContent?, ContentItemDisplay<TVariant>?> mapToDisplay)
         where TVariant : ContentVariantDisplay
     {
@@ -900,8 +900,17 @@ public class ContentController : ContentControllerBase
         {
             case ContentSaveAction.Save:
             case ContentSaveAction.SaveNew:
-                SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications,
-                    contentSavedHeader, contentSavedText, "editVariantSavedText", cultureForInvariantErrors, null,
+                SaveAndNotify(
+                    contentItem,
+                    saveMethod,
+                    variantCount,
+                    notifications,
+                    globalNotifications,
+                    contentSavedHeader,
+                    contentSavedText,
+                    "editVariantSavedText",
+                    cultureForInvariantErrors,
+                    null,
                     out wasCancelled);
                 break;
             case ContentSaveAction.Schedule:
@@ -914,15 +923,23 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications,
-                    "editContentSavedHeader", "editContentScheduledSavedText", "editVariantSavedText",
-                    cultureForInvariantErrors, contentSchedule, out wasCancelled);
+                SaveAndNotify(
+                    contentItem,
+                    saveMethod,
+                    variantCount,
+                    notifications,
+                    globalNotifications,
+                    "editContentSavedHeader",
+                    "editContentScheduledSavedText",
+                    "editVariantSavedText",
+                    cultureForInvariantErrors,
+                    contentSchedule,
+                    out wasCancelled);
                 break;
 
             case ContentSaveAction.SendPublish:
             case ContentSaveAction.SendPublishNew:
-                var sendResult = _contentService.SendToPublication(contentItem.PersistedContent,
-                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                var sendResult = _contentService.SendToPublication(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
                 wasCancelled = sendResult == false;
                 if (sendResult)
                 {
@@ -937,14 +954,22 @@ public class ContentController : ContentControllerBase
                                 .Where(x => x.Save && !variantErrors.Contains((x.Culture, x.Segment)))
                                 .Select(x => (culture: x.Culture, segment: x.Segment));
 
-                            foreach (var (culture, segment) in validVariants)
+                            foreach ((string? culture, string? segment) in validVariants)
                             {
                                 var variantName = GetVariantName(culture, segment);
 
-                                AddSuccessNotification(notifications, culture, segment,
+                                AddSuccessNotification(
+                                    notifications,
+                                    culture,
+                                    segment,
                                     _localizedTextService.Localize("speechBubbles", "editContentSendToPublish"),
-                                    _localizedTextService.Localize("speechBubbles", "editVariantSendToPublishText",
-                                        new[] {variantName}));
+                                    _localizedTextService.Localize(
+                                        "speechBubbles",
+                                        "editVariantSendToPublishText",
+                                        new[]
+                                        {
+                                            variantName
+                                        }));
                             }
                         }
                     }
@@ -960,14 +985,12 @@ public class ContentController : ContentControllerBase
             case ContentSaveAction.Publish:
             case ContentSaveAction.PublishNew:
             {
-                PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors,
-                    out wasCancelled, out var successfulCultures);
+                PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
                 // Add warnings if domains are not set up correctly
                 AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
-                AddPublishStatusNotifications(new[] {publishStatus}, globalNotifications, notifications,
-                    successfulCultures);
+                AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
             }
-                break;
+            break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
             {
@@ -980,12 +1003,11 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors,
-                    out wasCancelled, out var successfulCultures).ToList();
+                var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-                break;
+            break;
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
             {
@@ -998,11 +1020,10 @@ public class ContentController : ContentControllerBase
                     break;
                 }
 
-                var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors,
-                    out wasCancelled, out var successfulCultures).ToList();
+                var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-                break;
+            break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -1052,8 +1073,10 @@ public class ContentController : ContentControllerBase
         return display;
     }
 
-    private void AddPublishStatusNotifications(IReadOnlyCollection<PublishResult> publishStatus,
-        SimpleNotificationModel globalNotifications, Dictionary<string, SimpleNotificationModel> variantNotifications,
+    private void AddPublishStatusNotifications(
+        IReadOnlyCollection<PublishResult> publishStatus,
+        SimpleNotificationModel globalNotifications,
+        Dictionary<string, SimpleNotificationModel> variantNotifications,
         string[]? successfulCultures)
     {
         //global notifications
@@ -1111,8 +1134,7 @@ public class ContentController : ContentControllerBase
                     //messages based on the variants in error so that the messages show in the publish/save dialog
                     if (variants.Count > 1)
                     {
-                        AddVariantValidationError(variant.Culture, variant.Segment, "publish",
-                            "contentPublishedFailedByMissingName");
+                        AddVariantValidationError(variant.Culture, variant.Segment, "publish", "contentPublishedFailedByMissingName");
                     }
                     else
                     {
@@ -1157,14 +1179,22 @@ public class ContentController : ContentControllerBase
     /// <param name="invariantSavedLocalizationAlias"></param>
     /// <param name="variantSavedLocalizationAlias"></param>
     /// <param name="wasCancelled"></param>
+    /// <param name="savedContentHeaderLocalizationAlias"></param>
+    /// <param name="cultureForInvariantErrors"></param>
+    /// <param name="contentSchedule"></param>
     /// <remarks>
     ///     Method is used for normal Saving and Scheduled Publishing
     /// </remarks>
-    private void SaveAndNotify(ContentItemSave contentItem,
-        Func<IContent, ContentScheduleCollection?, OperationResult>? saveMethod, int variantCount,
-        Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-        string savedContentHeaderLocalizationAlias, string invariantSavedLocalizationAlias,
-        string variantSavedLocalizationAlias, string? cultureForInvariantErrors,
+    private void SaveAndNotify(
+        ContentItemSave contentItem,
+        Func<IContent, ContentScheduleCollection?, OperationResult>? saveMethod,
+        int variantCount,
+        Dictionary<string, SimpleNotificationModel> notifications,
+        SimpleNotificationModel globalNotifications,
+        string savedContentHeaderLocalizationAlias,
+        string invariantSavedLocalizationAlias,
+        string variantSavedLocalizationAlias,
+        string? cultureForInvariantErrors,
         ContentScheduleCollection? contentSchedule,
         out bool wasCancelled)
     {
@@ -1181,13 +1211,21 @@ public class ContentController : ContentControllerBase
                     .Where(x => x.Save && (!variantErrors?.Contains((x.Culture, x.Segment)) ?? false))
                     .Select(x => (culture: x.Culture, segment: x.Segment));
 
-                foreach (var (culture, segment) in savedWithoutErrors)
+                foreach ((string? culture, string? segment) in savedWithoutErrors)
                 {
                     var variantName = GetVariantName(culture, segment);
 
-                    AddSuccessNotification(notifications, culture, segment,
-                        _localizedTextService.Localize("speechBubbles", savedContentHeaderLocalizationAlias),
-                        _localizedTextService.Localize(null, variantSavedLocalizationAlias, new[] {variantName}));
+                    AddSuccessNotification(
+                        notifications,
+                        culture,
+                        segment,
+                        _localizedTextService.Localize(
+                            "speechBubbles",
+                            savedContentHeaderLocalizationAlias),
+                        _localizedTextService.Localize(null, variantSavedLocalizationAlias, new[]
+                            {
+                                variantName
+                            }));
                 }
             }
             else if (ModelState.IsValid)
@@ -1203,9 +1241,9 @@ public class ContentController : ContentControllerBase
     ///     Validates the incoming schedule and update the model
     /// </summary>
     /// <param name="contentItem"></param>
+    /// <param name="contentSchedule"></param>
     /// <param name="globalNotifications"></param>
-    private bool SaveSchedule(ContentItemSave contentItem, ContentScheduleCollection contentSchedule,
-        SimpleNotificationModel globalNotifications)
+    private bool SaveSchedule(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
     {
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
@@ -1215,8 +1253,7 @@ public class ContentController : ContentControllerBase
         return SaveScheduleVariant(contentItem, contentSchedule);
     }
 
-    private bool SaveScheduleInvariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule,
-        SimpleNotificationModel globalNotifications)
+    private bool SaveScheduleInvariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
     {
         ContentVariantSave variant = contentItem.Variants.First();
 
@@ -1397,6 +1434,7 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="notifications"></param>
     /// <param name="culture"></param>
+    /// <param name="segment"></param>
     /// <param name="header"></param>
     /// <param name="msg"></param>
     /// <remarks>
@@ -1404,8 +1442,13 @@ public class ContentController : ContentControllerBase
     ///     otherwise
     ///     variant specific notifications are used to show success messages in the save/publish dialog.
     /// </remarks>
-    private static void AddSuccessNotification(IDictionary<string, SimpleNotificationModel> notifications,
-        string? culture, string? segment, string header, string msg)
+    private static void AddSuccessNotification(
+        IDictionary<string,
+            SimpleNotificationModel> notifications,
+        string? culture,
+        string? segment,
+        string header,
+        string msg)
     {
         //add the global notification (which will display globally if all variants are successfully processed)
         notifications[string.Empty].AddSuccessNotification(header, msg);
@@ -1428,16 +1471,12 @@ public class ContentController : ContentControllerBase
         return authorizationResult.Succeeded;
     }
 
-    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force,
-        string? cultureForInvariantErrors,
-        out bool wasCancelled, out string[]? successfulCultures)
+    private IEnumerable<PublishResult> PublishBranchInternal(ContentItemSave contentItem, bool force, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
     {
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(
-                contentItem.PersistedContent!, force,
-                userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = null; //must be null! this implies invariant
@@ -1452,10 +1491,7 @@ public class ContentController : ContentControllerBase
         var variants = contentItem.Variants.ToList();
 
         //validate if we can publish based on the mandatory language requirements
-        var canPublish = ValidatePublishingMandatoryLanguages(
-            variantErrors,
-            contentItem, variants, mandatoryCultures,
-            mandatoryVariant => mandatoryVariant.Publish);
+        var canPublish = ValidatePublishingMandatoryLanguages(variantErrors, contentItem, variants, mandatoryCultures, mandatoryVariant => mandatoryVariant.Publish);
 
         //Now check if there are validation errors on each variant.
         //If validation errors are detected on a variant and it's state is set to 'publish', then we
@@ -1476,8 +1512,7 @@ public class ContentController : ContentControllerBase
         {
             //proceed to publish if all validation still succeeds
             IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(
-                contentItem.PersistedContent!, force, culturesToPublish.WhereNotNull().ToArray(),
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+                contentItem.PersistedContent!, force, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = contentItem.Variants.Where(x => x.Publish).Select(x => x.Culture).WhereNotNull()
@@ -1487,12 +1522,10 @@ public class ContentController : ContentControllerBase
         else
         {
             //can only save
-            OperationResult saveResult = _contentService.Save(contentItem.PersistedContent!,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            OperationResult saveResult = _contentService.Save(contentItem.PersistedContent!, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             PublishResult[] publishStatus =
             {
-                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null,
-                    contentItem.PersistedContent)
+                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
             };
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
@@ -1505,20 +1538,20 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="contentItem"></param>
     /// <param name="wasCancelled"></param>
-    /// <param name="successfulCultures">
+    /// <param name="successfulCultures"></param>
+    /// <param name="defaultCulture"></param>
+    /// <param name="cultureForInvariantErrors">
     ///     if the content is variant this will return an array of cultures that will be published (passed validation rules)
     /// </param>
     /// <remarks>
     ///     If this is a culture variant than we need to do some validation, if it's not we'll publish as normal
     /// </remarks>
-    private PublishResult PublishInternal(ContentItemSave contentItem, string? defaultCulture,
-        string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
+    private PublishResult PublishInternal(ContentItemSave contentItem, string? defaultCulture, string? cultureForInvariantErrors, out bool wasCancelled, out string[]? successfulCultures)
     {
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            PublishResult publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent!,
-                userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            PublishResult publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
             successfulCultures = null; //must be null! this implies invariant
             return publishStatus;
@@ -1534,7 +1567,9 @@ public class ContentController : ContentControllerBase
         //validate if we can publish based on the mandatory languages selected
         var canPublish = ValidatePublishingMandatoryLanguages(
             variantErrors,
-            contentItem, variants, mandatoryCultures,
+            contentItem,
+            variants,
+            mandatoryCultures,
             mandatoryVariant => mandatoryVariant.Publish);
 
         //if none are published and there are validation errors for mandatory cultures, then we can't publish anything
@@ -1566,8 +1601,10 @@ public class ContentController : ContentControllerBase
         if (canPublish)
         {
             //proceed to publish if all validation still succeeds
-            PublishResult publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent!,
-                culturesToPublish, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            PublishResult publishStatus = _contentService.SaveAndPublish(
+                contentItem.PersistedContent!,
+                culturesToPublish,
+                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
             successfulCultures = culturesToPublish;
 
@@ -1576,18 +1613,17 @@ public class ContentController : ContentControllerBase
         else
         {
             //can only save
-            OperationResult saveResult = _contentService.Save(contentItem.PersistedContent!,
+            OperationResult saveResult = _contentService.Save(
+                contentItem.PersistedContent!,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
-            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null,
-                contentItem.PersistedContent);
+            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
             return publishStatus;
         }
     }
 
-    private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[]? culturesPublished,
-        SimpleNotificationModel globalNotifications)
+    private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
     {
         foreach (PublishResult publishResult in publishResults)
         {
@@ -1605,8 +1641,7 @@ public class ContentController : ContentControllerBase
     /// <param name="persistedContent"></param>
     /// <param name="culturesPublished"></param>
     /// <param name="globalNotifications"></param>
-    internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished,
-        SimpleNotificationModel globalNotifications)
+    internal void AddDomainWarnings(IContent? persistedContent, string[]? culturesPublished, SimpleNotificationModel globalNotifications)
     {
         // Don't try to verify if no cultures were published
         if (culturesPublished is null)
@@ -1646,7 +1681,8 @@ public class ContentController : ContentControllerBase
 
             _logger.LogWarning(
                 "The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
-                persistedContent?.Name, string.Join(", ", publishedCultures));
+                persistedContent?.Name,
+                string.Join(", ", publishedCultures));
             return;
         }
 
@@ -1657,11 +1693,12 @@ public class ContentController : ContentControllerBase
         {
             globalNotifications.AddWarningNotification(
                 _localizedTextService.Localize("auditTrails", "publish"),
-                _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] {culture}));
+                _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] { culture }));
 
             _logger.LogWarning(
                 "The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
-                persistedContent?.Name, culture);
+                persistedContent?.Name,
+                culture);
         }
     }
 
@@ -1700,32 +1737,29 @@ public class ContentController : ContentControllerBase
 
         //iterate over the results by invalid first
         string? firstInvalidMandatoryCulture = null;
-        foreach ((ContentVariantSave model, bool publishing, bool isValid) r in result.OrderBy(x => x.isValid))
+        foreach ((ContentVariantSave model, bool publishing, bool isValid) in result.OrderBy(x => x.isValid))
         {
-            if (!r.isValid)
+            if (!isValid)
             {
-                firstInvalidMandatoryCulture = r.model.Culture;
+                firstInvalidMandatoryCulture = model.Culture;
             }
 
-            if (r.publishing && !r.isValid)
+            if (publishing && !isValid)
             {
                 //flagged for publishing but the mandatory culture is invalid
-                AddVariantValidationError(r.model.Culture, r.model.Segment, "publish",
-                    "contentPublishedFailedReqCultureValidationError");
+                AddVariantValidationError(model.Culture, model.Segment, "publish", "contentPublishedFailedReqCultureValidationError");
                 canPublish = false;
             }
-            else if (r.publishing && r.isValid && firstInvalidMandatoryCulture != null)
+            else if (publishing && isValid && firstInvalidMandatoryCulture != null)
             {
                 //in this case this culture also cannot be published because another mandatory culture is invalid
-                AddVariantValidationError(r.model.Culture, r.model.Segment, "publish",
-                    "contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
+                AddVariantValidationError(model.Culture, model.Segment, "publish", "contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
                 canPublish = false;
             }
-            else if (!r.publishing)
+            else if (!publishing)
             {
                 //cannot continue publishing since a required culture that is not currently being published isn't published
-                AddVariantValidationError(r.model.Culture, r.model.Segment, "speechBubbles",
-                    "contentReqCulturePublishError");
+                AddVariantValidationError(model.Culture, model.Segment, "speechBubbles", "contentReqCulturePublishError");
                 canPublish = false;
             }
         }
@@ -1738,22 +1772,20 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="persistentContent"></param>
     /// <param name="cultureVariants"></param>
+    /// <param name="defaultCulture"></param>
     /// <returns></returns>
     /// <remarks>
     ///     This would generally never fail unless someone is tampering with the request
     /// </remarks>
-    private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants,
-        string? defaultCulture)
+    private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants, string? defaultCulture)
     {
         foreach (ContentVariantSave variant in cultureVariants.Where(x => x.Publish))
         {
             // publishing any culture, implies the invariant culture
-            var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture,
-                defaultCulture.InvariantEquals(variant.Culture)));
+            var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
             if (!valid)
             {
-                AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles",
-                    "contentCultureValidationError");
+                AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");
                 return false;
             }
         }
@@ -1790,17 +1822,17 @@ public class ContentController : ContentControllerBase
     /// </summary>
     /// <param name="culture">Culture to assign the error to</param>
     /// <param name="segment">Segment to assign the error to</param>
-    /// <param name="localizationKey"></param>
+    /// <param name="localizationArea"></param>
+    /// <param name="localizationAlias"></param>
     /// <param name="cultureToken">
     ///     The culture used in the localization message, null by default which means <see cref="culture" /> will be used.
     /// </param>
-    private void AddVariantValidationError(string? culture, string? segment, string localizationArea,
-        string localizationAlias, string? cultureToken = null)
+    private void AddVariantValidationError(string? culture, string? segment, string localizationArea, string localizationAlias, string? cultureToken = null)
     {
         var cultureToUse = cultureToken ?? culture;
         var variantName = GetVariantName(cultureToUse, segment);
 
-        var errMsg = _localizedTextService.Localize(localizationArea, localizationAlias, new[] {variantName});
+        var errMsg = _localizedTextService.Localize(localizationArea, localizationAlias, new[] { variantName });
 
         ModelState.AddVariantValidationError(culture, segment, errMsg);
     }
@@ -1820,7 +1852,7 @@ public class ContentController : ContentControllerBase
         }
 
         var cultureName = culture == null ? null : _allLangs.Value[culture].CultureName;
-        var variantName = string.Join(" — ", new[] {segment, cultureName}.Where(x => !x.IsNullOrWhiteSpace()));
+        var variantName = string.Join(" — ", new[] { segment, cultureName }.Where(x => !x.IsNullOrWhiteSpace()));
 
         // Format: <segment> [&mdash;] <culture name>
         return variantName;
@@ -1845,12 +1877,11 @@ public class ContentController : ContentControllerBase
             return HandleContentNotFound(id);
         }
 
-        PublishResult publishResult = _contentService.SaveAndPublish(foundContent,
-            userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+        PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
         if (publishResult.Success == false)
         {
             var notificationModel = new SimpleNotificationModel();
-            AddMessageForPublishStatus(new[] {publishResult}, notificationModel);
+            AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
             return ValidationProblem(notificationModel);
         }
 
@@ -1897,8 +1928,7 @@ public class ContentController : ContentControllerBase
         //if the current item is in the recycle bin
         if (foundContent.Trashed == false)
         {
-            OperationResult moveResult = _contentService.MoveToRecycleBin(foundContent,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+            OperationResult moveResult = _contentService.MoveToRecycleBin(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
             if (moveResult.Success == false)
             {
                 return ValidationProblem();
@@ -1906,7 +1936,8 @@ public class ContentController : ContentControllerBase
         }
         else
         {
-            OperationResult deleteResult = _contentService.Delete(foundContent,
+            OperationResult deleteResult = _contentService.Delete(
+                foundContent,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
             if (deleteResult.Success == false)
             {
@@ -1956,8 +1987,7 @@ public class ContentController : ContentControllerBase
         var resource =
             new ContentPermissionsResource(_contentService.GetById(sorted.ParentId), ActionSort.ActionLetter);
         AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource,
-                AuthorizationPolicies.ContentPermissionByResource);
+            await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -1966,7 +1996,8 @@ public class ContentController : ContentControllerBase
         try
         {
             // Save content with new sort order and update content xml in db accordingly
-            OperationResult sortResult = _contentService.Sort(sorted.IdSortOrder,
+            OperationResult sortResult = _contentService.Sort(
+                sorted.IdSortOrder,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             if (!sortResult.Success)
             {
@@ -1995,8 +2026,7 @@ public class ContentController : ContentControllerBase
         // Authorize...
         var resource = new ContentPermissionsResource(_contentService.GetById(move.ParentId), ActionMove.ActionLetter);
         AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource,
-                AuthorizationPolicies.ContentPermissionByResource);
+            await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -2015,8 +2045,7 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        _contentService.Move(toMove, move.ParentId,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        _contentService.Move(toMove, move.ParentId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         return Content(toMove.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
     }
@@ -2031,8 +2060,7 @@ public class ContentController : ContentControllerBase
         // Authorize...
         var resource = new ContentPermissionsResource(_contentService.GetById(copy.ParentId), ActionCopy.ActionLetter);
         AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource,
-                AuthorizationPolicies.ContentPermissionByResource);
+            await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -2050,8 +2078,7 @@ public class ContentController : ContentControllerBase
             return null;
         }
 
-        IContent? c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        IContent? c = _contentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         if (c is null)
         {
@@ -2079,8 +2106,7 @@ public class ContentController : ContentControllerBase
         // Authorize...
         var resource = new ContentPermissionsResource(foundContent, ActionUnpublish.ActionLetter);
         AuthorizationResult authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, resource,
-                AuthorizationPolicies.ContentPermissionByResource);
+            await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbid();
@@ -2090,8 +2116,7 @@ public class ContentController : ContentControllerBase
         if (model.Cultures?.Length == 0 || model.Cultures?.Length == languageCount)
         {
             //this means that the entire content item will be unpublished
-            PublishResult unpublishResult = _contentService.Unpublish(foundContent,
-                userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+            PublishResult unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             ContentItemDisplayWithSchedule? content = MapToDisplayWithSchedule(foundContent);
 
@@ -2114,8 +2139,7 @@ public class ContentController : ContentControllerBase
             {
                 foreach (var c in model.Cultures)
                 {
-                    PublishResult result = _contentService.Unpublish(foundContent, c,
-                        _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+                    PublishResult result = _contentService.Unpublish(foundContent, c, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
                     results[c] = result;
                     if (result.Result == PublishResultType.SuccessUnpublishMandatoryCulture)
                     {
@@ -2141,8 +2165,7 @@ public class ContentController : ContentControllerBase
             {
                 content?.AddSuccessNotification(
                     _localizedTextService.Localize("conten", "unpublish"),
-                    _localizedTextService.Localize("speechBubbles", "contentCultureUnpublished",
-                        new[] {_allLangs.Value[r.Key].CultureName}));
+                    _localizedTextService.Localize("speechBubbles", "contentCultureUnpublished", new[] { _allLangs.Value[r.Key].CultureName }));
             }
 
             return content;
@@ -2194,8 +2217,7 @@ public class ContentController : ContentControllerBase
             _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
 
 
-        if (permission?.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(),
-                StringComparer.Ordinal) == false)
+        if (permission?.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
         {
             HttpContext.SetReasonPhrase("Permission Denied.");
             return BadRequest("You do not have permission to assign domains on that node.");
@@ -2219,7 +2241,8 @@ public class ContentController : ContentControllerBase
             {
                 wildcard = new UmbracoDomain("*" + model.NodeId)
                 {
-                    LanguageId = model.Language, RootContentId = model.NodeId
+                    LanguageId = model.Language,
+                    RootContentId = model.NodeId
                 };
             }
 
@@ -2307,7 +2330,7 @@ public class ContentController : ContentControllerBase
             else
             {
                 // yet there is a race condition here...
-                var newDomain = new UmbracoDomain(name) {LanguageId = domainModel.Lang, RootContentId = model.NodeId};
+                var newDomain = new UmbracoDomain(name) { LanguageId = domainModel.Lang, RootContentId = model.NodeId };
                 Attempt<OperationResult?> saveAttempt = _domainService.Save(newDomain);
                 if (saveAttempt == false)
                 {
@@ -2327,10 +2350,12 @@ public class ContentController : ContentControllerBase
     ///     and we're dealing with variant content, then call the base class HandleInvalidModelState
     /// </summary>
     /// <param name="display"></param>
+    /// <param name="cultureForInvariantErrors"></param>
     /// <remarks>
     ///     This is required to wire up the validation in the save/publish dialog
     /// </remarks>
-    private void HandleInvalidModelState<TVariant>(ContentItemDisplay<TVariant>? display,
+    private void HandleInvalidModelState<TVariant>(
+        ContentItemDisplay<TVariant>? display,
         string? cultureForInvariantErrors)
         where TVariant : ContentVariantDisplay
     {
@@ -2342,7 +2367,7 @@ public class ContentController : ContentControllerBase
 
             if (variantErrors is not null)
             {
-                foreach (var (culture, segment) in variantErrors)
+                foreach ((string? culture, string? segment) in variantErrors)
                 {
                     AddVariantValidationError(culture, segment, "speechBubbles", "contentCultureValidationError");
                 }
@@ -2357,7 +2382,7 @@ public class ContentController : ContentControllerBase
     private void MapValuesForPersistence(ContentItemSave contentSave)
     {
         // inline method to determine the culture and segment to persist the property
-        (string? culture, string? segment) PropertyCultureAndSegment(IProperty? property, ContentVariantSave variant)
+        static (string? culture, string? segment) PropertyCultureAndSegment(IProperty? property, ContentVariantSave variant)
         {
             var culture = property?.PropertyType.VariesByCulture() ?? false ? variant.Culture : null;
             var segment = property?.PropertyType.VariesBySegment() ?? false ? variant.Segment : null;
@@ -2422,13 +2447,13 @@ public class ContentController : ContentControllerBase
                 (save, property) =>
                 {
                     // Get property value
-                    var (culture, segment) = PropertyCultureAndSegment(property, variant);
+                    (string? culture, string? segment) = PropertyCultureAndSegment(property, variant);
                     return property?.GetValue(culture, segment);
                 },
                 (save, property, v) =>
                 {
                     // Set property value
-                    var (culture, segment) = PropertyCultureAndSegment(property, variant);
+                    (string? culture, string? segment) = PropertyCultureAndSegment(property, variant);
                     property?.SetValue(v, culture, segment);
                 },
                 variant.Culture);
@@ -2456,8 +2481,7 @@ public class ContentController : ContentControllerBase
             if (template is null)
             {
                 // ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}",
-                    contentSave.TemplateAlias);
+                _logger.LogWarning("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
             }
             else if (contentSave.PersistedContent is not null && template.Id != contentSave.PersistedContent.TemplateId)
             {
@@ -2530,8 +2554,7 @@ public class ContentController : ContentControllerBase
     /// <param name="successfulCultures">
     ///     This is null when dealing with invariant content, else it's the cultures that were successfully published
     /// </param>
-    private void AddMessageForPublishStatus(IReadOnlyCollection<PublishResult> statuses, INotificationModel display,
-        string[]? successfulCultures = null)
+    private void AddMessageForPublishStatus(IReadOnlyCollection<PublishResult> statuses, INotificationModel display, string[]? successfulCultures = null)
     {
         var totalStatusCount = statuses.Count();
 
@@ -2594,13 +2617,12 @@ public class ContentController : ContentControllerBase
                             {
                                 display.AddSuccessNotification(
                                     _localizedTextService.Localize("speechBubbles", "editContentPublishedHeader"),
-                                    _localizedTextService.Localize("speechBubbles", "editVariantPublishedText",
-                                        new[] {_allLangs.Value[c].CultureName}));
+                                    _localizedTextService.Localize("speechBubbles", "editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
                             }
                         }
                     }
                 }
-                    break;
+                break;
                 case PublishResultType.SuccessPublish:
                 {
                     // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
@@ -2613,8 +2635,7 @@ public class ContentController : ContentControllerBase
                         display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles", "editContentPublishedHeader"),
                             totalStatusCount > 1
-                                ? _localizedTextService.Localize("speechBubbles", "editMultiContentPublishedText",
-                                    new[] {itemCount.ToInvariantString()})
+                                ? _localizedTextService.Localize("speechBubbles", "editMultiContentPublishedText", new[] { itemCount.ToInvariantString() })
                                 : _localizedTextService.Localize("speechBubbles", "editContentPublishedText"));
                     }
                     else
@@ -2624,61 +2645,55 @@ public class ContentController : ContentControllerBase
                             display.AddSuccessNotification(
                                 _localizedTextService.Localize("speechBubbles", "editContentPublishedHeader"),
                                 totalStatusCount > 1
-                                    ? _localizedTextService.Localize("speechBubbles", "editMultiVariantPublishedText",
-                                        new[] {itemCount.ToInvariantString(), _allLangs.Value[c].CultureName})
-                                    : _localizedTextService.Localize("speechBubbles", "editVariantPublishedText",
-                                        new[] {_allLangs.Value[c].CultureName}));
+                                    ? _localizedTextService.Localize("speechBubbles", "editMultiVariantPublishedText", new[] { itemCount.ToInvariantString(), _allLangs.Value[c].CultureName })
+                                    : _localizedTextService.Localize("speechBubbles", "editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
                         }
                     }
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishPathNotPublished:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "contentPublishedFailedByParent",
-                            new[] {names}).Trim());
+                        _localizedTextService.Localize("publish", "contentPublishedFailedByParent", new[] { names }).Trim());
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishCancelledByEvent:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
-                    AddCancelMessage(display, "publish", "contentPublishedFailedByEvent", new[] {names});
+                    AddCancelMessage(display, "publish", "contentPublishedFailedByEvent", new[] { names });
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishAwaitingRelease:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "contentPublishedFailedAwaitingRelease",
-                            new[] {names}).Trim());
+                        _localizedTextService.Localize("publish", "contentPublishedFailedAwaitingRelease", new[] { names }).Trim());
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishHasExpired:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "contentPublishedFailedExpired",
-                            new[] {names}).Trim());
+                        _localizedTextService.Localize("publish", "contentPublishedFailedExpired", new[] { names }).Trim());
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishIsTrashed:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
-                        _localizedTextService.Localize("publish", "contentPublishedFailedIsTrashed",
-                            new[] {names}).Trim());
+                        _localizedTextService.Localize("publish", "contentPublishedFailedIsTrashed", new[] { names }).Trim());
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishContentInvalid:
                 {
                     if (successfulCultures == null)
@@ -2686,24 +2701,23 @@ public class ContentController : ContentControllerBase
                         var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                         display.AddWarningNotification(
                             _localizedTextService.Localize(null, "publish"),
-                            _localizedTextService.Localize("publish", "contentPublishedFailedInvalid",
-                                new[] {names}).Trim());
+                            _localizedTextService.Localize("publish", "contentPublishedFailedInvalid", new[] { names }).Trim());
                     }
                     else
                     {
                         foreach (var c in successfulCultures)
                         {
-                            var names = string.Join(", ",
+                            var names = string.Join(
+                                ", ",
                                 status.Select(x =>
                                     $"'{(x.Content?.ContentType.VariesByCulture() ?? false ? x.Content.GetCultureName(c) : x.Content?.Name)}'"));
                             display.AddWarningNotification(
                                 _localizedTextService.Localize(null, "publish"),
-                                _localizedTextService.Localize("publish", "contentPublishedFailedInvalid",
-                                    new[] {names}).Trim());
+                                _localizedTextService.Localize("publish", "contentPublishedFailedInvalid", new[] { names }).Trim());
                         }
                     }
                 }
-                    break;
+                break;
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
@@ -2802,7 +2816,8 @@ public class ContentController : ContentControllerBase
         return notifications;
     }
 
-    public IActionResult PostNotificationOptions(int contentId,
+    public IActionResult PostNotificationOptions(
+        int contentId,
         [FromQuery(Name = "notifyOptions[]")] string[] notifyOptions)
     {
         if (contentId <= 0)
@@ -2816,8 +2831,7 @@ public class ContentController : ContentControllerBase
             return NotFound();
         }
 
-        _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content,
-            notifyOptions);
+        _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, content, notifyOptions);
 
         return NoContent();
     }
@@ -2845,7 +2859,7 @@ public class ContentController : ContentControllerBase
             out var totalRecords,
             culture);
 
-        var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize) {Items = results};
+        var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize) { Items = results };
 
         return Ok(model);
     }
@@ -2861,8 +2875,7 @@ public class ContentController : ContentControllerBase
             return NotFound();
         }
 
-        _contentVersionService.SetPreventCleanup(versionId, preventCleanup,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         return NoContent();
     }
@@ -2889,7 +2902,9 @@ public class ContentController : ContentControllerBase
         {
             var rollbackVersion = new RollbackVersion
             {
-                VersionId = version.VersionId, VersionDate = version.UpdateDate, VersionAuthorId = version.WriterId
+                VersionId = version.VersionId,
+                VersionDate = version.UpdateDate,
+                VersionAuthorId = version.WriterId
             };
 
             rollbackVersions.Add(rollbackVersion);
@@ -2928,8 +2943,7 @@ public class ContentController : ContentControllerBase
     [HttpPost]
     public IActionResult PostRollbackContent(int contentId, int versionId, string culture = "*")
     {
-        OperationResult rollbackResult = _contentService.Rollback(contentId, versionId, culture,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        OperationResult rollbackResult = _contentService.Rollback(contentId, versionId, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         if (rollbackResult.Success)
         {

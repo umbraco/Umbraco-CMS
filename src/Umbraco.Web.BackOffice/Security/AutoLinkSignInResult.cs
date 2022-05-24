@@ -14,17 +14,17 @@ public class AutoLinkSignInResult : SignInResult
     {
     }
 
-    public static AutoLinkSignInResult FailedNotLinked { get; } = new() {Succeeded = false};
+    public static AutoLinkSignInResult FailedNotLinked { get; } = new() { Succeeded = false };
 
-    public static AutoLinkSignInResult FailedNoEmail { get; } = new() {Succeeded = false};
+    public static AutoLinkSignInResult FailedNoEmail { get; } = new() { Succeeded = false };
 
     public IReadOnlyCollection<string> Errors { get; } = Array.Empty<string>();
 
-    public static AutoLinkSignInResult FailedException(string error) => new(new[] {error}) {Succeeded = false};
+    public static AutoLinkSignInResult FailedException(string error) => new(new[] { error }) { Succeeded = false };
 
     public static AutoLinkSignInResult FailedCreatingUser(IReadOnlyCollection<string> errors) =>
-        new(errors) {Succeeded = false};
+        new(errors) { Succeeded = false };
 
     public static AutoLinkSignInResult FailedLinkingUser(IReadOnlyCollection<string> errors) =>
-        new(errors) {Succeeded = false};
+        new(errors) { Succeeded = false };
 }

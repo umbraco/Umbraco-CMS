@@ -72,10 +72,9 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
             // Limit the action/id to only allow characters - this is so this route doesn't hog all other
             // routes like: /umbraco/channels/word.aspx, etc...
             // (Not that we have to worry about too many of those these days, there still might be a need for these constraints).
-            new {action = @"[a-zA-Z]*", id = @"[a-zA-Z]*"});
+            new { action = @"[a-zA-Z]*", id = @"[a-zA-Z]*" });
 
-        endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeApiArea,
-            true, string.Empty);
+        endpoints.MapUmbracoApiRoute<AuthenticationController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeApiArea, true, string.Empty);
     }
 
     /// <summary>

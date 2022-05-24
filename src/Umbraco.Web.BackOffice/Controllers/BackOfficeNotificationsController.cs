@@ -22,7 +22,7 @@ public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonC
     /// <returns></returns>
     protected OkObjectResult Ok(string message)
     {
-        var notificationModel = new SimpleNotificationModel {Message = message};
+        var notificationModel = new SimpleNotificationModel { Message = message };
         notificationModel.AddSuccessNotification(message, string.Empty);
 
         return new OkObjectResult(notificationModel);
@@ -44,7 +44,7 @@ public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonC
     /// <returns></returns>
     protected ActionResult ValidationProblem(string? errorHeader, string errorMessage)
     {
-        var notificationModel = new SimpleNotificationModel {Message = errorMessage};
+        var notificationModel = new SimpleNotificationModel { Message = errorMessage };
         notificationModel.AddErrorNotification(errorHeader, errorMessage);
         return new ValidationErrorResult(notificationModel);
     }

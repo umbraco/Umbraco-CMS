@@ -119,8 +119,10 @@ public class CodeFileController : BackOfficeNotificationsController
         switch (type)
         {
             case Constants.Trees.PartialViews:
-                var view = new PartialView(PartialViewType.PartialView, display.VirtualPath ?? string.Empty);
-                view.Content = display.Content;
+                var view = new PartialView(PartialViewType.PartialView, display.VirtualPath ?? string.Empty)
+                {
+                    Content = display.Content,
+                };
                 Attempt<IPartialView?> result = _fileService.CreatePartialView(view, display.Snippet, currentUser?.Id);
                 if (result.Success)
                 {
@@ -130,8 +132,10 @@ public class CodeFileController : BackOfficeNotificationsController
                 return ValidationProblem(result.Exception?.Message);
 
             case Constants.Trees.PartialViewMacros:
-                var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath ?? string.Empty);
-                viewMacro.Content = display.Content;
+                var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath ?? string.Empty)
+                {
+                    Content = display.Content,
+                };
                 Attempt<IPartialView?> resultMacro =
                     _fileService.CreatePartialViewMacro(viewMacro, display.Snippet, currentUser?.Id);
                 if (resultMacro.Success)
@@ -217,7 +221,7 @@ public class CodeFileController : BackOfficeNotificationsController
                 break;
         }
 
-        return new CodeFileDisplay {VirtualPath = virtualPath, Path = Url.GetTreePathFromFilePath(virtualPath)};
+        return new CodeFileDisplay { VirtualPath = virtualPath, Path = Url.GetTreePathFromFilePath(virtualPath) };
     }
 
     /// <summary>
@@ -342,7 +346,8 @@ public class CodeFileController : BackOfficeNotificationsController
 
         return snippets.Select(snippet => new SnippetDisplay
         {
-            Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(), FileName = snippet
+            Name = snippet.SplitPascalCasing(_shortStringHelper).ToFirstUpperInvariant(),
+            FileName = snippet,
         }).ToList();
     }
 
@@ -372,8 +377,7 @@ public class CodeFileController : BackOfficeNotificationsController
         {
             case Constants.Trees.PartialViews:
                 codeFileDisplay =
-                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView,
-                        string.Empty));
+                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
                 if (codeFileDisplay is not null)
                 {
                     codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
@@ -386,8 +390,7 @@ public class CodeFileController : BackOfficeNotificationsController
                 break;
             case Constants.Trees.PartialViewMacros:
                 codeFileDisplay =
-                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro,
-                        string.Empty));
+                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
                 if (codeFileDisplay is not null)
                 {
                     codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
@@ -464,8 +467,7 @@ public class CodeFileController : BackOfficeNotificationsController
         {
             case Constants.Trees.PartialViews:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.PartialViews,
-                            virtualPath))))
+                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.PartialViews, virtualPath))))
                 {
                     _fileService.DeletePartialViewFolder(virtualPath);
                     return Ok();
@@ -476,13 +478,11 @@ public class CodeFileController : BackOfficeNotificationsController
                     return Ok();
                 }
 
-                return new UmbracoProblemResult("No Partial View or folder found with the specified path",
-                    HttpStatusCode.NotFound);
+                return new UmbracoProblemResult("No Partial View or folder found with the specified path", HttpStatusCode.NotFound);
 
             case Constants.Trees.PartialViewMacros:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.MacroPartials,
-                            virtualPath))))
+                        _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.MacroPartials, virtualPath))))
                 {
                     _fileService.DeletePartialViewMacroFolder(virtualPath);
                     return Ok();
@@ -493,13 +493,11 @@ public class CodeFileController : BackOfficeNotificationsController
                     return Ok();
                 }
 
-                return new UmbracoProblemResult("No Partial View Macro or folder found with the specified path",
-                    HttpStatusCode.NotFound);
+                return new UmbracoProblemResult("No Partial View Macro or folder found with the specified path", HttpStatusCode.NotFound);
 
             case Constants.Trees.Scripts:
                 if (IsDirectory(
-                        _hostingEnvironment.MapPathWebRoot(
-                            Path.Combine(_globalSettings.UmbracoScriptsPath, virtualPath))))
+                        _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoScriptsPath, virtualPath))))
                 {
                     _fileService.DeleteScriptFolder(virtualPath);
                     return Ok();
@@ -511,8 +509,7 @@ public class CodeFileController : BackOfficeNotificationsController
                     return Ok();
                 }
 
-                return new UmbracoProblemResult("No Script or folder found with the specified path",
-                    HttpStatusCode.NotFound);
+                return new UmbracoProblemResult("No Script or folder found with the specified path", HttpStatusCode.NotFound);
             case Constants.Trees.Stylesheets:
                 if (IsDirectory(
                         _hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoCssPath, virtualPath))))
@@ -624,7 +621,9 @@ public class CodeFileController : BackOfficeNotificationsController
 
         return StylesheetHelper.ParseRules(data.Content)?.Select(rule => new StylesheetRule
         {
-            Name = rule.Name, Selector = rule.Selector, Styles = rule.Styles
+            Name = rule.Name,
+            Selector = rule.Selector,
+            Styles = rule.Styles
         }).ToArray();
     }
 
@@ -654,10 +653,13 @@ public class CodeFileController : BackOfficeNotificationsController
         {
             foreach (StylesheetRule rule in data.Rules)
             {
-                data.Content = StylesheetHelper.AppendRule(data.Content,
+                data.Content = StylesheetHelper.AppendRule(
+                    data.Content,
                     new Core.Strings.Css.StylesheetRule
                     {
-                        Name = rule.Name, Selector = rule.Selector, Styles = rule.Styles
+                        Name = rule.Name,
+                        Selector = rule.Selector,
+                        Styles = rule.Styles
                     });
             }
 
@@ -677,20 +679,25 @@ public class CodeFileController : BackOfficeNotificationsController
     ///     use a normal file system because they must exist on a real file system for ASP.NET to work.
     /// </remarks>
     private IScript? CreateOrUpdateScript(CodeFileDisplay display) =>
-        CreateOrUpdateFile(display, ".js", _fileSystems.ScriptsFileSystem,
+        CreateOrUpdateFile(
+            display,
+            ".js",
+            _fileSystems.ScriptsFileSystem,
             name => _fileService.GetScript(name),
             (script, userId) => _fileService.SaveScript(script, userId),
             name => new Script(name ?? string.Empty));
 
     private IStylesheet? CreateOrUpdateStylesheet(CodeFileDisplay display) =>
-        CreateOrUpdateFile(display, ".css", _fileSystems.StylesheetsFileSystem,
+        CreateOrUpdateFile(
+            display,
+            ".css",
+            _fileSystems.StylesheetsFileSystem,
             name => _fileService.GetStylesheet(name),
             (stylesheet, userId) => _fileService.SaveStylesheet(stylesheet, userId),
-            name => new Stylesheet(name ?? string.Empty)
-        );
+            name => new Stylesheet(name ?? string.Empty));
 
-    private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem? fileSystem,
-        Func<string?, T> getFileByName, Action<T, int?> saveFile, Func<string?, T> createFile) where T : IFile?
+    private T CreateOrUpdateFile<T>(CodeFileDisplay display, string extension, IFileSystem? fileSystem, Func<string?, T> getFileByName, Action<T, int?> saveFile, Func<string?, T> createFile)
+        where T : IFile?
     {
         //must always end with the correct extension
         display.Name = EnsureCorrectFileExtension(display.Name, extension);
@@ -736,12 +743,15 @@ public class CodeFileController : BackOfficeNotificationsController
     }
 
     private Attempt<IPartialView?> CreateOrUpdatePartialView(CodeFileDisplay display) =>
-        CreateOrUpdatePartialView(display, Constants.SystemDirectories.PartialViews,
-            _fileService.GetPartialView, _fileService.SavePartialView, _fileService.CreatePartialView);
+        CreateOrUpdatePartialView(
+            display,
+            Constants.SystemDirectories.PartialViews,
+            _fileService.GetPartialView,
+            _fileService.SavePartialView,
+            _fileService.CreatePartialView);
 
     private Attempt<IPartialView?> CreateOrUpdatePartialViewMacro(CodeFileDisplay display) =>
-        CreateOrUpdatePartialView(display, Constants.SystemDirectories.MacroPartials,
-            _fileService.GetPartialViewMacro, _fileService.SavePartialViewMacro, _fileService.CreatePartialViewMacro);
+        CreateOrUpdatePartialView(display, Constants.SystemDirectories.MacroPartials, _fileService.GetPartialViewMacro, _fileService.SavePartialViewMacro, _fileService.CreatePartialViewMacro);
 
     /// <summary>
     ///     Helper method to take care of persisting partial views or partial view macros - so we're not duplicating the same
@@ -754,10 +764,13 @@ public class CodeFileController : BackOfficeNotificationsController
     /// <param name="createView"></param>
     /// <returns></returns>
     private Attempt<IPartialView?> CreateOrUpdatePartialView(
-        CodeFileDisplay display, string systemDirectory,
+        CodeFileDisplay display,
+        string systemDirectory,
         Func<string, IPartialView?> getView,
-        Func<IPartialView, int?, Attempt<IPartialView?>> saveView,
-        Func<IPartialView, string?, int?, Attempt<IPartialView?>> createView)
+        Func<IPartialView, int?,
+            Attempt<IPartialView?>> saveView,
+        Func<IPartialView, string?,
+            int?, Attempt<IPartialView?>> createView)
     {
         //must always end with the correct extension
         display.Name = EnsureCorrectFileExtension(display.Name, ".cshtml");
@@ -778,8 +791,10 @@ public class CodeFileController : BackOfficeNotificationsController
         }
         else
         {
-            view = new PartialView(PartialViewType.PartialView, virtualPath + display.Name);
-            view.Content = display.Content;
+            view = new PartialView(PartialViewType.PartialView, virtualPath + display.Name)
+            {
+                Content = display.Content
+            };
             partialViewResult = createView(view, display.Snippet, currentUser?.Id);
         }
 

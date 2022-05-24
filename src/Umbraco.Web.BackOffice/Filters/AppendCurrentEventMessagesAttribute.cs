@@ -22,8 +22,7 @@ internal sealed class AppendCurrentEventMessagesAttribute : TypeFilterAttribute
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public AppendCurrentEventMessagesFilter(IUmbracoContextAccessor umbracoContextAccessor,
-            IEventMessagesFactory eventMessagesFactory)
+        public AppendCurrentEventMessagesFilter(IUmbracoContextAccessor umbracoContextAccessor, IEventMessagesFactory eventMessagesFactory)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _eventMessagesFactory = eventMessagesFactory;
@@ -36,8 +35,7 @@ internal sealed class AppendCurrentEventMessagesAttribute : TypeFilterAttribute
                 return;
             }
 
-            if (context.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(),
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (context.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 return;
             }
@@ -52,8 +50,7 @@ internal sealed class AppendCurrentEventMessagesAttribute : TypeFilterAttribute
                 return;
             }
 
-            var notifications = obj.Value as INotificationModel;
-            if (notifications == null)
+            if (obj.Value is not INotificationModel notifications)
             {
                 return;
             }
@@ -90,7 +87,9 @@ internal sealed class AppendCurrentEventMessagesAttribute : TypeFilterAttribute
 
                 notifications.Notifications?.Add(new BackOfficeNotification
                 {
-                    Message = eventMessage.Message, Header = eventMessage.Category, NotificationType = msgType
+                    Message = eventMessage.Message,
+                    Header = eventMessage.Category,
+                    NotificationType = msgType
                 });
             }
         }

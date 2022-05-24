@@ -49,6 +49,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
     /// <param name="userService">The <see cref="IUserService" /></param>
     /// <param name="ipResolver">The <see cref="IIpResolver" /></param>
     /// <param name="systemClock">The <see cref="ISystemClock" /></param>
+    /// <param name="umbracoRequestPaths">The <see cref="UmbracoRequestPaths"/></param>
+    /// <param name="basicAuthService">The <see cref="IBasicAuthService"/></param>
     public ConfigureBackOfficeCookieOptions(
         IServiceProvider serviceProvider,
         IUmbracoContextAccessor umbracoContextAccessor,
@@ -112,7 +114,8 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
         // Note: the purpose for the data protector must remain fixed for interop to work.
         IDataProtector dataProtector = options.DataProtectionProvider.CreateProtector(
             "Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware",
-            Constants.Security.BackOfficeAuthenticationType, "v2");
+            Constants.Security.BackOfficeAuthenticationType,
+            "v2");
         var ticketDataFormat = new TicketDataFormat(dataProtector);
 
         options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOut, ticketDataFormat);
@@ -122,8 +125,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
             _umbracoContextAccessor,
             _runtimeState,
             _umbracoRequestPaths,
-            _basicAuthService
-        );
+            _basicAuthService);
 
         options.Events = new CookieAuthenticationEvents
         {
@@ -197,19 +199,28 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                     // generate a session id and assign it
                     // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
                     Guid session = _runtimeState.Level == RuntimeLevel.Run
-                        ? _userService.CreateLoginSession(backOfficeIdentity.GetId()!.Value,
+                        ? _userService.CreateLoginSession(
+                            backOfficeIdentity.GetId()!.Value,
                             _ipResolver.GetCurrentRequestIpAddress())
                         : Guid.NewGuid();
 
                     // add our session claim
-                    backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(),
-                        ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
+                    backOfficeIdentity.AddClaim(new Claim(
+                        Constants.Security.SessionIdClaimType,
+                        session.ToString(),
+                        ClaimValueTypes.String,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        backOfficeIdentity));
 
                     // since it is a cookie-based authentication add that claim
-                    backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String,
+                    backOfficeIdentity.AddClaim(new Claim(
+                        ClaimTypes.CookiePath,
+                        "/",
+                        ClaimValueTypes.String,
                         Constants.Security.BackOfficeAuthenticationType,
-                        Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
+                        Constants.Security.BackOfficeAuthenticationType,
+                        backOfficeIdentity));
                 }
 
                 return Task.CompletedTask;
@@ -245,7 +256,7 @@ public class ConfigureBackOfficeCookieOptions : IConfigureNamedOptions<CookieAut
                 };
                 foreach (var cookie in cookies)
                 {
-                    ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext!, cookie, new CookieOptions {Path = "/"});
+                    ctx.Options.CookieManager.DeleteCookie(ctx.HttpContext!, cookie, new CookieOptions { Path = "/" });
                 }
 
                 return Task.CompletedTask;

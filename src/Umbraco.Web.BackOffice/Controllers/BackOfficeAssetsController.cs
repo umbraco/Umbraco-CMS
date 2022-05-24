@@ -14,12 +14,14 @@ public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
 {
     private readonly IFileSystem _jsLibFileSystem;
 
-    public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment,
-        ILoggerFactory loggerFactory, IOptionsSnapshot<GlobalSettings> globalSettings)
+    public BackOfficeAssetsController(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, ILoggerFactory loggerFactory, IOptionsSnapshot<GlobalSettings> globalSettings)
     {
         var path = globalSettings.Value.UmbracoPath + Path.DirectorySeparatorChar + "lib";
-        _jsLibFileSystem = new PhysicalFileSystem(ioHelper, hostingEnvironment,
-            loggerFactory.CreateLogger<PhysicalFileSystem>(), hostingEnvironment.MapPathWebRoot(path),
+        _jsLibFileSystem = new PhysicalFileSystem(
+            ioHelper,
+            hostingEnvironment,
+            loggerFactory.CreateLogger<PhysicalFileSystem>(),
+            hostingEnvironment.MapPathWebRoot(path),
             hostingEnvironment.ToAbsolute(path));
     }
 
@@ -29,7 +31,7 @@ public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
         const string momentLocaleFolder = "moment";
         const string flatpickrLocaleFolder = "flatpickr/l10n";
 
-        return new {moment = GetLocales(momentLocaleFolder), flatpickr = GetLocales(flatpickrLocaleFolder)};
+        return new { moment = GetLocales(momentLocaleFolder), flatpickr = GetLocales(flatpickrLocaleFolder) };
     }
 
     private IEnumerable<string> GetLocales(string path)
@@ -38,7 +40,7 @@ public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
         for (var i = 0; i < cultures.Count; i++)
         {
             cultures[i] = cultures[i]
-                .Substring(cultures[i].IndexOf(path, StringComparison.Ordinal) + path.Length + 1);
+[(cultures[i].IndexOf(path, StringComparison.Ordinal) + path.Length + 1)..];
         }
 
         return cultures;
