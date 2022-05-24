@@ -13,17 +13,43 @@
           DestinationFolder="$(MSBuildProjectDirectory)"
           SkipUnchangedFiles="true" />
   </Target>
-  
+
   <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
     <ItemGroup>
-        <_AppPluginsFiles Include="App_Plugins\**" />
+      <_AppPluginsFiles Include="App_Plugins\**" />
 
-        <ContentWithTargetPath
-            Include="@(_AppPluginsFiles)"
-            Exclude="@(ContentWithTargetPath)"
-            TargetPath="%(Identity)"
-            CopyToOutputDirectory="PreserveNewest"
-            CopyToPublishDirectory="PreserveNewest"/>
+      <ContentWithTargetPath
+        Include="@(_AppPluginsFiles)"
+        Exclude="@(ContentWithTargetPath)"
+        TargetPath="%(Identity)"
+        CopyToOutputDirectory="PreserveNewest"
+        CopyToPublishDirectory="PreserveNewest"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="IncludeAppPluginsContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
+    <ItemGroup>
+      <_AppPluginsFiles Include="App_Plugins\**" />
+
+      <ContentWithTargetPath
+        Include="@(_AppPluginsFiles)"
+        Exclude="@(ContentWithTargetPath)"
+        TargetPath="%(Identity)"
+        CopyToOutputDirectory="PreserveNewest"
+        CopyToPublishDirectory="PreserveNewest"/>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
+    <ItemGroup>
+      <_UmbracoFolderFiles Include="umbraco\config\**" />
+      <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoBackOffice\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoInstall\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
+      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
+      <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
+      <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
 </Project>
