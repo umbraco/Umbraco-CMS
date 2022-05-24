@@ -116,13 +116,19 @@ namespace Umbraco.Cms.Core.Routing
                 if (culture == null)
                     culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
             }
+            else if(content.Ancestors().Any(x=>x.ContentType.VariesByCulture()))
+            {
+                //We need to ensure all ancestors are also invariant, otherwise we have to set a culture to find the url
+                if (culture == null)
+                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            }
 
             if (current == null)
             {
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-            
+
 
             var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
@@ -230,7 +236,7 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-                
+
 
             var url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))
