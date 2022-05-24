@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 new ActionCollection(() => null),
                 Mock.Of<ISqlContext>(),
                 Mock.Of<IJsonSerializer>(),
-                Mock.Of<IScopeProvider>(),
+                Mock.Of<ICoreScopeProvider>(),
                 Mock.Of<IAuthorizationService>(),
                 Mock.Of<IContentVersionService>()
             );
