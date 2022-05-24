@@ -52,7 +52,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UmbracoInstallerPerformInstallRequest'
+              $ref: '#/components/schemas/UmbracoPerformInstallRequest'
         required: true
       responses:
         '201':
@@ -71,7 +71,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UmbracoInstallerDatabaseConfiguration'
+              $ref: '#/components/schemas/UmbracoPerformInstallDatabaseConfiguration'
         required: true
       responses:
         '201':
@@ -169,20 +169,39 @@ components:
       required:
         - version
     ConsentLevel:
+      type: string
+      enum:
+        - Minimal
+        - Basic
+        - Detailed
+    TelemetryModel:
       type: object
       properties:
         level:
-          type: string
-          enum:
-            - Minimal
-            - Basic
-            - Detailed
+          $ref: '#/components/schemas/ConsentLevel'
         description:
           type: string
       required:
         - level
         - description
-    UmbracoDatabaseConfiguration:
+    UmbracoInstallerUserModel:
+      type: object
+      properties:
+        minCharLength:
+          type: number
+          format: float
+        minNonAlphaNumericLength:
+          type: number
+          format: float
+        consentLevels:
+          type: array
+          items:
+            $ref: '#/components/schemas/TelemetryModel'
+      required:
+        - minCharLength
+        - minNonAlphaNumericLength
+        - consentLevels
+    UmbracoInstallerDatabaseModel:
       type: object
       properties:
         id:
@@ -197,8 +216,6 @@ components:
         providerName:
           type: string
           nullable: true
-        supportsQuickInstall:
-          type: boolean
         isAvailable:
           type: boolean
         requiresServer:
@@ -218,78 +235,25 @@ components:
         - displayName
         - defaultDatabaseName
         - providerName
-        - supportsQuickInstall
         - isAvailable
         - requiresServer
         - serverPlaceholder
         - requiresCredentials
         - supportsIntegratedAuthentication
         - requiresConnectionTest
-    UmbracoDatabaseConfigurationQuickInstall:
-      type: object
-      properties:
-        displayName:
-          type: string
-        defaultDatabaseName:
-          type: string
-      required:
-        - displayName
-        - defaultDatabaseName
-    UmbracoInstallerStepModel:
-      type: object
-      properties:
-        minCharLength:
-          type: number
-          format: float
-        minNonAlphaNumericLength:
-          type: number
-          format: float
-        customInstallAvailable:
-          type: boolean
-        consentLevels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConsentLevel'
-        databases:
-          type: array
-          items:
-            $ref: '#/components/schemas/UmbracoDatabaseConfiguration'
-        quickInstallSettings:
-          $ref: '#/components/schemas/UmbracoDatabaseConfigurationQuickInstall'
-    UmbracoInstallerStep:
-      type: object
-      properties:
-        model:
-          $ref: '#/components/schemas/UmbracoInstallerStepModel'
-          nullable: true
-        view:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        serverOrder:
-          type: number
-          format: float
-      required:
-        - model
-        - view
-        - name
-        - description
-        - serverOrder
     UmbracoInstaller:
       type: object
       properties:
-        installId:
-          type: string
-        steps:
+        user:
+          $ref: '#/components/schemas/UmbracoInstallerUserModel'
+        databases:
           type: array
           items:
-            $ref: '#/components/schemas/UmbracoInstallerStep'
+            $ref: '#/components/schemas/UmbracoInstallerDatabaseModel'
       required:
-        - installId
-        - steps
-    UmbracoInstallerDatabaseConfiguration:
+        - user
+        - databases
+    UmbracoPerformInstallDatabaseConfiguration:
       type: object
       properties:
         connectionString:
@@ -305,7 +269,7 @@ components:
         - providerName
         - integratedAuth
         - databaseProviderMetadataId
-    UmbracoInstallerPerformInstallRequest:
+    UmbracoPerformInstallRequest:
       type: object
       properties:
         name:
@@ -317,13 +281,9 @@ components:
         subscribeToNewsletter:
           type: boolean
         telemetryLevel:
-          type: string
-          enum:
-            - Minimal
-            - Basic
-            - Detailed
+          $ref: '#/components/schemas/ConsentLevel'
         database:
-          $ref: '#/components/schemas/UmbracoInstallerDatabaseConfiguration'
+          $ref: '#/components/schemas/UmbracoPerformInstallDatabaseConfiguration'
       required:
         - name
         - email
