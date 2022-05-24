@@ -658,6 +658,42 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 #endif
+        /// <inheritdoc />
+        Cms.Core.Scoping.IScope Cms.Core.Scoping.IScopeProvider.CreateScope(
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            IEventDispatcher? eventDispatcher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
+            bool? scopeFileSystems = null,
+            bool callContext = false,
+            bool autoComplete = false) =>
+            (Cms.Core.Scoping.IScope) CreateScope(
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                notificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete);
+
+        /// <inheritdoc />
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
+            RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
+            IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
+            (Core.Scoping.IScope)CreateDetachedScope(
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                scopedNotificationPublisher,
+                scopeFileSystems);
+
+        /// <inheritdoc />
+        void Core.Scoping.IScopeProvider.AttachScope(Core.Scoping.IScope scope, bool callContext) =>
+            AttachScope(scope, callContext);
+
+        /// <inheritdoc />
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.DetachScope() =>
+            (Core.Scoping.IScope)DetachScope();
     }
 
 #if DEBUG_SCOPES

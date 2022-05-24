@@ -1171,9 +1171,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.PublishedCache.NuCache
             }
         }
 
-        private static IScopeProvider GetScopeProvider()
+        private static ICoreScopeProvider GetScopeProvider()
         {
-            IScopeProvider scopeProvider = Mock.Of<IScopeProvider>();
+            ICoreScopeProvider scopeProvider = Mock.Of<ICoreScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.Context).Returns(() => null);
             return scopeProvider;

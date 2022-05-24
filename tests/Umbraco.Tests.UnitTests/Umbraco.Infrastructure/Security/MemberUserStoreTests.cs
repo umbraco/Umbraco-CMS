@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             _mockMemberService = new Mock<IMemberService>();
             var mockScope = new Mock<IScope>();
-            var mockScopeProvider = new Mock<IScopeProvider>();
+            var mockScopeProvider = new Mock<global::Umbraco.Cms.Infrastructure.Scoping.IScopeProvider>();
             mockScopeProvider
                 .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(mockScope.Object);
