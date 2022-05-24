@@ -35,7 +35,7 @@ class UMBAppElement extends UMBContextMixin(LitElement) {
 
   constructor () {
     super();
-    this.provide('umbNotificationService', notificationService);
+    this.provideContext('umbNotificationService', notificationService);
   }
 
   render() {
@@ -46,28 +46,24 @@ class UMBAppElement extends UMBContextMixin(LitElement) {
 
 ### Request context
 
-Contexts shared through the Context API are async. To request a new context send a context request using the ```requestContext``` method from the ```UMBContextRequesterMixin```.
-When a context is resolved the ```contextRecieved``` callback is called with all resolved contexts for that component.
-Until a requested context is resolved you should make sure to disable any functionality using that context.
+Contexts shared through the Context API are async. To request a new context send a context request using the ```requestContext``` method from the ```UMBContextRequestMixin```.
+When a context is resolved the callback given to the method is called with the context.
+Until a requested context is resolved you should make sure to disable or query any functionality using that context.
 
 ```ts
 import { html, LitElement } from 'lit';
 import type { UMBNotificationService } from './shell/shared/notification';
-import { UMBContextRequesterMixin } from './utils/context';
+import { UMBContextRequestMixin } from './utils/context';
 
-class MyElement extends UMBContextRequesterMixin(LitElement) {
+class MyElement extends UMBContextRequestMixin(LitElement) {
 
   private _notificationService: UMBNotificationService;
 
   constructor () {
     super();
-    this.requestContext('umbNotificationService');
-  }
-
-  contextRecieved(identifier, api) {
-    if(identifier = 'umbNotificationService') {
+    this.requestContext('umbNotificationService', (api) => {
       this._notificationService = api;
-    }
+    });
   }
 
   private _handleClick () {
@@ -122,7 +118,7 @@ This example shows how to use the ContextRequester class directly.
 ```ts
 import { html, LitElement } from 'lit';
 import { UMBNotificationService } from './notification.service';
-import { UMBContextRequester } from './utils/context';
+import { UMBContextRequest } from './utils/context';
 
 class MyElement extends LitElement {
 
@@ -131,7 +127,7 @@ class MyElement extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
-    new UMBContextRequester(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
+    new UMBContextRequest(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
       this._notificationService = _instance;
     });
   }
