@@ -5,14 +5,14 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { getUserSections } from '../api/fetcher';
-import { UmbContextInjectMixin } from '../core/context';
+import { UmbContextConsumerMixin } from '../core/context';
 import { UmbExtensionManifest, UmbExtensionRegistry, UmbManifestSectionMeta } from '../core/extension';
 import { UmbRouter } from '../core/router';
 
 // TODO: umb or not umb in file name?
 
 @customElement('umb-backoffice-header')
-export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
+export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
@@ -134,19 +134,13 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
   connectedCallback() {
     super.connectedCallback();
 
-    this.requestContext('umbRouter');
-    this.requestContext('umbExtensionRegistry');
-  }
-
-  contextInjected(contexts: Map<string, any>): void {
-    if (contexts.has('umbExtensionRegistry')) {
-      this._extensionRegistry = contexts.get('umbExtensionRegistry');
+    this.consumeContext('umbExtensionRegistry', (api: unknown) => {
+      this._extensionRegistry = api as UmbExtensionRegistry;
       this._useSections();
-    }
-
-    if (contexts.has('umbRouter')) {
-      this._router = contexts.get('umbRouter');
-    }
+    });
+    this.consumeContext('UmbRouter', (api: unknown) => {
+      this._router = api as UmbRouter;
+    });
   }
 
   private async _useSections() {
