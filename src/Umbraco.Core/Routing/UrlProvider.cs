@@ -111,14 +111,10 @@ namespace Umbraco.Cms.Core.Routing
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
             // (but only for variant content of course)
-            if (content.ContentType.VariesByCulture())
+            // We need to check all ancestors because urls are variant even for invariant content, if an ancestor is variant.
+            if (content.AncestorsOrSelf().Any(x=>x.ContentType.VariesByCulture()))
             {
-                if (culture == null)
-                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
-            }
-            else if(content.Ancestors().Any(x=>x.ContentType.VariesByCulture()))
-            {
-                //We need to ensure all ancestors are also invariant, otherwise we have to set a culture to find the url
+
                 if (culture == null)
                     culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
             }
