@@ -1,9 +1,20 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+import { state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
+
+import { UmbContextInjectMixin } from '../core/context';
+import { UmbSectionContext } from '../section.context';
+
+import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension';
+
+// TODO: lazy load these. How to we handle dynamic import of our typescript file?
+import '../content/content-section.element';
+import '../media/media-section.element';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends LitElement {
+export class UmbBackofficeMain extends UmbContextInjectMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -70,8 +81,56 @@ export class UmbBackofficeMain extends LitElement {
     `,
   ];
 
+  @state()
+  private _sectionElement?: HTMLElement;
+
+  private _sectionContext?: UmbSectionContext;
+  private _currentSectionSubscription?: Subscription;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.requestContext('umbRouter');
+    this.requestContext('umbSectionContext');
+  }
+
+  contextInjected(contexts: Map<string, any>): void {
+    if (contexts.has('umbSectionContext')) {
+      this._sectionContext = contexts.get('umbSectionContext');
+      this._useCurrentSection();
+    }
+  }
+
+  private _useCurrentSection () {
+    this._currentSectionSubscription?.unsubscribe();
+
+    this._currentSectionSubscription = this._sectionContext?.getCurrent()
+    .subscribe(section => {
+      this._createSectionElement(section);
+    });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._currentSectionSubscription?.unsubscribe();
+  }
+
+  private async _createSectionElement (section: UmbExtensionManifest<UmbManifestSectionMeta>) {
+    if (!section) return;
+
+    // TODO: How do we handle dynamic imports of our files?
+    if (section.js) {
+      await import(/* @vite-ignore */section.js);
+    }
+
+    if (section.elementName) {
+      this._sectionElement = document.createElement(section.elementName);
+    }
+  }
+
   render() {
     return html`
+      ${ this._sectionElement }
+      <!--
       <div id="editor">
         <div id="editor-top">
           <uui-input value="Home"></uui-input>
@@ -88,6 +147,7 @@ export class UmbBackofficeMain extends LitElement {
           <uui-button look="primary" color="positive">Save and publish</uui-button>
         </div>
       </div>
+      -->
     `;
   }
 }

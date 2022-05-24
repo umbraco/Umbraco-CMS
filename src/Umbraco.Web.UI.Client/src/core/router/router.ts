@@ -4,7 +4,7 @@ import { UmbRouterBeforeLeaveEvent } from './router-before-leave.event';
 
 export interface UmbRoute {
   path: string;
-  elementName: string;
+  alias: string;
   meta?: any;
 }
 
@@ -24,15 +24,13 @@ export interface UmbRouteElement extends HTMLElement {
 export class UmbRouter {
   private _routes: Array<UmbRoute> = [];
   private _host: HTMLElement;
-  private _outlet: HTMLElement;
   private _element?: UmbRouteElement;
 
   private _location: ReplaySubject<UmbRouteLocation> = new ReplaySubject(1);
   public readonly location: Observable<UmbRouteLocation> = this._location.asObservable();
 
-  constructor(host: HTMLElement, outlet: HTMLElement) {
+  constructor(host: HTMLElement) {
     this._host = host;
-    this._outlet = outlet;
 
     // Anchor Hijacker
     this._host.addEventListener('click', async (event: any) => {
@@ -110,15 +108,12 @@ export class UmbRouter {
     const canLeave = await this._requestLeave(location);
     if (!canLeave) return;
 
-    this._setupElement(location);
-
     const canEnter = await this._requestEnter(location);
     if (!canEnter) return;
 
     window.history.pushState(null, '', pathname);
 
     this._location.next(location);
-    this._render();
   }
 
   private _resolve(pathname: string): UmbRouteLocation | null {
@@ -143,21 +138,5 @@ export class UmbRouter {
     });
 
     return location;
-  }
-
-  private _setupElement(location: UmbRouteLocation) {
-    this._element = document.createElement(location.route.elementName);
-    this._element.location = location;
-  }
-
-  private async _render() {
-    if (!this._element) return;
-
-    const childNodes = this._outlet.childNodes;
-    childNodes.forEach((node) => {
-      this._outlet.removeChild(node);
-    });
-
-    this._outlet.appendChild(this._element);
   }
 }

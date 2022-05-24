@@ -1,31 +1,36 @@
 import '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+
+// TODO: lazy load these
+import './installer/installer.element';
 import './auth/login/login.element';
 import './auth/auth-layout.element';
 import './backoffice/backoffice.element';
-import './installer/installer.element';
+
+import { UmbSectionContext } from './section.context';
 
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { getInitStatus } from './api/fetcher';
-import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
+import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouteLocation, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
 import { UmbContextProvideMixin } from './core/context';
+import { Subscription } from 'rxjs';
 
 const routes: Array<UmbRoute> = [
   {
     path: '/login',
-    elementName: 'umb-login',
+    alias: 'login',
     meta: { requiresAuth: false },
   },
   {
     path: '/install',
-    elementName: 'umb-installer',
+    alias: 'install',
     meta: { requiresAuth: false },
   },
   {
     path: '/section/:section',
-    elementName: 'umb-backoffice',
+    alias: 'app',
     meta: { requiresAuth: true },
   },
 ];
@@ -42,7 +47,11 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     }
   `;
 
-  _router?: UmbRouter;
+  private _isInstalled = false;
+
+  private _view?: HTMLElement;
+  private _router?: UmbRouter;
+  private _locationSubscription?: Subscription;
 
   constructor() {
     super();
@@ -51,7 +60,10 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
 
   connectedCallback(): void {
     super.connectedCallback();
+    const { extensionRegistry } = window.Umbraco;
+
     this.provide('umbExtensionRegistry', window.Umbraco.extensionRegistry);
+    this.provide('umbSectionContext', new UmbSectionContext(extensionRegistry));
   }
 
   private _onBeforeEnter = (event: Event) => {
@@ -71,10 +83,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
   }
 
   protected async firstUpdated(): Promise<void> {
-    const outlet = this.shadowRoot?.getElementById('outlet');
-    if (!outlet) return;
-
-    this._router = new UmbRouter(this, outlet);
+    this._router = new UmbRouter(this);
     this._router.setRoutes(routes);
 
     // TODO: find a solution for magic strings
@@ -83,27 +92,59 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     try {
       const { data } = await getInitStatus({});
 
-      if (!data.installed) {
+      this._isInstalled = data.installed;
+
+      if (!this._isInstalled) {
         this._router.push('/install');
         return;
       }
       
-      if (!this._isAuthorized()) {
+      if (!this._isAuthorized() || window.location.pathname === '/install') {
         this._router.push('/login');
       } else {
-        const next = window.location.pathname === '/' ? '/section/content'  : window.location.pathname;
+        const next = window.location.pathname === '/' ? '/section/Content'  : window.location.pathname;
         this._router.push(next);
       }
+
+      this._useLocation();
 
     } catch (error) {
       console.log(error);
     }
   }
 
+  private _useLocation () {
+    this._locationSubscription?.unsubscribe();
+      
+    this._locationSubscription = this._router?.location
+    .subscribe((location: UmbRouteLocation) => {
+      if (location.route.alias === 'login') {
+        this._renderView('umb-login');
+        return;
+      }
+
+      if (location.route.alias === 'install') {
+        this._renderView('umb-installer');
+        return;
+      }
+
+      this._renderView('umb-backoffice');
+    });
+  }
+
+  _renderView (view: string) {
+    if (this._view?.tagName === view.toUpperCase()) return;
+    this._view = document.createElement(view);
+    this.requestUpdate();
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._locationSubscription?.unsubscribe();
+  }
+
   render() {
-    return html`
-      <div id="outlet"></div>
-    `;
+    return html`${this._view}`;
   }
 }
 
