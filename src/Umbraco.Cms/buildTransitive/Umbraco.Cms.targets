@@ -34,7 +34,6 @@
       <_UmbracoFolderFiles Include="umbraco\UmbracoBackOffice\**" />
       <_UmbracoFolderFiles Include="umbraco\UmbracoInstall\**" />
       <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
-      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
       <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
       <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
