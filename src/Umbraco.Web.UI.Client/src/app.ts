@@ -9,21 +9,24 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { getInitStatus } from './api/fetcher';
-import { UmbRoute, UmbRouter } from './core/router';
+import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
 import { UmbContextProvideMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
   {
     path: '/login',
     elementName: 'umb-login',
+    meta: { requiresAuth: false },
   },
   {
     path: '/install',
     elementName: 'umb-installer',
+    meta: { requiresAuth: false },
   },
   {
     path: '/section/:section',
     elementName: 'umb-backoffice',
+    meta: { requiresAuth: true },
   },
 ];
 
@@ -39,19 +42,32 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     }
   `;
 
-  @state()
-  _authorized = false;
-
   _router?: UmbRouter;
 
   constructor() {
     super();
-    this._authorized = sessionStorage.getItem('is-authenticated') === 'true';
+    this.addEventListener(umbRouterBeforeEnterEventType, this._onBeforeEnter);
   }
 
   connectedCallback(): void {
     super.connectedCallback();
     this.provide('umbExtensionRegistry', window.Umbraco.extensionRegistry);
+  }
+
+  private _onBeforeEnter = (event: Event) => {
+    if (!isUmbRouterBeforeEnterEvent(event)) return;
+    this._handleUnauthorizedNavigation(event);
+  }
+
+  private _handleUnauthorizedNavigation(event: UmbRouterBeforeEnterEvent) {
+    if (event.to.route.meta.requiresAuth && !this._isAuthorized()) {
+      event.preventDefault();
+      this._router?.push('/login');
+    }
+  }
+
+  private _isAuthorized(): boolean {
+    return sessionStorage.getItem('is-authenticated') === 'true';
   }
 
   protected async firstUpdated(): Promise<void> {
@@ -71,11 +87,12 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
         this._router.push('/install');
         return;
       }
-
-      if (!this._authorized) {
+      
+      if (!this._isAuthorized()) {
         this._router.push('/login');
       } else {
-        this._router.push('/section/content');
+        const next = window.location.pathname === '/' ? '/section/content'  : window.location.pathname;
+        this._router.push(next);
       }
 
     } catch (error) {
