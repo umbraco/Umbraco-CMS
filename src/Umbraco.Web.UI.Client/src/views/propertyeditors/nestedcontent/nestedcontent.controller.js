@@ -94,7 +94,8 @@
         if (vm.maxItems === 0)
             vm.maxItems = 1000;
 
-        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
+        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;
+        vm.expandsOnLoad = Object.toBoolean(model.config.expandsOnLoad)
         vm.showIcons = Object.toBoolean(model.config.showIcons);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
@@ -617,8 +618,8 @@
                 modelWasChanged = true;
             }
 
-            // If there is only one item, set it as current node
-            if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+            // If there is only one item and expandsOnLoad property is true, set it as current node
+            if (vm.singleMode || (vm.expandsOnLoad && vm.nodes.length === 1)) {
                 setCurrentNode(vm.nodes[0], false);
             }
 
