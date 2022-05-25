@@ -1,7 +1,7 @@
 
 # Context API
 
-In order to provide contextual shared logic or data we have established asystem called Context API. 
+In order to provide contextual shared logic or data we have established a system called Context API. 
 
 This system is based on the **Provider Pattern**, This is an event-based protocol that components can use to retrieve data from any location in the DOM.
 
@@ -26,20 +26,13 @@ For other components to consume a context we need to provide it from a parent co
 
 ```ts
 import { html, LitElement } from 'lit';
-import { ContextProviderMixin } from './utils/context';
-import { UMBNotificationService } from './shell/shared/notification';
+import { UmbContextProviderMixin } from './context';
+import { UmbNotificationService } from './notification';
 
-class UMBAppElement extends ContextProviderMixin(LitElement) {
-
-  notificationService: UMBNotificationService = new UMBNotificationService();
-
+class UmbAppElement extends UmbContextProviderMixin(LitElement) {
   constructor () {
     super();
-    this.provideContext('umbNotificationService', notificationService);
-  }
-
-  render() {
-    return html`<slot></slot>`;
+    this.provideContext('umbNotificationService', new UmbNotificationService());
   }
 }
 ```
@@ -52,12 +45,12 @@ Until a requested context is resolved you should make sure to disable or query a
 
 ```ts
 import { html, LitElement } from 'lit';
-import type { UMBNotificationService } from './shell/shared/notification';
-import { UMBContextConsumerMixin } from './utils/context';
+import { UmbContextConsumerMixin } from './context';
+import type { UmbNotificationService } from './notification';
 
-class MyElement extends UMBContextConsumerMixin(LitElement) {
+class MyElement extends UmbContextConsumerMixin(LitElement) {
 
-  private _notificationService: UMBNotificationService;
+  private _notificationService: UmbNotificationService;
 
   constructor () {
     super();
@@ -67,7 +60,7 @@ class MyElement extends UMBContextConsumerMixin(LitElement) {
   }
 
   private _handleClick () {
-    const data: UMBNotificationDefaultData = { message: 'Notification message' };
+    const data: UmbNotificationDefaultData = { message: 'Notification message' };
     this._notificationService?.peek('positive', { data });
   }
 
@@ -87,13 +80,12 @@ This example shows how to use the ContextProvider class directly.
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UMBContextProvider } from './utils/context';
-import { UMBNotificationService } from './notification.service';
+import { UmbContextProvider } from './context';
+import { UmbNotificationService } from './notification';
 
-class UMBAppElement extends LitElement {
+class UmbAppElement extends LitElement {
 
-  notificationService: UMVNotificationService = new UMBNotificationService();
-  private _notificationProvider = new UMBContextProvider(this, 'umbNotificationService', this.notificationService);
+  private _notificationProvider = new UmbContextProvider(this, 'umbNotificationService', new UMBNotificationService());
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -104,10 +96,6 @@ class UMBAppElement extends LitElement {
     super.disconnectedCallback();
     this._notificationProvider.detach();
   }
-
-  render() {
-    return html`<slot></slot>`;
-  }
 }
 ```
 
@@ -117,17 +105,17 @@ This example shows how to use the ContextRequester class directly.
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UMBNotificationService } from './notification.service';
-import { UMBContextConsumer } from './utils/context';
+import { UmbNotificationService } from './notification';
+import { UmbContextConsumer } from './context';
 
 class MyElement extends LitElement {
 
-  private _notificationService: UMBNotificationService;
+  private _notificationService: UmbNotificationService;
   
   connectedCallback(): void {
     super.connectedCallback();
 
-    new UMBContextConsumer(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
+    new UmbContextConsumer(this, 'umbNotificationService', (_instance: UmbNotificationService) => {
       this._notificationService = _instance;
     });
   }
