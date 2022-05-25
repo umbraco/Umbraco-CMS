@@ -1,7 +1,7 @@
 import { expect, oneEvent } from '@open-wc/testing';
 import { UmbContextProvider } from './context-provider';
-import { UmbContextRequester } from './context-requester';
-import { UmbContextRequestEvent, umbContextRequestType } from './context-request.event';
+import { UmbContextConsumer } from './context-consumer';
+import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
 
 const testContextKey = 'my-test-context';
 
@@ -9,30 +9,30 @@ class MyClass {
   prop = 'value from provider';
 }
 
-describe('UmbContextRequester', () => {
-  let requestor: UmbContextRequester;
+describe('UmbContextConsumer', () => {
+  let consumer: UmbContextConsumer;
 
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    requestor = new UmbContextRequester(document.body, testContextKey, () => {});
+    consumer = new UmbContextConsumer(document.body, testContextKey, () => {});
   });
 
   describe('Public API', () => {
     describe('methods', () => {
       it('has a dispatchRequest method', () => {
-        expect(requestor).to.have.property('dispatchRequest').that.is.a('function');
+        expect(consumer).to.have.property('dispatchRequest').that.is.a('function');
       });
     });
 
     describe('events', () => {
       it('dispatches request context event when constructed', async () => {
-        const listener = oneEvent(window, umbContextRequestType);
+        const listener = oneEvent(window, umbContextRequestEventType);
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        new UmbContextRequester(document.body, testContextKey, () => {});
-        const event = await listener as unknown as UmbContextRequestEvent;
+        new UmbContextConsumer(document.body, testContextKey, () => {});
+        const event = await listener as unknown as UmbContextRequestEventImplementation;
         expect(event).to.exist;
-        expect(event.type).to.eq(umbContextRequestType);
-        expect(event.contextKey).to.eq(testContextKey);
+        expect(event.type).to.eq(umbContextRequestEventType);
+        expect(event.contextAlias).to.eq(testContextKey);
       });
     });
   });
@@ -43,7 +43,7 @@ describe('UmbContextRequester', () => {
     const element = document.createElement('div');
     document.body.appendChild(element);
 
-    new UmbContextRequester(element, testContextKey, (_instance) => {
+    new UmbContextConsumer(element, testContextKey, (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
     });

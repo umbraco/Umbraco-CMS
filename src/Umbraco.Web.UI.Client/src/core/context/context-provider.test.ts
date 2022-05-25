@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { UmbContextProvider } from './context-provider';
-import { UmbContextRequester } from './context-requester';
-import { UmbContextRequestEvent } from './context-request.event';
+import { UmbContextConsumer } from './context-consumer';
+import { UmbContextRequestEventImplementation } from './context-request.event';
 
 class MyClass {
   prop = 'value from provider';
@@ -38,7 +38,7 @@ describe('UmbContextProvider', () => {
   });
 
   it('handles context request events', (done) => {
-    const event = new UmbContextRequestEvent('my-test-context', (_instance) => {
+    const event = new UmbContextRequestEventImplementation('my-test-context', (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
     });
@@ -46,11 +46,11 @@ describe('UmbContextProvider', () => {
     document.body.dispatchEvent(event);
   });
 
-  it('works with UmbContextRequester', (done) => {
+  it('works with UmbContextConsumer', (done) => {
     const element = document.createElement('div');
     document.body.appendChild(element);
 
-    new UmbContextRequester(element, 'my-test-context', (_instance) => {
+    new UmbContextConsumer(element, 'my-test-context', (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
     });

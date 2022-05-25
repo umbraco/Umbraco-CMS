@@ -5,15 +5,15 @@ import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
 import { getUserSections } from '../api/fetcher';
-import { UmbContextInjectMixin } from '../core/context';
 import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { UmbSectionContext } from '../section.context';
+import { UmbContextConsumerMixin } from '../core/context';
 
 // TODO: umb or not umb in file name?
 
 @customElement('umb-backoffice-header')
-export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
+export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
@@ -104,6 +104,21 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
   private _locationSubscription?: Subscription;
   private _location? : UmbRouteLocation;
 
+  constructor () {
+    super();
+
+    this.consumeContext('umbRouter', (_instance: UmbRouter) => {
+      this._router = _instance;
+      this._useLocation();
+    });
+
+    this.consumeContext('umbSectionContext', (_instance: UmbSectionContext) => {
+      this._sectionContext = _instance;
+      this._useCurrentSection();
+      this._useSections();
+    });
+  }
+
   private _handleMore(e: MouseEvent) {
     e.stopPropagation();
     this._open = !this._open;
@@ -132,26 +147,6 @@ export class UmbBackofficeHeader extends UmbContextInjectMixin(LitElement) {
     moreTab?.setAttribute('active', 'true');
 
     this._open = false;
-  }
-
-  connectedCallback() {
-    super.connectedCallback();
-
-    this.requestContext('umbRouter');
-    this.requestContext('umbSectionContext');
-  }
-
-  contextInjected(contexts: Map<string, any>): void {
-    if (contexts.has('umbRouter')) {
-      this._router = contexts.get('umbRouter');
-      this._useLocation();
-    }
-
-    if (contexts.has('umbSectionContext')) {
-      this._sectionContext = contexts.get('umbSectionContext');
-      this._useCurrentSection();
-      this._useSections();
-    }
   }
 
   private _useLocation () {

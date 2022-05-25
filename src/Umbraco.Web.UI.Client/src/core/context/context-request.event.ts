@@ -1,31 +1,31 @@
-export const umbContextRequestType = 'umb:context-request';
+export const umbContextRequestEventType = 'umb:context-request';
 
 export type UmbContextCallback = (instance: any) => void;
 
 /**
  * @export
- * @interface UmbContextRequest
+ * @interface UmbContextRequestEvent
  */
-export interface UmbContextRequest {
-  readonly contextKey: string;
+export interface UmbContextRequestEvent extends Event {
+  readonly contextAlias: string;
   readonly callback: UmbContextCallback;
 }
 
 /**
  * @export
- * @class UmbContextRequestEvent
+ * @class UmbContextRequestEventImplementation
  * @extends {Event}
- * @implements {UmbContextRequest}
+ * @implements {UmbContextRequestEvent}
  */
-export class UmbContextRequestEvent extends Event implements UmbContextRequest {
+export class UmbContextRequestEventImplementation extends Event implements UmbContextRequestEvent {
   public constructor(
-    public readonly contextKey: string,
+    public readonly contextAlias: string,
     public readonly callback: UmbContextCallback
   ) {
-    super(umbContextRequestType, {bubbles: true, composed: true, cancelable: true });
+    super(umbContextRequestEventType, {bubbles: true, composed: true, cancelable: true });
   }
 }
 
-export const isUmbContextRequestEvent = (event: Event): event is UmbContextRequestEvent => {
-  return event.type === umbContextRequestType;
+export const isUmbContextRequestEvent = (event: Event): event is UmbContextRequestEventImplementation => {
+  return event.type === umbContextRequestEventType;
 }

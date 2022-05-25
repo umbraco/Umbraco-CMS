@@ -1,27 +1,27 @@
-export const umbContextProvideType = 'umb:context-provide';
+export const umbContextProvideEventType = 'umb:context-provide';
 
 /**
  * @export
- * @interface UmbContextProvide
+ * @interface UmbContextProvideEvent
  */
-export interface UmbContextProvide {
-  readonly contextKey: string;
+export interface UmbContextProvideEvent extends Event {
+  readonly contextAlias: string;
 }
 
 /**
  * @export
- * @class UmbContextProvideEvent
+ * @class UmbContextProvideEventImplementation
  * @extends {Event}
- * @implements {UmbContextProvide}
+ * @implements {UmbContextProvideEvent}
  */
-export class UmbContextProvideEvent extends Event implements UmbContextProvide {
+export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
   public constructor(
-    public readonly contextKey: string,
+    public readonly contextAlias: string,
   ) {
-    super(umbContextProvideType, {bubbles: true, composed: true });
+    super(umbContextProvideEventType, {bubbles: true, composed: true });
   }
 }
 
-export const isUmbContextProvideEvent = (event: Event): event is UmbContextProvideEvent => {
-  return event.type === umbContextProvideType;
+export const isUmbContextProvideEvent = (event: Event): event is UmbContextProvideEventImplementation => {
+  return event.type === umbContextProvideEventType;
 }

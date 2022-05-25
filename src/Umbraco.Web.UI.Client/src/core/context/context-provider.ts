@@ -1,5 +1,5 @@
-import { umbContextRequestType, isUmbContextRequestEvent } from './context-request.event';
-import { UmbContextProvideEvent } from './context-provide.event';
+import { umbContextRequestEventType, isUmbContextRequestEvent } from './context-request.event';
+import { UmbContextProvideEventImplementation } from './context-provide.event';
 
 /**
  * @export
@@ -17,26 +17,26 @@ export class UmbContextProvider {
    * @param {*} instance
    * @memberof UmbContextProvider
    */
-  constructor (host: HTMLElement, contextKey: string, instance: any) {
+  constructor (host: HTMLElement, contextKey: string, instance: unknown) {
     this.host = host;
     this._contextKey = contextKey;
     this._instance = instance;
-    this.attach();
   }
 
   /**
    * @memberof UmbContextProvider
    */
   public attach () {
-    this.host.addEventListener(umbContextRequestType, this._handleContextRequest);
-    this.host.dispatchEvent(new UmbContextProvideEvent(this._contextKey));
+    this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
+    this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextKey));
   }
 
   /**
    * @memberof UmbContextProvider
    */
   public detach () {
-    this.host.removeEventListener(umbContextRequestType, this._handleContextRequest);
+    this.host.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
+    // TODO: fire unprovide event.
   }
 
   /**
@@ -45,8 +45,9 @@ export class UmbContextProvider {
    * @memberof UmbContextProvider
    */
   private _handleContextRequest = (event: Event) => {
+    
     if (!isUmbContextRequestEvent(event)) return;
-    if (event.contextKey !== this._contextKey) return;
+    if (event.contextAlias !== this._contextKey) return;
 
     event.stopPropagation();
     event.callback(this._instance);

@@ -12,11 +12,11 @@ import { UmbSectionContext } from './section.context';
 
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
 
 import { getInitStatus } from './api/fetcher';
 import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouteLocation, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
-import { UmbContextProvideMixin } from './core/context';
-import { Subscription } from 'rxjs';
+import { UmbContextProviderMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
   {
@@ -38,7 +38,7 @@ const routes: Array<UmbRoute> = [
 
 // Import somewhere else?
 @customElement('umb-app')
-export class UmbApp extends UmbContextProvideMixin(LitElement) {
+export class UmbApp extends UmbContextProviderMixin(LitElement) {
   static styles = css`
     :host,
     #outlet {
@@ -63,8 +63,8 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     super.connectedCallback();
     const { extensionRegistry } = window.Umbraco;
 
-    this.provide('umbExtensionRegistry', window.Umbraco.extensionRegistry);
-    this.provide('umbSectionContext', new UmbSectionContext(extensionRegistry));
+    this.provideContext('umbExtensionRegistry', window.Umbraco.extensionRegistry);
+    this.provideContext('umbSectionContext', new UmbSectionContext(extensionRegistry));
   }
 
   private _onBeforeEnter = (event: Event) => {
@@ -88,7 +88,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     this._router.setRoutes(routes);
 
     // TODO: find a solution for magic strings
-    this.provide('umbRouter', this._router);
+    this.provideContext('umbRouter', this._router);
 
     // TODO: this is a temporary routing solution for shell elements
     try {
