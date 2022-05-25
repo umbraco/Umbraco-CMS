@@ -1,4 +1,4 @@
-import '@umbraco-ui/uui';
+import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 
 // TODO: lazy load these
@@ -55,6 +55,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     }
   `;
 
+  private _iconRegistry: UUIIconRegistryEssential = new UUIIconRegistryEssential();
+
   private _isInstalled = false;
 
   private _view?: HTMLElement;
@@ -64,10 +66,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
   constructor() {
     super();
     this.addEventListener(umbRouterBeforeEnterEventType, this._onBeforeEnter);
-  }
+    this._iconRegistry.attach(this);
 
-  connectedCallback(): void {
-    super.connectedCallback();
     const { extensionRegistry } = window.Umbraco;
 
     this.provideContext('umbExtensionRegistry', window.Umbraco.extensionRegistry);

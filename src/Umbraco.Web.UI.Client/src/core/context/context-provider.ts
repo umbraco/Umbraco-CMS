@@ -6,18 +6,18 @@ import { UmbContextProvideEventImplementation } from './context-provide.event';
  * @class UmbContextProvider
  */
 export class UmbContextProvider {
-  protected host: HTMLElement;
+  protected host: EventTarget;
   private _contextKey: string;
-  private _instance: any;
+  private _instance: unknown;
 
   /**
    * Creates an instance of UmbContextProvider.
-   * @param {HTMLElement} host
+   * @param {EventTarget} host
    * @param {string} contextKey
    * @param {*} instance
    * @memberof UmbContextProvider
    */
-  constructor (host: HTMLElement, contextKey: string, instance: unknown) {
+  constructor (host: EventTarget, contextKey: string, instance: unknown) {
     this.host = host;
     this._contextKey = contextKey;
     this._instance = instance;
@@ -36,7 +36,7 @@ export class UmbContextProvider {
    */
   public detach () {
     this.host.removeEventListener(umbContextRequestEventType, this._handleContextRequest);
-    // TODO: fire unprovide event.
+    // TODO: fire unprovided event.
   }
 
   /**

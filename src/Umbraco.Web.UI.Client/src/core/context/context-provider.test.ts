@@ -12,6 +12,7 @@ describe('UmbContextProvider', () => {
 
   beforeEach(() => {
     provider = new UmbContextProvider(document.body, 'my-test-context', new MyClass());
+    provider.attach();
   });
 
   afterEach(async () => {
@@ -38,7 +39,7 @@ describe('UmbContextProvider', () => {
   });
 
   it('handles context request events', (done) => {
-    const event = new UmbContextRequestEventImplementation('my-test-context', (_instance) => {
+    const event = new UmbContextRequestEventImplementation('my-test-context', (_instance: MyClass) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
     });
@@ -50,9 +51,11 @@ describe('UmbContextProvider', () => {
     const element = document.createElement('div');
     document.body.appendChild(element);
 
-    new UmbContextConsumer(element, 'my-test-context', (_instance) => {
+    const localConsumer = new UmbContextConsumer(element, 'my-test-context', (_instance: MyClass) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
+      localConsumer.detach();
     });
+    localConsumer.attach();
   });
 });
