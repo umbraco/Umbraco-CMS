@@ -2,6 +2,10 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 
+import '../properties/node-property.element.ts';
+import '../properties/property-editor-text.element.ts';
+import '../properties/property-editor-textarea.element.ts';
+
 @customElement('umb-node-editor')
 class UmbNodeEditor extends LitElement {
   static styles = [
@@ -68,10 +72,32 @@ class UmbNodeEditor extends LitElement {
         background-color: var(--uui-color-surface);
         box-sizing: border-box;
       }
+
+      .property {
+        display: grid;
+        grid-template-columns: 200px 600px;
+        gap: 32px;
+      }
+      .property > .property-label > p {
+        color: var(--uui-color-text-alt);
+      }
+      .property uui-input,
+      .property uui-textarea {
+        width: 100%;
+      }
+
+      uui-box hr {
+        margin-bottom: var(--uui-size-6);
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid var(--uui-color-border-alt);
+      }
     `,
   ];
-  
-  render () {
+
+  render() {
     return html`
       <div id="node-editor">
         <div id="node-editor-top">
@@ -82,14 +108,24 @@ class UmbNodeEditor extends LitElement {
             <uui-tab disabled>Actions</uui-tab>
           </uui-tab-group>
         </div>
-        <uui-scroll-container id="node-editor-content"></uui-scroll-container>
+        <uui-scroll-container id="node-editor-content">
+          <uui-box>
+            <umb-node-property label="Text string label" description="This is the a text string property">
+              <umb-property-editor-text></umb-property-editor-text>
+            </umb-node-property>
+            <hr />
+            <umb-node-property label="Textarea label" description="this is a textarea property">
+              <umb-property-editor-textarea></umb-property-editor-textarea>
+            </umb-node-property>
+          </uui-box>
+        </uui-scroll-container>
         <div id="node-editor-bottom">
           <uui-button>Save and preview</uui-button>
           <uui-button look="secondary">Save</uui-button>
           <uui-button look="primary" color="positive">Save and publish</uui-button>
         </div>
       </div>
-    `
+    `;
   }
 }
 
