@@ -74,7 +74,11 @@ public static class ConfigurationExtensions
         if (!string.IsNullOrEmpty(connectionString))
         {
             // Replace data directory
-            connectionString = ReplaceDataDirectoryPlaceholder(connectionString);
+            string? dataDirectory = AppDomain.CurrentDomain.GetData(DataDirectoryName)?.ToString();
+            if (!string.IsNullOrEmpty(dataDirectory))
+            {
+                connectionString = connectionString.Replace(DataDirectoryPlaceholder, dataDirectory);
+            }
 
             // Get provider name
             providerName = configuration.GetConnectionStringProviderName(name);
@@ -82,20 +86,6 @@ public static class ConfigurationExtensions
         else
         {
             providerName = null;
-        }
-
-        return connectionString;
-    }
-
-    internal static string? ReplaceDataDirectoryPlaceholder(string? connectionString)
-    {
-        if (!string.IsNullOrEmpty(connectionString))
-        {
-            string? dataDirectory = AppDomain.CurrentDomain.GetData(DataDirectoryName)?.ToString();
-            if (!string.IsNullOrEmpty(dataDirectory))
-            {
-                return connectionString.Replace(DataDirectoryPlaceholder, dataDirectory);
-            }
         }
 
         return connectionString;
