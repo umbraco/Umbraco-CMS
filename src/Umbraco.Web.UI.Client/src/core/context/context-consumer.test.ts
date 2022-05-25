@@ -19,16 +19,17 @@ describe('UmbContextConsumer', () => {
 
   describe('Public API', () => {
     describe('methods', () => {
-      it('has a dispatchRequest method', () => {
-        expect(consumer).to.have.property('dispatchRequest').that.is.a('function');
+      it('has a request method', () => {
+        expect(consumer).to.have.property('request').that.is.a('function');
       });
     });
 
     describe('events', () => {
       it('dispatches request context event when constructed', async () => {
         const listener = oneEvent(window, umbContextRequestEventType);
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        new UmbContextConsumer(document.body, testContextKey, () => {});
+
+        consumer.attach();
+
         const event = await listener as unknown as UmbContextRequestEventImplementation;
         expect(event).to.exist;
         expect(event.type).to.eq(umbContextRequestEventType);
@@ -39,14 +40,16 @@ describe('UmbContextConsumer', () => {
 
   it('works with UmbContextProvider', (done: any) => {
     const provider = new UmbContextProvider(document.body, testContextKey, new MyClass());
+    provider.attach();
 
     const element = document.createElement('div');
     document.body.appendChild(element);
 
-    new UmbContextConsumer(element, testContextKey, (_instance) => {
+    const localConsumer = new UmbContextConsumer(element, testContextKey, (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
-    });
+    })
+    localConsumer.attach();
 
     provider.detach();
   });

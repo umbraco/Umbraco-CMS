@@ -25,6 +25,6 @@ describe('UmbContextRequestEvent', () => {
   });
 
   it('is cancelable', () => {
-    expect(event.composed).to.be.true;
+    expect(event.cancelable).to.be.true;
   });
 });
