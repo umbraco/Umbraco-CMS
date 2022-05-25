@@ -18,6 +18,9 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
     this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
       this._extensionRegistry = _instance;
 
+      // TODO: Could we make it easier to unsubscribe? If we invented a Pattern/Mixin/class ala Lit-Controllers we could make it auto unsubscribe.
+      // ContextConsumers could be turned into single classes which uses the 'Controller' ability to hook into connected and disconnected.
+      // Generally that means that a web component must have the ControllerMixin?? and then controllers can easily be attached, they would know about life cycle and thereby be able to unsubscribe on disconnected etc.
       this._extensionsSubscription?.unsubscribe();
 
       this._extensionsSubscription = this._extensionRegistry.extensions.subscribe(extensions => {
