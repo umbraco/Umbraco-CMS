@@ -2,13 +2,17 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
-@defineElement('umb-backoffice-content')
-export class UmbBackofficeContent extends LitElement {
+@defineElement('umb-backoffice-main')
+export class UmbBackofficeMain extends LitElement {
   static styles = [
     UUITextStyles,
     css`
       :host {
         flex: 1 1 auto;
+      }
+
+      // TODO: not call this editor, I would like to reserve that name for the view of editing data, like what goes in the router-outlet or in infinite editors (or inside Nested Content)
+      #editor {
         background-color: var(--uui-color-background);
         width: 100%;
         height: 100%;
@@ -16,7 +20,7 @@ export class UmbBackofficeContent extends LitElement {
         flex-direction: column;
       }
 
-      #top-bar {
+      #editor-top {
         background-color: var(--uui-color-surface);
         width: 100%;
         display: flex;
@@ -26,19 +30,19 @@ export class UmbBackofficeContent extends LitElement {
         border-bottom: 1px solid var(--uui-color-border);
       }
 
-      #top-bar uui-input {
+      #editor-top uui-input {
         width: 100%;
         margin-left: 16px;
       }
 
-      #top-bar uui-tab-group {
+      #editor-top uui-tab-group {
         --uui-tab-divider: var(--uui-color-border);
         border-left: 1px solid var(--uui-color-border);
         flex-wrap: nowrap;
         height: 60px;
       }
 
-      #content-content {
+      #editor-content {
         padding: var(--uui-size-6);
         display: flex;
         flex: 1;
@@ -50,7 +54,7 @@ export class UmbBackofficeContent extends LitElement {
         font-size: 0.8rem;
       }
 
-      #bottom-bar {
+      #editor-bottom {
         display: flex;
         flex: none;
         justify-content: end;
@@ -68,19 +72,21 @@ export class UmbBackofficeContent extends LitElement {
 
   render() {
     return html`
-      <div id="top-bar">
-        <uui-input value="Home"></uui-input>
-        <uui-tab-group>
-          <uui-tab active>Content</uui-tab>
-          <uui-tab>Info</uui-tab>
-          <uui-tab disabled>Actions</uui-tab>
-        </uui-tab-group>
-      </div>
-      <uui-scroll-container id="content-content"></uui-scroll-container>
-      <div id="bottom-bar">
-        <uui-button>Save and preview</uui-button>
-        <uui-button look="secondary">Save</uui-button>
-        <uui-button look="primary" color="positive">Save and publish</uui-button>
+      <div id="editor">
+        <div id="editor-top">
+          <uui-input value="Home"></uui-input>
+          <uui-tab-group>
+            <uui-tab active>Content</uui-tab>
+            <uui-tab>Info</uui-tab>
+            <uui-tab disabled>Actions</uui-tab>
+          </uui-tab-group>
+        </div>
+        <uui-scroll-container id="editor-content"></uui-scroll-container>
+        <div id="editor-bottom">
+          <uui-button>Save and preview</uui-button>
+          <uui-button look="secondary">Save</uui-button>
+          <uui-button look="primary" color="positive">Save and publish</uui-button>
+        </div>
       </div>
     `;
   }
@@ -88,6 +94,6 @@ export class UmbBackofficeContent extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-backoffice-content': UmbBackofficeContent;
+    'umb-backoffice-main': UmbBackofficeMain;
   }
 }
