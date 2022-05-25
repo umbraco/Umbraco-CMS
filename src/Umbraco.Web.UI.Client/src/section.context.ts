@@ -4,8 +4,8 @@ import { UmbExtensionManifest, UmbExtensionRegistry, UmbManifestSectionMeta } fr
 export class UmbSectionContext {
   private _extensionRegistry!: UmbExtensionRegistry;
 
-  private _current: ReplaySubject<UmbExtensionManifest<UmbManifestSectionMeta>> = new ReplaySubject(1);
-  public readonly current: Observable<UmbExtensionManifest<UmbManifestSectionMeta>> = this._current.asObservable();
+  private _current: ReplaySubject<UmbExtensionManifest> = new ReplaySubject(1);
+  public readonly current: Observable<UmbExtensionManifest> = this._current.asObservable();
 
   constructor(_extensionRegistry: UmbExtensionRegistry) {
     this._extensionRegistry = _extensionRegistry;
@@ -14,7 +14,7 @@ export class UmbSectionContext {
   getSections () {
     return this._extensionRegistry.extensions
       .pipe(
-        map((extensions: Array<UmbExtensionManifest<unknown>>) => extensions
+        map((extensions: Array<UmbExtensionManifest>) => extensions
           .filter(extension => extension.type === 'section')
           .sort((a: any, b: any) => b.meta.weight - a.meta.weight))
       );
@@ -26,7 +26,7 @@ export class UmbSectionContext {
 
   async setCurrent (sectionAlias: string) {
     const sections = await firstValueFrom(this.getSections());
-    const matchedSection = sections.find(section => section.alias === sectionAlias) as UmbExtensionManifest<UmbManifestSectionMeta>;
+    const matchedSection = sections.find(section => section.alias === sectionAlias) as UmbExtensionManifest;
     this._current.next(matchedSection);
   }
 
