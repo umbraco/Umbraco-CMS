@@ -13,6 +13,9 @@ dist-ssr
 types
 *.local
 
+## testing
+/coverage/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
