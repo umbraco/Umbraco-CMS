@@ -25,6 +25,22 @@ namespace Umbraco.Cms.Core.Scoping
         /// <remarks>
         /// <para></para>
         /// </remarks>
+        [Obsolete("Please use the Get method that accepts an Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
+        public static T? Get<T>(IScopeProvider scopeProvider, string key, Func<bool, T> ctor)
+            where T : ScopeContextualBase
+            => Get<T>((ICoreScopeProvider)scopeProvider, key, ctor);
+
+        /// <summary>
+        /// Gets a contextual object.
+        /// </summary>
+        /// <typeparam name="T">The type of the object.</typeparam>
+        /// <param name="scopeProvider">A scope provider.</param>
+        /// <param name="key">A context key for the object.</param>
+        /// <param name="ctor">A function producing the contextual object.</param>
+        /// <returns>The contextual object.</returns>
+        /// <remarks>
+        /// <para></para>
+        /// </remarks>
         public static T? Get<T>(ICoreScopeProvider scopeProvider, string key, Func<bool, T> ctor)
             where T : ScopeContextualBase
         {
