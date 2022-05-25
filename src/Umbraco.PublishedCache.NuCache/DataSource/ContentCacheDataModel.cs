@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 public class ContentCacheDataModel
 {
     // TODO: We don't want to allocate empty arrays
-    //dont serialize empty properties
+    // dont serialize empty properties
     [DataMember(Order = 0)]
     [JsonProperty("pd")]
     [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
@@ -30,7 +30,7 @@ public class ContentCacheDataModel
     [JsonProperty("us")]
     public string? UrlSegment { get; set; }
 
-    //Legacy properties used to deserialize existing nucache db entries
+    // Legacy properties used to deserialize existing nucache db entries
     [IgnoreDataMember]
     [JsonProperty("properties")]
     [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]

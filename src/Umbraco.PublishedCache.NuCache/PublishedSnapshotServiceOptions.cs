@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 
@@ -13,8 +13,7 @@ public class PublishedSnapshotServiceOptions
     //// indicates that the snapshot cache should reuse the application request cache
     //// otherwise a new cache object would be created for the snapshot specifically,
     //// which is the default - web boot manager uses this to optimize facades
-    //public bool PublishedSnapshotCacheIsApplicationRequestCache;
-
+    // public bool PublishedSnapshotCacheIsApplicationRequestCache;
 
     /// <summary>
     ///     If true this disables the persisted local cache files for content and media

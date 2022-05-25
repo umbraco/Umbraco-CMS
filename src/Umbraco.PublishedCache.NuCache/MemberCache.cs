@@ -34,8 +34,19 @@ public class MemberCache : IPublishedMemberCache, IDisposable
     public IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Member, alias);
 
     public IPublishedContent? Get(IMember member)
-        => PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault,
-            _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory);
+        =>
+            PublishedMember.Create(
+                member,
+                GetContentType(member.ContentTypeId),
+                _previewDefault,
+                _publishedSnapshotAccessor,
+                _variationContextAccessor,
+                _publishedModelFactory);
+
+    public void Dispose() =>
+
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(true);
 
     #endregion
 
@@ -53,10 +64,6 @@ public class MemberCache : IPublishedMemberCache, IDisposable
             _disposedValue = true;
         }
     }
-
-    public void Dispose() =>
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(true);
 
     #endregion
 }

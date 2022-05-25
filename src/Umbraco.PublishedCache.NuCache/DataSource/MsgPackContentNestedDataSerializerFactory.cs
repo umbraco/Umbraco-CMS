@@ -35,7 +35,6 @@ internal class MsgPackContentNestedDataSerializerFactory : IContentCacheDataSeri
         // We need to initialize these options now so that any data lookups required are completed and are not done while the content cache
         // is performing DB queries which will result in errors since we'll be trying to query with open readers.
         // NOTE: The calls to GetAll() below should be cached if the data has not been changed.
-
         var contentTypes = new Dictionary<int, IContentTypeComposition>();
         if ((types & ContentCacheDataSerializerEntityType.Document) == ContentCacheDataSerializerEntityType.Document)
         {

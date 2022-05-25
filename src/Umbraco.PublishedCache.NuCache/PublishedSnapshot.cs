@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.PublishedCache;
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
 
 // implements published snapshot
-public class PublishedSnapshot : IPublishedSnapshot, IDisposable
+public class PublishedSnapshot : IPublishedSnapshot
 {
     private readonly PublishedSnapshotService? _service;
     private bool _defaultPreview;

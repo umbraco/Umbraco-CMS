@@ -42,15 +42,14 @@ public static class UmbracoBuilderExtensions
         // TODO: Gotta wonder how much this does actually improve perf? It's a lot of weird code to make this happen so hope it's worth it
         builder.Services.AddUnique<IIdKeyMap>(factory =>
         {
-            var idkSvc = new IdKeyMap(factory.GetRequiredService<ICoreScopeProvider>(),
+            var idkSvc = new IdKeyMap(
+                factory.GetRequiredService<ICoreScopeProvider>(),
                 factory.GetRequiredService<IIdKeyMapRepository>());
             if (factory.GetRequiredService<IPublishedSnapshotService>() is PublishedSnapshotService
                 publishedSnapshotService)
             {
-                idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id),
-                    uid => publishedSnapshotService.GetDocumentId(uid));
-                idkSvc.SetMapper(UmbracoObjectTypes.Media, id => publishedSnapshotService.GetMediaUid(id),
-                    uid => publishedSnapshotService.GetMediaId(uid));
+                idkSvc.SetMapper(UmbracoObjectTypes.Document, id => publishedSnapshotService.GetDocumentUid(id), uid => publishedSnapshotService.GetDocumentId(uid));
+                idkSvc.SetMapper(UmbracoObjectTypes.Media, id => publishedSnapshotService.GetMediaUid(id), uid => publishedSnapshotService.GetMediaId(uid));
             }
 
             return idkSvc;
@@ -93,7 +92,6 @@ public static class UmbracoBuilderExtensions
         // composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
         return builder;
     }
-
 
     private static IUmbracoBuilder AddNuCacheNotifications(this IUmbracoBuilder builder)
     {

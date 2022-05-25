@@ -34,16 +34,20 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
     // after the current snapshot has been resync-ed
     // it's too late for UmbracoContext which has captured previewDefault and stuff into these ctor vars
     // but, no, UmbracoContext returns snapshot.Content which comes from elements SO a resync should create a new cache
-
-    public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, IAppCache snapshotCache,
-        IAppCache? elementsCache, IDomainCache domainCache, IOptions<GlobalSettings> globalSettings,
+    public ContentCache(
+        bool previewDefault,
+        ContentStore.Snapshot snapshot,
+        IAppCache snapshotCache,
+        IAppCache? elementsCache,
+        IDomainCache domainCache,
+        IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor)
         : base(previewDefault)
     {
         _snapshot = snapshot;
         _snapshotCache = snapshotCache;
         _elementsCache = elementsCache;
-        _domainCache = domainCache;
+        _domainCache = domainCache ?? throw new ArgumentNullException(nameof(domainCache));
         _globalSettings = globalSettings.Value;
         _variationContextAccessor = variationContextAccessor;
     }
@@ -62,18 +66,15 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
 
     // at the moment we try our best to be backward compatible, but really,
     // should get rid of hideTopLevelNode and other oddities entirely, eventually
-
     public IPublishedContent? GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
         GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
 
-    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null,
-        string? culture = null)
+    public IPublishedContent? GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string? culture = null)
     {
         if (route == null)
         {
             throw new ArgumentNullException(nameof(route));
         }
-
 
         IAppCache? cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
             ? _elementsCache
@@ -165,7 +166,9 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         IPublishedContent? content = node;
         var urlSegment = content.UrlSegment(_variationContextAccessor, culture);
         var hasDomains = _domainCache.GetAssignedWithCulture(culture, content.Id);
-        while (hasDomains == false && content != null) // content is null at root
+
+        // content is null at root
+        while (hasDomains == false && content != null)
         {
             // no segment indicates this is not published when this is a variant
             if (urlSegment.IsNullOrWhiteSpace())
@@ -200,15 +203,15 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         // assemble the route
         pathParts.Reverse();
         var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-        //prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
-        //and is done so that we know the ID of the domain node for the path
-        var route = (content?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
+
+        // prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
+        // and is done so that we know the ID of the domain node for the path
+        var route = (content?.Id.ToString(CultureInfo.InvariantCulture) ?? string.Empty) + path;
 
         return route;
     }
 
-    private IPublishedContent? FollowRoute(IPublishedContent? content, IReadOnlyList<string> parts, int start,
-        string? culture)
+    private IPublishedContent? FollowRoute(IPublishedContent? content, IReadOnlyList<string> parts, int start, string? culture)
     {
         var i = start;
         while (content != null && i < parts.Count)
@@ -242,7 +245,8 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
                 throw new Exception("Failed to get node at /.");
             }
 
-            if (rootNode.Id == content.Id) // remove only if we're the default node
+            // remove only if we're the default node
+            if (rootNode.Id == content.Id)
             {
                 segments.RemoveAt(segments.Count - 1);
             }
@@ -279,8 +283,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
 
         if (guidUdi.EntityType != Constants.UdiEntityType.Document)
         {
-            throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Document}\".",
-                nameof(contentId));
+            throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Document}\".", nameof(contentId));
         }
 
         return GetById(preview, guidUdi.Guid);
@@ -304,7 +307,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         // handle context culture for variant
         if (culture == null)
         {
-            culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
         // _snapshot.GetAtRoot() returns all ContentNode at root
@@ -313,7 +316,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         //
         // GetNodePublishedContent may return null if !preview and there is no
         // published model, so we need to filter these nulls out
-
         IEnumerable<IPublishedContent> atRoot = _snapshot.GetAtRoot()
             .Select(n => GetNodePublishedContent(n, preview))
             .WhereNotNull();
@@ -335,7 +337,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         }
 
         // both .Draft and .Published cannot be null at the same time
-
         return preview
             ? node.DraftModel ?? GetPublishedContentAsDraft(node.PublishedModel)
             : node.PublishedModel;
@@ -347,13 +348,12 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
     {
         if (content == null /*|| preview == false*/)
         {
-            return null; //content;
+            return null; // content;
         }
 
         // an object in the cache is either an IPublishedContentOrMedia,
         // or a model inheriting from PublishedContentExtended - in which
         // case we need to unwrap to get to the original IPublishedContentOrMedia.
-
         var inner = PublishedContent.UnwrapIPublishedContent(content);
         return inner.AsDraft();
     }
@@ -400,8 +400,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return GetByXPath(iterator);
     }
 
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath,
-        XPathVariable[] vars)
+    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
         XPathNodeIterator iterator = navigator.Select(xpath, vars);

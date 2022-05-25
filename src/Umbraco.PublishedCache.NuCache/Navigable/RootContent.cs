@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Xml.XPath;
+using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
@@ -18,6 +18,7 @@ internal class RootContent : INavigableContent
     public IList<int> ChildIds => _childIds;
 
     public object? Value(int index) =>
+
         // only id has a value
         index == 0 ? "-1" : null;
 

@@ -22,6 +22,7 @@ public class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
 
         MessagePackSerializerOptions? defaultOptions = ContractlessStandardResolver.Options;
         IFormatterResolver? resolver = CompositeResolver.Create(
+
             // TODO: We want to be able to intern the strings for aliases when deserializing like we do for Newtonsoft but I'm unsure exactly how
             // to do that but it would seem to be with a custom message pack resolver but I haven't quite figured out based on the docs how
             // to do that since that is part of the int key -> string mapping operation, might have to see the source code to figure that one out.
@@ -31,8 +32,7 @@ public class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
             // new ContentNestedDataResolver(),
 
             // finally use standard resolver
-            defaultOptions.Resolver
-        );
+            defaultOptions.Resolver);
 
         _options = defaultOptions
             .WithResolver(resolver)
@@ -40,8 +40,7 @@ public class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
             .WithSecurity(MessagePackSecurity.UntrustedData);
     }
 
-    public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData,
-        bool published)
+    public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published)
     {
         if (byteData != null)
         {
@@ -63,8 +62,7 @@ public class MsgPackContentNestedDataSerializer : IContentCacheDataSerializer
         return null;
     }
 
-    public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model,
-        bool published)
+    public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
     {
         Compress(content, model, published);
         var bytes = MessagePackSerializer.Serialize(model, _options);

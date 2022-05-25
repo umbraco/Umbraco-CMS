@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
 {
-    private static readonly ContentDataSerializer s_defaultDataSerializer = new();
+    private static readonly ContentDataSerializer S_defaultDataSerializer = new();
     private readonly ContentDataSerializer? _contentDataSerializer;
 
     public ContentNodeKitSerializer(ContentDataSerializer? contentDataSerializer = null)
@@ -12,12 +12,11 @@ internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
         _contentDataSerializer = contentDataSerializer;
         if (_contentDataSerializer == null)
         {
-            _contentDataSerializer = s_defaultDataSerializer;
+            _contentDataSerializer = S_defaultDataSerializer;
         }
     }
 
-    //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
-
+    // static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
     public ContentNodeKit ReadFrom(Stream stream)
     {
         var contentNode = new ContentNode(
@@ -28,8 +27,7 @@ internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
             PrimitiveSerializer.Int32.ReadFrom(stream), // sort order
             PrimitiveSerializer.Int32.ReadFrom(stream), // parent id
             PrimitiveSerializer.DateTime.ReadFrom(stream), // date created
-            PrimitiveSerializer.Int32.ReadFrom(stream) // creator id
-        );
+            PrimitiveSerializer.Int32.ReadFrom(stream)); // creator id
 
         var contentTypeId = PrimitiveSerializer.Int32.ReadFrom(stream);
         var hasDraft = PrimitiveSerializer.Boolean.ReadFrom(stream);

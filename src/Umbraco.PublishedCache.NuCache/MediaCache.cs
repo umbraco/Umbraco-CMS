@@ -1,4 +1,4 @@
-﻿using System.Xml.XPath;
+using System.Xml.XPath;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -16,8 +16,7 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
 
     #region Constructors
 
-    public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot,
-        IVariationContextAccessor variationContextAccessor)
+    public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IVariationContextAccessor variationContextAccessor)
         : base(previewDefault)
     {
         _snapshot = snapshot;
@@ -58,7 +57,8 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
 
         if (guidUdi.EntityType != Constants.UdiEntityType.Media)
         {
-            throw new ArgumentException($"Udi entity type must be \"{Constants.UdiEntityType.Media}\".",
+            throw new ArgumentException(
+                $"Udi entity type must be \"{Constants.UdiEntityType.Media}\".",
                 nameof(contentId));
         }
 
@@ -80,7 +80,7 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
         // handle context culture for variant
         if (culture == null)
         {
-            culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+            culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
         IEnumerable<IPublishedContent?> atRoot = _snapshot.GetAtRoot().Select(x => x.PublishedModel);
@@ -109,6 +109,13 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
         return GetSingleByXPath(iterator);
     }
 
+    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
+    {
+        XPathNavigator navigator = CreateNavigator(preview);
+        XPathNodeIterator iterator = navigator.Select(xpath, vars);
+        return GetByXPath(iterator);
+    }
+
     private static IPublishedContent? GetSingleByXPath(XPathNodeIterator iterator)
     {
         if (iterator.MoveNext() == false)
@@ -116,21 +123,13 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
             return null;
         }
 
-        var xnav = iterator.Current as NavigableNavigator;
-        if (xnav == null)
+        if (iterator.Current is not NavigableNavigator xnav)
         {
             return null;
         }
 
         var xcontent = xnav.UnderlyingObject as NavigableContent;
-        return xcontent == null ? null : xcontent.InnerContent;
-    }
-
-    public override IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars)
-    {
-        XPathNavigator navigator = CreateNavigator(preview);
-        XPathNodeIterator iterator = navigator.Select(xpath, vars);
-        return GetByXPath(iterator);
+        return xcontent?.InnerContent;
     }
 
     public override IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars)
@@ -140,31 +139,29 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
         return GetByXPath(iterator);
     }
 
+    public override XPathNavigator CreateNavigator(bool preview)
+    {
+        var source = new Source(this, preview);
+        var navigator = new NavigableNavigator(source);
+        return navigator;
+    }
+
     private static IEnumerable<IPublishedContent> GetByXPath(XPathNodeIterator iterator)
     {
         while (iterator.MoveNext())
         {
-            var xnav = iterator.Current as NavigableNavigator;
-            if (xnav == null)
+            if (iterator.Current is not NavigableNavigator xnav)
             {
                 continue;
             }
 
-            var xcontent = xnav.UnderlyingObject as NavigableContent;
-            if (xcontent == null)
+            if (xnav.UnderlyingObject is not NavigableContent xcontent)
             {
                 continue;
             }
 
             yield return xcontent.InnerContent;
         }
-    }
-
-    public override XPathNavigator CreateNavigator(bool preview)
-    {
-        var source = new Source(this, preview);
-        var navigator = new NavigableNavigator(source);
-        return navigator;
     }
 
     public override XPathNavigator? CreateNodeNavigator(int id, bool preview)

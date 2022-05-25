@@ -35,7 +35,8 @@ internal class PublishedContent : PublishedContentBase
         ContentData contentData,
         IPublishedSnapshotAccessor? publishedSnapshotAccessor,
         IVariationContextAccessor? variationContextAccessor,
-        IPublishedModelFactory? publishedModelFactory) : base(variationContextAccessor)
+        IPublishedModelFactory? publishedModelFactory)
+        : base(variationContextAccessor)
     {
         _contentNode = contentNode ?? throw new ArgumentNullException(nameof(contentNode));
         ContentData = contentData ?? throw new ArgumentNullException(nameof(contentData));
@@ -83,7 +84,8 @@ internal class PublishedContent : PublishedContentBase
     }
 
     // clone for previewing as draft a published content that is published and has no draft
-    private PublishedContent(PublishedContent origin) : base(origin.VariationContextAccessor)
+    private PublishedContent(PublishedContent origin)
+        : base(origin.VariationContextAccessor)
     {
         _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         VariationContextAccessor = origin.VariationContextAccessor;
@@ -104,7 +106,6 @@ internal class PublishedContent : PublishedContentBase
 
     // this is for tests purposes
     // args are: current published snapshot (may be null), previewing, content id - returns: content
-
     internal static Func<IPublishedSnapshot, bool, int, IPublishedContent?> GetContentByIdFunc { get; set; }
         = (publishedShapshot, previewing, id) => publishedShapshot.Content?.GetById(previewing, id);
 
@@ -177,7 +178,7 @@ internal class PublishedContent : PublishedContentBase
             {
                 return _cultures = new Dictionary<string, PublishedCultureInfo>
                 {
-                    {"", new PublishedCultureInfo("", ContentData.Name, _urlSegment, CreateDate)}
+                    { string.Empty, new PublishedCultureInfo(string.Empty, ContentData.Name, _urlSegment, CreateDate) },
                 };
             }
 
@@ -187,7 +188,8 @@ internal class PublishedContent : PublishedContentBase
             }
 
             return _cultures = ContentData.CultureInfos
-                .ToDictionary(x => x.Key,
+                .ToDictionary(
+                    x => x.Key,
                     x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.UrlSegment, x.Value.Date),
                     StringComparer.OrdinalIgnoreCase);
         }
@@ -214,7 +216,7 @@ internal class PublishedContent : PublishedContentBase
         // handle context culture
         if (culture == null)
         {
-            culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+            culture = VariationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
         // not the 'published' published content, and varies
@@ -245,7 +247,7 @@ internal class PublishedContent : PublishedContentBase
         // handle context culture
         if (culture == null)
         {
-            culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
+            culture = VariationContextAccessor?.VariationContext?.Culture ?? string.Empty;
         }
 
         // there is a 'published' published content, and varies
@@ -335,8 +337,8 @@ internal class PublishedContent : PublishedContentBase
             return null; // happens when 'alias' does not match a content type property alias
         }
 
-        if (index >= PropertiesArray
-                .Length) // should never happen - properties array must be in sync with property type
+        // should never happen - properties array must be in sync with property type
+        if (index >= PropertiesArray.Length)
         {
             throw new IndexOutOfRangeException(
                 "Index points outside the properties array, which means the properties array is corrupt.");
@@ -413,8 +415,7 @@ internal class PublishedContent : PublishedContentBase
             return new PublishedContent(this).CreateModel(_publishedModelFactory);
         }
 
-        return (IPublishedContent?)cache.Get(AsPreviewingCacheKey,
-            () => new PublishedContent(this).CreateModel(_publishedModelFactory));
+        return (IPublishedContent?)cache.Get(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel(_publishedModelFactory));
     }
 
     // used by Navigable.Source,...

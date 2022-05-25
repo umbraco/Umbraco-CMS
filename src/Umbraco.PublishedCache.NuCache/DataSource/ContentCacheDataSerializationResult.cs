@@ -13,7 +13,14 @@ public struct ContentCacheDataSerializationResult : IEquatable<ContentCacheDataS
     }
 
     public string? StringData { get; }
+
     public byte[]? ByteData { get; }
+
+    public static bool operator ==(ContentCacheDataSerializationResult left, ContentCacheDataSerializationResult right)
+        => left.Equals(right);
+
+    public static bool operator !=(ContentCacheDataSerializationResult left, ContentCacheDataSerializationResult right)
+        => !(left == right);
 
     public override bool Equals(object? obj)
         => obj is ContentCacheDataSerializationResult result && Equals(result);
@@ -37,10 +44,4 @@ public struct ContentCacheDataSerializationResult : IEquatable<ContentCacheDataS
 
         return hashCode;
     }
-
-    public static bool operator ==(ContentCacheDataSerializationResult left, ContentCacheDataSerializationResult right)
-        => left.Equals(right);
-
-    public static bool operator !=(ContentCacheDataSerializationResult left, ContentCacheDataSerializationResult right)
-        => !(left == right);
 }

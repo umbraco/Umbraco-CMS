@@ -1,4 +1,4 @@
-﻿using CSharpTest.Net.Serialization;
+using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -24,29 +24,18 @@ internal abstract class SerializerBase
     private const char PrefixChar = 'R';
 
     protected string ReadString(Stream stream) => PrimitiveSerializer.String.ReadFrom(stream);
+
     protected int ReadInt(Stream stream) => PrimitiveSerializer.Int32.ReadFrom(stream);
+
     protected long ReadLong(Stream stream) => PrimitiveSerializer.Int64.ReadFrom(stream);
+
     protected float ReadFloat(Stream stream) => PrimitiveSerializer.Float.ReadFrom(stream);
+
     protected double ReadDouble(Stream stream) => PrimitiveSerializer.Double.ReadFrom(stream);
+
     protected DateTime ReadDateTime(Stream stream) => PrimitiveSerializer.DateTime.ReadFrom(stream);
+
     protected byte[] ReadByteArray(Stream stream) => PrimitiveSerializer.Bytes.ReadFrom(stream);
-
-    private T? ReadStruct<T>(Stream stream, char t, Func<Stream, T> read)
-        where T : struct
-    {
-        var type = PrimitiveSerializer.Char.ReadFrom(stream);
-        if (type == PrefixNull)
-        {
-            return null;
-        }
-
-        if (type != t)
-        {
-            throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{t}'.");
-        }
-
-        return read(stream);
-    }
 
     protected string? ReadStringObject(Stream stream, bool intern = false) // required 'cos string is not a struct
     {
@@ -66,10 +55,31 @@ internal abstract class SerializerBase
             : PrimitiveSerializer.String.ReadFrom(stream);
     }
 
+    private T? ReadStruct<T>(Stream stream, char t, Func<Stream, T> read)
+        where T : struct
+    {
+        var type = PrimitiveSerializer.Char.ReadFrom(stream);
+        if (type == PrefixNull)
+        {
+            return null;
+        }
+
+        if (type != t)
+        {
+            throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{t}'.");
+        }
+
+        return read(stream);
+    }
+
     protected int? ReadIntObject(Stream stream) => ReadStruct(stream, PrefixInt32, ReadInt);
+
     protected long? ReadLongObject(Stream stream) => ReadStruct(stream, PrefixLong, ReadLong);
+
     protected float? ReadFloatObject(Stream stream) => ReadStruct(stream, PrefixFloat, ReadFloat);
+
     protected double? ReadDoubleObject(Stream stream) => ReadStruct(stream, PrefixDouble, ReadDouble);
+
     protected DateTime? ReadDateTimeObject(Stream stream) => ReadStruct(stream, PrefixDateTime, ReadDateTime);
 
     protected object? ReadObject(Stream stream)

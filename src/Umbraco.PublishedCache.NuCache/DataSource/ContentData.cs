@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 /// <summary>
 ///     Represents everything that is specific to an edited or published content version
@@ -15,8 +15,15 @@ public class ContentData
         CultureInfos = null!;
     }
 
-    public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId,
-        int? templateId, bool published, IDictionary<string, PropertyData[]>? properties,
+    public ContentData(
+        string? name,
+        string? urlSegment,
+        int versionId,
+        DateTime versionDate,
+        int writerId,
+        int? templateId,
+        bool published,
+        IDictionary<string, PropertyData[]>? properties,
         IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));

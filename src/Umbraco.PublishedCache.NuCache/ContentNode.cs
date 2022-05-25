@@ -11,6 +11,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache;
 [DebuggerDisplay("Id: {Id}, Path: {Path}")]
 public class ContentNode
 {
+    // everything that is common to both draft and published versions
+    // keep this as small as possible
+#pragma warning disable IDE1006 // Naming Styles
+    public readonly int Id;
+
     private ContentData? _draftData;
 
     // draft and published version (either can be null, but not both)
@@ -34,10 +39,16 @@ public class ContentNode
     }
 
     // special ctor with no content data - for members
-    public ContentNode(int id, Guid uid, IPublishedContentType contentType,
-        int level, string path, int sortOrder,
+    public ContentNode(
+        int id,
+        Guid uid,
+        IPublishedContentType contentType,
+        int level,
+        string path,
+        int sortOrder,
         int parentContentId,
-        DateTime createDate, int creatorId)
+        DateTime createDate,
+        int creatorId)
         : this()
     {
         Id = id;
@@ -51,23 +62,34 @@ public class ContentNode
         CreatorId = creatorId;
     }
 
-    public ContentNode(int id, Guid uid, IPublishedContentType contentType,
-        int level, string path, int sortOrder,
+    public ContentNode(
+        int id,
+        Guid uid,
+        IPublishedContentType contentType,
+        int level,
+        string path,
+        int sortOrder,
         int parentContentId,
-        DateTime createDate, int creatorId,
-        ContentData draftData, ContentData publishedData,
+        DateTime createDate,
+        int creatorId,
+        ContentData draftData,
+        ContentData publishedData,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IVariationContextAccessor variationContextAccessor,
         IPublishedModelFactory publishedModelFactory)
         : this(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId) =>
-        SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor,
-            variationContextAccessor, publishedModelFactory);
+        SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
 
     // 2-phases ctor, phase 1
-    public ContentNode(int id, Guid uid,
-        int level, string path, int sortOrder,
+    public ContentNode(
+        int id,
+        Guid uid,
+        int level,
+        string path,
+        int sortOrder,
         int parentContentId,
-        DateTime createDate, int creatorId)
+        DateTime createDate,
+        int creatorId)
     {
         Id = id;
         Uid = uid;
@@ -84,8 +106,7 @@ public class ContentNode
     }
 
     // clone
-    public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory,
-        IPublishedContentType? contentType = null)
+    public ContentNode(ContentNode origin, IPublishedModelFactory publishedModelFactory, IPublishedContentType? contentType = null)
     {
         _publishedModelFactory = publishedModelFactory;
         Id = origin.Id;
@@ -115,9 +136,13 @@ public class ContentNode
     public IPublishedContent? PublishedModel => GetModel(ref _publishedModel, _publishedData);
 
     // two-phase ctor, phase 2
-    public void SetContentTypeAndData(IPublishedContentType contentType, ContentData? draftData,
-        ContentData? publishedData, IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IVariationContextAccessor variationContextAccessor, IPublishedModelFactory publishedModelFactory)
+    public void SetContentTypeAndData(
+        IPublishedContentType contentType,
+        ContentData? draftData,
+        ContentData? publishedData,
+        IPublishedSnapshotAccessor publishedSnapshotAccessor,
+        IVariationContextAccessor variationContextAccessor,
+        IPublishedModelFactory publishedModelFactory)
     {
         ContentType = contentType;
 
@@ -137,6 +162,8 @@ public class ContentNode
     public bool HasPublishedCulture(string culture) =>
         _publishedData != null && (_publishedData.CultureInfos?.ContainsKey(culture) ?? false);
 
+    public ContentNodeKit ToKit() => new(this, ContentType.Id, _draftData, _publishedData);
+
     private IPublishedContent? GetModel(ref IPublishedContent? model, ContentData? contentData)
     {
         if (model != null)
@@ -152,10 +179,8 @@ public class ContentNode
         // create the model - we want to be fast, so no lock here: we may create
         // more than 1 instance, but the lock below ensures we only ever return
         // 1 unique instance - and locking is a nice explicit way to ensure this
-
         IPublishedContent? m =
-            new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor,
-                _publishedModelFactory).CreateModel(_publishedModelFactory);
+            new PublishedContent(this, contentData, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory).CreateModel(_publishedModelFactory);
 
         // locking 'this' is not a best-practice but ContentNode is internal and
         // we know what we do, so it is fine here and avoids allocating an object
@@ -165,19 +190,14 @@ public class ContentNode
         }
     }
 
-    public ContentNodeKit ToKit() => new(this, ContentType.Id, _draftData, _publishedData);
-
-    // everything that is common to both draft and published versions
-    // keep this as small as possible
-
-#pragma warning disable IDE1006 // Naming Styles
-    public readonly int Id;
     public readonly Guid Uid;
-    public IPublishedContentType ContentType = null!;
     public readonly int Level;
+    public IPublishedContentType ContentType = null!;
     public readonly string Path;
     public readonly int SortOrder;
     public readonly int ParentContentId;
+    public readonly DateTime CreateDate;
+
 #pragma warning restore IDE1006 // Naming Styles
 
     // TODO: Can we make everything readonly?? This would make it easier to debug and be less error prone especially for new developers.
@@ -187,8 +207,6 @@ public class ContentNode
     public int LastChildContentId;
     public int NextSiblingContentId;
     public int PreviousSiblingContentId;
-
-    public readonly DateTime CreateDate;
     public readonly int CreatorId;
 #pragma warning restore IDE1006 // Naming Styles
 }

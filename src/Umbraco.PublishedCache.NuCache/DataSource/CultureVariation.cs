@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
@@ -25,7 +25,7 @@ public class CultureVariation
     [JsonProperty("isd")]
     public bool IsDraft { get; set; }
 
-    //Legacy properties used to deserialize existing nucache db entries
+    // Legacy properties used to deserialize existing nucache db entries
     [IgnoreDataMember]
     [JsonProperty("name")]
     private string LegacyName { set => Name = value; }

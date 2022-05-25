@@ -5,13 +5,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 public interface INuCacheContentRepository
 {
     void DeleteContentItem(IContentBase item);
+
     IEnumerable<ContentNodeKit> GetAllContentSources();
+
     IEnumerable<ContentNodeKit> GetAllMediaSources();
+
     IEnumerable<ContentNodeKit> GetBranchContentSources(int id);
+
     IEnumerable<ContentNodeKit> GetBranchMediaSources(int id);
+
     ContentNodeKit GetContentSource(int id);
+
     ContentNodeKit GetMediaSource(int id);
+
     IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids);
+
     IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids);
 
     /// <summary>
@@ -50,6 +58,8 @@ public interface INuCacheContentRepository
         IReadOnlyCollection<int>? memberTypeIds = null);
 
     bool VerifyContentDbCache();
+
     bool VerifyMediaDbCache();
+
     bool VerifyMemberDbCache();
 }

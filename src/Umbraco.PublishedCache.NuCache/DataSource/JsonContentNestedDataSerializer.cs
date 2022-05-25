@@ -11,19 +11,18 @@ public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
     // which is bad, because they were Int32 in the database - take care
     private readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
-        Converters = new List<JsonConverter> {new ForceInt32Converter()},
+        Converters = new List<JsonConverter> { new ForceInt32Converter() },
 
         // Explicitly specify date handling so that it's consistent and follows the same date handling as MessagePack
         DateParseHandling = DateParseHandling.DateTime,
         DateFormatHandling = DateFormatHandling.IsoDateFormat,
         DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-        DateFormatString = "o"
+        DateFormatString = "o",
     };
 
     private readonly JsonNameTable _propertyNameTable = new DefaultJsonNameTable();
 
-    public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData,
-        bool published)
+    public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published)
     {
         if (stringData == null && byteData != null)
         {
@@ -41,12 +40,10 @@ public class JsonContentNestedDataSerializer : IContentCacheDataSerializer
         }
     }
 
-    public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model,
-        bool published)
+    public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
     {
         // note that numeric values (which are Int32) are serialized without their
         // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
-
         var json = JsonConvert.SerializeObject(model);
         return new ContentCacheDataSerializationResult(json, null);
     }
@@ -57,6 +54,7 @@ public class JsonArrayPool : IArrayPool<char>
     public static readonly JsonArrayPool Instance = new();
 
     public char[] Rent(int minimumLength) =>
+
         // get char array from System.Buffers shared pool
         ArrayPool<char>.Shared.Rent(minimumLength);
 

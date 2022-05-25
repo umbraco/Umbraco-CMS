@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -26,12 +26,12 @@ public struct ContentNodeKit
         PublishedData = publishedData;
     }
 
+    public static ContentNodeKit Empty { get; } = default(ContentNodeKit);
 
     public bool IsEmpty => Node == null;
 
     public bool IsNull => ContentTypeId < 0;
 
-    public static ContentNodeKit Empty { get; } = new();
     public static ContentNodeKit Null { get; } = new(null!, -1, null, null);
 
     public void Build(
@@ -54,14 +54,12 @@ public struct ContentNodeKit
             draftData = PublishedData;
         }
 
-        Node?.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor,
-            variationContextAccessor, publishedModelFactory);
+        Node?.SetContentTypeAndData(contentType, draftData, publishedData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory);
     }
 
     public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory)
         => new(new ContentNode(Node, publishedModelFactory), ContentTypeId, DraftData, PublishedData);
 
-    public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory, ContentData draftData,
-        ContentData publishedData)
+    public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory, ContentData draftData, ContentData publishedData)
         => new(new ContentNode(Node, publishedModelFactory), ContentTypeId, draftData, publishedData);
 }

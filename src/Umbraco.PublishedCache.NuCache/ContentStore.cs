@@ -44,20 +44,22 @@ public class ContentStore
     private readonly ILoggerFactory _loggerFactory;
 
     private readonly IPublishedModelFactory _publishedModelFactory;
+
     // this class is an extended version of SnapDictionary
     // most of the snapshots management code, etc is an exact copy
     // SnapDictionary has unit tests to ensure it all works correctly
     // For locking information, see SnapDictionary
-
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly object _rlocko = new();
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly object _wlocko = new();
     private Task? _collectTask;
     private GenObj? _genObj;
-    private long _liveGen, _floorGen;
+    private long _liveGen;
+    private long _floorGen;
     private BPlusTree<int, ContentNodeKit>? _localDb;
-    private bool _nextGen, _collectAuto;
+    private bool _nextGen;
+    private bool _collectAuto;
     private LinkedNode<ContentNode> _root;
     private List<KeyValuePair<int, ContentNodeKit>>? _wchanges;
 
@@ -107,9 +109,8 @@ public class ContentStore
         private readonly ContentStore _store;
         private long _gen;
 
-        //private static int _count;
-        //private readonly int _thisCount;
-
+        // private static int _count;
+        // private readonly int _thisCount;
         internal Snapshot(ContentStore store, GenRef genRef
 #if DEBUG
             , ILogger<Snapshot> logger
@@ -120,8 +121,8 @@ public class ContentStore
             _genRef = genRef;
             _gen = genRef.Gen;
             Interlocked.Increment(ref genRef.GenObj.Count);
-            //_thisCount = _count++;
 
+            // _thisCount = _count++;
 #if DEBUG
             _logger = logger;
             _logger.LogDebug("Creating snapshot.");
@@ -147,12 +148,12 @@ public class ContentStore
         // the only way we can iterate over "all" without locking the entire cache forever
         // is by shallow cloning the cache, which is quite expensive, so we should probably not do it,
         // and implement cache-level indexes
-        //public IEnumerable<ContentNode> GetAll()
-        //{
+        // public IEnumerable<ContentNode> GetAll()
+        // {
         //    if (_gen < 0)
         //        throw new ObjectDisposedException("snapshot" /*+ " (" + _thisCount + ")"*/);
         //    return _store.GetAll(_gen);
-        //}
+        // }
 
         public bool IsEmpty
         {
@@ -274,7 +275,6 @@ public class ContentStore
     #region Locking
 
     // see notes on SnapDictionary
-
     private readonly string _instanceId = Guid.NewGuid().ToString("N");
 
     private class WriteLockInfo
@@ -335,7 +335,9 @@ public class ContentStore
         lock (_rlocko)
         {
             // see SnapDictionary
-            try { }
+            try
+            {
+            }
             finally
             {
                 if (_nextGen == false || forceGen)
@@ -363,7 +365,9 @@ public class ContentStore
                 lock (_rlocko)
                 {
                     // see SnapDictionary
-                    try { }
+                    try
+                    {
+                    }
                     finally
                     {
                         _nextGen = false;
@@ -530,7 +534,7 @@ public class ContentStore
     /// </exception>
     public void UpdateContentTypesLocked(IEnumerable<IPublishedContentType> types)
     {
-        //nothing to do if this is empty, no need to lock/allocate/iterate/etc...
+        // nothing to do if this is empty, no need to lock/allocate/iterate/etc...
         if (!types.Any())
         {
             return;
@@ -591,7 +595,6 @@ public class ContentStore
             }
         }
 
-
         // beware! at that point the cache is inconsistent,
         // assuming we are going to SetAll content items!
     }
@@ -609,8 +612,10 @@ public class ContentStore
     /// <exception cref="InvalidOperationException">
     ///     Thrown if this method is not called within a write lock
     /// </exception>
-    public void UpdateContentTypesLocked(IReadOnlyCollection<int>? removedIds,
-        IReadOnlyCollection<IPublishedContentType> refreshedTypes, IReadOnlyCollection<ContentNodeKit> kits)
+    public void UpdateContentTypesLocked(
+        IReadOnlyCollection<int>? removedIds,
+        IReadOnlyCollection<IPublishedContentType> refreshedTypes,
+        IReadOnlyCollection<ContentNodeKit> kits)
     {
         EnsureLocked();
 
@@ -622,7 +627,7 @@ public class ContentStore
 
         if (kits.Count == 0 && refreshedIdsA.Count == 0 && removedIdsA.Count == 0)
         {
-            return; //exit - there is nothing to do here
+            return; // exit - there is nothing to do here
         }
 
         var removedContentTypeNodes = new List<int>();
@@ -796,8 +801,7 @@ public class ContentStore
         parent = GetParentLink(kit.Node, null);
         if (parent == null)
         {
-            _logger.LogWarning("Skip item id={kitNodeId}, could not find parent id={kitNodeParentContentId}.",
-                kit.Node.Id, kit.Node.ParentContentId);
+            _logger.LogWarning("Skip item id={kitNodeId}, could not find parent id={kitNodeParentContentId}.", kit.Node.Id, kit.Node.ParentContentId);
             return false;
         }
 
@@ -808,7 +812,10 @@ public class ContentStore
         {
             _logger.LogWarning(
                 "Skip item id={kitNodeId}, no Data assigned for linked node with path {kitNodePath} and parent id {kitNodeParentContentId}. This can indicate data corruption for the Path value for node {kitNodeId}. See the Health Check dashboard in Settings to resolve data integrity issues.",
-                kit.Node.Id, kit.Node.Path, kit.Node.ParentContentId, kit.Node.Id);
+                kit.Node.Id,
+                kit.Node.Path,
+                kit.Node.ParentContentId,
+                kit.Node.Id);
             return false;
         }
 
@@ -823,8 +830,7 @@ public class ContentStore
         if (_contentTypesById.TryGetValue(kit.ContentTypeId, out LinkedNode<IPublishedContentType?>? link) == false ||
             link.Value == null)
         {
-            _logger.LogWarning("Skip item id={kitNodeId}, could not find content type id={kitContentTypeId}.",
-                kit.Node.Id, kit.ContentTypeId);
+            _logger.LogWarning("Skip item id={kitNodeId}, could not find content type id={kitContentTypeId}.", kit.Node.Id, kit.ContentTypeId);
             return false;
         }
 
@@ -832,8 +838,7 @@ public class ContentStore
         var canBePublished = ParentPublishedLocked(kit);
 
         // and use
-        kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory,
-            canBePublished);
+        kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory, canBePublished);
 
         return true;
     }
@@ -852,7 +857,8 @@ public class ContentStore
     /// <param name="dict"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    private static LinkedNode<TValue>? GetHead<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict,
+    private static LinkedNode<TValue>? GetHead<TKey, TValue>(
+        ConcurrentDictionary<TKey, LinkedNode<TValue>> dict,
         TKey key)
         where TValue : class?
         where TKey : notnull
@@ -887,8 +893,8 @@ public class ContentStore
         {
             throw new ArgumentException("Kit content cannot have children.", nameof(kit));
         }
-        // ReSharper restore LocalizableElement
 
+        // ReSharper restore LocalizableElement
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Set content ID: {KitNodeId}", kit.Node.Id);
@@ -1019,7 +1025,6 @@ public class ContentStore
         //  LastChildContentId
         //  NextSiblingContentId
         //  PreviousSiblingContentId
-
         ContentNode? previousNode = null;
         ContentNode? parent = null;
 
@@ -1032,7 +1037,6 @@ public class ContentStore
         // the configuration setting Umbraco:CMS:NuCache:KitPageSize to a higher value.
 
         // If we are not loading from the database, then we can ignore this restriction.
-
         foreach (IEnumerable<ContentNodeKit> kitGroup in
                  kits.InGroupsOf(!fromDb || kitGroupSize < 1 ? 1 : kitGroupSize))
         {
@@ -1062,8 +1066,7 @@ public class ContentStore
 
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id,
-                        thisNode.ParentContentId);
+                    _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
                 }
 
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
@@ -1133,8 +1136,8 @@ public class ContentStore
         ClearRootLocked();
 
         // do NOT clear types else they are gone!
-        //ClearLocked(_contentTypesById);
-        //ClearLocked(_contentTypesByAlias);
+        // ClearLocked(_contentTypesById);
+        // ClearLocked(_contentTypesByAlias);
 
         // By using InGroupsOf() here we are forcing the database query result extraction to retrieve items in batches,
         // reducing the possibility of a database timeout (ThreadAbortException) on large datasets.
@@ -1158,8 +1161,7 @@ public class ContentStore
 
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id,
-                        kit.Node.ParentContentId);
+                    _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
                 }
 
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
@@ -1209,9 +1211,10 @@ public class ContentStore
         // clear
         if (existing != null)
         {
-            //this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
+            // this zero's out the branch (recursively), if we're in a new gen this will add a NULL placeholder for the gen
             ClearBranchLocked(existing);
-            //TODO: This removes the current GEN from the tree - do we really want to do that? (not sure if this is still an issue....)
+
+            // TODO: This removes the current GEN from the tree - do we really want to do that? (not sure if this is still an issue....)
             RemoveTreeNodeLocked(existing);
         }
 
@@ -1342,6 +1345,7 @@ public class ContentStore
     ///     Gets the parent link node, may be null or root if ParentContentId is less than 0
     /// </summary>
     /// <param name="gen">the generation requested, null for the latest stored</param>
+    /// <param name="content">The content node</param>
     private LinkedNode<ContentNode>? GetParentLink(ContentNode content, long? gen)
     {
         if (content.ParentContentId < 0)
@@ -1366,7 +1370,7 @@ public class ContentStore
     /// <summary>
     ///     Gets the linked parent node and if it doesn't exist throw a <see cref="PanicException" />
     /// </summary>
-    /// <param name="content"></param>
+    /// <param name="content">The content node</param>
     /// <param name="gen">the generation requested, null for the latest stored</param>
     /// <returns></returns>
     private LinkedNode<ContentNode> GetRequiredParentLink(ContentNode content, long? gen) => content.ParentContentId < 0
@@ -1387,7 +1391,7 @@ public class ContentStore
             return link;
         }
 
-        //find the correct snapshot, find the first that is <= the requested gen
+        // find the correct snapshot, find the first that is <= the requested gen
         while (link != null && link.Gen > gen)
         {
             link = link.Next;
@@ -1408,7 +1412,6 @@ public class ContentStore
     {
         // NOTE: DO NOT modify `content` here, this would modify data for an existing Gen, all modifications are done to clones
         // which would be targeting the new Gen.
-
         LinkedNode<ContentNode> parentLink = content.ParentContentId < 0
             ? _root
             : GetRequiredLinkedNode(content.ParentContentId, "parent", null);
@@ -1422,7 +1425,6 @@ public class ContentStore
         }
 
         // if first/last, clone parent, then remove
-
         if (parent.FirstChildContentId == content.Id || parent.LastChildContentId == content.Id)
         {
             parent = GenCloneLocked(parentLink);
@@ -1442,7 +1444,6 @@ public class ContentStore
         }
 
         // maintain linked list
-
         if (content.NextSiblingContentId > 0)
         {
             LinkedNode<ContentNode> nextLink =
@@ -1644,13 +1645,13 @@ public class ContentStore
     {
         SetValueLocked(_contentTypesById, type.Id, type);
         SetValueLocked(_contentTypesByAlias, type.Alias, type);
+
         // ensure the key/id map is accurate
         _contentTypeKeyToIdMap[type.Key] = type.Id;
     }
 
     // set a node (just the node, not the tree)
-    private void SetValueLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key,
-        TValue value)
+    private void SetValueLocked<TKey, TValue>(ConcurrentDictionary<TKey, LinkedNode<TValue>> dict, TKey key, TValue value)
         where TValue : class?
         where TKey : notnull
     {
@@ -1834,7 +1835,6 @@ public class ContentStore
             // - the genRefRef counter is zero because all snapshots have properly been disposed
             // - the genRefRef weak ref is dead because all snapshots have been collected
             // in both cases, we will dequeue and collect
-
             var snapshot = new Snapshot(this, _genObj.GetGenRef()
 #if DEBUG
                 , _loggerFactory.CreateLogger<Snapshot>()
@@ -1873,7 +1873,6 @@ public class ContentStore
         // slightly dangerous because it's not taking into account app shutdown.
         // TODO: There should be a different method or class responsible for executing the cleanup on a
         // background (set and forget) thread.
-
         if (_collectTask != null)
         {
             return _collectTask;
@@ -1881,7 +1880,8 @@ public class ContentStore
 
         // ReSharper disable InconsistentlySynchronizedField
         Task task = _collectTask = Task.Run(Collect);
-        _collectTask.ContinueWith(_ =>
+        _collectTask.ContinueWith(
+            _ =>
             {
                 lock (_rlocko)
                 {
@@ -1890,10 +1890,11 @@ public class ContentStore
             },
             CancellationToken.None,
             TaskContinuationOptions.ExecuteSynchronously,
+
             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             TaskScheduler.Default);
-        // ReSharper restore InconsistentlySynchronizedField
 
+        // ReSharper restore InconsistentlySynchronizedField
         return task;
     }
 
@@ -1908,7 +1909,7 @@ public class ContentStore
             _genObjs.TryDequeue(out genObj); // cannot fail since TryPeek has succeeded
             _floorGen = genObj!.Gen;
 #if DEBUG
-            //_logger.LogDebug("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
+            // _logger.LogDebug("_floorGen=" + _floorGen + ", _liveGen=" + _liveGen);
 #endif
         }
 
@@ -1936,9 +1937,10 @@ public class ContentStore
         // it is OK to enumerate a concurrent dictionary and it does not lock
         // it - and here it's not an issue if we skip some items, they will be
         // processed next time we collect
-
         long liveGen;
-        lock (_rlocko) // r is good
+
+        // r is good
+        lock (_rlocko)
         {
             liveGen = _liveGen;
             if (_nextGen == false)
@@ -1952,7 +1954,7 @@ public class ContentStore
             LinkedNode<TValue>? link = kvp.Value;
 
 #if DEBUG
-            //_logger.LogDebug("Collect id:" + kvp.Key + ", gen:" + link.Gen +
+            // _logger.LogDebug("Collect id:" + kvp.Key + ", gen:" + link.Gen +
             //    ", nxt:" + (link.Next == null ? "null" : "link") +
             //    ", val:" + (link.Value == null ? "null" : "value"));
 #endif
@@ -1991,8 +1993,8 @@ public class ContentStore
     }
 
     // TODO: This is never used? Should it be? Maybe move to TestHelper below?
-    //public async Task WaitForPendingCollect()
-    //{
+    // public async Task WaitForPendingCollect()
+    // {
     //    Task task;
     //    lock (_rlocko)
     //    {
@@ -2000,8 +2002,7 @@ public class ContentStore
     //    }
     //    if (task != null)
     //        await task;
-    //}
-
+    // }
     public long GenCount => _genObjs.Count;
 
     public long SnapCount => _genObjs.Sum(x => x.Count);
@@ -2020,7 +2021,9 @@ public class ContentStore
         public TestHelper(ContentStore store) => _store = store;
 
         public long LiveGen => _store._liveGen;
+
         public long FloorGen => _store._floorGen;
+
         public bool NextGen => _store._nextGen;
 
         public bool CollectAuto
@@ -2048,7 +2051,8 @@ public class ContentStore
             {
                 tuples.Add((link.Gen, link.Value));
                 link = link.Next;
-            } while (link != null);
+            }
+            while (link != null);
 
             return tuples.ToArray();
         }

@@ -59,7 +59,7 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
     }
 
     public void DeleteContentItem(IContentBase item)
-        => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new {id = item.Id});
+        => Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id", new { id = item.Id });
 
     public void RefreshContent(IContent content)
     {
@@ -72,7 +72,7 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
         if (content.PublishedState == PublishedState.Unpublishing)
         {
             // if unpublishing, remove published data from table
-            Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new {id = content.Id});
+            Database.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
         }
         else if (content.PublishedState == PublishedState.Publishing)
         {
@@ -127,7 +127,7 @@ LEFT JOIN cmsContentNu nuEdited ON (umbracoNode.id=nuEdited.nodeId AND nuEdited.
 LEFT JOIN cmsContentNu nuPublished ON (umbracoNode.id=nuPublished.nodeId AND nuPublished.published=1)
 WHERE umbracoNode.nodeObjectType=@objType
 AND nuEdited.nodeId IS NULL OR ({Constants.DatabaseSchema.Tables.Document}.published=1 AND nuPublished.nodeId IS NULL);",
-            new {objType = contentObjectType});
+            new { objType = contentObjectType });
 
         return count == 0;
     }
@@ -144,7 +144,8 @@ FROM umbracoNode
 LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
-", new {objType = mediaObjectType});
+",
+            new { objType = mediaObjectType });
 
         return count == 0;
     }
@@ -161,7 +162,8 @@ FROM umbracoNode
 LEFT JOIN cmsContentNu ON (umbracoNode.id=cmsContentNu.nodeId AND cmsContentNu.published=0)
 WHERE umbracoNode.nodeObjectType=@objType
 AND cmsContentNu.nodeId IS NULL
-", new {objType = memberObjectType});
+",
+            new { objType = memberObjectType });
 
         return count == 0;
     }
@@ -203,9 +205,7 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateContentNodeKit(row, serializer);
         }
@@ -230,9 +230,7 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateContentNodeKit(row, serializer);
         }
@@ -262,9 +260,7 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateContentNodeKit(row, serializer);
         }
@@ -306,9 +302,7 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateMediaNodeKit(row, serializer);
         }
@@ -333,9 +327,7 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateMediaNodeKit(row, serializer);
         }
@@ -365,12 +357,29 @@ AND cmsContentNu.nodeId IS NULL
 
         // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
         // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql,
-                     sqlCount))
+        foreach (ContentSourceDto row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
         {
             yield return CreateMediaNodeKit(row, serializer);
         }
+    }
+
+    public ContentNodeKit GetMediaSource(IScope scope, int id)
+    {
+        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+            .Append(SqlWhereNodeId(SqlContext, id))
+            .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext));
+
+        ContentSourceDto? dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+
+        if (dto == null)
+        {
+            return ContentNodeKit.Empty;
+        }
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+        return CreateMediaNodeKit(dto, serializer);
     }
 
     private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IContentBase content, bool published)
@@ -387,13 +396,12 @@ AND cmsContentNu.nodeId IS NULL
                 dataRaw = dto.RawData ?? Array.Empty<byte>(),
                 data = dto.Data,
                 id = dto.NodeId,
-                published = dto.Published
+                published = dto.Published,
             });
     }
 
     // assumes content tree lock
-    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid contentObjectType = Constants.ObjectTypes.Document;
 
@@ -406,7 +414,7 @@ AND cmsContentNu.nodeId IS NULL
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
-                new {objType = contentObjectType});
+                new { objType = contentObjectType });
         }
         else
         {
@@ -420,7 +428,7 @@ WHERE cmsContentNu.nodeId IN (
     WHERE umbracoNode.nodeObjectType=@objType
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
-                new {objType = contentObjectType, ctypes = contentTypeIds});
+                new { objType = contentObjectType, ctypes = contentTypeIds });
         }
 
         // insert back - if anything fails the transaction will rollback
@@ -456,12 +464,12 @@ WHERE cmsContentNu.nodeId IN (
 
             Database.BulkInsertRecords(items);
             processed += count;
-        } while (processed < total);
+        }
+        while (processed < total);
     }
 
     // assumes media tree lock
-    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
@@ -474,7 +482,7 @@ WHERE cmsContentNu.nodeId IN (
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
-                new {objType = mediaObjectType});
+                new { objType = mediaObjectType });
         }
         else
         {
@@ -488,7 +496,7 @@ WHERE cmsContentNu.nodeId IN (
     WHERE umbracoNode.nodeObjectType=@objType
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
-                new {objType = mediaObjectType, ctypes = contentTypeIds});
+                new { objType = mediaObjectType, ctypes = contentTypeIds });
         }
 
         // insert back - if anything fails the transaction will rollback
@@ -509,12 +517,12 @@ WHERE cmsContentNu.nodeId IN (
             var items = descendants.Select(m => GetDto(m, false, serializer)).ToList();
             Database.BulkInsertRecords(items);
             processed += items.Count;
-        } while (processed < total);
+        }
+        while (processed < total);
     }
 
     // assumes member tree lock
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize,
-        IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
     {
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
@@ -527,7 +535,7 @@ WHERE cmsContentNu.nodeId IN (
 WHERE cmsContentNu.nodeId IN (
     SELECT id FROM umbracoNode WHERE umbracoNode.nodeObjectType=@objType
 )",
-                new {objType = memberObjectType});
+                new { objType = memberObjectType });
         }
         else
         {
@@ -541,7 +549,7 @@ WHERE cmsContentNu.nodeId IN (
     WHERE umbracoNode.nodeObjectType=@objType
     AND {Constants.DatabaseSchema.Tables.Content}.contentTypeId IN (@ctypes)
 )",
-                new {objType = memberObjectType, ctypes = contentTypeIds});
+                new { objType = memberObjectType, ctypes = contentTypeIds });
         }
 
         // insert back - if anything fails the transaction will rollback
@@ -561,7 +569,8 @@ WHERE cmsContentNu.nodeId IN (
             ContentNuDto[] items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
             Database.BulkInsertRecords(items);
             processed += items.Length;
-        } while (processed < total);
+        }
+        while (processed < total);
     }
 
     private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
@@ -590,7 +599,7 @@ WHERE cmsContentNu.nodeId IN (
                     {
                         Culture = pvalue.Culture ?? string.Empty,
                         Segment = pvalue.Segment ?? string.Empty,
-                        Value = value
+                        Value = value,
                     });
                 }
             }
@@ -621,7 +630,7 @@ WHERE cmsContentNu.nodeId IN (
                         UrlSegment =
                             content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
                         Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
-                        IsDraft = cultureIsDraft
+                        IsDraft = cultureIsDraft,
                     };
                 }
             }
@@ -632,7 +641,7 @@ WHERE cmsContentNu.nodeId IN (
         {
             PropertyData = propertyData,
             CultureData = cultureData,
-            UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders)
+            UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders),
         };
 
         ContentCacheDataSerializationResult serialized =
@@ -640,7 +649,10 @@ WHERE cmsContentNu.nodeId IN (
 
         var dto = new ContentNuDto
         {
-            NodeId = content.Id, Published = published, Data = serialized.StringData, RawData = serialized.ByteData
+            NodeId = content.Id,
+            Published = published,
+            Data = serialized.StringData,
+            RawData = serialized.ByteData,
         };
 
         return dto;
@@ -650,18 +662,30 @@ WHERE cmsContentNu.nodeId IN (
     private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
         SqlTemplate sqlTemplate = SqlContext.Templates.Get(
-            Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect, tsql =>
-                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
-                        x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"),
+            Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect,
+            tsql =>
+                tsql.Select<NodeDto>(
+                        x => Alias(x.NodeId, "Id"),
+                        x => Alias(x.UniqueId, "Key"),
+                        x => Alias(x.Level, "Level"),
+                        x => Alias(x.Path, "Path"),
+                        x => Alias(x.SortOrder, "SortOrder"),
                         x => Alias(x.ParentId, "ParentId"),
-                        x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
+                        x => Alias(x.CreateDate, "CreateDate"),
+                        x => Alias(x.UserId, "CreatorId"))
                     .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                     .AndSelect<DocumentDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
-                    .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"),
-                        x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
+                    .AndSelect<ContentVersionDto>(
+                        x => Alias(x.Id, "VersionId"),
+                        x => Alias(x.Text, "EditName"),
+                        x => Alias(x.VersionDate, "EditVersionDate"),
+                        x => Alias(x.UserId, "EditWriterId"))
                     .AndSelect<DocumentVersionDto>(x => Alias(x.TemplateId, "EditTemplateId"))
-                    .AndSelect<ContentVersionDto>("pcver", x => Alias(x.Id, "PublishedVersionId"),
-                        x => Alias(x.Text, "PubName"), x => Alias(x.VersionDate, "PubVersionDate"),
+                    .AndSelect<ContentVersionDto>(
+                        "pcver",
+                        x => Alias(x.Id, "PublishedVersionId"),
+                        x => Alias(x.Text, "PubName"),
+                        x => Alias(x.VersionDate, "PubVersionDate"),
                         x => Alias(x.UserId, "PubWriterId"))
                     .AndSelect<DocumentVersionDto>("pdver", x => Alias(x.TemplateId, "PubTemplateId"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
@@ -673,7 +697,6 @@ WHERE cmsContentNu.nodeId IN (
         Sql<ISqlContext>? sql = sqlTemplate.Sql();
 
         // TODO: I'm unsure how we can format the below into SQL templates also because right.Current and right.Published end up being parameters
-
         if (joins != null)
         {
             sql = sql.Append(joins(sql.SqlContext));
@@ -686,10 +709,12 @@ WHERE cmsContentNu.nodeId IN (
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
             .InnerJoin<DocumentVersionDto>()
             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-            .LeftJoin<ContentVersionDto>(j =>
+            .LeftJoin<ContentVersionDto>(
+                j =>
                 j.InnerJoin<DocumentVersionDto>("pdver")
                     .On<ContentVersionDto, DocumentVersionDto>(
-                        (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"), "pcver")
+                        (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                "pcver")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
             .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
                 (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
@@ -707,8 +732,9 @@ WHERE cmsContentNu.nodeId IN (
             Constants.SqlTemplates.NuCacheDatabaseDataSource.SourcesSelectUmbracoNodeJoin, builder =>
                 builder.InnerJoin<NodeDto>("x")
                     .On<NodeDto, NodeDto>(
-                        (left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path,
-                            (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"));
+                        (left, right) => left.NodeId == right.NodeId ||
+                                         SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"),
+                        aliasRight: "x"));
 
         Sql<ISqlContext> sql = sqlTemplate.Sql();
         return sql;
@@ -718,7 +744,8 @@ WHERE cmsContentNu.nodeId IN (
     {
         ISqlSyntaxProvider syntax = sqlContext.SqlSyntax;
 
-        SqlTemplate sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeId,
+        SqlTemplate sqlTemplate = sqlContext.Templates.Get(
+            Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeId,
             builder =>
                 builder.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
 
@@ -767,7 +794,7 @@ WHERE cmsContentNu.nodeId IN (
     /// <summary>
     ///     Returns a slightly more optimized query to use for the document counting when paging over the content sources
     /// </summary>
-    /// <param name="scope"></param>
+    /// <param name="joins"></param>
     /// <returns></returns>
     private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
@@ -791,10 +818,14 @@ WHERE cmsContentNu.nodeId IN (
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
             .InnerJoin<DocumentVersionDto>()
             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-            .LeftJoin<ContentVersionDto>(j =>
+            .LeftJoin<ContentVersionDto>(
+                j =>
                 j.InnerJoin<DocumentVersionDto>("pdver")
-                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published,
-                        "pcver", "pdver"), "pcver")
+                    .On<ContentVersionDto, DocumentVersionDto>(
+                        (left, right) => left.Id == right.Id && right.Published,
+                        "pcver",
+                        "pdver"),
+                "pcver")
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver");
 
         return sql;
@@ -804,13 +835,21 @@ WHERE cmsContentNu.nodeId IN (
     {
         SqlTemplate sqlTemplate = SqlContext.Templates.Get(
             Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
-                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
-                        x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"),
+                tsql.Select<NodeDto>(
+                        x => Alias(x.NodeId, "Id"),
+                        x => Alias(x.UniqueId, "Key"),
+                        x => Alias(x.Level, "Level"),
+                        x => Alias(x.Path, "Path"),
+                        x => Alias(x.SortOrder, "SortOrder"),
                         x => Alias(x.ParentId, "ParentId"),
-                        x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
+                        x => Alias(x.CreateDate, "CreateDate"),
+                        x => Alias(x.UserId, "CreatorId"))
                     .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
-                    .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"),
-                        x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
+                    .AndSelect<ContentVersionDto>(
+                        x => Alias(x.Id, "VersionId"),
+                        x => Alias(x.Text, "EditName"),
+                        x => Alias(x.VersionDate, "EditVersionDate"),
+                        x => Alias(x.UserId, "EditWriterId"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
                     .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
                     .From<NodeDto>());
@@ -828,7 +867,8 @@ WHERE cmsContentNu.nodeId IN (
             .InnerJoin<ContentVersionDto>()
             .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
             .LeftJoin<ContentNuDto>("nuEdit")
-            .On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published,
+            .On<NodeDto, ContentNuDto>(
+                (left, right) => left.NodeId == right.NodeId && !right.Published,
                 aliasRight: "nuEdit");
 
         return sql;
@@ -856,25 +896,6 @@ WHERE cmsContentNu.nodeId IN (
         return sql;
     }
 
-    public ContentNodeKit GetMediaSource(IScope scope, int id)
-    {
-        Sql<ISqlContext>? sql = SqlMediaSourcesSelect()
-            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
-            .Append(SqlWhereNodeId(SqlContext, id))
-            .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext));
-
-        ContentSourceDto? dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-
-        if (dto == null)
-        {
-            return ContentNodeKit.Empty;
-        }
-
-        IContentCacheDataSerializer serializer =
-            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
-        return CreateMediaNodeKit(dto, serializer);
-    }
-
     private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
     {
         ContentData? d = null;
@@ -890,7 +911,8 @@ WHERE cmsContentNu.nodeId IN (
                                                         ", consider rebuilding.");
                 }
 
-                _logger.LogWarning("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
+                _logger.LogWarning(
+                    "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
                     dto.Id);
             }
             else
@@ -922,7 +944,8 @@ WHERE cmsContentNu.nodeId IN (
                                                         ", consider rebuilding.");
                 }
 
-                _logger.LogWarning("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
+                _logger.LogWarning(
+                    "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
                     dto.Id);
             }
             else
@@ -944,8 +967,7 @@ WHERE cmsContentNu.nodeId IN (
             }
         }
 
-        var n = new ContentNode(dto.Id, dto.Key,
-            dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
+        var n = new ContentNode(dto.Id, dto.Key, dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
         var s = new ContentNodeKit(n, dto.ContentTypeId, d, p);
 
@@ -974,8 +996,7 @@ WHERE cmsContentNu.nodeId IN (
             deserializedMedia?.PropertyData,
             deserializedMedia?.CultureData);
 
-        var n = new ContentNode(dto.Id, dto.Key,
-            dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
+        var n = new ContentNode(dto.Id, dto.Key, dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
         var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
 

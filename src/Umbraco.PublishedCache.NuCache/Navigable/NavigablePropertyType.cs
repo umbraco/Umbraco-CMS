@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Xml.XPath;
+using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
 
@@ -11,5 +11,6 @@ internal class NavigablePropertyType : INavigableFieldType
     }
 
     public string Name { get; }
+
     public Func<object, string>? XmlStringConverter { get; }
 }

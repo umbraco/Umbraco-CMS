@@ -1,4 +1,4 @@
-﻿using CSharpTest.Net.Serialization;
+using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 

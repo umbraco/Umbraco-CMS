@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
@@ -20,9 +20,13 @@ internal class NavigableContent : INavigableContent
             XmlString(i++, _content.UpdateDate), XmlString(i++, true), // isDoc
             XmlString(i++, _content.SortOrder), XmlString(i++, _content.Level), XmlString(i++, _content.TemplateId),
             XmlString(i++, _content.WriterId), XmlString(i++, _content.CreatorId), XmlString(i++, _content.UrlSegment),
-            XmlString(i, _content.IsDraft())
+            XmlString(i, _content.IsDraft()),
         };
     }
+
+    #region INavigableContent
+
+    public IPublishedContent InnerContent { get; }
 
     private string? XmlString(int index, object? value)
     {
@@ -34,10 +38,6 @@ internal class NavigableContent : INavigableContent
         INavigableFieldType field = Type.FieldTypes[index];
         return field.XmlStringConverter == null ? value.ToString() : field.XmlStringConverter(value);
     }
-
-    #region INavigableContent
-
-    public IPublishedContent InnerContent { get; }
 
     public int Id => _content.Id;
 
@@ -58,7 +58,7 @@ internal class NavigableContent : INavigableContent
         if (index < NavigableContentType.BuiltinProperties.Length)
         {
             // built-in field, ie attribute
-            //return XmlString(index, _builtInValues1[index]);
+            // return XmlString(index, _builtInValues1[index]);
             return _builtInValues[index];
         }
 

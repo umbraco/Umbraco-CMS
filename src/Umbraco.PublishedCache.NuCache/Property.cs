@@ -37,7 +37,9 @@ internal class Property : PublishedPropertyBase
     private string? _valuesCacheKey;
 
     // initializes a published content property with no value
-    public Property(IPublishedPropertyType propertyType, PublishedContent content,
+    public Property(
+        IPublishedPropertyType propertyType,
+        PublishedContent content,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
@@ -45,7 +47,10 @@ internal class Property : PublishedPropertyBase
     }
 
     // initializes a published content property with a value
-    public Property(IPublishedPropertyType propertyType, PublishedContent content, PropertyData[]? sourceValues,
+    public Property(
+        IPublishedPropertyType propertyType,
+        PublishedContent content,
+        PropertyData[]? sourceValues,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
         : base(propertyType, referenceCacheLevel)
@@ -54,7 +59,7 @@ internal class Property : PublishedPropertyBase
         {
             foreach (PropertyData sourceValue in sourceValues)
             {
-                if (sourceValue.Culture == "" && sourceValue.Segment == "")
+                if (sourceValue.Culture == string.Empty && sourceValue.Segment == string.Empty)
                 {
                     _sourceValue = sourceValue.Value;
                 }
@@ -70,7 +75,7 @@ internal class Property : PublishedPropertyBase
                         {
                             Culture = sourceValue.Culture,
                             Segment = sourceValue.Segment,
-                            SourceValue = sourceValue.Value
+                            SourceValue = sourceValue.Value,
                         };
                 }
             }
@@ -100,9 +105,8 @@ internal class Property : PublishedPropertyBase
     }
 
     // used to cache the CacheValues of this property
-    internal string ValuesCacheKey => _valuesCacheKey
-                                      ?? (_valuesCacheKey =
-                                          CacheKeys.PropertyCacheValues(_contentUid, Alias, _isPreviewing));
+    internal string ValuesCacheKey => _valuesCacheKey ??=
+                                          CacheKeys.PropertyCacheValues(_contentUid, Alias, _isPreviewing);
 
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
@@ -142,6 +146,30 @@ internal class Property : PublishedPropertyBase
         }
     }
 
+    public override object? GetSourceValue(string? culture = null, string? segment = null)
+    {
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
+
+        if (culture == string.Empty && segment == string.Empty)
+        {
+            return _sourceValue;
+        }
+
+        lock (_locko)
+        {
+            if (_sourceValues == null)
+            {
+                return null;
+            }
+
+            return _sourceValues.TryGetValue(
+                new CompositeStringStringKey(culture, segment),
+                out SourceInterValue? sourceValue)
+                ? sourceValue.SourceValue
+                : null;
+        }
+    }
+
     private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
     {
         CacheValues cacheValues;
@@ -155,7 +183,7 @@ internal class Property : PublishedPropertyBase
                 break;
             case PropertyCacheLevel.Element:
                 // cache within the property object itself, ie within the content object
-                cacheValues = _cacheValues ?? (_cacheValues = new CacheValues());
+                cacheValues = _cacheValues ??= new CacheValues();
                 break;
             case PropertyCacheLevel.Elements:
                 // cache within the elements cache, unless previewing, then use the snapshot or
@@ -185,7 +213,8 @@ internal class Property : PublishedPropertyBase
 
     private CacheValues GetCacheValues(IAppCache? cache)
     {
-        if (cache == null) // no cache, don't cache
+        // no cache, don't cache
+        if (cache == null)
         {
             return new CacheValues();
         }
@@ -196,7 +225,7 @@ internal class Property : PublishedPropertyBase
     // this is always invoked from within a lock, so does not require its own lock
     private object? GetInterValue(string? culture, string? segment)
     {
-        if (culture == "" && segment == "")
+        if (culture == string.Empty && segment == string.Empty)
         {
             if (_interInitialized)
             {
@@ -218,7 +247,9 @@ internal class Property : PublishedPropertyBase
         {
             _sourceValues[k] = vvalue = new SourceInterValue
             {
-                Culture = culture, Segment = segment, SourceValue = GetSourceValue(culture, segment)
+                Culture = culture,
+                Segment = segment,
+                SourceValue = GetSourceValue(culture, segment),
             };
         }
 
@@ -230,29 +261,6 @@ internal class Property : PublishedPropertyBase
         vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
         vvalue.InterInitialized = true;
         return vvalue.InterValue;
-    }
-
-    public override object? GetSourceValue(string? culture = null, string? segment = null)
-    {
-        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
-
-        if (culture == "" && segment == "")
-        {
-            return _sourceValue;
-        }
-
-        lock (_locko)
-        {
-            if (_sourceValues == null)
-            {
-                return null;
-            }
-
-            return _sourceValues.TryGetValue(new CompositeStringStringKey(culture, segment),
-                out SourceInterValue? sourceValue)
-                ? sourceValue.SourceValue
-                : null;
-        }
     }
 
     public override object? GetValue(string? culture = null, string? segment = null)
@@ -272,8 +280,7 @@ internal class Property : PublishedPropertyBase
                 return cacheValues.ObjectValue;
             }
 
-            cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel,
-                GetInterValue(culture, segment), _isPreviewing);
+            cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
             cacheValues.ObjectInitialized = true;
             value = cacheValues.ObjectValue;
         }
@@ -297,8 +304,7 @@ internal class Property : PublishedPropertyBase
                 return cacheValues.XPathValue;
             }
 
-            cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, initialCacheLevel,
-                GetInterValue(culture, segment), _isPreviewing);
+            cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
             cacheValues.XPathInitialized = true;
             return cacheValues.XPathValue;
         }
@@ -309,8 +315,11 @@ internal class Property : PublishedPropertyBase
     private class CacheValue
     {
         public bool ObjectInitialized { get; set; }
+
         public object? ObjectValue { get; set; }
+
         public bool XPathInitialized { get; set; }
+
         public object? XPathValue { get; set; }
     }
 
@@ -321,7 +330,7 @@ internal class Property : PublishedPropertyBase
         // this is always invoked from within a lock, so does not require its own lock
         public CacheValue For(string? culture, string? segment)
         {
-            if (culture == "" && segment == "")
+            if (culture == string.Empty && segment == string.Empty)
             {
                 return this;
             }
@@ -359,7 +368,9 @@ internal class Property : PublishedPropertyBase
         }
 
         public object? SourceValue { get; set; }
+
         public bool InterInitialized { get; set; }
+
         public object? InterValue { get; set; }
     }
 

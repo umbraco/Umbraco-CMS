@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap;
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 
 internal class GenRef
 {

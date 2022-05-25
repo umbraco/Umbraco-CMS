@@ -1,4 +1,4 @@
-﻿using CSharpTest.Net.Serialization;
+using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -27,7 +27,9 @@ internal class DictionaryOfCultureVariationSerializer : SerializerBase,
             var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
             var cultureVariation = new CultureVariation
             {
-                Name = ReadStringObject(stream), UrlSegment = ReadStringObject(stream), Date = ReadDateTime(stream)
+                Name = ReadStringObject(stream),
+                UrlSegment = ReadStringObject(stream),
+                Date = ReadDateTime(stream),
             };
             dict[languageId] = cultureVariation;
         }
@@ -46,10 +48,10 @@ internal class DictionaryOfCultureVariationSerializer : SerializerBase,
         foreach ((var culture, CultureVariation variation) in variations)
         {
             // TODO: it's weird we're dealing with cultures here, and languageId in properties
-
             PrimitiveSerializer.String.WriteTo(culture, stream); // should never be null
             WriteObject(variation.Name, stream); // write an object in case it's null (though... should not happen)
-            WriteObject(variation.UrlSegment,
+            WriteObject(
+                variation.UrlSegment,
                 stream); // write an object in case it's null (though... should not happen)
             PrimitiveSerializer.DateTime.WriteTo(variation.Date, stream);
         }

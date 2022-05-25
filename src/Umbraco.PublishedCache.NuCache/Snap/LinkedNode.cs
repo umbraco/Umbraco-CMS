@@ -1,5 +1,6 @@
-﻿namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap;
-//NOTE: This cannot be struct because it references itself
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap;
+
+// NOTE: This cannot be struct because it references itself
 
 /// <summary>
 ///     Used to represent an item in a linked list

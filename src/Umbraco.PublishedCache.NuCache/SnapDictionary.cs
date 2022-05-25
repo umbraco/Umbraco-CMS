@@ -16,6 +16,7 @@ public class SnapDictionary<TKey, TValue>
     private const long CollectMinGenDelta = 4;
 
     private readonly ConcurrentQueue<GenObj> _genObjs;
+
     // read
     // http://www.codeproject.com/Articles/548406/Dictionary-plus-Locking-versus-ConcurrentDictionar
     // http://arbel.net/2013/02/03/best-practices-for-using-concurrentdictionary/
@@ -29,14 +30,15 @@ public class SnapDictionary<TKey, TValue>
     // been replaced with a normal c# lock because that's exactly how the normal c# lock works,
     // see https://blogs.msdn.microsoft.com/ericlippert/2009/03/06/locks-and-exceptions-do-not-mix/
     // for the readlock, there's no reason here to use the long hand way.
-
     private readonly ConcurrentDictionary<TKey, LinkedNode<TValue>> _items;
     private readonly object _rlocko = new();
     private readonly object _wlocko = new();
     private Task? _collectTask;
     private GenObj? _genObj;
-    private long _liveGen, _floorGen;
-    private bool _nextGen, _collectAuto;
+    private long _liveGen;
+    private long _floorGen;
+    private bool _nextGen;
+    private bool _collectAuto;
 
     #region Ctor
 
@@ -61,16 +63,16 @@ public class SnapDictionary<TKey, TValue>
         private readonly SnapDictionary<TKey, TValue> _store;
         private int _disposed;
 
-        //private static int _count;
-        //private readonly int _thisCount;
-
+        // private static int _count;
+        // private readonly int _thisCount;
         internal Snapshot(SnapDictionary<TKey, TValue> store, GenRef genRef)
         {
             _store = store;
             _genRef = genRef;
             _gen = genRef.GenObj.Gen;
             _genRef.GenObj.Reference();
-            //_thisCount = _count++;
+
+            // _thisCount = _count++;
         }
 
         internal Snapshot(SnapDictionary<TKey, TValue> store, long gen)
@@ -152,7 +154,6 @@ public class SnapDictionary<TKey, TValue>
 
     // side note - using (...) {} for locking is prone to nasty leaks in case of weird exceptions
     // such as thread-abort or out-of-memory, which is why we've moved away from the old using wrapper we had on locking.
-
     private readonly string _instanceId = Guid.NewGuid().ToString("N");
 
     private class WriteLockInfo
@@ -206,8 +207,10 @@ public class SnapDictionary<TKey, TValue>
             // http://joeduffyblog.com/2005/03/18/atomicity-and-asynchronous-exception-failures/
             // http://joeduffyblog.com/2007/02/07/introducing-the-new-readerwriterlockslim-in-orcas/
             // http://chabster.blogspot.fr/2013/12/readerwriterlockslim-fails-on-dual.html
-            //RuntimeHelpers.PrepareConstrainedRegions();
-            try { }
+            // RuntimeHelpers.PrepareConstrainedRegions();
+            try
+            {
+            }
             finally
             {
                 if (_nextGen == false || forceGen)
@@ -238,7 +241,9 @@ public class SnapDictionary<TKey, TValue>
         {
             lock (_rlocko)
             {
-                try { }
+                try
+                {
+                }
                 finally
                 {
                     // forget about the temp. liveGen
@@ -456,7 +461,6 @@ public class SnapDictionary<TKey, TValue>
             // - genObj.Count is zero because all snapshots have properly been disposed
             // - genObj.WeakGenRef is dead because all snapshots have been collected
             // in both cases, we will dequeue and collect
-
             var snapshot = new Snapshot(this, _genObj.GetGenRef());
 
             // reading _floorGen is safe if _collectTask is null
@@ -486,7 +490,8 @@ public class SnapDictionary<TKey, TValue>
 
         // ReSharper disable InconsistentlySynchronizedField
         Task task = _collectTask = Task.Run(() => Collect());
-        _collectTask.ContinueWith(_ =>
+        _collectTask.ContinueWith(
+            _ =>
             {
                 lock (_rlocko)
                 {
@@ -495,10 +500,11 @@ public class SnapDictionary<TKey, TValue>
             },
             CancellationToken.None,
             TaskContinuationOptions.ExecuteSynchronously,
+
             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             TaskScheduler.Default);
-        // ReSharper restore InconsistentlySynchronizedField
 
+        // ReSharper restore InconsistentlySynchronizedField
         return task;
     }
 
@@ -519,9 +525,10 @@ public class SnapDictionary<TKey, TValue>
         // it is OK to enumerate a concurrent dictionary and it does not lock
         // it - and here it's not an issue if we skip some items, they will be
         // processed next time we collect
-
         long liveGen;
-        lock (_rlocko) // r is good
+
+        // r is good
+        lock (_rlocko)
         {
             liveGen = _liveGen;
             if (_nextGen == false)
@@ -530,13 +537,12 @@ public class SnapDictionary<TKey, TValue>
             }
         }
 
-        //Console.WriteLine("Collect live=" + liveGen + " floor=" + _floorGen);
-
+        // Console.WriteLine("Collect live=" + liveGen + " floor=" + _floorGen);
         foreach (KeyValuePair<TKey, LinkedNode<TValue>> kvp in dict)
         {
             LinkedNode<TValue>? link = kvp.Value;
 
-            //Console.WriteLine("Collect id=" + kvp.Key + " gen=" + link.Gen
+            // Console.WriteLine("Collect id=" + kvp.Key + " gen=" + link.Gen
             //    + " nxt=" + (link.Next == null ? null : "next")
             //    + " val=" + link.Value);
 
@@ -554,7 +560,8 @@ public class SnapDictionary<TKey, TValue>
                 var idict = dict as ICollection<KeyValuePair<TKey, LinkedNode<TValue>>>;
                 /*var removed =*/
                 idict.Remove(kvp);
-                //Console.WriteLine("remove (" + (removed ? "true" : "false") + ")");
+
+                // Console.WriteLine("remove (" + (removed ? "true" : "false") + ")");
                 continue;
             }
 
@@ -576,8 +583,8 @@ public class SnapDictionary<TKey, TValue>
     }
 
     // TODO: This is never used? Should it be? Maybe move to TestHelper below?
-    //public /*async*/ Task PendingCollect()
-    //{
+    // public /*async*/ Task PendingCollect()
+    // {
     //    Task task;
     //    lock (_rlocko)
     //    {
@@ -586,8 +593,7 @@ public class SnapDictionary<TKey, TValue>
     //    return task ?? Task.CompletedTask;
     //    //if (task != null)
     //    //    await task;
-    //}
-
+    // }
     public long GenCount => _genObjs.Count;
 
     public long SnapCount => _genObjs.Sum(x => x.Count);
@@ -606,8 +612,11 @@ public class SnapDictionary<TKey, TValue>
         public TestHelper(SnapDictionary<TKey, TValue> dict) => _dict = dict;
 
         public long LiveGen => _dict._liveGen;
+
         public long FloorGen => _dict._floorGen;
+
         public bool NextGen => _dict._nextGen;
+
         public bool IsLocked => Monitor.IsEntered(_dict._wlocko);
 
         public bool CollectAuto
@@ -636,7 +645,8 @@ public class SnapDictionary<TKey, TValue>
             {
                 genVals.Add(new GenVal(link.Gen, link.Value));
                 link = link.Next;
-            } while (link != null);
+            }
+            while (link != null);
 
             return genVals.ToArray();
         }

@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 [DebuggerDisplay("{Display}")]
 internal struct LazyCompressedString
 {
+    private readonly object _locker;
     private byte[]? _bytes;
     private string? _str;
-    private readonly object _locker;
 
     /// <summary>
     ///     Constructor
@@ -25,6 +25,39 @@ internal struct LazyCompressedString
         _bytes = bytes;
         _str = null;
     }
+
+    /// <summary>
+    ///     Used to display debugging output since ToString() can only be called once
+    /// </summary>
+    private string Display
+    {
+        get
+        {
+            if (_str != null)
+            {
+                return $"Decompressed: {_str}";
+            }
+
+            lock (_locker)
+            {
+                if (_str != null)
+                {
+                    // double check
+                    return $"Decompressed: {_str}";
+                }
+
+                if (_bytes == null)
+                {
+                    // This shouldn't happen
+                    throw new PanicException("Bytes have already been cleared");
+                }
+
+                return $"Compressed Bytes: {_bytes.Length}";
+            }
+        }
+    }
+
+    public static implicit operator string(LazyCompressedString l) => l.ToString();
 
     public byte[] GetBytes()
     {
@@ -68,38 +101,5 @@ internal struct LazyCompressedString
         return _str;
     }
 
-    /// <summary>
-    ///     Used to display debugging output since ToString() can only be called once
-    /// </summary>
-    private string Display
-    {
-        get
-        {
-            if (_str != null)
-            {
-                return $"Decompressed: {_str}";
-            }
-
-            lock (_locker)
-            {
-                if (_str != null)
-                {
-                    // double check
-                    return $"Decompressed: {_str}";
-                }
-
-                if (_bytes == null)
-                {
-                    // This shouldn't happen
-                    throw new PanicException("Bytes have already been cleared");
-                }
-
-                return $"Compressed Bytes: {_bytes.Length}";
-            }
-        }
-    }
-
     public override string ToString() => DecompressString();
-
-    public static implicit operator string(LazyCompressedString l) => l.ToString();
 }

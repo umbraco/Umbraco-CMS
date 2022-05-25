@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml.XPath;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
@@ -18,15 +18,14 @@ internal class Source : INavigableSource
         _root = new RootContent(contentAtRoot.Select(x => x.Id));
     }
 
+    public int LastAttributeIndex => NavigableContentType.BuiltinProperties.Length - 1;
+
     public INavigableContent? Get(int id)
     {
         // wrap in a navigable content
-
         IPublishedContent? content = _data.GetById(_preview, id);
         return content == null ? null : new NavigableContent(content);
     }
-
-    public int LastAttributeIndex => NavigableContentType.BuiltinProperties.Length - 1;
 
     public INavigableContent Root => _root;
 }

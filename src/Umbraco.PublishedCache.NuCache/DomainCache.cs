@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache;
@@ -20,6 +20,9 @@ public class DomainCache : IDomainCache
     }
 
     /// <inheritdoc />
+    public string DefaultCulture { get; }
+
+    /// <inheritdoc />
     public IEnumerable<Domain> GetAll(bool includeWildcards)
     {
         IEnumerable<Domain> list = _snapshot.GetAll();
@@ -36,7 +39,6 @@ public class DomainCache : IDomainCache
     {
         // probably this could be optimized with an index
         // but then we'd need a custom DomainStore of some sort
-
         IEnumerable<Domain> list = _snapshot.GetAll();
         list = list.Where(x => x.ContentId == documentId);
         if (includeWildcards == false)
@@ -50,7 +52,4 @@ public class DomainCache : IDomainCache
     /// <inheritdoc />
     public bool HasAssigned(int documentId, bool includeWildcards = false)
         => documentId > 0 && GetAssigned(documentId, includeWildcards).Any();
-
-    /// <inheritdoc />
-    public string DefaultCulture { get; }
 }

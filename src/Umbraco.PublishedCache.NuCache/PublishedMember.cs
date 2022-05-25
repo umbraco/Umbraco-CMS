@@ -29,8 +29,7 @@ internal class PublishedMember : PublishedContent
         IVariationContextAccessor variationContextAccessor,
         IPublishedModelFactory publishedModelFactory)
     {
-        var d = new ContentData(member.Name, null, 0, member.UpdateDate, member.CreatorId, -1, previewing,
-            GetPropertyValues(contentType, member), null);
+        var d = new ContentData(member.Name, null, 0, member.UpdateDate, member.CreatorId, -1, previewing, GetPropertyValues(contentType, member), null);
 
         var n = new ContentNode(
             member.Id,
@@ -43,35 +42,34 @@ internal class PublishedMember : PublishedContent
             member.CreateDate,
             member.CreatorId);
 
-        return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor,
-                publishedModelFactory)
+        return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory)
             .CreateModel(publishedModelFactory);
     }
 
-    private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType,
-        IMember member)
+    private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
     {
         // see node in PublishedSnapshotService
         // we do not (want to) support ConvertDbToXml/String
 
-        //var propertyEditorResolver = PropertyEditorResolver.Current;
+        // var propertyEditorResolver = PropertyEditorResolver.Current;
 
         // see note in MemberType.Variations
         // we don't want to support variations on members
-
         var properties = member
             .Properties
-            //.Select(property =>
-            //{
+
+            // .Select(property =>
+            // {
             //    var e = propertyEditorResolver.GetByAlias(property.PropertyType.PropertyEditorAlias);
             //    var v = e == null
             //        ? property.Value
             //        : e.ValueEditor.ConvertDbToString(property, property.PropertyType, ApplicationContext.Current.Services.DataTypeService);
             //    return new KeyValuePair<string, object>(property.Alias, v);
-            //})
-            //.ToDictionary(x => x.Key, x => x.Value);
-            .ToDictionary(x => x.Alias,
-                x => new[] {new PropertyData {Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty}},
+            // })
+            // .ToDictionary(x => x.Key, x => x.Value);
+            .ToDictionary(
+                x => x.Alias,
+                x => new[] { new PropertyData { Value = x.GetValue(), Culture = string.Empty, Segment = string.Empty } },
                 StringComparer.OrdinalIgnoreCase);
 
         // see also PublishedContentType
@@ -88,8 +86,7 @@ internal class PublishedMember : PublishedContent
         return properties;
     }
 
-    private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties,
-        string alias, object? value)
+    private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
     {
         IPublishedPropertyType? propertyType = contentType.GetPropertyType(alias);
         if (propertyType == null || propertyType.IsUserProperty)
@@ -97,7 +94,7 @@ internal class PublishedMember : PublishedContent
             return;
         }
 
-        properties[alias] = new[] {new PropertyData {Value = value, Culture = string.Empty, Segment = string.Empty}};
+        properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
     #region IPublishedMember
