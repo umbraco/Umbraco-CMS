@@ -14,6 +14,9 @@ export default {
     `<html>
       <body>
         <script type="module" src="${testFramework}"></script>
+                <script type="module">
+          import 'element-internals-polyfill';
+        </script>
       </body>
     </html>`,
 };
