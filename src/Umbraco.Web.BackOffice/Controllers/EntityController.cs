@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [ParameterSwapControllerActionSelector(nameof(GetUrlsByIds), "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))]
 public class EntityController : UmbracoAuthorizedJsonController
 {
-    private static readonly string[] _postFilterSplitStrings = {"=", "==", "!=", "<>", ">", "<", ">=", "<="};
+    private static readonly string[] _postFilterSplitStrings = { "=", "==", "!=", "<>", ">", "<", ">=", "<=" };
 
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -158,8 +158,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="dataTypeKey">If set used to look up whether user and group start node permissions will be ignored.</param>
     /// <returns></returns>
     [HttpGet]
-    public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string? searchFrom = null,
-        Guid? dataTypeKey = null)
+    public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string? searchFrom = null, Guid? dataTypeKey = null)
     {
         // NOTE: Theoretically you shouldn't be able to see member data if you don't have access to members right? ... but there is a member picker, so can't really do that
 
@@ -348,8 +347,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<int, string?> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type,
-        [FromQuery] string? culture = null)
+    public IDictionary<int, string?> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -378,7 +376,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         return ids
             .Distinct()
-            .Select(id => new {Id = id, Url = MediaOrDocumentUrl(id)}).ToDictionary(x => x.Id, x => x.Url);
+            .Select(id => new { Id = id, Url = MediaOrDocumentUrl(id) }).ToDictionary(x => x.Id, x => x.Url);
     }
 
     /// <summary>
@@ -395,8 +393,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<Guid, string?> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type,
-        [FromQuery] string? culture = null)
+    public IDictionary<Guid, string?> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -418,7 +415,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         return ids
             .Distinct()
-            .Select(id => new {Id = id, Url = MediaOrDocumentUrl(id)}).ToDictionary(x => x.Id, x => x.Url);
+            .Select(id => new { Id = id, Url = MediaOrDocumentUrl(id) }).ToDictionary(x => x.Id, x => x.Url);
     }
 
     /// <summary>
@@ -435,8 +432,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public IDictionary<Udi, string?> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type,
-        [FromQuery] string? culture = null)
+    public IDictionary<Udi, string?> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
     {
         if (ids == null || !ids.Any())
         {
@@ -453,8 +449,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
             return type switch
             {
-                UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid,
-                    culture: culture ?? ClientCulture()),
+                UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture()),
 
                 // NOTE: If culture is passed here we get an empty string rather than a media item URL.
                 UmbracoEntityTypes.Media => _publishedUrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
@@ -465,7 +460,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         return ids
             .Distinct()
-            .Select(id => new {Id = id, Url = MediaOrDocumentUrl(id)}).ToDictionary(x => x.Id, x => x.Url);
+            .Select(id => new { Id = id, Url = MediaOrDocumentUrl(id) }).ToDictionary(x => x.Id, x => x.Url);
     }
 
     /// <summary>
@@ -520,7 +515,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     public IActionResult GetUrl(int id, UmbracoEntityTypes type, string? culture = null)
     {
-        culture = culture ?? ClientCulture();
+        culture ??= ClientCulture();
 
         var returnUrl = string.Empty;
 
@@ -605,7 +600,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     [HttpGet]
     public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
     {
-        culture = culture ?? ClientCulture();
+        culture ??= ClientCulture();
 
         var url = _publishedUrlProvider.GetUrl(id, culture: culture);
         IEnumerable<string> anchorValues = _contentService.GetAnchorValuesFromRTEs(id, culture);
@@ -714,8 +709,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             //the EntityService can search paged members from the root
 
             intId = -1;
-            return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter,
-                dataTypeKey);
+            return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter, dataTypeKey);
         }
 
         //the EntityService cannot search members of a certain type, this is currently not supported and would require
@@ -724,10 +718,16 @@ public class EntityController : UmbracoAuthorizedJsonController
         //TODO: We should really fix this in the EntityService but if we don't we should allow the ISearchableTree for the members controller
         // to be used for this search instead of the built in/internal searcher
 
-        IEnumerable<SearchResultEntity> searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize,
-            pageNumber - 1, out var total, null, id);
+        IEnumerable<SearchResultEntity> searchResult = _treeSearcher.ExamineSearch(
+            filter ?? string.Empty,
+            type,
+            pageSize,
+            pageNumber - 1,
+            out var total,
+            null,
+            id);
 
-        return new PagedResult<EntityBasic>(total, pageNumber, pageSize) {Items = searchResult};
+        return new PagedResult<EntityBasic>(total, pageNumber, pageSize) { Items = searchResult };
     }
 
     /// <summary>
@@ -740,6 +740,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="orderBy"></param>
     /// <param name="orderDirection"></param>
     /// <param name="filter"></param>
+    /// <param name="dataTypeKey"></param>
     /// <returns></returns>
     public ActionResult<PagedResult<EntityBasic>> GetPagedChildren(
         int id,
@@ -765,7 +766,6 @@ public class EntityController : UmbracoAuthorizedJsonController
         if (objectType.HasValue)
         {
             IEnumerable<IEntitySlim> entities;
-            long totalRecords;
 
             var startNodes = GetStartNodes(type);
 
@@ -779,8 +779,12 @@ public class EntityController : UmbracoAuthorizedJsonController
             }
 
             // else proceed as usual
-            entities = _entityService.GetPagedChildren(id, objectType.Value, pageNumber - 1, pageSize,
-                out totalRecords,
+            entities = _entityService.GetPagedChildren(
+                id,
+                objectType.Value,
+                pageNumber - 1,
+                pageSize,
+                out long totalRecords,
                 filter.IsNullOrWhiteSpace()
                     ? null
                     : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
@@ -866,7 +870,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         }
 
         // re-normalize since NULL can be passed in
-        filter = filter ?? string.Empty;
+        filter ??= string.Empty;
 
         UmbracoObjectTypes? objectType = ConvertToObjectType(type);
         if (objectType.HasValue)
@@ -882,20 +886,34 @@ public class EntityController : UmbracoAuthorizedJsonController
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(dataTypeKey);
                 entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
-                    ? _entityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize,
+                    ? _entityService.GetPagedDescendants(
+                        objectType.Value,
+                        pageNumber - 1,
+                        pageSize,
                         out totalRecords,
-                        _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
-                        Ordering.By(orderBy, orderDirection), false)
-                    : _entityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize,
+                        _sqlContext.Query<IUmbracoEntity>()
+                            .Where(x => x.Name!.Contains(filter)),
+                        Ordering.By(orderBy, orderDirection),
+                        false)
+                    : _entityService.GetPagedDescendants(
+                        aids,
+                        objectType.Value,
+                        pageNumber - 1,
+                        pageSize,
                         out totalRecords,
                         _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
                         Ordering.By(orderBy, orderDirection));
             }
             else
             {
-                entities = _entityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize,
+                entities = _entityService.GetPagedDescendants(
+                    id,
+                    objectType.Value,
+                    pageNumber - 1,
+                    pageSize,
                     out totalRecords,
-                    _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
+                    _sqlContext.Query<IUmbracoEntity>()
+                        .Where(x => x.Name!.Contains(filter)),
                     Ordering.By(orderBy, orderDirection));
             }
 
@@ -931,14 +949,10 @@ public class EntityController : UmbracoAuthorizedJsonController
                                                                             .IsDataTypeIgnoringUserStartNodes(
                                                                                 dataTypeKey.Value);
 
-    public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))]
-        FormCollection queryStrings) =>
+    public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
         GetResultForAncestors(id, type, queryStrings);
 
-    public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))]
-        FormCollection queryStrings)
+    public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
     {
         IEntitySlim? entity = _entityService.Get(id);
         if (entity is null)
@@ -957,12 +971,10 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <param name="searchFrom"></param>
     /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
     /// <returns></returns>
-    private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType,
-        string? searchFrom = null, bool ignoreUserStartNodes = false)
+    private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string? searchFrom = null, bool ignoreUserStartNodes = false)
     {
         var culture = ClientCulture();
-        return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, culture, searchFrom,
-            ignoreUserStartNodes);
+        return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, culture, searchFrom, ignoreUserStartNodes);
     }
 
     private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
@@ -989,8 +1001,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         }
     }
 
-    private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType,
-        FormCollection? queryStrings = null)
+    private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, FormCollection? queryStrings = null)
     {
         UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
         if (objectType.HasValue)
@@ -1412,8 +1423,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         var propertyName = postFilterParts[0];
         var constraintValue = postFilterParts[1];
-        var stringOperator = postFilter.Substring(propertyName.Length,
-            postFilter.Length - propertyName.Length - constraintValue.Length);
+        var stringOperator = postFilter.Substring(propertyName.Length, postFilter.Length - propertyName.Length - constraintValue.Length);
         Operator binaryOperator;
 
         try
@@ -1436,11 +1446,13 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         var queryCondition = new QueryCondition
         {
-            Term = new OperatorTerm {Operator = binaryOperator},
+            Term = new OperatorTerm { Operator = binaryOperator },
             ConstraintValue = constraintValue,
             Property = new PropertyModel
             {
-                Alias = propertyName, Name = propertyName, Type = property.PropertyType.Name
+                Alias = propertyName,
+                Name = propertyName,
+                Type = property.PropertyType.Name
             }
         };
 
@@ -1449,13 +1461,13 @@ public class EntityController : UmbracoAuthorizedJsonController
 
     private Func<object, EntityBasic?> MapEntities(string? culture = null)
     {
-        culture = culture ?? ClientCulture();
+        culture ??= ClientCulture();
         return x => MapEntity(x, culture);
     }
 
     private EntityBasic? MapEntity(object entity, string? culture = null)
     {
-        culture = culture ?? ClientCulture();
+        culture ??= ClientCulture();
         return _umbracoMapper.Map<EntityBasic>(entity, context => { context.SetCulture(culture); });
     }
 
@@ -1512,8 +1524,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] int[] ids,
-        [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {
@@ -1534,8 +1545,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Guid[] ids,
-        [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {
@@ -1558,8 +1568,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// </remarks>
     [HttpGet]
     [HttpPost]
-    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Udi[] ids,
-        [FromQuery] UmbracoEntityTypes type)
+    public ActionResult<IEnumerable<EntityBasic>> GetByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type)
     {
         if (ids == null)
         {

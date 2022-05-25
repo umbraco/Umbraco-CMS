@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Http;
@@ -15,13 +15,12 @@ internal static class ControllerContextExtensions
     ///     Invokes the authorization filters for the controller action.
     /// </summary>
     /// <returns>Whether the user is authenticated or not.</returns>
-    internal static async Task<bool> InvokeAuthorizationFiltersForRequest(this ControllerContext controllerContext,
-        ActionContext actionContext)
+    internal static async Task<bool> InvokeAuthorizationFiltersForRequest(this ControllerContext controllerContext, ActionContext actionContext)
     {
         ControllerActionDescriptor actionDescriptor = controllerContext.ActionDescriptor;
 
         var metadataCollection =
-            new EndpointMetadataCollection(actionDescriptor.EndpointMetadata.Union(new[] {actionDescriptor}));
+            new EndpointMetadataCollection(actionDescriptor.EndpointMetadata.Union(new[] { actionDescriptor }));
 
         IReadOnlyList<IAuthorizeData> authorizeData = metadataCollection.GetOrderedMetadata<IAuthorizeData>();
         IAuthorizationPolicyProvider policyProvider = controllerContext.HttpContext.RequestServices
@@ -44,8 +43,7 @@ internal static class ControllerContextExtensions
             // with the nested controller
             var resource = new Endpoint(null, metadataCollection, null);
             PolicyAuthorizationResult authorizeResult =
-                await policyEvaluator.AuthorizeAsync(policy, authenticateResult, controllerContext.HttpContext,
-                    resource);
+                await policyEvaluator.AuthorizeAsync(policy, authenticateResult, controllerContext.HttpContext, resource);
             if (!authorizeResult.Succeeded)
             {
                 return false;
@@ -68,8 +66,7 @@ internal static class ControllerContextExtensions
         // if the authorization filter returns a result, it means it failed to authorize
         var authorizationFilterContext =
             new AuthorizationFilterContext(actionContext, filters.Select(x => x.Filter).ToArray());
-        return await ExecuteAuthorizationFiltersAsync(authorizationFilterContext, authorizationFilters,
-            asyncAuthorizationFilters);
+        return await ExecuteAuthorizationFiltersAsync(authorizationFilterContext, authorizationFilters, asyncAuthorizationFilters);
     }
 
     /// <summary>
@@ -152,8 +149,7 @@ internal static class ControllerContextExtensions
                 filter = typeFilterAttribute.CreateInstance(serviceProvider);
             }
 
-            var match = filter as T;
-            if (match != null)
+            if (filter is T match)
             {
                 list.Add(match);
             }

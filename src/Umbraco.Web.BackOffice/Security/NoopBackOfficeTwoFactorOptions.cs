@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Web.BackOffice.Security;
 
 [Obsolete("Not used anymore")]
 public class NoopBackOfficeTwoFactorOptions : IBackOfficeTwoFactorOptions

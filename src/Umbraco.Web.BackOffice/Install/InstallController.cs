@@ -62,7 +62,7 @@ public class InstallController : Controller
 
     [HttpGet]
     [StatusCodeResult(HttpStatusCode.ServiceUnavailable)]
-    [TypeFilter(typeof(StatusCodeResultAttribute), Arguments = new object[] {HttpStatusCode.ServiceUnavailable})]
+    [TypeFilter(typeof(StatusCodeResultAttribute), Arguments = new object[] { HttpStatusCode.ServiceUnavailable })]
     public async Task<ActionResult> Index()
     {
         var umbracoPath = Url.GetBackOfficeUrl();
@@ -92,10 +92,9 @@ public class InstallController : Controller
 
         ViewData.SetUmbracoVersion(_umbracoVersion.SemanticVersion);
 
-        await _installHelper.SetInstallStatusAsync(false, "");
+        await _installHelper.SetInstallStatusAsync(false, string.Empty);
 
-        return View(Path.Combine(Constants.SystemDirectories.Umbraco.TrimStart("~"), Constants.Web.Mvc.InstallArea,
-            nameof(Index) + ".cshtml"));
+        return View(Path.Combine(Constants.SystemDirectories.Umbraco.TrimStart("~"), Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
     }
 
     /// <summary>

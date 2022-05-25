@@ -26,11 +26,10 @@ public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorV
         }
 
         // list of reserved/disallowed aliases for content/media/member types - more can be added as the need arises
-        var reservedModelAliases = new[] {"system"};
+        var reservedModelAliases = new[] { "system" };
         if (reservedModelAliases.Contains(model.Alias, StringComparer.OrdinalIgnoreCase))
         {
-            yield return new ValidationResult($"The model alias {model.Alias} is a reserved term and cannot be used",
-                new[] {"Alias"});
+            yield return new ValidationResult($"The model alias {model.Alias} is a reserved term and cannot be used", new[] { "Alias" });
         }
 
         TProperty[] properties = model.Groups.SelectMany(x => x.Properties)
@@ -78,7 +77,7 @@ public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorV
 
         if (reservedProperties.InvariantContains(alias) || reservedMethods.InvariantContains(alias))
         {
-            string[] memberNames = {$"Groups[{groupIndex}].Properties[{propertyIndex}].Alias"};
+            string[] memberNames = { $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias" };
 
             return new ValidationResult(
                 $"The alias {alias} is a reserved term and cannot be used",

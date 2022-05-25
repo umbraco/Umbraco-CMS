@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -21,7 +21,7 @@ public class StylesheetController : UmbracoAuthorizedJsonController
     public IEnumerable<Stylesheet> GetAll() =>
         _fileService.GetStylesheets()
             .Select(x =>
-                new Stylesheet {Name = x.Alias, Path = x.VirtualPath});
+                new Stylesheet { Name = x.Alias, Path = x.VirtualPath });
 
     public IEnumerable<StylesheetRule> GetRulesByName(string name)
     {
@@ -31,6 +31,6 @@ public class StylesheetController : UmbracoAuthorizedJsonController
             return Enumerable.Empty<StylesheetRule>();
         }
 
-        return css.Properties.Select(x => new StylesheetRule {Name = x.Name, Selector = x.Alias});
+        return css.Properties.Select(x => new StylesheetRule { Name = x.Name, Selector = x.Alias });
     }
 }

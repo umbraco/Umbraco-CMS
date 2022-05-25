@@ -52,14 +52,13 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
     public IEnumerable<ExamineSearcherModel> GetSearcherDetails()
     {
         var model = new List<ExamineSearcherModel>(
-            _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel {Name = searcher.Name})
+            _examineManager.RegisteredSearchers.Select(searcher => new ExamineSearcherModel { Name = searcher.Name })
                 .OrderBy(x =>
                     x.Name?.TrimEnd("Searcher"))); //order by name , but strip the "Searcher" from the end if it exists
         return model;
     }
 
-    public ActionResult<SearchResults> GetSearchResults(string searcherName, string? query, int pageIndex = 0,
-        int pageSize = 20)
+    public ActionResult<SearchResults> GetSearchResults(string searcherName, string? query, int pageIndex = 0, int pageSize = 20)
     {
         query = query?.Trim();
 
@@ -195,7 +194,8 @@ public class ExamineManagementController : UmbracoAuthorizedJsonController
 
         var properties = new Dictionary<string, object?>
         {
-            ["DocumentCount"] = indexDiag.GetDocumentCount(), ["FieldCount"] = indexDiag.GetFieldNames().Count()
+            ["DocumentCount"] = indexDiag.GetDocumentCount(),
+            ["FieldCount"] = indexDiag.GetFieldNames().Count()
         };
 
         foreach (KeyValuePair<string, object?> p in indexDiag.Metadata)

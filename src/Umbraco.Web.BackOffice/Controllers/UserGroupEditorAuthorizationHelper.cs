@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -15,8 +15,7 @@ internal class UserGroupEditorAuthorizationHelper
     private readonly IMediaService _mediaService;
     private readonly IUserService _userService;
 
-    public UserGroupEditorAuthorizationHelper(IUserService userService, IContentService contentService,
-        IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
+    public UserGroupEditorAuthorizationHelper(IUserService userService, IContentService contentService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
     {
         _userService = userService;
         _contentService = contentService;
@@ -110,7 +109,8 @@ internal class UserGroupEditorAuthorizationHelper
     /// <param name="currentMediaStartId"></param>
     /// <param name="proposedMediaStartId"></param>
     /// <returns></returns>
-    public Attempt<string?> AuthorizeStartNodeChanges(IUser? currentUser,
+    public Attempt<string?> AuthorizeStartNodeChanges(
+        IUser? currentUser,
         int? currentContentStartId,
         int? proposedContentStartId,
         int? currentMediaStartId,

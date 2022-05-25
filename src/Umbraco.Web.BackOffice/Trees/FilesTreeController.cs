@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 [CoreTree]
 public class FilesTreeController : FileSystemTreeController
 {
-    private static readonly string[] ExtensionsStatic = {"*"};
+    private static readonly string[] ExtensionsStatic = { "*" };
 
     public FilesTreeController(
         ILocalizedTextService localizedTextService,

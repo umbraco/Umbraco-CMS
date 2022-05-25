@@ -47,7 +47,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
         {
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Cannot set an empty password", new[] {"value"})
+                ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" })
             });
         }
 
@@ -58,7 +58,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // this really shouldn't ever happen... but just in case
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Password could not be verified", new[] {"oldPassword"})
+                ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" })
             });
         }
 
@@ -77,7 +77,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
                 _logger.LogWarning("Could not reset user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel
                 {
-                    ChangeError = new ValidationResult(errors, new[] {"value"})
+                    ChangeError = new ValidationResult(errors, new[] { "value" })
                 });
             }
 
@@ -91,13 +91,12 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             // no, fail with an error message for "oldPassword"
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult("Incorrect password", new[] {"oldPassword"})
+                ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" })
             });
         }
 
         // can we change to the new password?
-        IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword,
-            changingPasswordModel.NewPassword);
+        IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.NewPassword);
         if (changeResult.Succeeded == false)
         {
             // no, fail with error messages for "password"
@@ -105,7 +104,7 @@ internal class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUser : Um
             _logger.LogWarning("Could not change user password {PasswordErrors}", errors);
             return Attempt.Fail(new PasswordChangedModel
             {
-                ChangeError = new ValidationResult(errors, new[] {"password"})
+                ChangeError = new ValidationResult(errors, new[] { "password" })
             });
         }
 

@@ -62,8 +62,17 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         IEventAggregator eventAggregator,
         IEmailSender emailSender,
         AppCaches appCaches)
-        : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService,
-            backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator,
+        : base(
+            localizedTextService,
+            umbracoApiControllerTypeCollection,
+            menuItemCollectionFactory,
+            entityService,
+            backofficeSecurityAccessor,
+            logger,
+            actionCollection,
+            userService,
+            dataTypeService,
+            eventAggregator,
             appCaches)
     {
         _treeSearcher = treeSearcher;
@@ -84,17 +93,14 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     protected override bool RecycleBinSmells => _contentService.RecycleBinSmells();
 
     protected override int[] UserStartNodes
-        => _userStartNodes ?? (_userStartNodes =
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService,
-                _appCaches) ?? Array.Empty<int>());
+        => _userStartNodes ??=
+            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService, _appCaches) ?? Array.Empty<int>();
 
     protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Document;
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
-        string? searchFrom = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document,
-            pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out var totalFound, searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -209,8 +215,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
 
 
         //return a normal node menu:
-        int iid;
-        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out iid) == false)
+        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iid) == false)
         {
             return NotFound();
         }
@@ -222,8 +227,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         }
 
         //if the user has no path access for this node, all they can do is refresh
-        if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService,
-                _appCaches) ?? false)
+        if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService, _appCaches) ?? false)
         {
             MenuItemCollection menu = _menuItemCollectionFactory.Create();
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -311,7 +315,9 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         {
             menu.Items.Add(new MenuItem("notify", LocalizedTextService)
             {
-                Icon = "megaphone", SeparatorBefore = true, OpensDialog = true
+                Icon = "megaphone",
+                SeparatorBefore = true,
+                OpensDialog = true
             });
         }
 
@@ -386,8 +392,7 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         }
     }
 
-    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false,
-        bool opensDialog = false)
+    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
         where TAction : IAction
     {
         MenuItem? menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);

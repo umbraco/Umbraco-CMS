@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -22,8 +22,12 @@ internal class MediaItemBinder : IModelBinder
     private readonly IUmbracoMapper _umbracoMapper;
 
 
-    public MediaItemBinder(IJsonSerializer jsonSerializer, IHostingEnvironment hostingEnvironment,
-        IMediaService mediaService, IUmbracoMapper umbracoMapper, IMediaTypeService mediaTypeService)
+    public MediaItemBinder(
+        IJsonSerializer jsonSerializer,
+        IHostingEnvironment hostingEnvironment,
+        IMediaService mediaService,
+        IUmbracoMapper umbracoMapper,
+        IMediaTypeService mediaTypeService)
     {
         _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
@@ -42,8 +46,7 @@ internal class MediaItemBinder : IModelBinder
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         MediaItemSave? model =
-            await _modelBinderHelper.BindModelFromMultipartRequestAsync<MediaItemSave>(_jsonSerializer,
-                _hostingEnvironment, bindingContext);
+            await _modelBinderHelper.BindModelFromMultipartRequestAsync<MediaItemSave>(_jsonSerializer, _hostingEnvironment, bindingContext);
         if (model == null)
         {
             return;

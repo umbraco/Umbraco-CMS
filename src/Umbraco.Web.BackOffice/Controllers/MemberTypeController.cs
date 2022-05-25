@@ -39,7 +39,8 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         ILocalizedTextService localizedTextService,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IShortStringHelper shortStringHelper)
-        : base(cultureDictionary,
+        : base(
+            cultureDictionary,
             editorValidatorCollection,
             contentTypeService,
             mediaTypeService,
@@ -149,13 +150,16 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     ///     be looked up via the db, they need to be passed in.
     /// </param>
     /// <returns></returns>
-    public IActionResult GetAvailableCompositeMemberTypes(int contentTypeId,
+    public IActionResult GetAvailableCompositeMemberTypes(
+        int contentTypeId,
         [FromQuery] string[] filterContentTypes,
         [FromQuery] string[] filterPropertyTypes)
     {
         ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> actionResult = PerformGetAvailableCompositeContentTypes(
             contentTypeId,
-            UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes,
+            UmbracoObjectTypes.MemberType,
+            filterContentTypes,
+            filterPropertyTypes,
             false);
 
         if (!(actionResult.Result is null))
@@ -164,14 +168,16 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
         }
 
         var result = actionResult.Value?
-            .Select(x => new {contentType = x.Item1, allowed = x.Item2});
+            .Select(x => new { contentType = x.Item1, allowed = x.Item2 });
         return Ok(result);
     }
 
     public MemberTypeDisplay? GetEmpty()
     {
-        var ct = new MemberType(_shortStringHelper, -1);
-        ct.Icon = Constants.Icons.Member;
+        var ct = new MemberType(_shortStringHelper, -1)
+        {
+            Icon = Constants.Icons.Member
+        };
 
         MemberTypeDisplay? dto = _umbracoMapper.Map<IMemberType, MemberTypeDisplay>(ct);
         return dto;

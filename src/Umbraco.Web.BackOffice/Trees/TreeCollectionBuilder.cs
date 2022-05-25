@@ -61,10 +61,17 @@ public class TreeCollectionBuilder : ICollectionBuilder<TreeCollection, Tree>
         var isCoreTree = controllerType.HasCustomAttribute<CoreTreeAttribute>(false);
 
         // Use section as tree group if core tree, so it isn't grouped by empty key and thus end up in "Third Party" tree group if adding custom tree nodes in other groups, e.g. "Settings" tree group.
-        attribute.TreeGroup = attribute.TreeGroup ?? (isCoreTree ? attribute.SectionAlias : attribute.TreeGroup);
+        attribute.TreeGroup ??= isCoreTree ? attribute.SectionAlias : attribute.TreeGroup;
 
-        var tree = new Tree(attribute.SortOrder, attribute.SectionAlias, attribute.TreeGroup, attribute.TreeAlias,
-            attribute.TreeTitle, attribute.TreeUse, controllerType, attribute.IsSingleNodeTree);
+        var tree = new Tree(
+            attribute.SortOrder,
+            attribute.SectionAlias,
+            attribute.TreeGroup,
+            attribute.TreeAlias,
+            attribute.TreeTitle,
+            attribute.TreeUse,
+            controllerType,
+            attribute.IsSingleNodeTree);
         _trees.Add(tree);
     }
 

@@ -37,8 +37,11 @@ public class SectionController : UmbracoAuthorizedJsonController
     public SectionController(
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         ILocalizedTextService localizedTextService,
-        IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
-        IUmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
+        IDashboardService dashboardService,
+        ISectionService sectionService,
+        ITreeService treeService,
+        IUmbracoMapper umbracoMapper,
+        IControllerFactory controllerFactory,
         IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
     {
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -61,8 +64,8 @@ public class SectionController : UmbracoAuthorizedJsonController
         // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
         // since tree's by nature are controllers and require request contextual data
         var appTreeController =
-            new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory,
-                _actionDescriptorCollectionProvider) {ControllerContext = ControllerContext};
+            new ApplicationTreeController(_treeService, _sectionService, _localizedTextService, _controllerFactory, _actionDescriptorCollectionProvider)
+            { ControllerContext = ControllerContext };
 
         IDictionary<string, IEnumerable<Tab<IDashboard>>> dashboards =
             _dashboardService.GetDashboards(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
@@ -72,8 +75,7 @@ public class SectionController : UmbracoAuthorizedJsonController
         foreach (Section? section in sectionModels)
         {
             var hasDashboards = section?.Alias is not null &&
-                                dashboards.TryGetValue(section.Alias,
-                                    out IEnumerable<Tab<IDashboard>>? dashboardsForSection) &&
+                                dashboards.TryGetValue(section.Alias, out IEnumerable<Tab<IDashboard>>? dashboardsForSection) &&
                                 dashboardsForSection.Any();
             if (hasDashboards)
             {

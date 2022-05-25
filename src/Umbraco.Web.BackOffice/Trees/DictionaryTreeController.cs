@@ -26,11 +26,13 @@ public class DictionaryTreeController : TreeController
     private readonly ILocalizationService _localizationService;
     private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
 
-    public DictionaryTreeController(ILocalizedTextService localizedTextService,
+    public DictionaryTreeController(
+        ILocalizedTextService localizedTextService,
         UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-        IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService,
-        IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection,
-        eventAggregator)
+        IMenuItemCollectionFactory menuItemCollectionFactory,
+        ILocalizationService localizationService,
+        IEventAggregator eventAggregator)
+        : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
     {
         _menuItemCollectionFactory = menuItemCollectionFactory;
         _localizationService = localizationService;
@@ -84,7 +86,7 @@ public class DictionaryTreeController : TreeController
 
         var nodes = new TreeNodeCollection();
 
-        Func<IDictionaryItem, string> ItemSort()
+        static Func<IDictionaryItem, string> ItemSort()
         {
             return item => item.ItemKey;
         }

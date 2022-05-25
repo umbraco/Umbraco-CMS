@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.BackOffice.Trees;
+namespace Umbraco.Cms.Web.BackOffice.Trees;
 
 /// <summary>
 ///     Common query string parameters used for tree query strings

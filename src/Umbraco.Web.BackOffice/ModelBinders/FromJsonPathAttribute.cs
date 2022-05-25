@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,8 +28,7 @@ public class FromJsonPathAttribute : ModelBinderAttribute
     {
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            if (bindingContext.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(),
-                    StringComparison.InvariantCultureIgnoreCase))
+            if (bindingContext.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(), StringComparison.InvariantCultureIgnoreCase))
             {
                 return;
             }

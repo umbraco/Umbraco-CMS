@@ -18,7 +18,7 @@ public sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
     /// </summary>
     /// <param name="incomingModel"></param>
     public FileUploadCleanupFilterAttribute(bool incomingModel = true) : base(typeof(FileUploadCleanupFilter)) =>
-        Arguments = new object[] {incomingModel};
+        Arguments = new object[] { incomingModel };
 
     // We need to use IAsyncActionFilter even that we dont have any async because we need access to
     // context.ActionArguments, and this is only available on ActionExecutingContext and not on
@@ -117,7 +117,7 @@ public sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
                                 }
 
                                 //clear out the temp path so it's not returned in the response
-                                f.TempFilePath = "";
+                                f.TempFilePath = string.Empty;
                             }
                             else
                             {

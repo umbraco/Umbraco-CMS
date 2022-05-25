@@ -49,19 +49,16 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
     }
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
-        string? searchFrom = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member,
-            pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Member, pageSize, pageIndex, out var totalFound, searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
     /// <summary>
     ///     Gets an individual tree node
     /// </summary>
-    public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
+    public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
     {
         ActionResult<TreeNode?> node = GetSingleTreeNode(id, queryStrings);
 
@@ -81,8 +78,7 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
 
     protected ActionResult<TreeNode?> GetSingleTreeNode(string id, FormCollection? queryStrings)
     {
-        Guid asGuid;
-        if (Guid.TryParse(id, out asGuid) == false)
+        if (Guid.TryParse(id, out Guid asGuid) == false)
         {
             return NotFound();
         }
@@ -100,7 +96,7 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
             member.Name,
             Constants.Icons.Member,
             false,
-            "",
+            string.Empty,
             Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.Member), member.Key));
 
         node.AdditionalData.Add("contentType", member.ContentTypeAlias);
@@ -116,15 +112,27 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
         if (id == Constants.System.RootString)
         {
             nodes.Add(
-                CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings,
-                    LocalizedTextService.Localize("member", "allMembers"), Constants.Icons.MemberType, true,
-                    queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" +
+                CreateTreeNode(
+                    Constants.Conventions.MemberTypes.AllMembersListId,
+                    id,
+                    queryStrings,
+                    LocalizedTextService.Localize("member", "allMembers"),
+                    Constants.Icons.MemberType,
+                    true,
+                    queryStrings.GetRequiredValue<string>("application") +
+                    TreeAlias.EnsureStartsWith('/') +
+                    "/list/" +
                     Constants.Conventions.MemberTypes.AllMembersListId));
 
             nodes.AddRange(_memberTypeService.GetAll()
                 .Select(memberType =>
-                    CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name,
-                        memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
+                    CreateTreeNode(
+                        memberType.Alias,
+                        id,
+                        queryStrings,
+                        memberType.Name,
+                        memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member),
+                        true,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') +
                         "/list/" + memberType.Alias)));
         }

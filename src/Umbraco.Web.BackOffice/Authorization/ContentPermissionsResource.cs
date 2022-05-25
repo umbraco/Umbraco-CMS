@@ -17,7 +17,7 @@ public class ContentPermissionsResource
     /// <param name="permissionToCheck">The permission to authorize.</param>
     public ContentPermissionsResource(IContent? content, char permissionToCheck)
     {
-        PermissionsToCheck = new List<char> {permissionToCheck};
+        PermissionsToCheck = new List<char> { permissionToCheck };
         Content = content;
     }
 

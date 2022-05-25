@@ -86,7 +86,9 @@ public class ImagesController : UmbracoAuthorizedApiController
         var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
         var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
         {
-            Width = width, ImageCropMode = ImageCropMode.Max, CacheBusterValue = rnd
+            Width = width,
+            ImageCropMode = ImageCropMode.Max,
+            CacheBusterValue = rnd
         });
         if (Url.IsLocalUrl(imageUrl))
         {
@@ -105,11 +107,17 @@ public class ImagesController : UmbracoAuthorizedApiController
     /// <param name="focalPointLeft"></param>
     /// <param name="focalPointTop"></param>
     /// <param name="mode"></param>
+    /// <param name="cacheBusterValue"></param>
+    /// <param name="cropX1"></param>
+    /// <param name="cropX2"></param>
+    /// <param name="cropY1"></param>
+    /// <param name="cropY2"></param>
     /// <returns></returns>
     /// <remarks>
     ///     If there is no media, image property or image file is found then this will return not found.
     /// </remarks>
-    public string? GetProcessedImageUrl(string imagePath,
+    public string? GetProcessedImageUrl(
+        string imagePath,
         int? width = null,
         int? height = null,
         decimal? focalPointLeft = null,
@@ -119,12 +127,14 @@ public class ImagesController : UmbracoAuthorizedApiController
         decimal? cropX1 = null,
         decimal? cropX2 = null,
         decimal? cropY1 = null,
-        decimal? cropY2 = null
-    )
+        decimal? cropY2 = null)
     {
         var options = new ImageUrlGenerationOptions(imagePath)
         {
-            Width = width, Height = height, ImageCropMode = mode, CacheBusterValue = cacheBusterValue
+            Width = width,
+            Height = height,
+            ImageCropMode = mode,
+            CacheBusterValue = cacheBusterValue
         };
 
         if (focalPointLeft.HasValue && focalPointTop.HasValue)

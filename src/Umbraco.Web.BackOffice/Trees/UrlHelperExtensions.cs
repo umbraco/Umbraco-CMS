@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ public static class UrlHelperExtensions
         //and normalizes paths - / is used consistently between trees and editors
         basePath = basePath.TrimStart("~");
         virtualPath = virtualPath?.TrimStart("~");
-        virtualPath = virtualPath?.Substring(basePath.Length);
+        virtualPath = virtualPath?[basePath.Length..];
         virtualPath = virtualPath?.Replace('\\', '/');
 
         //-1 is the default root id for trees
@@ -40,8 +40,11 @@ public static class UrlHelperExtensions
         return sb.ToString().TrimEnd(",");
     }
 
-    public static string GetTreeUrl(this IUrlHelper urlHelper,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, Type treeType, string nodeId,
+    public static string GetTreeUrl(
+        this IUrlHelper urlHelper,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        Type treeType,
+        string nodeId,
         FormCollection? queryStrings)
     {
         var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetNodes", treeType)?
@@ -55,8 +58,11 @@ public static class UrlHelperExtensions
         return actionUrl;
     }
 
-    public static string GetMenuUrl(this IUrlHelper urlHelper,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, Type treeType, string nodeId,
+    public static string GetMenuUrl(
+        this IUrlHelper urlHelper,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        Type treeType,
+        string nodeId,
         FormCollection? queryStrings)
     {
         var actionUrl = urlHelper.GetUmbracoApiService(umbracoApiControllerTypeCollection, "GetMenu", treeType)?

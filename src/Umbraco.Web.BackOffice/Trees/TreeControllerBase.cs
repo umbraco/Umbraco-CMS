@@ -72,8 +72,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     ///     data from the front-end
     ///     to the back end to be used in the query for model data.
     /// </remarks>
-    protected abstract ActionResult<TreeNodeCollection> GetTreeNodes(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings);
+    protected abstract ActionResult<TreeNodeCollection> GetTreeNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings);
 
     /// <summary>
     ///     Returns the menu structure for the node
@@ -81,8 +80,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="id"></param>
     /// <param name="queryStrings"></param>
     /// <returns></returns>
-    protected abstract ActionResult<MenuItemCollection> GetMenuForNode(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings);
+    protected abstract ActionResult<MenuItemCollection> GetMenuForNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings);
 
     /// <summary>
     ///     The method called to render the contents of the tree structure
@@ -97,8 +95,8 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     ///     data from the front-end
     ///     to the back end to be used in the query for model data.
     /// </remarks>
-    protected virtual async Task<ActionResult<TreeNodeCollection>> GetTreeNodesAsync(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
+    protected virtual async Task<ActionResult<TreeNodeCollection>> GetTreeNodesAsync(
+        string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
         GetTreeNodes(id, queryStrings);
 
     /// <summary>
@@ -110,8 +108,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <remarks>
     ///     If overriden, GetMenuForNode will not be called
     /// </remarks>
-    protected virtual async Task<ActionResult<MenuItemCollection>> GetMenuForNodeAsync(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
+    protected virtual async Task<ActionResult<MenuItemCollection>> GetMenuForNodeAsync(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings) =>
         GetMenuForNode(id, queryStrings);
 
     /// <summary>
@@ -172,8 +169,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     ///     data from the front-end
     ///     to the back end to be used in the query for model data.
     /// </remarks>
-    public async Task<ActionResult<TreeNodeCollection?>> GetNodes(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
+    public async Task<ActionResult<TreeNodeCollection?>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
     {
         if (queryStrings == null)
         {
@@ -218,8 +214,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="id"></param>
     /// <param name="queryStrings"></param>
     /// <returns></returns>
-    public async Task<ActionResult<MenuItemCollection?>> GetMenu(string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
+    public async Task<ActionResult<MenuItemCollection?>> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings)
     {
         if (queryStrings == null)
         {
@@ -258,7 +253,9 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
             Url.GetTreeUrl(_apiControllers, GetType(), rootNodeAsString, queryStrings),
             Url.GetMenuUrl(_apiControllers, GetType(), rootNodeAsString, queryStrings))
         {
-            HasChildren = true, RoutePath = currApp, Name = RootNodeDisplayName
+            HasChildren = true,
+            RoutePath = currApp,
+            Name = RootNodeDisplayName
         };
 
         return node;
@@ -304,7 +301,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     {
         var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
         var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
-        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) {Name = title};
+        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title };
         return node;
     }
 
@@ -317,12 +314,11 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="title"></param>
     /// <param name="icon"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title,
-        string? icon)
+    public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title, string? icon)
     {
         var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
         var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
-        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) {Name = title, Icon = icon, NodeType = TreeAlias};
+        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, Icon = icon, NodeType = TreeAlias };
         return node;
     }
 
@@ -336,12 +332,11 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="routePath"></param>
     /// <param name="icon"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon,
-        string routePath)
+    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string title, string icon, string routePath)
     {
         var jsonUrl = Url.GetTreeUrl(_apiControllers, GetType(), id, queryStrings);
         var menuUrl = Url.GetMenuUrl(_apiControllers, GetType(), id, queryStrings);
-        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) {Name = title, RoutePath = routePath, Icon = icon};
+        var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, RoutePath = routePath, Icon = icon };
         return node;
     }
 
@@ -354,12 +349,10 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="queryStrings"></param>
     /// <param name="hasChildren"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId,
-        FormCollection? queryStrings, bool hasChildren)
+    public TreeNode CreateTreeNode(IEntitySlim entity, Guid entityObjectType, string parentId, FormCollection? queryStrings, bool hasChildren)
     {
         var contentTypeIcon = entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
-        TreeNode treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name,
-            contentTypeIcon);
+        TreeNode treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, contentTypeIcon);
         treeNode.Path = entity.Path;
         treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
         treeNode.HasChildren = hasChildren;
@@ -377,8 +370,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="icon"></param>
     /// <param name="hasChildren"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId,
-        FormCollection queryStrings, string icon, bool hasChildren)
+    public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormCollection queryStrings, string icon, bool hasChildren)
     {
         TreeNode treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
         treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
@@ -397,8 +389,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="icon"></param>
     /// <param name="hasChildren"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon,
-        bool hasChildren)
+    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon, bool hasChildren)
     {
         TreeNode treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
         treeNode.HasChildren = hasChildren;
@@ -416,8 +407,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="hasChildren"></param>
     /// <param name="icon"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon,
-        bool hasChildren, string routePath)
+    public TreeNode CreateTreeNode(string id, string parentId, FormCollection queryStrings, string? title, string? icon, bool hasChildren, string routePath)
     {
         TreeNode treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
         treeNode.HasChildren = hasChildren;
@@ -437,8 +427,7 @@ public abstract class TreeControllerBase : UmbracoAuthorizedApiController, ITree
     /// <param name="icon"></param>
     /// <param name="udi"></param>
     /// <returns></returns>
-    public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title, string icon,
-        bool hasChildren, string? routePath, Udi udi)
+    public TreeNode CreateTreeNode(string id, string parentId, FormCollection? queryStrings, string? title, string icon, bool hasChildren, string? routePath, Udi udi)
     {
         TreeNode treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
         treeNode.HasChildren = hasChildren;

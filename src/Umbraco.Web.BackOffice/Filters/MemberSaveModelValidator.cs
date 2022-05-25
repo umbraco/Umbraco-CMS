@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -39,8 +39,10 @@ internal class
         _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
     }
 
-    public override bool ValidatePropertiesData(MemberSave? model,
-        IContentProperties<ContentPropertyBasic>? modelWithProperties, ContentPropertyCollectionDto? dto,
+    public override bool ValidatePropertiesData(
+        MemberSave? model,
+        IContentProperties<ContentPropertyBasic>? modelWithProperties,
+        ContentPropertyCollectionDto? dto,
         ModelStateDictionary modelState)
     {
         if (model is null)
@@ -51,14 +53,14 @@ internal class
         if (model.Username.IsNullOrWhiteSpace())
         {
             modelState.AddPropertyError(
-                new ValidationResult("Invalid user name", new[] {"value"}),
+                new ValidationResult("Invalid user name", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
         }
 
         if (model.Email.IsNullOrWhiteSpace() || new EmailAddressAttribute().IsValid(model.Email) == false)
         {
             modelState.AddPropertyError(
-                new ValidationResult("Invalid email", new[] {"value"}),
+                new ValidationResult("Invalid email", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
@@ -66,7 +68,7 @@ internal class
         if (validEmail == false)
         {
             modelState.AddPropertyError(
-                new ValidationResult("Email address is already in use", new[] {"value"}),
+                new ValidationResult("Email address is already in use", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
         }
 
@@ -74,7 +76,7 @@ internal class
         if (validLogin == false)
         {
             modelState.AddPropertyError(
-                new ValidationResult("Username is already in use", new[] {"value"}),
+                new ValidationResult("Username is already in use", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
         }
 
@@ -91,8 +93,7 @@ internal class
     /// <param name="modelWithProperties"></param>
     /// <param name="actionContext"></param>
     /// <returns></returns>
-    public override bool ValidateProperties(MemberSave? model,
-        IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
+    public override bool ValidateProperties(MemberSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
     {
         var propertiesToValidate = model?.Properties.ToList();
         Dictionary<string, PropertyType> defaultProps =

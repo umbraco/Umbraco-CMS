@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 
 public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
 {
-    private static readonly char[] Comma = {','};
+    private static readonly char[] Comma = { ',' };
     private readonly ActionCollection _actionCollection;
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -45,8 +45,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
         IUserService userService,
         IDataTypeService dataTypeService,
         IEventAggregator eventAggregator,
-        AppCaches appCaches
-    )
+        AppCaches appCaches)
         : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
     {
         _entityService = entityService;
@@ -87,12 +86,10 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// <param name="id"></param>
     /// <param name="queryStrings"></param>
     /// <returns></returns>
-    public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id,
-        [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
+    public ActionResult<TreeNode?> GetTreeNode([FromRoute] string id, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection? queryStrings)
     {
-        int asInt;
         Guid asGuid = Guid.Empty;
-        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out asInt) == false)
+        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int asInt) == false)
         {
             if (Guid.TryParse(id, out asGuid) == false)
             {
@@ -155,9 +152,10 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// <param name="e"></param>
     /// <param name="parentId"></param>
     /// <param name="queryStrings"></param>
+    /// <param name="startNodeIds"></param>
+    /// <param name="startNodePaths"></param>
     /// <returns></returns>
-    internal TreeNode? GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormCollection queryStrings,
-        int[]? startNodeIds, string[]? startNodePaths)
+    internal TreeNode? GetSingleTreeNodeWithAccessCheck(IEntitySlim e, string parentId, FormCollection queryStrings, int[]? startNodeIds, string[]? startNodePaths)
     {
         var entityIsAncestorOfStartNodes =
             ContentPermissions.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
@@ -192,8 +190,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
                     _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateMediaStartNodeIds(
                         _entityService, _appCaches);
                 startNodePaths =
-                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetMediaStartNodePaths(_entityService,
-                        _appCaches);
+                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetMediaStartNodePaths(_entityService, _appCaches);
                 break;
             case Constants.System.RecycleBinContent:
                 startNodeIds =
@@ -230,8 +227,10 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
             // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
             if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
             {
-                _logger.LogWarning("User {Username} does not have access to node with id {Id}",
-                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Username, id);
+                _logger.LogWarning(
+                    "User {Username} does not have access to node with id {Id}",
+                    _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Username,
+                    id);
                 return nodes;
             }
 
@@ -298,9 +297,8 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
 
     private int GetTopNodeId(IUmbracoEntity entity)
     {
-        int id;
         var parts = entity.Path.Split(Comma, StringSplitOptions.RemoveEmptyEntries);
-        return parts.Length >= 2 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out id)
+        return parts.Length >= 2 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int id)
             ? id
             : 0;
     }
@@ -371,10 +369,8 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
         }
 
         return RecycleBinId == Constants.System.RecycleBinContent
-            ? _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(entity, _entityService,
-                _appCaches) ?? false
-            : _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasMediaPathAccess(entity, _entityService,
-                _appCaches) ?? false;
+            ? _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(entity, _entityService, _appCaches) ?? false
+            : _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasMediaPathAccess(entity, _entityService, _appCaches) ?? false;
     }
 
     /// <summary>
@@ -527,7 +523,8 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
             {
                 menu.Items.Add(new MenuItem("emptyrecyclebin", LocalizedTextService)
                 {
-                    Icon = "trash", OpensDialog = true
+                    Icon = "trash",
+                    OpensDialog = true
                 });
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
@@ -544,8 +541,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// <param name="menuWithAllItems"></param>
     /// <param name="userAllowedMenuItems"></param>
     /// <returns></returns>
-    protected void FilterUserAllowedMenuItems(MenuItemCollection menuWithAllItems,
-        IEnumerable<MenuItem> userAllowedMenuItems)
+    protected void FilterUserAllowedMenuItems(MenuItemCollection menuWithAllItems, IEnumerable<MenuItem> userAllowedMenuItems)
     {
         IAction?[] userAllowedActions =
             userAllowedMenuItems.Where(x => x.Action != null).Select(x => x.Action).ToArray();
@@ -581,6 +577,7 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// </summary>
     /// <param name="doc">The Document to check permissions against</param>
     /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>
+    /// <param name="culture">The culture of the node</param>
     /// <remarks>By default the user must have Browse permissions to see the node in the Content tree</remarks>
     /// <returns></returns>
     internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, string? culture) =>
@@ -595,21 +592,18 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     /// <returns></returns>
     internal Tuple<Guid?, int?>? GetIdentifierFromString(string id)
     {
-        Guid idGuid;
-        int idInt;
-        Udi? idUdi;
 
-        if (Guid.TryParse(id, out idGuid))
+        if (Guid.TryParse(id, out Guid idGuid))
         {
             return new Tuple<Guid?, int?>(idGuid, null);
         }
 
-        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out idInt))
+        if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int idInt))
         {
             return new Tuple<Guid?, int?>(null, idInt);
         }
 
-        if (UdiParser.TryParse(id, out idUdi))
+        if (UdiParser.TryParse(id, out Udi? idUdi))
         {
             var guidUdi = idUdi as GuidUdi;
             if (guidUdi != null)

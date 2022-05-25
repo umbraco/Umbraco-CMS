@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
@@ -48,18 +48,27 @@ public class TemplateQueryController : UmbracoAuthorizedJsonController
         new(_localizedTextService.Localize("template", "is"), Operator.Equals, new[] {"string"}),
         new(_localizedTextService.Localize("template", "isNot"), Operator.NotEquals, new[] {"string"}),
         new(_localizedTextService.Localize("template", "before"), Operator.LessThan, new[] {"datetime"}),
-        new(_localizedTextService.Localize("template", "beforeIncDate"), Operator.LessThanEqualTo,
-            new[] {"datetime"}),
-        new(_localizedTextService.Localize("template", "after"), Operator.GreaterThan, new[] {"datetime"}),
-        new(_localizedTextService.Localize("template", "afterIncDate"), Operator.GreaterThanEqualTo,
-            new[] {"datetime"}),
+        new(_localizedTextService.Localize("template", "beforeIncDate"), Operator.LessThanEqualTo, new[] {"datetime"}),
+        new(
+            _localizedTextService.Localize("template", "after"),
+            Operator.GreaterThan,
+            new[]
+            {
+                "datetime"
+            }),
+        new(
+            _localizedTextService.Localize("template", "afterIncDate"),
+            Operator.GreaterThanEqualTo,
+            new[]
+            {
+                "datetime"
+            }),
         new(_localizedTextService.Localize("template", "equals"), Operator.Equals, new[] {"int"}),
         new(_localizedTextService.Localize("template", "doesNotEqual"), Operator.NotEquals, new[] {"int"}),
         new(_localizedTextService.Localize("template", "contains"), Operator.Contains, new[] {"string"}),
         new(_localizedTextService.Localize("template", "doesNotContain"), Operator.NotContains, new[] {"string"}),
         new(_localizedTextService.Localize("template", "greaterThan"), Operator.GreaterThan, new[] {"int"}),
-        new(_localizedTextService.Localize("template", "greaterThanEqual"), Operator.GreaterThanEqualTo,
-            new[] {"int"}),
+        new(_localizedTextService.Localize("template", "greaterThanEqual"), Operator.GreaterThanEqualTo, new[] {"int"}),
         new(_localizedTextService.Localize("template", "lessThan"), Operator.LessThan, new[] {"int"}),
         new(_localizedTextService.Localize("template", "lessThanEqual"), Operator.LessThanEqualTo, new[] {"int"})
     };
@@ -110,7 +119,8 @@ public class TemplateQueryController : UmbracoAuthorizedJsonController
             ExecutionTime = timer.ElapsedMilliseconds,
             SampleResults = results.Take(20).Select(x => new TemplateQueryResult
             {
-                Icon = "icon-document", Name = x.Name
+                Icon = "icon-document",
+                Name = x.Name
             })
         };
     }
@@ -184,7 +194,8 @@ public class TemplateQueryController : UmbracoAuthorizedJsonController
             contents = SortByDefaultPropertyValue(contents, model.Sort);
 
             queryExpression.Append(indent);
-            queryExpression.AppendFormat(model.Sort.Direction == "ascending"
+            queryExpression.AppendFormat(
+                model.Sort.Direction == "ascending"
                     ? ".OrderBy(x => x.{0})"
                     : ".OrderByDescending(x => x.{0})"
                 , model.Sort?.Property?.Alias);
@@ -215,8 +226,7 @@ public class TemplateQueryController : UmbracoAuthorizedJsonController
         }
     }
 
-    private IEnumerable<IPublishedContent>? SortByDefaultPropertyValue(IEnumerable<IPublishedContent>? contents,
-        SortExpression sortExpression)
+    private IEnumerable<IPublishedContent>? SortByDefaultPropertyValue(IEnumerable<IPublishedContent>? contents, SortExpression sortExpression)
     {
         switch (sortExpression.Property?.Alias)
         {
@@ -253,14 +263,16 @@ public class TemplateQueryController : UmbracoAuthorizedJsonController
             .Select(x => new ContentTypeModel
             {
                 Alias = x.Alias,
-                Name = _localizedTextService.Localize("template", "contentOfType", new[] {x.Name ?? string.Empty})
+                Name = _localizedTextService.Localize("template", "contentOfType", new[] { x.Name ?? string.Empty })
             })
             .OrderBy(x => x.Name).ToList();
 
-        contentTypes.Insert(0,
+        contentTypes.Insert(
+            0,
             new ContentTypeModel
             {
-                Alias = string.Empty, Name = _localizedTextService.Localize("template", "allContent")
+                Alias = string.Empty,
+                Name = _localizedTextService.Localize("template", "allContent")
             });
 
         return contentTypes;

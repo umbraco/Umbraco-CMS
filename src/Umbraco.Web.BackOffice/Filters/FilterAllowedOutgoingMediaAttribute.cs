@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -21,7 +21,7 @@ internal class FilterAllowedOutgoingMediaAttribute : TypeFilterAttribute
 {
     public FilterAllowedOutgoingMediaAttribute(Type outgoingType, string? propertyName = null)
         : base(typeof(FilterAllowedOutgoingMediaFilter)) =>
-        Arguments = new object[] {outgoingType, propertyName ?? string.Empty};
+        Arguments = new object[] { outgoingType, propertyName ?? string.Empty };
 }
 
 internal class FilterAllowedOutgoingMediaFilter : IActionFilter
@@ -63,10 +63,9 @@ internal class FilterAllowedOutgoingMediaFilter : IActionFilter
             return;
         }
 
-        var objectContent = context.Result as ObjectResult;
-        if (objectContent != null)
+        if (context.Result is ObjectResult objectContent)
         {
-            var collection = GetValueFromResponse(objectContent);
+            dynamic? collection = GetValueFromResponse(objectContent);
 
             if (collection != null)
             {
@@ -95,7 +94,7 @@ internal class FilterAllowedOutgoingMediaFilter : IActionFilter
         var toRemove = new List<dynamic>();
         foreach (dynamic item in items)
         {
-            var hasPathAccess = item != null &&
+            dynamic hasPathAccess = item != null &&
                                 ContentPermissions.HasPathAccess(item?.Path, GetUserStartNodes(user), RecycleBinId);
             if (hasPathAccess == false)
             {
@@ -103,7 +102,7 @@ internal class FilterAllowedOutgoingMediaFilter : IActionFilter
             }
         }
 
-        foreach (var item in toRemove)
+        foreach (dynamic item in toRemove)
         {
             items.Remove(item);
         }

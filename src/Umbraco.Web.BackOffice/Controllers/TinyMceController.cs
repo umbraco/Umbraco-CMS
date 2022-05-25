@@ -69,7 +69,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
 
         // Really we should only have one file per request to this endpoint
         //  var file = result.FileData[0];
-        var fileName = formFile.FileName.Trim(new[] {'\"'}).TrimEnd();
+        var fileName = formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
         var safeFileName = fileName.ToSafeFileName(_shortStringHelper);
         var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
 
@@ -77,8 +77,7 @@ public class TinyMceController : UmbracoAuthorizedApiController
             _imageUrlGenerator.IsSupportedImageFormat(ext) == false)
         {
             // Throw some error - to say can't upload this IMG type
-            return new UmbracoProblemResult("This is not an image filetype extension that is approved",
-                HttpStatusCode.BadRequest);
+            return new UmbracoProblemResult("This is not an image filetype extension that is approved", HttpStatusCode.BadRequest);
         }
 
         var newFilePath = imageTempPath + Path.DirectorySeparatorChar + safeFileName;
@@ -89,6 +88,6 @@ public class TinyMceController : UmbracoAuthorizedApiController
             await formFile.CopyToAsync(stream);
         }
 
-        return Ok(new {tmpLocation = relativeNewFilePath});
+        return Ok(new { tmpLocation = relativeNewFilePath });
     }
 }

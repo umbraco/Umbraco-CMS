@@ -45,8 +45,7 @@ public class DictionaryController : BackOfficeNotificationsController
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IOptionsSnapshot<GlobalSettings> globalSettings,
         ILocalizedTextService localizedTextService,
-        IUmbracoMapper umbracoMapper
-    )
+        IUmbracoMapper umbracoMapper)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -80,12 +79,10 @@ public class DictionaryController : BackOfficeNotificationsController
 
         foreach (IDictionaryItem dictionaryItem in foundDictionaryDescendants)
         {
-            _localizationService.Delete(dictionaryItem,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            _localizationService.Delete(dictionaryItem, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
         }
 
-        _localizationService.Delete(foundDictionary,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+        _localizationService.Delete(foundDictionary, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
         return Ok();
     }
@@ -113,10 +110,13 @@ public class DictionaryController : BackOfficeNotificationsController
         if (_localizationService.DictionaryItemExists(key))
         {
             var message = _localizedTextService.Localize(
-                "dictionaryItem", "changeKeyError",
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService,
-                    _globalSettings),
-                new Dictionary<string, string?> {{"0", key}});
+                "dictionaryItem",
+                "changeKeyError",
+                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings),
+                new Dictionary<string, string?>
+                {
+                    {"0", key}
+                });
             return ValidationProblem(message);
         }
 
@@ -264,8 +264,7 @@ public class DictionaryController : BackOfficeNotificationsController
     {
         IDictionaryItem? dictionaryItem = dictionary.Id is null
             ? null
-            : _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()!,
-                CultureInfo.InvariantCulture));
+            : _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()!, CultureInfo.InvariantCulture));
 
         if (dictionaryItem == null)
         {
@@ -273,8 +272,7 @@ public class DictionaryController : BackOfficeNotificationsController
         }
 
         CultureInfo? userCulture =
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService,
-                _globalSettings);
+            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings);
 
         if (dictionary.NameIsDirty)
         {
@@ -284,9 +282,10 @@ public class DictionaryController : BackOfficeNotificationsController
             if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
             {
                 var message = _localizedTextService.Localize(
-                    "dictionaryItem", "changeKeyError",
+                    "dictionaryItem",
+                    "changeKeyError",
                     userCulture,
-                    new Dictionary<string, string?> {{"0", dictionary.Name}});
+                    new Dictionary<string, string?> { { "0", dictionary.Name } });
                 ModelState.AddModelError("Name", message);
                 return ValidationProblem(ModelState);
             }
@@ -296,8 +295,7 @@ public class DictionaryController : BackOfficeNotificationsController
 
         foreach (DictionaryTranslationSave translation in dictionary.Translations)
         {
-            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem,
-                _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
         }
 
         try
@@ -307,15 +305,13 @@ public class DictionaryController : BackOfficeNotificationsController
             DictionaryDisplay? model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
             model?.Notifications.Add(new BackOfficeNotification(
-                _localizedTextService.Localize("speechBubbles", "dictionaryItemSaved", userCulture), string.Empty,
-                NotificationStyle.Success));
+                _localizedTextService.Localize("speechBubbles", "dictionaryItemSaved", userCulture), string.Empty, NotificationStyle.Success));
 
             return model;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name,
-                dictionary.ParentId);
+            _logger.LogError(ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
             return ValidationProblem("Something went wrong saving dictionary");
         }
     }
@@ -371,8 +367,7 @@ public class DictionaryController : BackOfficeNotificationsController
     /// <param name="list">
     ///     The list.
     /// </param>
-    private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level,
-        ICollection<DictionaryOverviewDisplay> list)
+    private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
     {
         foreach (IDictionaryItem childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key)
                      ?.OrderBy(ItemSort()) ?? Enumerable.Empty<IDictionaryItem>())

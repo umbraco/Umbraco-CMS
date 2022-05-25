@@ -28,8 +28,7 @@ internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
         private readonly PropertyEditorCollection _propertyEditorCollection;
         private readonly IUmbracoMapper _umbracoMapper;
 
-        public DataTypeValidateFilter(IDataTypeService dataTypeService,
-            PropertyEditorCollection propertyEditorCollection, IUmbracoMapper umbracoMapper)
+        public DataTypeValidateFilter(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection, IUmbracoMapper umbracoMapper)
         {
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _propertyEditorCollection = propertyEditorCollection ??
@@ -92,8 +91,7 @@ internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
                     break;
 
                 default:
-                    context.Result = new UmbracoProblemResult($"Data type action {dataType.Action} was not found.",
-                        HttpStatusCode.NotFound);
+                    context.Result = new UmbracoProblemResult($"Data type action {dataType.Action} was not found.", HttpStatusCode.NotFound);
                     return;
             }
 
@@ -117,9 +115,11 @@ internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
 
                     // run each IValueValidator (with null valueType and dataTypeConfiguration: not relevant here)
                     foreach (IValueValidator validator in editorField.Validators)
-                    foreach (ValidationResult result in validator.Validate(field.Value, null, null))
                     {
-                        context.ModelState.AddValidationError(result, "Properties", field.Key ?? string.Empty);
+                        foreach (ValidationResult result in validator.Validate(field.Value, null, null))
+                        {
+                            context.ModelState.AddValidationError(result, "Properties", field.Key ?? string.Empty);
+                        }
                     }
                 }
             }

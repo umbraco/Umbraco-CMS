@@ -12,14 +12,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 /// <summary>
 ///     Tree for displaying partial views in the settings app
 /// </summary>
-[Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, SortOrder = 7,
-    TreeGroup = Constants.Trees.Groups.Templating)]
+[Tree(Constants.Applications.Settings, Constants.Trees.PartialViews, SortOrder = 7, TreeGroup = Constants.Trees.Groups.Templating)]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViews)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
 public class PartialViewsTreeController : FileSystemTreeController
 {
-    private static readonly string[] ExtensionsStatic = {"cshtml"};
+    private static readonly string[] ExtensionsStatic = { "cshtml" };
 
     public PartialViewsTreeController(
         ILocalizedTextService localizedTextService,

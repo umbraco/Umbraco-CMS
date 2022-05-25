@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -62,8 +62,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         {
             var model = (ContentItemSave?)context.ActionArguments["contentItem"];
             var contentItemValidator =
-                new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(),
-                    _propertyValidationService);
+                new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _propertyValidationService);
 
             if (context.ModelState.ContainsKey("contentItem"))
             {
@@ -93,8 +92,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                 {
                     if (contentItemValidator.ValidateProperties(model, variant, context))
                     {
-                        contentItemValidator.ValidatePropertiesData(model, variant, variant.PropertyCollectionDto,
-                            context.ModelState);
+                        contentItemValidator.ValidatePropertiesData(model, variant, variant.PropertyCollectionDto, context.ModelState);
                     }
                 }
             }
@@ -113,7 +111,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         {
             if (!contentItem?.Variants.Any(x => x.Save) ?? true)
             {
-                actionContext.Result = new NotFoundObjectResult(new {Message = "No variants flagged for saving"});
+                actionContext.Result = new NotFoundObjectResult(new { Message = "No variants flagged for saving" });
                 return false;
             }
 

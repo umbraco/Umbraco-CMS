@@ -168,7 +168,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         List<UserTourStatus>? userTours = null;
         if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.TourData.IsNullOrWhiteSpace() ?? true)
         {
-            userTours = new List<UserTourStatus> {status};
+            userTours = new List<UserTourStatus> { status };
             if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
             {
                 _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData =
@@ -276,8 +276,15 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         Attempt<int?>? userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId();
         var result = userId?.ResultOr(0);
         //borrow the logic from the user controller
-        return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileManager,
-            _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator,
+        return UsersController.PostSetAvatarInternal(
+            file,
+            _userService,
+            _appCaches.RuntimeCache,
+            _mediaFileManager,
+            _shortStringHelper,
+            _contentSettings,
+            _hostingEnvironment,
+            _imageUrlGenerator,
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
     }
 
@@ -308,8 +315,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         {
             // even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
             var result = new ModelWithNotifications<string?>(passwordChangeResult.Result?.ResetPassword);
-            result.AddSuccessNotification(_localizedTextService.Localize("user", "password"),
-                _localizedTextService.Localize("user", "passwordChanged"));
+            result.AddSuccessNotification(_localizedTextService.Localize("user", "password"), _localizedTextService.Localize("user", "passwordChanged"));
             return result;
         }
 
@@ -317,8 +323,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
         {
             foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
-                ModelState.AddModelError(memberName,
-                    passwordChangeResult.Result.ChangeError.ErrorMessage ?? string.Empty);
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage ?? string.Empty);
             }
         }
 

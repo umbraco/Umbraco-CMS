@@ -12,14 +12,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 /// <summary>
 ///     Tree for displaying partial view macros in the developer app
 /// </summary>
-[Tree(Constants.Applications.Settings, Constants.Trees.PartialViewMacros, SortOrder = 8,
-    TreeGroup = Constants.Trees.Groups.Templating)]
+[Tree(Constants.Applications.Settings, Constants.Trees.PartialViewMacros, SortOrder = 8, TreeGroup = Constants.Trees.Groups.Templating)]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessPartialViewMacros)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
 public class PartialViewMacrosTreeController : PartialViewsTreeController
 {
-    private static readonly string[] ExtensionsStatic = {"cshtml"};
+    private static readonly string[] ExtensionsStatic = { "cshtml" };
 
     public PartialViewMacrosTreeController(
         ILocalizedTextService localizedTextService,
@@ -27,8 +26,7 @@ public class PartialViewMacrosTreeController : PartialViewsTreeController
         IMenuItemCollectionFactory menuItemCollectionFactory,
         FileSystems fileSystems,
         IEventAggregator eventAggregator)
-        : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, fileSystems,
-            eventAggregator) =>
+        : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, fileSystems, eventAggregator) =>
         FileSystem = fileSystems.MacroPartialsFileSystem;
 
     protected override IFileSystem? FileSystem { get; }

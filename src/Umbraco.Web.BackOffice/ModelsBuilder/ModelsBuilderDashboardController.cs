@@ -56,7 +56,7 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
         {
             if (!_config.ModelsMode.SupportsExplicitGeneration())
             {
-                var result2 = new BuildResult {Success = false, Message = "Models generation is not enabled."};
+                var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
 
                 return Ok(result2);
             }
@@ -79,9 +79,9 @@ public class ModelsBuilderDashboardController : UmbracoAuthorizedJsonController
     {
         OutOfDateStatus status = _outOfDateModels.IsEnabled
             ? _outOfDateModels.IsOutOfDate
-                ? new OutOfDateStatus {Status = OutOfDateType.OutOfDate}
-                : new OutOfDateStatus {Status = OutOfDateType.Current}
-            : new OutOfDateStatus {Status = OutOfDateType.Unknown};
+                ? new OutOfDateStatus { Status = OutOfDateType.OutOfDate }
+                : new OutOfDateStatus { Status = OutOfDateType.Current }
+            : new OutOfDateStatus { Status = OutOfDateType.Unknown };
 
         return status;
     }

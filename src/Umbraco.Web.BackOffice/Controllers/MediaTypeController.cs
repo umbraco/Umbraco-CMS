@@ -37,7 +37,8 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public MediaTypeController(ICultureDictionary cultureDictionary,
+    public MediaTypeController(
+        ICultureDictionary cultureDictionary,
         EditorValidatorCollection editorValidatorCollection,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
@@ -179,7 +180,9 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> actionResult = PerformGetAvailableCompositeContentTypes(
             filter.ContentTypeId,
-            UmbracoObjectTypes.MediaType, filter.FilterContentTypes, filter.FilterPropertyTypes,
+            UmbracoObjectTypes.MediaType,
+            filter.FilterContentTypes,
+            filter.FilterPropertyTypes,
             filter.IsElement);
 
         if (!(actionResult.Result is null))
@@ -187,7 +190,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
             return actionResult.Result;
         }
 
-        var result = actionResult.Value?.Select(x => new {contentType = x.Item1, allowed = x.Item2});
+        var result = actionResult.Value?.Select(x => new { contentType = x.Item1, allowed = x.Item2 });
         return Ok(result);
     }
 
@@ -204,7 +207,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         var result =
             PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType).Value?
-                .Select(x => new {contentType = x});
+                .Select(x => new { contentType = x });
         return Ok(result);
     }
 
@@ -258,8 +261,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     public IActionResult PostCreateContainer(int parentId, string name)
     {
         Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
-            _mediaTypeService.CreateContainer(parentId, Guid.NewGuid(), name,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            _mediaTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
         if (result.Success)
         {
@@ -273,8 +275,7 @@ public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     public IActionResult PostRenameContainer(int id, string name)
     {
         Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
-            _mediaTypeService.RenameContainer(id, name,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            _mediaTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
         if (result.Success)
         {

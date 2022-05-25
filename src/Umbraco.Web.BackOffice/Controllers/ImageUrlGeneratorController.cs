@@ -23,7 +23,6 @@ public class ImageUrlGeneratorController : UmbracoAuthorizedJsonController
 
     public ImageUrlGeneratorController(IImageUrlGenerator imageUrlGenerator) => _imageUrlGenerator = imageUrlGenerator;
 
-    public string? GetCropUrl(string mediaPath, int? width = null, int? height = null,
-        ImageCropMode? imageCropMode = null) => _imageUrlGenerator.GetImageUrl(
-        new ImageUrlGenerationOptions(mediaPath) {Width = width, Height = height, ImageCropMode = imageCropMode});
+    public string? GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null) => _imageUrlGenerator.GetImageUrl(
+        new ImageUrlGenerationOptions(mediaPath) { Width = width, Height = height, ImageCropMode = imageCropMode });
 }

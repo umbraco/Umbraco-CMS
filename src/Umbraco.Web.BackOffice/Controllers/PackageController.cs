@@ -92,8 +92,7 @@ public class PackageController : UmbracoAuthorizedJsonController
     [HttpDelete]
     public IActionResult DeleteCreatedPackage(int packageId)
     {
-        _packagingService.DeleteCreatedPackage(packageId,
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
+        _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
         return Ok();
     }
@@ -141,8 +140,7 @@ public class PackageController : UmbracoAuthorizedJsonController
         Response.Headers.Add("Content-Disposition", cd.ToString());
         // Set custom header so umbRequestHelper.downloadFile can save the correct filename
         Response.Headers.Add("x-filename", WebUtility.UrlEncode(fileName));
-        return new FileStreamResult(System.IO.File.OpenRead(package.PackagePath),
-            new MediaTypeHeaderValue("application/octet-stream") {Charset = encoding.WebName});
+        return new FileStreamResult(System.IO.File.OpenRead(package.PackagePath), new MediaTypeHeaderValue("application/octet-stream") { Charset = encoding.WebName });
     }
 
     public ActionResult<InstalledPackage> GetInstalledPackageByName([FromQuery] string packageName)

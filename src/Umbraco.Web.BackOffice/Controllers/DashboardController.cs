@@ -94,11 +94,12 @@ public class DashboardController : UmbracoApiController
             HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
             // Hacking the response - can't set the HttpContext.Response.Body, so instead returning the error as JSON
-            var errorJson = JsonConvert.SerializeObject(new {Error = "Dashboard source not permitted"});
+            var errorJson = JsonConvert.SerializeObject(new { Error = "Dashboard source not permitted" });
             return JObject.Parse(errorJson);
         }
 
-        var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
+        var url = string.Format(
+            "{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}&siteid={7}",
             baseUrl,
             _dashboardSettings.ContentDashboardPath,
             section,
@@ -249,8 +250,7 @@ public class DashboardController : UmbracoApiController
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}",
-                    urlPrefix, url);
+                _logger.LogError(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
 
                 //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                 _appCaches.RuntimeCache.InsertCacheItem(key, () => result, new TimeSpan(0, 5, 0));
@@ -275,7 +275,7 @@ public class DashboardController : UmbracoApiController
             Type = x.Type,
             Expanded = x.Expanded,
             IsActive = x.IsActive,
-            Properties = x.Properties?.Select(y => new DashboardSlim {Alias = y.Alias, View = y.View})
+            Properties = x.Properties?.Select(y => new DashboardSlim { Alias = y.Alias, View = y.View })
         }).ToList();
     }
 

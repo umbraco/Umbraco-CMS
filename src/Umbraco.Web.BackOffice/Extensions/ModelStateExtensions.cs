@@ -118,7 +118,7 @@ public static class ModelStateExtensions
             .Select(x =>
             {
                 // Format "<culture>_<segment>"
-                var cs = x.Split(new[] {'_'});
+                var cs = x.Split(new[] { '_' });
                 return (culture: cs[0], segment: cs[1]);
             })
             .Where(x => !x.culture.IsNullOrWhiteSpace())

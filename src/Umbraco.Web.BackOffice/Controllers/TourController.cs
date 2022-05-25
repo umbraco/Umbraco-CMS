@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
@@ -67,8 +67,7 @@ public class TourController : UmbracoAuthorizedJsonController
 
         foreach (var embeddedTourName in embeddedTourNames)
         {
-            await TryParseTourFile(embeddedTourName, result, nonPluginFilters, aliasOnlyFilters,
-                async x => await GetContentFromEmbeddedResource(x));
+            await TryParseTourFile(embeddedTourName, result, nonPluginFilters, aliasOnlyFilters, async x => await GetContentFromEmbeddedResource(x));
         }
 
 
@@ -98,8 +97,13 @@ public class TourController : UmbracoAuthorizedJsonController
                     {
                         foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
                         {
-                            await TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters,
-                                async x => await System.IO.File.ReadAllTextAsync(x), pluginName);
+                            await TryParseTourFile(
+                                tourFile,
+                                result,
+                                combinedFilters,
+                                aliasOnlyFilters,
+                                async x => await System.IO.File.ReadAllTextAsync(x),
+                                pluginName);
                         }
                     }
                 }
@@ -158,7 +162,7 @@ public class TourController : UmbracoAuthorizedJsonController
     {
         IEnumerable<BackOfficeTourFile> tourFiles = await GetTours();
 
-        var doctypeAliasWithCompositions = new List<string> {doctypeAlias};
+        var doctypeAliasWithCompositions = new List<string> { doctypeAlias };
 
         IContentType? contentType = _contentTypeService.Get(doctypeAlias);
 
@@ -181,7 +185,8 @@ public class TourController : UmbracoAuthorizedJsonController
             });
     }
 
-    private async Task TryParseTourFile(string tourFile,
+    private async Task TryParseTourFile(
+        string tourFile,
         ICollection<BackOfficeTourFile> result,
         List<BackOfficeTourFilter> filters,
         List<BackOfficeTourFilter> aliasOnlyFilters,
@@ -220,8 +225,7 @@ public class TourController : UmbracoAuthorizedJsonController
             IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
             var localizedTours = backOfficeTours?.Where(x =>
-                string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user?.Language,
-                    StringComparison.InvariantCultureIgnoreCase)).ToList();
+                string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(user?.Language, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
             var tour = new BackOfficeTourFile
             {

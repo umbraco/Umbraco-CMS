@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
@@ -44,14 +44,12 @@ internal class MemberBinder : IModelBinder
     /// <summary>
     ///     Creates the model from the request and binds it to the context
     /// </summary>
-    /// <param name="actionContext"></param>
     /// <param name="bindingContext"></param>
     /// <returns></returns>
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         MemberSave? model =
-            await _modelBinderHelper.BindModelFromMultipartRequestAsync<MemberSave>(_jsonSerializer,
-                _hostingEnvironment, bindingContext);
+            await _modelBinderHelper.BindModelFromMultipartRequestAsync<MemberSave>(_jsonSerializer, _hostingEnvironment, bindingContext);
         if (model == null)
         {
             return;

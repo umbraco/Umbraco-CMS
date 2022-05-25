@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -48,15 +48,18 @@ internal sealed class MemberSaveValidationAttribute : TypeFilterAttribute
         {
             var model = (MemberSave?)context.ActionArguments["contentItem"];
             var contentItemValidator = new MemberSaveModelValidator(
-                _loggerFactory.CreateLogger<MemberSaveModelValidator>(), _backofficeSecurityAccessor.BackOfficeSecurity,
-                _memberTypeService, _memberService, _shortStringHelper, _propertyValidationService);
+                _loggerFactory.CreateLogger<MemberSaveModelValidator>(),
+                _backofficeSecurityAccessor.BackOfficeSecurity,
+                _memberTypeService,
+                _memberService,
+                _shortStringHelper,
+                _propertyValidationService);
             //now do each validation step
             if (contentItemValidator.ValidateExistingContent(model, context))
             {
                 if (contentItemValidator.ValidateProperties(model, model, context))
                 {
-                    contentItemValidator.ValidatePropertiesData(model, model, model?.PropertyCollectionDto,
-                        context.ModelState);
+                    contentItemValidator.ValidatePropertiesData(model, model, model?.PropertyCollectionDto, context.ModelState);
                 }
             }
         }

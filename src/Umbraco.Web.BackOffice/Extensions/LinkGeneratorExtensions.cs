@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Web.BackOffice.Install;
 
@@ -10,8 +10,7 @@ public static class BackofficeLinkGeneratorExtensions
     ///     Returns the URL for the installer
     /// </summary>
     public static string? GetInstallerUrl(this LinkGenerator linkGenerator)
-        => linkGenerator.GetPathByAction(nameof(InstallController.Index),
-            ControllerExtensions.GetControllerName<InstallController>(), new {area = Constants.Web.Mvc.InstallArea});
+        => linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Constants.Web.Mvc.InstallArea });
 
     /// <summary>
     ///     Returns the URL for the installer api
@@ -20,5 +19,5 @@ public static class BackofficeLinkGeneratorExtensions
         => linkGenerator.GetPathByAction(
             nameof(InstallApiController.GetSetup),
             ControllerExtensions.GetControllerName<InstallApiController>(),
-            new {area = Constants.Web.Mvc.InstallArea})?.TrimEnd(nameof(InstallApiController.GetSetup));
+            new { area = Constants.Web.Mvc.InstallArea })?.TrimEnd(nameof(InstallApiController.GetSetup));
 }

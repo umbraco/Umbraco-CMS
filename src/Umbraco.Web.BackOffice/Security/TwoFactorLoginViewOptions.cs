@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.BackOffice.Security;
+namespace Umbraco.Cms.Web.BackOffice.Security;
 
 /// <summary>
 ///     Options used as named options for 2fa providers

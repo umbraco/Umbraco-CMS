@@ -35,15 +35,13 @@ public class
         _contentPermissions = contentPermissions;
 
     /// <inheritdoc />
-    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context,
-        ContentPermissionsQueryStringRequirement requirement)
+    protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, ContentPermissionsQueryStringRequirement requirement)
     {
         int nodeId;
         if (requirement.NodeId.HasValue == false)
         {
             if (HttpContextAccessor.HttpContext is null || requirement.QueryStringName is null ||
-                !HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName,
-                    out StringValues routeVal))
+                !HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
             {
                 // Must succeed this requirement since we cannot process it
                 return Task.FromResult(true);
@@ -66,7 +64,7 @@ public class
             nodeId,
             BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
             out IContent? contentItem,
-            new[] {requirement.PermissionToCheck});
+            new[] { requirement.PermissionToCheck });
 
         if (HttpContextAccessor.HttpContext is not null && contentItem is not null)
         {

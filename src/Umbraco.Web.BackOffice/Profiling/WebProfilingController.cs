@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -19,5 +19,5 @@ public class WebProfilingController : UmbracoAuthorizedJsonController
     public WebProfilingController(IHostingEnvironment hosting) => _hosting = hosting;
 
     public object GetStatus() =>
-        new {Enabled = _hosting.IsDebugMode};
+        new { Enabled = _hosting.IsDebugMode };
 }

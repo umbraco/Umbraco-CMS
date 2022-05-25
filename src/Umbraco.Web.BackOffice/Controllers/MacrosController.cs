@@ -85,7 +85,7 @@ public class MacrosController : BackOfficeNotificationsController
 
         try
         {
-            var macro = new Macro(_shortStringHelper) {Alias = alias, Name = name, MacroSource = string.Empty};
+            var macro = new Macro(_shortStringHelper) { Alias = alias, Name = name, MacroSource = string.Empty };
 
             _macroService.Save(macro, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
@@ -213,8 +213,7 @@ public class MacrosController : BackOfficeNotificationsController
 
             macroDisplay.Notifications.Clear();
 
-            macroDisplay.Notifications.Add(new BackOfficeNotification("Success", "Macro saved",
-                NotificationStyle.Success));
+            macroDisplay.Notifications.Add(new BackOfficeNotification("Success", "Macro saved", NotificationStyle.Success));
 
             return macroDisplay;
         }
@@ -260,7 +259,7 @@ public class MacrosController : BackOfficeNotificationsController
         IDataEditor[] parameterEditors = _parameterEditorCollection.ToArray();
 
         var grouped = parameterEditors
-            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? string.Empty : x.Group.ToLower())
             .OrderBy(x => x.Key)
             .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
@@ -346,7 +345,8 @@ public class MacrosController : BackOfficeNotificationsController
                 DirectoryInfo[] macroPartials = viewsFolder.First().GetDirectories("MacroPartials");
                 if (macroPartials.Any())
                 {
-                    files.AddRange(FindPartialViewFilesInFolder(macroPartials.First().FullName,
+                    files.AddRange(FindPartialViewFilesInFolder(
+                        macroPartials.First().FullName,
                         macroPartials.First().FullName,
                         Constants.SystemDirectories.AppPlugins + "/" + directory.Name + "/Views/MacroPartials"));
                 }
@@ -406,7 +406,7 @@ public class MacrosController : BackOfficeNotificationsController
 
         IEnumerable<MacroParameterDisplay> parameters = macro.Properties.Values
             .OrderBy(x => x.SortOrder)
-            .Select(x => new MacroParameterDisplay {Editor = x.EditorAlias, Key = x.Alias, Label = x.Name, Id = x.Id});
+            .Select(x => new MacroParameterDisplay { Editor = x.EditorAlias, Key = x.Alias, Label = x.Name, Id = x.Id });
 
         if (display is not null)
         {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -17,8 +17,7 @@ public class RelationController : UmbracoAuthorizedJsonController
     private readonly IRelationService _relationService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public RelationController(IUmbracoMapper umbracoMapper,
-        IRelationService relationService)
+    public RelationController(IUmbracoMapper umbracoMapper, IRelationService relationService)
     {
         _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         _relationService = relationService ?? throw new ArgumentNullException(nameof(relationService));

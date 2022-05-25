@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,8 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters;
 /// </summary>
 internal abstract class ContentModelValidator
 {
-    protected ContentModelValidator(ILogger<ContentModelValidator> logger,
-        IPropertyValidationService propertyValidationService)
+    protected ContentModelValidator(ILogger<ContentModelValidator> logger, IPropertyValidationService propertyValidationService)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         PropertyValidationService = propertyValidationService ??
@@ -77,12 +76,10 @@ internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWith
     /// <param name="modelWithProperties"></param>
     /// <param name="actionContext"></param>
     /// <returns></returns>
-    public virtual bool ValidateProperties(TModelSave? model,
-        IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
+    public virtual bool ValidateProperties(TModelSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
     {
         TPersisted? persistedContent = model?.PersistedContent;
-        return ValidateProperties(modelWithProperties?.Properties.ToList() ?? new List<ContentPropertyBasic>(),
-            persistedContent?.Properties.ToList(), actionContext);
+        return ValidateProperties(modelWithProperties?.Properties.ToList() ?? new List<ContentPropertyBasic>(), persistedContent?.Properties.ToList(), actionContext);
     }
 
     /// <summary>
@@ -92,8 +89,7 @@ internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWith
     /// <param name="persistedProperties"></param>
     /// <param name="actionContext"></param>
     /// <returns></returns>
-    protected bool ValidateProperties(List<ContentPropertyBasic>? postedProperties,
-        List<IProperty>? persistedProperties, ActionExecutingContext actionContext)
+    protected bool ValidateProperties(List<ContentPropertyBasic>? postedProperties, List<IProperty>? persistedProperties, ActionExecutingContext actionContext)
     {
         if (postedProperties is null)
         {
@@ -176,8 +172,6 @@ internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWith
     /// <param name="property"></param>
     /// <param name="postedValue"></param>
     /// <param name="modelState"></param>
-    /// <param name="requiredDefaultMessages"></param>
-    /// <param name="formatDefaultMessages"></param>
     protected virtual void ValidatePropertyValue(
         TModelSave? model,
         TModelWithProperties? modelWithProperties,
@@ -197,8 +191,13 @@ internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWith
         }
 
         foreach (ValidationResult validationResult in PropertyValidationService.ValidatePropertyValue(
-                     editor, property.DataType, postedValue, property.IsRequired ?? false,
-                     property.ValidationRegExp, property.IsRequiredMessage, property.ValidationRegExpMessage))
+                     editor,
+                     property.DataType,
+                     postedValue,
+                     property.IsRequired ?? false,
+                     property.ValidationRegExp,
+                     property.IsRequiredMessage,
+                     property.ValidationRegExpMessage))
         {
             AddPropertyError(model, modelWithProperties, editor, property, validationResult, modelState);
         }
@@ -211,6 +210,5 @@ internal abstract class ContentModelValidator<TPersisted, TModelSave, TModelWith
         ContentPropertyDto property,
         ValidationResult validationResult,
         ModelStateDictionary modelState) =>
-        modelState.AddPropertyError(validationResult, property.Alias, property.Culture ?? string.Empty,
-            property.Segment ?? string.Empty);
+        modelState.AddPropertyError(validationResult, property.Alias, property.Culture ?? string.Empty, property.Segment ?? string.Empty);
 }

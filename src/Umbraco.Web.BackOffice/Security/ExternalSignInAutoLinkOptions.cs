@@ -26,7 +26,7 @@ public class ExternalSignInAutoLinkOptions
         string? defaultCulture = null,
         bool allowManualLinking = true)
     {
-        DefaultUserGroups = defaultUserGroups ?? new[] {SecurityConstants.EditorGroupAlias};
+        DefaultUserGroups = defaultUserGroups ?? new[] { SecurityConstants.EditorGroupAlias };
         AutoLinkExternalAccount = autoLinkExternalAccount;
         AllowManualLinking = allowManualLinking;
         _defaultCulture = defaultCulture;

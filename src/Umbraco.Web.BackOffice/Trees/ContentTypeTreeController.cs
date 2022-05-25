@@ -19,8 +19,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-[Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0,
-    TreeGroup = Constants.Trees.Groups.Settings)]
+[Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, SortOrder = 0, TreeGroup = Constants.Trees.Groups.Settings)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
 public class ContentTypeTreeController : TreeController, ISearchableTree
@@ -30,11 +29,15 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
     private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
     private readonly UmbracoTreeSearcher _treeSearcher;
 
-    public ContentTypeTreeController(ILocalizedTextService localizedTextService,
-        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher,
-        IMenuItemCollectionFactory menuItemCollectionFactory, IContentTypeService contentTypeService,
-        IEntityService entityService, IEventAggregator eventAggregator) : base(localizedTextService,
-        umbracoApiControllerTypeCollection, eventAggregator)
+    public ContentTypeTreeController(
+        ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        UmbracoTreeSearcher treeSearcher,
+        IMenuItemCollectionFactory menuItemCollectionFactory,
+        IContentTypeService contentTypeService,
+        IEntityService entityService,
+        IEventAggregator eventAggregator)
+        : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
     {
         _treeSearcher = treeSearcher;
         _menuItemCollectionFactory = menuItemCollectionFactory;
@@ -42,11 +45,9 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
         _entityService = entityService;
     }
 
-    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex,
-        string? searchFrom = null)
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
     {
-        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query,
-            pageSize, pageIndex, out var totalFound, searchFrom);
+        IEnumerable<SearchResultEntity?> results = _treeSearcher.EntitySearch(UmbracoObjectTypes.DocumentType, query, pageSize, pageIndex, out var totalFound, searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
 
@@ -83,10 +84,10 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
                 .OrderBy(entity => entity.Name)
                 .Select(dt =>
                 {
-                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder,
-                        dt.HasChildren, "");
+                    TreeNode node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, string.Empty);
                     node.Path = dt.Path;
                     node.NodeType = "container";
+
                     // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
                     node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                     return node;
@@ -112,8 +113,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
                     // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
                     // need this check to keep supporting sites where children have already been created.
                     var hasChildren = dt.HasChildren;
-                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings,
-                        contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
+                    TreeNode node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, contentType?.Icon ?? Constants.Icons.ContentType, hasChildren);
 
                     node.Path = dt.Path;
 
@@ -140,15 +140,16 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
             menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
             {
-                Icon = "page-up", SeparatorBefore = true, OpensDialog = true
+                Icon = "page-up",
+                SeparatorBefore = true,
+                OpensDialog = true
             });
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }
 
-        IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture),
-            UmbracoObjectTypes.DocumentTypeContainer);
+        IEntitySlim? container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
         if (container != null)
         {
             //set the default to create
@@ -156,7 +157,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
 
             menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-            menu.Items.Add(new MenuItem("rename", LocalizedTextService) {Icon = "icon icon-edit"});
+            menu.Items.Add(new MenuItem("rename", LocalizedTextService) { Icon = "icon icon-edit" });
 
             if (container.HasChildren == false)
             {
@@ -181,7 +182,9 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
             menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
             menu.Items.Add(new MenuItem("export", LocalizedTextService)
             {
-                Icon = "download-alt", SeparatorBefore = true, OpensDialog = true
+                Icon = "download-alt",
+                SeparatorBefore = true,
+                OpensDialog = true
             });
             menu.Items.Add<ActionDelete>(LocalizedTextService, true, true);
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));

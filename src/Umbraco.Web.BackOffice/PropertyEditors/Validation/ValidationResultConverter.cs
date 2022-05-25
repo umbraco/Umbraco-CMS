@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -35,8 +35,7 @@ internal class ValidationResultConverter : JsonConverter
 
     public override bool CanConvert(Type objectType) => typeof(ValidationResult).IsAssignableFrom(objectType);
 
-    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue,
-        JsonSerializer serializer) => throw new NotImplementedException();
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) => throw new NotImplementedException();
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
@@ -107,16 +106,14 @@ internal class ValidationResultConverter : JsonConverter
                             // "errors/propertyHasErrors" message, however I think that leaves for less flexibility since it could/should be
                             // up to the front-end validator to show whatever message it wants (if any) for an error indicating a nested property error.
                             // Will leave blank.
-                            modelState.AddPropertyValidationError(new ValidationResult(string.Empty),
-                                propTypeResult.PropertyTypeAlias, _culture, _segment);
+                            modelState.AddPropertyValidationError(new ValidationResult(string.Empty), propTypeResult.PropertyTypeAlias, _culture, _segment);
                         }
                     }
                     else
                     {
                         foreach (ValidationResult v in result)
                         {
-                            modelState.AddPropertyValidationError(v, propTypeResult.PropertyTypeAlias, _culture,
-                                _segment);
+                            modelState.AddPropertyValidationError(v, propTypeResult.PropertyTypeAlias, _culture, _segment);
                         }
                     }
                 }
@@ -142,7 +139,7 @@ internal class ValidationResultConverter : JsonConverter
             var jo = new JObject();
             if (!validationResult?.ErrorMessage.IsNullOrWhiteSpace() ?? false)
             {
-                var errObj = JToken.FromObject(validationResult!.ErrorMessage!, camelCaseSerializer);
+                var errObj = JToken.FromObject(validationResult.ErrorMessage!, camelCaseSerializer);
                 jo.Add("errorMessage", errObj);
             }
 

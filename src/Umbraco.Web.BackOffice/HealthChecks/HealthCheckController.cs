@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Authorization;
@@ -28,8 +28,7 @@ public class HealthCheckController : UmbracoAuthorizedJsonController
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckController" /> class.
     /// </summary>
-    public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger,
-        IOptions<HealthChecksSettings> healthChecksSettings)
+    public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings)
     {
         _checks = checks ?? throw new ArgumentNullException(nameof(checks));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

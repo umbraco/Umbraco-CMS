@@ -26,7 +26,8 @@ public class IconService : IIconService
         IOptionsMonitor<GlobalSettings> globalSettings,
         IHostingEnvironment hostingEnvironment,
         AppCaches appCaches)
-        : this(globalSettings,
+        : this(
+            globalSettings,
             hostingEnvironment,
             appCaches,
             StaticServiceProvider.Instance.GetRequiredService<IWebHostEnvironment>())
@@ -62,7 +63,7 @@ public class IconService : IIconService
         IReadOnlyDictionary<string, string>? allIconModels = GetIconDictionary();
         if (allIconModels?.ContainsKey(iconName) ?? false)
         {
-            return new IconModel {Name = iconName, SvgString = allIconModels[iconName]};
+            return new IconModel { Name = iconName, SvgString = allIconModels[iconName] };
         }
 
         return null;
@@ -90,7 +91,7 @@ public class IconService : IIconService
         {
             var svgContent = File.ReadAllText(iconPath);
 
-            var svg = new IconModel {Name = iconName, SvgString = svgContent};
+            var svg = new IconModel { Name = iconName, SvgString = svgContent };
 
             return svg;
         }
@@ -153,8 +154,7 @@ public class IconService : IIconService
             .Select(GetIcon)
             .WhereNotNull()
             .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
-    );
+            .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase));
 
     private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
     {

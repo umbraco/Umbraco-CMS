@@ -71,7 +71,8 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         IHostingEnvironment hostingEnvironment,
         EditorValidatorCollection editorValidatorCollection,
         PackageDataInstallation packageDataInstallation)
-        : base(cultureDictionary,
+        : base(
+            cultureDictionary,
             editorValidatorCollection,
             contentTypeService,
             mediaTypeService,
@@ -205,7 +206,9 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         ActionResult<IEnumerable<Tuple<EntityBasic?, bool>>> actionResult = PerformGetAvailableCompositeContentTypes(
             filter.ContentTypeId,
-            UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes,
+            UmbracoObjectTypes.DocumentType,
+            filter.FilterContentTypes,
+            filter.FilterPropertyTypes,
             filter.IsElement);
 
         if (!(actionResult.Result is null))
@@ -214,7 +217,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         }
 
         var result = actionResult.Value?
-            .Select(x => new {contentType = x.Item1, allowed = x.Item2});
+            .Select(x => new { contentType = x.Item1, allowed = x.Item2 });
         return Ok(result);
     }
 
@@ -240,7 +243,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         var result =
             PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType).Value?
-                .Select(x => new {contentType = x});
+                .Select(x => new { contentType = x });
         return Ok(result);
     }
 
@@ -283,8 +286,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     public IActionResult PostCreateContainer(int parentId, string name)
     {
         Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
-            _contentTypeService.CreateContainer(parentId, Guid.NewGuid(), name,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            _contentTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
         if (result.Success)
         {
@@ -298,8 +300,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     public IActionResult PostRenameContainer(int id, string name)
     {
         Attempt<OperationResult<OperationResultType, EntityContainer>?> result =
-            _contentTypeService.RenameContainer(id, name,
-                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            _contentTypeService.RenameContainer(id, name, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
         if (result.Success)
         {
@@ -402,7 +403,8 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
             {
                 _logger.LogWarning(
                     "Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
-                    contentTypeAlias, tryCreateTemplate.Result?.Result);
+                    contentTypeAlias,
+                    tryCreateTemplate.Result?.Result);
             }
 
             template = tryCreateTemplate.Result?.Entity;
@@ -576,7 +578,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         }
 
 
-        var xd = new XmlDocument {XmlResolver = null};
+        var xd = new XmlDocument { XmlResolver = null };
         xd.Load(filePath);
 
         var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0);
@@ -608,7 +610,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
         foreach (IFormFile formFile in file)
         {
             var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote);
-            var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+            var ext = fileName[(fileName.LastIndexOf('.') + 1)..].ToLower();
 
             var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             var tempPath = Path.Combine(root, fileName);
@@ -623,7 +625,7 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
                 {
                     model.TempFileName = Path.Combine(root, fileName);
 
-                    var xd = new XmlDocument {XmlResolver = null};
+                    var xd = new XmlDocument { XmlResolver = null };
                     xd.Load(model.TempFileName);
 
                     model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild?.Value;

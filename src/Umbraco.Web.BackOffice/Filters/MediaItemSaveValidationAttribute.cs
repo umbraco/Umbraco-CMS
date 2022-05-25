@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -59,8 +59,7 @@ internal class MediaItemSaveValidationAttribute : TypeFilterAttribute
         {
             var model = (MediaItemSave?)context.ActionArguments["contentItem"];
             var contentItemValidator =
-                new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(),
-                    _propertyValidationService);
+                new MediaSaveModelValidator(_loggerFactory.CreateLogger<MediaSaveModelValidator>(), _propertyValidationService);
 
             if (await ValidateUserAccessAsync(model, context))
             {
@@ -69,8 +68,7 @@ internal class MediaItemSaveValidationAttribute : TypeFilterAttribute
                 {
                     if (contentItemValidator.ValidateProperties(model, model, context))
                     {
-                        contentItemValidator.ValidatePropertiesData(model, model, model?.PropertyCollectionDto,
-                            context.ModelState);
+                        contentItemValidator.ValidatePropertiesData(model, model, model?.PropertyCollectionDto, context.ModelState);
                     }
                 }
             }

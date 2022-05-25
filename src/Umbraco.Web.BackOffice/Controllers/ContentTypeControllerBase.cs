@@ -132,8 +132,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
         }
 
         ContentTypeAvailableCompositionsResults availableCompositions =
-            ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes,
-                filterPropertyTypes, isElement);
+            ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes, isElement);
 
 
         IContentTypeComposition[] currCompositions =
@@ -143,8 +142,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
 
         return availableCompositions.Results
             .Select(x =>
-                new Tuple<EntityBasic?, bool>(UmbracoMapper.Map<IContentTypeComposition, EntityBasic>(x.Composition),
-                    x.Allowed))
+                new Tuple<EntityBasic?, bool>(UmbracoMapper.Map<IContentTypeComposition, EntityBasic>(x.Composition), x.Allowed))
             .Select(x =>
             {
                 //we need to ensure that the item is enabled if it is already selected
@@ -175,8 +173,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
             .ToList();
     }
 
-    private IEnumerable<EntityContainer> GetEntityContainers(IContentTypeComposition? contentType,
-        UmbracoObjectTypes type)
+    private IEnumerable<EntityContainer> GetEntityContainers(IContentTypeComposition? contentType, UmbracoObjectTypes type)
     {
         if (contentType == null)
         {
@@ -320,8 +317,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
         var exists = allAliases.InvariantContains(contentTypeSave.Alias);
         if (exists && (ctId == 0 || (!ct?.Alias.InvariantEquals(contentTypeSave.Alias) ?? false)))
         {
-            ModelState.AddModelError("Alias",
-                LocalizedTextService.Localize("editcontenttype", "aliasAlreadyExists"));
+            ModelState.AddModelError("Alias", LocalizedTextService.Localize("editcontenttype", "aliasAlreadyExists"));
         }
 
         // execute the external validators
@@ -375,10 +371,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
         }
         else
         {
-            if (beforeCreateNew != null)
-            {
-                beforeCreateNew(contentTypeSave);
-            }
+            beforeCreateNew?.Invoke(contentTypeSave);
 
             //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
             //always filter these 0 types out
@@ -408,7 +401,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
                         ex, contentTypeSave, ct, ctId);
                 if (responseEx is null)
                 {
-                    throw ex;
+                    throw;
                 }
 
                 return ValidationProblem(responseEx);
@@ -434,8 +427,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
             {
                 newCt.AllowedContentTypes =
                     newCt.AllowedContentTypes?.Union(
-                        new[] {new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder)}
-                    );
+                        new[] { new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) });
                 saveContentType(newCt);
             }
 
@@ -453,9 +445,11 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
             .Where(x => !string.IsNullOrWhiteSpace(x.ErrorMessage) && x.MemberNames.Any());
 
         foreach (ValidationResult r in validationResults)
-        foreach (var m in r.MemberNames)
         {
-            modelState.AddModelError(m, r.ErrorMessage ?? string.Empty);
+            foreach (var m in r.MemberNames)
+            {
+                modelState.AddModelError(m, r.ErrorMessage ?? string.Empty);
+            }
         }
     }
 
@@ -557,8 +551,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
                 (validateAttempt.Exception as InvalidCompositionException)?.PropertyGroupAliases ??
                 Array.Empty<string>();
 
-            AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave,
-                duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
+            AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
 
             TContentTypeDisplay? display = UmbracoMapper.Map<TContentTypeDisplay>(composition);
             //map the 'save' data on top
@@ -602,8 +595,10 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
     /// <param name="duplicatePropertyTypeAliases"></param>
     /// <param name="invalidPropertyGroupAliases"></param>
     /// <returns></returns>
-    private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave,
-        IEnumerable<string>? duplicatePropertyTypeAliases, IEnumerable<string>? invalidPropertyGroupAliases)
+    private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(
+        TContentTypeSave contentTypeSave,
+        IEnumerable<string>? duplicatePropertyTypeAliases,
+        IEnumerable<string>? invalidPropertyGroupAliases)
         where TContentTypeSave : ContentTypeSave<TPropertyType>
         where TPropertyType : PropertyTypeBasic
     {
@@ -668,8 +663,10 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
 
         if (invalidCompositionException != null)
         {
-            AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave,
-                invalidCompositionException.PropertyTypeAliases, invalidCompositionException.PropertyGroupAliases);
+            AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(
+                contentTypeSave,
+                invalidCompositionException.PropertyTypeAliases,
+                invalidCompositionException.PropertyGroupAliases);
             return CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
         }
 
@@ -684,8 +681,7 @@ public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotifi
     /// <param name="ctId"></param>
     /// <param name="contentTypeSave"></param>
     /// <param name="ct"></param>
-    private TContentTypeDisplay? CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(int ctId,
-        TContentTypeSave contentTypeSave, TContentType? ct)
+    private TContentTypeDisplay? CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(int ctId, TContentTypeSave contentTypeSave, TContentType? ct)
         where TContentTypeDisplay : ContentTypeCompositionDisplay
         where TContentTypeSave : ContentTypeSave
     {

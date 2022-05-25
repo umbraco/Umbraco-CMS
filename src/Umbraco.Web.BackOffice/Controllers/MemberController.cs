@@ -70,6 +70,7 @@ public class MemberController : ContentControllerBase
     /// <param name="backOfficeSecurityAccessor">The back office security accessor</param>
     /// <param name="jsonSerializer">The JSON serializer</param>
     /// <param name="passwordChanger">The password changer</param>
+    /// <param name="scopeProvider">The core scope provider</param>
     public MemberController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -158,9 +159,10 @@ public class MemberController : ContentControllerBase
         IMemberType? foundType = _memberTypeService.Get(listName);
         var name = foundType != null ? foundType.Name : listName;
 
-        var apps = new List<ContentApp>();
-        apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member",
-            Constants.DataTypes.DefaultMembersListView));
+        var apps = new List<ContentApp>
+        {
+            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member", Constants.DataTypes.DefaultMembersListView)
+        };
         apps[0].Active = true;
 
         var display = new MemberListDisplay
@@ -376,7 +378,7 @@ public class MemberController : ContentControllerBase
                 {
                     case nameof(IdentityErrorDescriber.InvalidUserName):
                         ModelState.AddPropertyError(
-                            new ValidationResult(error.Description, new[] {"value"}),
+                            new ValidationResult(error.Description, new[] { "value" }),
                             string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                         break;
                     case nameof(IdentityErrorDescriber.PasswordMismatch):
@@ -387,22 +389,22 @@ public class MemberController : ContentControllerBase
                     case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
                     case nameof(IdentityErrorDescriber.PasswordTooShort):
                         ModelState.AddPropertyError(
-                            new ValidationResult(error.Description, new[] {"value"}),
+                            new ValidationResult(error.Description, new[] { "value" }),
                             string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                         break;
                     case nameof(IdentityErrorDescriber.InvalidEmail):
                         ModelState.AddPropertyError(
-                            new ValidationResult(error.Description, new[] {"value"}),
+                            new ValidationResult(error.Description, new[] { "value" }),
                             string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                         break;
                     case nameof(IdentityErrorDescriber.DuplicateUserName):
                         ModelState.AddPropertyError(
-                            new ValidationResult(error.Description, new[] {"value"}),
+                            new ValidationResult(error.Description, new[] { "value" }),
                             string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                         break;
                     case nameof(IdentityErrorDescriber.DuplicateEmail):
                         ModelState.AddPropertyError(
-                            new ValidationResult(error.Description, new[] {"value"}),
+                            new ValidationResult(error.Description, new[] { "value" }),
                             string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
                         break;
                 }
@@ -570,8 +572,7 @@ public class MemberController : ContentControllerBase
                 foreach (var memberName in passwordChangeResult.Result?.ChangeError?.MemberNames ??
                                            Enumerable.Empty<string>())
                 {
-                    ModelState.AddModelError(memberName,
-                        passwordChangeResult.Result?.ChangeError?.ErrorMessage ?? string.Empty);
+                    ModelState.AddModelError(memberName, passwordChangeResult.Result?.ChangeError?.ErrorMessage ?? string.Empty);
                 }
 
                 return ValidationProblem(ModelState);
@@ -604,7 +605,7 @@ public class MemberController : ContentControllerBase
         if (contentItem.Name.IsNullOrWhiteSpace())
         {
             ModelState.AddPropertyError(
-                new ValidationResult("Invalid user name", new[] {"value"}),
+                new ValidationResult("Invalid user name", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
             return false;
         }
@@ -615,7 +616,7 @@ public class MemberController : ContentControllerBase
             if (!validPassword.Succeeded)
             {
                 ModelState.AddPropertyError(
-                    new ValidationResult("Invalid password: " + MapErrors(validPassword.Errors), new[] {"value"}),
+                    new ValidationResult("Invalid password: " + MapErrors(validPassword.Errors), new[] { "value" }),
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
                 return false;
             }
@@ -625,7 +626,7 @@ public class MemberController : ContentControllerBase
         if (byUsername != null && byUsername.Key != contentItem.Key)
         {
             ModelState.AddPropertyError(
-                new ValidationResult("Username is already in use", new[] {"value"}),
+                new ValidationResult("Username is already in use", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
             return false;
         }
@@ -634,7 +635,7 @@ public class MemberController : ContentControllerBase
         if (byEmail != null && byEmail.Key != contentItem.Key)
         {
             ModelState.AddPropertyError(
-                new ValidationResult("Email address is already in use", new[] {"value"}),
+                new ValidationResult("Email address is already in use", new[] { "value" }),
                 $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
             return false;
         }
@@ -660,8 +661,7 @@ public class MemberController : ContentControllerBase
     /// </summary>
     /// <param name="groups">The groups to updates</param>
     /// <param name="identityMember">The member as an identity user</param>
-    private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string>? groups,
-        MemberIdentityUser identityMember)
+    private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string>? groups, MemberIdentityUser identityMember)
     {
         var hasChanges = false;
 

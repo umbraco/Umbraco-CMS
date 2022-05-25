@@ -143,24 +143,21 @@ public class InstallApiController : ControllerBase
                 // check if there's a custom view to return for this step
                 if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                 {
-                    return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View,
-                        setupData.ViewModel);
+                    return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
                 }
 
                 return new InstallProgressResultModel(false, step.Name, nextStep);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during installation step {Step}",
-                    step.Name);
+                _logger.LogError(ex, "An error occurred during installation step {Step}", step.Name);
 
                 if (ex is TargetInvocationException && ex.InnerException != null)
                 {
                     ex = ex.InnerException;
                 }
 
-                var installException = ex as InstallException;
-                if (installException != null)
+                if (ex is InstallException installException)
                 {
                     return new ValidationErrorResult(new
                     {
@@ -170,16 +167,15 @@ public class InstallApiController : ControllerBase
                     });
                 }
 
-                return new ValidationErrorResult(new {step = step.Name, view = "error", message = ex.Message});
+                return new ValidationErrorResult(new { step = step.Name, view = "error", message = ex.Message });
             }
         }
 
         _installStatusTracker.Reset();
-        return new InstallProgressResultModel(true, "", "");
+        return new InstallProgressResultModel(true, string.Empty, string.Empty);
     }
 
-    private static object? GetInstruction(InstallInstructions installModel, InstallTrackingItem item,
-        InstallSetupStep step)
+    private static object? GetInstruction(InstallInstructions installModel, InstallTrackingItem item, InstallSetupStep step)
     {
         object? instruction = null;
         installModel.Instructions?.TryGetValue(item.Name, out instruction); // else null
@@ -201,8 +197,7 @@ public class InstallApiController : ControllerBase
     /// <param name="installId"></param>
     /// <param name="installModel"></param>
     /// <returns></returns>
-    private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId,
-        InstallInstructions installModel)
+    private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId, InstallInstructions installModel)
     {
         while (queue.Count > 0)
         {
@@ -258,18 +253,17 @@ public class InstallApiController : ControllerBase
 
         var model = modelAttempt.Result;
         Type genericStepType = typeof(InstallSetupStep<>);
-        Type[] typeArgs = {step.StepType};
+        Type[] typeArgs = { step.StepType };
         Type typedStepType = genericStepType.MakeGenericType(typeArgs);
         try
         {
             MethodInfo method = typedStepType.GetMethods().Single(x => x.Name == "RequiresExecution");
-            var result = (bool?)method.Invoke(step, new[] {model});
+            var result = (bool?)method.Invoke(step, new[] { model });
             return result ?? false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Checking if step requires execution ({Step}) failed.",
-                step.Name);
+            _logger.LogError(ex, "Checking if step requires execution ({Step}) failed.", step.Name);
             throw;
         }
     }
@@ -277,8 +271,7 @@ public class InstallApiController : ControllerBase
     // executes the step
     internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object? instruction)
     {
-        using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.",
-                   "Step completed"))
+        using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
         {
             Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
             if (!modelAttempt.Success)
@@ -289,12 +282,12 @@ public class InstallApiController : ControllerBase
 
             var model = modelAttempt.Result;
             Type genericStepType = typeof(InstallSetupStep<>);
-            Type[] typeArgs = {step.StepType};
+            Type[] typeArgs = { step.StepType };
             Type typedStepType = genericStepType.MakeGenericType(typeArgs);
             try
             {
                 MethodInfo method = typedStepType.GetMethods().Single(x => x.Name == "ExecuteAsync");
-                var task = (Task<InstallSetupResult>?)method.Invoke(step, new[] {model});
+                var task = (Task<InstallSetupResult>?)method.Invoke(step, new[] { model });
                 return await task!;
             }
             catch (Exception ex)

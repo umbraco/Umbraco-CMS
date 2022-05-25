@@ -44,8 +44,7 @@ public class TemplateController : BackOfficeNotificationsController
         IFileService fileService,
         IUmbracoMapper umbracoMapper,
         IShortStringHelper shortStringHelper)
-        : this(fileService, umbracoMapper, shortStringHelper,
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
+        : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
     {
     }
 
@@ -144,8 +143,10 @@ public class TemplateController : BackOfficeNotificationsController
     public TemplateDisplay? GetScaffold(int id)
     {
         //empty default
-        var dt = new Template(_shortStringHelper, string.Empty, string.Empty);
-        dt.Path = "-1";
+        var dt = new Template(_shortStringHelper, string.Empty, string.Empty)
+        {
+            Path = "-1"
+        };
 
         if (id > 0)
         {
@@ -224,7 +225,7 @@ public class TemplateController : BackOfficeNotificationsController
                             var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
                             //Get the substring of the child & any children (descendants it may have too)
-                            var childTemplatePath = childTemplate.Path.Substring(positionInPath);
+                            var childTemplatePath = childTemplate.Path[positionInPath..];
 
                             //As we are updating the template to be a child of a master
                             //Set the path to the master's path + its current template id + the current child path substring

@@ -54,7 +54,7 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         var enabled = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking == false;
         var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false;
-        return Ok(new {enabled, userIsAdmin});
+        return Ok(new { enabled, userIsAdmin });
     }
 
     //add paging
@@ -62,10 +62,9 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     public RedirectUrlSearchResult SearchRedirectUrls(string searchTerm, int page = 0, int pageSize = 10)
     {
         var searchResult = new RedirectUrlSearchResult();
-        long resultCount;
 
         IEnumerable<IRedirectUrl> redirects = string.IsNullOrWhiteSpace(searchTerm)
-            ? _redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
+            ? _redirectUrlService.GetAllRedirectUrls(page, pageSize, out long resultCount)
             : _redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
         searchResult.SearchResults =

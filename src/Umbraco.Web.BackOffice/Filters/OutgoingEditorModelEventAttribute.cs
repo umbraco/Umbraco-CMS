@@ -32,7 +32,8 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
 
         public OutgoingEditorModelEventFilter(
             IUmbracoContextAccessor umbracoContextAccessor,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEventAggregator eventAggregator)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IEventAggregator eventAggregator)
         {
             _umbracoContextAccessor = umbracoContextAccessor
                                       ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -66,7 +67,7 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
                 }
                 else
                 {
-                    models = new[] {objectContent.Value};
+                    models = new[] { objectContent.Value };
                 }
 
                 foreach (var model in models)

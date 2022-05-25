@@ -148,9 +148,11 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     public MediaItemDisplay GetRecycleBin()
     {
-        var apps = new List<ContentApp>();
-        apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media",
-            Constants.DataTypes.DefaultMediaListView));
+        var apps = new List<ContentApp>
+        {
+            ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media",
+            Constants.DataTypes.DefaultMediaListView)
+        };
         apps[0].Active = true;
         var display = new MediaItemDisplay
         {
@@ -263,8 +265,7 @@ public class MediaController : ContentControllerBase
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, pageNumber, pageSize);
         }
 
-        long total;
-        IEnumerable<IMedia> children = _mediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total,
+        IEnumerable<IMedia> children = _mediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out long total,
             //lookup these content types
             _sqlContext.Query<IMedia>().Where(x => folderTypes.Contains(x.ContentTypeId)),
             Ordering.By("Name"));
@@ -712,7 +713,7 @@ public class MediaController : ContentControllerBase
         {
             var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
-            var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLowerInvariant();
+            var ext = safeFileName[(safeFileName.LastIndexOf('.') + 1)..].ToLowerInvariant();
 
             if (!_contentSettings.IsFileAllowedForUpload(ext))
             {
@@ -776,7 +777,7 @@ public class MediaController : ContentControllerBase
             {
                 tempFiles.Notifications.Add(new BackOfficeNotification(
                     _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                    _localizedTextService.Localize("media", "disallowedMediaType", new[] {mediaTypeAlias}),
+                    _localizedTextService.Localize("media", "disallowedMediaType", new[] { mediaTypeAlias }),
                     NotificationStyle.Warning));
                 continue;
             }
@@ -869,7 +870,6 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     private async Task<ActionResult<int?>?> GetParentIdAsIntAsync(string? parentId, bool validatePermissions)
     {
-        int intParentId;
 
         // test for udi
         if (UdiParser.TryParse(parentId, out GuidUdi? parentUdi))
@@ -878,11 +878,10 @@ public class MediaController : ContentControllerBase
         }
 
         //if it's not an INT then we'll check for GUID
-        if (int.TryParse(parentId, NumberStyles.Integer, CultureInfo.InvariantCulture, out intParentId) == false)
+        if (int.TryParse(parentId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intParentId) == false)
         {
             // if a guid then try to look up the entity
-            Guid idGuid;
-            if (Guid.TryParse(parentId, out idGuid))
+            if (Guid.TryParse(parentId, out Guid idGuid))
             {
                 IEntitySlim? entity = _entityService.Get(idGuid);
                 if (entity != null)
@@ -1106,9 +1105,11 @@ public class MediaController : ContentControllerBase
             return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
         }
 
-        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
-        pagedResult.Items = children
-            .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull();
+        var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize)
+        {
+            Items = children
+            .Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>).WhereNotNull()
+        };
 
         return pagedResult;
     }

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Umbraco.Cms.Web.BackOffice.ActionResults;

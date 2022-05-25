@@ -213,8 +213,7 @@ public class DataTypeController : BackOfficeNotificationsController
     /// <param name="editorAlias"></param>
     /// <param name="dataTypeId">The data type id for the pre-values, -1 if it is a new data type</param>
     /// <returns></returns>
-    public ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>> GetPreValues(string editorAlias,
-        int dataTypeId = -1)
+    public ActionResult<IEnumerable<DataTypeConfigurationFieldDisplay>> GetPreValues(string editorAlias, int dataTypeId = -1)
     {
         IDataEditor? propEd = _propertyEditors[editorAlias];
         if (propEd == null)
@@ -326,7 +325,7 @@ public class DataTypeController : BackOfficeNotificationsController
 
         // map back to display model, and return
         DataTypeDisplay? display = _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
-        display?.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "dataTypeSaved"), "");
+        display?.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "dataTypeSaved"), string.Empty);
         return display;
     }
 
@@ -357,8 +356,7 @@ public class DataTypeController : BackOfficeNotificationsController
                 return ValidationProblem();
             case MoveOperationStatusType.FailedNotAllowedByPath:
                 var notificationModel = new SimpleNotificationModel();
-                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"),
-                    "");
+                notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"), string.Empty);
                 return ValidationProblem(notificationModel);
             default:
                 throw new ArgumentOutOfRangeException();
@@ -397,18 +395,15 @@ public class DataTypeController : BackOfficeNotificationsController
 
             if (groupOfEntityType.Key == UmbracoObjectTypes.DocumentType.GetUdiType())
             {
-                result.DocumentTypes = GetContentTypeUsages(_contentTypeService.GetAll(guidsAndPropertyAliases.Keys),
-                    guidsAndPropertyAliases);
+                result.DocumentTypes = GetContentTypeUsages(_contentTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
             }
             else if (groupOfEntityType.Key == UmbracoObjectTypes.MediaType.GetUdiType())
             {
-                result.MediaTypes = GetContentTypeUsages(_mediaTypeService.GetAll(guidsAndPropertyAliases.Keys),
-                    guidsAndPropertyAliases);
+                result.MediaTypes = GetContentTypeUsages(_mediaTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
             }
             else if (groupOfEntityType.Key == UmbracoObjectTypes.MemberType.GetUdiType())
             {
-                result.MemberTypes = GetContentTypeUsages(_memberTypeService.GetAll(guidsAndPropertyAliases.Keys),
-                    guidsAndPropertyAliases);
+                result.MemberTypes = GetContentTypeUsages(_memberTypeService.GetAll(guidsAndPropertyAliases.Keys), guidsAndPropertyAliases);
             }
         }
 
@@ -436,7 +431,8 @@ public class DataTypeController : BackOfficeNotificationsController
             Properties = x.PropertyTypes.Where(p => usages[x.Key].InvariantContains(p.Alias))
                 .Select(p => new DataTypeReferences.ContentTypeReferences.PropertyTypeReferences
                 {
-                    Alias = p.Alias, Name = p.Name
+                    Alias = p.Alias,
+                    Name = p.Name
                 })
         });
 
@@ -488,7 +484,7 @@ public class DataTypeController : BackOfficeNotificationsController
         }
 
         var grouped = dataTypes?.WhereNotNull()
-            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower())
+            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? string.Empty : x.Group!.ToLower())
             .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
         return grouped;
@@ -522,8 +518,13 @@ public class DataTypeController : BackOfficeNotificationsController
         }
 
         var grouped = datatypes
-            .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group!.ToLower()).ToDictionary(group => group.Key,
-                group => group.OrderBy(d => d.Name).AsEnumerable());
+            .GroupBy(x => x.Group.IsNullOrWhiteSpace()
+                ? string.Empty
+                : x.Group!.ToLower())
+            .ToDictionary(
+                group => group.Key,
+                group => group.OrderBy(d => d.Name)
+                    .AsEnumerable());
 
         return grouped;
     }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -53,7 +53,8 @@ public class LogController : UmbracoAuthorizedJsonController
     }
 
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContentOrMedia)]
-    public PagedResult<AuditLog> GetPagedEntityLog(int id,
+    public PagedResult<AuditLog> GetPagedEntityLog(
+        int id,
         int pageNumber = 1,
         int pageSize = 10,
         Direction orderDirection = Direction.Descending,
@@ -64,15 +65,19 @@ public class LogController : UmbracoAuthorizedJsonController
             return new PagedResult<AuditLog>(0, pageNumber, pageSize);
         }
 
-        long totalRecords;
         IQuery<IAuditItem>? dateQuery = sinceDate.HasValue
             ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate)
             : null;
-        IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize,
-            out totalRecords, orderDirection, customFilter: dateQuery);
+        IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByEntity(
+            id,
+            pageNumber - 1,
+            pageSize,
+            out long totalRecords,
+            orderDirection,
+            customFilter: dateQuery);
         IEnumerable<AuditLog> mapped = result.Select(item => _umbracoMapper.Map<AuditLog>(item)).WhereNotNull();
 
-        var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize) {Items = MapAvatarsAndNames(mapped)};
+        var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize) { Items = MapAvatarsAndNames(mapped) };
 
         return page;
     }
@@ -88,15 +93,19 @@ public class LogController : UmbracoAuthorizedJsonController
             return new PagedResult<AuditLog>(0, pageNumber, pageSize);
         }
 
-        long totalRecords;
         IQuery<IAuditItem>? dateQuery = sinceDate.HasValue
             ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate)
             : null;
         var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
-        IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize,
-            out totalRecords, orderDirection, customFilter: dateQuery);
+        IEnumerable<IAuditItem> result = _auditService.GetPagedItemsByUser(
+            userId,
+            pageNumber - 1,
+            pageSize,
+            out long totalRecords,
+            orderDirection,
+            customFilter: dateQuery);
         IEnumerable<AuditLog> mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result).WhereNotNull();
-        return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize) {Items = MapAvatarsAndNames(mapped)};
+        return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize) { Items = MapAvatarsAndNames(mapped) };
     }
 
     public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
@@ -110,8 +119,8 @@ public class LogController : UmbracoAuthorizedJsonController
     {
         var mappedItems = items.ToList();
         var userIds = mappedItems.Select(x => x.UserId).ToArray();
-        var userAvatars = _userService.GetUsersById(userIds).ToDictionary(x => x.Id,
-            x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator));
+        var userAvatars = _userService.GetUsersById(userIds).ToDictionary(
+            x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator));
         var userNames = _userService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
         foreach (AuditLog item in mappedItems)
         {

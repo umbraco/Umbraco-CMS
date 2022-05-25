@@ -7,5 +7,5 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 /// </summary>
 public class ExternalLoginSignInResult : SignInResult
 {
-    public static ExternalLoginSignInResult NotAllowed { get; } = new() {Succeeded = false};
+    public static ExternalLoginSignInResult NotAllowed { get; } = new() { Succeeded = false };
 }

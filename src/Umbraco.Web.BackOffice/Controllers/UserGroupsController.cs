@@ -67,8 +67,7 @@ public class UserGroupsController : BackOfficeNotificationsController
             _userService, _contentService, _mediaService, _entityService, _appCaches);
 
         Attempt<string?> isAuthorized =
-            authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
-                userGroupSave.Alias);
+            authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, userGroupSave.Alias);
         if (isAuthorized == false)
         {
             return Unauthorized(isAuthorized.Result);
@@ -85,7 +84,8 @@ public class UserGroupsController : BackOfficeNotificationsController
         }
 
         //if start nodes were changed we need to check that the current user has access to them
-        isAuthorized = authHelper.AuthorizeStartNodeChanges(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
+        isAuthorized = authHelper.AuthorizeStartNodeChanges(
+            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
             userGroupSave.PersistedUserGroup?.StartContentId,
             userGroupSave.StartContentId,
             userGroupSave.PersistedUserGroup?.StartMediaId,
@@ -132,7 +132,8 @@ public class UserGroupsController : BackOfficeNotificationsController
 
         UserGroupDisplay? display = _umbracoMapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-        display?.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "operationSavedHeader"),
+        display?.AddSuccessNotification(
+            _localizedTextService.Localize("speechBubbles", "operationSavedHeader"),
             _localizedTextService.Localize("speechBubbles", "editUserGroupSaved"));
         return display;
     }
@@ -226,11 +227,9 @@ public class UserGroupsController : BackOfficeNotificationsController
 
         if (userGroups.Length > 1)
         {
-            return Ok(_localizedTextService.Localize("speechBubbles", "deleteUserGroupsSuccess",
-                new[] {userGroups.Length.ToString()}));
+            return Ok(_localizedTextService.Localize("speechBubbles", "deleteUserGroupsSuccess", new[] { userGroups.Length.ToString() }));
         }
 
-        return Ok(_localizedTextService.Localize("speechBubbles", "deleteUserGroupSuccess",
-            new[] {userGroups[0].Name}));
+        return Ok(_localizedTextService.Localize("speechBubbles", "deleteUserGroupSuccess", new[] { userGroups[0].Name }));
     }
 }

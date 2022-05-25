@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -34,18 +34,15 @@ internal class IsCurrentUserModelFilterAttribute : TypeFilterAttribute
                 return;
             }
 
-            var objectContent = context.Result as ObjectResult;
-            if (objectContent != null)
+            if (context.Result is ObjectResult objectContent)
             {
-                var model = objectContent.Value as UserBasic;
-                if (model != null)
+                if (objectContent.Value is UserBasic model)
                 {
                     model.IsCurrentUser = (int?)model.Id == user.Id;
                 }
                 else
                 {
-                    var collection = objectContent.Value as IEnumerable<UserBasic>;
-                    if (collection != null)
+                    if (objectContent.Value is IEnumerable<UserBasic> collection)
                     {
                         foreach (UserBasic userBasic in collection)
                         {
@@ -54,8 +51,7 @@ internal class IsCurrentUserModelFilterAttribute : TypeFilterAttribute
                     }
                     else
                     {
-                        var paged = objectContent.Value as UsersController.PagedUserResult;
-                        if (paged != null && paged.Items != null)
+                        if (objectContent.Value is UsersController.PagedUserResult paged && paged.Items != null)
                         {
                             foreach (UserBasic userBasic in paged.Items)
                             {

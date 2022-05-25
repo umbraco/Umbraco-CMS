@@ -176,7 +176,7 @@ public class UsersController : BackOfficeNotificationsController
 
         //get the file info
         IFormFile file = files.First();
-        var fileName = file.FileName.Trim(new[] {'\"'}).TrimEnd();
+        var fileName = file.FileName.Trim(new[] { '\"' }).TrimEnd();
         var safeFileName = fileName.ToSafeFileName(shortStringHelper);
         var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -313,7 +313,7 @@ public class UsersController : BackOfficeNotificationsController
         if (isAdmin == false)
         {
             //this user is not an admin so in that case we need to exclude all admin users
-            excludeUserGroups = new[] {Constants.Security.AdminGroupAlias};
+            excludeUserGroups = new[] { Constants.Security.AdminGroupAlias };
         }
 
         IQuery<IUser> filterQuery = _sqlContext.Query<IUser>();
@@ -334,13 +334,12 @@ public class UsersController : BackOfficeNotificationsController
         {
             if (userStates == null || userStates.Any() == false)
             {
-                userStates = new[] {UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive};
+                userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
             }
         }
 
         long pageIndex = pageNumber - 1;
-        long total;
-        IEnumerable<IUser> result = _userService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection,
+        IEnumerable<IUser> result = _userService.GetAll(pageIndex, pageSize, out long total, orderBy, orderDirection,
             userStates, userGroups, excludeUserGroups, filterQuery);
 
         var paged = new PagedUserResult(total, pageNumber, pageSize)
@@ -536,7 +535,7 @@ public class UsersController : BackOfficeNotificationsController
             _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Email, user, userSave.Message);
 
         display?.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "resendInviteHeader"),
-            _localizedTextService.Localize("speechBubbles", "resendInviteSuccess", new[] {user?.Name}));
+            _localizedTextService.Localize("speechBubbles", "resendInviteSuccess", new[] { user?.Name }));
         return display;
     }
 
@@ -583,7 +582,7 @@ public class UsersController : BackOfficeNotificationsController
         var action = _linkGenerator.GetPathByAction(
             nameof(BackOfficeController.VerifyInvite),
             ControllerExtensions.GetControllerName<BackOfficeController>(),
-            new {area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken});
+            new { area = Constants.Web.Mvc.BackOfficeArea, invite = inviteToken });
 
         // Construct full URL using configured application URL (which will fall back to request)
         Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request
@@ -596,7 +595,7 @@ public class UsersController : BackOfficeNotificationsController
         var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
             // Ensure the culture of the found user is used for the email!
             UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
-            new[] {userDisplay?.Name, from, message, inviteUri.ToString(), senderEmail});
+            new[] { userDisplay?.Name, from, message, inviteUri.ToString(), senderEmail });
 
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.
@@ -797,10 +796,10 @@ public class UsersController : BackOfficeNotificationsController
         if (users.Length > 1)
         {
             return Ok(_localizedTextService.Localize("speechBubbles", "disableUsersSuccess",
-                new[] {userIds.Length.ToString()}));
+                new[] { userIds.Length.ToString() }));
         }
 
-        return Ok(_localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] {users[0].Name}));
+        return Ok(_localizedTextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
     }
 
     /// <summary>
@@ -822,11 +821,11 @@ public class UsersController : BackOfficeNotificationsController
         {
             return Ok(
                 _localizedTextService.Localize("speechBubbles", "enableUsersSuccess",
-                    new[] {userIds.Length.ToString()}));
+                    new[] { userIds.Length.ToString() }));
         }
 
         return Ok(
-            _localizedTextService.Localize("speechBubbles", "enableUserSuccess", new[] {users[0].Name}));
+            _localizedTextService.Localize("speechBubbles", "enableUserSuccess", new[] { users[0].Name }));
     }
 
     /// <summary>
@@ -863,13 +862,13 @@ public class UsersController : BackOfficeNotificationsController
             if (userIds.Length == 1)
             {
                 return Ok(
-                    _localizedTextService.Localize("speechBubbles", "unlockUserSuccess", new[] {user.Name}));
+                    _localizedTextService.Localize("speechBubbles", "unlockUserSuccess", new[] { user.Name }));
             }
         }
 
         return Ok(
             _localizedTextService.Localize("speechBubbles", "unlockUsersSuccess",
-                new[] {(userIds.Length - notFound.Count).ToString()}));
+                new[] { (userIds.Length - notFound.Count).ToString() }));
     }
 
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
@@ -920,7 +919,7 @@ public class UsersController : BackOfficeNotificationsController
         _userService.Delete(user, true);
 
         return Ok(
-            _localizedTextService.Localize("speechBubbles", "deleteUserSuccess", new[] {userName}));
+            _localizedTextService.Localize("speechBubbles", "deleteUserSuccess", new[] { userName }));
     }
 
     public class PagedUserResult : PagedResult<UserBasic>

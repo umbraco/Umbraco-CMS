@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Web.BackOffice.SignalR;
+namespace Umbraco.Cms.Web.BackOffice.SignalR;
 
 public interface IPreviewHub
 {

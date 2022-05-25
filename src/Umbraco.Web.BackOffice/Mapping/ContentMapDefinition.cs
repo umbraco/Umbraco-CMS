@@ -87,8 +87,7 @@ internal class ContentMapDefinition : IMapDefinition
         _publishedUrlProvider = publishedUrlProvider;
         _appCaches = appCaches;
 
-        _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService,
-            contentTypeBaseServiceProvider);
+        _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
         _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
         _contentVariantMapper = new ContentVariantMapper(_localizationService, localizedTextService);
@@ -98,16 +97,14 @@ internal class ContentMapDefinition : IMapDefinition
     {
         mapper.Define<IContent, ContentItemBasic<ContentPropertyBasic>>(
             (source, context) => new ContentItemBasic<ContentPropertyBasic>(), Map);
-        mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(),
-            Map);
+        mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
 
         mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
         mapper.Define<IContent, ContentItemDisplayWithSchedule>(
             (source, context) => new ContentItemDisplayWithSchedule(), Map);
 
         mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
-        mapper.Define<IContent, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(),
-            Map);
+        mapper.Define<IContent, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(), Map);
     }
 
     // Umbraco.Code.MapAll
@@ -156,8 +153,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.Trashed = source.Trashed;
         target.TreeNodeUrl = _commonTreeNodeMapper.GetTreeNodeUrl<ContentTreeController>(source);
         target.Udi =
-            Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document,
-                source.Key);
+            Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
         target.UpdateDate = source.UpdateDate;
         target.Updater = _commonMapper.GetCreator(source, context);
         target.Urls = GetUrls(source);
@@ -206,8 +202,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.State = _basicStateMapper.Map(source, context);
         target.Trashed = source.Trashed;
         target.Udi =
-            Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document,
-                source.Key);
+            Udi.Create(source.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, source.Key);
         target.UpdateDate = GetUpdateDate(source, context);
         target.Updater = _commonMapper.GetCreator(source, context);
         target.VariesByCulture = source.ContentType.VariesByCulture();
@@ -264,13 +259,20 @@ internal class ContentMapDefinition : IMapDefinition
 
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return new[] {UrlInfo.Message("Cannot generate URLs without a current Umbraco Context")};
+            return new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") };
         }
 
         // NOTE: unfortunately we're not async, we'll use .Result and hope this won't cause a deadlock anywhere for now
-        UrlInfo[] urls = source.GetContentUrlsAsync(_publishedRouter, umbracoContext, _localizationService,
-                _localizedTextService, _contentService, _variationContextAccessor,
-                _loggerFactory.CreateLogger<IContent>(), _uriUtility, _publishedUrlProvider)
+        UrlInfo[] urls = source.GetContentUrlsAsync(
+                _publishedRouter,
+                umbracoContext,
+                _localizationService,
+                _localizedTextService,
+                _contentService,
+                _variationContextAccessor,
+                _loggerFactory.CreateLogger<IContent>(),
+                _uriUtility,
+                _publishedUrlProvider)
             .ConfigureAwait(false)
             .GetAwaiter()
             .GetResult()
@@ -421,8 +423,7 @@ internal class ContentMapDefinition : IMapDefinition
 
         return contentType?.AllowedTemplates?
             .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-            .ToDictionary(t => t.Alias,
-                t => _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, t.Name));
+            .ToDictionary(t => t.Alias, t => _localizedTextService.UmbracoDictionaryTranslate(_cultureDictionary, t.Name));
     }
 
     private string? GetDefaultTemplate(IContent source)

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -32,15 +32,14 @@ internal sealed class FilterAllowedOutgoingContentAttribute : TypeFilterAttribut
     {
     }
 
-    internal FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService,
-        IEntityService entityService)
+    internal FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService)
         : this(outgoingType, null, ActionBrowse.ActionLetter)
     {
     }
 
     public FilterAllowedOutgoingContentAttribute(Type outgoingType, string? propertyName, char permissionToCheck)
         : base(typeof(FilterAllowedOutgoingContentFilter)) =>
-        Arguments = new object[] {outgoingType, propertyName ?? string.Empty, permissionToCheck};
+        Arguments = new object[] { outgoingType, propertyName ?? string.Empty, permissionToCheck };
 }
 
 internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoingMediaFilter
@@ -50,8 +49,13 @@ internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoing
     private readonly char _permissionToCheck;
     private readonly IUserService _userService;
 
-    public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,
-        IUserService userService, IEntityService entityService, AppCaches appCaches,
+    public FilterAllowedOutgoingContentFilter(
+        Type outgoingType,
+        string propertyName,
+        char permissionToCheck,
+        IUserService userService,
+        IEntityService entityService,
+        AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         : base(entityService, backofficeSecurityAccessor, appCaches, outgoingType, propertyName)
     {
@@ -101,7 +105,7 @@ internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoing
                 }
             }
 
-            foreach (var item in toRemove)
+            foreach (dynamic item in toRemove)
             {
                 items.Remove(item);
             }
