@@ -6,7 +6,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Core.Scoping;
 
 [Obsolete("Please use Umbraco.Cms.Infrastructure.Scoping.IScopeProvider or Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
-public interface IScopeProvider
+public interface IScopeProvider : ICoreScopeProvider
 {
     /// <summary>
     /// Creates an ambient scope.

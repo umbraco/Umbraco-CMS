@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -17,5 +18,13 @@ public class LegacyScopeProviderTests : UmbracoIntegrationTest
         {
             Assert.IsInstanceOf<global::Umbraco.Cms.Core.Scoping.IScope>(scope);
         }
+    }
+
+    [Test]
+    public void LegacyScopeProvider_Always_IsACoreScopeProvider()
+    {
+        var scopeProvider = GetRequiredService<global::Umbraco.Cms.Core.Scoping.IScopeProvider>();
+
+        Assert.IsInstanceOf<ICoreScopeProvider>(scopeProvider);
     }
 }
