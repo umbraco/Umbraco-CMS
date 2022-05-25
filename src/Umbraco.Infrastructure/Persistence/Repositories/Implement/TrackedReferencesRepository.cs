@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Xml.XPath;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -98,35 +99,52 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .WhereLike<NodeDto>(x => x.Path, subsubQuery);
             }
 
+            var innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[cr].childId as id" , "[rt].[alias]", "[rt].[name]", "[rt].[isDependency]", "[rt].[dual]")
+                .From<RelationDto>("cr").InnerJoin<RelationTypeDto>("rt")
+                .On<RelationDto, RelationTypeDto>((cr, rt) => rt.Dual == false && rt.Id == cr.RelationType, "cr", "rt");
+
+            var innerUnionSqlDualParent = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[dpr].parentId as id", "[dprt].[alias]", "[dprt].[name]", "[dprt].[isDependency]", "[dprt].[dual]")
+                .From<RelationDto>("dpr").InnerJoin<RelationTypeDto>("dprt")
+                .On<RelationDto, RelationTypeDto>((dpr, dprt) => dprt.Dual == true && dprt.Id == dpr.RelationType, "dpr", "dprt");
+
+            var innerUnionSql3 = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[dcr].childId as id", "[dcrt].[alias]", "[dcrt].[name]", "[dcrt].[isDependency]", "[dcrt].[dual]")
+                .From<RelationDto>("dcr").InnerJoin<RelationTypeDto>("dcrt")
+                .On<RelationDto, RelationTypeDto>((dcr, dcrt) => dcrt.Dual == true && dcrt.Id == dcr.RelationType, "dcr", "dcrt");
+
+
+            var innerUnionSql = innerUnionSqlChild.Union(innerUnionSqlDualParent).Union(innerUnionSql3);
+
+
             // Get all relations where parent is in the sub query
-            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().SelectDistinct(
-                    "[pn].[id] as nodeId",
-                    "[pn].[uniqueId] as nodeKey",
-                    "[pn].[text] as nodeName",
-                    "[pn].[nodeObjectType] as nodeObjectType",
+            var sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
+                    "[n].[id] as nodeId",
+                    "[n].[uniqueId] as nodeKey",
+                    "[n].[text] as nodeName",
+                    "[n].[nodeObjectType] as nodeObjectType",
                     "[ct].[icon] as contentTypeIcon",
                     "[ct].[alias] as contentTypeAlias",
                     "[ctn].[text] as contentTypeName",
-                    "[umbracoRelationType].[alias] as relationTypeAlias",
-                    "[umbracoRelationType].[name] as relationTypeName",
-                    "[umbracoRelationType].[isDependency] as relationTypeIsDependency",
-                    "[umbracoRelationType].[dual] as relationTypeIsBidirectional")
-                .From<RelationDto>("r")
-                .InnerJoin<RelationTypeDto>("umbracoRelationType").On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id, aliasLeft: "r", aliasRight: "umbracoRelationType")
-                .InnerJoin<NodeDto>("cn").On<RelationDto, NodeDto, RelationTypeDto>((r, cn, rt) => (!rt.Dual && r.ParentId == cn.NodeId) || (rt.Dual && (r.ChildId == cn.NodeId || r.ParentId == cn.NodeId)), aliasLeft: "r", aliasRight: "cn", aliasOther: "umbracoRelationType")
-                .InnerJoin<NodeDto>("pn").On<RelationDto, NodeDto, NodeDto>((r, pn, cn) => (pn.NodeId == r.ChildId && cn.NodeId == r.ParentId) || (pn.NodeId == r.ParentId && cn.NodeId == r.ChildId), aliasLeft: "r", aliasRight: "pn", aliasOther: "cn")
-                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "pn", aliasRight: "c")
+                    "[x].[alias] as relationTypeAlias",
+                    "[x].[name] as relationTypeName",
+                    "[x].[isDependency] as relationTypeIsDependency",
+                    "[x].[dual] as relationTypeIsBidirectional")
+                .From<NodeDto>("n")
+                .InnerJoinNested(innerUnionSql, "x").On<NodeDto, NodeDto/*this should in reality be another object representing the nested type*/>((n, x) => n.NodeId == x.NodeId, "n", "x")
+                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "n", aliasRight: "c")
                 .LeftJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c", aliasRight: "ct")
                 .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId, aliasLeft: "ct", aliasRight: "ctn")
-                .WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object>>)(x => x.NodeId), subQuery, "pn");
+                .WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
             {
-                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "umbracoRelationType");
+                sql = sql.Where<RelationTypeDto>(rt => rt.IsDependency, "x");
             }
 
             // Ordering is required for paging
-            sql = sql.OrderBy<RelationTypeDto>(x => x.Alias);
+            sql = sql.OrderBy<RelationTypeDto>(x => x.Alias, "x");
 
             var pagedResult = _scopeAccessor.AmbientScope.Database.Page<RelationItemDto>(pageIndex + 1, pageSize, sql);
             totalRecords = pagedResult.TotalItems;
