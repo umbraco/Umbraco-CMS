@@ -71,7 +71,7 @@ const registerInternalManifests = async () => {
   
   extensionRegistry.register({
     type: 'propertyEditor',
-    alias: 'Umb.Section.Settings',
+    alias: 'Umb.PropertyEditor.MyPropertyEditor',
     name: 'Settings',
     elementName: 'umb-settings-section',
     meta: {

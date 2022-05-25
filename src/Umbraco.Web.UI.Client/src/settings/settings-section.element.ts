@@ -7,7 +7,7 @@ import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
 @customElement('umb-settings-section')
 export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
   @state()
-  private _extensions: Array<UmbExtensionManifest<any>> = [];
+  private _extensions: Array<UmbExtensionManifest> = [];
 
   private _extensionRegistry?: UmbExtensionRegistry;
   private _extensionsSubscription?: Subscription;
