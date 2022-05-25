@@ -25,7 +25,7 @@ describe('UmbContextConsumer', () => {
     });
 
     describe('events', () => {
-      it('dispatches request context event when constructed', async () => {
+      it('dispatches context request event when constructed', async () => {
         const listener = oneEvent(window, umbContextRequestEventType);
 
         consumer.attach();
