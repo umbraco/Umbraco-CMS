@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly ILogger<TwoFactorLoginController> _logger;
-        private readonly ITwoFactorLoginService2 _twoFactorLoginService;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
         private readonly IBackOfficeSignInManager _backOfficeSignInManager;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
         private readonly IOptionsSnapshot<TwoFactorLoginViewOptions> _twoFactorLoginViewOptions;
@@ -34,12 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _logger = logger;
-
-            if (twoFactorLoginService is not ITwoFactorLoginService2 twoFactorLoginService2)
-            {
-                throw new ArgumentException("twoFactorLoginService needs to implement ITwoFactorLoginService2 until the interfaces are merged", nameof(twoFactorLoginService));
-            }
-            _twoFactorLoginService = twoFactorLoginService2;
+            _twoFactorLoginService = twoFactorLoginService;
             _backOfficeSignInManager = backOfficeSignInManager;
             _backOfficeUserManager = backOfficeUserManager;
             _twoFactorLoginViewOptions = twoFactorLoginViewOptions;

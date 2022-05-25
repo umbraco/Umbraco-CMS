@@ -15,7 +15,7 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 namespace Umbraco.Cms.Core.Services
 {
     /// <inheritdoc />
-    public class TwoFactorLoginService : ITwoFactorLoginService2
+    public class TwoFactorLoginService : ITwoFactorLoginService
     {
         private readonly ITwoFactorLoginRepository _twoFactorLoginRepository;
         private readonly ICoreScopeProvider _scopeProvider;
