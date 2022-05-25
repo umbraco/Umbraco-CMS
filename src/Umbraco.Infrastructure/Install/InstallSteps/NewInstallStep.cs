@@ -176,17 +176,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
         }
 
-        public override string View
-        {
-            get
-            {
-                return ShowView()
-                    // the user UI
-                    ? "user"
-                    // continue install UI
-                    : "continueinstall";
-            }
-        }
+        public override string View => ShowView()
+            // the user UI
+            ? "user"
+            // continue install UI
+            : "continueinstall";
 
         private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
         {
@@ -200,40 +194,34 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             var installState = InstallState.Unknown;
 
-
-            // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
-            // exception in the installer.
-
-            var databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
-
-            var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
-            if (hasConnString)
+            if (_databaseBuilder.IsDatabaseConfigured)
             {
                 installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
             }
 
-            var connStringConfigured = databaseSettings?.IsConnectionStringConfigured() ?? false;
-            if (connStringConfigured)
+            var umbracoConnectionString = _connectionStrings.CurrentValue;
+
+            var isConnectionStringConfigured = umbracoConnectionString.IsConnectionStringConfigured();
+            if (isConnectionStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
             }
 
-
-            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
-            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings?.ConnectionString, factory);
-            if (canConnect)
+            var factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
+            var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
+            if (isConnectionAvailable)
             {
                 installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
             }
 
-            var umbracoInstalled = canConnect ? _databaseBuilder.IsUmbracoInstalled() : false;
-            if (umbracoInstalled)
+            var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
+            if (isUmbracoInstalled)
             {
                 installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
             }
 
-            var hasNonDefaultUser = umbracoInstalled ? _databaseBuilder.HasSomeNonDefaultUser() : false;
-            if (hasNonDefaultUser)
+            var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
+            if (hasSomeNonDefaultUser)
             {
                 installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
             }
@@ -245,14 +233,12 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         {
             var installState = GetInstallState();
 
-            return installState.HasFlag(InstallState.Unknown)
-                || !installState.HasFlag(InstallState.UmbracoInstalled);
+            return installState.HasFlag(InstallState.Unknown) || !installState.HasFlag(InstallState.UmbracoInstalled);
         }
 
         public override bool RequiresExecution(UserModel model)
         {
             var installState = GetInstallState();
-
             if (installState.HasFlag(InstallState.Unknown))
             {
                 // In this one case when it's a brand new install and nothing has been configured, make sure the
@@ -260,8 +246,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
             }
 
-            return installState.HasFlag(InstallState.Unknown)
-                || !installState.HasFlag(InstallState.HasNonDefaultUser);
+            return installState.HasFlag(InstallState.Unknown) || !installState.HasFlag(InstallState.HasNonDefaultUser);
         }
 
         [Flags]

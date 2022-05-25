@@ -155,28 +155,24 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var connectionString = providerMeta.GenerateConnectionString(databaseSettings);
             var providerName = databaseSettings.ProviderName ?? providerMeta.ProviderName;
 
-            if (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName!))
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(providerName) ||
+                (providerMeta.RequiresConnectionTest && !CanConnect(connectionString, providerName)))
             {
                 return false;
             }
 
             if (!isTrialRun)
             {
-                _configManipulator.SaveConnectionString(connectionString!, providerName);
-                Configure(connectionString!, providerName, _globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
+                _configManipulator.SaveConnectionString(connectionString, providerName);
+                Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
             }
 
             return true;
         }
 
-        private void Configure(string connectionString, string? providerName, bool installMissingDatabase)
+        private void Configure(bool installMissingDatabase)
         {
-            // Update existing connection string
-            var umbracoConnectionString = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
-            umbracoConnectionString.ConnectionString = connectionString;
-            umbracoConnectionString.ProviderName = providerName;
-
-            _databaseFactory.Configure(umbracoConnectionString);
+            _databaseFactory.Configure(_connectionStrings.CurrentValue);
 
             if (installMissingDatabase)
             {

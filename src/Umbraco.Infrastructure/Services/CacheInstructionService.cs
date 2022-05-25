@@ -314,12 +314,12 @@ namespace Umbraco.Cms
             private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
             {
                 var result = new List<RefreshInstruction>();
-                if (jsonInstructions is not null)
+                if (jsonInstructions is null)
                 {
                     return result;
                 }
 
-                foreach (JToken jsonItem in jsonInstructions!)
+                foreach (JToken jsonItem in jsonInstructions)
                 {
                     // Could be a JObject in which case we can convert to a RefreshInstruction.
                     // Otherwise it could be another JArray - in which case we'll iterate that.
