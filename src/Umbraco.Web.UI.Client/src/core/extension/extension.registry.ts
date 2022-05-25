@@ -8,7 +8,7 @@ export interface UmbExtensionManifestBase {
   type: string;
   alias: string;
   name: string;
-  js?: string;
+  js?: string | (() => Promise<unknown>);
   elementName?: string;
   meta: unknown;
 }

@@ -32,6 +32,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Content',
       name: 'Content',
       elementName: 'umb-content-section',
+      js: () => import('./content/content-section.element'),
       meta: {
         weight: 50
       }
@@ -41,6 +42,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Media',
       name: 'Media',
       elementName: 'umb-media-section',
+      js: () => import('./media/media-section.element'),
       meta: {
         weight: 40
       }
@@ -59,6 +61,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Settings',
       name: 'Settings',
       elementName: 'umb-settings-section',
+      js: () => import('./settings/settings-section.element'),
       meta: {
         weight: 20
       }
@@ -66,9 +69,6 @@ const registerInternalManifests = async () => {
   ];
   manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
 
-
-
-  
   extensionRegistry.register({
     type: 'propertyEditor',
     alias: 'Umb.PropertyEditor.MyPropertyEditor',
@@ -77,7 +77,7 @@ const registerInternalManifests = async () => {
     meta: {
       test: 20
     }
-  })
+  });
 }
 
 const setup = async () => {
