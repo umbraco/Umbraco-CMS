@@ -1,4 +1,5 @@
 import { Observable, ReplaySubject } from 'rxjs';
+
 import { UmbRouterBeforeEnterEvent } from './router-before-enter.event';
 import { UmbRouterBeforeLeaveEvent } from './router-before-leave.event';
 
@@ -10,7 +11,7 @@ export interface UmbRoute {
 
 export interface UmbRouteLocation {
   pathname: string;
-  params: object;
+  params: Record<string, any>;
   fullPath: string;
   route: UmbRoute;
 }
