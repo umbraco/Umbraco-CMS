@@ -1,5 +1,5 @@
 import { worker } from './mocks/browser';
-import { UmbExtensionRegistry, UmbExtensionManifest } from './core/extension';
+import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestCore } from './core/extension';
 
 const extensionRegistry = new UmbExtensionRegistry();
 
@@ -26,7 +26,7 @@ const registerExtensionManifestsFromServer = async () => {
 
 const registerInternalManifests = async () => {
   // TODO: where do we get these from?
-  const manifests: Array<UmbExtensionManifest> = [
+  const manifests: Array<UmbExtensionManifestCore> = [
     {
       type: 'section',
       alias: 'Umb.Section.Content',
@@ -64,18 +64,26 @@ const registerInternalManifests = async () => {
       }
     }
   ];
-  manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
+  manifests.forEach((manifest: UmbExtensionManifestCore) => extensionRegistry.register<UmbExtensionManifestCore>(manifest));
 
 
-
-  
   extensionRegistry.register({
     type: 'propertyEditor',
     alias: 'Umb.PropertyEditor.MyPropertyEditor',
     name: 'Settings',
     elementName: 'umb-settings-section',
     meta: {
-      test: 20
+      weight: '200'
+    }
+  })
+
+  extensionRegistry.register<UmbExtensionManifest>({
+    type: 'asdf',
+    alias: 'Umb.PropertyEditor.MyPropertyEditor2',
+    name: 'Settings',
+    elementName: 'umb-settings-section',
+    meta: {
+      hello: 'world'
     }
   })
 }
