@@ -777,7 +777,7 @@ public class UsersController : BackOfficeNotificationsController
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
     public IActionResult PostDisableUsers([FromQuery] int[] userIds)
     {
-        Attempt<int?> tryGetCurrentUserId =
+        Attempt<int> tryGetCurrentUserId =
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
         if (tryGetCurrentUserId.Success && userIds.Contains(tryGetCurrentUserId.Result))
         {

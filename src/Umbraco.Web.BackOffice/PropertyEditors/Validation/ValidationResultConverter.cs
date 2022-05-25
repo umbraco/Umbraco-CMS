@@ -139,7 +139,7 @@ internal class ValidationResultConverter : JsonConverter
             var jo = new JObject();
             if (!validationResult?.ErrorMessage.IsNullOrWhiteSpace() ?? false)
             {
-                var errObj = JToken.FromObject(validationResult.ErrorMessage!, camelCaseSerializer);
+                var errObj = JToken.FromObject(validationResult!.ErrorMessage!, camelCaseSerializer);
                 jo.Add("errorMessage", errObj);
             }
 

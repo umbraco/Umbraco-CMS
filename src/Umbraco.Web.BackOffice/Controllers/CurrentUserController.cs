@@ -273,7 +273,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     [AppendUserModifiedHeader]
     public IActionResult PostSetAvatar(IList<IFormFile> file)
     {
-        Attempt<int?>? userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId();
+        Attempt<int>? userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId();
         var result = userId?.ResultOr(0);
         //borrow the logic from the user controller
         return UsersController.PostSetAvatarInternal(
