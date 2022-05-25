@@ -12,6 +12,7 @@ import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension'
 // TODO: lazy load these. How to we handle dynamic import of our typescript file?
 import '../content/content-section.element';
 import '../media/media-section.element';
+import '../settings/settings-section.element';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
