@@ -86,13 +86,13 @@ export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
   private _allowedSection: Array<string> = [];
 
   @state()
-  private _sections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
+  private _sections: Array<UmbExtensionManifest> = [];
 
   @state()
-  private _visibleSections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
+  private _visibleSections: Array<UmbExtensionManifest> = [];
 
   @state()
-  private _extraSections: Array<UmbExtensionManifest<UmbManifestSectionMeta>> = [];
+  private _extraSections: Array<UmbExtensionManifest> = [];
 
   @state()
   private _currentSectionAlias = '';
@@ -124,7 +124,7 @@ export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
     this._open = !this._open;
   }
 
-  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifest<UmbManifestSectionMeta>) {
+  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifest) {
     const tab = e.currentTarget as any;
 
     // TODO: we need to be able to prevent the tab from setting the active state
