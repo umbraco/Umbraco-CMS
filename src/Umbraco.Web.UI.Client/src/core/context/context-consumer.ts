@@ -9,13 +9,13 @@ export class UmbContextConsumer {
 
   /**
    * Creates an instance of UmbContextConsumer.
-   * @param {HTMLElement} element
+   * @param {EventTarget} target
    * @param {string} _contextKey
    * @param {UmbContextCallback} _callback
    * @memberof UmbContextConsumer
    */
   constructor (
-    protected element: HTMLElement,
+    protected target: EventTarget,
     private _contextKey: string,
     private _callback: UmbContextCallback
   ) {
@@ -27,7 +27,7 @@ export class UmbContextConsumer {
    */
    public request() {
     const event = new UmbContextRequestEventImplementation(this._contextKey, this._callback);
-    this.element.dispatchEvent(event);
+    this.target.dispatchEvent(event);
   }
 
   public attach() {

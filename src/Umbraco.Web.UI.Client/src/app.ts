@@ -6,7 +6,7 @@ import './installer/installer.element';
 import './auth/login/login.element';
 import './auth/auth-layout.element';
 import './backoffice/backoffice.element';
-import './backoffice/node-editor.element';
+import './backoffice/node-editor-layout.element';
 
 import { UmbSectionContext } from './section.context';
 
@@ -15,7 +15,14 @@ import { customElement } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { getInitStatus } from './api/fetcher';
-import { isUmbRouterBeforeEnterEvent, UmbRoute, UmbRouteLocation, UmbRouter, UmbRouterBeforeEnterEvent, umbRouterBeforeEnterEventType } from './core/router';
+import {
+  isUmbRouterBeforeEnterEvent,
+  UmbRoute,
+  UmbRouteLocation,
+  UmbRouter,
+  UmbRouterBeforeEnterEvent,
+  umbRouterBeforeEnterEventType,
+} from './core/router';
 import { UmbContextProviderMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
@@ -70,7 +77,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
   private _onBeforeEnter = (event: Event) => {
     if (!isUmbRouterBeforeEnterEvent(event)) return;
     this._handleUnauthorizedNavigation(event);
-  }
+  };
 
   private _handleUnauthorizedNavigation(event: UmbRouterBeforeEnterEvent) {
     if (event.to.route.meta.requiresAuth && !this._isAuthorized()) {
@@ -100,26 +107,24 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
         this._router.push('/install');
         return;
       }
-      
+
       if (!this._isAuthorized() || window.location.pathname === '/install') {
         this._router.push('/login');
       } else {
-        const next = window.location.pathname === '/' ? '/section/Content'  : window.location.pathname;
+        const next = window.location.pathname === '/' ? '/section/Content' : window.location.pathname;
         this._router.push(next);
       }
 
       this._useLocation();
-
     } catch (error) {
       console.log(error);
     }
   }
 
-  private _useLocation () {
+  private _useLocation() {
     this._locationSubscription?.unsubscribe();
-      
-    this._locationSubscription = this._router?.location
-    .subscribe((location: UmbRouteLocation) => {
+
+    this._locationSubscription = this._router?.location.subscribe((location: UmbRouteLocation) => {
       if (location.route.alias === 'login') {
         this._renderView('umb-login');
         return;
@@ -134,7 +139,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     });
   }
 
-  _renderView (view: string) {
+  _renderView(view: string) {
     if (this._view?.tagName === view.toUpperCase()) return;
     this._view = document.createElement(view);
     this.requestUpdate();

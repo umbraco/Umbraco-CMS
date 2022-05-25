@@ -17,7 +17,7 @@ describe('UmbContextProvideEvent', () => {
     expect(event.composed).to.be.true;
   });
 
-  it('is cancelable', () => {
-    expect(event.composed).to.be.false;
+  it('is not cancelable', () => {
+    expect(event.cancelable).to.be.false;
   });
 });

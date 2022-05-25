@@ -1,7 +1,7 @@
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-
+import './content-editor.element';
 @defineElement('umb-content-section')
 export class UmbContentSection extends LitElement {
   static styles = [
@@ -16,7 +16,7 @@ export class UmbContentSection extends LitElement {
   ];
 
   render() {
-    return html`<umb-node-editor></umb-node-editor>`;
+    return html`<umb-content-editor></umb-content-editor>`;
   }
 }
 

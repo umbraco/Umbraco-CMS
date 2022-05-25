@@ -33,7 +33,7 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
   private _sectionContext?: UmbSectionContext;
   private _currentSectionSubscription?: Subscription;
 
-  constructor () {
+  constructor() {
     super();
 
     this.consumeContext('umbSectionContext', (_instance: UmbSectionContext) => {
@@ -42,11 +42,10 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
     });
   }
 
-  private _useCurrentSection () {
+  private _useCurrentSection() {
     this._currentSectionSubscription?.unsubscribe();
 
-    this._currentSectionSubscription = this._sectionContext?.getCurrent()
-    .subscribe(section => {
+    this._currentSectionSubscription = this._sectionContext?.getCurrent().subscribe((section) => {
       this._createSectionElement(section);
     });
   }
@@ -56,12 +55,12 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
     this._currentSectionSubscription?.unsubscribe();
   }
 
-  private async _createSectionElement (section: UmbExtensionManifest<UmbManifestSectionMeta>) {
+  private async _createSectionElement(section: UmbExtensionManifest<UmbManifestSectionMeta>) {
     if (!section) return;
 
     // TODO: How do we handle dynamic imports of our files?
     if (section.js) {
-      await import(/* @vite-ignore */section.js);
+      await import(/* @vite-ignore */ section.js);
     }
 
     if (section.elementName) {
@@ -70,9 +69,7 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
   }
 
   render() {
-    return html`
-      ${ this._sectionElement }
-    `;
+    return html` ${this._sectionElement} `;
   }
 }
 
