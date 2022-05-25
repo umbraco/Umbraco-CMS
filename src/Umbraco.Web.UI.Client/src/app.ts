@@ -10,7 +10,7 @@ import { customElement, state } from 'lit/decorators.js';
 
 import { getInitStatus } from './api/fetcher';
 import { UmbRoute, UmbRouter } from './core/router';
-import { UmbContextProvideMixin } from './core/context';
+import { UmbContextProviderMixin } from './core/context';
 
 const routes: Array<UmbRoute> = [
   {
@@ -29,7 +29,7 @@ const routes: Array<UmbRoute> = [
 
 // Import somewhere else?
 @customElement('umb-app')
-export class UmbApp extends UmbContextProvideMixin(LitElement) {
+export class UmbApp extends UmbContextProviderMixin(LitElement) {
   static styles = css`
     :host,
     #outlet {
@@ -51,7 +51,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.provide('umbExtensionRegistry', window.Umbraco.extensionRegistry);
+    this.provideContext('umbExtensionRegistry', window.Umbraco.extensionRegistry);
   }
 
   protected async firstUpdated(): Promise<void> {
@@ -62,7 +62,7 @@ export class UmbApp extends UmbContextProvideMixin(LitElement) {
     this._router.setRoutes(routes);
 
     // TODO: find a solution for magic strings
-    this.provide('umbRouter', this._router);
+    this.provideContext('umbRouter', this._router);
 
     try {
       const { data } = await getInitStatus({});

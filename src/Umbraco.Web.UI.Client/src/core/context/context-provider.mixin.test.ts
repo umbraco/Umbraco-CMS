@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbContextProvideMixin } from './context-provide.mixin';
+import { UmbContextProviderMixin } from './context-provider.mixin';
 
 class MyClass {
   prop: string;
@@ -9,19 +9,19 @@ class MyClass {
   }
 }
 
-class MyTestProviderElement extends UmbContextProvideMixin(HTMLElement) {
+class MyTestProviderElement extends UmbContextProviderMixin(HTMLElement) {
   constructor() {
     super();
-    this.provide('my-test-context-1', new MyClass('context value 1'));
-    this.provide('my-test-context-2', new MyClass('context value 2'));
+    this.provideContext('my-test-context-1', new MyClass('context value 1'));
+    this.provideContext('my-test-context-2', new MyClass('context value 2'));
   }
 }
 
 customElements.define('my-test-provider-element', MyTestProviderElement);
 
-describe('UmbContextProvideMixin', async () => {
+describe('UmbContextProviderMixin', async () => {
   const element: MyTestProviderElement = await fixture(html`<my-test-provider-element></my-test-provider-element>`);
-  const _providers = element['_providers'];
+  const _providers = (element as any)['_providers'];
 
   it('sets all providers to element', () => {
     expect(_providers.has('my-test-context-1')).to.be.true;
@@ -33,7 +33,7 @@ describe('UmbContextProvideMixin', async () => {
     expect(provider).to.not.be.undefined;
     if (!provider) return;
     expect(provider['_instance'].prop).to.eq('context value 1');
-    element.provide('my-test-context-1', new MyClass('new context value 1'));
+    element.provideContext('my-test-context-1', new MyClass('new context value 1'));
     expect(provider['_instance'].prop).to.eq('context value 1');
   });
 });

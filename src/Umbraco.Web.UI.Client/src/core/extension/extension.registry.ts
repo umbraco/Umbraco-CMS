@@ -21,15 +21,15 @@ export class UmbExtensionRegistry {
   public readonly extensions: Observable<Array<UmbExtensionManifest<unknown>>> = this._extensions.asObservable();
 
   register (manifest: UmbExtensionManifest<unknown>) {
-    const extensions = this._extensions.getValue();
-    const extension = extensions.find(extension => extension.alias === manifest.alias);
+    const extensionsValues = this._extensions.getValue();
+    const extension = extensionsValues.find(extension => extension.alias === manifest.alias);
 
     if (extension) {
       console.error(`Extension with alias ${manifest.alias} is already registered`);
       return;
     }
 
-    this._extensions.next([...extensions, manifest]);
+    this._extensions.next([...extensionsValues, manifest]);
   }
 
   // TODO: implement unregister of extension

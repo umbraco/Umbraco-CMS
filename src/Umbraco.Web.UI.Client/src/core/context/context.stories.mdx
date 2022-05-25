@@ -7,8 +7,8 @@ This system is based on the **Provider Pattern**, This is an event-based protoco
 
 This consists of a provider and a requester:
 
-**Context Requester**
-* A component requiring some data fires a ```umb:context-request``` event.
+**Context Consumer**
+* A component requsting an API fires a ```umb:context-request``` event.
 * The event carries a context value that denotes the data requested and a callback which will receive the data.
 * Providers can attach event listeners for ```umb:context-request``` events to handle them and provide the requested data.
 * Once a provider satisfies a request it calls stopPropagation() on the event.
@@ -26,10 +26,10 @@ For other components to consume a context we need to provide it from a parent co
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UMBContextMixin } from './utils/context';
+import { ContextProviderMixin } from './utils/context';
 import { UMBNotificationService } from './shell/shared/notification';
 
-class UMBAppElement extends UMBContextMixin(LitElement) {
+class UMBAppElement extends ContextProviderMixin(LitElement) {
 
   notificationService: UMBNotificationService = new UMBNotificationService();
 
@@ -46,22 +46,22 @@ class UMBAppElement extends UMBContextMixin(LitElement) {
 
 ### Request context
 
-Contexts shared through the Context API are async. To request a new context send a context request using the ```requestContext``` method from the ```UMBContextRequestMixin```.
+Contexts shared through the Context API are async. To request a new context send a context request using the ```consumeContext``` method from the ```UMBContextConsumerMixin```.
 When a context is resolved the callback given to the method is called with the context.
 Until a requested context is resolved you should make sure to disable or query any functionality using that context.
 
 ```ts
 import { html, LitElement } from 'lit';
 import type { UMBNotificationService } from './shell/shared/notification';
-import { UMBContextRequestMixin } from './utils/context';
+import { UMBContextConsumerMixin } from './utils/context';
 
-class MyElement extends UMBContextRequestMixin(LitElement) {
+class MyElement extends UMBContextConsumerMixin(LitElement) {
 
   private _notificationService: UMBNotificationService;
 
   constructor () {
     super();
-    this.requestContext('umbNotificationService', (api) => {
+    this.consumeContext('umbNotificationService', (api) => {
       this._notificationService = api;
     });
   }
@@ -118,7 +118,7 @@ This example shows how to use the ContextRequester class directly.
 ```ts
 import { html, LitElement } from 'lit';
 import { UMBNotificationService } from './notification.service';
-import { UMBContextRequest } from './utils/context';
+import { UMBContextConsumer } from './utils/context';
 
 class MyElement extends LitElement {
 
@@ -127,7 +127,7 @@ class MyElement extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
-    new UMBContextRequest(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
+    new UMBContextConsumer(this, 'umbNotificationService', (_instance: UMBNotificationService) => {
       this._notificationService = _instance;
     });
   }
