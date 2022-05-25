@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -67,7 +73,7 @@ public class TwoFactorLoginController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserTwoFactorProviderModel>>> Get2FAProvidersForUser(int userId)
     {
-        BackOfficeIdentityUser user = await _backOfficeUserManager.FindByIdAsync(userId.ToString());
+        BackOfficeIdentityUser user = await _backOfficeUserManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
 
         var enabledProviderNameHashSet =
             new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));

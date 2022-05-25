@@ -336,7 +336,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
     {
         BackOfficeIdentityUser identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor
-            .BackOfficeSecurity?.GetUserId().ResultOr(0)?.ToString(CultureInfo.InvariantCulture));
+            .BackOfficeSecurity?.GetUserId().ResultOr(0).ToString(CultureInfo.InvariantCulture));
 
         // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
         // but there didn't used to be)

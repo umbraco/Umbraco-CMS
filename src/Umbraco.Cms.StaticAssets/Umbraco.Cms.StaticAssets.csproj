@@ -14,7 +14,7 @@
       <PackagePath>buildTransitive</PackagePath>
     </None>
   </ItemGroup>
-  
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -63,17 +63,5 @@
       A fix was put in place in Web SDK to update for wwwwroot in case someone runs npm build etc in a target, we're borrowing their trick.
       https://github.com/dotnet/sdk/blob/e2b2b1a4ac56c955b84d62fe71cda3b6f258b42b/src/WebSdk/Publish/Targets/ComputeTargets/Microsoft.NET.Sdk.Publish.ComputeFiles.targets
    -->
-  <Target Name="IncludeUmbracoFolderContent" BeforeTargets="GetCopyToOutputDirectoryItems;GetCopyToPublishDirectoryItems;">
-    <ItemGroup>
-      <_UmbracoFolderFiles Include="umbraco\config\**" />
-      <_UmbracoFolderFiles Include="umbraco\PartialViewMacros\**" />
-      <_UmbracoFolderFiles Include="umbraco\UmbracoBackOffice\**" />
-      <_UmbracoFolderFiles Include="umbraco\UmbracoInstall\**" />
-      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
-      <_UmbracoFolderFiles Include="umbraco\UmbracoWebsite\**" />
-      <_UmbracoFolderFiles Include="umbraco\Licenses\**" />
-      <ContentWithTargetPath Include="@(_UmbracoFolderFiles)" Exclude="@(ContentWithTargetPath)" TargetPath="%(Identity)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-    </ItemGroup>
-  </Target>
 
 </Project>

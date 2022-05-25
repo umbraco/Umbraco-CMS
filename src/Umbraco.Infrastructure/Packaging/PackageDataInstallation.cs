@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   contentTypeService,
                   contentService,
                   propertyEditors,
-                  scopeProvider,
+                  (Umbraco.Cms.Infrastructure.Scoping.IScopeProvider) scopeProvider,
                   shortStringHelper,
                   serializer,
                   mediaService,

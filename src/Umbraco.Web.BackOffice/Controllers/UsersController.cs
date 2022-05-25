@@ -778,8 +778,8 @@ public class UsersController : BackOfficeNotificationsController
     public IActionResult PostDisableUsers([FromQuery] int[] userIds)
     {
         Attempt<int?> tryGetCurrentUserId =
-            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int?>.Fail();
-        if (tryGetCurrentUserId.Success && userIds.Contains(tryGetCurrentUserId.Result!.Value))
+            _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
+        if (tryGetCurrentUserId.Success && userIds.Contains(tryGetCurrentUserId.Result))
         {
             return ValidationProblem("The current user cannot disable itself");
         }
