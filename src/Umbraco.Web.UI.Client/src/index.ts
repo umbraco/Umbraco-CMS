@@ -21,12 +21,12 @@ const registerExtensionManifestsFromServer = async () => {
   // TODO: add schema and use fetcher
   const res = await fetch('/umbraco/backoffice/manifests');
   const { manifests } = await res.json();
-  manifests.forEach((manifest: UmbExtensionManifest<unknown>) => extensionRegistry.register(manifest));
+  manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
 }
 
 const registerInternalManifests = async () => {
   // TODO: where do we get these from?
-  const manifests: Array<UmbExtensionManifest<unknown>> = [
+  const manifests: Array<UmbExtensionManifest> = [
     {
       type: 'section',
       alias: 'Umb.Section.Content',
@@ -64,7 +64,20 @@ const registerInternalManifests = async () => {
       }
     }
   ];
-  manifests.forEach((manifest: UmbExtensionManifest<unknown>) => extensionRegistry.register(manifest));
+  manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
+
+
+
+  
+  extensionRegistry.register({
+    type: 'propertyEditor',
+    alias: 'Umb.Section.Settings',
+    name: 'Settings',
+    elementName: 'umb-settings-section',
+    meta: {
+      test: 20
+    }
+  })
 }
 
 const setup = async () => {
