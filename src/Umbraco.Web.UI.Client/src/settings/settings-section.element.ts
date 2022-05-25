@@ -25,7 +25,9 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
       // Generally that means that a web component must have the ControllerMixin?? and then controllers can easily be attached, they would know about life cycle and thereby be able to unsubscribe on disconnected etc.
       //
       // All code regarding subscription could be boiled down to:
-      //OurUmbracoSubscribeMethod(this, this._extensionRegistry.extensions, (extensions) => {}); // uses `this` to append the subscription to the controller array.
+      // OurUmbracoSubscribeMethod(this, this._extensionRegistry.extensions, (extensions) => {}); // uses `this` to append the subscription to the controller array.
+      // Or:
+      // this.attachSubscription(this._extensionRegistry.extensions, (extensions) => {});
       this._extensionsSubscription = this._extensionRegistry.extensions.subscribe(extensions => {
         this._extensions = [...extensions];// TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
       });
