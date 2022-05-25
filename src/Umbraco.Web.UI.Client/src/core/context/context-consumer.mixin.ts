@@ -3,7 +3,7 @@ import { UmbContextConsumer } from './context-consumer';
 type Constructor<T = HTMLElement> = new (...args: any[]) => T;
 
 export declare class UmbContextConsumerInterface {
-  consumeContext(alias: string, callback?: (_instance: unknown) => void):void;
+  consumeContext(alias: string, callback?: (_instance: any) => void):void;
   whenAvailableOrChanged(contextAliases: string[], callback?: () => void):void;
 }
 

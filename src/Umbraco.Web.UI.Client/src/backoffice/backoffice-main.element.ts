@@ -4,7 +4,7 @@ import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { UmbContextInjectMixin } from '../core/context';
+import { UmbContextConsumerMixin } from '../core/context';
 import { UmbSectionContext } from '../section.context';
 
 import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension';
@@ -14,7 +14,7 @@ import '../content/content-section.element';
 import '../media/media-section.element';
 
 @defineElement('umb-backoffice-main')
-export class UmbBackofficeMain extends UmbContextInjectMixin(LitElement) {
+export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -32,17 +32,13 @@ export class UmbBackofficeMain extends UmbContextInjectMixin(LitElement) {
   private _sectionContext?: UmbSectionContext;
   private _currentSectionSubscription?: Subscription;
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.requestContext('umbRouter');
-    this.requestContext('umbSectionContext');
-  }
+  constructor () {
+    super();
 
-  contextInjected(contexts: Map<string, any>): void {
-    if (contexts.has('umbSectionContext')) {
-      this._sectionContext = contexts.get('umbSectionContext');
+    this.consumeContext('umbSectionContext', (_instance: UmbSectionContext) => {
+      this._sectionContext = _instance;
       this._useCurrentSection();
-    }
+    });
   }
 
   private _useCurrentSection () {
