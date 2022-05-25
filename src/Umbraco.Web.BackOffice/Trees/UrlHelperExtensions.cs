@@ -18,7 +18,7 @@ public static class UrlHelperExtensions
         //and normalizes paths - / is used consistently between trees and editors
         basePath = basePath.TrimStart("~");
         virtualPath = virtualPath?.TrimStart("~");
-        virtualPath = virtualPath?[basePath.Length..];
+        virtualPath = virtualPath?.Substring(basePath.Length);
         virtualPath = virtualPath?.Replace('\\', '/');
 
         //-1 is the default root id for trees

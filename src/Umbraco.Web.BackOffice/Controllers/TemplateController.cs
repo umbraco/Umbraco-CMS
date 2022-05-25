@@ -225,7 +225,7 @@ public class TemplateController : BackOfficeNotificationsController
                             var positionInPath = childTemplate.Path.IndexOf(templateIdInPath) + templateIdInPath.Length;
 
                             //Get the substring of the child & any children (descendants it may have too)
-                            var childTemplatePath = childTemplate.Path[positionInPath..];
+                            var childTemplatePath = childTemplate.Path.Substring(positionInPath);
 
                             //As we are updating the template to be a child of a master
                             //Set the path to the master's path + its current template id + the current child path substring

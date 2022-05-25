@@ -39,8 +39,7 @@ public class BackOfficeAssetsController : UmbracoAuthorizedJsonController
         var cultures = _jsLibFileSystem.GetFiles(path, "*.js").ToList();
         for (var i = 0; i < cultures.Count; i++)
         {
-            cultures[i] = cultures[i]
-[(cultures[i].IndexOf(path, StringComparison.Ordinal) + path.Length + 1)..];
+            cultures[i] = cultures[i].Substring(cultures[i].IndexOf(path, StringComparison.Ordinal) + path.Length + 1);
         }
 
         return cultures;
