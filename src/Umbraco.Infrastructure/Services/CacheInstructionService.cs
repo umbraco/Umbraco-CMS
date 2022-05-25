@@ -319,7 +319,7 @@ namespace Umbraco.Cms
                     return result;
                 }
 
-                foreach (JToken jsonItem in jsonInstructions!)
+                foreach (JToken jsonItem in jsonInstructions)
                 {
                     // Could be a JObject in which case we can convert to a RefreshInstruction.
                     // Otherwise it could be another JArray - in which case we'll iterate that.
