@@ -68,13 +68,12 @@ export const UmbContextConsumerMixin = <T extends Constructor<HTMLElement>>(supe
       this._resolved.clear();
     }
 
-
-    _consumeContextCallback(newAlias, newInstance) {
+    _consumeContextCallback(_newAlias: string, _newInstance: unknown) {
       // TODO: do be done.
     }
 
     // might return a object, so you can unsubscribe.
-    whenAvailableOrChanged(contextAliases: string[]) {
+    whenAvailableOrChanged(_contextAliases: string[]) {
       // TODO: To be done.
     }
   };
