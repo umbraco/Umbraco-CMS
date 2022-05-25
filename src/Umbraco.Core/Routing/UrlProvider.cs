@@ -112,11 +112,9 @@ namespace Umbraco.Cms.Core.Routing
             // be nice with tests, assume things can be null, ultimately fall back to invariant
             // (but only for variant content of course)
             // We need to check all ancestors because urls are variant even for invariant content, if an ancestor is variant.
-            if (content.AncestorsOrSelf().Any(x=>x.ContentType.VariesByCulture()))
+            if (culture == null && content.AncestorsOrSelf().Any(x => x.ContentType.VariesByCulture()))
             {
-
-                if (culture == null)
-                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
             }
 
             if (current == null)
