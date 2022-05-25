@@ -35,10 +35,7 @@ export class UmbBackoffice extends LitElement {
   render() {
     return html`
       <umb-backoffice-header></umb-backoffice-header>
-      <div id="main">
-        <umb-backoffice-sidebar></umb-backoffice-sidebar>
-        <umb-backoffice-main></umb-backoffice-main>
-      </div>
+      <umb-backoffice-main></umb-backoffice-main>
     `;
   }
 }

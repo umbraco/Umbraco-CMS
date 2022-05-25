@@ -3,7 +3,7 @@ import { UmbContextConsumer } from './context-consumer';
 type Constructor<T = HTMLElement> = new (...args: any[]) => T;
 
 export declare class UmbContextConsumerInterface {
-  consumeContext(alias: string, callback?: (_instance: unknown) => void):void;
+  consumeContext(alias: string, callback?: (_instance: any) => void):void;
   whenAvailableOrChanged(contextAliases: string[], callback?: () => void):void;
 }
 
@@ -68,13 +68,12 @@ export const UmbContextConsumerMixin = <T extends Constructor<HTMLElement>>(supe
       this._resolved.clear();
     }
 
-
-    _consumeContextCallback(newAlias, newInstance) {
+    _consumeContextCallback(_newAlias: string, _newInstance: unknown) {
       // TODO: do be done.
     }
 
     // might return a object, so you can unsubscribe.
-    whenAvailableOrChanged(contextAliases: string[]) {
+    whenAvailableOrChanged(_contextAliases: string[]) {
       // TODO: To be done.
     }
   };
