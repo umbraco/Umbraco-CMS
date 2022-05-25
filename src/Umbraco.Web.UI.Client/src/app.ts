@@ -7,6 +7,9 @@ import './auth/login/login.element';
 import './auth/auth-layout.element';
 import './backoffice/backoffice.element';
 import './backoffice/node-editor-layout.element';
+import './property-editors/node-property.element';
+import './property-editors/property-editor-text.element';
+import './property-editors/property-editor-textarea.element';
 
 import { UmbSectionContext } from './section.context';
 
