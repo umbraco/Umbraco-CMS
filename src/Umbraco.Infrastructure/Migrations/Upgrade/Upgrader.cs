@@ -36,6 +36,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// </summary>
         /// <param name="scopeProvider">A scope provider.</param>
         /// <param name="keyValueService">A key-value service.</param>
+        [Obsolete("Please use the Execute method that accepts an Umbraco.Cms.Core.Scoping.ICoreScopeProvider instead.")]
+        public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
+            => Execute(migrationPlanExecutor, (ICoreScopeProvider)scopeProvider, keyValueService);
+
+        /// <summary>
+        /// Executes.
+        /// </summary>
+        /// <param name="scopeProvider">A scope provider.</param>
+        /// <param name="keyValueService">A key-value service.</param>
         public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, ICoreScopeProvider scopeProvider, IKeyValueService keyValueService)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
