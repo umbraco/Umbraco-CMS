@@ -1,13 +1,9 @@
-using System;
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
-namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
+[Flags]
+public enum ContentCacheDataSerializerEntityType
 {
-    [Flags]
-    public enum ContentCacheDataSerializerEntityType
-    {
-        Document = 1,
-        Media = 2,
-        Member = 4
-    }
-
+    Document = 1,
+    Media = 2,
+    Member = 4
 }
