@@ -22,15 +22,6 @@ class UmbNodeProperty extends LitElement {
       .property uui-textarea {
         width: 100%;
       }
-
-      uui-box hr {
-        margin-bottom: var(--uui-size-6);
-      }
-
-      hr {
-        border: 0;
-        border-top: 1px solid var(--uui-color-border-alt);
-      }
     `,
   ];
 

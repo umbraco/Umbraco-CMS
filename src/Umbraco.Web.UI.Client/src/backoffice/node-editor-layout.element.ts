@@ -1,0 +1,88 @@
+import { css, html, LitElement } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { customElement } from 'lit/decorators.js';
+
+import '../properties/node-property.element.ts';
+import '../properties/property-editor-text.element.ts';
+import '../properties/property-editor-textarea.element.ts';
+
+@customElement('umb-node-editor-layout')
+class UmbNodeEditorLayout extends LitElement {
+  static styles = [
+    UUITextStyles,
+    css`
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      #node-editor {
+        background-color: var(--uui-color-background);
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #header {
+        background-color: var(--uui-color-surface);
+        width: 100%;
+        display: flex;
+        flex: none;
+        gap: 16px;
+        align-items: center;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      #content {
+        padding: var(--uui-size-6);
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      #footer {
+        display: flex;
+        flex: none;
+        justify-content: end;
+        align-items: center;
+        height: 70px;
+        width: 100%;
+        gap: 16px;
+        padding-right: 24px;
+        border-top: 1px solid var(--uui-color-border);
+        background-color: var(--uui-color-surface);
+        box-sizing: border-box;
+      }
+    `,
+  ];
+
+  private _onSaveAndPublish() {
+    console.log('Save and publish');
+  }
+
+  render() {
+    return html`
+      <div id="node-editor">
+        <div id="header">
+          <slot name="name"></slot>
+          <slot name="apps"></slot>
+        </div>
+        <uui-scroll-container id="content">
+          <slot name="content"></slot>
+        </uui-scroll-container>
+        <div id="footer">
+          <slot name="actions"></slot>
+        </div>
+      </div>
+    `;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'umb-node-editor-layout': UmbNodeEditorLayout;
+  }
+}
