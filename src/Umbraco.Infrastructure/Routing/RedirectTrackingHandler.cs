@@ -143,27 +143,22 @@ namespace Umbraco.Cms.Core.Routing
                 foreach (var culture in cultures)
                 {
                     var route = contentCache.GetRouteById(publishedContent.Id, culture);
-                    if (IsNotRoute(route))
-                    {
-                        //Retry using all languages, if this is invariant but has a variant ancestor
-                        if (string.IsNullOrEmpty(culture))
-                        {
-                            var languages = _localizationService.GetAllLanguages();
-
-                            foreach (var language in languages)
-                            {
-                                route = contentCache.GetRouteById(publishedContent.Id, language.IsoCode);
-
-                                if (!IsNotRoute(route))
-                                {
-                                    oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] = new ContentKeyAndOldRoute(publishedContent.Key, route);
-                                }
-                            }
-                        }
-                    }
-                    else
+                    if (!IsNotRoute(route))
                     {
                         oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route);
+                    }
+                    else if (string.IsNullOrEmpty(culture))
+                    {
+                        // Retry using all languages, if this is invariant but has a variant ancestor
+                        var languages = _localizationService.GetAllLanguages();
+                        foreach (var language in languages)
+                        {
+                            route = contentCache.GetRouteById(publishedContent.Id, language.IsoCode);
+                            if (!IsNotRoute(route))
+                            {
+                                oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] = new ContentKeyAndOldRoute(publishedContent.Key, route);
+                            }
+                        }
                     }
                 }
             }
