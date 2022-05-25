@@ -7,8 +7,8 @@ This system is based on the **Provider Pattern**, This is an event-based protoco
 
 This consists of a provider and a requester:
 
-**Context Requester**
-* A component requiring some data fires a ```umb:context-request``` event.
+**Context Consumer**
+* A component requsting an API fires a ```umb:context-request``` event.
 * The event carries a context value that denotes the data requested and a callback which will receive the data.
 * Providers can attach event listeners for ```umb:context-request``` events to handle them and provide the requested data.
 * Once a provider satisfies a request it calls stopPropagation() on the event.
@@ -26,10 +26,10 @@ For other components to consume a context we need to provide it from a parent co
 
 ```ts
 import { html, LitElement } from 'lit';
-import { UMBContextMixin } from './utils/context';
+import { ContextProviderMixin } from './utils/context';
 import { UMBNotificationService } from './shell/shared/notification';
 
-class UMBAppElement extends UMBContextMixin(LitElement) {
+class UMBAppElement extends ContextProviderMixin(LitElement) {
 
   notificationService: UMBNotificationService = new UMBNotificationService();
 
