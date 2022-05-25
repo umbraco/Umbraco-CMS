@@ -14,6 +14,9 @@ export const handlers = [
             alias: 'My.Section.Custom',
             name: 'Custom',
             elementName: 'umb-custom-section',
+            meta: {
+              weight: 30
+            }
           },
         ],
       })

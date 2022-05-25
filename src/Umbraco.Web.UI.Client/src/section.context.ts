@@ -14,7 +14,9 @@ export class UmbSectionContext {
   getSections () {
     return this._extensionRegistry.extensions
       .pipe(
-        map((extensions: Array<UmbExtensionManifest<unknown>>) => extensions.filter(extension => extension.type === 'section'))
+        map((extensions: Array<UmbExtensionManifest<unknown>>) => extensions
+          .filter(extension => extension.type === 'section')
+          .sort((a: any, b: any) => b.meta.weight - a.meta.weight))
       );
   }
 
