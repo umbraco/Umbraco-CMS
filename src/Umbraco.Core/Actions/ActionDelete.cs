@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Actions
         /// <summary>
         /// The unique action alias
         /// </summary>
-        private const string ActionAlias = "delete";
+        public const string ActionAlias = "delete";
 
         /// <summary>
         /// The unique action letter
