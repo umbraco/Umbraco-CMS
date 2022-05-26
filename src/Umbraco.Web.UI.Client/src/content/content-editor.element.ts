@@ -53,6 +53,39 @@ class UmbContentEditor extends LitElement {
     console.log('Save and preview');
   }
 
+  private properties = [
+    {
+      label: 'Text string label',
+      description: 'This is the a text string property',
+      dataTypeAlias: 'myTextStringEditor',
+      value: 'hello world'
+    },
+    {
+      label: 'Textarea label',
+      description: 'this is a textarea property',
+      dataTypeAlias: 'myTextAreaEditor',
+      value: 'Teeeeexxxt areaaaaaa'
+    }
+  ]
+
+  /*
+  
+  import { unsafeHTML } from 'lit-html/directives/unsafe-html';
+   
+     // ...
+
+    const template = `
+      <h${this.rank} class="a-heading">
+        <slot></slot>
+      </h${this.rank}>
+    `;
+
+    return html`
+      ${unsafeHTML(template)}
+    `;
+    
+  */
+
   render() {
     return html`
       <umb-node-editor-layout>
@@ -64,13 +97,13 @@ class UmbContentEditor extends LitElement {
         </uui-tab-group>
 
         <uui-box slot="content">
-          <umb-node-property label="Text string label" description="This is the a text string property">
-            <umb-property-editor-text></umb-property-editor-text>
-          </umb-node-property>
-          <hr />
-          <umb-node-property label="Textarea label" description="this is a textarea property">
-            <umb-property-editor-textarea></umb-property-editor-textarea>
-          </umb-node-property>
+          ${this.properties.map(
+            property => html`
+            <umb-node-property label="${property.label}" description="${property.description}">
+              <umb-node-property-control .dataTypeAlias=${property.dataTypeAlias} .value=${property.value}></umb-node-property-control>
+            </umb-node-property>
+            <hr />
+          `)}
         </uui-box>
 
         <div slot="actions">
