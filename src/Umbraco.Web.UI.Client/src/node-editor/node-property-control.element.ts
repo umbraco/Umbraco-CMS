@@ -62,9 +62,10 @@ class UmbNodePropertyControl extends LitElement {
 
       if (this._element) {
         this.shadowRoot?.removeChild(this._element);
+        delete this._element;
       }
       if(this.elementName) {
-        this._element = document.createElement(this.elementName)
+        this._element = document.createElement(this.elementName);
         this.shadowRoot?.appendChild(this._element);
       }
     }
