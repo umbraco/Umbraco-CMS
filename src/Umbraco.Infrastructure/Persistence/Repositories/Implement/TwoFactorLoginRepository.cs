@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
@@ -129,12 +126,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public async Task<IEnumerable<ITwoFactorLogin>> GetByUserOrMemberKeyAsync(Guid userOrMemberKey)
         {
-            var sql = Sql()
-                .Select<TwoFactorLoginDto>()
-                .From<TwoFactorLoginDto>()
-                .Where<TwoFactorLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
-            var dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
-            return dtos.WhereNotNull().Select(Map).WhereNotNull();
+            try
+            {
+                var sql = Sql()
+                    .Select<TwoFactorLoginDto>()
+                    .From<TwoFactorLoginDto>()
+                    .Where<TwoFactorLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
+                var dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
+                return dtos.WhereNotNull().Select(Map).WhereNotNull();
+            }
+
+            // TODO (v11): Remove this as the table should always exist when upgrading from 10.x
+            // SQL Server - table doesn't exist, likely upgrading from < 9.3.0.
+            catch (SqlException ex) when (ex.Number == 208 && ex.Message.Contains(TwoFactorLoginDto.TableName))
+            {
+                return Enumerable.Empty<ITwoFactorLogin>();
+            }
         }
     }
 }
