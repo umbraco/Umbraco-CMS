@@ -65,6 +65,28 @@ const registerInternalManifests = async () => {
       meta: {
         weight: 20
       }
+    },
+    {
+      type: 'dashboard',
+      alias: 'Umb.Dashboard.Welcome',
+      name: 'Welcome',
+      elementName: 'umb-dashboard-welcome',
+      js: () => import('./dashboards/dashboard-welcome.element'),
+      meta: {
+        sections: ['Umb.Section.Content'],
+        weight: 20
+      }
+    },
+    {
+      type: 'dashboard',
+      alias: 'Umb.Dashboard.RedirectManagement',
+      name: 'Redirect Management',
+      elementName: 'umb-dashboard-redirect-management',
+      js: () => import('./dashboards/dashboard-redirect-management.element'),
+      meta: {
+        sections: ['Umb.Section.Content'],
+        weight: 10
+      }
     }
   ];
   manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));

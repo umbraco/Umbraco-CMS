@@ -45,6 +45,16 @@ const routes: Array<UmbRoute> = [
     alias: 'app',
     meta: { requiresAuth: true },
   },
+  {
+    path: '/section/:section/dashboard/:dashboard',
+    alias: 'dashboard',
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/section/:section/node/:nodeId',
+    alias: 'node',
+    meta: { requiresAuth: true },
+  }
 ];
 
 // Import somewhere else?

@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-content-editor')
 class UmbContentEditor extends LitElement {
@@ -40,6 +40,9 @@ class UmbContentEditor extends LitElement {
       }
     `,
   ];
+
+  @property()
+  id!: string;
 
   private _onSaveAndPublish() {
     console.log('Save and publish');
@@ -97,6 +100,7 @@ class UmbContentEditor extends LitElement {
         </uui-tab-group>
 
         <uui-box slot="content">
+          <h1 style="margin-bottom: 40px;">RENDER NODE WITH ID: ${this.id}</h1>
           ${this.properties.map(
             property => html`
             <umb-node-property label="${property.label}" description="${property.description}">
