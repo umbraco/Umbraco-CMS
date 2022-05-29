@@ -216,6 +216,7 @@ function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataForma
         * </pre>
         *
         * @param {String} file path of the file to import
+        * @param {Int?} parentId the int of the parent dictionary item to move incomming dictionary items to
         * @returns {Promise} resourcePromise object.
         *
         */

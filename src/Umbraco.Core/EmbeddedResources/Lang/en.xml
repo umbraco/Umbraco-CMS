@@ -36,6 +36,7 @@
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="chooseWhereToImport">Choose where to import</key>
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="infiniteEditorChooseWhereToCopy">Choose where to copy the selected item(s)</key>
     <key alias="infiniteEditorChooseWhereToMove">Choose where to move the selected item(s)</key>
