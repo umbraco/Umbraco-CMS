@@ -39,7 +39,6 @@ angular.module("umbraco")
           vm.model = response.data;
           vm.state = "confirm";
           vm.uploadStatus = "done";
-          console.log(vm.model)
 
         }, function (err) {
           notificationsService.error(err.data.notifications[0].header, err.data.notifications[0].message);
