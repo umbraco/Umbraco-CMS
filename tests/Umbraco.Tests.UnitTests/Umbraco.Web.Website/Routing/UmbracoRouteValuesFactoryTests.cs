@@ -22,75 +22,75 @@ using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing;
+
+[TestFixture]
+public class UmbracoRouteValuesFactoryTests
 {
-
-    [TestFixture]
-    public class UmbracoRouteValuesFactoryTests
+    private UmbracoRouteValuesFactory GetFactory(
+        out Mock<IPublishedRouter> publishedRouter,
+        out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults,
+        out IPublishedRequest request)
     {
-        private UmbracoRouteValuesFactory GetFactory(
-            out Mock<IPublishedRouter> publishedRouter,
-            out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults,
-            out IPublishedRequest request)
+        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
+        builder.SetPublishedContent(Mock.Of<IPublishedContent>());
+        var builtRequest = request = builder.Build();
+
+        publishedRouter = new Mock<IPublishedRouter>();
+        publishedRouter.Setup(x => x.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null))
+            .Returns((IPublishedRequest r, IPublishedContent c) => Task.FromResult(builtRequest))
+            .Verifiable();
+
+        renderingDefaults =
+            Mock.Of<IOptions<UmbracoRenderingDefaultsOptions>>(x =>
+                x.Value.DefaultControllerType == typeof(RenderController));
+
+        // add the default one
+        var actionDescriptors = new List<ActionDescriptor>
         {
-            var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
-            builder.SetPublishedContent(Mock.Of<IPublishedContent>());
-            IPublishedRequest builtRequest = request = builder.Build();
-
-            publishedRouter = new Mock<IPublishedRouter>();
-            publishedRouter.Setup(x => x.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null))
-                .Returns((IPublishedRequest r, IPublishedContent c) => Task.FromResult(builtRequest))
-                .Verifiable();
-
-            renderingDefaults = Mock.Of<IOptions<UmbracoRenderingDefaultsOptions>>(x => x.Value.DefaultControllerType == typeof(RenderController));
-
-            // add the default one
-            var actionDescriptors = new List<ActionDescriptor>
+            new ControllerActionDescriptor
             {
-                new ControllerActionDescriptor
-                {
-                    ControllerName = ControllerExtensions.GetControllerName<RenderController>(),
-                    ActionName = nameof(RenderController.Index),
-                    ControllerTypeInfo = typeof(RenderController).GetTypeInfo()
-                }
-            };
-            var actionSelector = new Mock<IActionSelector>();
-            actionSelector.Setup(x => x.SelectCandidates(It.IsAny<RouteContext>())).Returns(actionDescriptors);
+                ControllerName = ControllerExtensions.GetControllerName<RenderController>(),
+                ActionName = nameof(RenderController.Index),
+                ControllerTypeInfo = typeof(RenderController).GetTypeInfo()
+            }
+        };
+        var actionSelector = new Mock<IActionSelector>();
+        actionSelector.Setup(x => x.SelectCandidates(It.IsAny<RouteContext>())).Returns(actionDescriptors);
 
-            var factory = new UmbracoRouteValuesFactory(
-                renderingDefaults,
-                Mock.Of<IShortStringHelper>(),
-                new UmbracoFeatures(),
-                new ControllerActionSearcher(
-                    new NullLogger<ControllerActionSearcher>(),
-                    actionSelector.Object),
-                publishedRouter.Object);
+        var factory = new UmbracoRouteValuesFactory(
+            renderingDefaults,
+            Mock.Of<IShortStringHelper>(),
+            new UmbracoFeatures(),
+            new ControllerActionSearcher(
+                new NullLogger<ControllerActionSearcher>(),
+                actionSelector.Object),
+            publishedRouter.Object);
 
-            return factory;
-        }
+        return factory;
+    }
 
-        [Test]
-        public async Task Update_Request_To_Not_Found_When_No_Template()
-        {
-            UmbracoRouteValuesFactory factory = GetFactory(out Mock<IPublishedRouter> publishedRouter, out _, out IPublishedRequest request);
+    [Test]
+    public async Task Update_Request_To_Not_Found_When_No_Template()
+    {
+        var factory = GetFactory(out var publishedRouter, out _, out var request);
 
-            UmbracoRouteValues result = await factory.CreateAsync(new DefaultHttpContext(), request);
+        var result = await factory.CreateAsync(new DefaultHttpContext(), request);
 
-            // The request has content, no template, no hijacked route and no disabled template features so UpdateRequestToNotFound will be called
-            publishedRouter.Verify(m => m.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null), Times.Once);
-        }
+        // The request has content, no template, no hijacked route and no disabled template features so UpdateRequestToNotFound will be called
+        publishedRouter.Verify(m => m.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null), Times.Once);
+    }
 
-        [Test]
-        public async Task Adds_Result_To_Route_Value_Dictionary()
-        {
-            UmbracoRouteValuesFactory factory = GetFactory(out _, out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults, out IPublishedRequest request);
+    [Test]
+    public async Task Adds_Result_To_Route_Value_Dictionary()
+    {
+        var factory = GetFactory(out _, out var renderingDefaults, out var request);
 
-            UmbracoRouteValues result = await factory.CreateAsync(new DefaultHttpContext(), request);
+        var result = await factory.CreateAsync(new DefaultHttpContext(), request);
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(renderingDefaults.Value.DefaultControllerType, result.ControllerType);
-            Assert.AreEqual(UmbracoRouteValues.DefaultActionName, result.ActionName);
-            Assert.IsNull(result.TemplateName);
-        }
+        Assert.IsNotNull(result);
+        Assert.AreEqual(renderingDefaults.Value.DefaultControllerType, result.ControllerType);
+        Assert.AreEqual(UmbracoRouteValues.DefaultActionName, result.ActionName);
+        Assert.IsNull(result.TemplateName);
     }
 }

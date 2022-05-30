@@ -5,18 +5,18 @@ using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
-{
-    [TestFixture]
-    public class JsInitializationTests
-    {
-        [Test]
-        public void Parse_Main()
-        {
-            var result = BackOfficeJavaScriptInitializer.WriteScript("[World]", "Hello", "Blah");
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration;
 
-            Assert.AreEqual(
-                @"LazyLoad.js([World], function () {
+[TestFixture]
+public class JsInitializationTests
+{
+    [Test]
+    public void Parse_Main()
+    {
+        var result = BackOfficeJavaScriptInitializer.WriteScript("[World]", "Hello", "Blah");
+
+        Assert.AreEqual(
+            @"LazyLoad.js([World], function () {
     //we need to set the legacy UmbClientMgr path
     if ((typeof UmbClientMgr) !== ""undefined"") {
         UmbClientMgr.setUmbracoPath('Hello');
@@ -28,6 +28,5 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 
     });
 });".StripWhitespace(), result.StripWhitespace());
-        }
     }
 }

@@ -58,7 +58,7 @@ public class ConfigureConnectionStringsTests
         var config = new Dictionary<string, string>
         {
             [$"ConnectionStrings:{UmbracoDbDsn}"] = aConnectionString,
-            [$"ConnectionStrings:{UmbracoDbDsn}_ProviderName"] = aProviderName,
+            [$"ConnectionStrings:{UmbracoDbDsn}_ProviderName"] = aProviderName
         };
 
         var result = GetOptions(config);
@@ -83,8 +83,9 @@ public class ConfigureConnectionStringsTests
         AppDomain.CurrentDomain.SetData("DataDirectory", aDataDirectory);
         var config = new Dictionary<string, string>
         {
-            [$"ConnectionStrings:{UmbracoDbDsn}"] = $"{ConnectionStrings.DataDirectoryPlaceholder}/{aConnectionString}",
-            [$"ConnectionStrings:{UmbracoDbDsn}_ProviderName"] = aProviderName,
+            [$"ConnectionStrings:{UmbracoDbDsn}"] =
+                $"{ConnectionStrings.DataDirectoryPlaceholder}/{aConnectionString}",
+            [$"ConnectionStrings:{UmbracoDbDsn}_ProviderName"] = aProviderName
         };
 
         var result = GetOptions(config);
@@ -95,7 +96,8 @@ public class ConfigureConnectionStringsTests
             Assert.That(result.Value.ConnectionString, Contains.Substring($"{aDataDirectory}/{aConnectionString}"));
 
             Assert.That(result.Get(UmbracoDbDsn).ConnectionString, Is.Not.Null);
-            Assert.That(result.Get(UmbracoDbDsn).ConnectionString, Contains.Substring($"{aDataDirectory}/{aConnectionString}"));
+            Assert.That(result.Get(UmbracoDbDsn).ConnectionString,
+                Contains.Substring($"{aDataDirectory}/{aConnectionString}"));
         });
     }
 }

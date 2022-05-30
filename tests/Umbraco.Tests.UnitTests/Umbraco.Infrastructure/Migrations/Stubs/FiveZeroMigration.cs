@@ -3,17 +3,16 @@
 
 using Umbraco.Cms.Infrastructure.Migrations;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs
-{
-    public class FiveZeroMigration : MigrationBase
-    {
-        public FiveZeroMigration(IMigrationContext context)
-            : base(context)
-        {
-        }
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
-        protected override void Migrate()
-        {
-        }
+public class FiveZeroMigration : MigrationBase
+{
+    public FiveZeroMigration(IMigrationContext context)
+        : base(context)
+    {
+    }
+
+    protected override void Migrate()
+    {
     }
 }

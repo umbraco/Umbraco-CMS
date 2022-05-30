@@ -5,49 +5,48 @@ using NUnit.Framework;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers;
+
+[TestFixture]
+public class ContentTypeMapperTest
 {
-    [TestFixture]
-    public class ContentTypeMapperTest
+    [Test]
+    public void Can_Map_Id_Property()
     {
-        [Test]
-        public void Can_Map_Id_Property()
-        {
-            // Act
-            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
+        // Act
+        var column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Id");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
+    }
 
-        [Test]
-        public void Can_Map_Name_Property()
-        {
-            // Act
-            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Name");
+    [Test]
+    public void Can_Map_Name_Property()
+    {
+        // Act
+        var column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Name");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[text]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[umbracoNode].[text]"));
+    }
 
-        [Test]
-        public void Can_Map_Thumbnail_Property()
-        {
-            // Act
-            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Thumbnail");
+    [Test]
+    public void Can_Map_Thumbnail_Property()
+    {
+        // Act
+        var column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Thumbnail");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentType].[thumbnail]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[cmsContentType].[thumbnail]"));
+    }
 
-        [Test]
-        public void Can_Map_Description_Property()
-        {
-            // Act
-            string column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Description");
+    [Test]
+    public void Can_Map_Description_Property()
+    {
+        // Act
+        var column = new ContentTypeMapper(TestHelper.GetMockSqlContext(), TestHelper.CreateMaps()).Map("Description");
 
-            // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentType].[description]"));
-        }
+        // Assert
+        Assert.That(column, Is.EqualTo("[cmsContentType].[description]"));
     }
 }
