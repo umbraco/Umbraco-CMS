@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { components } from '../../../schemas/generated-schema';
+import { VersionResponse } from '../../models';
 
 // TODO: set up schema
 export const handlers = [
@@ -7,9 +7,9 @@ export const handlers = [
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json({
+      ctx.json<VersionResponse>({
         version: '13.0.0',
-      } as components['schemas']['VersionResponse'])
+      })
     );
   }),
 ];

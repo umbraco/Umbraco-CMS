@@ -1,12 +1,12 @@
 import { rest } from 'msw';
-import { components } from '../../../schemas/generated-schema';
+import { UmbracoInstaller } from '../../models';
 
 export const handlers = [
   rest.get('/umbraco/backoffice/install', (_req, res, ctx) => {
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json({
+      ctx.json<UmbracoInstaller>({
         user: {
           minCharLength: 2,
           minNonAlphaNumericLength: 0,
@@ -33,7 +33,6 @@ export const handlers = [
             displayName: 'SQLite',
             defaultDatabaseName: 'Umbraco',
             providerName: 'Microsoft.Data.SQLite',
-            supportsQuickInstall: true,
             isAvailable: true,
             requiresServer: false,
             serverPlaceholder: null,
@@ -47,7 +46,6 @@ export const handlers = [
             displayName: 'SQL Server',
             defaultDatabaseName: '',
             providerName: 'Microsoft.Data.SqlClient',
-            supportsQuickInstall: false,
             isAvailable: true,
             requiresServer: true,
             serverPlaceholder: '(local)\\SQLEXPRESS',
@@ -69,7 +67,7 @@ export const handlers = [
             requiresConnectionTest: true,
           },
         ],
-      } as components['schemas']['UmbracoInstaller'])
+      })
     );
   }),
 
@@ -78,5 +76,5 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(201)
     );
-  })
+  }),
 ];

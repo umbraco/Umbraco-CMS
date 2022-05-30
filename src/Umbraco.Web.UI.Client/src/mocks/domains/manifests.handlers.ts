@@ -1,5 +1,4 @@
 import { rest } from 'msw';
-import { components } from '../../../schemas/generated-schema';
 
 // TODO: set up schema
 export const handlers = [
@@ -15,8 +14,8 @@ export const handlers = [
             name: 'Custom',
             elementName: 'umb-custom-section',
             meta: {
-              weight: 30
-            }
+              weight: 30,
+            },
           },
         ],
       })

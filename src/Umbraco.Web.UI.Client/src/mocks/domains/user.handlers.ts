@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { components } from '../../../schemas/generated-schema';
+import { AllowedSectionsResponse, UserResponse } from '../../models';
 
 export const handlers = [
   rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
@@ -35,19 +35,19 @@ export const handlers = [
     // If authenticated, return a mocked user details
     return res(
       ctx.status(200),
-      ctx.json({
+      ctx.json<UserResponse>({
         username: 'admin',
         role: 'administrator',
-      } as components['schemas']['UserResponse'])
+      })
     );
   }),
 
   rest.get('/umbraco/backoffice/user/sections', (_req, res, ctx) => {
     return res(
       ctx.status(200),
-      ctx.json({
+      ctx.json<AllowedSectionsResponse>({
         sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-      } as components['schemas']['AllowedSectionsResponse'])
+      })
     );
-  })
+  }),
 ];
