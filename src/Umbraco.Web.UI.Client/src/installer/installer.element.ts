@@ -6,8 +6,8 @@ import './installer-user.element';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { getInstall, postInstall } from '../api/fetcher';
-import { PostInstallRequest, UmbracoInstaller } from '../models';
+import { getInstall, postInstall } from '../core/api/fetcher';
+import { PostInstallRequest, UmbracoInstaller } from '../core/models';
 
 @customElement('umb-installer')
 export class UmbInstaller extends LitElement {

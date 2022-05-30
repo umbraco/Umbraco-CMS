@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { InitResponse } from '../models';
+import { InitResponse } from '../core/models';
 import { handlers as contentHandlers } from './domains/content.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import { handlers as manifestsHandlers } from './domains/manifests.handlers';

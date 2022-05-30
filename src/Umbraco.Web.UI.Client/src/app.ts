@@ -14,7 +14,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { getInitStatus } from './api/fetcher';
+import { getInitStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import {
   isUmbRouterBeforeEnterEvent,

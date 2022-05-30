@@ -4,7 +4,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
-import { getUserSections } from '../api/fetcher';
+import { getUserSections } from '../core/api/fetcher';
 import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { UmbSectionContext } from '../section.context';

@@ -1,4 +1,4 @@
-import { components } from '../../schemas/generated-schema';
+import { components } from '../../../schemas/generated-schema';
 
 export type PostInstallRequest = components['schemas']['UmbracoPerformInstallRequest'];
 export type InitResponse = components['schemas']['InitResponse'];

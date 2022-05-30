@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { VersionResponse } from '../../models';
+import { VersionResponse } from '../../core/models';
 
 // TODO: set up schema
 export const handlers = [

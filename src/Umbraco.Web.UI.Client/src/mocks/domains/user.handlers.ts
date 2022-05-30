@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { AllowedSectionsResponse, UserResponse } from '../../models';
+import { AllowedSectionsResponse, UserResponse } from '../../core/models';
 
 export const handlers = [
   rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
