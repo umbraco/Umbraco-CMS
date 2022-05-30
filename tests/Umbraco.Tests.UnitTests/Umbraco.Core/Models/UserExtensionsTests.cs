@@ -33,7 +33,7 @@ public class UserExtensionsTests
         bool outcome)
     {
         var user = _userBuilder
-            .WithStartContentIds(new[] {startNodeId})
+            .WithStartContentIds(new[] { startNodeId })
             .Build();
 
         var content = Mock.Of<IContent>(c => c.Path == contentPath && c.Id == 5);
@@ -42,7 +42,7 @@ public class UserExtensionsTests
         esmock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns<UmbracoObjectTypes, int[]>((type, ids) =>
-                new[] {new TreeEntityPath {Id = startNodeId, Path = startNodePath}});
+                new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
 
         Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object, AppCaches.Disabled));
     }
@@ -91,9 +91,9 @@ public class UserExtensionsTests
         esmock
             .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns<UmbracoObjectTypes, int[]>((type, ids) =>
-                paths.Where(x => ids.Contains(x.Key)).Select(x => new TreeEntityPath {Id = x.Key, Path = x.Value}));
+                paths.Where(x => ids.Contains(x.Key)).Select(x => new TreeEntityPath { Id = x.Key, Path = x.Value }));
 
-        var comma = new[] {','};
+        var comma = new[] { ',' };
 
         var groupSnA = groupSn.Split(comma, StringSplitOptions.RemoveEmptyEntries)
             .Select(x => int.Parse(x, CultureInfo.InvariantCulture)).ToArray();

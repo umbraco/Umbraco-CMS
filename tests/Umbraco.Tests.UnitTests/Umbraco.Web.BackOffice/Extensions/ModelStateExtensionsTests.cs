@@ -113,7 +113,7 @@ public class ModelStateExtensionsTests
         var localizationService = new Mock<ILocalizationService>();
         localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-        ms.AddPropertyError(new ValidationResult("no header image", new[] {"myField"}), "headerImage", null,
+        ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", null,
             "mySegment"); // invariant/segment property
 
         Assert.AreEqual("_Properties.headerImage.invariant.mySegment.myField", ms.Keys.First());
@@ -126,7 +126,7 @@ public class ModelStateExtensionsTests
         var localizationService = new Mock<ILocalizationService>();
         localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns("en-US");
 
-        ms.AddPropertyError(new ValidationResult("no header image", new[] {"myField"}), "headerImage", "en-US",
+        ms.AddPropertyError(new ValidationResult("no header image", new[] { "myField" }), "headerImage", "en-US",
             "mySegment"); // variant/segment property
 
         Assert.AreEqual("_Properties.headerImage.en-US.mySegment.myField", ms.Keys.First());

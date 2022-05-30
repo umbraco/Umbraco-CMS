@@ -36,7 +36,7 @@ public class NestedContentTests
         PropertyEditorCollection editors = null;
         var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>());
-        editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] {editor}));
+        editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
         var serializer = new ConfigurationEditorJsonSerializer();
 
@@ -47,7 +47,7 @@ public class NestedContentTests
             {
                 MinItems = 1,
                 MaxItems = 1,
-                ContentTypes = new[] {new NestedContentConfiguration.ContentType {Alias = "contentN1"}}
+                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } }
             }
         };
 
@@ -58,23 +58,24 @@ public class NestedContentTests
             {
                 MinItems = 1,
                 MaxItems = 99,
-                ContentTypes = new[] {new NestedContentConfiguration.ContentType {Alias = "contentN1"}}
+                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } }
             }
         };
 
         var dataType3 =
             new DataType(
                 new TextboxPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(),
-                    Mock.Of<IEditorConfigurationParser>()), serializer) {Id = 3};
+                    Mock.Of<IEditorConfigurationParser>()), serializer)
+            { Id = 3 };
 
         // mocked dataservice returns nested content preValues
         var dataTypeServiceMock = new Mock<IDataTypeService>();
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] {dataType1, dataType2, dataType3});
+        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2, dataType3 });
 
         var publishedModelFactory = new Mock<IPublishedModelFactory>();
 
         // mocked model factory returns model type
-        var modelTypes = new Dictionary<string, Type> {{"contentN1", typeof(TestElementModel)}};
+        var modelTypes = new Dictionary<string, Type> { { "contentN1", typeof(TestElementModel) } };
         publishedModelFactory
             .Setup(x => x.MapModelType(It.IsAny<Type>()))
             .Returns((Type type) => ModelType.Map(type, modelTypes));

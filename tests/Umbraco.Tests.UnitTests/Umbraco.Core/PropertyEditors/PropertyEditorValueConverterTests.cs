@@ -73,9 +73,9 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
-    [TestCase("[\"apples\"]", new[] {"apples"})]
-    [TestCase("[\"apples\",\"oranges\"]", new[] {"apples", "oranges"})]
-    [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] {"apples", "oranges", "pears"})]
+    [TestCase("[\"apples\"]", new[] { "apples" })]
+    [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
+    [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
     [TestCase("", new string[] { })]
     [TestCase(null, new string[] { })]
     public void CanConvertCheckboxListPropertyEditor(object value, IEnumerable<string> expected)
@@ -86,9 +86,9 @@ public class PropertyEditorValueConverterTests
         Assert.AreEqual(expected, result);
     }
 
-    [TestCase("[\"apples\"]", new[] {"apples"})]
-    [TestCase("[\"apples\",\"oranges\"]", new[] {"apples", "oranges"})]
-    [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] {"apples", "oranges", "pears"})]
+    [TestCase("[\"apples\"]", new[] { "apples" })]
+    [TestCase("[\"apples\",\"oranges\"]", new[] { "apples", "oranges" })]
+    [TestCase("[\"apples\",\"oranges\",\"pears\"]", new[] { "apples", "oranges", "pears" })]
     [TestCase("", new string[] { })]
     [TestCase(null, new string[] { })]
     public void CanConvertDropdownListMultiplePropertyEditor(object value, IEnumerable<string> expected)
@@ -96,12 +96,12 @@ public class PropertyEditorValueConverterTests
         var mockPublishedContentTypeFactory = new Mock<IPublishedContentTypeFactory>();
         mockPublishedContentTypeFactory.Setup(x => x.GetDataType(123))
             .Returns(new PublishedDataType(123, "test",
-                new Lazy<object>(() => new DropDownFlexibleConfiguration {Multiple = true})));
+                new Lazy<object>(() => new DropDownFlexibleConfiguration { Multiple = true })));
 
         var publishedPropType = new PublishedPropertyType(
             new PublishedContentType(Guid.NewGuid(), 1234, "test", PublishedItemType.Content,
                 Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing),
-            new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar) {DataTypeId = 123},
+            new PropertyType(Mock.Of<IShortStringHelper>(), "test", ValueStorageType.Nvarchar) { DataTypeId = 123 },
             new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
             Mock.Of<IPublishedModelFactory>(),
             mockPublishedContentTypeFactory.Object);

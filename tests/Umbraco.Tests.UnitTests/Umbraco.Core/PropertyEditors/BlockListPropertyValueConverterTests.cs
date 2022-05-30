@@ -85,7 +85,7 @@ public class BlockListPropertyValueConverterTests
 
     private BlockListConfiguration ConfigForSingle() => new()
     {
-        Blocks = new[] {new BlockListConfiguration.BlockConfiguration {ContentElementTypeKey = _contentKey1}}
+        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } }
     };
 
     private IPublishedPropertyType GetPropertyType(BlockListConfiguration config)

@@ -77,16 +77,16 @@ public class RoutableDocumentFilterTests
     [TestCase("/api/WebApiTest/Index/1234", false)]
     public void Is_Reserved_By_Route(string url, bool isReserved)
     {
-        var globalSettings = new GlobalSettings {ReservedPaths = string.Empty, ReservedUrls = string.Empty};
-        var routingSettings = new WebRoutingSettings {TryMatchingEndpointsForAllPages = true};
+        var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+        var routingSettings = new WebRoutingSettings { TryMatchingEndpointsForAllPages = true };
 
         var endpoint1 = CreateEndpoint(
             "Umbraco/RenderMvc/{action?}/{id?}",
-            new {controller = "RenderMvc"});
+            new { controller = "RenderMvc" });
 
         var endpoint2 = CreateEndpoint(
             "api/{controller?}/{id?}",
-            new {action = "Index"},
+            new { action = "Index" },
             1);
 
         var endpointDataSource = new DefaultEndpointDataSource(endpoint1, endpoint2);
@@ -110,12 +110,12 @@ public class RoutableDocumentFilterTests
     [TestCase("/umbraco/default/blah/123", false)]
     public void Is_Reserved_By_Default_Back_Office_Route(string url, bool isReserved)
     {
-        var globalSettings = new GlobalSettings {ReservedPaths = string.Empty, ReservedUrls = string.Empty};
-        var routingSettings = new WebRoutingSettings {TryMatchingEndpointsForAllPages = true};
+        var globalSettings = new GlobalSettings { ReservedPaths = string.Empty, ReservedUrls = string.Empty };
+        var routingSettings = new WebRoutingSettings { TryMatchingEndpointsForAllPages = true };
 
         var endpoint1 = CreateEndpoint(
             "umbraco/{action?}/{id?}",
-            new {controller = "BackOffice"});
+            new { controller = "BackOffice" });
 
         var endpointDataSource = new DefaultEndpointDataSource(endpoint1);
 

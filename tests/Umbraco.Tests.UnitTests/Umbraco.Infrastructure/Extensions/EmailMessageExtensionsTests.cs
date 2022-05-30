@@ -41,16 +41,16 @@ public class EmailMessageExtensionsTests
     public void Can_Construct_MimeMessage_From_Full_EmailMessage()
     {
         const string from = "from@email.com";
-        string[] to = {"to@email.com", "to2@email.com"};
-        string[] cc = {"cc@email.com", "cc2@email.com"};
-        string[] bcc = {"bcc@email.com", "bcc2@email.com", "bcc3@email.com", "invalid@email@address"};
-        string[] replyTo = {"replyto@email.com"};
+        string[] to = { "to@email.com", "to2@email.com" };
+        string[] cc = { "cc@email.com", "cc2@email.com" };
+        string[] bcc = { "bcc@email.com", "bcc2@email.com", "bcc3@email.com", "invalid@email@address" };
+        string[] replyTo = { "replyto@email.com" };
         const string subject = "Subject";
         const string body = "Message";
         const bool isBodyHtml = false;
 
         using var attachmentStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-        var attachments = new List<EmailMessageAttachment> {new(attachmentStream, "test.txt")};
+        var attachments = new List<EmailMessageAttachment> { new(attachmentStream, "test.txt") };
         var emailMessage = new EmailMessage(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments);
 
         var result = emailMessage.ToMimeMessage(ConfiguredSender);
@@ -168,16 +168,16 @@ public class EmailMessageExtensionsTests
     public void Can_Construct_NotificationEmailModel_From_Full_EmailMessage()
     {
         const string from = "\"From Email\" <from@from.com>";
-        string[] to = {"to@email.com", "\"Second Email\" <to2@email.com>", "invalid@invalid@invalid"};
-        string[] cc = {"\"First CC\" <cc@email.com>", "cc2@email.com", "invalid@invalid@invalid"};
-        string[] bcc = {"bcc@email.com", "bcc2@email.com", "\"Third BCC\" <bcc3@email.com>", "invalid@email@address"};
-        string[] replyTo = {"replyto@email.com", "invalid@invalid@invalid"};
+        string[] to = { "to@email.com", "\"Second Email\" <to2@email.com>", "invalid@invalid@invalid" };
+        string[] cc = { "\"First CC\" <cc@email.com>", "cc2@email.com", "invalid@invalid@invalid" };
+        string[] bcc = { "bcc@email.com", "bcc2@email.com", "\"Third BCC\" <bcc3@email.com>", "invalid@email@address" };
+        string[] replyTo = { "replyto@email.com", "invalid@invalid@invalid" };
         const string subject = "Subject";
         const string body = "Message";
         const bool isBodyHtml = false;
 
         using var attachmentStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-        var attachments = new List<EmailMessageAttachment> {new(attachmentStream, "test.txt")};
+        var attachments = new List<EmailMessageAttachment> { new(attachmentStream, "test.txt") };
         var emailMessage = new EmailMessage(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments);
 
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);

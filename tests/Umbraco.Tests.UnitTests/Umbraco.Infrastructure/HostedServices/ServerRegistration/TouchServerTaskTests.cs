@@ -76,7 +76,7 @@ public class TouchServerTaskTests
 
         var settings = new GlobalSettings
         {
-            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings {StaleServerTimeout = _staleServerTimeout}
+            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings { StaleServerTimeout = _staleServerTimeout }
         };
 
         IServerRoleAccessor roleAccessor = useElection

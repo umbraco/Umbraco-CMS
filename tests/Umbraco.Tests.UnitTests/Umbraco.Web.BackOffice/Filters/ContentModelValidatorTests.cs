@@ -23,8 +23,8 @@ public class ContentModelValidatorTests
         var cityPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("city");
         cityPropertyTypeResult.AddValidationResult(new ValidationResult("City is invalid"));
         cityPropertyTypeResult.AddValidationResult(new ValidationResult("City cannot be empty"));
-        cityPropertyTypeResult.AddValidationResult(new ValidationResult("City is not in Australia", new[] {"country"}));
-        cityPropertyTypeResult.AddValidationResult(new ValidationResult("Not a capital city", new[] {"capital"}));
+        cityPropertyTypeResult.AddValidationResult(new ValidationResult("City is not in Australia", new[] { "country" }));
+        cityPropertyTypeResult.AddValidationResult(new ValidationResult("Not a capital city", new[] { "capital" }));
         addressInfoElementTypeResult.ValidationResults.Add(cityPropertyTypeResult);
         nestedLevel2.ValidationResults.Add(addressInfoElementTypeResult);
 
@@ -33,12 +33,12 @@ public class ContentModelValidatorTests
         var addressBookElementTypeResult = new ComplexEditorElementTypeValidationResult("addressBook", id2);
         var addressesPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("addresses");
         addressesPropertyTypeResult.AddValidationResult(new ValidationResult("Must have at least 3 addresses",
-            new[] {"counter"}));
+            new[] { "counter" }));
         addressesPropertyTypeResult.AddValidationResult(nestedLevel2); // This is a nested result within the level 1
         addressBookElementTypeResult.ValidationResults.Add(addressesPropertyTypeResult);
         var bookNamePropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("bookName");
         bookNamePropertyTypeResult.AddValidationResult(
-            new ValidationResult("Invalid address book name", new[] {"book"}));
+            new ValidationResult("Invalid address book name", new[] { "book" }));
         addressBookElementTypeResult.ValidationResults.Add(bookNamePropertyTypeResult);
         nestedLevel1.ValidationResults.Add(addressBookElementTypeResult);
 
@@ -46,7 +46,7 @@ public class ContentModelValidatorTests
         var addressBookElementTypeResult2 = new ComplexEditorElementTypeValidationResult("addressBook", id3);
         var addressesPropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("addresses");
         addressesPropertyTypeResult2.AddValidationResult(new ValidationResult("Must have at least 2 addresses",
-            new[] {"counter"}));
+            new[] { "counter" }));
         addressBookElementTypeResult2.ValidationResults.Add(addressesPropertyTypeResult);
         var bookNamePropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("bookName");
         bookNamePropertyTypeResult2.AddValidationResult(new ValidationResult("Name is too long"));

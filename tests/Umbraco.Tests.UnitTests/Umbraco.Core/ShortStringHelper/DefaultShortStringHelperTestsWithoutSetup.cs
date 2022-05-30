@@ -236,7 +236,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = '*'
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
                 }));
         Assert.AreEqual("foo", helper.CleanString("   foo   ", CleanStringType.Alias));
         Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
@@ -250,7 +251,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = '*'
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
                 }));
         Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
@@ -259,7 +261,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = ' '
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = ' '
                 }));
         Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
@@ -277,7 +280,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = '文'
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '文'
                 }));
         Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
     }
@@ -290,7 +294,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = '*'
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
                 }));
         Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
@@ -348,7 +353,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = '*'
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
                 }));
         Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
@@ -358,7 +364,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Ascii | CleanStringType.Unchanged, Separator = '*'
+                    StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
+                    Separator = '*'
                 }));
         Assert.AreEqual(string.Empty, helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
@@ -401,7 +408,8 @@ public class DefaultShortStringHelperTestsWithoutSetup
             .WithConfig(CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged, Separator = ' '
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = ' '
                 }));
 
         // BBB is an acronym

@@ -136,7 +136,7 @@ public class SurfaceControllerTests
             new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(),
                 Mock.Of<IPublishedUrlProvider>())
             {
-                ControllerContext = new ControllerContext {HttpContext = httpContext, RouteData = new RouteData()}
+                ControllerContext = new ControllerContext { HttpContext = httpContext, RouteData = new RouteData() }
             };
 
         var result = ctrl.GetContentFromCurrentPage() as PublishedContentResult;

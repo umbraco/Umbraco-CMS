@@ -55,7 +55,7 @@ public class UriUtilityTests
     {
         // Arrange
         var sourceUri = new Uri(sourceUrl, UriKind.Relative);
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = trailingSlash};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = trailingSlash };
         var uriUtility = BuildUriUtility("/");
 
         // Act

@@ -51,7 +51,7 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
     {
         GlobalSettings.HideTopLevelNodeFromPath = true;
 
-        var lookup = await GetContentFinder(urlString);
+        var (finder, frequest) = await GetContentFinder(urlString);
 
         Assert.IsTrue(GlobalSettings.HideTopLevelNodeFromPath);
 
@@ -61,12 +61,12 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
             Debugger.Break();
         }
 
-        var result = await lookup.finder.TryFindContent(lookup.frequest);
+        var result = await finder.TryFindContent(frequest);
 
         if (expectedId > 0)
         {
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
         else
         {
@@ -82,14 +82,14 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
     {
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
-        var lookup = await GetContentFinder(urlString);
+        var (finder, frequest) = await GetContentFinder(urlString);
 
         Assert.IsFalse(GlobalSettings.HideTopLevelNodeFromPath);
 
-        var result = await lookup.finder.TryFindContent(lookup.frequest);
+        var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
+        Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
     }
 
     /// <summary>
@@ -104,12 +104,12 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
     {
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
-        var lookup = await GetContentFinder(urlString);
+        var (finder, frequest) = await GetContentFinder(urlString);
 
-        var result = await lookup.finder.TryFindContent(lookup.frequest);
+        var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
+        Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
     }
 
     /// <summary>
@@ -127,15 +127,15 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
     {
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
-        var lookup = await GetContentFinder(urlString);
+        var (finder, frequest) = await GetContentFinder(urlString);
 
-        lookup.frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, "en-US", false),
+        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, "en-US", false),
             new Uri("http://mysite/")));
 
-        var result = await lookup.finder.TryFindContent(lookup.frequest);
+        var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
+        Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
     }
 
     /// <summary>
@@ -154,14 +154,14 @@ public class ContentFinderByUrlTests : PublishedSnapshotServiceTestBase
     {
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
-        var lookup = await GetContentFinder(urlString);
+        var (finder, frequest) = await GetContentFinder(urlString);
 
-        lookup.frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, "en-US", false),
+        frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, "en-US", false),
             new Uri("http://mysite/æøå")));
 
-        var result = await lookup.finder.TryFindContent(lookup.frequest);
+        var result = await finder.TryFindContent(frequest);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
+        Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
     }
 }

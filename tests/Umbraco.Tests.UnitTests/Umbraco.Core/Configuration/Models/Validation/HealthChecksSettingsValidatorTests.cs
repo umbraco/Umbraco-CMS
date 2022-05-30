@@ -35,7 +35,9 @@ public class HealthChecksSettingsValidatorTests
         {
             Notification = new HealthChecksNotificationSettings
             {
-                Enabled = true, FirstRunTime = firstRunTime, Period = TimeSpan.FromHours(1)
+                Enabled = true,
+                FirstRunTime = firstRunTime,
+                Period = TimeSpan.FromHours(1)
             }
         };
 }

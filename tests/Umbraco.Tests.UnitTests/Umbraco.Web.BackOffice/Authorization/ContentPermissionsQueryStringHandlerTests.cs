@@ -36,7 +36,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
         var mockHttpContextAccessor = CreateMockHttpContextAccessor();
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -48,7 +48,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext(NodeId);
         var mockHttpContextAccessor = CreateMockHttpContextAccessor();
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"B"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -61,7 +61,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor("xxx");
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -73,7 +73,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -86,7 +86,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: NodeId.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"B"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -99,7 +99,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -112,7 +112,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeUdi.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"B"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -125,7 +125,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -138,7 +138,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: s_nodeGuid.ToString());
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"B"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "B" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -151,7 +151,7 @@ public class ContentPermissionsQueryStringHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringValue: "invalid");
-        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] {"A"});
+        var sut = CreateHandler(mockHttpContextAccessor.Object, NodeId, new[] { "A" });
 
         await sut.HandleAsync(authHandlerContext);
 
@@ -166,7 +166,7 @@ public class ContentPermissionsQueryStringHandlerTests
             : new ContentPermissionsQueryStringRequirement(Permission);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName = QueryStringName,
@@ -175,7 +175,7 @@ public class ContentPermissionsQueryStringHandlerTests
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
         var mockHttpRequest = new Mock<HttpRequest>();
-        var queryParams = new Dictionary<string, StringValues> {{queryStringName, queryStringValue}};
+        var queryParams = new Dictionary<string, StringValues> { { queryStringName, queryStringValue } };
         mockHttpRequest.SetupGet(x => x.Query).Returns(new QueryCollection(queryParams));
         mockHttpContext.SetupGet(x => x.Request).Returns(mockHttpRequest.Object);
         mockHttpContext.SetupGet(x => x.Items).Returns(new Dictionary<object, object>());
@@ -229,7 +229,7 @@ public class ContentPermissionsQueryStringHandlerTests
             .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(),
                 It.Is<string>(y => y == $"{Constants.System.RootString},{nodeId.ToInvariantString()}")))
             .Returns(new EntityPermissionSet(nodeId,
-                new EntityPermissionCollection(new List<EntityPermission> {new(1, nodeId, permissionsForPath)})));
+                new EntityPermissionCollection(new List<EntityPermission> { new(1, nodeId, permissionsForPath) })));
 
         var mockContentService = new Mock<IContentService>();
         mockContentService

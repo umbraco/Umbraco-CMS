@@ -55,10 +55,10 @@ public class UmbracoBackOfficeIdentityTests
         Assert.AreEqual("testing", verifiedIdentity.GetUsername());
         Assert.AreEqual("hello world", verifiedIdentity.GetRealName());
         Assert.AreEqual(1, verifiedIdentity.GetStartContentNodes().Length);
-        Assert.IsTrue(verifiedIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] {5543, 5555}));
-        Assert.IsTrue(new[] {"content", "media"}.SequenceEqual(verifiedIdentity.GetAllowedApplications()));
+        Assert.IsTrue(verifiedIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] { 5543, 5555 }));
+        Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(verifiedIdentity.GetAllowedApplications()));
         Assert.AreEqual("en-us", verifiedIdentity.GetCultureString());
-        Assert.IsTrue(new[] {"admin"}.SequenceEqual(verifiedIdentity.GetRoles()));
+        Assert.IsTrue(new[] { "admin" }.SequenceEqual(verifiedIdentity.GetRoles()));
 
         Assert.AreEqual(11, verifiedIdentity.Claims.Count());
     }
@@ -124,12 +124,12 @@ public class UmbracoBackOfficeIdentityTests
             "1234",
             "testing",
             "hello world",
-            new[] {654},
-            new[] {654},
+            new[] { 654 },
+            new[] { 654 },
             "en-us",
             securityStamp,
-            new[] {"content", "media"},
-            new[] {"admin"});
+            new[] { "content", "media" },
+            new[] { "admin" });
 
         Assert.AreEqual(12, claimsIdentity.Claims.Count());
         Assert.IsNull(claimsIdentity.Actor);

@@ -29,7 +29,7 @@ public class UmbracoPasswordHasherTests
     {
         Mock.Get(jsonSerializer)
             .Setup(x => x.Deserialize<PersistedPasswordSettings>(It.IsAny<string>()))
-            .Returns(new PersistedPasswordSettings {HashAlgorithm = algorithm});
+            .Returns(new PersistedPasswordSettings { HashAlgorithm = algorithm });
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
@@ -52,7 +52,7 @@ public class UmbracoPasswordHasherTests
     {
         Mock.Get(jsonSerializer)
             .Setup(x => x.Deserialize<PersistedPasswordSettings>(It.IsAny<string>()))
-            .Returns(new PersistedPasswordSettings {HashAlgorithm = algorithm});
+            .Returns(new PersistedPasswordSettings { HashAlgorithm = algorithm });
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 
@@ -72,7 +72,7 @@ public class UmbracoPasswordHasherTests
     {
         Mock.Get(jsonSerializer)
             .Setup(x => x.Deserialize<PersistedPasswordSettings>(It.IsAny<string>()))
-            .Returns(new PersistedPasswordSettings {HashAlgorithm = algorithm});
+            .Returns(new PersistedPasswordSettings { HashAlgorithm = algorithm });
 
         var result = sut.VerifyHashedPassword(aUser, hashedPassword, providedPassword);
 

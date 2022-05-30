@@ -24,7 +24,7 @@ public class HealthCheckSettingsExtensionsTests
     {
         var settings = new HealthChecksSettings
         {
-            Notification = new HealthChecksNotificationSettings {FirstRunTime = firstRunTimeCronExpression}
+            Notification = new HealthChecksNotificationSettings { FirstRunTime = firstRunTimeCronExpression }
         };
         var now = new DateTime(2020, 10, 31, 12, 0, 0);
         var result = settings.GetNotificationDelay(CronTabParser, now, TimeSpan.Zero);
@@ -36,7 +36,7 @@ public class HealthCheckSettingsExtensionsTests
     {
         var settings = new HealthChecksSettings
         {
-            Notification = new HealthChecksNotificationSettings {FirstRunTime = "30 12 * * *"}
+            Notification = new HealthChecksNotificationSettings { FirstRunTime = "30 12 * * *" }
         };
         var now = new DateTime(2020, 10, 31, 12, 25, 0);
         var result = settings.GetNotificationDelay(CronTabParser, now, TimeSpan.FromMinutes(10));

@@ -42,9 +42,9 @@ public class MemberBuilderTests
         var testLastLoginDate = DateTime.Now.AddHours(-3);
         var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
         var testPropertyType1 =
-            new PropertyTypeDetail {Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88};
+            new PropertyTypeDetail { Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88 };
         var testPropertyType2 =
-            new PropertyTypeDetail {Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87};
+            new PropertyTypeDetail { Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87 };
         var testPropertyType3 = new PropertyTypeDetail
         {
             Alias = "author",
@@ -53,7 +53,7 @@ public class MemberBuilderTests
             SortOrder = 1,
             DataTypeId = -88
         };
-        var testGroups = new[] {"group1", "group2"};
+        var testGroups = new[] { "group1", "group2" };
         var testPropertyData1 = new KeyValuePair<string, object>("title", "Name member");
         var testPropertyData2 = new KeyValuePair<string, object>("bodyText", "This is a subpage");
         var testPropertyData3 = new KeyValuePair<string, object>("author", "John Doe");

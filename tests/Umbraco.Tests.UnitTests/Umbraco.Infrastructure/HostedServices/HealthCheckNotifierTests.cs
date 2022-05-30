@@ -115,9 +115,9 @@ public class HealthCheckNotifierTests
             Notification = new HealthChecksNotificationSettings
             {
                 Enabled = enabled,
-                DisabledChecks = new List<DisabledHealthCheckSettings> {new() {Id = Guid.Parse(Check3Id)}}
+                DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check3Id) } }
             },
-            DisabledChecks = new List<DisabledHealthCheckSettings> {new() {Id = Guid.Parse(Check2Id)}}
+            DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check2Id) } }
         };
         var checks = new HealthCheckCollection(() => new List<HealthCheck>
         {
@@ -127,7 +127,7 @@ public class HealthCheckNotifierTests
         _mockNotificationMethod = new Mock<IHealthCheckNotificationMethod>();
         _mockNotificationMethod.SetupGet(x => x.Enabled).Returns(notificationEnabled);
         var notifications = new HealthCheckNotificationMethodCollection(() =>
-            new List<IHealthCheckNotificationMethod> {_mockNotificationMethod.Object});
+            new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
 
         var mockRunTimeState = new Mock<IRuntimeState>();
         mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);

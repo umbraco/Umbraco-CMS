@@ -150,7 +150,7 @@ public class VariationTests
     public void PropertyTests()
     {
         var propertyType =
-            new PropertyType(TestHelper.ShortStringHelper, "editor", ValueStorageType.Nvarchar) {Alias = "prop"};
+            new PropertyType(TestHelper.ShortStringHelper, "editor", ValueStorageType.Nvarchar) { Alias = "prop" };
         var prop = new Property(propertyType);
 
         const string langFr = "fr-FR";
@@ -606,7 +606,7 @@ public class VariationTests
             .Returns(new DataType(textBoxEditor, serializer));
 
         var propertyEditorCollection =
-            new PropertyEditorCollection(new DataEditorCollection(() => new[] {textBoxEditor}));
+            new PropertyEditorCollection(new DataEditorCollection(() => new[] { textBoxEditor }));
         return new PropertyValidationService(
             propertyEditorCollection,
             dataTypeService,

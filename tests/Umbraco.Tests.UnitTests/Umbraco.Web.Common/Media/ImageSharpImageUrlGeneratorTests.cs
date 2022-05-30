@@ -24,7 +24,7 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString =
             s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) {Crop = s_crop, Width = 100, Height = 100});
+                new ImageUrlGenerationOptions(MediaPath) { Crop = s_crop, Width = 100, Height = 100 });
         Assert.AreEqual(
             MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
             urlString);
@@ -35,7 +35,7 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString =
             s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) {FocalPoint = s_focus1, Width = 200, Height = 300});
+                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 200, Height = 300 });
         Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300", urlString);
     }
 
@@ -44,7 +44,7 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString =
             s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) {FocalPoint = s_focus1, Width = 100, Height = 100});
+                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 100, Height = 100 });
         Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=100&height=100", urlString);
     }
 
@@ -102,7 +102,7 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString =
             s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(string.Empty) {Crop = s_crop, Width = 100, Height = 100});
+                new ImageUrlGenerationOptions(string.Empty) { Crop = s_crop, Width = 100, Height = 100 });
         Assert.AreEqual("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
             urlString);
     }
@@ -116,27 +116,37 @@ public class ImageSharpImageUrlGeneratorTests
         var urlStringMin =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
-                ImageCropMode = ImageCropMode.Min, Width = 300, Height = 150
+                ImageCropMode = ImageCropMode.Min,
+                Width = 300,
+                Height = 150
             });
         var urlStringBoxPad =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
-                ImageCropMode = ImageCropMode.BoxPad, Width = 300, Height = 150
+                ImageCropMode = ImageCropMode.BoxPad,
+                Width = 300,
+                Height = 150
             });
         var urlStringPad =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
-                ImageCropMode = ImageCropMode.Pad, Width = 300, Height = 150
+                ImageCropMode = ImageCropMode.Pad,
+                Width = 300,
+                Height = 150
             });
         var urlStringMax =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
-                ImageCropMode = ImageCropMode.Max, Width = 300, Height = 150
+                ImageCropMode = ImageCropMode.Max,
+                Width = 300,
+                Height = 150
             });
         var urlStringStretch =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
-                ImageCropMode = ImageCropMode.Stretch, Width = 300, Height = 150
+                ImageCropMode = ImageCropMode.Stretch,
+                Width = 300,
+                Height = 150
             });
 
         Assert.AreEqual(MediaPath + "?rmode=min&width=300&height=150", urlStringMin);
@@ -154,7 +164,10 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            ImageCropMode = ImageCropMode.Crop, ImageCropAnchor = ImageCropAnchor.Center, Width = 100, Height = 270
+            ImageCropMode = ImageCropMode.Crop,
+            ImageCropAnchor = ImageCropAnchor.Center,
+            Width = 100,
+            Height = 270
         });
         Assert.AreEqual(MediaPath + "?rmode=crop&ranchor=center&width=100&height=270", urlString);
     }
@@ -165,7 +178,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_PreferFocalPointCenter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) {Width = 300, Height = 150});
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 300, Height = 150 });
         Assert.AreEqual(MediaPath + "?width=300&height=150", urlString);
     }
 
@@ -177,7 +190,7 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString =
             s_generator.GetImageUrl(
-                new ImageUrlGenerationOptions(MediaPath) {FocalPoint = s_focus2, Width = 270, Height = 161});
+                new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus2, Width = 270, Height = 161 });
         Assert.AreEqual(MediaPath + "?rxy=0.4275,0.41&width=270&height=161", urlString);
     }
 
@@ -187,7 +200,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_WidthOnlyParameter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) {Width = 200});
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 200 });
         Assert.AreEqual(MediaPath + "?width=200", urlString);
     }
 
@@ -197,7 +210,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_HeightOnlyParameter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) {Height = 200});
+        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Height = 200 });
         Assert.AreEqual(MediaPath + "?height=200", urlString);
     }
 
@@ -209,7 +222,10 @@ public class ImageSharpImageUrlGeneratorTests
     {
         var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            ImageCropMode = ImageCropMode.Pad, Width = 400, Height = 400, FurtherOptions = "&bgcolor=fff"
+            ImageCropMode = ImageCropMode.Pad,
+            Width = 400,
+            Height = 400,
+            FurtherOptions = "&bgcolor=fff"
         });
         Assert.AreEqual(MediaPath + "?rmode=pad&width=400&height=400&bgcolor=fff", urlString);
     }

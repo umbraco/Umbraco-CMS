@@ -51,7 +51,7 @@ public class MemberUserStoreTests
     {
         // arrange
         var sut = CreateSut();
-        var fakeUser = new MemberIdentityUser {UserName = "MyName"};
+        var fakeUser = new MemberIdentityUser { UserName = "MyName" };
 
         // act
         await sut.SetNormalizedUserNameAsync(fakeUser, "NewName", CancellationToken.None);
@@ -162,8 +162,8 @@ public class MemberUserStoreTests
             PasswordHash = "abcde",
             SecurityStamp = "abc"
         };
-        fakeUser.Roles.Add(new IdentityUserRole<string> {RoleId = "role1", UserId = "123"});
-        fakeUser.Roles.Add(new IdentityUserRole<string> {RoleId = "role2", UserId = "123"});
+        fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role1", UserId = "123" });
+        fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role2", UserId = "123" });
 
 
         IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
@@ -208,7 +208,7 @@ public class MemberUserStoreTests
 
         _mockMemberService.Verify(x => x.Save(mockMember));
         _mockMemberService.Verify(x => x.GetById(123));
-        _mockMemberService.Verify(x => x.ReplaceRoles(new[] {123}, new[] {"role1", "role2"}));
+        _mockMemberService.Verify(x => x.ReplaceRoles(new[] { 123 }, new[] { "role1", "role2" }));
     }
 
     [Test]

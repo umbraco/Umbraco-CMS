@@ -27,13 +27,14 @@ public class PropertyCacheLevelTests
     {
         var converter = new CacheConverter1(cacheLevel);
 
-        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] {converter});
+        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { converter });
 
         var configurationEditorJsonSerializer = new ConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer) {Id = 1};
+                Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
+        { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
@@ -58,7 +59,7 @@ public class PropertyCacheLevelTests
         // anything else is not > None, use Content
         //
         // for standalone elements, it's only None or Content
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> {{"prop1", "1234"}},
+        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } },
             false);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -114,12 +115,13 @@ public class PropertyCacheLevelTests
     {
         var converter = new CacheConverter1(converterCacheLevel);
 
-        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] {converter});
+        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { converter });
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer()) {Id = 1};
+                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
+        { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
@@ -146,7 +148,7 @@ public class PropertyCacheLevelTests
         // pretend we're creating this set as a value for a property
         // referenceCacheLevel is the cache level for this fictious property
         // converterCacheLevel is the cache level specified by the converter
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> {{"prop1", "1234"}},
+        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } },
             false, referenceCacheLevel, publishedSnapshotAccessor.Object);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
@@ -194,12 +196,13 @@ public class PropertyCacheLevelTests
     {
         var converter = new CacheConverter1(PropertyCacheLevel.Unknown);
 
-        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] {converter});
+        var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[] { converter });
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
             new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer()) {Id = 1};
+                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
+        { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
         var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
@@ -215,7 +218,7 @@ public class PropertyCacheLevelTests
         Assert.Throws<Exception>(() =>
         {
             var unused = new PublishedElement(setType1, Guid.NewGuid(),
-                new Dictionary<string, object> {{"prop1", "1234"}}, false);
+                new Dictionary<string, object> { { "prop1", "1234" } }, false);
         });
     }
 

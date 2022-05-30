@@ -14,7 +14,7 @@ public class DeepCloneableListTests
     [Test]
     public void Deep_Clones_Each_Item_Once()
     {
-        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.CloneOnce) {new(), new(), new()};
+        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.CloneOnce) { new(), new(), new() };
 
         var cloned = list.DeepClone() as DeepCloneableList<TestClone>;
 
@@ -45,7 +45,7 @@ public class DeepCloneableListTests
     [Test]
     public void Deep_Clones_All_Elements()
     {
-        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) {new(), new(), new()};
+        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) { new(), new(), new() };
 
         var cloned = list.DeepClone() as DeepCloneableList<TestClone>;
 
@@ -57,7 +57,7 @@ public class DeepCloneableListTests
     [Test]
     public void Clones_Each_Item()
     {
-        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) {new(), new(), new()};
+        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) { new(), new(), new() };
 
         var cloned = (DeepCloneableList<TestClone>)list.DeepClone();
 
@@ -70,7 +70,7 @@ public class DeepCloneableListTests
     [Test]
     public void Cloned_Sequence_Equals()
     {
-        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) {new(), new(), new()};
+        var list = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) { new(), new(), new() };
 
         var cloned = (DeepCloneableList<TestClone>)list.DeepClone();
 

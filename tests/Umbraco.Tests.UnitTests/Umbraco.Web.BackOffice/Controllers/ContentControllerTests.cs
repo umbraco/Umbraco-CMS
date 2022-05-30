@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -35,7 +35,7 @@ public class ContentControllerTests
         // Setup domain service
         var domainServiceMock = new Mock<IDomainService>();
         domainServiceMock.Setup(x => x.GetAssignedDomains(1060, It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/", "da-dk"), new UmbracoDomain("/en", "en-us")});
+            .Returns(new[] { new UmbracoDomain("/", "da-dk"), new UmbracoDomain("/en", "en-us") });
 
         // Create content, we need to specify and ID in order to be able to configure domain service
         var rootNode = new ContentBuilder()
@@ -51,7 +51,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"en-us", "da-dk"};
+        var culturesPublished = new[] { "en-us", "da-dk" };
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
@@ -77,7 +77,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"da-dk"};
+        var culturesPublished = new[] { "da-dk" };
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
@@ -106,7 +106,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"en-us", "da-dk"};
+        var culturesPublished = new[] { "en-us", "da-dk" };
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
@@ -119,7 +119,7 @@ public class ContentControllerTests
     {
         var domainServiceMock = new Mock<IDomainService>();
         domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/", "da-dk")});
+            .Returns(new[] { new UmbracoDomain("/", "da-dk") });
 
 
         var rootNode = new ContentBuilder()
@@ -135,7 +135,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"en-us", "da-dk", "nl-bk", "se-sv"};
+        var culturesPublished = new[] { "en-us", "da-dk", "nl-bk", "se-sv" };
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);
@@ -153,13 +153,13 @@ public class ContentControllerTests
 
         var domainServiceMock = new Mock<IDomainService>();
         domainServiceMock.Setup(x => x.GetAssignedDomains(rootId, It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/", "da-dk")});
+            .Returns(new[] { new UmbracoDomain("/", "da-dk") });
 
         domainServiceMock.Setup(x => x.GetAssignedDomains(level1Id, It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/en", "en-us")});
+            .Returns(new[] { new UmbracoDomain("/en", "en-us") });
 
         domainServiceMock.Setup(x => x.GetAssignedDomains(level2Id, It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/se", "se-sv"), new UmbracoDomain("/nl", "nl-bk")});
+            .Returns(new[] { new UmbracoDomain("/se", "se-sv"), new UmbracoDomain("/nl", "nl-bk") });
 
         var level3Node = new ContentBuilder()
             .WithContentType(CreateContentType())
@@ -184,7 +184,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"en-us", "da-dk", "nl-bk", "se-sv", "de-de"};
+        var culturesPublished = new[] { "en-us", "da-dk", "nl-bk", "se-sv", "de-de" };
 
         var contentController = CreateContentController(domainServiceMock.Object);
         var notifications = new SimpleNotificationModel();
@@ -199,7 +199,7 @@ public class ContentControllerTests
     {
         var domainServiceMock = new Mock<IDomainService>();
         domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
-            .Returns(new[] {new UmbracoDomain("/", "da-dk")});
+            .Returns(new[] { new UmbracoDomain("/", "da-dk") });
 
         var rootNode = new ContentBuilder()
             .WithContentType(CreateContentType())
@@ -220,7 +220,7 @@ public class ContentControllerTests
             .Done()
             .Build();
 
-        var culturesPublished = new[] {"en-us", "se-sv"};
+        var culturesPublished = new[] { "en-us", "se-sv" };
         var notifications = new SimpleNotificationModel();
 
         var contentController = CreateContentController(domainServiceMock.Object);

@@ -24,7 +24,7 @@ public class PublishedContentExtensionTests : PublishedSnapshotServiceTestBase
             out var dataTypes).ToList();
 
         // configure inheritance for content types
-        var baseType = new ContentType(TestHelper.ShortStringHelper, -1) {Alias = "Base"};
+        var baseType = new ContentType(TestHelper.ShortStringHelper, -1) { Alias = "Base" };
         contentTypes[0].AddContentType(baseType);
 
         InitializedCache(kits, contentTypes, dataTypes);

@@ -28,15 +28,15 @@ public class UmbracoContentValueSetValidatorTests
             Mock.Of<IScopeProvider>());
 
         var result =
-            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new {hello = "world", path = "-1,555"}));
+            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         result = validator.Validate(
-            ValueSet.FromObject("777", IndexTypes.Media, new {hello = "world", path = "-1,555"}));
+            ValueSet.FromObject("777", IndexTypes.Media, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", "invalid-category",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
     }
 
@@ -49,11 +49,11 @@ public class UmbracoContentValueSetValidatorTests
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>());
 
-        var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new {hello = "world"}));
+        var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 
@@ -68,19 +68,19 @@ public class UmbracoContentValueSetValidatorTests
             555);
 
         var result =
-            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new {hello = "world", path = "-1,555"}));
+            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,444"}));
+            new { hello = "world", path = "-1,444" }));
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555,777"}));
+            new { hello = "world", path = "-1,555,777" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555,777,999"}));
+            new { hello = "world", path = "-1,555,777,999" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 
@@ -90,11 +90,11 @@ public class UmbracoContentValueSetValidatorTests
         var validator = new ValueSetValidator(
             null,
             null,
-            new[] {"hello", "world"},
+            new[] { "hello", "world" },
             null);
 
         var valueSet = ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555", world = "your oyster"});
+            new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
@@ -110,10 +110,10 @@ public class UmbracoContentValueSetValidatorTests
             null,
             null,
             null,
-            new[] {"hello", "world"});
+            new[] { "hello", "world" });
 
         var valueSet = ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555", world = "your oyster"});
+            new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
@@ -128,11 +128,11 @@ public class UmbracoContentValueSetValidatorTests
         var validator = new ValueSetValidator(
             null,
             null,
-            new[] {"hello", "world"},
-            new[] {"world"});
+            new[] { "hello", "world" },
+            new[] { "world" });
 
         var valueSet = ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555", world = "your oyster"});
+            new { hello = "world", path = "-1,555", world = "your oyster" });
         var result = validator.Validate(valueSet);
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
@@ -149,18 +149,18 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            includeItemTypes: new List<string> {"include-content"});
+            includeItemTypes: new List<string> { "include-content" });
 
         var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "include-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 
@@ -172,18 +172,18 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            excludeItemTypes: new List<string> {"exclude-content"});
+            excludeItemTypes: new List<string> { "exclude-content" });
 
         var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "exclude-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
     }
 
@@ -195,23 +195,23 @@ public class UmbracoContentValueSetValidatorTests
             true,
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IScopeProvider>(),
-            includeItemTypes: new List<string> {"include-content", "exclude-content"},
-            excludeItemTypes: new List<string> {"exclude-content"});
+            includeItemTypes: new List<string> { "include-content", "exclude-content" },
+            excludeItemTypes: new List<string> { "exclude-content" });
 
         var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "test-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "exclude-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "include-content",
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 
@@ -226,15 +226,15 @@ public class UmbracoContentValueSetValidatorTests
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-                new {hello = "world", path = "-1,-20,555"}));
+                new { hello = "world", path = "-1,-20,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,-20,555,777"}));
+            new { hello = "world", path = "-1,-20,555,777" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content,
-            new {hello = "world", path = "-1,555"}));
+            new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(new ValueSet(
@@ -242,7 +242,9 @@ public class UmbracoContentValueSetValidatorTests
             IndexTypes.Content,
             new Dictionary<string, object>
             {
-                ["hello"] = "world", ["path"] = "-1,555", [UmbracoExamineFieldNames.PublishedFieldName] = "y"
+                ["hello"] = "world",
+                ["path"] = "-1,555",
+                [UmbracoExamineFieldNames.PublishedFieldName] = "y"
             }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
@@ -258,15 +260,15 @@ public class UmbracoContentValueSetValidatorTests
 
         var result =
             validator.Validate(ValueSet.FromObject("555", IndexTypes.Media,
-                new {hello = "world", path = "-1,-21,555"}));
+                new { hello = "world", path = "-1,-21,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Media,
-            new {hello = "world", path = "-1,-21,555,777"}));
+            new { hello = "world", path = "-1,-21,555,777" }));
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
         result = validator.Validate(
-            ValueSet.FromObject("555", IndexTypes.Media, new {hello = "world", path = "-1,555"}));
+            ValueSet.FromObject("555", IndexTypes.Media, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 
@@ -280,7 +282,7 @@ public class UmbracoContentValueSetValidatorTests
             Mock.Of<IScopeProvider>());
 
         var result =
-            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new {hello = "world", path = "-1,555"}));
+            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
         result = validator.Validate(new ValueSet(
@@ -288,7 +290,9 @@ public class UmbracoContentValueSetValidatorTests
             IndexTypes.Content,
             new Dictionary<string, object>
             {
-                ["hello"] = "world", ["path"] = "-1,555", [UmbracoExamineFieldNames.PublishedFieldName] = "n"
+                ["hello"] = "world",
+                ["path"] = "-1,555",
+                [UmbracoExamineFieldNames.PublishedFieldName] = "n"
             }));
         Assert.AreEqual(ValueSetValidationStatus.Failed, result.Status);
 
@@ -297,7 +301,9 @@ public class UmbracoContentValueSetValidatorTests
             IndexTypes.Content,
             new Dictionary<string, object>
             {
-                ["hello"] = "world", ["path"] = "-1,555", [UmbracoExamineFieldNames.PublishedFieldName] = "y"
+                ["hello"] = "world",
+                ["path"] = "-1,555",
+                [UmbracoExamineFieldNames.PublishedFieldName] = "y"
             }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
@@ -380,11 +386,11 @@ public class UmbracoContentValueSetValidatorTests
             Mock.Of<IScopeProvider>());
 
         var result =
-            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new {hello = "world", path = "-1,555"}));
+            validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
         Assert.AreEqual(ValueSetValidationStatus.Filtered, result.Status);
 
         result = validator.Validate(ValueSet.FromObject("777", IndexTypes.Content,
-            new {hello = "world", path = "-1,777"}));
+            new { hello = "world", path = "-1,777" }));
         Assert.AreEqual(ValueSetValidationStatus.Valid, result.Status);
     }
 }

@@ -32,7 +32,7 @@ public class ObjectExtensionsTests
     [Test]
     public void Can_Convert_List_To_Enumerable()
     {
-        var list = new List<string> {"hello", "world", "awesome"};
+        var list = new List<string> { "hello", "world", "awesome" };
         var result = list.TryConvertTo<IEnumerable<string>>();
         Assert.IsTrue(result.Success);
         Assert.AreEqual(3, result.Result.Count());
@@ -42,7 +42,7 @@ public class ObjectExtensionsTests
     public void ObjectExtensions_Object_To_Dictionary()
     {
         // Arrange
-        var obj = new {Key1 = "value1", Key2 = "value2", Key3 = "value3"};
+        var obj = new { Key1 = "value1", Key2 = "value2", Key3 = "value3" };
 
         // Act
         var d = obj.ToDictionary<string>();

@@ -18,7 +18,7 @@ public class ArtifactBaseTests
     public void CanSerialize()
     {
         var udi = new GuidUdi("test", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
-        var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) {Name = "Test Name", Alias = "testAlias"};
+        var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) { Name = "Test Name", Alias = "testAlias" };
 
         var serialized = JsonConvert.SerializeObject(artifact);
 
@@ -33,7 +33,7 @@ public class ArtifactBaseTests
         // This test was introduced following: https://github.com/umbraco/Umbraco.Deploy.Issues/issues/72 to verify
         // that consistent ordering rules are used across platforms.
         var udi = new GuidUdi("test", Guid.Parse("3382d5433b5749d08919bc9961422a1f"));
-        var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) {Name = "Test Name", Alias = "testAlias"};
+        var artifact = new TestArtifact(udi, new List<ArtifactDependency>()) { Name = "Test Name", Alias = "testAlias" };
 
         var dependencies = new ArtifactDependencyCollection();
 

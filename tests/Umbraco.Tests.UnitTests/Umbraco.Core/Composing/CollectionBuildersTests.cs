@@ -123,7 +123,7 @@ public class CollectionBuildersTests
         var builder = _composition.WithCollectionBuilder<TestCollectionBuilder>();
 
         ////builder.Append<Resolved4>(); // does not compile
-        Assert.Throws<InvalidOperationException>(() => builder.Append(new[] {typeof(Resolved4)}));
+        Assert.Throws<InvalidOperationException>(() => builder.Append(new[] { typeof(Resolved4) }));
     }
 
     [Test]

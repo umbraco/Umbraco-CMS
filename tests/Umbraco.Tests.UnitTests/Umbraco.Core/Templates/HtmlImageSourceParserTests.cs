@@ -84,7 +84,7 @@ public class HtmlImageSourceParserTests
             umbracoContextAccessor,
             Options.Create(webRoutingSettings),
             new UrlProviderCollection(() => Enumerable.Empty<IUrlProvider>()),
-            new MediaUrlProviderCollection(() => new[] {mediaUrlProvider.Object}),
+            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
             Mock.Of<IVariationContextAccessor>());
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {

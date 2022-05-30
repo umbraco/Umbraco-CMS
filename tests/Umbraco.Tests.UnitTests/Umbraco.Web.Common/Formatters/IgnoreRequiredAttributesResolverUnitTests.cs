@@ -24,7 +24,7 @@ public class IgnoreRequiredAttributesResolverUnitTests
 
             var actual = JsonConvert.DeserializeObject<ObjectWithRequiredProperty>(
                 emptyJsonObject,
-                new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+                new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
 
             Assert.IsNotNull(actual);
             Assert.IsNull(actual.Property);

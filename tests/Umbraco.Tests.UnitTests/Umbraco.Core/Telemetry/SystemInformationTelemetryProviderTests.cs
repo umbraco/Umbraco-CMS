@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
@@ -111,10 +111,10 @@ public class SystemInformationTelemetryProviderTests
             Mock.Of<IUmbracoVersion>(),
             Mock.Of<ILocalizationService>(),
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x =>
-                x.CurrentValue == new ModelsBuilderSettings {ModelsMode = modelsMode}),
-            Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings {Debug = isDebug}),
+                x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             Mock.Of<IOptionsMonitor<GlobalSettings>>(x =>
-                x.CurrentValue == new GlobalSettings {UmbracoPath = umbracoPath}),
+                x.CurrentValue == new GlobalSettings { UmbracoPath = umbracoPath }),
             hostEnvironment.Object,
             Mock.Of<IUmbracoDatabaseFactory>(x =>
                 x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)));

@@ -66,14 +66,16 @@ public class ConvertersTests
         var dataType1 = new DataType(
             new VoidEditor(
                 Mock.Of<IDataValueEditorFactory>()),
-            serializer) {Id = 1};
+            serializer)
+        { Id = 1 };
         var dataType2 = new DataType(
             new VoidEditor(
                 "2",
                 Mock.Of<IDataValueEditorFactory>()),
-            serializer) {Id = 2};
+            serializer)
+        { Id = 2 };
 
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] {dataType1, dataType2});
+        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2 });
 
         var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object);
 
@@ -94,12 +96,12 @@ public class ConvertersTests
         var element1 = new PublishedElement(
             elementType1,
             Guid.NewGuid(),
-            new Dictionary<string, object> {{"prop1", "val1"}},
+            new Dictionary<string, object> { { "prop1", "val1" } },
             false);
         var element2 = new PublishedElement(
             elementType2,
             Guid.NewGuid(),
-            new Dictionary<string, object> {{"prop2", "1003"}},
+            new Dictionary<string, object> { { "prop2", "1003" } },
             false);
         var cnt1 = new InternalPublishedContent(contentType1)
         {

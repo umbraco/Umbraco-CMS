@@ -14,7 +14,7 @@ public class AutoInterningStringConverterTests
     public void Intern_Property_String()
     {
         var str1 = "Hello";
-        var obj = new Test {Name = str1 + Guid.NewGuid()};
+        var obj = new Test { Name = str1 + Guid.NewGuid() };
 
         // ensure the raw value is not interned
         Assert.IsNull(string.IsInterned(obj.Name));
@@ -31,7 +31,7 @@ public class AutoInterningStringConverterTests
         var str1 = "key";
         var obj = new Test
         {
-            Values = new Dictionary<string, int> {[str1 + Guid.NewGuid()] = 0, [str1 + Guid.NewGuid()] = 1}
+            Values = new Dictionary<string, int> { [str1 + Guid.NewGuid()] = 0, [str1 + Guid.NewGuid()] = 1 }
         };
 
         // ensure the raw value is not interned

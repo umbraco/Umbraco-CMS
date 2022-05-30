@@ -20,7 +20,7 @@ public class StylesheetHelperTests
         var results = StylesheetHelper.ParseRules(css);
 
         var result = StylesheetHelper.ReplaceRule(css, results.First().Name,
-            new StylesheetRule {Name = "My new rule", Selector = "p", Styles = "font-size:1em; color:blue;"});
+            new StylesheetRule { Name = "My new rule", Selector = "p", Styles = "font-size:1em; color:blue;" });
 
         Assert.AreEqual(
             @"body {font-family:Arial;}/**umb_name:My new rule*/
@@ -35,7 +35,7 @@ p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {m
             @"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}";
 
         var result = StylesheetHelper.AppendRule(css,
-            new StylesheetRule {Name = "My new rule", Selector = "p", Styles = "font-size:1em; color:blue;"});
+            new StylesheetRule { Name = "My new rule", Selector = "p", Styles = "font-size:1em; color:blue;" });
 
         Assert.AreEqual(
             @"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}
@@ -142,9 +142,9 @@ world */p{font-size: 1em;}")]
 }");
         // add a couple of rules
         var result = StylesheetHelper.AppendRule(css,
-            new StylesheetRule {Name = "Test", Selector = ".test", Styles = "font-color: red;margin: 1rem;"});
+            new StylesheetRule { Name = "Test", Selector = ".test", Styles = "font-color: red;margin: 1rem;" });
         result = StylesheetHelper.AppendRule(result,
-            new StylesheetRule {Name = "Test2", Selector = ".test2", Styles = "font-color: green;"});
+            new StylesheetRule { Name = "Test2", Selector = ".test2", Styles = "font-color: green;" });
 
         // verify the CSS formatting including the indents
         Assert.AreEqual(

@@ -23,7 +23,7 @@ public class TaskHelperTests
         [Frozen] ILogger<TaskHelper> logger,
         TaskHelper sut)
     {
-        var local = new AsyncLocal<string> {Value = "hello"};
+        var local = new AsyncLocal<string> { Value = "hello" };
 
         string taskResult = null;
 

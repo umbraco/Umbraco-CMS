@@ -29,7 +29,8 @@ public class ExpressionTests : BaseUsingSqlSyntax
     public void Equals_Claus_With_Two_Entity_Values()
     {
         var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()),
-            new ConfigurationEditorJsonSerializer()) {Id = 12345};
+            new ConfigurationEditorJsonSerializer())
+        { Id = 12345 };
         Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeId == dataType.Id;
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<PropertyType>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -58,7 +59,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
     public void Can_Query_With_Content_Type_Aliases_IEnumerable()
     {
         // Arrange - Contains is IEnumerable.Contains extension method
-        var aliases = new[] {"Test1", "Test2"};
+        var aliases = new[] { "Test1", "Test2" };
         Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -74,7 +75,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
     public void Can_Query_With_Content_Type_Aliases_List()
     {
         // Arrange - Contains is List.Contains instance method
-        var aliases = new List<string> {"Test1", "Test2"};
+        var aliases = new List<string> { "Test1", "Test2" };
         Expression<Func<IMedia, bool>> predicate = content => aliases.Contains(content.ContentType.Alias);
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IContent>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);
@@ -181,7 +182,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
     [Test]
     public void Sql_In()
     {
-        var userNames = new[] {"hello@world.com", "blah@blah.com"};
+        var userNames = new[] { "hello@world.com", "blah@blah.com" };
 
         Expression<Func<IUser, bool>> predicate = user => userNames.Contains(user.Username);
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);
@@ -225,7 +226,7 @@ public class ExpressionTests : BaseUsingSqlSyntax
         Console.WriteLine(result);
         Assert.AreEqual("upper([umbracoUser].[userLogin]) LIKE upper(@0)", result);
 
-        var foo = new Foo {Value = "aaaaa"};
+        var foo = new Foo { Value = "aaaaa" };
         predicate = user => user.Login.StartsWith(foo.Value);
         modelToSqlExpressionHelper = new PocoToSqlExpressionVisitor<UserDto>(SqlContext, null);
         result = modelToSqlExpressionHelper.Visit(predicate);

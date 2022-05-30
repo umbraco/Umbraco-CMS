@@ -72,7 +72,7 @@ public class MediaPermissionsTests
         var mediaService = mediaServiceMock.Object;
         var entityServiceMock = new Mock<IEntityService>();
         entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns(new[] {Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876")});
+            .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
         var entityService = entityServiceMock.Object;
         var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
@@ -110,7 +110,7 @@ public class MediaPermissionsTests
         var mediaService = mediaServiceMock.Object;
         var entityServiceMock = new Mock<IEntityService>();
         entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns(new[] {Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")});
+            .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
         var entityService = entityServiceMock.Object;
         var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
@@ -148,7 +148,7 @@ public class MediaPermissionsTests
         var mediaService = mediaServiceMock.Object;
         var entityServiceMock = new Mock<IEntityService>();
         entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns(new[] {Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234")});
+            .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
         var entityService = entityServiceMock.Object;
         var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
@@ -162,7 +162,7 @@ public class MediaPermissionsTests
     private IUser CreateUser(int id = 0, int? startMediaId = null) =>
         new UserBuilder()
             .WithId(id)
-            .WithStartMediaIds(startMediaId.HasValue ? new[] {startMediaId.Value} : new int[0])
+            .WithStartMediaIds(startMediaId.HasValue ? new[] { startMediaId.Value } : new int[0])
             .AddUserGroup()
             .WithId(1)
             .WithName("admin")

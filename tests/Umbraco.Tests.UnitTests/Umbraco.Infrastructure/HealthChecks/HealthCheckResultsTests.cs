@@ -28,7 +28,7 @@ public class HealthCheckResultsTests
             throw new NotImplementedException();
 
         public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
-            new List<HealthCheckStatus> {new(_message) {ResultType = _resultType}};
+            new List<HealthCheckStatus> { new(_message) { ResultType = _resultType } };
     }
 
     [HealthCheck("CFD6FC34-59C9-4402-B55F-C8BC96B628A1", "Stub check 1")]

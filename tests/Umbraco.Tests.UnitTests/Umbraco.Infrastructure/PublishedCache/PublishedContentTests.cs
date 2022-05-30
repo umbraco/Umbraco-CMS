@@ -35,7 +35,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         _dataTypes = dataTypes;
 
         // configure the Home content type to be composed of another for tests.
-        var compositionType = new ContentType(TestHelper.ShortStringHelper, -1) {Alias = "MyCompositionAlias"};
+        var compositionType = new ContentType(TestHelper.ShortStringHelper, -1) { Alias = "MyCompositionAlias" };
         contentTypes.First(x => x.Alias == "Home").AddContentType(compositionType);
 
         InitializedCache(kits, contentTypes, dataTypes);
@@ -48,7 +48,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
     // override to specify our own factory with custom types
     protected override IPublishedModelFactory PublishedModelFactory
         => _publishedModelFactory ??= new PublishedModelFactory(
-            new[] {typeof(Home), typeof(Anything), typeof(CustomDocument)},
+            new[] { typeof(Home), typeof(Anything), typeof(CustomDocument) },
             PublishedValueFallback);
 
     [PublishedModel("Home")]
@@ -234,7 +234,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         var doc = GetContent(1173);
 
         var items = doc.Children(VariationContextAccessor)
-            .Concat(new[] {GetContent(1175), GetContent(4444)})
+            .Concat(new[] { GetContent(1175), GetContent(4444) })
             .ToIndexedArray();
 
         foreach (var item in items)
@@ -255,7 +255,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
     {
         var doc = GetContent(1046);
 
-        var expected = new[] {1046, 1173, 1174, 117, 1177, 1178, 1179, 1176, 1175, 4444, 1172};
+        var expected = new[] { 1046, 1173, 1174, 117, 1177, 1178, 1179, 1176, 1175, 4444, 1172 };
         var exindex = 0;
 
         // must respect the XPath descendants-or-self axis!
@@ -359,7 +359,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         var ordered = doc.Children(VariationContextAccessor).OrderBy(x => x.UpdateDate);
 
-        var correctOrder = new[] {1178, 1177, 1174, 1176};
+        var correctOrder = new[] { 1178, 1177, 1174, 1176 };
         for (var i = 0; i < correctOrder.Length; i++)
         {
             Assert.AreEqual(correctOrder[i], ordered.ElementAt(i).Id);
@@ -480,7 +480,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         Assert.IsNotNull(result);
 
         Assert.AreEqual(3, result.Length);
-        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] {1174, 1173, 1046}));
+        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] { 1174, 1173, 1046 }));
     }
 
     [Test]
@@ -493,7 +493,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         Assert.IsNotNull(result);
 
         Assert.AreEqual(2, result.Length);
-        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] {1173, 1046}));
+        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] { 1173, 1046 }));
     }
 
     [Test]
@@ -606,7 +606,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         Assert.IsNotNull(result);
 
         Assert.AreEqual(10, result.Count());
-        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] {1046, 1173, 1174, 1176, 1175}));
+        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] { 1046, 1173, 1174, 1176, 1175 }));
     }
 
     [Test]
@@ -619,7 +619,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         Assert.IsNotNull(result);
 
         Assert.AreEqual(9, result.Count());
-        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] {1173, 1174, 1176, 1175, 4444}));
+        Assert.IsTrue(result.Select(x => x.Id).ContainsAll(new[] { 1173, 1174, 1176, 1175, 4444 }));
     }
 
     [Test]
@@ -749,25 +749,25 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         var publishedSnapshot = GetPublishedSnapshot();
 
-        CollectionAssertAreEqual(new[] {root, root2},
+        CollectionAssertAreEqual(new[] { root, root2 },
             root.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] {level1_1, level1_2, level1_3},
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
             level1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1, level1_2, level1_3},
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
             level1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1, level1_2, level1_3},
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
             level1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_4.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_5.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
     }
 
@@ -800,24 +800,24 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         var publishedSnapshot = GetPublishedSnapshot();
 
-        CollectionAssertAreEqual(new[] {root2}, root.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { root2 }, root.Siblings(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] {level1_2, level1_3},
+        CollectionAssertAreEqual(new[] { level1_2, level1_3 },
             level1_1.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1, level1_3},
+        CollectionAssertAreEqual(new[] { level1_1, level1_3 },
             level1_2.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1, level1_2},
+        CollectionAssertAreEqual(new[] { level1_1, level1_2 },
             level1_3.Siblings(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] {level1_1_2, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_1.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_3, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_3, level1_1_4, level1_1_5 },
             level1_1_2.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_4, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_4, level1_1_5 },
             level1_1_3.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_5},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_5 },
             level1_1_4.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] {level1_1_1, level1_1_2, level1_1_3, level1_1_4},
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4 },
             level1_1_5.Siblings(publishedSnapshot, VariationContextAccessor));
     }
 
@@ -863,7 +863,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         var ct = PublishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 0, "alias", CreatePropertyTypes);
 
         var c = new ImageWithLegendModel(ct, guid,
-            new Dictionary<string, object> {{"legend", val1}, {"image", val2}, {"size", val3}}, false);
+            new Dictionary<string, object> { { "legend", val1 }, { "image", val2 }, { "size", val3 } }, false);
 
         Assert.AreEqual(val1, c.Legend);
         Assert.AreEqual(val3, c.Size);

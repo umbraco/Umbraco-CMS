@@ -171,7 +171,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
 
         result.Add(item3);
 
-        contentTypes = new[] {contentType1, contentType2};
+        contentTypes = new[] { contentType1, contentType2 };
 
         return result;
     }

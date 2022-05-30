@@ -30,7 +30,7 @@ public class ContentModelSerializationTests
                     Label = "Property " + propertyIndex,
                     Id = propertyIndex,
                     Value = "value" + propertyIndex,
-                    Config = new Dictionary<string, object> {{propertyIndex.ToInvariantString(), "value"}},
+                    Config = new Dictionary<string, object> { { propertyIndex.ToInvariantString(), "value" } },
                     Description = "Description " + propertyIndex,
                     View = "~/Views/View" + propertyIndex,
                     HideLabel = false
@@ -39,13 +39,16 @@ public class ContentModelSerializationTests
 
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
-                Alias = "Tab" + tabIndex, Label = "Tab" + tabIndex, Properties = props
+                Alias = "Tab" + tabIndex,
+                Label = "Tab" + tabIndex,
+                Properties = props
             });
         }
 
         var displayModel = new ContentItemDisplay
         {
-            Id = 1234, Variants = new List<ContentVariantDisplay> {new() {Name = "Test", Tabs = tabs}}
+            Id = 1234,
+            Variants = new List<ContentVariantDisplay> { new() { Name = "Test", Tabs = tabs } }
         };
 
         var json = JsonConvert.SerializeObject(displayModel);

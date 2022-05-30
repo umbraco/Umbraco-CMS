@@ -102,7 +102,7 @@ public class UserGroupHandlerTests
         var requirement = new UserGroupRequirement();
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private UserGroupHandler CreateHandler(string queryStringValue = "", bool userIsAdmin = false)
@@ -127,7 +127,7 @@ public class UserGroupHandlerTests
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
         var mockHttpRequest = new Mock<HttpRequest>();
-        var queryParams = new Dictionary<string, StringValues> {{QueryStringName, queryStringValue}};
+        var queryParams = new Dictionary<string, StringValues> { { QueryStringName, queryStringValue } };
         mockHttpRequest.SetupGet(x => x.Query).Returns(new QueryCollection(queryParams));
         mockHttpContext.SetupGet(x => x.Request).Returns(mockHttpRequest.Object);
         mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(mockHttpContext.Object);
@@ -139,10 +139,10 @@ public class UserGroupHandlerTests
         var mockUserService = new Mock<IUserService>();
         mockUserService
             .Setup(x => x.GetAllUserGroups(It.Is<int[]>(y => y.Length == 1 && y[0] == Group1Id)))
-            .Returns(new List<IUserGroup> {CreateUserGroup(Group1Id, Group1Alias)});
+            .Returns(new List<IUserGroup> { CreateUserGroup(Group1Id, Group1Alias) });
         mockUserService
             .Setup(x => x.GetAllUserGroups(It.Is<int[]>(y => y.Length == 1 && y[0] == Group2Id)))
-            .Returns(new List<IUserGroup> {CreateUserGroup(Group2Id, Group2Alias)});
+            .Returns(new List<IUserGroup> { CreateUserGroup(Group2Id, Group2Alias) });
         mockUserService
             .Setup(x => x.GetAllUserGroups(It.Is<int[]>(y => y.Length == 2 && y[0] == Group1Id && y[1] == Group2Id)))
             .Returns(new List<IUserGroup>

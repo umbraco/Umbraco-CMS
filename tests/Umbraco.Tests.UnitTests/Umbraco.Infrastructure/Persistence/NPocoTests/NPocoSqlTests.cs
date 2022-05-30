@@ -19,7 +19,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
     [Test]
     public void Where_Clause_With_Starts_With_Additional_Parameters()
     {
-        var content = new NodeDto {NodeId = 123, Path = "-1,123"};
+        var content = new NodeDto { NodeId = 123, Path = "-1,123" };
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Path.SqlStartsWith(content.Path, TextColumnType.NVarchar));
 
@@ -32,7 +32,7 @@ public class NPocoSqlTests : BaseUsingSqlSyntax
     [Test]
     public void Where_Clause_With_Starts_With_By_Variable()
     {
-        var content = new NodeDto {NodeId = 123, Path = "-1,123"};
+        var content = new NodeDto { NodeId = 123, Path = "-1,123" };
         var sql = Sql().SelectAll().From<NodeDto>()
             .Where<NodeDto>(x => x.Path.StartsWith(content.Path) && x.NodeId != content.NodeId);
 

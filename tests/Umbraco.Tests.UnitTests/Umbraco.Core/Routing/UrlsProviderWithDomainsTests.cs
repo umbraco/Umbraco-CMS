@@ -281,7 +281,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains1();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
@@ -312,7 +312,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains2();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
@@ -335,7 +335,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains3();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
@@ -364,7 +364,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains4();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
@@ -384,7 +384,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains4();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
@@ -450,7 +450,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains4();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://domain1.com/test");
@@ -472,7 +472,7 @@ public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
         SetDomains5();
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://domain1.com/en/test");

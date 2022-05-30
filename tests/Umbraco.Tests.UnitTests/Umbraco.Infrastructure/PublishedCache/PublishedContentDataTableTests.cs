@@ -27,7 +27,10 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
     {
         var contentType = new ContentType(TestHelper.ShortStringHelper, -1)
         {
-            Alias = name, Name = name, Key = Guid.NewGuid(), Id = name.GetHashCode()
+            Alias = name,
+            Name = name,
+            Key = Guid.NewGuid(),
+            Id = name.GetHashCode()
         };
         foreach (var prop in propertyAliasesAndNames)
         {
@@ -49,16 +52,16 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
         var valueCounter = 1;
         var parentId = 3;
 
-        var properties = new Dictionary<string, string> {["property1"] = "Property 1", ["property2"] = "Property 2"};
+        var properties = new Dictionary<string, string> { ["property1"] = "Property 1", ["property2"] = "Property 2" };
 
         var parentContentType = CreateContentType("Parent", dataType,
-            new Dictionary<string, string>(properties) {["property3"] = "Property 3"});
+            new Dictionary<string, string>(properties) { ["property3"] = "Property 3" });
         var childContentType = CreateContentType("Child", dataType,
-            new Dictionary<string, string>(properties) {["property4"] = "Property 4"});
+            new Dictionary<string, string>(properties) { ["property4"] = "Property 4" });
         var child2ContentType = CreateContentType("Child2", dataType,
-            new Dictionary<string, string>(properties) {["property4"] = "Property 4"});
+            new Dictionary<string, string>(properties) { ["property4"] = "Property 4" });
 
-        contentTypes = new[] {parentContentType, childContentType, child2ContentType};
+        contentTypes = new[] { parentContentType, childContentType, child2ContentType };
 
         var parentData = new ContentDataBuilder()
             .WithName("Page" + Guid.NewGuid())

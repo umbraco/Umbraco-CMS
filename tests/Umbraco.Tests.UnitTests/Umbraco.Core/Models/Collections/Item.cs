@@ -225,4 +225,19 @@ public abstract class Item : IEntity, ICanBeDirty
     public static bool operator ==(Item left, Item right) => ReferenceEquals(left, right);
 
     public static bool operator !=(Item left, Item right) => !(left == right);
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(obj, null))
+        {
+            return false;
+        }
+
+        throw new NotImplementedException();
+    }
 }

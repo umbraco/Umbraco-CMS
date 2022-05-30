@@ -29,7 +29,7 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
     [Test]
     public async Task DoNotPolluteCache()
     {
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
         SetDomains1();
@@ -110,7 +110,7 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
         return new UrlProvider(
             new TestUmbracoContextAccessor(umbracoContext),
             Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] {urlProvider}),
+            new UrlProviderCollection(() => new[] { urlProvider }),
             new MediaUrlProviderCollection(() => Enumerable.Empty<IMediaUrlProvider>()),
             Mock.Of<IVariationContextAccessor>()
         );

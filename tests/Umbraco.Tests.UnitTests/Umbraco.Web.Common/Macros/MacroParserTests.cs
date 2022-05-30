@@ -28,7 +28,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -48,7 +48,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""Map"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -68,7 +68,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""Map"" ></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -88,7 +88,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -108,7 +108,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -128,7 +128,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -152,7 +152,7 @@ public class MacroParserTests
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -242,7 +242,7 @@ asdfsdf
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -262,7 +262,7 @@ asdfsdf
 <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" ><img src='blah.jpg'/></?UMBRACO_MACRO>
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>
@@ -283,7 +283,7 @@ asdfsdf
 test"" />
 <p>asdfasdf</p>";
         var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content,
-            new Dictionary<string, string> {{"test1", "value1"}, {"test2", "value2\r\ntest"}});
+            new Dictionary<string, string> { { "test1", "value1" }, { "test2", "value2\r\ntest" } });
 
         Assert.AreEqual(
             @"<p>asdfasdf</p>

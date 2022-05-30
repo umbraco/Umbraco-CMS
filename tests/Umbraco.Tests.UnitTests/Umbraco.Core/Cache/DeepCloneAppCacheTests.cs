@@ -37,7 +37,7 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     [Test]
     public void Clones_List()
     {
-        var original = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) {new(), new(), new()};
+        var original = new DeepCloneableList<TestClone>(ListCloneBehavior.Always) { new(), new(), new() };
 
         var val = _provider.GetCacheItem("test", () => original);
 
@@ -51,7 +51,7 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     [Test]
     public void Ensures_Cloned_And_Reset()
     {
-        var original = new TestClass {Name = "hello"};
+        var original = new TestClass { Name = "hello" };
         Assert.IsTrue(original.IsDirty());
 
         var val = _provider.GetCacheItem("test", () => original);

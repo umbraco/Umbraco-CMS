@@ -27,7 +27,7 @@ public class FilterAllowedOutgoingContentAttributeTests
     [Test]
     public void GetValueFromResponse_Already_EnumerableContent()
     {
-        var expected = new List<ContentItemBasic> {new()};
+        var expected = new List<ContentItemBasic> { new() };
 
         var att = new FilterAllowedOutgoingContentFilter(
             expected.GetType(),
@@ -46,8 +46,8 @@ public class FilterAllowedOutgoingContentAttributeTests
     [Test]
     public void GetValueFromResponse_From_Property()
     {
-        var expected = new List<ContentItemBasic> {new()};
-        var container = new MyTestClass {MyList = expected};
+        var expected = new List<ContentItemBasic> { new() };
+        var container = new MyTestClass { MyList = expected };
 
         var att = new FilterAllowedOutgoingContentFilter(
             expected.GetType(),
@@ -66,8 +66,8 @@ public class FilterAllowedOutgoingContentAttributeTests
     [Test]
     public void GetValueFromResponse_Returns_Null_Not_Found_Property()
     {
-        var expected = new List<ContentItemBasic> {new()};
-        var container = new MyTestClass {MyList = expected};
+        var expected = new List<ContentItemBasic> { new() };
+        var container = new MyTestClass { MyList = expected };
 
         var att = new FilterAllowedOutgoingContentFilter(
             expected.GetType(),
@@ -91,7 +91,7 @@ public class FilterAllowedOutgoingContentAttributeTests
         var userService = userServiceMock.Object;
         var entityServiceMock = new Mock<IEntityService>();
         entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
-            .Returns(new[] {Mock.Of<TreeEntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5")});
+            .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
         var entityService = entityServiceMock.Object;
 
         var list = new List<ContentItemBasic>();
@@ -113,7 +113,7 @@ public class FilterAllowedOutgoingContentAttributeTests
             }
 
             path += i.ToInvariantString();
-            list.Add(new ContentItemBasic {Id = i, Name = "Test" + i, ParentId = i, Path = path});
+            list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = i, Path = path });
         }
 
         att.FilterBasedOnStartNode(list, user);
@@ -127,7 +127,7 @@ public class FilterAllowedOutgoingContentAttributeTests
         var list = new List<ContentItemBasic>();
         for (var i = 0; i < 10; i++)
         {
-            list.Add(new ContentItemBasic {Id = i, Name = "Test" + i, ParentId = -1});
+            list.Add(new ContentItemBasic { Id = i, Name = "Test" + i, ParentId = -1 });
         }
 
         var ids = list.Select(x => (int)x.Id).ToArray();
@@ -166,7 +166,7 @@ public class FilterAllowedOutgoingContentAttributeTests
     private IUser CreateUser(int id = 0, int? startContentId = null) =>
         new UserBuilder()
             .WithId(id)
-            .WithStartContentIds(startContentId.HasValue ? new[] {startContentId.Value} : new int[0])
+            .WithStartContentIds(startContentId.HasValue ? new[] { startContentId.Value } : new int[0])
             .Build();
 
     private class MyTestClass

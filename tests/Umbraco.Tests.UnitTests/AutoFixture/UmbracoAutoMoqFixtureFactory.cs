@@ -8,7 +8,7 @@ internal static class UmbracoAutoMoqFixtureFactory
 {
     internal static IFixture CreateDefaultFixture() =>
         new Fixture()
-            .Customize(new AutoMoqCustomization {ConfigureMembers = true})
+            .Customize(new AutoMoqCustomization { ConfigureMembers = true })
             .Customize(new OmitRecursionCustomization())
             .Customize(new UmbracoCustomizations());
 }

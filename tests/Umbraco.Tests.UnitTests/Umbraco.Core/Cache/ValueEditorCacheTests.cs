@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
@@ -76,7 +76,7 @@ public class ValueEditorCacheTests
         var editor2DataType1 = sut.GetValueEditor(dataEditor2, dataType1);
         var editor2Datatype2 = sut.GetValueEditor(dataEditor2, dataType2);
 
-        sut.ClearCache(new[] {dataType1.Id});
+        sut.ClearCache(new[] { dataType1.Id });
 
         // New value editor objects should be created after it's cleared
         Assert.AreNotSame(editor1DataType1, sut.GetValueEditor(dataEditor1, dataType1),

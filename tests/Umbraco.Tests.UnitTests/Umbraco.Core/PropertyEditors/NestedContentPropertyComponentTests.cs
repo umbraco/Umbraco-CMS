@@ -26,7 +26,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void No_Nesting()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -51,7 +51,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void One_Level_Nesting_Unescaped()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -97,7 +97,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void One_Level_Nesting_Escaped()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -150,7 +150,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void Nested_In_Complex_Editor_Escaped()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -258,7 +258,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void No_Nesting_Generates_Keys_For_Missing_Items()
     {
-        Guid[] guids = {Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -284,7 +284,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void One_Level_Nesting_Escaped_Generates_Keys_For_Missing_Items()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()
@@ -330,7 +330,7 @@ public class NestedContentPropertyComponentTests
     [Test]
     public void Nested_In_Complex_Editor_Escaped_Generates_Keys_For_Missing_Items()
     {
-        Guid[] guids = {Guid.NewGuid(), Guid.NewGuid()};
+        Guid[] guids = { Guid.NewGuid(), Guid.NewGuid() };
         var guidCounter = 0;
 
         Guid GuidFactory()

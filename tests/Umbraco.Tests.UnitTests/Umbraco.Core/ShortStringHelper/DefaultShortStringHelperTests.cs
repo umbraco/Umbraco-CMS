@@ -75,13 +75,13 @@ public class DefaultShortStringHelperTests
 
     private static string StripQuotes(string s)
     {
-        s = s.ReplaceMany(new Dictionary<string, string> {{"'", string.Empty}, {"\u8217", string.Empty}});
+        s = s.ReplaceMany(new Dictionary<string, string> { { "'", string.Empty }, { "\u8217", string.Empty } });
         return s;
     }
 
     private static string WhiteQuotes(string s)
     {
-        s = s.ReplaceMany(new Dictionary<string, string> {{"'", " "}, {"\u8217", " "}});
+        s = s.ReplaceMany(new Dictionary<string, string> { { "'", " " }, { "\u8217", " " } });
         return s;
     }
 

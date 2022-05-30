@@ -167,17 +167,17 @@ public class LogviewerTests
 
         // Check invalid log levels
         // Rather than expect 0 items - get all items back & ignore the invalid levels
-        string[] invalidLogLevels = {"Invalid", "NotALevel"};
+        string[] invalidLogLevels = { "Invalid", "NotALevel" };
         var queryWithInvalidLevels = _logViewer.GetLogs(_logTimePeriod, 1, logLevels: invalidLogLevels);
         Assert.AreEqual(102, queryWithInvalidLevels.TotalItems);
 
         // Check we can call method with an array of logLevel (error & warning)
-        string[] logLevels = {"Warning", "Error"};
+        string[] logLevels = { "Warning", "Error" };
         var queryWithLevels = _logViewer.GetLogs(_logTimePeriod, 1, logLevels: logLevels);
         Assert.AreEqual(7, queryWithLevels.TotalItems);
 
         // Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
-        string[] logLevelMismatch = {"Debug", "Information"};
+        string[] logLevelMismatch = { "Debug", "Information" };
         var filterLevelQuery = _logViewer.GetLogs(_logTimePeriod, 1, filterExpression: "@Level='Warning'",
             logLevels: logLevelMismatch);
         Assert.AreEqual(0, filterLevelQuery.TotalItems);
@@ -209,7 +209,7 @@ public class LogviewerTests
 
         var searches = _logViewer.GetSavedSearches();
 
-        var savedSearch = new SavedLogSearch {Name = "Unit Test Example", Query = "Has(UnitTest)"};
+        var savedSearch = new SavedLogSearch { Name = "Unit Test Example", Query = "Has(UnitTest)" };
 
         // Check if we can find the newly added item from the results we get back
         var findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");

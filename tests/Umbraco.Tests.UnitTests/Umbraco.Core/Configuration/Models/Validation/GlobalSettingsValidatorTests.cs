@@ -24,7 +24,7 @@ public class GlobalSettingsValidatorTests
     public void Returns_Fail_For_Configuration_With_Invalid_SmtpFrom_Field()
     {
         var validator = new GlobalSettingsValidator();
-        var options = new GlobalSettings {Smtp = new SmtpSettings {From = "invalid"}};
+        var options = new GlobalSettings { Smtp = new SmtpSettings { From = "invalid" } };
 
         var result = validator.Validate("settings", options);
         Assert.False(result.Succeeded);
@@ -34,7 +34,7 @@ public class GlobalSettingsValidatorTests
     public void Returns_Fail_For_Configuration_With_Insufficient_SqlWriteLockTimeOut()
     {
         var validator = new GlobalSettingsValidator();
-        var options = new GlobalSettings {DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:00.099")};
+        var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:00.099") };
 
         var result = validator.Validate("settings", options);
         Assert.False(result.Succeeded);
@@ -44,7 +44,7 @@ public class GlobalSettingsValidatorTests
     public void Returns_Fail_For_Configuration_With_Excessive_SqlWriteLockTimeOut()
     {
         var validator = new GlobalSettingsValidator();
-        var options = new GlobalSettings {DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:21")};
+        var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:21") };
 
         var result = validator.Validate("settings", options);
         Assert.False(result.Succeeded);
@@ -54,7 +54,7 @@ public class GlobalSettingsValidatorTests
     public void Returns_Success_For_Configuration_With_Valid_SqlWriteLockTimeOut()
     {
         var validator = new GlobalSettingsValidator();
-        var options = new GlobalSettings {DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:20")};
+        var options = new GlobalSettings { DistributedLockingWriteLockDefaultTimeout = TimeSpan.Parse("00:00:20") };
 
         var result = validator.Validate("settings", options);
         Assert.True(result.Succeeded);

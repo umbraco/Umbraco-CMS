@@ -105,6 +105,6 @@ public class ImageCropperTemplateCoreExtensionsTests
 
     private static ImageCropperValue CreateImageCropperValueWithCrops() => new()
     {
-        Crops = new List<ImageCropperValue.ImageCropperCrop> {new() {Alias = "TestCrop", Width = 100, Height = 200}}
+        Crops = new List<ImageCropperValue.ImageCropperCrop> { new() { Alias = "TestCrop", Width = 100, Height = 200 } }
     };
 }

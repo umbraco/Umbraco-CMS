@@ -40,7 +40,7 @@ public class ReflectionUtilitiesTests
         Assert.IsInstanceOf<Class1>(ctor1());
 
         ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null,
-            CallingConventions.Any, new[] {typeof(int)}, null);
+            CallingConventions.Any, new[] { typeof(int) }, null);
         var ctor3 = ReflectionUtilities.EmitConstructor<Func<int, object>>(ctorInfo);
         Assert.IsInstanceOf<Class1>(ctor3(42));
 
@@ -121,7 +121,7 @@ public class ReflectionUtilitiesTests
         method1(class1);
 
         methodInfo = typeof(Class1).GetMethod("Method2", BindingFlags.Instance | BindingFlags.Public, null,
-            new[] {typeof(int)}, null);
+            new[] { typeof(int) }, null);
         var method2 = ReflectionUtilities.EmitMethod<Action<Class1, int>>(methodInfo);
         method2(class1, 42);
 
@@ -130,7 +130,7 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(42, method3(class1));
 
         methodInfo = typeof(Class1).GetMethod("Method4", BindingFlags.Instance | BindingFlags.Public, null,
-            new[] {typeof(string)}, null);
+            new[] { typeof(string) }, null);
         var method4 = ReflectionUtilities.EmitMethod<Func<Class1, string, int>>(methodInfo);
         Assert.AreEqual(42, method4(class1, "42"));
 
@@ -139,7 +139,7 @@ public class ReflectionUtilitiesTests
         smethod1();
 
         methodInfo = typeof(Class1).GetMethod("SMethod2", BindingFlags.Static | BindingFlags.Public, null,
-            new[] {typeof(int)}, null);
+            new[] { typeof(int) }, null);
         var smethod2 = ReflectionUtilities.EmitMethod<Action<int>>(methodInfo);
         smethod2(42);
 
@@ -148,7 +148,7 @@ public class ReflectionUtilitiesTests
         Assert.AreEqual(42, smethod3());
 
         methodInfo = typeof(Class1).GetMethod("SMethod4", BindingFlags.Static | BindingFlags.Public, null,
-            new[] {typeof(string)}, null);
+            new[] { typeof(string) }, null);
         var smethod4 = ReflectionUtilities.EmitMethod<Func<string, int>>(methodInfo);
         Assert.AreEqual(42, smethod4("42"));
 
@@ -362,7 +362,7 @@ public class ReflectionUtilitiesTests
         var propInt4 = type4.GetProperty("IntValue");
 
         var object2A = new Class2A();
-        var object4 = new Class4 {ClassAValue = object2A, IntValue = 159};
+        var object4 = new Class4 { ClassAValue = object2A, IntValue = 159 };
 
         // can cast the return type from Class2A to Class2
         var getterClassA4 = ReflectionUtilities.EmitPropertyGetter<Class4, Class2>(propClassA4);
@@ -394,7 +394,7 @@ public class ReflectionUtilitiesTests
         var propClass4 = type5.GetProperty("ClassValue");
 
         var object2 = new Class2();
-        var object4 = new Class5 {ClassValue = object2};
+        var object4 = new Class5 { ClassValue = object2 };
 
         // can cast the object type from Class5 to Class4
         var getterClass4 = ReflectionUtilities.EmitPropertyGetter<Class5, Class2>(propClass4);
@@ -415,7 +415,7 @@ public class ReflectionUtilitiesTests
         // test simple class
         var type4 = typeof(Class4);
 
-        var object4 = new Class4 {IntValue = 1, StringValue = "foo", ClassValue = new Class2()};
+        var object4 = new Class4 { IntValue = 1, StringValue = "foo", ClassValue = new Class2() };
 
         // works with a string property
         var propString4 = type4.GetProperty("StringValue");
@@ -555,7 +555,7 @@ public class ReflectionUtilitiesTests
     [Test]
     public void DeconstructAnonymousType()
     {
-        var o = new {a = 1, b = "hello"};
+        var o = new { a = 1, b = "hello" };
 
         var getters = new Dictionary<string, Func<object, object>>();
         foreach (var prop in o.GetType().GetProperties())
@@ -630,7 +630,7 @@ public class ReflectionUtilitiesTests
         public readonly int Field3 = 22;
 
         public int Field1 = 33;
-        private int Field2 = 66;
+        private readonly int Field2 = 66;
 
         public Class1()
         {

@@ -45,7 +45,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() {Name = "root", IsDraft = true, Date = DateTime.Now, UrlSegment = "root"}
+                [culture] = new() { Name = "root", IsDraft = true, Date = DateTime.Now, UrlSegment = "root" }
             })
             .Build(ShortStringHelper, propertyDataTypes, contentType1, "alias");
 
@@ -59,7 +59,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() {Name = "home", IsDraft = true, Date = DateTime.Now, UrlSegment = "home"}
+                [culture] = new() { Name = "home", IsDraft = true, Date = DateTime.Now, UrlSegment = "home" }
             })
             .Build();
 
@@ -74,7 +74,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() {Name = "name-fr2", IsDraft = true, Date = DateTime.Now, UrlSegment = "test-fr"}
+                [culture] = new() { Name = "name-fr2", IsDraft = true, Date = DateTime.Now, UrlSegment = "test-fr" }
             })
             .Build();
 
@@ -85,7 +85,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             draftData: contentData,
             publishedData: contentData);
 
-        InitializedCache(new[] {root, parent, content}, new[] {contentType1}, dataTypes);
+        InitializedCache(new[] { root, parent, content }, new[] { contentType1 }, dataTypes);
     }
 
     private void SetDomains1()
@@ -107,7 +107,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     [Test]
     public void Ensure_Cache_Is_Correct()
     {
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = false};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = false };
 
         var xml = PublishedContentXml.BaseWebTestXml(1234);
 
@@ -173,7 +173,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     [TestCase(1172, "/test-page/")]
     public void Get_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
     {
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         var xml = PublishedContentXml.BaseWebTestXml(1234);
 
@@ -200,7 +200,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     {
         const string currentUri = "http://example.us/test";
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         PopulateCache(culture);
 
@@ -223,7 +223,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     {
         const string currentUri = "http://example.fr/test";
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         PopulateCache();
 
@@ -247,7 +247,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     {
         const string currentUri = "http://example.us/test";
 
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         PopulateCache();
 
@@ -265,7 +265,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     [Test]
     public void Get_Url_Relative_Or_Absolute()
     {
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         var xml = PublishedContentXml.BaseWebTestXml(1234);
 

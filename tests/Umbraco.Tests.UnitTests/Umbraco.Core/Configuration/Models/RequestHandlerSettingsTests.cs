@@ -17,7 +17,7 @@ public class RequestHandlerSettingsTests
         };
 
 
-        var settings = new RequestHandlerSettings {UserDefinedCharCollection = userCollection};
+        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         var expectedCollection = RequestHandlerSettings.DefaultCharCollection.ToList();
@@ -37,7 +37,8 @@ public class RequestHandlerSettingsTests
 
         var settings = new RequestHandlerSettings
         {
-            UserDefinedCharCollection = userCollection, EnableDefaultCharReplacements = false
+            UserDefinedCharCollection = userCollection,
+            EnableDefaultCharReplacements = false
         };
         var actual = settings.GetCharReplacements().ToList();
 
@@ -53,7 +54,7 @@ public class RequestHandlerSettingsTests
             new() {Char = "%", Replacement = "percent"}, new() {Char = ".", Replacement = "dot"}
         };
 
-        var settings = new RequestHandlerSettings {UserDefinedCharCollection = userCollection};
+        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
@@ -73,7 +74,7 @@ public class RequestHandlerSettingsTests
             new() {Char = "new", Replacement = "new"}
         };
 
-        var settings = new RequestHandlerSettings {UserDefinedCharCollection = userCollection};
+        var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
 
         // Add 1 to the length, because we're expecting to only add one new one

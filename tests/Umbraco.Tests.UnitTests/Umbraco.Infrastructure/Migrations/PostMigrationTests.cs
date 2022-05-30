@@ -61,7 +61,7 @@ public class PostMigrationTests
             new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
             DatabaseType.SQLCe,
             Mock.Of<IPocoDataFactory>());
-        var scopeProvider = new MigrationTests.TestScopeProvider(scope) {SqlContext = sqlContext};
+        var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
         var plan = new MigrationPlan("Test")
             .From(string.Empty).To("done");
@@ -110,7 +110,7 @@ public class PostMigrationTests
             new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
             DatabaseType.SQLCe,
             Mock.Of<IPocoDataFactory>());
-        var scopeProvider = new MigrationTests.TestScopeProvider(scope) {SqlContext = sqlContext};
+        var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
         var plan = new MigrationPlan("Test")
             .From(string.Empty).To<TestMigration>("done");

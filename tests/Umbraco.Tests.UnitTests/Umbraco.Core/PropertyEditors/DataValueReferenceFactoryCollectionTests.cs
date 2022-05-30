@@ -72,7 +72,7 @@ public class DataValueReferenceFactoryCollectionTests
                     new() {Culture = "en-US", Segment = "B", EditedValue = trackedUdi3}
                 }
             };
-        var properties = new PropertyCollection {property};
+        var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors);
 
         Assert.AreEqual(2, result.Count());
@@ -117,7 +117,7 @@ public class DataValueReferenceFactoryCollectionTests
                     new() {Culture = "en-US", Segment = "B", EditedValue = trackedUdi3}
                 }
             };
-        var properties = new PropertyCollection {property};
+        var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors);
 
         Assert.AreEqual(2, result.Count());
@@ -162,7 +162,7 @@ public class DataValueReferenceFactoryCollectionTests
                     new() {Segment = "B", EditedValue = trackedUdi4}
                 }
             };
-        var properties = new PropertyCollection {property};
+        var properties = new PropertyCollection { property };
         var result = collection.GetAllReferences(properties, propertyEditors);
 
         Assert.AreEqual(2, result.Count());

@@ -22,7 +22,7 @@ public class DistributedCacheTests
         ServerRegistrar = new TestServerRegistrar();
         ServerMessenger = new TestServerMessenger();
 
-        var cacheRefresherCollection = new CacheRefresherCollection(() => new[] {new TestCacheRefresher()});
+        var cacheRefresherCollection = new CacheRefresherCollection(() => new[] { new TestCacheRefresher() });
 
         _distributedCache = new Cms.Core.Cache.DistributedCache(ServerMessenger, cacheRefresherCollection);
     }
@@ -52,7 +52,7 @@ public class DistributedCacheTests
             _distributedCache.Refresh(
                 Guid.Parse("E0F452CB-DCB2-4E84-B5A5-4F01744C5C73"),
                 x => x.Id,
-                new TestObjectWithId {Id = i});
+                new TestObjectWithId { Id = i });
         }
 
         Assert.AreEqual(10, ServerMessenger.IntIdsRefreshed.Count);

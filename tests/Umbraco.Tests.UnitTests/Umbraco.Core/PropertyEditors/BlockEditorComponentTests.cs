@@ -19,7 +19,8 @@ public class BlockEditorComponentTests
 {
     private readonly JsonSerializerSettings _serializerSettings = new()
     {
-        Formatting = Formatting.None, NullValueHandling = NullValueHandling.Ignore
+        Formatting = Formatting.None,
+        NullValueHandling = NullValueHandling.Ignore
     };
 
     private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";

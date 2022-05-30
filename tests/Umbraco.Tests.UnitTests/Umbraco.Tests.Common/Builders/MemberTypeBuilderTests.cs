@@ -37,9 +37,9 @@ public class MemberTypeBuilderTests
         const bool testTrashed = true;
         const int testPropertyTypeIdsIncrementingFrom = 200;
         var testPropertyType1 =
-            new PropertyTypeDetail {Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88};
+            new PropertyTypeDetail { Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88 };
         var testPropertyType2 =
-            new PropertyTypeDetail {Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87};
+            new PropertyTypeDetail { Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87 };
         var testPropertyData1 = new KeyValuePair<string, object>("title", "Name member");
 
         var builder = new MemberTypeBuilder();

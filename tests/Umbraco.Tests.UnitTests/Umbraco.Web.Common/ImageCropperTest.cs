@@ -60,7 +60,8 @@ public class ImageCropperTest
         var obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1,
             new JsonSerializerSettings
             {
-                Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal
+                Culture = CultureInfo.InvariantCulture,
+                FloatParseHandling = FloatParseHandling.Decimal
             });
         Assert.AreEqual(cropperValue, obj);
     }
@@ -373,7 +374,7 @@ public class ImageCropperTest
 
     internal class TestImageUrlGenerator : IImageUrlGenerator
     {
-        public IEnumerable<string> SupportedImageFileTypes => new[] {"jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif"};
+        public IEnumerable<string> SupportedImageFileTypes => new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
 
         public string GetImageUrl(ImageUrlGenerationOptions options)
         {

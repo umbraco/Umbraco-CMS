@@ -18,7 +18,7 @@ public class BasicAuthServiceTests
     {
         var sut = new BasicAuthService(
             Mock.Of<IOptionsMonitor<BasicAuthSettings>>(
-                _ => _.CurrentValue == new BasicAuthSettings {Enabled = enabled}), new IpAddressUtilities());
+                _ => _.CurrentValue == new BasicAuthSettings { Enabled = enabled }), new IpAddressUtilities());
 
         return sut.IsBasicAuthEnabled();
     }
@@ -34,7 +34,7 @@ public class BasicAuthServiceTests
         var allowedIPs = commaSeperatedAllowlist.Split(",").Select(x => x.Trim()).ToArray();
         var sut = new BasicAuthService(
             Mock.Of<IOptionsMonitor<BasicAuthSettings>>(_ =>
-                _.CurrentValue == new BasicAuthSettings {AllowedIPs = allowedIPs}), new IpAddressUtilities());
+                _.CurrentValue == new BasicAuthSettings { AllowedIPs = allowedIPs }), new IpAddressUtilities());
 
         return sut.IsIpAllowListed(IPAddress.Parse(clientIpAddress));
     }

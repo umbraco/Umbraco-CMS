@@ -26,7 +26,7 @@ public class PublishContentCacheTests : PublishedSnapshotServiceTestBase
             out var dataTypes).ToList();
 
         // configure the Home content type to be composed of another for tests.
-        var compositionType = new ContentType(TestHelper.ShortStringHelper, -1) {Alias = "MyCompositionAlias"};
+        var compositionType = new ContentType(TestHelper.ShortStringHelper, -1) { Alias = "MyCompositionAlias" };
         contentTypes.First(x => x.Alias == "Home").AddContentType(compositionType);
 
         InitializedCache(kits, contentTypes, dataTypes);

@@ -58,7 +58,7 @@ public class MemberManagerTests
             Mock.Of<ITwoFactorLoginService>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
-        var idOptions = new IdentityOptions {Lockout = {AllowedForNewUsers = false}};
+        var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
         _mockIdentityOptions.Setup(o => o.Value).Returns(idOptions);
         _mockPasswordHasher = new Mock<IPasswordHasher<MemberIdentityUser>>();
 
@@ -71,7 +71,7 @@ public class MemberManagerTests
         _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
             new MemberPasswordConfigurationSettings());
 
-        var pwdValidators = new List<PasswordValidator<MemberIdentityUser>> {new()};
+        var pwdValidators = new List<PasswordValidator<MemberIdentityUser>> { new() };
 
         var userManager = new MemberManager(
             new Mock<IIpResolver>().Object,
@@ -100,7 +100,7 @@ public class MemberManagerTests
     {
         //arrange
         var sut = CreateSut();
-        var fakeUser = new MemberIdentityUser {PasswordConfig = "testConfig"};
+        var fakeUser = new MemberIdentityUser { PasswordConfig = "testConfig" };
 
         //act
         var identityResult = await sut.CreateAsync(fakeUser);
@@ -229,7 +229,7 @@ public class MemberManagerTests
     {
         var builder = new MemberTypeBuilder();
         var memberType = builder.BuildSimpleMemberType();
-        return new Member(memberType) {Id = 777, Username = fakeUser.UserName};
+        return new Member(memberType) { Id = 777, Username = fakeUser.UserName };
     }
 
     private void MockMemberServiceForCreateMember(IMember fakeMember)

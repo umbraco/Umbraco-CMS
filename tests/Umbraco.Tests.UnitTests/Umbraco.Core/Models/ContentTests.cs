@@ -540,7 +540,7 @@ public class ContentTests
         var content = ContentBuilder.CreateTextpageContent(contentType, "Textpage", -1);
 
         // Act
-        content.PropertyValues(new {title = "This is the new title"});
+        content.PropertyValues(new { title = "This is the new title" });
 
         // Assert
         Assert.That(content.Properties.Any(), Is.True);
@@ -578,7 +578,7 @@ public class ContentTests
 
         // Act
         contentType.PropertyGroups.Add(
-            new PropertyGroup(true) {Alias = "testGroup", Name = "Test Group", SortOrder = 3});
+            new PropertyGroup(true) { Alias = "testGroup", Name = "Test Group", SortOrder = 3 });
 
         // Assert
         Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
@@ -656,7 +656,7 @@ public class ContentTests
             .WithAlias("subtitle")
             .WithName("Subtitle")
             .Build();
-        var propertyGroup = new PropertyGroup(true) {Alias = "testGroup", Name = "Test Group", SortOrder = 3};
+        var propertyGroup = new PropertyGroup(true) { Alias = "testGroup", Name = "Test Group", SortOrder = 3 };
         propertyGroup.PropertyTypes.Add(propertyType);
         contentType.PropertyGroups.Add(propertyGroup);
         var newProperty = new Property(propertyType);
@@ -815,7 +815,7 @@ public class ContentTests
         contentType.ResetDirtyProperties();
 
         // Act
-        var propertyGroup = new PropertyGroup(true) {Alias = "testGroup", Name = "Test Group", SortOrder = 3};
+        var propertyGroup = new PropertyGroup(true) { Alias = "testGroup", Name = "Test Group", SortOrder = 3 };
         contentType.PropertyGroups.Add(propertyGroup);
 
         // Assert
@@ -934,7 +934,7 @@ public class ContentTests
         var simple2ContentType = ContentTypeBuilder.CreateSimpleContentType(
             "anotherSimple",
             "Another Simple Page",
-            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> {propertyType}));
+            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> { propertyType }));
 
         // Act
         var added = simpleContentType.AddContentType(simple2ContentType);
@@ -960,7 +960,7 @@ public class ContentTests
         var simple2ContentType = ContentTypeBuilder.CreateSimpleContentType(
             "anotherSimple",
             "Another Simple Page",
-            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> {propertyType}));
+            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> { propertyType }));
 
         // Act
         var addedMeta = simple2ContentType.AddContentType(metaContentType);
@@ -989,7 +989,7 @@ public class ContentTests
         var mixin1 = ContentTypeBuilder.CreateSimpleContentType(
             "mixin1",
             "Mixin1",
-            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> {propertyType1}));
+            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> { propertyType1 }));
         var propertyType2 = new PropertyTypeBuilder()
             .WithAlias("author")
             .WithName("Author")
@@ -997,7 +997,7 @@ public class ContentTests
         var mixin2 = ContentTypeBuilder.CreateSimpleContentType(
             "mixin2",
             "Mixin2",
-            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> {propertyType2}));
+            propertyTypeCollection: new PropertyTypeCollection(true, new List<PropertyType> { propertyType2 }));
 
         // Act
         var addedMetaMixin2 = mixin2.AddContentType(meta);

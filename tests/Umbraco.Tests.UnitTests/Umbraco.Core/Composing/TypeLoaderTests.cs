@@ -135,9 +135,9 @@ public class TypeLoaderTests
         f5.CreateText().Close();
         f6.CreateText().Close();
         f7.CreateText().Close();
-        FileInfo[] list1 = {f1, f2, f3, f4, f5, f6};
-        FileInfo[] list2 = {f1, f3, f5};
-        FileInfo[] list3 = {f1, f3, f5, f7};
+        FileInfo[] list1 = { f1, f2, f3, f4, f5, f6 };
+        FileInfo[] list2 = { f1, f3, f5 };
+        FileInfo[] list3 = { f1, f3, f5, f7 };
 
         // Act
         var hash1 = GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()));

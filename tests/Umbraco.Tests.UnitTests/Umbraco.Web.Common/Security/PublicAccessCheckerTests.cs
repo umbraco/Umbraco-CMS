@@ -23,7 +23,7 @@ public class PublicAccessCheckerTests
     {
         var services = new ServiceCollection();
         services.AddScoped(x => memberManager);
-        httpContext = new DefaultHttpContext {RequestServices = services.BuildServiceProvider()};
+        httpContext = new DefaultHttpContext { RequestServices = services.BuildServiceProvider() };
 
         var localHttpContext = httpContext;
         return Mock.Of<IHttpContextAccessor>(x => x.HttpContext == localHttpContext);
@@ -43,7 +43,7 @@ public class PublicAccessCheckerTests
     private ClaimsPrincipal GetLoggedInUser()
     {
         var user = new ClaimsPrincipal(new ClaimsIdentity(
-            new[] {new(ClaimTypes.NameIdentifier, "1234"), new Claim(ClaimTypes.Name, "test@example.com")},
+            new[] { new(ClaimTypes.NameIdentifier, "1234"), new Claim(ClaimTypes.Name, "test@example.com") },
             "TestAuthentication"));
         return user;
     }
@@ -52,7 +52,7 @@ public class PublicAccessCheckerTests
     {
         if (roles == null)
         {
-            roles = new[] {"role1", "role2"};
+            roles = new[] { "role1", "role2" };
         }
 
         Mock.Get(memberManager).Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
@@ -129,7 +129,7 @@ public class PublicAccessCheckerTests
                     }
                 }));
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {IsApproved = true, UserName = username});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true, UserName = username });
         MockGetRolesAsync(memberManager, Enumerable.Empty<string>());
 
         var result = await sut.HasMemberAccessToContentAsync(123);
@@ -147,7 +147,7 @@ public class PublicAccessCheckerTests
 
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager,
-            new MemberIdentityUser {IsApproved = true, LockoutEnd = DateTime.UtcNow.AddDays(10)});
+            new MemberIdentityUser { IsApproved = true, LockoutEnd = DateTime.UtcNow.AddDays(10) });
         MockGetRolesAsync(memberManager);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
@@ -164,7 +164,7 @@ public class PublicAccessCheckerTests
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
 
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {IsApproved = false});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = false });
         MockGetRolesAsync(memberManager);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
@@ -180,7 +180,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {IsApproved = true});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns((IContent)null);
 
@@ -198,7 +198,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {IsApproved = true});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns((PublicAccessEntry)null);
@@ -217,7 +217,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {UserName = "MyUsername", IsApproved = true});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))
@@ -237,7 +237,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {UserName = "MyUsername", IsApproved = true});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))
@@ -257,7 +257,7 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager, new MemberIdentityUser {UserName = "MyUsername", IsApproved = true});
+        MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))

@@ -16,7 +16,7 @@ public class EncryptionHelperTests
     [Test]
     public void Create_Encrypted_RouteString_From_Anonymous_Object()
     {
-        var additionalRouteValues = new {key1 = "value1", key2 = "value2", Key3 = "Value3", keY4 = "valuE4"};
+        var additionalRouteValues = new { key1 = "value1", key2 = "value2", Key3 = "Value3", keY4 = "valuE4" };
 
         var encryptedRouteString = EncryptionHelper.CreateEncryptedRouteString(
             DataProtectionProvider,

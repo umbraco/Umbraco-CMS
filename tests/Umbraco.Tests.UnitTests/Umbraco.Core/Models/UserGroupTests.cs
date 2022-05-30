@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -54,6 +54,6 @@ public class UserGroupTests
     private IUserGroup Build() =>
         _builder
             .WithId(3)
-            .WithAllowedSections(new List<string> {"A", "B"})
+            .WithAllowedSections(new List<string> { "A", "B" })
             .Build();
 }

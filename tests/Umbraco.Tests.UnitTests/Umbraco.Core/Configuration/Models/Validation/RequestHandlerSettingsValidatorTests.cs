@@ -23,7 +23,7 @@ public class RequestHandlerSettingsValidatorTests
     public void Returns_Fail_For_Configuration_With_Invalid_ConvertUrlsToAscii_Field()
     {
         var validator = new RequestHandlerSettingsValidator();
-        var options = new RequestHandlerSettings {ConvertUrlsToAscii = "invalid"};
+        var options = new RequestHandlerSettings { ConvertUrlsToAscii = "invalid" };
         var result = validator.Validate("settings", options);
         Assert.False(result.Succeeded);
     }

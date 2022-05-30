@@ -129,7 +129,7 @@ public class AdminUsersHandlerTests
         var requirement = new AdminUsersRequirement(queryStringName);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private AdminUsersHandler CreateHandler(string queryStringName = SingleUserEditQueryStringName,
@@ -149,7 +149,7 @@ public class AdminUsersHandlerTests
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
         var mockHttpRequest = new Mock<HttpRequest>();
-        var queryParams = new Dictionary<string, StringValues> {{queryStringName, queryStringValue}};
+        var queryParams = new Dictionary<string, StringValues> { { queryStringName, queryStringValue } };
         mockHttpRequest.SetupGet(x => x.Query).Returns(new QueryCollection(queryParams));
         mockHttpContext.SetupGet(x => x.Request).Returns(mockHttpRequest.Object);
         mockHttpContextAccessor.SetupGet(x => x.HttpContext).Returns(mockHttpContext.Object);
@@ -172,11 +172,11 @@ public class AdminUsersHandlerTests
         mockUserService
             .Setup(x => x.GetUsersById(It.Is<int[]>(y =>
                 y.Length == 2 && y[0] == Admin2UserId && y[1] == NonAdmin2UserId)))
-            .Returns(new List<IUser> {adminUser2, nonAdminUser2});
+            .Returns(new List<IUser> { adminUser2, nonAdminUser2 });
         mockUserService
             .Setup(x => x.GetUsersById(It.Is<int[]>(y =>
                 y.Length == 2 && y[0] == NonAdmin2UserId && y[1] == NonAdmin3UserId)))
-            .Returns(new List<IUser> {nonAdminUser2, nonAdminUser3});
+            .Returns(new List<IUser> { nonAdminUser2, nonAdminUser3 });
 
         var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
         mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(editingWithAdmin ? adminUser1 : nonAdminUser1);
@@ -195,7 +195,7 @@ public class AdminUsersHandlerTests
 
         mockUserService
             .Setup(x => x.GetUsersById(It.Is<int[]>(y => y.Length == 1 && y[0] == id)))
-            .Returns(new List<IUser> {user});
+            .Returns(new List<IUser> { user });
 
         return user;
     }

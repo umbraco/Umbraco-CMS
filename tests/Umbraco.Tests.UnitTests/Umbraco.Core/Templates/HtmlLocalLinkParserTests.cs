@@ -88,8 +88,8 @@ public class HtmlLocalLinkParserTests
         var publishedUrlProvider = new UrlProvider(
             umbracoContextAccessor,
             Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] {contentUrlProvider.Object}),
-            new MediaUrlProviderCollection(() => new[] {mediaUrlProvider.Object}),
+            new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
+            new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
             Mock.Of<IVariationContextAccessor>());
         using (var reference = umbracoContextFactory.EnsureUmbracoContext())
         {

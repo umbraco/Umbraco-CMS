@@ -54,7 +54,7 @@ internal class FileNameTests
         var viewResult = await sut.Index() as ViewResult;
         var fileName = GetViewName(viewResult, Path.DirectorySeparatorChar.ToString());
 
-        var views = GetUiFiles(new[] {"umbraco", "UmbracoInstall"});
+        var views = GetUiFiles(new[] { "umbraco", "UmbracoInstall" });
         Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
     }
 
@@ -69,7 +69,7 @@ internal class FileNameTests
         var viewResult = sut.Index() as ViewResult;
         var fileName = GetViewName(viewResult);
 
-        var views = GetUiFiles(new[] {"umbraco", "UmbracoBackOffice"});
+        var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
         Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
     }
@@ -92,7 +92,7 @@ internal class FileNameTests
 
         var viewResult = await sut.Default() as ViewResult;
         var fileName = GetViewName(viewResult);
-        var views = GetUiFiles(new[] {"umbraco", "UmbracoBackOffice"});
+        var views = GetUiFiles(new[] { "umbraco", "UmbracoBackOffice" });
 
         Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
     }

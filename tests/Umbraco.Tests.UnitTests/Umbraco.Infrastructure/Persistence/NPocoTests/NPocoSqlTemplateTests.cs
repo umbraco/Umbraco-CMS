@@ -33,18 +33,18 @@ public class NPocoSqlTemplateTests
         var sql = sqlTemplates.Get("xxx", s => s
             .SelectAll()
             .From("zbThing1")
-            .Where("id=@id", new {id = SqlTemplate.Arg("id")})).Sql(new {id = 1});
+            .Where("id=@id", new { id = SqlTemplate.Arg("id") })).Sql(new { id = 1 });
 
         var sql2 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached.")).Sql(1);
 
         var sql3 = sqlTemplates.Get("xxx", x => throw new InvalidOperationException("Should be cached."))
-            .Sql(new {id = 1});
+            .Sql(new { id = 1 });
     }
 
     [Test]
     public void SqlTemplateArgs()
     {
-        var mappers = new MapperCollection {new NullableDateMapper()};
+        var mappers = new MapperCollection { new NullableDateMapper() };
         var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(),
             mappers);
 
@@ -70,18 +70,18 @@ public class NPocoSqlTemplateTests
         template = sqlTemplates.Get("sql2", s => s.Select<Thing1Dto>().From<Thing1Dto>()
             .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("value")));
 
-        sql = template.Sql(new {value = "foo"});
+        sql = template.Sql(new { value = "foo" });
         Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual("foo", sql.Arguments[0]);
 
-        sql = template.Sql(new {value = 123});
+        sql = template.Sql(new { value = 123 });
         Assert.AreEqual(sqlBase + "(([zbThing1].[name] = @0))", sql.SQL.NoCrLf());
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual(123, sql.Arguments[0]);
 
-        Assert.Throws<InvalidOperationException>(() => template.Sql(new {xvalue = 123}));
-        Assert.Throws<InvalidOperationException>(() => template.Sql(new {value = 123, xvalue = 456}));
+        Assert.Throws<InvalidOperationException>(() => template.Sql(new { xvalue = 123 }));
+        Assert.Throws<InvalidOperationException>(() => template.Sql(new { value = 123, xvalue = 456 }));
 
         var i = 666;
 
@@ -114,18 +114,18 @@ public class NPocoSqlTemplateTests
         Assert.AreEqual(123, sql.Arguments[0]);
 
         // and thanks to a patched visitor, this now works
-        sql = template.Sql(new {i = "foo"});
+        sql = template.Sql(new { i = "foo" });
         Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual("foo", sql.Arguments[0]);
 
-        sql = template.Sql(new {i = 123});
+        sql = template.Sql(new { i = 123 });
         Assert.AreEqual(sqlBase + "(([zbThing1].[id] = @0))", sql.SQL.NoCrLf());
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual(123, sql.Arguments[0]);
 
-        Assert.Throws<InvalidOperationException>(() => template.Sql(new {j = 123}));
-        Assert.Throws<InvalidOperationException>(() => template.Sql(new {i = 123, j = 456}));
+        Assert.Throws<InvalidOperationException>(() => template.Sql(new { j = 123 }));
+        Assert.Throws<InvalidOperationException>(() => template.Sql(new { i = 123, j = 456 }));
 
         // now with more arguments
         template = sqlTemplates.Get("sql4a", s => s.Select<Thing1Dto>().From<Thing1Dto>()
@@ -154,7 +154,7 @@ public class NPocoSqlTemplateTests
         Assert.AreEqual(1, sql.Arguments.Length);
         Assert.AreEqual("foo", sql.Arguments[0]);
 
-        sql = template.Sql(new[] {1, 2, 3});
+        sql = template.Sql(new[] { 1, 2, 3 });
         Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0,@1,@2))", sql.SQL.NoCrLf());
         Assert.AreEqual(3, sql.Arguments.Length);
         Assert.AreEqual(1, sql.Arguments[0]);
@@ -171,7 +171,7 @@ public class NPocoSqlTemplateTests
         Assert.AreEqual("foo", sql.Arguments[0]);
         Assert.AreEqual("bar", sql.Arguments[1]);
 
-        sql = template.Sql(new[] {1, 2, 3}, "bar");
+        sql = template.Sql(new[] { 1, 2, 3 }, "bar");
         Assert.AreEqual(sqlBase + "([zbThing1].[id] IN (@0,@1,@2)) AND (([zbThing1].[name] = @3))", sql.SQL.NoCrLf());
         Assert.AreEqual(4, sql.Arguments.Length);
         Assert.AreEqual(1, sql.Arguments[0]);
@@ -198,7 +198,7 @@ public class NPocoSqlTemplateTests
             .Append("AND whatever=@0", SqlTemplate.Arg("j"))
             .Append("AND whatever=@0", SqlTemplate.Arg("k")));
 
-        sql = template.Sql(new {j = new[] {1, 2, 3}, k = "oops"});
+        sql = template.Sql(new { j = new[] { 1, 2, 3 }, k = "oops" });
         Assert.AreEqual(sqlBase.TrimEnd("WHERE ") + "AND whatever=@0,@1,@2 AND whatever=@3", sql.SQL.NoCrLf());
         Assert.AreEqual(4, sql.Arguments.Length);
         Assert.AreEqual(1, sql.Arguments[0]);

@@ -36,7 +36,7 @@ public class ContentTypeServiceExtensionsTests
                     DataTypeId = -88
                 }
             };
-            var pg = new PropertyGroup(contentCollection) {Alias = "test", Name = "test", SortOrder = 1};
+            var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);
         }
 
@@ -58,9 +58,9 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3, ct4, ct5},
-                new[] {ct2.Alias},
-                new[] {"blah"})
+                new[] { ct1, ct2, ct3, ct4, ct5 },
+                new[] { ct2.Alias },
+                new[] { "blah" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(1, availableTypes.Count());
@@ -85,7 +85,7 @@ public class ContentTypeServiceExtensionsTests
                     DataTypeId = -88
                 }
             };
-            var pg = new PropertyGroup(contentCollection) {Alias = "test", Name = "test", SortOrder = 1};
+            var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);
         }
 
@@ -104,9 +104,9 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3, ct4},
+                new[] { ct1, ct2, ct3, ct4 },
                 new string[] { },
-                new[] {"title"})
+                new[] { "title" })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(1, availableTypes.Count());
@@ -131,7 +131,7 @@ public class ContentTypeServiceExtensionsTests
                     DataTypeId = -88
                 }
             };
-            var pg = new PropertyGroup(contentCollection) {Alias = "test", Name = "test", SortOrder = 1};
+            var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);
         }
 
@@ -150,8 +150,8 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3, ct4},
-                new[] {ct2.Alias})
+                new[] { ct1, ct2, ct3, ct4 },
+                new[] { ct2.Alias })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(1, availableTypes.Count());
@@ -172,7 +172,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3})
+                new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(2, availableTypes.Count());
@@ -195,7 +195,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
             ct1,
-            new[] {ct1, ct2, ct3}).Results;
+            new[] { ct1, ct2, ct3 }).Results;
 
         Assert.AreEqual(0, availableTypes.Count());
     }
@@ -217,7 +217,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
             ct1,
-            new[] {ct1, ct2, ct3}).Results;
+            new[] { ct1, ct2, ct3 }).Results;
 
         Assert.AreEqual(0, availableTypes.Count());
     }
@@ -238,7 +238,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3})
+                new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(1, availableTypes.Count());
@@ -261,7 +261,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3})
+                new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(2, availableTypes.Count());
@@ -288,7 +288,7 @@ public class ContentTypeServiceExtensionsTests
 
         var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] {ct1, ct2, ct3})
+                new[] { ct1, ct2, ct3 })
             .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
         Assert.AreEqual(3, availableTypes.Count());

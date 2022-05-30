@@ -35,13 +35,13 @@ public class ContentTypeBuilderTests
         const bool testTrashed = true;
         const int testPropertyTypeIdsIncrementingFrom = 200;
         var testPropertyType1 =
-            new PropertyTypeDetail {Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88};
+            new PropertyTypeDetail { Alias = "title", Name = "Title", SortOrder = 1, DataTypeId = -88 };
         var testPropertyType2 =
-            new PropertyTypeDetail {Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87};
-        var testTemplate1 = new TemplateDetail {Id = 200, Alias = "template1", Name = "Template 1"};
-        var testTemplate2 = new TemplateDetail {Id = 201, Alias = "template2", Name = "Template 2"};
-        var testAllowedContentType1 = new AllowedContentTypeDetail {Id = 300, Alias = "subType1", SortOrder = 1};
-        var testAllowedContentType2 = new AllowedContentTypeDetail {Id = 301, Alias = "subType2", SortOrder = 2};
+            new PropertyTypeDetail { Alias = "bodyText", Name = "Body Text", SortOrder = 2, DataTypeId = -87 };
+        var testTemplate1 = new TemplateDetail { Id = 200, Alias = "template1", Name = "Template 1" };
+        var testTemplate2 = new TemplateDetail { Id = 201, Alias = "template2", Name = "Template 2" };
+        var testAllowedContentType1 = new AllowedContentTypeDetail { Id = 300, Alias = "subType1", SortOrder = 1 };
+        var testAllowedContentType2 = new AllowedContentTypeDetail { Id = 301, Alias = "subType2", SortOrder = 2 };
 
         var builder = new ContentTypeBuilder();
 

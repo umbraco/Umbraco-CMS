@@ -60,12 +60,12 @@ public class PublishedRequestBuilderTests
 
         var content = Mock.Of<IPublishedContent>(x => x.Id == 1);
         var template = Mock.Of<ITemplate>(x => x.Id == 1);
-        string[] cacheExt = {"must-revalidate"};
+        string[] cacheExt = { "must-revalidate" };
         var auCulture = "en-AU";
         var usCulture = "en-US";
         var domain = new DomainAndUri(
             new Domain(1, "test", 2, auCulture, false), new Uri("https://example.com/en-au"));
-        IReadOnlyDictionary<string, string> headers = new Dictionary<string, string> {["Hello"] = "world"};
+        IReadOnlyDictionary<string, string> headers = new Dictionary<string, string> { ["Hello"] = "world" };
         var redirect = "https://test.com";
 
         sut

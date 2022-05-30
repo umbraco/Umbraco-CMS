@@ -56,10 +56,10 @@ public class ColorListValidatorTest
         var result =
             validator.Validate(
                 new JArray(
-                    JObject.FromObject(new {value = "CC0000"}),
-                    JObject.FromObject(new {value = "zxcvzxcvxzcv"}),
-                    JObject.FromObject(new {value = "ABC"}),
-                    JObject.FromObject(new {value = "1234567"})),
+                    JObject.FromObject(new { value = "CC0000" }),
+                    JObject.FromObject(new { value = "zxcvzxcvxzcv" }),
+                    JObject.FromObject(new { value = "ABC" }),
+                    JObject.FromObject(new { value = "1234567" })),
                 null,
                 ColorPickerPropertyEditor);
         Assert.AreEqual(2, result.Count());

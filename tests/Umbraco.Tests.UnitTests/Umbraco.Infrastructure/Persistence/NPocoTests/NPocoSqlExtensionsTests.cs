@@ -103,7 +103,7 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         var sql = new Sql<ISqlContext>(SqlContext)
             .Select("*")
             .From<NodeDto>()
-            .WhereIn<NodeDto>(x => x.NodeId, new[] {1, 2, 3});
+            .WhereIn<NodeDto>(x => x.NodeId, new[] { 1, 2, 3 });
         Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[id] IN (@0,@1,@2))", sql.SQL);
     }
 
@@ -115,7 +115,7 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         var sql = new Sql<ISqlContext>(SqlContext)
             .Select("*")
             .From<NodeDto>()
-            .WhereIn<NodeDto>(x => x.Text, new[] {"a", "b", "c"});
+            .WhereIn<NodeDto>(x => x.Text, new[] { "a", "b", "c" });
         Assert.AreEqual("SELECT *\nFROM [umbracoNode]\nWHERE ([umbracoNode].[text] IN (@0,@1,@2))", sql.SQL);
     }
 

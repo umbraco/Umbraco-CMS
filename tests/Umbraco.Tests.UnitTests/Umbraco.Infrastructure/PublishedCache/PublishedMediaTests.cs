@@ -27,7 +27,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
 
         var dataTypes = GetDefaultDataTypes().ToList();
         var serializer = new ConfigurationEditorJsonSerializer();
-        var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) {Id = 4};
+        var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };
         dataTypes.Add(rteDataType);
         _dataTypes = dataTypes.ToArray();
 
@@ -106,7 +106,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
         cache.Add(root);
         cache.AddRange(firstLevelChildren);
         cache.AddRange(secondLevelChildren);
-        InitializedCache(null, null, _dataTypes, cache, new[] {mediaType});
+        InitializedCache(null, null, _dataTypes, cache, new[] { mediaType });
         rootId = root.Node.Id;
     }
 
@@ -114,7 +114,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
     public void Get_Property_Value_Uses_Converter()
     {
         var cache = CreateRoot(out var mediaType);
-        InitializedCache(null, null, _dataTypes.ToArray(), new[] {cache}, new[] {mediaType});
+        InitializedCache(null, null, _dataTypes.ToArray(), new[] { cache }, new[] { mediaType });
 
         var publishedMedia = GetMedia(1);
 
@@ -220,7 +220,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
 
         var publishedSubChild1 = GetMedia(secondLevelChildren[0].Node.Id);
         Assert.IsTrue(publishedSubChild1.Ancestors().Select(x => x.Id)
-            .ContainsAll(new[] {firstLevelChildren[0].Node.Id, rootId}));
+            .ContainsAll(new[] { firstLevelChildren[0].Node.Id, rootId }));
     }
 
     [Test]
@@ -233,6 +233,6 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
 
         var publishedSubChild1 = GetMedia(secondLevelChildren[0].Node.Id);
         Assert.IsTrue(publishedSubChild1.AncestorsOrSelf().Select(x => x.Id)
-            .ContainsAll(new[] {secondLevelChildren[0].Node.Id, firstLevelChildren[0].Node.Id, rootId}));
+            .ContainsAll(new[] { secondLevelChildren[0].Node.Id, firstLevelChildren[0].Node.Id, rootId }));
     }
 }

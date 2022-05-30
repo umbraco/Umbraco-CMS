@@ -65,7 +65,7 @@ internal class UmbracoCustomizations : ICustomization
                     x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                 Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
-        var httpContextAccessor = new HttpContextAccessor {HttpContext = new DefaultHttpContext()};
+        var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
         fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));
         fixture.Customize<IHttpContextAccessor>(x => x.FromFactory(() => httpContextAccessor));
 

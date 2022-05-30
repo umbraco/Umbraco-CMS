@@ -32,7 +32,7 @@ public class ContentPermissionsPublishBranchHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(NodeId,
-            new Dictionary<int, string[]> {{DescendentNodeId1, new[] {"A"}}, {DescendentNodeId2, new[] {"A"}}});
+            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "A" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -46,7 +46,7 @@ public class ContentPermissionsPublishBranchHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(NodeId,
-            new Dictionary<int, string[]> {{DescendentNodeId1, new[] {"A"}}, {DescendentNodeId2, new[] {"B"}}});
+            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "B" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -60,7 +60,7 @@ public class ContentPermissionsPublishBranchHandlerTests
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
         var mockUserService = CreateMockUserService(NodeId,
-            new Dictionary<int, string[]> {{DescendentNodeId1, new[] {"B"}}, {DescendentNodeId2, new[] {"A"}}});
+            new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "B" } }, { DescendentNodeId2, new[] { "A" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
         await sut.HandleAsync(authHandlerContext);
@@ -74,7 +74,7 @@ public class ContentPermissionsPublishBranchHandlerTests
         var requirement = new ContentPermissionsPublishBranchRequirement('A');
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = CreateContent(NodeId);
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private static Mock<IUserService> CreateMockUserService(int parentNodeId,

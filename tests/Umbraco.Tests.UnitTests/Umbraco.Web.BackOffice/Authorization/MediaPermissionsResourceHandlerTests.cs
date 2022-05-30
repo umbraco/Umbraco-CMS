@@ -74,7 +74,7 @@ public class MediaPermissionsResourceHandlerTests
         var resource = createWithNodeId
             ? new MediaPermissionsResource(nodeId)
             : new MediaPermissionsResource(media);
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private static IMedia CreateMedia(int nodeId)

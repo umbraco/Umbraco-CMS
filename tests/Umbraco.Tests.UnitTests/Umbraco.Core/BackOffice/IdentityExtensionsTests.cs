@@ -23,7 +23,7 @@ public class IdentityExtensionsTests
     public void ToErrorMessage_When_Single_Error_Expect_Error_Description()
     {
         const string expectedError = "invalid something";
-        var errors = new List<IdentityError> {new() {Code = "1", Description = expectedError}};
+        var errors = new List<IdentityError> { new() { Code = "1", Description = expectedError } };
 
         var errorMessage = errors.ToErrorMessage();
 

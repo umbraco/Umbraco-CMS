@@ -31,7 +31,7 @@ public class PendingPackageMigrationsTests
     private PendingPackageMigrations GetPendingPackageMigrations()
         => new(
             Mock.Of<ILogger<PendingPackageMigrations>>(),
-            new PackageMigrationPlanCollection(() => new[] {new TestPackageMigrationPlan()}));
+            new PackageMigrationPlanCollection(() => new[] { new TestPackageMigrationPlan() }));
 
     [Test]
     public void GivenNoRegisteredMigrations_ThenPlanIsReturned()

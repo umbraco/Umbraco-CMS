@@ -62,7 +62,7 @@ public class LogScrubberTests
         ServerRole serverRole = ServerRole.Single,
         bool isMainDom = true)
     {
-        var settings = new LoggingSettings {MaxLogAge = TimeSpan.FromMinutes(MaxLogAgeInMinutes)};
+        var settings = new LoggingSettings { MaxLogAge = TimeSpan.FromMinutes(MaxLogAgeInMinutes) };
 
         var mockServerRegistrar = new Mock<IServerRoleAccessor>();
         mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);

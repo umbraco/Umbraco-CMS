@@ -34,7 +34,7 @@ public abstract class BaseUsingSqlSyntax
         composition.Services.AddUnique(_ => SqlContext);
 
         var factory = composition.CreateServiceProvider();
-        var pocoMappers = new MapperCollection {new NullableDateMapper()};
+        var pocoMappers = new MapperCollection { new NullableDateMapper() };
         var pocoDataFactory =
             new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(),
                 pocoMappers);

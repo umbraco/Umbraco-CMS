@@ -39,7 +39,7 @@ public class MigrationPlanTests
 
         var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
             DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
-        var scopeProvider = new MigrationTests.TestScopeProvider(scope) {SqlContext = sqlContext};
+        var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
         var migrationBuilder = Mock.Of<IMigrationBuilder>();
         Mock.Get(migrationBuilder)

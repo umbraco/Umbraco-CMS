@@ -15,9 +15,9 @@ public class EnumerableExtensionsTests
     [Test]
     public void Unsorted_Sequence_Equal()
     {
-        var list1 = new[] {1, 2, 3, 4, 5, 6};
-        var list2 = new[] {6, 5, 3, 2, 1, 4};
-        var list3 = new[] {6, 5, 4, 3, 2, 2};
+        var list1 = new[] { 1, 2, 3, 4, 5, 6 };
+        var list2 = new[] { 6, 5, 3, 2, 1, 4 };
+        var list3 = new[] { 6, 5, 4, 3, 2, 2 };
 
         Assert.IsTrue(list1.UnsortedSequenceEqual(list2));
         Assert.IsTrue(list2.UnsortedSequenceEqual(list1));
@@ -31,9 +31,9 @@ public class EnumerableExtensionsTests
     [Test]
     public void Contains_All()
     {
-        var list1 = new[] {1, 2, 3, 4, 5, 6};
-        var list2 = new[] {6, 5, 3, 2, 1, 4};
-        var list3 = new[] {6, 5, 4, 3};
+        var list1 = new[] { 1, 2, 3, 4, 5, 6 };
+        var list2 = new[] { 6, 5, 3, 2, 1, 4 };
+        var list3 = new[] { 6, 5, 4, 3 };
 
         Assert.IsTrue(list1.ContainsAll(list2));
         Assert.IsTrue(list2.ContainsAll(list1));
@@ -44,7 +44,7 @@ public class EnumerableExtensionsTests
     [Test]
     public void SelectRecursive_2()
     {
-        var hierarchy = new TestItem("1") {Children = new List<TestItem> {new("1.1"), new("1.2"), new("1.3")}};
+        var hierarchy = new TestItem("1") { Children = new List<TestItem> { new("1.1"), new("1.2"), new("1.3") } };
 
         var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
@@ -120,7 +120,7 @@ public class EnumerableExtensionsTests
     [Test]
     public void InGroupsOf_ReturnsAllElements()
     {
-        var integers = new[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+        var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
 
         var groupsOfTwo = integers.InGroupsOf(2).ToArray();
 
@@ -140,7 +140,7 @@ public class EnumerableExtensionsTests
     [Test]
     public void InGroupsOf_CanRepeat()
     {
-        var integers = new[] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+        var integers = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
         var inGroupsOf = integers.InGroupsOf(2);
         Assert.AreEqual(5, inGroupsOf.Count());
         Assert.AreEqual(5, inGroupsOf.Count()); // again
@@ -154,7 +154,7 @@ public class EnumerableExtensionsTests
         var tuple2 = new Tuple<string, string>("fruit", "orange");
         var tuple3 = new Tuple<string, string>("fruit", "banana");
         var tuple4 = new Tuple<string, string>("fruit", "banana"); // Should be filtered out
-        var list = new List<Tuple<string, string>> {tuple1, tuple2, tuple3, tuple4};
+        var list = new List<Tuple<string, string>> { tuple1, tuple2, tuple3, tuple4 };
 
         // Act
         var iteratorSource = list.DistinctBy(x => x.Item2);

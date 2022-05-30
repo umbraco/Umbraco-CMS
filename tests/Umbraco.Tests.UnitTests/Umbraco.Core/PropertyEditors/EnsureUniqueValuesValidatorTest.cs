@@ -61,8 +61,8 @@ public class EnsureUniqueValuesValidatorTest
         var result =
             validator.Validate(
                 new JArray(
-                    JObject.FromObject(new {value = "hello"}),
-                    JObject.FromObject(new {value = "world"})),
+                    JObject.FromObject(new { value = "hello" }),
+                    JObject.FromObject(new { value = "world" })),
                 null,
                 ColorPickerPropertyEditor);
         Assert.AreEqual(0, result.Count());
@@ -75,8 +75,8 @@ public class EnsureUniqueValuesValidatorTest
         var result =
             validator.Validate(
                 new JArray(
-                    JObject.FromObject(new {value = "hello"}),
-                    JObject.FromObject(new {value = "hello"})),
+                    JObject.FromObject(new { value = "hello" }),
+                    JObject.FromObject(new { value = "hello" })),
                 null,
                 ColorPickerPropertyEditor);
         Assert.AreEqual(1, result.Count());
@@ -89,10 +89,10 @@ public class EnsureUniqueValuesValidatorTest
         var result =
             validator.Validate(
                 new JArray(
-                    JObject.FromObject(new {value = "hello"}),
-                    JObject.FromObject(new {value = "hello"}),
-                    JObject.FromObject(new {value = "world"}),
-                    JObject.FromObject(new {value = "world"})),
+                    JObject.FromObject(new { value = "hello" }),
+                    JObject.FromObject(new { value = "hello" }),
+                    JObject.FromObject(new { value = "world" }),
+                    JObject.FromObject(new { value = "world" })),
                 null,
                 ColorPickerPropertyEditor);
         Assert.AreEqual(2, result.Count());

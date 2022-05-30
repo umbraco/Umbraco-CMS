@@ -767,8 +767,8 @@ public class NavigableNavigatorTests
         // see http://www.onenaught.com/posts/352/xslt-performance-tip-dont-indent-output
         // why aren't we using an XmlWriter here?
         var transform = new XslCompiledTransform(debug);
-        var xmlReader = new XmlTextReader(new StringReader(xslt)) {EntityHandling = EntityHandling.ExpandEntities};
-        var xslResolver = new XmlUrlResolver {Credentials = CredentialCache.DefaultCredentials};
+        var xmlReader = new XmlTextReader(new StringReader(xslt)) { EntityHandling = EntityHandling.ExpandEntities };
+        var xslResolver = new XmlUrlResolver { Credentials = CredentialCache.DefaultCredentials };
         var args = new XsltArgumentList();
 
         // .Default is more restrictive than .TrustedXslt
@@ -1025,7 +1025,7 @@ internal class TestContent : INavigableContent
 
     public TestContent WithValues(params object[] values)
     {
-        FieldValues = values ?? new object[] {null};
+        FieldValues = values ?? new object[] { null };
         return this;
     }
 }

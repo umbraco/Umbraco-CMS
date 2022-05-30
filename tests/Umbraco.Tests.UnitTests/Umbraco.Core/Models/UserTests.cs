@@ -59,7 +59,7 @@ public class UserTests
             .WithIsLockedOut(true)
             .WithComments("comments")
             .WithSessionTimeout(5)
-            .WithStartContentIds(new[] {3})
-            .WithStartMediaIds(new[] {8})
+            .WithStartContentIds(new[] { 3 })
+            .WithStartMediaIds(new[] { 8 })
             .Build();
 }

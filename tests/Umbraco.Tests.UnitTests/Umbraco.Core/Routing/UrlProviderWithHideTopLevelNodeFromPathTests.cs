@@ -39,7 +39,7 @@ public class UrlProviderWithHideTopLevelNodeFromPathTests : PublishedSnapshotSer
     [TestCase(1172, "/test-page/")] // not hidden because not first root
     public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
     {
-        var requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
 

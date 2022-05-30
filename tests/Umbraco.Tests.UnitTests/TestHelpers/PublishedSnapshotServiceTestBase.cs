@@ -60,7 +60,7 @@ public class PublishedSnapshotServiceTestBase
     protected GlobalSettings GlobalSettings { get; } = new();
 
     protected virtual PropertyValueConverterCollection PropertyValueConverterCollection =>
-        new(() => new[] {new TestSimpleTinyMceValueConverter()});
+        new(() => new[] { new TestSimpleTinyMceValueConverter() });
 
     protected IPublishedContent GetContent(int id)
     {
@@ -97,7 +97,7 @@ public class PublishedSnapshotServiceTestBase
         var publishedUrlProvider = new UrlProvider(
             umbracoContextAccessor,
             Options.Create(webRoutingSettings),
-            new UrlProviderCollection(() => new[] {urlProvider}),
+            new UrlProviderCollection(() => new[] { urlProvider }),
             new MediaUrlProviderCollection(() => Enumerable.Empty<IMediaUrlProvider>()),
             Mock.Of<IVariationContextAccessor>());
 
@@ -146,9 +146,9 @@ public class PublishedSnapshotServiceTestBase
 
         // create data types, property types and content types
         var dataType =
-            new DataType(new VoidEditor("Editor", Mock.Of<IDataValueEditorFactory>()), serializer) {Id = 3};
+            new DataType(new VoidEditor("Editor", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
 
-        return new[] {dataType};
+        return new[] { dataType };
     }
 
     protected virtual ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes,
@@ -249,7 +249,7 @@ public class PublishedSnapshotServiceTestBase
         var nuCacheSettings = new NuCacheSettings();
 
         // at last, create the complete NuCache snapshot service!
-        var options = new PublishedSnapshotServiceOptions {IgnoreLocalDb = true};
+        var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
         SnapshotService = new PublishedSnapshotService(
             options,
             Mock.Of<ISyncBootStateAccessor>(x => x.GetSyncBootState() == SyncBootState.WarmBoot),

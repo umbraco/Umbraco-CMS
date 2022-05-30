@@ -222,7 +222,7 @@ public class LocalizedTextServiceTests
         var result = txtService.Localize(
             "testKey",
             culture,
-            new Dictionary<string, string> {{"0", "world"}, {"1", "great"}, {"2", "planet"}});
+            new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
         Assert.AreEqual("Hello world, you are such a great planet", result);
     }
@@ -324,7 +324,7 @@ public class LocalizedTextServiceTests
             }, s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testKey", culture,
-            new Dictionary<string, string> {{"0", "world"}, {"1", "great"}, {"2", "planet"}});
+            new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
         Assert.AreEqual("Hello world, you are such a great planet", result);
     }

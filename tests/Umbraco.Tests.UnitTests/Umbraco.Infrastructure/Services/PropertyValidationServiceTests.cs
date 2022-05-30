@@ -46,7 +46,7 @@ public class PropertyValidationServiceTests
                 new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
                 textService.Object, Mock.Of<IShortStringHelper>(), new JsonNetSerializer(), Mock.Of<IIOHelper>()));
 
-        var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] {dataEditor}));
+        var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
         validationService = new PropertyValidationService(propEditors, dataTypeService.Object,
             Mock.Of<ILocalizedTextService>(), new ValueEditorCache());
@@ -60,31 +60,35 @@ public class PropertyValidationServiceTests
         var p1 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p1.SetValue("Hello", "en-US");
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p2.SetValue("Hello");
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p4.SetValue(null); // invalid
 
         var content = Mock.Of<IContent>(
             x => x.Published == true // set to published, the default culture will validate invariant anyways
-                 && x.Properties == new PropertyCollection(new[] {p1, p2, p3, p4}));
+                 && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", true));
@@ -101,25 +105,29 @@ public class PropertyValidationServiceTests
         var p1 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p1.SetValue("Hello", "en-US");
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p2.SetValue("Hello");
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p4.SetValue(null); // invalid
 
@@ -127,7 +135,7 @@ public class PropertyValidationServiceTests
             x =>
                 x.Published ==
                 false // set to not published, the non default culture will need to validate invariant too
-                && x.Properties == new PropertyCollection(new[] {p1, p2, p3, p4}));
+                && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
@@ -144,31 +152,35 @@ public class PropertyValidationServiceTests
         var p1 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p1.SetValue(null, "en-US"); // invalid
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p3.SetValue(null, "en-US"); // ignored because the impact isn't the default lang + the content is published
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p4.SetValue(null); // ignored because the impact isn't the default lang + the content is published
 
         var content = Mock.Of<IContent>(
             x => x.Published == true // set to published
-                 && x.Properties == new PropertyCollection(new[] {p1, p2, p3, p4}));
+                 && x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
         var result =
             validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Explicit("en-US", false));
@@ -185,30 +197,34 @@ public class PropertyValidationServiceTests
         var p1 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p1.SetValue(null, "en-US"); // ignored since this is variant
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p3.SetValue("Hello", "en-US"); // ignored since this is variant
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p4.SetValue(null); // invalid
 
         var content = Mock.Of<IContent>(
-            x => x.Properties == new PropertyCollection(new[] {p1, p2, p3, p4}));
+            x => x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
         var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.Invariant);
 
@@ -224,30 +240,34 @@ public class PropertyValidationServiceTests
         var p1 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p1.SetValue(null, "en-US"); // invalid
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
-                Mandatory = true, Variations = ContentVariation.Culture
+                Mandatory = true,
+                Variations = ContentVariation.Culture
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
-                Mandatory = true, Variations = ContentVariation.Nothing
+                Mandatory = true,
+                Variations = ContentVariation.Nothing
             });
         p4.SetValue(null); // invalid
 
         var content = Mock.Of<IContent>(
-            x => x.Properties == new PropertyCollection(new[] {p1, p2, p3, p4}));
+            x => x.Properties == new PropertyCollection(new[] { p1, p2, p3, p4 }));
 
         var result = validationService.IsPropertyDataValid(content, out var invalid, CultureImpact.All);
 

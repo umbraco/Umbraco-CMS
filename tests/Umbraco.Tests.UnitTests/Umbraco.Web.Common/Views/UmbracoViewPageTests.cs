@@ -136,7 +136,7 @@ public class UmbracoViewPageTests
         var model = new ContentModel<ContentType2>(content);
         var view = new ContentType1TestPage();
         var viewData =
-            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) {Model = model};
+            new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { Model = model };
 
         view.SetViewData(viewData);
 
@@ -288,7 +288,7 @@ public class UmbracoViewPageTests
     {
         var sourceViewDataDictionary =
             new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
-        return new ViewDataDictionary(sourceViewDataDictionary) {Model = model};
+        return new ViewDataDictionary(sourceViewDataDictionary) { Model = model };
     }
 
     public class ContentType1 : PublishedContentWrapped

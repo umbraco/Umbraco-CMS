@@ -33,10 +33,13 @@ public class BuilderTests
         };
         type1.Properties.Add(new PropertyModel
         {
-            Alias = "prop1", ClrName = "Prop1", Name = "prop1Name", ModelClrType = typeof(string)
+            Alias = "prop1",
+            ClrName = "Prop1",
+            Name = "prop1Name",
+            ModelClrType = typeof(string)
         });
 
-        TypeModel[] types = {type1};
+        TypeModel[] types = { type1 };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types);
@@ -146,7 +149,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ItemType = TypeModel.ItemTypes.Element
         };
 
-        TypeModel[] types = {type1, type2};
+        TypeModel[] types = { type1, type2 };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types)
@@ -247,17 +250,23 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         };
         type1.Properties.Add(new PropertyModel
         {
-            Alias = "prop1", ClrName = "Prop1", ModelClrType = typeof(IPublishedContent)
+            Alias = "prop1",
+            ClrName = "Prop1",
+            ModelClrType = typeof(IPublishedContent)
         });
         type1.Properties.Add(new PropertyModel
         {
-            Alias = "prop2", ClrName = "Prop2", ModelClrType = typeof(StringBuilder)
+            Alias = "prop2",
+            ClrName = "Prop2",
+            ModelClrType = typeof(StringBuilder)
         });
         type1.Properties.Add(new PropertyModel
         {
-            Alias = "prop3", ClrName = "Prop3", ModelClrType = typeof(BootFailedException)
+            Alias = "prop3",
+            ClrName = "Prop3",
+            ModelClrType = typeof(BootFailedException)
         });
-        TypeModel[] types = {type1};
+        TypeModel[] types = { type1 };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types)
@@ -296,7 +305,10 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         };
         parentType.Properties.Add(new PropertyModel
         {
-            Alias = "prop1", ClrName = "Prop1", Name = "prop1Name", ModelClrType = typeof(string)
+            Alias = "prop1",
+            ClrName = "Prop1",
+            Name = "prop1Name",
+            ModelClrType = typeof(string)
         });
 
         var childType = new TypeModel
@@ -310,7 +322,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ItemType = TypeModel.ItemTypes.Content
         };
 
-        TypeModel[] docTypes = {parentType, childType};
+        TypeModel[] docTypes = { parentType, childType };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, docTypes);
@@ -492,11 +504,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         };
         type1.Properties.Add(new PropertyModel
         {
-            Alias = "prop1", ClrName = "Prop1", Name = "prop1Name", ModelClrType = typeof(string)
+            Alias = "prop1",
+            ClrName = "Prop1",
+            Name = "prop1Name",
+            ModelClrType = typeof(string)
         });
         type1.MixinTypes.Add(composition1);
 
-        TypeModel[] types = {type1, composition1};
+        TypeModel[] types = { type1, composition1 };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types);
@@ -686,7 +701,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     {
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        var builder = new TextBuilder {ModelsNamespaceForTests = "ModelsNamespace"};
+        var builder = new TextBuilder { ModelsNamespaceForTests = "ModelsNamespace" };
         var sb = new StringBuilder();
         builder.WriteClrType(sb, input);
         Assert.AreEqual(expected, sb.ToString());

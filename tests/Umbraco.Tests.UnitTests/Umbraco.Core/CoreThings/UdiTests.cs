@@ -212,7 +212,7 @@ public class UdiTests
     {
         var settings = new JsonSerializerSettings
         {
-            Converters = new JsonConverter[] {new UdiJsonConverter(), new UdiRangeJsonConverter()}
+            Converters = new JsonConverter[] { new UdiJsonConverter(), new UdiRangeJsonConverter() }
         };
 
         var guid = Guid.NewGuid();
@@ -301,7 +301,7 @@ public class UdiTests
 
         // can get method for Deploy compatibility
         var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null,
-            new[] {typeof(string), typeof(bool)}, null);
+            new[] { typeof(string), typeof(bool) }, null);
         Assert.IsNotNull(method);
     }
 

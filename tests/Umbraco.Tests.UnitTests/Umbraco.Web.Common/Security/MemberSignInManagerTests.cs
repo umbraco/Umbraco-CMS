@@ -58,7 +58,7 @@ public class MemberSignInManagerTests
         var serviceProvider = serviceProviderFactory.CreateServiceProvider(serviceCollection);
         var httpContextFactory = new DefaultHttpContextFactory(serviceProvider);
         var features = new DefaultHttpContext().Features;
-        features.Set<IHttpConnectionFeature>(new HttpConnectionFeature {LocalIpAddress = IPAddress.Parse("127.0.0.1")});
+        features.Set<IHttpConnectionFeature>(new HttpConnectionFeature { LocalIpAddress = IPAddress.Parse("127.0.0.1") });
         var httpContext = httpContextFactory.Create(features);
 
         _mockLogger = new Mock<ILogger<SignInManager<MemberIdentityUser>>>();
@@ -97,7 +97,7 @@ public class MemberSignInManagerTests
         //arrange
         var userId = "bo8w3d32q9b98";
         var sut = CreateSut();
-        var fakeUser = new MemberIdentityUser(777) {UserName = "TestUser"};
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
         var password = "testPassword";
         var lockoutOnFailure = false;
         var isPersistent = true;
@@ -121,7 +121,7 @@ public class MemberSignInManagerTests
     {
         //arrange
         var sut = CreateSut();
-        var fakeUser = new MemberIdentityUser(777) {UserName = "TestUser"};
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
         var password = "testPassword";
         var lockoutOnFailure = false;
         var isPersistent = true;

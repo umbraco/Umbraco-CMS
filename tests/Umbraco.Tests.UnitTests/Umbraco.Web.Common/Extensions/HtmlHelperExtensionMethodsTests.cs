@@ -102,7 +102,7 @@ public class HtmlHelperExtensionMethodsTests
     [Test]
     public void Strip_Specific_Html()
     {
-        string[] tags = {"b"};
+        string[] tags = { "b" };
 
         var result = _htmlHelper.StripHtml(SampleWithBoldAndAnchorElements, tags).ToString();
 

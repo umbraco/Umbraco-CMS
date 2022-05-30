@@ -27,7 +27,7 @@ public class DataTypeBuilderTests
             .AddEditor()
             .WithAlias(testEditorAlias)
             .WithName(testEditorName)
-            .WithDefaultConfiguration(new Dictionary<string, object> {{"value1", "value1"}, {"value2", "value2"}})
+            .WithDefaultConfiguration(new Dictionary<string, object> { { "value1", "value1" }, { "value2", "value2" } })
             .Done()
             .Build();
 

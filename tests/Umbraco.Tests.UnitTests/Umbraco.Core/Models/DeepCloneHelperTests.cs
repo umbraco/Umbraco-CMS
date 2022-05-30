@@ -15,7 +15,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Ref_Properties()
     {
-        var test1 = new Test1 {MyTest1 = new Test1(), MyTest2 = new Test2()};
+        var test1 = new Test1 { MyTest1 = new Test1(), MyTest2 = new Test2() };
 
         var clone = (Test1)test1.DeepClone();
 
@@ -27,7 +27,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Array_Property()
     {
-        var test1 = new Test3 {MyTest1 = new object[] {new Test1(), new Test1()}};
+        var test1 = new Test3 { MyTest1 = new object[] { new Test1(), new Test1() } };
 
         var clone = (Test3)test1.DeepClone();
 
@@ -43,7 +43,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Typed_Array_Property()
     {
-        var test1 = new Test4 {MyTest1 = new[] {new Test1(), new Test1()}};
+        var test1 = new Test4 { MyTest1 = new[] { new Test1(), new Test1() } };
 
         var clone = (Test4)test1.DeepClone();
 
@@ -59,7 +59,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Enumerable_Property()
     {
-        var test1 = new Test5 {MyTest1 = new[] {new Test1(), new Test1()}};
+        var test1 = new Test5 { MyTest1 = new[] { new Test1(), new Test1() } };
 
         var clone = (Test5)test1.DeepClone();
 
@@ -76,7 +76,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Typed_Enumerable_Property()
     {
-        var test1 = new Test6 {MyTest1 = new[] {new Test1(), new Test1()}};
+        var test1 = new Test6 { MyTest1 = new[] { new Test1(), new Test1() } };
 
         var clone = (Test6)test1.DeepClone();
 
@@ -92,7 +92,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Custom_Enumerable_Property()
     {
-        var test1 = new Test7 {MyTest1 = new List<Test1> {new(), new()}};
+        var test1 = new Test7 { MyTest1 = new List<Test1> { new(), new() } };
 
         var clone = (Test7)test1.DeepClone();
 
@@ -108,7 +108,7 @@ public class DeepCloneHelperTests
     [Test]
     public void Deep_Clone_Custom_Enumerable_Interface_Property()
     {
-        var test1 = new Test8 {MyTest1 = new List<Test1> {new(), new()}};
+        var test1 = new Test8 { MyTest1 = new List<Test1> { new(), new() } };
 
         var clone = (Test8)test1.DeepClone();
 

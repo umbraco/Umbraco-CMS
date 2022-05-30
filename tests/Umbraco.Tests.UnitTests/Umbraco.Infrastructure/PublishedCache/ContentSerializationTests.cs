@@ -23,7 +23,7 @@ public class ContentSerializationTests
             PropertyData = new Dictionary<string, PropertyData[]>
             {
                 ["propertyOne"] =
-                    new[] {new PropertyData {Culture = "en-US", Segment = "test", Value = "hello world"}},
+                    new[] { new PropertyData { Culture = "en-US", Segment = "test", Value = "hello world" } },
                 ["propertyTwo"] = new[]
                 {
                     new PropertyData {Culture = "en-US", Segment = "test", Value = "Lorem ipsum"}
@@ -31,7 +31,7 @@ public class ContentSerializationTests
             },
             CultureData = new Dictionary<string, CultureVariation>
             {
-                ["en-US"] = new() {Date = now, IsDraft = false, Name = "Home", UrlSegment = "home"}
+                ["en-US"] = new() { Date = now, IsDraft = false, Name = "Home", UrlSegment = "home" }
             },
             UrlSegment = "home"
         };

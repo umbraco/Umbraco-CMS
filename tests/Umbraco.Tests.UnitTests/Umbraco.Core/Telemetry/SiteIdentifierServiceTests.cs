@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -70,7 +70,7 @@ public class SiteIdentifierServiceTests
 
     private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString)
     {
-        var globalSettings = new GlobalSettings {Id = guidString};
+        var globalSettings = new GlobalSettings { Id = guidString };
         return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
     }
 }

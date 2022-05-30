@@ -138,15 +138,15 @@ public class StringExtensionsTests
         Assert.AreEqual(expected, output);
     }
 
-    [TestCase("pineapple", new[] {"banana", "apple", "blueberry", "strawberry"}, StringComparison.CurrentCulture, true)]
-    [TestCase("PINEAPPLE", new[] {"banana", "apple", "blueberry", "strawberry"}, StringComparison.CurrentCulture,
+    [TestCase("pineapple", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
+    [TestCase("PINEAPPLE", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture,
         false)]
-    [TestCase("pineapple", new[] {"banana", "Apple", "blueberry", "strawberry"}, StringComparison.CurrentCulture,
+    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture,
         false)]
-    [TestCase("pineapple", new[] {"banana", "Apple", "blueberry", "strawberry"}, StringComparison.OrdinalIgnoreCase,
+    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase,
         true)]
-    [TestCase("pineapple", new[] {"banana", "blueberry", "strawberry"}, StringComparison.OrdinalIgnoreCase, false)]
-    [TestCase("Strawberry unicorn pie", new[] {"Berry"}, StringComparison.OrdinalIgnoreCase, true)]
+    [TestCase("pineapple", new[] { "banana", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, false)]
+    [TestCase("Strawberry unicorn pie", new[] { "Berry" }, StringComparison.OrdinalIgnoreCase, true)]
     [TestCase("empty pie", new string[0], StringComparison.OrdinalIgnoreCase, false)]
     public void ContainsAny(string haystack, IEnumerable<string> needles, StringComparison comparison, bool expected)
     {

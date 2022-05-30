@@ -73,7 +73,7 @@ public class KeepAliveTests
         ServerRole serverRole = ServerRole.Single,
         bool isMainDom = true)
     {
-        var settings = new KeepAliveSettings {DisableKeepAliveTask = !enabled};
+        var settings = new KeepAliveSettings { DisableKeepAliveTask = !enabled };
 
         var mockHostingEnvironment = new Mock<IHostingEnvironment>();
         mockHostingEnvironment.SetupGet(x => x.ApplicationMainUrl).Returns(new Uri(ApplicationUrl));

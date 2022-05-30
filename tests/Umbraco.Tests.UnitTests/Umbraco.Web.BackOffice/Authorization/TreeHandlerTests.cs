@@ -61,7 +61,7 @@ public class TreeHandlerTests
         var requirement = new TreeRequirement(Tree1Alias, Tree2Alias);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private TreeHandler CreateHandler(bool userIsAuthorized = false, bool userCanAccessContentSection = false)

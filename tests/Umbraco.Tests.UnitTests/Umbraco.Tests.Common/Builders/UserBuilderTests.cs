@@ -31,8 +31,8 @@ public class UserBuilderTests
         var testLastPasswordChangeDate = DateTime.Now.AddHours(-4);
         var testComments = "comments";
         var testSessionTimeout = 5;
-        var testStartContentIds = new[] {3};
-        var testStartMediaIds = new[] {8};
+        var testStartContentIds = new[] { 3 };
+        var testStartMediaIds = new[] { 8 };
 
         var builder = new UserBuilder();
 
@@ -52,8 +52,8 @@ public class UserBuilderTests
             .WithLastPasswordChangeDate(testLastPasswordChangeDate)
             .WithComments(testComments)
             .WithSessionTimeout(5)
-            .WithStartContentIds(new[] {3})
-            .WithStartMediaIds(new[] {8})
+            .WithStartContentIds(new[] { 3 })
+            .WithStartMediaIds(new[] { 8 })
             .Build();
 
         // Assert

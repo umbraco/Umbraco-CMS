@@ -45,7 +45,7 @@ public class UmbracoApplicationTests
 
         Assert.AreEqual(6, UmbracoServices.EnsureDistinctAliases(typeModels).Count);
 
-        typeModels.Add(new TypeModel {ItemType = TypeModel.ItemTypes.Media, Alias = "content1"});
+        typeModels.Add(new TypeModel { ItemType = TypeModel.ItemTypes.Media, Alias = "content1" });
 
         try
         {

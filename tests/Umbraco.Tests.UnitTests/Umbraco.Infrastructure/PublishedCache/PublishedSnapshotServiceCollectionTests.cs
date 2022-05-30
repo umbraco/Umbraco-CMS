@@ -25,28 +25,36 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var propertyType =
             new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar)
             {
-                Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Nothing
+                Alias = "prop",
+                DataTypeId = 3,
+                Variations = ContentVariation.Nothing
             };
         _contentTypeInvariant =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
-                Id = 2, Alias = "itype", Variations = ContentVariation.Nothing
+                Id = 2,
+                Alias = "itype",
+                Variations = ContentVariation.Nothing
             };
         _contentTypeInvariant.AddPropertyType(propertyType);
 
         propertyType =
             new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar)
             {
-                Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture
+                Alias = "prop",
+                DataTypeId = 3,
+                Variations = ContentVariation.Culture
             };
         _contentTypeVariant =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
-                Id = 3, Alias = "vtype", Variations = ContentVariation.Culture
+                Id = 3,
+                Alias = "vtype",
+                Variations = ContentVariation.Culture
             };
         _contentTypeVariant.AddPropertyType(propertyType);
 
-        _contentTypes = new[] {_contentTypeInvariant, _contentTypeVariant};
+        _contentTypes = new[] { _contentTypeInvariant, _contentTypeVariant };
     }
 
     private ContentType _contentTypeInvariant;
@@ -55,7 +63,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
     private IEnumerable<ContentNodeKit> GetNestedVariantKits()
     {
-        var paths = new Dictionary<int, string> {{-1, "-1"}};
+        var paths = new Dictionary<int, string> { { -1, "-1" } };
 
         //1x variant (root)
         yield return CreateVariantKit(1, -1, 1, paths);
@@ -77,7 +85,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
     private IEnumerable<ContentNodeKit> GetInvariantKits()
     {
-        var paths = new Dictionary<int, string> {{-1, "-1"}};
+        var paths = new Dictionary<int, string> { { -1, "-1" } };
 
         yield return CreateInvariantKit(1, -1, 1, paths);
         yield return CreateInvariantKit(2, -1, 2, paths);
@@ -119,7 +127,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
     private IEnumerable<ContentNodeKit> GetVariantKits()
     {
-        var paths = new Dictionary<int, string> {{-1, "-1"}};
+        var paths = new Dictionary<int, string> { { -1, "-1" } };
 
         yield return CreateVariantKit(1, -1, 1, paths);
         yield return CreateVariantKit(2, -1, 2, paths);
@@ -141,18 +149,18 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
     private static Dictionary<string, CultureVariation> GetCultureInfos(int id, DateTime now)
     {
-        var en = new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        var fr = new[] {1, 3, 4, 6, 7, 9, 10, 12};
+        var en = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        var fr = new[] { 1, 3, 4, 6, 7, 9, 10, 12 };
 
         var infos = new Dictionary<string, CultureVariation>();
         if (en.Contains(id))
         {
-            infos["en-US"] = new CultureVariation {Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false};
+            infos["en-US"] = new CultureVariation { Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false };
         }
 
         if (fr.Contains(id))
         {
-            infos["fr-FR"] = new CultureVariation {Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false};
+            infos["fr-FR"] = new CultureVariation { Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false };
         }
 
         return infos;
@@ -183,22 +191,22 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
     private IEnumerable<ContentNodeKit> GetVariantWithDraftKits()
     {
-        var paths = new Dictionary<int, string> {{-1, "-1"}};
+        var paths = new Dictionary<int, string> { { -1, "-1" } };
 
         Dictionary<string, CultureVariation> GetCultureInfos(int id, DateTime now)
         {
-            var en = new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-            var fr = new[] {1, 3, 4, 6, 7, 9, 10, 12};
+            var en = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var fr = new[] { 1, 3, 4, 6, 7, 9, 10, 12 };
 
             var infos = new Dictionary<string, CultureVariation>();
             if (en.Contains(id))
             {
-                infos["en-US"] = new CultureVariation {Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false};
+                infos["en-US"] = new CultureVariation { Name = "N" + id + "-" + "en-US", Date = now, IsDraft = false };
             }
 
             if (fr.Contains(id))
             {
-                infos["fr-FR"] = new CultureVariation {Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false};
+                infos["fr-FR"] = new CultureVariation { Name = "N" + id + "-" + "fr-FR", Date = now, IsDraft = false };
             }
 
             return infos;
@@ -332,7 +340,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify
         SnapshotService.Notify(
-            new[] {new ContentCacheRefresher.JsonPayload(10, Guid.Empty, TreeChangeTypes.RefreshBranch)}, out _, out _);
+            new[] { new ContentCacheRefresher.JsonPayload(10, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -362,7 +370,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify
         SnapshotService.Notify(
-            new[] {new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch)}, out _, out _);
+            new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -479,7 +487,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // This test replicates an issue we saw here https://github.com/umbraco/Umbraco-CMS/pull/7907#issuecomment-610259393
         // The data was sent to me and this replicates it's structure
 
-        var paths = new Dictionary<int, string> {{-1, "-1"}};
+        var paths = new Dictionary<int, string> { { -1, "-1" } };
 
         InitializedCache(new List<ContentNodeKit>
         {
@@ -508,7 +516,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         // notify - which ensures there are 2 generations in the cache meaning each LinkedNode has a Next value.
         SnapshotService.Notify(
-            new[] {new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch)}, out _, out _);
+            new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _);
 
         // refresh the branch again, this used to show the issue where a null ref exception would occur
         // because in the ClearBranchLocked logic, when SetValueLocked was called within a recursive call
@@ -516,7 +524,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // this value before recursing.
         Assert.DoesNotThrow(() =>
             SnapshotService.Notify(
-                new[] {new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch)}, out _,
+                new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _,
                 out _));
     }
 
@@ -808,7 +816,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         IEnumerable<ContentNodeKit> GetKits()
         {
-            var paths = new Dictionary<int, string> {{-1, "-1"}};
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
 
             yield return CreateInvariantKit(1, -1, 1, paths);
             yield return CreateInvariantKit(2, 1, 1, paths);
@@ -823,7 +831,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var parentNode = parentNodes[0];
         AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 2);
 
-        SnapshotService.Notify(new[] {new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove)},
+        SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove) },
             out _, out _);
 
         parentNodes = contentStore.Test.GetValues(1);
@@ -840,7 +848,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         IEnumerable<ContentNodeKit> GetKits()
         {
-            var paths = new Dictionary<int, string> {{-1, "-1"}};
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
 
             //root
             yield return CreateInvariantKit(1, -1, 1, paths);
@@ -915,7 +923,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         IEnumerable<ContentNodeKit> GetKits()
         {
-            var paths = new Dictionary<int, string> {{-1, "-1"}};
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
 
             //root
             yield return CreateInvariantKit(100, -1, 1, paths);
@@ -949,7 +957,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         Assert.IsFalse(contentStore.Test.NextGen);
 
         SnapshotService.Notify(
-            new[] {new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode)}, out _, out _);
+            new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshNode) }, out _, out _);
 
         Assert.AreEqual(2, contentStore.Test.LiveGen);
         Assert.IsTrue(contentStore.Test.NextGen);
@@ -983,7 +991,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         IEnumerable<ContentNodeKit> GetKits()
         {
-            var paths = new Dictionary<int, string> {{-1, "-1"}};
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
 
             //root
             yield return CreateInvariantKit(100, -1, 1, paths);
@@ -1021,7 +1029,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
                 published ? rootKit.PublishedData : null);
             NuCacheContentService.ContentKits[1] = kit;
 
-            SnapshotService.Notify(new[] {new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType)}, out _,
+            SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType) }, out _,
                 out _);
 
             Assert.AreEqual(assertGen, contentStore.Test.LiveGen);
@@ -1058,7 +1066,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         IEnumerable<ContentNodeKit> GetKits()
         {
-            var paths = new Dictionary<int, string> {{-1, "-1"}};
+            var paths = new Dictionary<int, string> { { -1, "-1" } };
 
             //root
             yield return CreateInvariantKit(1, -1, 1, paths);

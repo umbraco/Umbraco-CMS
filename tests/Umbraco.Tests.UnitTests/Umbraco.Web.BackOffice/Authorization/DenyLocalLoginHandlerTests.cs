@@ -41,7 +41,7 @@ public class DenyLocalLoginHandlerTests
         var requirement = new DenyLocalLoginRequirement();
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private DenyLocalLoginHandler CreateHandler(bool denyLocalLogin = false)

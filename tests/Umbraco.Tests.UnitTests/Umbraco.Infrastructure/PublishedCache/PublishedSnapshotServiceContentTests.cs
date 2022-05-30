@@ -26,18 +26,22 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
         _propertyType =
             new PropertyType(TestHelper.ShortStringHelper, "Umbraco.Void.Editor", ValueStorageType.Nvarchar)
             {
-                Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture
+                Alias = "prop",
+                DataTypeId = 3,
+                Variations = ContentVariation.Culture
             };
         _contentType =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
-                Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture
+                Id = 2,
+                Alias = "alias-ct",
+                Variations = ContentVariation.Culture
             };
         _contentType.AddPropertyType(_propertyType);
 
-        var contentTypes = new[] {_contentType};
+        var contentTypes = new[] { _contentType };
 
-        InitializedCache(new[] {CreateKit()}, contentTypes);
+        InitializedCache(new[] { CreateKit() }, contentTypes);
     }
 
     private ContentType _contentType;
@@ -62,10 +66,10 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
                 // draft data = everything, and IsDraft indicates what's edited
-                ["fr-FR"] = new() {Name = "name-fr2", IsDraft = true, Date = new DateTime(2018, 01, 03, 01, 00, 00)},
-                ["en-UK"] = new() {Name = "name-uk2", IsDraft = true, Date = new DateTime(2018, 01, 04, 01, 00, 00)},
-                ["dk-DA"] = new() {Name = "name-da2", IsDraft = true, Date = new DateTime(2018, 01, 05, 01, 00, 00)},
-                ["de-DE"] = new() {Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00)}
+                ["fr-FR"] = new() { Name = "name-fr2", IsDraft = true, Date = new DateTime(2018, 01, 03, 01, 00, 00) },
+                ["en-UK"] = new() { Name = "name-uk2", IsDraft = true, Date = new DateTime(2018, 01, 04, 01, 00, 00) },
+                ["dk-DA"] = new() { Name = "name-da2", IsDraft = true, Date = new DateTime(2018, 01, 05, 01, 00, 00) },
+                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) }
             })
             .Build();
 
@@ -84,9 +88,9 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
                 // published data = only what's actually published, and IsDraft has to be false
-                ["fr-FR"] = new() {Name = "name-fr1", IsDraft = false, Date = new DateTime(2018, 01, 01, 01, 00, 00)},
-                ["en-UK"] = new() {Name = "name-uk1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00)},
-                ["de-DE"] = new() {Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00)}
+                ["fr-FR"] = new() { Name = "name-fr1", IsDraft = false, Date = new DateTime(2018, 01, 01, 01, 00, 00) },
+                ["en-UK"] = new() { Name = "name-uk1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) },
+                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) }
             })
             .Build();
 

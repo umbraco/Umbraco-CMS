@@ -40,7 +40,7 @@ public class UmbracoSmidgeConfigCacheBusterTests
     [Test]
     public void GetValue_DefaultReleaseSetupWithConfiguredVersion_HasSensibleDefaults()
     {
-        var config = Options.Create(new RuntimeMinificationSettings {Version = "1"});
+        var config = Options.Create(new RuntimeMinificationSettings { Version = "1" });
         var fixture = new Fixture();
         fixture.Customize(new AutoMoqCustomization());
         fixture.Inject(config);

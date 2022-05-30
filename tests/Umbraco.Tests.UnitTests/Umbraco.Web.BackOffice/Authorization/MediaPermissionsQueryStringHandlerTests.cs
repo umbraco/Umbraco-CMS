@@ -137,7 +137,7 @@ public class MediaPermissionsQueryStringHandlerTests
         var requirement = new MediaPermissionsQueryStringRequirement(QueryStringName);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName = QueryStringName,
@@ -146,7 +146,7 @@ public class MediaPermissionsQueryStringHandlerTests
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
         var mockHttpRequest = new Mock<HttpRequest>();
-        var queryParams = new Dictionary<string, StringValues> {{queryStringName, queryStringValue}};
+        var queryParams = new Dictionary<string, StringValues> { { queryStringName, queryStringValue } };
         mockHttpRequest.SetupGet(x => x.Query).Returns(new QueryCollection(queryParams));
         mockHttpContext.SetupGet(x => x.Request).Returns(mockHttpRequest.Object);
         mockHttpContext.SetupGet(x => x.Items).Returns(new Dictionary<object, object>());

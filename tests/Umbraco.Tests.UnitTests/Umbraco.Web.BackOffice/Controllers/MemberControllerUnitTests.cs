@@ -302,14 +302,14 @@ public class MemberControllerUnitTests
         IBackOfficeSecurity backOfficeSecurity, IUser user)
     {
         Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
-        Mock.Get(user).Setup(x => x.AllowedSections).Returns(new[] {"member"});
+        Mock.Get(user).Setup(x => x.AllowedSections).Returns(new[] { "member" });
         Mock.Get(backOfficeSecurity).Setup(x => x.CurrentUser).Returns(user);
     }
 
     private static void SetupPasswordSuccess(IMemberManager umbracoMembersUserManager,
         IPasswordChanger<MemberIdentityUser> passwordChanger, bool successful = true)
     {
-        var passwordChanged = new PasswordChangedModel {ChangeError = null, ResetPassword = null};
+        var passwordChanged = new PasswordChangedModel { ChangeError = null, ResetPassword = null };
         if (!successful)
         {
             var attempt = Attempt.Fail(passwordChanged);
@@ -390,7 +390,7 @@ public class MemberControllerUnitTests
         // arrange
         var roleName = "anyrole";
         IMember member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.Save);
-        fakeMemberData.Groups = new List<string> {roleName};
+        fakeMemberData.Groups = new List<string> { roleName };
         var membersIdentityUser = new MemberIdentityUser(123);
         Mock.Get(umbracoMembersUserManager)
             .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
@@ -432,7 +432,7 @@ public class MemberControllerUnitTests
         Mock.Get(umbracoMembersUserManager)
             .Verify(u => u.GetRolesAsync(membersIdentityUser));
         Mock.Get(umbracoMembersUserManager)
-            .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] {roleName}));
+            .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
         Mock.Get(umbracoMembersUserManager)
             .Verify(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()));
         Mock.Get(memberService)
@@ -493,7 +493,7 @@ public class MemberControllerUnitTests
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
             textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>()));
 
-        var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => new[] {dataEditor}));
+        var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
         IMapDefinition memberMapDefinition = new MemberMapDefinition(
             commonMapper,
@@ -581,7 +581,7 @@ public class MemberControllerUnitTests
             SortOrder = member.SortOrder,
             ContentTypeId = memberType.Id,
             Key = member.Key,
-            Password = new ChangingPasswordModel {Id = 456, NewPassword = member.RawPasswordValue, OldPassword = null},
+            Password = new ChangingPasswordModel { Id = 456, NewPassword = member.RawPasswordValue, OldPassword = null },
             Name = member.Name,
             Email = member.Email,
             Username = member.Username,

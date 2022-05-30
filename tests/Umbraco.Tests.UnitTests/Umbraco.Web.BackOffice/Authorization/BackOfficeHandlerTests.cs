@@ -89,7 +89,7 @@ public class BackOfficeHandlerTests
         var requirement = new BackOfficeRequirement(requireApproval);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private BackOfficeHandler CreateHandler(RuntimeLevel runtimeLevel = RuntimeLevel.Run,

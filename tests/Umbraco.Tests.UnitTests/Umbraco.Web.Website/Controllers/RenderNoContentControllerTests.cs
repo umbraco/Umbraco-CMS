@@ -49,7 +49,8 @@ public class RenderNoContentControllerTests
 
         var globalSettings = new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings
         {
-            UmbracoPath = UmbracoPathSetting, NoNodesViewPath = ViewPath
+            UmbracoPath = UmbracoPathSetting,
+            NoNodesViewPath = ViewPath
         });
         var controller = new RenderNoContentController(new TestUmbracoContextAccessor(mockUmbracoContext.Object),
             globalSettings, mockHostingEnvironment.Object);

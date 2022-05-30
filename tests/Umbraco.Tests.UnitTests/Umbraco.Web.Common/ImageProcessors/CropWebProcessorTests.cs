@@ -35,7 +35,7 @@ public class CropWebProcessorTests
         using var formattedImage = new FormattedImage(image, PngFormat.Instance);
 
         var logger = new NullLogger<ImageSharpMiddleware>();
-        var commands = new CommandCollection {{CropWebProcessor.Coordinates, coordinates}};
+        var commands = new CommandCollection { { CropWebProcessor.Coordinates, coordinates } };
         var parser = new CommandParser(new ICommandConverter[]
         {
             new ArrayConverter<float>(), new SimpleCommandConverter<float>()

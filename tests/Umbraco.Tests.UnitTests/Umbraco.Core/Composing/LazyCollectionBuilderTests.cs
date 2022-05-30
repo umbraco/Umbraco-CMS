@@ -45,7 +45,7 @@ public class LazyCollectionBuilderTests
 
         Assert.AreEqual(3, values.Count());
         Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] {typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3)}));
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
         var other = factory.GetRequiredService<TestCollection>();
         Assert.AreNotSame(values, other); // transient
@@ -60,9 +60,9 @@ public class LazyCollectionBuilderTests
         var composition = new UmbracoBuilder(container, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
 
         composition.WithCollectionBuilder<TestCollectionBuilder>()
-            .Add(() => new[] {typeof(TransientObject3), typeof(TransientObject2)})
-            .Add(() => new[] {typeof(TransientObject3), typeof(TransientObject2)})
-            .Add(() => new[] {typeof(TransientObject1)});
+            .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
+            .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
+            .Add(() => new[] { typeof(TransientObject1) });
 
         var factory = composition.CreateServiceProvider();
 
@@ -70,7 +70,7 @@ public class LazyCollectionBuilderTests
 
         Assert.AreEqual(3, values.Count());
         Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] {typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3)}));
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
         var other = factory.GetRequiredService<TestCollection>();
         Assert.AreNotSame(values, other); // transient
@@ -88,7 +88,7 @@ public class LazyCollectionBuilderTests
             .Add<TransientObject3>()
             .Add<TransientObject2>()
             .Add<TransientObject3>()
-            .Add(() => new[] {typeof(TransientObject1)});
+            .Add(() => new[] { typeof(TransientObject1) });
 
         var factory = composition.CreateServiceProvider();
 
@@ -96,7 +96,7 @@ public class LazyCollectionBuilderTests
 
         Assert.AreEqual(3, values.Count());
         Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] {typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3)}));
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2), typeof(TransientObject3) }));
 
         var other = factory.GetRequiredService<TestCollection>();
         Assert.AreNotSame(values, other); // transient
@@ -117,7 +117,7 @@ public class LazyCollectionBuilderTests
             ////.Add<TransientObject4>()
 
             // legal so far...
-            .Add(() => new[] {typeof(TransientObject4)});
+            .Add(() => new[] { typeof(TransientObject4) });
 
         Assert.Throws<InvalidOperationException>(() =>
         {
@@ -134,7 +134,7 @@ public class LazyCollectionBuilderTests
 
         composition.WithCollectionBuilder<TestCollectionBuilder>()
             .Add<TransientObject3>()
-            .Add(() => new[] {typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1)})
+            .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2), typeof(TransientObject1) })
             .Exclude<TransientObject3>();
 
         var factory = composition.CreateServiceProvider();
@@ -145,7 +145,7 @@ public class LazyCollectionBuilderTests
         Assert.IsFalse(values.Select(x => x.GetType())
             .Contains(typeof(TransientObject3)));
         Assert.IsTrue(values.Select(x => x.GetType())
-            .ContainsAll(new[] {typeof(TransientObject1), typeof(TransientObject2)}));
+            .ContainsAll(new[] { typeof(TransientObject1), typeof(TransientObject2) }));
 
         var other = factory.GetRequiredService<TestCollection>();
         Assert.AreNotSame(values, other); // transient

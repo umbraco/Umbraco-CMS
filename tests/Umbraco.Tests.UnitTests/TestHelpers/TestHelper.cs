@@ -126,7 +126,7 @@ public static class TestHelper
 
     public static void CleanDirectories(string[] directories)
     {
-        var preserves = new Dictionary<string, string[]> {{Constants.SystemDirectories.MvcViews, new[] {"dummy.txt"}}};
+        var preserves = new Dictionary<string, string[]> { { Constants.SystemDirectories.MvcViews, new[] { "dummy.txt" } } };
 
         foreach (var directory in directories)
         {

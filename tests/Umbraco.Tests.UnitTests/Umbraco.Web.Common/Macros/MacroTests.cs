@@ -25,7 +25,7 @@ public class MacroTests
     [TestCase("", false)]
     public void Macro_Is_File_Based(string macroSource, bool expectedNonNull)
     {
-        var model = new MacroModel {MacroSource = macroSource};
+        var model = new MacroModel { MacroSource = macroSource };
         var filename = MacroRenderer.GetMacroFileName(model);
         if (expectedNonNull)
         {

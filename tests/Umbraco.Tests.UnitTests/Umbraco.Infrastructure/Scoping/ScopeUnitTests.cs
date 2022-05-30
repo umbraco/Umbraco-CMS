@@ -590,8 +590,10 @@ public class ScopeUnitTests
             // Request a lock to create the ReadLocks dict.
             scope.ReadLock(Constants.Locks.Domains);
 
-            var readDict = new Dictionary<int, int>();
-            readDict[Constants.Locks.Languages] = 1;
+            var readDict = new Dictionary<int, int>
+            {
+                [Constants.Locks.Languages] = 1
+            };
             scope.GetReadLocks()[Guid.NewGuid()] = readDict;
 
             Assert.Throws<InvalidOperationException>(() => scope.Dispose());
@@ -615,8 +617,10 @@ public class ScopeUnitTests
             // Request a lock to create the WriteLocks dict.
             scope.WriteLock(Constants.Locks.Domains);
 
-            var writeDict = new Dictionary<int, int>();
-            writeDict[Constants.Locks.Languages] = 1;
+            var writeDict = new Dictionary<int, int>
+            {
+                [Constants.Locks.Languages] = 1
+            };
             scope.GetWriteLocks()[Guid.NewGuid()] = writeDict;
 
             Assert.Throws<InvalidOperationException>(() => scope.Dispose());

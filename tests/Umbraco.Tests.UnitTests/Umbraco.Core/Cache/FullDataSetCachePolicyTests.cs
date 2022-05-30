@@ -149,7 +149,7 @@ public class FullDataSetCachePolicyTests
     [Test]
     public void Get_All_Without_Ids_From_Cache()
     {
-        AuditItem[] getAll = {null};
+        AuditItem[] getAll = { null };
 
         var cache = new Mock<IAppPolicyCache>();
 

@@ -23,7 +23,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
     [SetUp]
     public void Setup()
     {
-        var globalSettings = new GlobalSettings {DefaultUILanguage = "test"};
+        var globalSettings = new GlobalSettings { DefaultUILanguage = "test" };
 
         _testUser = new BackOfficeIdentityUser(globalSettings, TestUserId, new List<IReadOnlyUserGroup>())
         {
@@ -124,9 +124,9 @@ public class BackOfficeClaimsPrincipalFactoryTests
         const string expectedClaimType = ClaimTypes.Role;
         const string expectedClaimValue = "b87309fb-4caf-48dc-b45a-2b752d051508";
 
-        _testUser.Roles.Add(new IdentityUserRole<string> {RoleId = expectedClaimValue});
+        _testUser.Roles.Add(new IdentityUserRole<string> { RoleId = expectedClaimValue });
         _mockUserManager.Setup(x => x.SupportsUserRole).Returns(true);
-        _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] {expectedClaimValue});
+        _mockUserManager.Setup(x => x.GetRolesAsync(_testUser)).ReturnsAsync(new[] { expectedClaimValue });
 
         var sut = CreateSut();
 
@@ -143,11 +143,12 @@ public class BackOfficeClaimsPrincipalFactoryTests
 
         _testUser.Claims.Add(new IdentityUserClaim<string>
         {
-            ClaimType = expectedClaimType, ClaimValue = expectedClaimValue
+            ClaimType = expectedClaimType,
+            ClaimValue = expectedClaimValue
         });
         _mockUserManager.Setup(x => x.SupportsUserClaim).Returns(true);
         _mockUserManager.Setup(x => x.GetClaimsAsync(_testUser)).ReturnsAsync(
-            new List<Claim> {new(expectedClaimType, expectedClaimValue)});
+            new List<Claim> { new(expectedClaimType, expectedClaimValue) });
 
         var sut = CreateSut();
 

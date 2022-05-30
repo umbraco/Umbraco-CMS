@@ -54,12 +54,12 @@ public class MemberPasswordHasherTests
     public PasswordVerificationResult VerifyHashedPassword(string password, string encryptedPassword,
         string decryptionKey)
     {
-        var member = new MemberIdentityUser {PasswordConfig = null};
+        var member = new MemberIdentityUser { PasswordConfig = null };
 
         var sut = new MemberPasswordHasher(
             new LegacyPasswordSecurity(),
             new JsonNetSerializer(),
-            Options.Create(new LegacyPasswordMigrationSettings {MachineKeyDecryptionKey = decryptionKey}),
+            Options.Create(new LegacyPasswordMigrationSettings { MachineKeyDecryptionKey = decryptionKey }),
             NullLoggerFactory.Instance.CreateLogger<MemberPasswordHasher>());
 
         return sut.VerifyHashedPassword(member, encryptedPassword, password);

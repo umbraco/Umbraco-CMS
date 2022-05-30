@@ -43,10 +43,10 @@ public class MappingTests
     [Test]
     public void SimpleMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition1()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
-        var thing1 = new Thing1 {Value = "value"};
+        var thing1 = new Thing1 { Value = "value" };
         var thing2 = mapper.Map<Thing1, Thing2>(thing1);
 
         Assert.IsNotNull(thing2);
@@ -65,12 +65,12 @@ public class MappingTests
     [Test]
     public void EnumerableMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition1()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
-        var thing1A = new Thing1 {Value = "valueA"};
-        var thing1B = new Thing1 {Value = "valueB"};
-        Thing1[] thing1 = {thing1A, thing1B};
+        var thing1A = new Thing1 { Value = "valueA" };
+        var thing1B = new Thing1 { Value = "valueB" };
+        Thing1[] thing1 = { thing1A, thing1B };
         var thing2 = mapper.Map<IEnumerable<Thing1>, IEnumerable<Thing2>>(thing1).ToList();
 
         Assert.IsNotNull(thing2);
@@ -96,10 +96,10 @@ public class MappingTests
     [Test]
     public void InheritedMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition1()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition1() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
-        var thing3 = new Thing3 {Value = "value"};
+        var thing3 = new Thing3 { Value = "value" };
         var thing2 = mapper.Map<Thing3, Thing2>(thing3);
 
         Assert.IsNotNull(thing2);
@@ -118,7 +118,7 @@ public class MappingTests
     [Test]
     public void CollectionsMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition2()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition2() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
         // can map a PropertyCollection
@@ -144,7 +144,7 @@ public class MappingTests
         // if timing is good, and mapper does have non-concurrent dictionaries, it fails
         // practically, to reproduce, one needs to add a 1s sleep in the mapper's loop
         // hence, this test is explicit
-        var thing3 = new Thing3 {Value = "value"};
+        var thing3 = new Thing3 { Value = "value" };
         var thing4 = new Thing4();
         Exception caught = null;
 
@@ -189,10 +189,10 @@ public class MappingTests
     [Test]
     public void EnumMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition4()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition4() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
-        var thing5 = new Thing5 {Fruit1 = Thing5Enum.Apple, Fruit2 = Thing5Enum.Banana, Fruit3 = Thing5Enum.Cherry};
+        var thing5 = new Thing5 { Fruit1 = Thing5Enum.Apple, Fruit2 = Thing5Enum.Banana, Fruit3 = Thing5Enum.Cherry };
 
         var thing6 = mapper.Map<Thing5, Thing6>(thing5);
 
@@ -205,7 +205,7 @@ public class MappingTests
     [Test]
     public void NullPropertyMap()
     {
-        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] {new MapperDefinition5()});
+        var definitions = new MapDefinitionCollection(() => new IMapDefinition[] { new MapperDefinition5() });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
         var thing7 = new Thing7();

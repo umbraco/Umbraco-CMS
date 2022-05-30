@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Persistence.SqlServer.Services;
 
@@ -22,7 +22,10 @@ public class SqlAzureDatabaseProviderMetadataTests
     {
         var settings = new DatabaseModel
         {
-            Server = server, DatabaseName = databaseName, Login = userName, Password = password
+            Server = server,
+            DatabaseName = databaseName,
+            Login = userName,
+            Password = password
         };
 
         var sut = new SqlAzureDatabaseProviderMetadata();
@@ -41,7 +44,10 @@ public class SqlAzureDatabaseProviderMetadataTests
     {
         var settings = new DatabaseModel
         {
-            Server = server, DatabaseName = databaseName, Login = userName, Password = password
+            Server = server,
+            DatabaseName = databaseName,
+            Login = userName,
+            Password = password
         };
 
         var sut = new SqlAzureDatabaseProviderMetadata();

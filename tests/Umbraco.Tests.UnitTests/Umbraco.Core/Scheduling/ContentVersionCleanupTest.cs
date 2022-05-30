@@ -29,7 +29,7 @@ internal class ContentVersionCleanupTest
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
         {
-            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings {EnableCleanup = false}
+            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings { EnableCleanup = false }
         });
         runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
         mainDom.Setup(x => x.IsMainDom).Returns(true);
@@ -52,7 +52,7 @@ internal class ContentVersionCleanupTest
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
         {
-            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings {EnableCleanup = true}
+            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings { EnableCleanup = true }
         });
         runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Unknown);
         mainDom.Setup(x => x.IsMainDom).Returns(true);
@@ -75,7 +75,7 @@ internal class ContentVersionCleanupTest
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
         {
-            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings {EnableCleanup = true}
+            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings { EnableCleanup = true }
         });
         runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
         mainDom.Setup(x => x.IsMainDom).Returns(true);
@@ -98,7 +98,7 @@ internal class ContentVersionCleanupTest
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
         {
-            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings {EnableCleanup = true}
+            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings { EnableCleanup = true }
         });
 
         runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -122,7 +122,7 @@ internal class ContentVersionCleanupTest
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
         {
-            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings {EnableCleanup = true}
+            ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings { EnableCleanup = true }
         });
 
         runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);

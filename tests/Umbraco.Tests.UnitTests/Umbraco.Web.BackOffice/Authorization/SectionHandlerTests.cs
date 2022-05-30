@@ -55,7 +55,7 @@ public class SectionHandlerTests
         var requirement = new SectionRequirement(Constants.Applications.Content, Constants.Applications.Media);
         var user = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()));
         var resource = new object();
-        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> {requirement}, user, resource);
+        return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
     private SectionHandler CreateHandler(bool userIsAuthorized = false, bool userCanAccessContentSection = false)

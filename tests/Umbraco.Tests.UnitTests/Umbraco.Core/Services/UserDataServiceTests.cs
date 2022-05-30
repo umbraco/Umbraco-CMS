@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -132,8 +132,8 @@ public class UserDataServiceTests
             _umbracoVersion,
             localizationService,
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x =>
-                x.CurrentValue == new ModelsBuilderSettings {ModelsMode = modelsMode}),
-            Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings {Debug = isDebug}),
+                x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings()),
             Mock.Of<IHostEnvironment>(),
             Mock.Of<IUmbracoDatabaseFactory>(x =>

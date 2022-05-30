@@ -25,7 +25,7 @@ public class UmbracoRequestPathsTests
 
     private IHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
     {
-        var hostingSettings = new HostingSettings {ApplicationVirtualPath = virtualPath};
+        var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
         var webRoutingSettings = new WebRoutingSettings();
         var mockedOptionsMonitorOfHostingSettings =
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);

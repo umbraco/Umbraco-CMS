@@ -14,7 +14,7 @@ public class OrderedHashSetTests
     public void Keeps_Last()
     {
         var list = new OrderedHashSet<MyClass>(false);
-        MyClass[] items = {new MyClass("test"), new MyClass("test"), new MyClass("test")};
+        MyClass[] items = { new MyClass("test"), new MyClass("test"), new MyClass("test") };
         foreach (var item in items)
         {
             list.Add(item);
@@ -29,7 +29,7 @@ public class OrderedHashSetTests
     public void Keeps_First()
     {
         var list = new OrderedHashSet<MyClass>(true);
-        MyClass[] items = {new MyClass("test"), new MyClass("test"), new MyClass("test")};
+        MyClass[] items = { new MyClass("test"), new MyClass("test"), new MyClass("test") };
         foreach (var item in items)
         {
             list.Add(item);

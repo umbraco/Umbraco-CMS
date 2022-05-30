@@ -26,7 +26,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         base.Setup();
 
         _webRoutingSettings = new WebRoutingSettings();
-        _requestHandlerSettings = new RequestHandlerSettings {AddTrailingSlash = true};
+        _requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
 
         GlobalSettings.HideTopLevelNodeFromPath = false;
 
@@ -63,7 +63,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
     {
         var allLangs = isoCodes
             .Select(CultureInfo.GetCultureInfo)
-            .Select(culture => new Language(culture.Name, culture.EnglishName) {IsDefault = true, IsMandatory = true})
+            .Select(culture => new Language(culture.Name, culture.EnglishName) { IsDefault = true, IsMandatory = true })
             .ToArray();
 
 
@@ -85,7 +85,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] {new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor)});
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings,
@@ -119,7 +119,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] {new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor)});
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
         var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings,
@@ -169,7 +169,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
-            new[] {new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor)});
+            new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
 

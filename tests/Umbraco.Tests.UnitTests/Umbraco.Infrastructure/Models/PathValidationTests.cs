@@ -93,7 +93,7 @@ public class PathValidationTests
             .Build();
 
         entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(),
-            umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim {Id = 888, Path = "-1,888"} : null,
+            umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim { Id = 888, Path = "-1,888" } : null,
             umbracoEntity => { });
 
         // works because the parent was found

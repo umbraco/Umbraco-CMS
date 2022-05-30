@@ -97,7 +97,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor,
                 new RepositoryCachePolicyOptions());
 
-        var found = defaultPolicy.GetAll(new object[] { }, ids => new[] {(AuditItem)null});
+        var found = defaultPolicy.GetAll(new object[] { }, ids => new[] { (AuditItem)null });
         Assert.AreEqual(2, found.Length);
     }
 
