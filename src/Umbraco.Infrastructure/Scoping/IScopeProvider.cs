@@ -104,11 +104,6 @@ public interface IScopeProvider : ICoreScopeProvider
     IScope DetachScope();
 
     /// <summary>
-    /// Gets the scope context.
-    /// </summary>
-    new IScopeContext? Context { get; }
-
-    /// <summary>
     /// Gets the sql context.
     /// </summary>
     ISqlContext SqlContext { get; }
