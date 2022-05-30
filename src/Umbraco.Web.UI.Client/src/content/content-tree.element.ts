@@ -5,6 +5,7 @@ import { UmbContextConsumerMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { Subscription } from 'rxjs';
 import { UUIMenuItemElement } from '@umbraco-ui/uui';
+import { data } from './content.service';
 
 @customElement('umb-content-tree')
 class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
@@ -20,18 +21,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
 
   // simplified tree for testing
   @state()
-  _tree: Array<any> = [
-    {
-      id: '1',
-      name: 'Hello World',
-      icon: 'document',
-    },
-    {
-      id: '2',
-      name: 'Hello World 2',
-      icon: 'document',
-    }
-  ];
+  _tree: Array<any> = [];
 
   @state()
   _section?: string;
@@ -45,6 +35,9 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
 
   constructor () {
     super();
+
+    // TODO: implement correct tree data
+    this._tree = data;
 
     this.consumeContext('umbRouter', (router: UmbRouter) => {
       this._router = router;

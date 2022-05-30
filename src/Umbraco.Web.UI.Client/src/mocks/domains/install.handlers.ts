@@ -1,112 +1,12 @@
 import { rest } from 'msw';
-import {
-  AllowedSectionsResponse,
-  ErrorResponse,
-  InitResponse,
-  UmbracoInstaller,
-  UserResponse,
-  VersionResponse,
-} from '../models';
-import { handlers as installHandlers } from './domains/install.handlers';
-import { handlers as manifestsHandlers } from './domains/manifests.handlers';
-import { handlers as userHandlers } from './domains/user.handlers';
-import { handlers as versionHandlers } from './domains/version.handlers';
+import { components } from '../../../schemas/generated-schema';
 
 export const handlers = [
-  rest.get('/umbraco/backoffice/manifests', (_req, res, ctx) => {
-    return res(
-      // Respond with a 200 status code
-      ctx.status(200),
-      ctx.json({
-        manifests: [
-          {
-            type: 'section',
-            alias: 'My.Section.Custom',
-            name: 'Custom',
-            elementName: 'umb-custom-section',
-            meta: {
-              weight: 30,
-            },
-          },
-        ],
-      })
-    );
-  }),
-
-  rest.get('/umbraco/backoffice/init', (_req, res, ctx) => {
-    return res(
-      // Respond with a 200 status code
-      ctx.status(200),
-      ctx.json<InitResponse>({
-        installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
-      })
-    );
-  }),
-
-  rest.get('/umbraco/backoffice/version', (_req, res, ctx) => {
-    return res(
-      // Respond with a 200 status code
-      ctx.status(200),
-      ctx.json<VersionResponse>({
-        version: '13.0.0',
-      })
-    );
-  }),
-
-  rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
-    // Persist user's authentication in the session
-    sessionStorage.setItem('is-authenticated', 'true');
-    return res(
-      // Respond with a 200 status code
-      ctx.status(201)
-    );
-  }),
-
-  rest.post('/umbraco/backoffice/user/logout', (_req, res, ctx) => {
-    // Persist user's authentication in the session
-    sessionStorage.removeItem('is-authenticated');
-    return res(
-      // Respond with a 200 status code
-      ctx.status(201)
-    );
-  }),
-
-  rest.get('/umbraco/backoffice/user', (_req, res, ctx) => {
-    // Check if the user is authenticated in this session
-    const isAuthenticated = sessionStorage.getItem('is-authenticated');
-    if (!isAuthenticated) {
-      // If not authenticated, respond with a 403 error
-      return res(
-        ctx.status(403),
-        ctx.json<ErrorResponse>({
-          errorMessage: 'Not authorized',
-        })
-      );
-    }
-    // If authenticated, return a mocked user details
-    return res(
-      ctx.status(200),
-      ctx.json<UserResponse>({
-        username: 'admin',
-        role: 'administrator',
-      })
-    );
-  }),
-
-  rest.get('/umbraco/backoffice/user/sections', (_req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json<AllowedSectionsResponse>({
-        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-      })
-    );
-  }),
-
   rest.get('/umbraco/backoffice/install', (_req, res, ctx) => {
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json<UmbracoInstaller>({
+      ctx.json({
         user: {
           minCharLength: 2,
           minNonAlphaNumericLength: 0,
@@ -133,6 +33,7 @@ export const handlers = [
             displayName: 'SQLite',
             defaultDatabaseName: 'Umbraco',
             providerName: 'Microsoft.Data.SQLite',
+            supportsQuickInstall: true,
             isAvailable: true,
             requiresServer: false,
             serverPlaceholder: null,
@@ -146,6 +47,7 @@ export const handlers = [
             displayName: 'SQL Server',
             defaultDatabaseName: '',
             providerName: 'Microsoft.Data.SqlClient',
+            supportsQuickInstall: false,
             isAvailable: true,
             requiresServer: true,
             serverPlaceholder: '(local)\\SQLEXPRESS',
@@ -167,7 +69,7 @@ export const handlers = [
             requiresConnectionTest: true,
           },
         ],
-      })
+      } as components['schemas']['UmbracoInstaller'])
     );
   }),
 
@@ -176,9 +78,5 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(201)
     );
-  }),
-  ...installHandlers,
-  ...manifestsHandlers,
-  ...userHandlers,
-  ...versionHandlers,
+  })
 ];
