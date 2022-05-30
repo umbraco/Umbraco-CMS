@@ -126,16 +126,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string GetSpecialDbType(SpecialDbType dbType, int customSize) => GetSpecialDbType(dbType);
 
     /// <inheritdoc />
-    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
-        out string constraintName)
+    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, out string constraintName)
     {
         // TODO: SQLite
         constraintName = string.Empty;
         return false;
     }
 
-    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector,
-        string? tableAlias = null)
+    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
         var fieldName = GetColumnName(field!);
@@ -174,8 +172,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     public override string GetConcat(params string[] args) => string.Join(" || ", args.AsEnumerable());
 
-    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string? referenceName = null, bool forInsert = false)
+    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {
@@ -230,8 +227,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sb.ToString().TrimStart(',');
     }
 
-    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
-        bool skipKeysAndIndexes = false)
+    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false)
     {
         var columns = Format(tableDefinition.Columns);
         var primaryKey = FormatPrimaryKey(tableDefinition);

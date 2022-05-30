@@ -184,8 +184,7 @@ public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProvide
         return sqlDbType;
     }
 
-    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
-        bool skipKeysAndIndexes = false)
+    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false)
     {
         var createSql = Format(tableDefinition);
         var createPrimaryKeySql = FormatPrimaryKey(tableDefinition);

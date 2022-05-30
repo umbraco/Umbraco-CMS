@@ -257,20 +257,20 @@ from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id
    inner join sys.schemas as S on T.[schema_id] = S.[schema_id]
 WHERE S.name = (SELECT SCHEMA_NAME()) AND I.is_primary_key = 0
 order by T.name, I.name");
-        return items.Select(item => new Tuple<string, string, string, bool>(item.TableName, item.IndexName,
-            item.ColumnName,
-            item.Unique == 1)).ToList();
+        return items.Select(item => new Tuple<string, string, string, bool>(item.TableName, item.IndexName, item.ColumnName, item.Unique == 1)).ToList();
     }
 
     /// <inheritdoc />
-    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
-        [MaybeNullWhen(false)] out string constraintName)
+    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, [MaybeNullWhen(false)] out string constraintName)
     {
-        constraintName = db.Fetch<string>(@"select con.[name] as [constraintName]
+        constraintName = db.Fetch<string>(
+                @"select con.[name] as [constraintName]
 from sys.default_constraints con
 join sys.columns col on con.object_id=col.default_object_id
 join sys.tables tbl on col.object_id=tbl.object_id
-where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
+where tbl.[name]=@0 and col.[name]=@1;",
+                tableName,
+                columnName)
             .FirstOrDefault();
         return !constraintName.IsNullOrWhiteSpace();
     }
@@ -294,8 +294,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
     protected override string FormatIdentity(ColumnDefinition column) =>
         column.IsIdentity ? GetIdentityString(column) : string.Empty;
 
-    public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top) => new Sql<ISqlContext>(sql.SqlContext,
-        sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+    public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top) => new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
 
     private static string GetIdentityString(ColumnDefinition column) => "IDENTITY(1,1)";
 
@@ -330,8 +329,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             ? $" INCLUDE ({string.Join(",", index.IncludeColumns.Select(x => GetQuotedColumnName(x.Name)))})"
             : string.Empty;
 
-        return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
-            GetQuotedTableName(index.TableName), columns, includeColumns);
+        return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name), GetQuotedTableName(index.TableName), columns, includeColumns);
     }
 
 
@@ -398,8 +396,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             EngineEdition = EngineEdition.Unknown;
         }
 
-        public ServerVersionInfo(string edition, string instanceName, string productVersion,
-            EngineEdition engineEdition, string machineName, string productLevel)
+        public ServerVersionInfo(string edition, string instanceName, string productVersion, EngineEdition engineEdition, string machineName, string productLevel)
         {
             Edition = edition;
             InstanceName = instanceName;

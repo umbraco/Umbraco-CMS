@@ -112,8 +112,16 @@ internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
                 col.Name,
                 col.Size > 0 ? col.Size : null,
                 col.Precision > 0 ? (short?)col.Precision : null,
-                null, col.IsUnique, col.IsIdentity, col.IsNullable, sqlDbType,
-                null, null, null, null, null);
+                null,
+                col.IsUnique,
+                col.IsIdentity,
+                col.IsNullable,
+                sqlDbType,
+                null,
+                null,
+                null,
+                null,
+                null);
         }
     }
 

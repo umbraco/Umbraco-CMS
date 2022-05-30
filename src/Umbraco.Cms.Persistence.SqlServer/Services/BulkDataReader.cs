@@ -219,7 +219,8 @@ internal abstract class BulkDataReader : IDataReader
     ///     For XML columns the schema collection's name. Otherwise, null.
     /// </param>
     /// <seealso cref="AddSchemaTableRows" />
-    protected void AddSchemaTableRow(string columnName,
+    protected void AddSchemaTableRow(
+        string columnName,
         int? columnSize,
         short? numericPrecision,
         short? numericScale,
@@ -301,7 +302,8 @@ internal abstract class BulkDataReader : IDataReader
                     throw new ArgumentOutOfRangeException("columnSize");
                 }
 
-                dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                dataTypeName = string.Format(
+                    CultureInfo.InvariantCulture,
                     "binary({0})",
                     columnSize.Value);
                 break;
@@ -324,7 +326,8 @@ internal abstract class BulkDataReader : IDataReader
                     throw new ArgumentOutOfRangeException("columnSize");
                 }
 
-                dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                dataTypeName = string.Format(
+                    CultureInfo.InvariantCulture,
                     "char({0})",
                     columnSize.Value);
                 break;
@@ -349,7 +352,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("numericPrecision");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "datetime2({0})",
                         numericPrecision.Value);
                 }
@@ -370,7 +374,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("numericPrecision");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "datetimeoffset({0})",
                         numericPrecision.Value);
                 }
@@ -401,7 +406,8 @@ internal abstract class BulkDataReader : IDataReader
                         "numericScale must not be larger than numericPrecision for \"decimal\" type columns.");
                 }
 
-                dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                dataTypeName = string.Format(
+                    CultureInfo.InvariantCulture,
                     "decimal({0}, {1})",
                     numericPrecision.Value,
                     numericScale.Value);
@@ -420,7 +426,8 @@ internal abstract class BulkDataReader : IDataReader
                     throw new ArgumentOutOfRangeException("numericPrecision");
                 }
 
-                dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                dataTypeName = string.Format(
+                    CultureInfo.InvariantCulture,
                     "float({0})",
                     numericPrecision.Value);
                 break;
@@ -453,7 +460,8 @@ internal abstract class BulkDataReader : IDataReader
                     throw new ArgumentOutOfRangeException("columnSize");
                 }
 
-                dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                dataTypeName = string.Format(
+                    CultureInfo.InvariantCulture,
                     "nchar({0})",
                     columnSize.Value);
                 break;
@@ -473,7 +481,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("columnSize");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "nvarchar({0})",
                         columnSize.Value);
                 }
@@ -523,7 +532,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("numericPrecision");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "time({0})",
                         numericPrecision.Value);
                 }
@@ -577,7 +587,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("columnSize");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "varbinary({0})",
                         columnSize.Value);
                 }
@@ -600,7 +611,8 @@ internal abstract class BulkDataReader : IDataReader
                         throw new ArgumentOutOfRangeException("columnSize");
                     }
 
-                    dataTypeName = string.Format(CultureInfo.InvariantCulture,
+                    dataTypeName = string.Format(
+                        CultureInfo.InvariantCulture,
                         "varchar({0})",
                         columnSize.Value);
                 }
@@ -672,7 +684,8 @@ internal abstract class BulkDataReader : IDataReader
                 throw new ArgumentOutOfRangeException("providerType");
         }
 
-        _schemaTable?.Rows.Add(columnName,
+        _schemaTable?.Rows.Add(
+            columnName,
             _schemaTable.Rows.Count,
             columnSize,
             numericPrecision,
@@ -893,7 +906,8 @@ internal abstract class BulkDataReader : IDataReader
     ///     The actual number of bytes read.
     /// </returns>
     /// <seealso cref="IDataRecord.GetBytes(int,long,byte[],int,int)" />
-    public long GetBytes(int i,
+    public long GetBytes(
+        int i,
         long fieldOffset,
         byte[]? buffer,
         int bufferoffset,
@@ -981,7 +995,8 @@ internal abstract class BulkDataReader : IDataReader
     ///     The actual number of characters read.
     /// </returns>
     /// <seealso cref="IDataRecord.GetChars(int,long,char[],int,int)" />
-    public long GetChars(int i,
+    public long GetChars(
+        int i,
         long fieldoffset,
         char[]? buffer,
         int bufferoffset,
@@ -1245,8 +1260,7 @@ internal abstract class BulkDataReader : IDataReader
         // Case sensitive search
         for (var ordinal = 0; ordinal < rowCount; ordinal++)
         {
-            if (string.Equals((string)schemaRows[ordinal][SchemaTableColumn.ColumnName], name,
-                    StringComparison.Ordinal))
+            if (string.Equals((string)schemaRows[ordinal][SchemaTableColumn.ColumnName], name, StringComparison.Ordinal))
             {
                 result = ordinal;
             }
@@ -1257,8 +1271,7 @@ internal abstract class BulkDataReader : IDataReader
             // Case insensitive search.
             for (var ordinal = 0; ordinal < rowCount; ordinal++)
             {
-                if (string.Equals((string)schemaRows[ordinal][SchemaTableColumn.ColumnName], name,
-                        StringComparison.OrdinalIgnoreCase))
+                if (string.Equals((string)schemaRows[ordinal][SchemaTableColumn.ColumnName], name, StringComparison.OrdinalIgnoreCase))
                 {
                     result = ordinal;
                 }
