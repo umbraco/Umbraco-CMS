@@ -69,25 +69,7 @@ class UmbContentEditor extends LitElement {
       dataTypeAlias: 'myTextAreaEditor',
       value: 'Teeeeexxxt areaaaaaa'
     }
-  ]
-
-  /*
-  
-  import { unsafeHTML } from 'lit-html/directives/unsafe-html';
-   
-     // ...
-
-    const template = `
-      <h${this.rank} class="a-heading">
-        <slot></slot>
-      </h${this.rank}>
-    `;
-
-    return html`
-      ${unsafeHTML(template)}
-    `;
-    
-  */
+  ];
 
   render() {
     return html`
