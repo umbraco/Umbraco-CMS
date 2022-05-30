@@ -24,7 +24,8 @@ public class TestProfiler : IProfiler
         // See https://miniprofiler.com/dotnet/AspDotNet
         MiniProfiler.Configure(new MiniProfilerOptions
         {
-            SqlFormatter = new SqlServerFormatter(), StackMaxLength = 5000
+            SqlFormatter = new SqlServerFormatter(),
+            StackMaxLength = 5000
         });
 
         MiniProfiler.StartNew();

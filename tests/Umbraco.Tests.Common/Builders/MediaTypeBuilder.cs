@@ -100,7 +100,7 @@ public class MediaTypeBuilder
         }
         else
         {
-            mediaType = new MediaType(ShortStringHelper, GetParentId()) {Alias = GetAlias()};
+            mediaType = new MediaType(ShortStringHelper, GetParentId()) { Alias = GetAlias() };
         }
 
         mediaType.Id = GetId();
@@ -127,8 +127,13 @@ public class MediaTypeBuilder
         return mediaType;
     }
 
-    public static MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null,
-        bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
+    public static MediaType CreateSimpleMediaType(
+        string alias,
+        string name,
+        IMediaType parent = null,
+        bool randomizeAliases = false,
+        string propertyGroupAlias = "content",
+        string propertyGroupName = "Content")
     {
         var builder = new MediaTypeBuilder();
         var mediaType = builder
@@ -172,8 +177,7 @@ public class MediaTypeBuilder
     public static MediaType CreateImageMediaTypeWithCrop(string alias = Constants.Conventions.MediaTypes.Image) =>
         CreateImageMediaType(alias ?? "Image", Constants.PropertyEditors.Aliases.ImageCropper, 1043);
 
-    private static MediaType CreateImageMediaType(string alias, string imageFieldPropertyEditorAlias,
-        int imageFieldDataTypeId)
+    private static MediaType CreateImageMediaType(string alias, string imageFieldPropertyEditorAlias, int imageFieldDataTypeId)
     {
         var builder = new MediaTypeBuilder();
         var mediaType = builder

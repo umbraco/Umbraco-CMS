@@ -28,6 +28,6 @@ public class StylesheetBuilder
         var path = _path ?? string.Empty;
         var content = _content ?? string.Empty;
 
-        return new Stylesheet(path) {Content = content};
+        return new Stylesheet(path) { Content = content };
     }
 }

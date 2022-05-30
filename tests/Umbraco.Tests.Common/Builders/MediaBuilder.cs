@@ -165,9 +165,9 @@ public class MediaBuilder
         var path = _path ?? $"-1,{id}";
         var sortOrder = _sortOrder ?? 0;
         var trashed = _trashed ?? false;
-        var propertyValues = _propertyValues ?? null;
-        var propertyValuesCulture = _propertyValuesCulture ?? null;
-        var propertyValuesSegment = _propertyValuesSegment ?? null;
+        var propertyValues = _propertyValues;
+        var propertyValuesCulture = _propertyValuesCulture;
+        var propertyValuesSegment = _propertyValuesSegment;
 
         if (_mediaTypeBuilder is null && _mediaType is null)
         {
@@ -217,7 +217,7 @@ public class MediaBuilder
             .WithName(name)
             .WithMediaType(mediaType)
             .WithParentId(parentId)
-            .WithPropertyValues(new {title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe"})
+            .WithPropertyValues(new { title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe" })
             .Build();
 
     public static Media CreateMediaImage(IMediaType mediaType, int parentId) =>

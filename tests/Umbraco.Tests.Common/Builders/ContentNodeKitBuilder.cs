@@ -17,8 +17,7 @@ public class ContentNodeKitBuilder : BuilderBase<ContentNodeKit>
         return this;
     }
 
-    public ContentNodeKitBuilder WithContentNode(int id, Guid uid, int level, string path, int sortOrder,
-        int parentContentId, DateTime createDate, int creatorId)
+    public ContentNodeKitBuilder WithContentNode(int id, Guid uid, int level, string path, int sortOrder, int parentContentId, DateTime createDate, int creatorId)
     {
         _contentNode = new ContentNode(id, uid, level, path, sortOrder, parentContentId, createDate, creatorId);
         return this;
@@ -88,8 +87,7 @@ public class ContentNodeKitBuilder : BuilderBase<ContentNodeKit>
 
         return new ContentNodeKitBuilder()
             .WithContentTypeId(contentTypeId)
-            .WithContentNode(id, uid ?? Guid.NewGuid(), level ?? pathParts.Length - 1, path, sortOrder ?? 0,
-                parentContentId.Value, createDate ?? DateTime.Now, creatorId)
+            .WithContentNode(id, uid ?? Guid.NewGuid(), level ?? pathParts.Length - 1, path, sortOrder ?? 0, parentContentId.Value, createDate ?? DateTime.Now, creatorId)
             .WithDraftData(draftData)
             .WithPublishedData(publishedData)
             .Build();

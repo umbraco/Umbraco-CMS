@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -21,10 +21,8 @@ public class PropertyDataBuilder : BuilderBase<Dictionary<string, PropertyData[]
         return this;
     }
 
-    public PropertyDataBuilder WithPropertyData(string alias, object value, string? culture = null,
-        string? segment = null)
-        => WithPropertyData(alias,
-            new PropertyData {Culture = culture ?? string.Empty, Segment = segment ?? string.Empty, Value = value});
+    public PropertyDataBuilder WithPropertyData(string alias, object value, string? culture = null, string? segment = null)
+        => WithPropertyData(alias, new PropertyData { Culture = culture ?? string.Empty, Segment = segment ?? string.Empty, Value = value });
 
     public override Dictionary<string, PropertyData[]> Build()
         => _properties.ToDictionary(x => x.Key, x => x.Value.ToArray());

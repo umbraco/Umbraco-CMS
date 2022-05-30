@@ -31,7 +31,7 @@ public class EntitySlimBuilder
         var id = _id ?? 1;
         var parentId = _parentId ?? -1;
 
-        return new EntitySlim {Id = id, ParentId = parentId};
+        return new EntitySlim { Id = id, ParentId = parentId };
     }
 
     public EntitySlimBuilder WithNoParentId()

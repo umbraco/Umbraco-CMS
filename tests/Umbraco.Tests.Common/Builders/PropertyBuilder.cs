@@ -78,11 +78,13 @@ public class PropertyBuilder
         var propertyType = _propertyType ?? _propertyTypeBuilder.Build();
 
         // Needs to be within collection to support publishing.
-        var propertyTypeCollection = new PropertyTypeCollection(true, new[] {propertyType});
+        var propertyTypeCollection = new PropertyTypeCollection(true, new[] { propertyType });
 
         return new Property(id, propertyTypeCollection[0])
         {
-            Key = key, CreateDate = createDate, UpdateDate = updateDate
+            Key = key,
+            CreateDate = createDate,
+            UpdateDate = updateDate
         };
     }
 }

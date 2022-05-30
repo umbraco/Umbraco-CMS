@@ -151,8 +151,7 @@ public class PropertyTypeBuilder<TParent>
         return this;
     }
 
-    public PropertyTypeBuilder<TParent> WithValidationRegExp(string validationRegExp,
-        string validationRegExpMessage = "")
+    public PropertyTypeBuilder<TParent> WithValidationRegExp(string validationRegExp, string validationRegExpMessage = "")
     {
         _validationRegExp = validationRegExp;
         _validationRegExpMessage = validationRegExpMessage;
@@ -178,7 +177,7 @@ public class PropertyTypeBuilder<TParent>
         var sortOrder = _sortOrder ?? 0;
         var dataTypeId = _dataTypeId ?? -88;
         var description = _description ?? string.Empty;
-        var propertyGroupId = _propertyGroupId ?? null;
+        var propertyGroupId = _propertyGroupId;
         var mandatory = _mandatory ?? false;
         var mandatoryMessage = _mandatoryMessage ?? string.Empty;
         var validationRegExp = _validationRegExp ?? string.Empty;

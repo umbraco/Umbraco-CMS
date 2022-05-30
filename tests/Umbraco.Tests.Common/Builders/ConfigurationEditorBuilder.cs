@@ -26,6 +26,6 @@ public class ConfigurationEditorBuilder<TParent> : ChildBuilderBase<TParent, ICo
     {
         var defaultConfiguration = _defaultConfiguration ?? new Dictionary<string, object>();
 
-        return new ConfigurationEditor {DefaultConfiguration = defaultConfiguration};
+        return new ConfigurationEditor { DefaultConfiguration = defaultConfiguration };
     }
 }

@@ -128,7 +128,7 @@ public class DataTypeBuilder
         var key = _key ?? Guid.NewGuid();
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
-        var deleteDate = _deleteDate ?? null;
+        var deleteDate = _deleteDate;
         var name = _name ?? Guid.NewGuid().ToString();
         var level = _level ?? 0;
         var path = _path ?? $"-1,{id}";

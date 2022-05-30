@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
@@ -30,6 +30,6 @@ public class ContentCultureInfosBuilder : ChildBuilderBase<ContentCultureInfosCo
         var cultureIso = _cultureIso ?? "en-us";
         var date = Date ?? DateTime.Now;
 
-        return new ContentCultureInfos(cultureIso) {Name = name, Date = date};
+        return new ContentCultureInfos(cultureIso) { Name = name, Date = date };
     }
 }

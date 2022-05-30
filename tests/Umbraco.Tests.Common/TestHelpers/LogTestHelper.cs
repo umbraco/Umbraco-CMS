@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -33,7 +33,8 @@ public static class LogTestHelper
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => state(v, t)),
                 exception,
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), (Times)times);
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)),
+            (Times)times);
 
         return logger;
     }

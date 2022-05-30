@@ -41,8 +41,7 @@ public static class ContentItemSaveBuilderExtensions
         return builder;
     }
 
-    private static void AddInvariantProperty(ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder,
-        IProperty contentProperty) =>
+    private static void AddInvariantProperty(ContentVariantSaveBuilder<ContentItemSaveBuilder> variantBuilder, IProperty contentProperty) =>
         variantBuilder
             .AddProperty()
             .WithId(contentProperty.Id)

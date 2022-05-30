@@ -40,8 +40,7 @@ public class TestDatabase : IUmbracoDatabase
     public TestDatabase(DatabaseType databaseType = null, ISqlSyntaxProvider syntaxProvider = null)
     {
         DatabaseType = databaseType ?? new SqlServerDatabaseType();
-        SqlContext = new SqlContext(syntaxProvider ?? new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-            DatabaseType, Mock.Of<IPocoDataFactory>());
+        SqlContext = new SqlContext(syntaxProvider ?? new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType, Mock.Of<IPocoDataFactory>());
     }
 
     /// <summary>
@@ -208,8 +207,7 @@ public class TestDatabase : IUmbracoDatabase
 
     public int Update(string tableName, string primaryKeyName, object poco) => throw new NotImplementedException();
 
-    public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue,
-        IEnumerable<string> columns) => throw new NotImplementedException();
+    public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue, IEnumerable<string> columns) => throw new NotImplementedException();
 
     public int Update(string tableName, string primaryKeyName, object poco, IEnumerable<string> columns) =>
         throw new NotImplementedException();
@@ -288,8 +286,7 @@ public class TestDatabase : IUmbracoDatabase
 
     public List<T> FetchOneToMany<T>(Expression<Func<T, IList>> many, Sql sql) => throw new NotImplementedException();
 
-    public List<T> FetchOneToMany<T>(Expression<Func<T, IList>> many, Func<T, object> idFunc, string sql,
-        params object[] args) => throw new NotImplementedException();
+    public List<T> FetchOneToMany<T>(Expression<Func<T, IList>> many, Func<T, object> idFunc, string sql, params object[] args) => throw new NotImplementedException();
 
     public List<T> FetchOneToMany<T>(Expression<Func<T, IList>> many, Func<T, object> idFunc, Sql sql) =>
         throw new NotImplementedException();
@@ -347,11 +344,9 @@ public class TestDatabase : IUmbracoDatabase
     public TRet FetchMultiple<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, params object[] args) =>
         throw new NotImplementedException();
 
-    public TRet FetchMultiple<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql,
-        params object[] args) => throw new NotImplementedException();
+    public TRet FetchMultiple<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
 
-    public TRet FetchMultiple<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql,
-        params object[] args) => throw new NotImplementedException();
+    public TRet FetchMultiple<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
 
     public TRet FetchMultiple<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, Sql sql) =>
         throw new NotImplementedException();
@@ -368,8 +363,7 @@ public class TestDatabase : IUmbracoDatabase
     (List<T1>, List<T2>, List<T3>) IDatabaseQuery.FetchMultiple<T1, T2, T3>(string sql, params object[] args) =>
         throw new NotImplementedException();
 
-    (List<T1>, List<T2>, List<T3>, List<T4>) IDatabaseQuery.FetchMultiple<T1, T2, T3, T4>(string sql,
-        params object[] args) => throw new NotImplementedException();
+    (List<T1>, List<T2>, List<T3>, List<T4>) IDatabaseQuery.FetchMultiple<T1, T2, T3, T4>(string sql, params object[] args) => throw new NotImplementedException();
 
     (List<T1>, List<T2>) IDatabaseQuery.FetchMultiple<T1, T2>(Sql sql) => throw new NotImplementedException();
 
@@ -424,14 +418,11 @@ public class TestDatabase : IUmbracoDatabase
 
     public Task<List<T>> SkipTakeAsync<T>(long skip, long take, Sql sql) => throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql,
-        params object[] args) => throw new NotImplementedException();
+    public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql,
-        params object[] args) => throw new NotImplementedException();
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb,
-        string sql, params object[] args) => throw new NotImplementedException();
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, string sql, params object[] args) => throw new NotImplementedException();
 
     public Task<TRet> FetchMultipleAsync<T1, T2, TRet>(Func<List<T1>, List<T2>, TRet> cb, Sql sql) =>
         throw new NotImplementedException();
@@ -439,8 +430,7 @@ public class TestDatabase : IUmbracoDatabase
     public Task<TRet> FetchMultipleAsync<T1, T2, T3, TRet>(Func<List<T1>, List<T2>, List<T3>, TRet> cb, Sql sql) =>
         throw new NotImplementedException();
 
-    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb,
-        Sql sql) => throw new NotImplementedException();
+    public Task<TRet> FetchMultipleAsync<T1, T2, T3, T4, TRet>(Func<List<T1>, List<T2>, List<T3>, List<T4>, TRet> cb, Sql sql) => throw new NotImplementedException();
 
     public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(string sql, params object[] args) =>
         throw new NotImplementedException();
@@ -448,8 +438,7 @@ public class TestDatabase : IUmbracoDatabase
     public Task<(List<T1>, List<T2>, List<T3>)> FetchMultipleAsync<T1, T2, T3>(string sql, params object[] args) =>
         throw new NotImplementedException();
 
-    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql,
-        params object[] args) => throw new NotImplementedException();
+    public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(string sql, params object[] args) => throw new NotImplementedException();
 
     public Task<(List<T1>, List<T2>)> FetchMultipleAsync<T1, T2>(Sql sql) => throw new NotImplementedException();
 
@@ -459,8 +448,7 @@ public class TestDatabase : IUmbracoDatabase
     public Task<(List<T1>, List<T2>, List<T3>, List<T4>)> FetchMultipleAsync<T1, T2, T3, T4>(Sql sql) =>
         throw new NotImplementedException();
 
-    public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount,
-        out string sqlPage) => throw new NotImplementedException();
+    public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage) => throw new NotImplementedException();
 
     public void InsertBulk<T>(IEnumerable<T> pocos) => throw new NotImplementedException();
 

@@ -331,8 +331,7 @@ public class MemberBuilder
         return list;
     }
 
-    public static Member CreateSimpleMember(IMemberType memberType, string name, string email, string password,
-        string username, Guid? key = null)
+    public static Member CreateSimpleMember(IMemberType memberType, string name, string email, string password, string username, Guid? key = null)
     {
         var builder = new MemberBuilder()
             .WithMemberType(memberType)
@@ -356,8 +355,7 @@ public class MemberBuilder
         return builder.Build();
     }
 
-    public static IEnumerable<IMember> CreateMultipleSimpleMembers(IMemberType memberType, int amount,
-        Action<int, IMember> onCreating = null)
+    public static IEnumerable<IMember> CreateMultipleSimpleMembers(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
     {
         var list = new List<IMember>();
 

@@ -43,8 +43,7 @@ public abstract class TestHelperBase
     protected TestHelperBase(Assembly entryAssembly)
     {
         MainDom = new SimpleMainDom();
-        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(),
-            new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance));
+        _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance));
     }
 
     /// <summary>
@@ -136,9 +135,14 @@ public abstract class TestHelperBase
     public ITypeFinder GetTypeFinder() => _typeFinder;
 
     public TypeLoader GetMockedTypeLoader() =>
-        new(Mock.Of<ITypeFinder>(), new VaryingRuntimeHash(), Mock.Of<IAppPolicyCache>(),
-            new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
-            Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
+        new(
+            Mock.Of<ITypeFinder>(),
+            new VaryingRuntimeHash(),
+            Mock.Of<IAppPolicyCache>(),
+            new DirectoryInfo(GetHostingEnvironment()
+                .MapPathContentRoot(Constants.SystemDirectories.TempData)),
+            Mock.Of<ILogger<TypeLoader>>(),
+            Mock.Of<IProfiler>());
 
     /// <summary>
     ///     Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based
@@ -180,7 +184,7 @@ public abstract class TestHelperBase
 
     public ILoggingConfiguration GetLoggingConfiguration(IHostingEnvironment hostingEnv = null)
     {
-        hostingEnv = hostingEnv ?? GetHostingEnvironment();
+        hostingEnv ??= GetHostingEnvironment();
         return new LoggingConfiguration(
             Path.Combine(hostingEnv.ApplicationPhysicalPath, "umbraco", "logs"));
     }

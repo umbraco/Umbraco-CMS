@@ -12,8 +12,7 @@ public static class ContentBaseExtensions
     ///     Set property values by alias with an anonymous object.
     /// </summary>
     /// <remarks>Does not support variants.</remarks>
-    public static void PropertyValues(this IContentBase content, object value, string? culture = null,
-        string? segment = null)
+    public static void PropertyValues(this IContentBase content, object value, string? culture = null, string? segment = null)
     {
         if (value == null)
         {

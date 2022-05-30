@@ -32,11 +32,11 @@ public class ContentPropertyBasicBuilder<TParent> : ChildBuilderBase<TParent, Co
 
     public override ContentPropertyBasic Build()
     {
-        var alias = _alias ?? null;
+        var alias = _alias;
         var id = _id ?? 0;
-        var value = _value ?? null;
+        var value = _value;
 
-        return new ContentPropertyBasic {Alias = alias, Id = id, Value = value};
+        return new ContentPropertyBasic { Alias = alias, Id = id, Value = value };
     }
 
     public ContentPropertyBasicBuilder<TParent> WithValue(object value)

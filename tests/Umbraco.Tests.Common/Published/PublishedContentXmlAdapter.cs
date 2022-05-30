@@ -43,12 +43,12 @@ public static class PublishedContentXmlAdapter
         out DataType[] dataTypes)
     {
         // use the label data type for all data for these tests except in the case
-        // where a property is named 'content', in which case use the RTE. 
+        // where a property is named 'content', in which case use the RTE.
         var serializer = new ConfigurationEditorJsonSerializer();
         var labelDataType =
-            new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), serializer) {Id = 3};
-        var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) {Id = 4};
-        dataTypes = new[] {labelDataType, rteDataType};
+            new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
+        var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };
+        dataTypes = new[] { labelDataType, rteDataType };
 
         var kitsAndXml = new List<(ContentNodeKit kit, XElement node)>();
 
@@ -65,7 +65,7 @@ public static class PublishedContentXmlAdapter
             {
                 properties[propertyElement.Name.LocalName] = new[]
                 {
-                    // TODO: builder? 
+                    // TODO: builder?
                     new PropertyData {Culture = string.Empty, Segment = string.Empty, Value = propertyElement.Value}
                 };
             }
@@ -104,7 +104,8 @@ public static class PublishedContentXmlAdapter
             {
                 contentType = new ContentType(shortStringHelper, -1)
                 {
-                    Id = kit.ContentTypeId, Alias = node.Name.LocalName
+                    Id = kit.ContentTypeId,
+                    Alias = node.Name.LocalName
                 };
                 SetContentTypeProperties(shortStringHelper, labelDataType, rteDataType, kit, contentType);
                 contentTypesIdToType[kit.ContentTypeId] = contentType;
@@ -121,8 +122,12 @@ public static class PublishedContentXmlAdapter
         return kitsAndXml.Select(x => x.kit);
     }
 
-    private static void SetContentTypeProperties(IShortStringHelper shortStringHelper, DataType labelDataType,
-        DataType rteDataType, ContentNodeKit kit, ContentType contentType)
+    private static void SetContentTypeProperties(
+        IShortStringHelper shortStringHelper,
+        DataType labelDataType,
+        DataType rteDataType,
+        ContentNodeKit kit,
+        ContentType contentType)
     {
         foreach (var property in kit.DraftData.Properties)
         {

@@ -37,6 +37,6 @@ public class UmbracoIdentityRoleBuilder : BuilderBase<UmbracoIdentityRole>,
         var id = _id;
         var name = _name;
 
-        return new UmbracoIdentityRole {Id = id, Name = name};
+        return new UmbracoIdentityRole { Id = id, Name = name };
     }
 }

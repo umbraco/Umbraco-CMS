@@ -42,7 +42,7 @@ public class ContentItemSaveBuilder : BuilderBase<ContentItemSave>,
     {
         var id = _id ?? 0;
         var parentId = _parentId ?? -1;
-        var contentTypeAlias = _contentTypeAlias ?? null;
+        var contentTypeAlias = _contentTypeAlias;
         var action = _action ?? ContentSaveAction.Save;
         var variants = _variantBuilders.Select(x => x.Build());
 

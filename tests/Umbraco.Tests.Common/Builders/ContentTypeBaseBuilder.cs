@@ -182,7 +182,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
 
     protected int GetParentId() => _parentId ?? -1;
 
-    protected IContentTypeComposition GetParent() => _parent ?? null;
+    protected IContentTypeComposition GetParent() => _parent;
 
     protected int GetLevel() => _level ?? 0;
 
@@ -202,8 +202,7 @@ public abstract class ContentTypeBaseBuilder<TParent, TType>
 
     protected bool GetIsContainer() => _isContainer ?? false;
 
-    protected void BuildPropertyGroups(ContentTypeCompositionBase contentType,
-        IEnumerable<PropertyGroup> propertyGroups)
+    protected void BuildPropertyGroups(ContentTypeCompositionBase contentType, IEnumerable<PropertyGroup> propertyGroups)
     {
         foreach (var propertyGroup in propertyGroups)
         {

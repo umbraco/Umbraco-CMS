@@ -61,10 +61,10 @@ public class DictionaryItemBuilder
     {
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
-        var deleteDate = _deleteDate ?? null;
+        var deleteDate = _deleteDate;
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
-        var parentId = _parentId ?? null;
+        var parentId = _parentId;
         var itemKey = _itemKey ?? Guid.NewGuid().ToString();
 
         var result = new DictionaryItem(itemKey)

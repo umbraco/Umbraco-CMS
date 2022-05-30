@@ -31,6 +31,5 @@ public static class FileSystemsCreator
         IFileSystem stylesheetFileSystem,
         IFileSystem scriptsFileSystem,
         IFileSystem mvcViewFileSystem) =>
-        new(loggerFactory, ioHelper, globalSettings, hostingEnvironment, macroPartialFileSystem,
-            partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem);
+        new(loggerFactory, ioHelper, globalSettings, hostingEnvironment, macroPartialFileSystem, partialViewsFileSystem, stylesheetFileSystem, scriptsFileSystem, mvcViewFileSystem);
 }

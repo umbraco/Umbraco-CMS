@@ -108,8 +108,8 @@ public class LanguageBuilder<TParent>
         var key = _key ?? Guid.NewGuid();
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
-        var deleteDate = _deleteDate ?? null;
-        var fallbackLanguageId = _fallbackLanguageId ?? null;
+        var deleteDate = _deleteDate;
+        var fallbackLanguageId = _fallbackLanguageId;
         var isDefault = _isDefault ?? false;
         var isMandatory = _isMandatory ?? false;
 

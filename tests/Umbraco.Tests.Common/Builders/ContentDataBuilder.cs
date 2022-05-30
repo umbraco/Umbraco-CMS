@@ -145,7 +145,10 @@ public class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
                 {
                     cultureVariation = new CultureVariation
                     {
-                        Date = DateTime.Now, IsDraft = true, Name = _name, UrlSegment = _segment
+                        Date = DateTime.Now,
+                        IsDraft = true,
+                        Name = _name,
+                        UrlSegment = _segment
                     };
                     contentCultureInfos[cultureValue.Culture] = cultureVariation;
                 }
@@ -205,8 +208,7 @@ public class ContentDataBuilder : BuilderBase<ContentData>, IWithNameBuilder
             .WithVersionDate(versionDate ?? DateTime.Now)
             .Build();
 
-    public static ContentData CreateVariant(string name, Dictionary<string, CultureVariation> cultureInfos,
-        DateTime? versionDate = null, bool published = true)
+    public static ContentData CreateVariant(string name, Dictionary<string, CultureVariation> cultureInfos, DateTime? versionDate = null, bool published = true)
         => new ContentDataBuilder()
             .WithName(name)
             .WithVersionDate(versionDate ?? DateTime.Now)

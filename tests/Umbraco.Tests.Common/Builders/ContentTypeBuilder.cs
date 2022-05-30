@@ -100,7 +100,7 @@ public class ContentTypeBuilder
         }
         else
         {
-            contentType = new ContentType(ShortStringHelper, GetParentId()) {Alias = GetAlias()};
+            contentType = new ContentType(ShortStringHelper, GetParentId()) { Alias = GetAlias() };
         }
 
         contentType.Id = GetId();
@@ -152,8 +152,7 @@ public class ContentTypeBuilder
         return contentType;
     }
 
-    public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page",
-        IContentType parent = null)
+    public static ContentType CreateBasicContentType(string alias = "basePage", string name = "Base Page", IContentType parent = null)
     {
         var builder = new ContentTypeBuilder();
         return (ContentType)builder
@@ -163,11 +162,9 @@ public class ContentTypeBuilder
             .Build();
     }
 
-    public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null,
-        bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
+    public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
     {
-        var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases,
-            propertyGroupAlias: propertyGroupAlias, propertyGroupName: propertyGroupName);
+        var builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupAlias: propertyGroupAlias, propertyGroupName: propertyGroupName);
 
         builder.AddPropertyType()
             .WithAlias(RandomAlias("gen", randomizeAliases))
@@ -182,16 +179,27 @@ public class ContentTypeBuilder
         return (ContentType)builder.Build();
     }
 
-    public static ContentType CreateSimpleContentType(string alias = null, string name = null,
-        IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false,
-        string propertyGroupAlias = "content", string propertyGroupName = "Content", bool mandatoryProperties = false,
+    public static ContentType CreateSimpleContentType(
+        string alias = null,
+        string name = null,
+        IContentType parent = null,
+        PropertyTypeCollection propertyTypeCollection = null,
+        bool randomizeAliases = false,
+        string propertyGroupAlias = "content",
+        string propertyGroupName = "Content",
+        bool mandatoryProperties = false,
         int defaultTemplateId = 0) =>
-        (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases,
-            propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
+        (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
 
-    public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null,
-        IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false,
-        string propertyGroupAlias = "content", string propertyGroupName = "Content", bool mandatoryProperties = false,
+    public static ContentTypeBuilder CreateSimpleContentTypeHelper(
+        string alias = null,
+        string name = null,
+        IContentType parent = null,
+        PropertyTypeCollection propertyTypeCollection = null,
+        bool randomizeAliases = false,
+        string propertyGroupAlias = "content",
+        string propertyGroupName = "Content",
+        bool mandatoryProperties = false,
         int defaultTemplateId = 0)
     {
         var builder = new ContentTypeBuilder()
@@ -250,11 +258,9 @@ public class ContentTypeBuilder
         return builder;
     }
 
-    public static ContentType CreateSimpleTagsContentType(string alias, string name, IContentType parent = null,
-        bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
+    public static ContentType CreateSimpleTagsContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", int defaultTemplateId = 1)
     {
-        var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases: randomizeAliases,
-            propertyGroupName: propertyGroupName, defaultTemplateId: defaultTemplateId);
+        var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName, defaultTemplateId: defaultTemplateId);
 
         var propertyType = new PropertyTypeBuilder()
             .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.Tags)
@@ -269,8 +275,7 @@ public class ContentTypeBuilder
         return contentType;
     }
 
-    public static ContentType CreateTextPageContentType(string alias = "textPage", string name = "Text Page",
-        int defaultTemplateId = 1)
+    public static ContentType CreateTextPageContentType(string alias = "textPage", string name = "Text Page", int defaultTemplateId = 1)
     {
         var builder = new ContentTypeBuilder();
         return (ContentType)builder

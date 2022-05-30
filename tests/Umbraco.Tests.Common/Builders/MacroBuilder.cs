@@ -115,8 +115,7 @@ public class MacroBuilder
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
-        var macro = new Macro(shortStringHelper, id, key, useInEditor, cacheDuration, alias, name, cacheByPage,
-            cacheByMember, dontRender, macroSource);
+        var macro = new Macro(shortStringHelper, id, key, useInEditor, cacheDuration, alias, name, cacheByPage, cacheByMember, dontRender, macroSource);
 
         foreach (var property in _propertyBuilders.Select(x => x.Build()))
         {

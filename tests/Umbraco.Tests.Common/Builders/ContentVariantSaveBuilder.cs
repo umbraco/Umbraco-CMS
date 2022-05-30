@@ -58,8 +58,8 @@ public class ContentVariantSaveBuilder<TParent> : ChildBuilderBase<TParent, Cont
 
     public override ContentVariantSave Build()
     {
-        var name = _name ?? null;
-        var culture = _cultureInfo?.Name ?? null;
+        var name = _name;
+        var culture = _cultureInfo?.Name;
         var save = _save ?? true;
         var publish = _publish ?? true;
         var properties = _propertyBuilders.Select(x => x.Build());

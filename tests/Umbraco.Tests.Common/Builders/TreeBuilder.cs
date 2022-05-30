@@ -72,8 +72,7 @@ public class TreeBuilder
         var treeUse = _treeUse ?? TreeUse.Main;
         var isSingleNode = _isSingleNode ?? false;
 
-        return new Tree(sortOrder, sectionAlias, group, alias, title, treeUse, typeof(SampleTreeController),
-            isSingleNode);
+        return new Tree(sortOrder, sectionAlias, group, alias, title, treeUse, typeof(SampleTreeController), isSingleNode);
     }
 
     private class SampleTreeController

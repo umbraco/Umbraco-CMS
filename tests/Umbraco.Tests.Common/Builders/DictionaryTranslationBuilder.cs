@@ -71,14 +71,15 @@ public class DictionaryTranslationBuilder
     {
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
-        var deleteDate = _deleteDate ?? null;
+        var deleteDate = _deleteDate;
         var id = _id ?? 1;
         var key = _key ?? Guid.NewGuid();
 
         var result = new DictionaryTranslation(
             _languageBuilder.Build(),
             _value ?? Guid.NewGuid().ToString(),
-            key) {CreateDate = createDate, UpdateDate = updateDate, DeleteDate = deleteDate, Id = id};
+            key)
+        { CreateDate = createDate, UpdateDate = updateDate, DeleteDate = deleteDate, Id = id };
 
         return result;
     }

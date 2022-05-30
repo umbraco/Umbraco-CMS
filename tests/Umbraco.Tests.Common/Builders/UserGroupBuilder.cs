@@ -138,7 +138,9 @@ public class UserGroupBuilder<TParent>
 
         var userGroup = new UserGroup(shortStringHelper, userCount, alias, name, _permissions, icon)
         {
-            Id = id, StartContentId = startContentId, StartMediaId = startMediaId
+            Id = id,
+            StartContentId = startContentId,
+            StartMediaId = startMediaId
         };
 
         foreach (var section in _allowedSections)
@@ -149,12 +151,16 @@ public class UserGroupBuilder<TParent>
         return userGroup;
     }
 
-    public static UserGroup CreateUserGroup(string alias = "testGroup", string name = "Test Group", string suffix = "",
-        string[] permissions = null, string[] allowedSections = null) =>
+    public static UserGroup CreateUserGroup(
+        string alias = "testGroup",
+        string name = "Test Group",
+        string suffix = "",
+        string[] permissions = null,
+        string[] allowedSections = null) =>
         (UserGroup)new UserGroupBuilder()
             .WithAlias(alias + suffix)
             .WithName(name + suffix)
-            .WithPermissions(permissions ?? new[] {"A", "B", "C"})
-            .WithAllowedSections(allowedSections ?? new[] {"content", "media"})
+            .WithPermissions(permissions ?? new[] { "A", "B", "C" })
+            .WithAllowedSections(allowedSections ?? new[] { "content", "media" })
             .Build();
 }

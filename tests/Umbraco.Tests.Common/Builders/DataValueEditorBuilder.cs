@@ -49,8 +49,8 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
 
     public override IDataValueEditor Build()
     {
-        var configuration = _configuration ?? null;
-        var view = _view ?? null;
+        var configuration = _configuration;
+        var view = _view;
         var hideLabel = _hideLabel ?? false;
         var valueType = _valueType ?? Guid.NewGuid().ToString();
 
@@ -59,7 +59,10 @@ public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataVa
             Mock.Of<IShortStringHelper>(),
             Mock.Of<IJsonSerializer>())
         {
-            Configuration = configuration, View = view, HideLabel = hideLabel, ValueType = valueType
+            Configuration = configuration,
+            View = view,
+            HideLabel = hideLabel,
+            ValueType = valueType
         };
     }
 }

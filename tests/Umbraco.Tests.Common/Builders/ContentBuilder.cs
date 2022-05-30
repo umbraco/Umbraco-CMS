@@ -219,7 +219,7 @@ public class ContentBuilder
         var versionId = _versionId ?? 0;
         var key = _key ?? Guid.NewGuid();
         var parentId = _parentId ?? -1;
-        var parent = _parent ?? null;
+        var parent = _parent;
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
         var name = _name ?? Guid.NewGuid().ToString();
@@ -228,10 +228,10 @@ public class ContentBuilder
         var path = _path ?? $"-1,{id}";
         var sortOrder = _sortOrder ?? 0;
         var trashed = _trashed ?? false;
-        var culture = _cultureInfo?.Name ?? null;
-        var propertyValues = _propertyValues ?? null;
-        var propertyValuesCulture = _propertyValuesCulture ?? null;
-        var propertyValuesSegment = _propertyValuesSegment ?? null;
+        var culture = _cultureInfo?.Name;
+        var propertyValues = _propertyValues;
+        var propertyValuesCulture = _propertyValuesCulture;
+        var propertyValuesSegment = _propertyValuesSegment;
 
         if (_contentTypeBuilder is null && _contentType is null)
         {
@@ -319,8 +319,7 @@ public class ContentBuilder
             })
             .Build();
 
-    public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1,
-        string? culture = null, string? segment = null) =>
+    public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string? culture = null, string? segment = null) =>
         new ContentBuilder()
             .WithContentType(contentType)
             .WithName(name)
@@ -336,8 +335,7 @@ public class ContentBuilder
                 segment)
             .Build();
 
-    public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent,
-        string? culture = null, string? segment = null, bool setPropertyValues = true)
+    public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string? culture = null, string? segment = null, bool setPropertyValues = true)
     {
         var builder = new ContentBuilder()
             .WithContentType(contentType)
@@ -352,7 +350,7 @@ public class ContentBuilder
         if (setPropertyValues)
         {
             builder = builder.WithPropertyValues(
-                new {title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe"},
+                new { title = name + " Subpage", bodyText = "This is a subpage", author = "John Doe" },
                 culture,
                 segment);
         }
@@ -371,7 +369,7 @@ public class ContentBuilder
         for (var i = 0; i < amount; i++)
         {
             var name = "Textpage No-" + i;
-            var content = new Content(name, parentId, contentType) {CreatorId = 0, WriterId = 0};
+            var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                 {
@@ -455,12 +453,9 @@ public class ContentBuilder
         content.SetValue("date", DateTime.Now.AddDays(-10));
         content.SetValue("ddl", "1234");
         content.SetValue("chklist", "randomc");
-        content.SetValue("contentPicker",
-            Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
-        content.SetValue("mediaPicker",
-            Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
-        content.SetValue("memberPicker",
-            Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
+        content.SetValue("contentPicker", Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C")).ToString());
+        content.SetValue("mediaPicker", Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691")).ToString());
+        content.SetValue("memberPicker", Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D")).ToString());
         content.SetValue("multiUrlPicker", "[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]");
         content.SetValue("tags", "this,is,tags");
 

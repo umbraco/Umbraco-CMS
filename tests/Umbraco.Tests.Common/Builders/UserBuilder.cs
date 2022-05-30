@@ -175,7 +175,7 @@ public class UserBuilder<TParent>
 
     public UserBuilder<TParent> WithStartContentId(int startContentId)
     {
-        _startContentIds = new[] {startContentId};
+        _startContentIds = new[] { startContentId };
         return this;
     }
 
@@ -187,7 +187,7 @@ public class UserBuilder<TParent>
 
     public UserBuilder<TParent> WithStartMediaId(int startMediaId)
     {
-        _startMediaIds = new[] {startMediaId};
+        _startMediaIds = new[] { startMediaId };
         return this;
     }
 
@@ -214,7 +214,7 @@ public class UserBuilder<TParent>
     {
         var id = _id ?? 0;
         var defaultLang = _defaultLang ?? "en";
-        var globalSettings = new GlobalSettings {DefaultUILanguage = defaultLang};
+        var globalSettings = new GlobalSettings { DefaultUILanguage = defaultLang };
         var key = _key ?? Guid.NewGuid();
         var createDate = _createDate ?? DateTime.Now;
         var updateDate = _updateDate ?? DateTime.Now;
@@ -231,8 +231,8 @@ public class UserBuilder<TParent>
         var lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
         var comments = _comments ?? string.Empty;
         var sessionTimeout = _sessionTimeout ?? 0;
-        var startContentIds = _startContentIds ?? new[] {-1};
-        var startMediaIds = _startMediaIds ?? new[] {-1};
+        var startContentIds = _startContentIds ?? new[] { -1 };
+        var startMediaIds = _startMediaIds ?? new[] { -1 };
         var groups = _userGroupBuilders.Select(x => x.Build());
 
         var result = new User(
