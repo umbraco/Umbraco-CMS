@@ -1,6 +1,14 @@
 import { rest } from 'msw';
 
 import { components } from '../../schemas/generated-schema';
+import {
+  AllowedSectionsResponse,
+  ErrorResponse,
+  InitResponse,
+  UmbracoInstaller,
+  UserResponse,
+  VersionResponse,
+} from '../models';
 
 export const handlers = [
   rest.get('/umbraco/backoffice/manifests', (_req, res, ctx) => {
@@ -15,8 +23,8 @@ export const handlers = [
             name: 'Custom',
             elementName: 'umb-custom-section',
             meta: {
-              weight: 30
-            }
+              weight: 30,
+            },
           },
         ],
       })
@@ -27,9 +35,9 @@ export const handlers = [
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json({
+      ctx.json<InitResponse>({
         installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
-      } as components['schemas']['InitResponse'])
+      })
     );
   }),
 
@@ -37,9 +45,9 @@ export const handlers = [
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json({
+      ctx.json<VersionResponse>({
         version: '13.0.0',
-      } as components['schemas']['VersionResponse'])
+      })
     );
   }),
 
@@ -68,7 +76,7 @@ export const handlers = [
       // If not authenticated, respond with a 403 error
       return res(
         ctx.status(403),
-        ctx.json({
+        ctx.json<ErrorResponse>({
           errorMessage: 'Not authorized',
         })
       );
@@ -76,19 +84,19 @@ export const handlers = [
     // If authenticated, return a mocked user details
     return res(
       ctx.status(200),
-      ctx.json({
+      ctx.json<UserResponse>({
         username: 'admin',
         role: 'administrator',
-      } as components['schemas']['UserResponse'])
+      })
     );
   }),
 
   rest.get('/umbraco/backoffice/user/sections', (_req, res, ctx) => {
     return res(
       ctx.status(200),
-      ctx.json({
+      ctx.json<AllowedSectionsResponse>({
         sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
-      } as components['schemas']['AllowedSectionsResponse'])
+      })
     );
   }),
 
@@ -96,7 +104,7 @@ export const handlers = [
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json({
+      ctx.json<UmbracoInstaller>({
         user: {
           minCharLength: 2,
           minNonAlphaNumericLength: 0,
@@ -123,7 +131,6 @@ export const handlers = [
             displayName: 'SQLite',
             defaultDatabaseName: 'Umbraco',
             providerName: 'Microsoft.Data.SQLite',
-            supportsQuickInstall: true,
             isAvailable: true,
             requiresServer: false,
             serverPlaceholder: null,
@@ -137,7 +144,6 @@ export const handlers = [
             displayName: 'SQL Server',
             defaultDatabaseName: '',
             providerName: 'Microsoft.Data.SqlClient',
-            supportsQuickInstall: false,
             isAvailable: true,
             requiresServer: true,
             serverPlaceholder: '(local)\\SQLEXPRESS',
@@ -159,7 +165,7 @@ export const handlers = [
             requiresConnectionTest: true,
           },
         ],
-      } as components['schemas']['UmbracoInstaller'])
+      })
     );
   }),
 
