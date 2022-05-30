@@ -3,34 +3,37 @@ using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Cms.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders;
+
+public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<ContentBuilder, ContentCultureInfosCollection>,
+    IBuildContentCultureInfosCollection
 {
-    public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<ContentBuilder, ContentCultureInfosCollection>, IBuildContentCultureInfosCollection
+    private readonly List<ContentCultureInfosBuilder> _cultureInfosBuilders;
+
+    public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) =>
+        _cultureInfosBuilders = new List<ContentCultureInfosBuilder>();
+
+    public ContentCultureInfosBuilder AddCultureInfos()
     {
-        private readonly List<ContentCultureInfosBuilder> _cultureInfosBuilders;
-        public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) => _cultureInfosBuilders = new List<ContentCultureInfosBuilder>();
+        var builder = new ContentCultureInfosBuilder(this);
+        _cultureInfosBuilders.Add(builder);
+        return builder;
+    }
 
-        public ContentCultureInfosBuilder AddCultureInfos()
+    public override ContentCultureInfosCollection Build()
+    {
+        if (_cultureInfosBuilders.Count < 1)
         {
-            var builder = new ContentCultureInfosBuilder(this);
-            _cultureInfosBuilders.Add(builder);
-            return builder;
+            throw new InvalidOperationException("You must add at least one culture infos to the collection builder");
         }
 
-        public override ContentCultureInfosCollection Build()
+        var cultureInfosCollection = new ContentCultureInfosCollection();
+
+        foreach (var cultureInfosBuilder in _cultureInfosBuilders)
         {
-            if (_cultureInfosBuilders.Count < 1)
-            {
-                throw new InvalidOperationException("You must add at least one culture infos to the collection builder");
-            }
-            var cultureInfosCollection = new ContentCultureInfosCollection();
-
-            foreach (ContentCultureInfosBuilder cultureInfosBuilder in _cultureInfosBuilders)
-            {
-                cultureInfosCollection.Add(cultureInfosBuilder.Build());
-            }
-
-            return cultureInfosCollection;
+            cultureInfosCollection.Add(cultureInfosBuilder.Build());
         }
+
+        return cultureInfosCollection;
     }
 }

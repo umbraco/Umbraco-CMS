@@ -1,6 +1,4 @@
-using System;
 using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -16,81 +14,85 @@ using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing;
+
+[TestFixture]
+public class SurfaceControllerTests : UmbracoTestServerTestBase
 {
-    [TestFixture]
-    public class SurfaceControllerTests : UmbracoTestServerTestBase
+    [Test]
+    public async Task Auto_Routes_For_Default_Action()
     {
-        [Test]
-        public async Task Auto_Routes_For_Default_Action()
-        {
-            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Index());
+        var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.Index());
 
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(url);
+        // Act
+        var response = await Client.GetAsync(url);
 
-            string body = await response.Content.ReadAsStringAsync();
+        var body = await response.Content.ReadAsStringAsync();
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Test]
-        public async Task Auto_Routes_For_Custom_Action()
-        {
-            string url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.News());
-
-            // Act
-            HttpResponseMessage response = await Client.GetAsync(url);
-
-            string body = await response.Content.ReadAsStringAsync();
-
-            // Assert
-            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
-        }
-
-        [Test]
-        public async Task Plugin_Controller_Routes_By_Area()
-        {
-            // Create URL manually, because PrepareSurfaceController URl will prepare whatever the controller is routed as
-            Type controllerType = typeof(TestPluginController);
-            var pluginAttribute = CustomAttributeExtensions.GetCustomAttribute<PluginControllerAttribute>(controllerType, false);
-            var controllerName = ControllerExtensions.GetControllerName(controllerType);
-            string url = $"/umbraco/{pluginAttribute?.AreaName}/{controllerName}";
-            PrepareUrl(url);
-
-            HttpResponseMessage response = await Client.GetAsync(url);
-
-            string body = await response.Content.ReadAsStringAsync();
-
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-
-        }
+        // Assert
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
 
-    // Test controllers must be non-nested, else we need to jump through some hoops with custom
-    // IApplicationFeatureProvider<ControllerFeature>
-    // For future notes if we want this, some example code of this is here
-    // https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/
-    public class TestSurfaceController : SurfaceController
+    [Test]
+    public async Task Auto_Routes_For_Custom_Action()
     {
-        public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
-        {
-        }
+        var url = PrepareSurfaceControllerUrl<TestSurfaceController>(x => x.News());
 
-        public IActionResult Index() => Ok();
+        // Act
+        var response = await Client.GetAsync(url);
 
-        public IActionResult News() => NoContent();
+        var body = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
     }
 
-    [PluginController("TestArea")]
-    public class TestPluginController : SurfaceController
+    [Test]
+    public async Task Plugin_Controller_Routes_By_Area()
     {
-        public TestPluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider) : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
-        {
-        }
+        // Create URL manually, because PrepareSurfaceController URl will prepare whatever the controller is routed as
+        var controllerType = typeof(TestPluginController);
+        var pluginAttribute =
+            CustomAttributeExtensions.GetCustomAttribute<PluginControllerAttribute>(controllerType, false);
+        var controllerName = ControllerExtensions.GetControllerName(controllerType);
+        var url = $"/umbraco/{pluginAttribute?.AreaName}/{controllerName}";
+        PrepareUrl(url);
 
-        public IActionResult Index() => Ok();
+        var response = await Client.GetAsync(url);
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
+}
+
+// Test controllers must be non-nested, else we need to jump through some hoops with custom
+// IApplicationFeatureProvider<ControllerFeature>
+// For future notes if we want this, some example code of this is here
+// https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/
+public class TestSurfaceController : SurfaceController
+{
+    public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
+        IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
+        : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+    {
+    }
+
+    public IActionResult Index() => Ok();
+
+    public IActionResult News() => NoContent();
+}
+
+[PluginController("TestArea")]
+public class TestPluginController : SurfaceController
+{
+    public TestPluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider) : base(umbracoContextAccessor, databaseFactory, services, appCaches,
+        profilingLogger, publishedUrlProvider)
+    {
+    }
+
+    public IActionResult Index() => Ok();
 }

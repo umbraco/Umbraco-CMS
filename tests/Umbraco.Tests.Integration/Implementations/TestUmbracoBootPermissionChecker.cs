@@ -3,12 +3,11 @@
 
 using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Cms.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Integration.Implementations;
+
+public class TestUmbracoBootPermissionChecker : IUmbracoBootPermissionChecker
 {
-    public class TestUmbracoBootPermissionChecker : IUmbracoBootPermissionChecker
+    public void ThrowIfNotPermissions()
     {
-        public void ThrowIfNotPermissions()
-        {
-        }
     }
 }

@@ -1,35 +1,27 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Tests.Benchmarks.Config;
 
-namespace Umbraco.Tests.Benchmarks
-{
-    [QuickRunConfig]
-    [MemoryDiagnoser]
-    public class JsonSerializerSettingsBenchmarks
-    {
-        [Benchmark]
-        public void SerializerSettingsInstantiation()
-        {
-            int instances = 1000;
-            for (int i = 0; i < instances; i++)
-            {
-                new JsonSerializerSettings();
-            }
-        }
+namespace Umbraco.Tests.Benchmarks;
 
-        [Benchmark(Baseline =true)]
-        public void SerializerSettingsSingleInstantiation()
+[QuickRunConfig]
+[MemoryDiagnoser]
+public class JsonSerializerSettingsBenchmarks
+{
+    [Benchmark]
+    public void SerializerSettingsInstantiation()
+    {
+        var instances = 1000;
+        for (var i = 0; i < instances; i++)
         {
             new JsonSerializerSettings();
         }
+    }
 
-//        // * Summary *
+    [Benchmark(Baseline = true)]
+    public void SerializerSettingsSingleInstantiation() => new JsonSerializerSettings();
+
+    //        // * Summary *
 
 //        BenchmarkDotNet=v0.11.3, OS=Windows 10.0.18362
 //Intel Core i5-8265U CPU 1.60GHz(Kaby Lake R), 1 CPU, 8 logical and 4 physical cores
@@ -65,5 +57,4 @@ namespace Umbraco.Tests.Benchmarks
 
 //        // ***** BenchmarkRunner: End *****
 //        Run time: 00:00:04 (4.88 sec), executed benchmarks: 2
-    }
 }

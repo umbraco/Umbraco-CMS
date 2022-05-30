@@ -4,37 +4,36 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
+
+[TestFixture]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+public class MetricsConsentServiceTest : UmbracoIntegrationTest
 {
-    [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class MetricsConsentServiceTest : UmbracoIntegrationTest
+    private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
+
+    private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+
+    [Test]
+    [TestCase(TelemetryLevel.Minimal)]
+    [TestCase(TelemetryLevel.Basic)]
+    [TestCase(TelemetryLevel.Detailed)]
+    public void Can_Store_Consent(TelemetryLevel level)
     {
-        private IMetricsConsentService MetricsConsentService => GetRequiredService<IMetricsConsentService>();
+        MetricsConsentService.SetConsentLevel(level);
 
-        private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+        var actual = MetricsConsentService.GetConsentLevel();
+        Assert.IsNotNull(actual);
+        Assert.AreEqual(level, actual);
+    }
 
-        [Test]
-        [TestCase(TelemetryLevel.Minimal)]
-        [TestCase(TelemetryLevel.Basic)]
-        [TestCase(TelemetryLevel.Detailed)]
-        public void Can_Store_Consent(TelemetryLevel level)
-        {
-            MetricsConsentService.SetConsentLevel(level);
+    [Test]
+    public void Enum_Stored_as_string()
+    {
+        MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
 
-            var actual = MetricsConsentService.GetConsentLevel();
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(level, actual);
-        }
+        var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
 
-        [Test]
-        public void Enum_Stored_as_string()
-        {
-            MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
-
-            var stringValue = KeyValueService.GetValue(Cms.Core.Services.MetricsConsentService.Key);
-
-            Assert.AreEqual("Detailed", stringValue);
-        }
+        Assert.AreEqual("Detailed", stringValue);
     }
 }

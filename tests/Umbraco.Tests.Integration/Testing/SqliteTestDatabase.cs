@@ -2,10 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -16,17 +14,17 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.Sqlite.Mappers;
-using Umbraco.Cms.Persistence.Sqlite.Services;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.Integration.Testing;
 
 public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 {
-    private readonly TestDatabaseSettings _settings;
-    private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
     public const string DatabaseName = "UmbracoTests";
+    private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
+    private readonly TestDatabaseSettings _settings;
 
     protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
@@ -47,13 +45,19 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         _testDatabases = schema.Concat(empty).ToList();
     }
 
+    public override void Detach(TestDbMeta meta)
+    {
+        meta.Connection.Close();
+        _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
+    }
+
     protected override void Initialize()
     {
         _prepareQueue = new BlockingCollection<TestDbMeta>();
         _readySchemaQueue = new BlockingCollection<TestDbMeta>();
         _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
 
-        foreach (TestDbMeta meta in _testDatabases)
+        foreach (var meta in _testDatabases)
         {
             _prepareQueue.Add(meta);
         }
@@ -70,12 +74,6 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         // Database survives in memory until all connections closed.
         meta.Connection = GetConnection(meta);
         meta.Connection.Open();
-    }
-
-    public override void Detach(TestDbMeta meta)
-    {
-        meta.Connection.Close();
-        _prepareQueue.TryAdd(CreateSqLiteMeta(meta.IsEmpty));
     }
 
     protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
@@ -101,7 +99,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         database.Mappers.Add(new NullableDateMapper());
         database.Mappers.Add(new SqlitePocoGuidMapper());
 
-        foreach (UmbracoDatabase.CommandInfo dbCommand in _cachedDatabaseInitCommands)
+        foreach (var dbCommand in _cachedDatabaseInitCommands)
         {
             database.Execute(dbCommand.Text, dbCommand.Parameters.Select(x => x.Value).ToArray());
         }
@@ -117,9 +115,11 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         using var database = (UmbracoDatabase)dbFactory.CreateDatabase();
         database.LogCommands = true;
 
-        using NPoco.ITransaction transaction = database.GetTransaction();
+        using var transaction = database.GetTransaction();
 
-        var options = new TestOptionsMonitor<InstallDefaultDataSettings>(new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
+        var options =
+            new TestOptionsMonitor<InstallDefaultDataSettings>(
+                new InstallDefaultDataSettings {InstallData = InstallDefaultDataOption.All});
 
         var schemaCreator = new DatabaseSchemaCreator(
             database,
@@ -156,15 +156,15 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     private TestDbMeta CreateSqLiteMeta(bool empty)
     {
-        var builder = new SqliteConnectionStringBuilder()
+        var builder = new SqliteConnectionStringBuilder
         {
             DataSource = $"{Guid.NewGuid()}",
             Mode = SqliteOpenMode.Memory,
             ForeignKeys = true,
             Pooling = false, // When pooling true, files kept open after connections closed, bad for cleanup.
-            Cache = SqliteCacheMode.Shared,
+            Cache = SqliteCacheMode.Shared
         };
 
-        return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Persistence.Sqlite.Constants.ProviderName, "InMemory");
+        return new TestDbMeta(builder.DataSource, empty, builder.ConnectionString, Constants.ProviderName, "InMemory");
     }
 }
