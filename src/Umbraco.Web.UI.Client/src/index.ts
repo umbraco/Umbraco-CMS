@@ -39,16 +39,6 @@ const registerInternalManifests = async () => {
     },
     {
       type: 'section',
-      alias: 'Umb.Section.Media',
-      name: 'Media',
-      elementName: 'umb-media-section',
-      js: () => import('./media/media-section.element'),
-      meta: {
-        weight: 40
-      }
-    },
-    {
-      type: 'section',
       alias: 'Umb.Section.Members',
       name: 'Members',
       elementName: 'umb-members-section',
@@ -87,7 +77,7 @@ const registerInternalManifests = async () => {
         sections: ['Umb.Section.Content'],
         weight: 10
       }
-    }
+    },
   ];
   manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
 
