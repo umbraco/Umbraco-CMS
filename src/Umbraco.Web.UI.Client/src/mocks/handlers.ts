@@ -1,6 +1,4 @@
 import { rest } from 'msw';
-
-import { components } from '../../schemas/generated-schema';
 import {
   AllowedSectionsResponse,
   ErrorResponse,
