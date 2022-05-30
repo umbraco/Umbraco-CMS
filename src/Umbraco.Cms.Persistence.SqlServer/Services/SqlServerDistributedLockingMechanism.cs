@@ -13,17 +13,17 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// SQL Server implementation of <see cref="IDistributedLockingMechanism"/>.
+///     SQL Server implementation of <see cref="IDistributedLockingMechanism" />.
 /// </summary>
 public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 {
+    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly ILogger<SqlServerDistributedLockingMechanism> _logger;
     private readonly Lazy<IScopeAccessor> _scopeAccessor; // Hooray it's a circular dependency.
-    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-    private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism"/> class.
+    ///     Initializes a new instance of the <see cref="SqlServerDistributedLockingMechanism" /> class.
     /// </summary>
     public SqlServerDistributedLockingMechanism(
         ILogger<SqlServerDistributedLockingMechanism> logger,
@@ -104,11 +104,9 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose()
-        {
+        public void Dispose() =>
             // Mostly no op, cleaned up by completing transaction in scope.
             _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
-        }
 
         public override string ToString()
             => $"SqlServerDistributedLock({LockId}, {LockType}";
@@ -124,12 +122,14 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqlServerDistributedLockingMechanism requires a transaction to function.");
             }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
-                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+                throw new InvalidOperationException(
+                    "A transaction with minimum ReadCommitted isolation level is required.");
             }
 
             const string query = "SELECT value FROM umbracoLock WITH (REPEATABLEREAD)  WHERE id=@id";
@@ -156,15 +156,18 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             if (!db.InTransaction)
             {
-                throw new InvalidOperationException("SqlServerDistributedLockingMechanism requires a transaction to function.");
+                throw new InvalidOperationException(
+                    "SqlServerDistributedLockingMechanism requires a transaction to function.");
             }
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
             {
-                throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+                throw new InvalidOperationException(
+                    "A transaction with minimum ReadCommitted isolation level is required.");
             }
 
-            const string query = @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
+            const string query =
+                @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id";
 
             db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
 
