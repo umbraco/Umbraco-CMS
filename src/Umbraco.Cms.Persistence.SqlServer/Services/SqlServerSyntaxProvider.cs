@@ -82,14 +82,12 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         var fromSettings = false;
 
         if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
-                                         || !Enum<VersionName>.TryParse(setting["SqlServer.".Length..],
-                                             out VersionName versionName, true))
+                                         || !Enum<VersionName>.TryParse(setting.Substring("SqlServer.".Length), out VersionName versionName, true))
         {
             versionName = GetSetVersion(connectionString, ProviderName, _logger).ProductVersionName;
         }
 
-        _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName,
-            DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
+        _logger.LogDebug("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).", versionName, DatabaseType.SqlServer2012, fromSettings ? "settings" : "detected");
 
         return DatabaseType.SqlServer2012;
     }
