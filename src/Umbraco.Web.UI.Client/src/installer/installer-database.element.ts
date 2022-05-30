@@ -1,7 +1,8 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { UUIBooleanInputEvent, UUISelectElement } from '@umbraco-ui/uui';
+import { PostInstallRequest, UmbracoInstallerDatabaseModel } from '../models';
 
-import { UUISelectElement } from '@umbraco-ui/uui';
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends LitElement {
   static styles: CSSResultGroup = [
@@ -34,14 +35,29 @@ export class UmbInstallerDatabase extends LitElement {
     `,
   ];
 
-  options = [
-    { name: 'SQLite', value: 'sqlite', selected: true },
-    { name: 'Microsoft SQL Server', value: 'msqls' },
-    { name: 'Custom connection string', value: 'custom' },
-  ];
+  @property({ attribute: false })
+  public get databases(): UmbracoInstallerDatabaseModel[] | undefined {
+    return this._databases;
+  }
+  public set databases(value: UmbracoInstallerDatabaseModel[] | undefined) {
+    const oldValue = value;
+    this._databases = value;
+    this._options = value?.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+    this._selectedDatabase = value?.[0];
+    this.requestUpdate('databases', oldValue);
+  }
 
   @state()
-  databaseType = 'sqlite';
+  private _options?: { name: string; value: string }[];
+
+  @state()
+  private _databases?: UmbracoInstallerDatabaseModel[] = [];
+
+  @state()
+  private _selectedDatabase?: UmbracoInstallerDatabaseModel;
+
+  @state()
+  private _useIntegratedAuthentication = false; // Used to hide credentials when integrated authentication is selected
 
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
@@ -52,37 +68,54 @@ export class UmbInstallerDatabase extends LitElement {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
-    const formData = new FormData(form);
+    const database: Record<string, FormDataEntryValue> = {};
 
-    this.dispatchEvent(new CustomEvent('install', { bubbles: true, composed: true }));
+    const formData = new FormData(form);
+    for (const pair of formData.entries()) {
+      database[pair[0]] = pair[1];
+    }
+
+    this.dispatchEvent(new CustomEvent('submit', { detail: { database } }));
   };
 
   private _onBack() {
-    this.dispatchEvent(new CustomEvent('user', { bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
   }
 
   private _renderSettings() {
-    switch (this.databaseType) {
-      case 'msqls':
-        return this._renderSqlServer();
-      case 'sqlite':
-        return this._renderSQLite();
-      default:
-        return this._renderCustom();
+    if (!this._selectedDatabase) return;
+
+    if (this._selectedDatabase.providerName === 'Microsoft.Data.SQLite') {
+      return this._renderSQLite();
     }
+
+    if (this._selectedDatabase.providerName === null) {
+      return this._renderCustom();
+    }
+
+    const result = [];
+
+    if (this._selectedDatabase.requiresServer) {
+      result.push(this._renderServer());
+    }
+    if (this._selectedDatabase.requiresCredentials) {
+      result.push(this._renderCredentials());
+    }
+
+    return result;
   }
   private _renderSQLite = () => html` <uui-form-layout-item>
     <uui-label for="database-file-name" slot="label" required>Database file name</uui-label>
     <uui-input
       type="text"
       id="database-file-name"
-      name="database-file-name"
+      name="databaseFileName"
       value="Umbraco"
       required
       required-message="Database file name is required"></uui-input>
   </uui-form-layout-item>`;
 
-  private _renderSqlServer = () => html`
+  private _renderServer = () => html`
     <h4>Connection</h4>
     <hr />
     <uui-form-layout-item>
@@ -91,7 +124,7 @@ export class UmbInstallerDatabase extends LitElement {
         type="text"
         id="server"
         name="server"
-        placeholder="(local)SQLEXPRESS"
+        .placeholder=${this._selectedDatabase?.serverPlaceholder || ''}
         required
         required-message="Server is required"></uui-input>
     </uui-form-layout-item>
@@ -100,29 +133,48 @@ export class UmbInstallerDatabase extends LitElement {
       <uui-input
         type="text"
         id="database-name"
-        name="database-name"
+        name="databaseName"
         placeholder="umbraco-cms"
         required
         required-message="Database name is required"></uui-input>
     </uui-form-layout-item>
+  `;
+
+  private _renderCredentials = () => html`
     <h4>Credentials</h4>
     <hr />
     <uui-form-layout-item>
-      <uui-checkbox name="int-auth" label="int-auth">Use integrated authentication</uui-checkbox>
-    </uui-form-layout-item>
-    <uui-form-layout-item>
-      <uui-label for="username" slot="label" required>Username</uui-label>
-      <uui-input type="text" id="username" name="username" required required-message="Username is required"></uui-input>
+      <uui-checkbox
+        name="intAuth"
+        label="int-auth"
+        @change=${(e: UUIBooleanInputEvent) => (this._useIntegratedAuthentication = e.target.checked)}
+        .checked=${this._useIntegratedAuthentication}
+        >Use integrated authentication</uui-checkbox
+      >
     </uui-form-layout-item>
 
-    <uui-form-layout-item>
-      <uui-label for="password" slot="label" required>Password</uui-label>
-      <uui-input-password
-        id="password"
-        name="password"
-        required
-        required-message="Password is required"></uui-input-password>
-    </uui-form-layout-item>
+    ${!this._useIntegratedAuthentication
+      ? html` <uui-form-layout-item>
+            <uui-label for="username" slot="label" required>Username</uui-label>
+            <uui-input
+              type="text"
+              id="username"
+              name="username"
+              required
+              required-message="Username is required"></uui-input>
+          </uui-form-layout-item>
+
+          <uui-form-layout-item>
+            <uui-label for="password" slot="label" required>Password</uui-label>
+            <uui-input
+              id="password"
+              name="password"
+              type="text"
+              autocomplete="new-password"
+              required
+              required-message="Password is required"></uui-input>
+          </uui-form-layout-item>`
+      : ''}
   `;
 
   private _renderCustom = () => html`
@@ -131,14 +183,14 @@ export class UmbInstallerDatabase extends LitElement {
       <uui-textarea
         type="text"
         id="connection-string"
-        name="connection-string"
+        name="connectionString"
         required
         required-message="Connection string is required"></uui-textarea>
     </uui-form-layout-item>
   `;
 
   private _handleDatabaseTypeChange = (e: CustomEvent) => {
-    this.databaseType = (e.target as UUISelectElement).value.toString();
+    this._selectedDatabase = this.databases?.find((db) => db.id === (e.target as UUISelectElement).value);
   };
 
   render() {
@@ -148,7 +200,11 @@ export class UmbInstallerDatabase extends LitElement {
         <form id="database-form" name="database" @submit="${this._handleSubmit}">
           <uui-form-layout-item>
             <uui-label for="database-type" slot="label" required>Database type</uui-label>
-            <uui-select .options=${this.options} @change=${this._handleDatabaseTypeChange}></uui-select>
+            <uui-select
+              id="database-type"
+              name="databaseType"
+              .options=${this._options || []}
+              @change=${this._handleDatabaseTypeChange}></uui-select>
           </uui-form-layout-item>
 
           ${this._renderSettings()}

@@ -6,54 +6,82 @@ import './installer-user.element';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { getInstall } from '../api/fetcher';
+import { getInstall, postInstall } from '../api/fetcher';
+import { PostInstallRequest, UmbracoInstaller } from '../models';
 
 @customElement('umb-installer')
 export class UmbInstaller extends LitElement {
   static styles: CSSResultGroup = [css``];
 
   @state()
-  step = 2;
+  step = 1;
 
   @state()
   user = {};
 
   @state()
-  database = {};
+  data?: PostInstallRequest;
+
+  private _handleSubmit(e: CustomEvent) {
+    this.data = { ...this.data, ...e.detail };
+    this._goToNextStep();
+    console.log('data', this.data);
+  }
+
+  @state()
+  installerSettings?: UmbracoInstaller;
 
   private _renderSection() {
     switch (this.step) {
       case 2:
-        return html`<umb-installer-database></umb-installer-database>`;
+        return html`<umb-installer-database
+          .databases=${this.installerSettings?.databases}
+          .data=${this.data}
+          @submit=${this._handleSubmit}></umb-installer-database>`;
       case 3:
         return html`<umb-installer-installing></umb-installer-installing>`;
 
       default:
-        return html`<umb-installer-user></umb-installer-user>`;
+        return html`<umb-installer-user
+          .userModel=${this.installerSettings?.user}
+          .data=${this.data}
+          @submit=${this._handleSubmit}></umb-installer-user>`;
     }
   }
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('install', () => this._handleInstall());
-    this.addEventListener('database', () => this._handleDatabase());
-    this.addEventListener('user', () => this._handleUser());
+    this.addEventListener('next', () => this._goToNextStep());
+    this.addEventListener('previous', () => this._goToPreviousStep());
 
     getInstall({}).then(({ data }) => {
-      console.log('install data', data);
+      this.installerSettings = data;
+      console.log('Install data response', data);
     });
   }
 
-  private _handleUser() {
-    this.step = 1;
+  private _goToNextStep() {
+    //TODO: Fix with router
+    if (this.step === 2) {
+      if (this.data) {
+        this._postInstall(this.data);
+      }
+    } else {
+      this.step++;
+    }
   }
 
-  private _handleDatabase() {
-    this.step = 2;
+  private _goToPreviousStep() {
+    this.step--;
   }
 
-  private _handleInstall() {
-    this.step = 3;
+  private async _postInstall(data: PostInstallRequest) {
+    try {
+      await postInstall(data);
+      this.step = 3; //TODO: Fix with router
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
