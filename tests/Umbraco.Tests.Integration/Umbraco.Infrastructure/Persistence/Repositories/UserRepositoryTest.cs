@@ -29,8 +29,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true,
-    Logger = UmbracoTestOptions.Logger.Console)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
 public class UserRepositoryTest : UmbracoIntegrationTest
 {
     private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
@@ -46,9 +45,15 @@ public class UserRepositoryTest : UmbracoIntegrationTest
         var accessor = (IScopeAccessor)provider;
         var mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
 
-        var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(),
-            Mappers, Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()),
-            new JsonNetSerializer(), mockRuntimeState.Object);
+        var repository = new UserRepository(
+            accessor,
+            AppCaches.Disabled,
+            LoggerFactory.CreateLogger<UserRepository>(),
+            Mappers,
+            Options.Create(GlobalSettings),
+            Options.Create(new UserPasswordConfigurationSettings()),
+            new JsonNetSerializer(),
+            mockRuntimeState.Object);
         return repository;
     }
 
@@ -62,8 +67,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
     private UserGroupRepository CreateUserGroupRepository(ICoreScopeProvider provider)
     {
         var accessor = (IScopeAccessor)provider;
-        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(),
-            LoggerFactory, ShortStringHelper);
+        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
     }
 
     [Test]
@@ -147,10 +151,15 @@ public class UserRepositoryTest : UmbracoIntegrationTest
 
             var mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
 
-            var repository2 = new UserRepository((IScopeAccessor)provider, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(),
-                Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()),
-                new JsonNetSerializer(), mockRuntimeState.Object);
+            var repository2 = new UserRepository(
+                (IScopeAccessor)provider,
+                AppCaches.Disabled,
+                LoggerFactory.CreateLogger<UserRepository>(),
+                Mock.Of<IMapperCollection>(),
+                Options.Create(GlobalSettings),
+                Options.Create(new UserPasswordConfigurationSettings()),
+                new JsonNetSerializer(),
+                mockRuntimeState.Object);
 
             repository2.Delete(user);
 
@@ -216,7 +225,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             var users = CreateAndCommitMultipleUsers(repository);
 
             // Act
-            var result = repository.GetMany(users[0].Id, users[1].Id);
+            var result = repository.GetMany(users[0].Id, users[1].Id).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -237,7 +246,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             CreateAndCommitMultipleUsers(repository);
 
             // Act
-            var result = repository.GetMany();
+            var result = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -311,7 +320,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                     out var totalRecs,
                     user => user.Id,
                     Direction.Ascending,
-                    excludeUserGroups: new[] {Constants.Security.TranslatorGroupAlias},
+                    excludeUserGroups: new[] { Constants.Security.TranslatorGroupAlias },
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id > -1));
 
                 // Assert
@@ -348,8 +357,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
                     out var totalRecs,
                     user => user.Id,
                     Direction.Ascending,
-                    new[] {Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias},
-                    new[] {Constants.Security.TranslatorGroupAlias},
+                    new[] { Constants.Security.AdminGroupAlias, Constants.Security.SensitiveDataGroupAlias },
+                    new[] { Constants.Security.TranslatorGroupAlias },
                     filter: provider.CreateQuery<IUser>().Where(x => x.Id == -1));
 
                 // Assert
@@ -460,8 +469,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             resolved.IsApproved = false;
             resolved.RawPasswordValue = "new";
             resolved.IsLockedOut = true;
-            resolved.StartContentIds = new[] {content.Id};
-            resolved.StartMediaIds = new[] {media.Id};
+            resolved.StartContentIds = new[] { content.Id };
+            resolved.StartMediaIds = new[] { media.Id };
             resolved.Email = "new@new.com";
             resolved.Username = "newName";
 
@@ -513,7 +522,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
         repository.Save(user);
 
         var group = UserGroupBuilderInstance.Build();
-        userGroupRepository.AddOrUpdateGroupWithUsers(group, new[] {user.Id});
+        userGroupRepository.AddOrUpdateGroupWithUsers(group, new[] { user.Id });
 
         user.AddGroup(UserGroupBuilderInstance.BuildReadOnly(group));
 
@@ -528,6 +537,6 @@ public class UserRepositoryTest : UmbracoIntegrationTest
         repository.Save(user1);
         repository.Save(user2);
         repository.Save(user3);
-        return new IUser[] {user1, user2, user3};
+        return new IUser[] { user1, user2, user3 };
     }
 }

@@ -32,8 +32,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console,
-    Boot = true)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
 public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
 {
     [SetUp]
@@ -67,11 +66,10 @@ public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
 
                 // Add a test auth scheme with a test auth handler to authn and assign the user
                 services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme,
-                        options => { }));
+                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
         });
 
-        Client = Factory.CreateClient(new WebApplicationFactoryClientOptions {AllowAutoRedirect = false});
+        Client = Factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
         LinkGenerator = Factory.Services.GetRequiredService<LinkGenerator>();
     }
@@ -199,8 +197,7 @@ public abstract class UmbracoTestServerTestBase : UmbracoIntegrationTestBase
 
         services.AddLogger(TestHelper.GetWebHostEnvironment(), Configuration);
 
-        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory,
-            TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 
         builder
             .AddConfiguration()

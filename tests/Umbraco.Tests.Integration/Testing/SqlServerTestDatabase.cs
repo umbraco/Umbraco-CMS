@@ -21,8 +21,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
     public const string DatabaseName = "UmbracoTests";
     private readonly TestDatabaseSettings _settings;
 
-    public SqlServerTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory,
-        IUmbracoDatabaseFactory databaseFactory)
+    public SqlServerTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory)
     {
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
@@ -32,12 +31,10 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
         var counter = 0;
 
         var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
-            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false,
-                _settings.SQLServerMasterConnectionString));
+            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", false, _settings.SQLServerMasterConnectionString));
 
         var empty = Enumerable.Range(0, _settings.EmptyDatabasesCount)
-            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true,
-                _settings.SQLServerMasterConnectionString));
+            .Select(x => TestDbMeta.CreateWithMasterConnectionString($"{DatabaseName}-{++counter}", true, _settings.SQLServerMasterConnectionString));
 
         _testDatabases = schema.Concat(empty).ToList();
     }

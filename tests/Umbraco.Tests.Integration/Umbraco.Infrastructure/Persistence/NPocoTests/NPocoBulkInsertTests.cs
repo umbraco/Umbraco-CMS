@@ -108,8 +108,7 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
         // Assert
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"),
-                Is.EqualTo(1000));
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(1000));
         }
     }
 
@@ -143,8 +142,7 @@ public class NPocoBulkInsertTests : UmbracoIntegrationTest
         // Assert
         using (var scope = ScopeProvider.CreateScope())
         {
-            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"),
-                Is.EqualTo(0));
+            Assert.That(ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoServer"), Is.EqualTo(0));
         }
     }
 

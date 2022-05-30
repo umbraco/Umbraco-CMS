@@ -18,8 +18,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true,
-    Logger = UmbracoTestOptions.Logger.Console)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
 public class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
@@ -32,8 +31,10 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         Root = InstallationSummary.ContentInstalled.First();
         ContentService.SaveAndPublish(Root);
 
-        var cultures = new List<string>();
-        cultures.Add(GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode());
+        var cultures = new List<string>
+        {
+            GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode()
+        };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)
         {
@@ -84,7 +85,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
         }
 
-        var rootUrls = GetContentUrlsAsync(Root);
+        var rootUrls = GetContentUrlsAsync(Root).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -105,7 +106,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         var domain = GetDomainUrlFromCultureCode(culture);
         SetDomainOnContent(Root, culture, domain);
 
-        var rootUrls = GetContentUrlsAsync(Root);
+        var rootUrls = GetContentUrlsAsync(Root).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -131,7 +132,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         var domainService = GetRequiredService<IDomainService>();
         var langId = GetRequiredService<ILocalizationService>().GetLanguageIdByIsoCode(cultureIsoCode);
         domainService.Save(
-            new UmbracoDomain(domain) {RootContentId = content.Id, LanguageId = langId});
+            new UmbracoDomain(domain) { RootContentId = content.Id, LanguageId = langId });
     }
 
     private IEnumerable<UrlInfo> GetContentUrlsAsync(IContent root) =>
@@ -144,6 +145,5 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
             GetRequiredService<IVariationContextAccessor>(),
             GetRequiredService<ILogger<IContent>>(),
             GetRequiredService<UriUtility>(),
-            GetRequiredService<IPublishedUrlProvider>()
-        ).GetAwaiter().GetResult();
+            GetRequiredService<IPublishedUrlProvider>()).GetAwaiter().GetResult();
 }

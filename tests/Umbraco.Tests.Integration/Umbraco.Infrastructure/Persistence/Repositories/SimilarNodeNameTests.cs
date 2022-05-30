@@ -11,7 +11,7 @@ public class SimilarNodeNameTests
 {
     public void Name_Is_Suffixed()
     {
-        SimilarNodeName[] names = {new SimilarNodeName {Id = 1, Name = "Zulu"}};
+        SimilarNodeName[] names = { new SimilarNodeName { Id = 1, Name = "Zulu" } };
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Zulu");
         Assert.AreEqual("Zulu (1)", res);
@@ -113,7 +113,7 @@ public class SimilarNodeNameTests
     [Test]
     public void Matched_Name_Is_Suffixed()
     {
-        SimilarNodeName[] names = {new SimilarNodeName {Id = 1, Name = "Test"}};
+        SimilarNodeName[] names = { new SimilarNodeName { Id = 1, Name = "Test" } };
 
         var res = SimilarNodeName.GetUniqueName(names, 0, "Test");
 
@@ -139,7 +139,7 @@ public class SimilarNodeNameTests
     [Test]
     public void Suffixed_Name_Causes_Secondary_Suffix()
     {
-        SimilarNodeName[] names = {new SimilarNodeName {Id = 6, Name = "Alpha (1)"}};
+        SimilarNodeName[] names = { new SimilarNodeName { Id = 6, Name = "Alpha (1)" } };
         var res = SimilarNodeName.GetUniqueName(names, 0, "Alpha (1)");
 
         Assert.AreEqual("Alpha (1) (1)", res);
@@ -150,7 +150,7 @@ public class SimilarNodeNameTests
     [TestCase("Test (1) (-1)", "Test (1) (-1) (1)")]
     public void NonPositive_Suffix_Is_Ignored(string suffix, string expected)
     {
-        SimilarNodeName[] names = {new SimilarNodeName {Id = 6, Name = suffix}};
+        SimilarNodeName[] names = { new SimilarNodeName { Id = 6, Name = suffix } };
         var res = SimilarNodeName.GetUniqueName(names, 0, suffix);
 
         Assert.AreEqual(expected, res);
@@ -164,8 +164,7 @@ public class SimilarNodeNameTests
     [TestCase(0, "Kilo", "Kilo (2)")]
     [TestCase(0, "Alpha", "Alpha (3)")]
     //// [TestCase(0, "Kilo (1)", "Kilo (1) (1)")] // though... we might consider "Kilo (2)"
-    [TestCase(0, "Kilo (1)",
-        "Kilo (2)")] // names[] contains "Kilo" AND "Kilo (1)", which implies that result should be "Kilo (2)"
+    [TestCase(0, "Kilo (1)", "Kilo (2)")] // names[] contains "Kilo" AND "Kilo (1)", which implies that result should be "Kilo (2)"
     [TestCase(6, "Kilo (1)", "Kilo (1)")] // because of the id
     [TestCase(0, "alpha", "alpha (3)")]
     [TestCase(0, "", " (1)")]

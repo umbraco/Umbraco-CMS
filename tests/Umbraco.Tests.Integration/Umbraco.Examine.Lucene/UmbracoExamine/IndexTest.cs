@@ -39,15 +39,14 @@ public class IndexTest : ExamineBaseTest
             var valueSet = node.ConvertToValueSet(IndexTypes.Content);
 
             // Ignored since the path isn't under 999
-            index.IndexItems(new[] {valueSet});
+            index.IndexItems(new[] { valueSet });
             Assert.AreEqual(0, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
 
             // Change so that it's under 999 and verify
             var values = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
-            values["path"] = new List<object> {"-1,999," + valueSet.Id};
-            var newValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType,
-                values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
-            index.IndexItems(new[] {newValueSet});
+            values["path"] = new List<object> { "-1,999," + valueSet.Id };
+            var newValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, values.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
+            index.IndexItems(new[] { newValueSet });
             Assert.AreEqual(1, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
         }
     }
@@ -62,7 +61,9 @@ public class IndexTest : ExamineBaseTest
             var contentType = ContentTypeBuilder.CreateBasicContentType();
             contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext)
             {
-                Alias = "rte", Name = "RichText", PropertyEditorAlias = Constants.PropertyEditors.Aliases.TinyMce
+                Alias = "rte",
+                Name = "RichText",
+                PropertyEditorAlias = Constants.PropertyEditors.Aliases.TinyMce
             });
 
             var content = ContentBuilder.CreateBasicContent(contentType);
@@ -97,7 +98,9 @@ public class IndexTest : ExamineBaseTest
             var contentType = ContentTypeBuilder.CreateBasicContentType();
             contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext)
             {
-                Alias = "grid", Name = "Grid", PropertyEditorAlias = Constants.PropertyEditors.Aliases.Grid
+                Alias = "grid",
+                Name = "Grid",
+                PropertyEditorAlias = Constants.PropertyEditors.Aliases.Grid
             });
             var content = ContentBuilder.CreateBasicContent(contentType);
             content.Id = 555;
@@ -214,12 +217,11 @@ public class IndexTest : ExamineBaseTest
     {
         // create a validator with
         // publishedValuesOnly false
-        // parentId 1116 (only content under that parent will be indexed)            
+        // parentId 1116 (only content under that parent will be indexed)
         using (GetSynchronousContentIndex(false, out var index, out var contentRebuilder, out _, 1116))
         {
             //get a node from the data repo (this one exists underneath 2222)
-            var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
-                .Root.Elements()
+            var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]").Root.Elements()
                 .First(x => (int)x.Attribute("id") == 2112);
 
             var currPath = (string)node.Attribute("path"); //should be : -1,1111,2222,2112
@@ -238,7 +240,7 @@ public class IndexTest : ExamineBaseTest
             node.SetAttributeValue("parentID", "1116");
 
             //now reindex the node, this should first delete it and then WILL add it because of the parent id constraint
-            index.IndexItems(new[] {node.ConvertToValueSet(IndexTypes.Media)});
+            index.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
             //now ensure it exists
             results = index.Searcher.CreateQuery().Id(2112).Execute();
@@ -276,7 +278,7 @@ public class IndexTest : ExamineBaseTest
             node.SetAttributeValue("parentID", "1116");
 
             //now reindex the node, this should first delete it and then NOT add it because of the parent id constraint
-            index.IndexItems(new[] {node.ConvertToValueSet(IndexTypes.Media)});
+            index.IndexItems(new[] { node.ConvertToValueSet(IndexTypes.Media) });
 
             //now ensure it's deleted
             results = searcher.CreateQuery().Id(2112).Execute();

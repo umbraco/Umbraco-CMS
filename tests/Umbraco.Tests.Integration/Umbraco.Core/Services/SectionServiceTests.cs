@@ -41,20 +41,20 @@ public class SectionServiceTests : UmbracoIntegrationTest
         using var _ = scope.Notifications.Suppress();
 
         var globalSettings = new GlobalSettings();
-        var user = new User(globalSettings) {Name = "Test user", Username = "testUser", Email = "testuser@test.com"};
+        var user = new User(globalSettings) { Name = "Test user", Username = "testUser", Email = "testuser@test.com" };
         UserService.Save(user);
 
-        var userGroupA = new UserGroup(ShortStringHelper) {Alias = "GroupA", Name = "Group A"};
+        var userGroupA = new UserGroup(ShortStringHelper) { Alias = "GroupA", Name = "Group A" };
         userGroupA.AddAllowedSection("media");
         userGroupA.AddAllowedSection("settings");
 
         // TODO: This is failing the test
-        UserService.Save(userGroupA, new[] {user.Id});
+        UserService.Save(userGroupA, new[] { user.Id });
 
-        var userGroupB = new UserGroup(ShortStringHelper) {Alias = "GroupB", Name = "Group B"};
+        var userGroupB = new UserGroup(ShortStringHelper) { Alias = "GroupB", Name = "Group B" };
         userGroupB.AddAllowedSection("settings");
         userGroupB.AddAllowedSection("member");
-        UserService.Save(userGroupB, new[] {user.Id});
+        UserService.Save(userGroupB, new[] { user.Id });
 
         return UserService.GetUserById(user.Id);
     }

@@ -43,12 +43,12 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             IDataType dataType1 =
-                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer) {Name = "dt1"};
+                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer)
+                { Name = "dt1" };
             DataTypeRepository.Save(dataType1);
             IDataType dataType2 =
-                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer) {Name = "dt2"};
+                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer)
+                { Name = "dt2" };
             DataTypeRepository.Save(dataType2);
 
             IContentType ct = new ContentType(ShortStringHelper, -1)
@@ -96,24 +96,23 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
-            var container1 = new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah1"};
+            var container1 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah1" };
             DataTypeContainerRepository.Save(container1);
 
             var container2 =
-                new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah2", ParentId = container1.Id};
+                new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
             DataTypeContainerRepository.Save(container2);
 
             var dataType =
                 (IDataType)new DataType(
-                    new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer, container2.Id) {Name = "dt1"};
+                    new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container2.Id)
+                { Name = "dt1" };
             DataTypeRepository.Save(dataType);
 
             // create a
             var dataType2 =
-                (IDataType)new DataType(
-                    new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer, dataType.Id) {Name = "dt2"};
+                (IDataType)new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, dataType.Id)
+                { Name = "dt2" };
             DataTypeRepository.Save(dataType2);
 
             var result = DataTypeRepository.Move(dataType, container1).ToArray();
@@ -135,7 +134,7 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
             DataTypeContainerRepository.Save(container);
 
             Assert.That(container.Id, Is.GreaterThan(0));
@@ -150,7 +149,7 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
             DataTypeContainerRepository.Save(container);
 
             // Act
@@ -166,12 +165,12 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
             DataTypeContainerRepository.Save(container);
 
             var dataTypeDefinition =
-                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer, container.Id) {Name = "test"};
+                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container.Id)
+                { Name = "test" };
             DataTypeRepository.Save(dataTypeDefinition);
 
             Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -183,12 +182,12 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
         using (ScopeProvider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DataType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
             DataTypeContainerRepository.Save(container);
 
             IDataType dataType =
-                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer, container.Id) {Name = "test"};
+                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container.Id)
+                { Name = "test" };
             DataTypeRepository.Save(dataType);
 
             // Act
@@ -209,8 +208,8 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             IDataType dataType =
-                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService),
-                    ConfigurationEditorJsonSerializer) {Name = "test"};
+                new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer)
+                { Name = "test" };
 
             DataTypeRepository.Save(dataType);
 
@@ -310,13 +309,12 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var dataTypeDefinition =
-                new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper),
-                    ConfigurationEditorJsonSerializer)
+                new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
                     CreatorId = 0,
-                    Configuration = new LabelConfiguration {ValueType = ValueTypes.Xml}
+                    Configuration = new LabelConfiguration { ValueType = ValueTypes.Xml }
                 };
 
             // Act
@@ -330,8 +328,7 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             Assert.That(exists, Is.True);
 
             // cannot compare 'configuration' as it's two different objects
-            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched,
-                ignoreProperties: new[] {"Configuration"});
+            TestHelper.AssertPropertyValuesAreEqual(dataTypeDefinition, fetched, ignoreProperties: new[] { "Configuration" });
 
             // still, can compare explicitely
             Assert.IsNotNull(dataTypeDefinition.Configuration);
@@ -352,7 +349,9 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
             var dataTypeDefinition =
                 new DataType(new IntegerPropertyEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
                 {
-                    DatabaseType = ValueStorageType.Integer, Name = "AgeDataType", CreatorId = 0
+                    DatabaseType = ValueStorageType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
                 };
             DataTypeRepository.Save(dataTypeDefinition);
 
@@ -377,10 +376,11 @@ public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var dataTypeDefinition =
-                new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper),
-                    ConfigurationEditorJsonSerializer)
+                new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
-                    DatabaseType = ValueStorageType.Integer, Name = "AgeDataType", CreatorId = 0
+                    DatabaseType = ValueStorageType.Integer,
+                    Name = "AgeDataType",
+                    CreatorId = 0
                 };
 
             // Act

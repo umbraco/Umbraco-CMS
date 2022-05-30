@@ -27,8 +27,7 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
     {
         var commonRepository = GetRequiredService<IContentTypeCommonRepository>();
         var languageRepository = GetRequiredService<ILanguageRepository>();
-        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled,
-            Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
+        return new MemberTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, Mock.Of<ILogger<MemberTypeRepository>>(), commonRepository, languageRepository, ShortStringHelper);
     }
 
     [Test]
@@ -319,8 +318,7 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(3, memberType.PropertyTypes.Count());
 
             // add one stub property, others are still missing
-            memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupAlias,
-                Constants.Conventions.Member.StandardPropertiesGroupName);
+            memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupAlias, Constants.Conventions.Member.StandardPropertiesGroupName);
 
             // saving *new* member type adds the (missing) stub properties
             repository.Save(memberType);

@@ -29,13 +29,18 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
     public void SetUpFileSystem()
     {
         var path = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoCssPath);
-        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment,
-            GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
+        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
 
-        _fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper,
+        _fileSystems = FileSystemsCreator.CreateTestFileSystems(
+            LoggerFactory,
+            IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            null, null, _fileSystem, null, null);
+            null,
+            null,
+            _fileSystem,
+            null,
+            null);
 
         var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
         _fileSystem.AddFile("styles.css", stream);
@@ -84,7 +89,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var stylesheet =
-                new Stylesheet("test-add.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             // Assert
@@ -102,7 +107,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var stylesheet =
-                new Stylesheet("test-update.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             var stylesheetUpdate = repository.Get("test-update.css");
@@ -128,7 +133,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
 
             // Act
             IStylesheet stylesheet =
-                new Stylesheet("test-update.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
@@ -139,7 +144,8 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             stylesheet = repository.Get(stylesheet.Name);
 
             // Assert
-            Assert.That(stylesheet.Content,
+            Assert.That(
+                stylesheet.Content,
                 Is.EqualTo(
                     "body { color:#000; } .bold {font-weight:bold;}\r\n\r\n/**umb_name:Test*/\r\np {\r\n\tfont-size:2em;\r\n}"
                         .Replace("\r\n", Environment.NewLine)));
@@ -157,7 +163,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var stylesheet =
-                new Stylesheet("test-update.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
@@ -177,7 +183,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var stylesheet =
-                new Stylesheet("test-delete.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             repository.Delete(stylesheet);
@@ -215,11 +221,11 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             var stylesheet =
-                new Stylesheet("styles-v2.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             // Act
-            var stylesheets = repository.GetMany();
+            var stylesheets = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(stylesheets, Is.Not.Null);
@@ -238,11 +244,11 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             var stylesheet =
-                new Stylesheet("styles-v2.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             // Act
-            var stylesheets = repository.GetMany("styles-v2.css", "styles.css");
+            var stylesheets = repository.GetMany("styles-v2.css", "styles.css").ToArray();
 
             // Assert
             Assert.That(stylesheets, Is.Not.Null);
@@ -277,7 +283,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             IStylesheet stylesheet =
-                new Stylesheet("test-path-1.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.css"));
@@ -285,7 +291,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("/css/test-path-1.css", stylesheet.VirtualPath);
 
             stylesheet =
-                new Stylesheet("path-2/test-path-2.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("path-2/test-path-2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
@@ -298,7 +304,7 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
 
             stylesheet =
-                new Stylesheet("path-2\\test-path-3.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("path-2\\test-path-3.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.css"));
@@ -316,12 +322,12 @@ public class StylesheetRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
             stylesheet =
-                new Stylesheet("..\\test-path-4.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("..\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             Assert.Throws<UnauthorizedAccessException>(() =>
                 repository.Save(stylesheet));
 
             stylesheet =
-                new Stylesheet("\\test-path-5.css") {Content = "body { color:#000; } .bold {font-weight:bold;}"};
+                new Stylesheet("\\test-path-5.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.Save(stylesheet);
 
             stylesheet = repository.Get("\\test-path-5.css");

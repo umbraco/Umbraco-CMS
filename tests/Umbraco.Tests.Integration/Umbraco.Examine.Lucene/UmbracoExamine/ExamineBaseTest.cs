@@ -37,6 +37,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
     /// <param name="contentRebuilder"></param>
     /// <param name="contentValueSetBuilder"></param>
     /// <param name="parentId"></param>
+    /// <param name="contentService"></param>
     /// <returns></returns>
     protected IDisposable GetSynchronousContentIndex(
         bool publishedValuesOnly,

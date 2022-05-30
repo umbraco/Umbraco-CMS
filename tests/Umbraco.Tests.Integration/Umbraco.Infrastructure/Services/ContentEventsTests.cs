@@ -147,7 +147,7 @@ public class ContentEventsTests : UmbracoIntegrationTestWithContent
                 return;
             }
 
-            IContent[] entities = {notification.Entity}; // args.Entities
+            IContent[] entities = { notification.Entity }; // args.Entities
 
             var e = new EventInstance
             {
@@ -768,7 +768,7 @@ public class ContentEventsTests : UmbracoIntegrationTestWithContent
         var content1 = CreateBranch();
         var content1C = Children(content1).ToArray();
         Assert.AreEqual(4, content1C.Length);
-        IContent[] content1Csorted = {content1C[3], content1C[0], content1C[1], content1C[2]};
+        IContent[] content1Csorted = { content1C[3], content1C[0], content1C[1], content1C[2] };
 
         ResetEvents();
         ContentService.Sort(content1Csorted);
@@ -812,7 +812,7 @@ public class ContentEventsTests : UmbracoIntegrationTestWithContent
         var content1 = CreateBranch();
         var content1C = Children(content1).ToArray();
         Assert.AreEqual(4, content1C.Length);
-        IContent[] content1Csorted = {content1C[0], content1C[1], content1C[3], content1C[2]};
+        IContent[] content1Csorted = { content1C[0], content1C[1], content1C[3], content1C[2] };
 
         ResetEvents();
         ContentService.Sort(content1Csorted);

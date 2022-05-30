@@ -94,45 +94,33 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         ContentService.Save(_trashed, 0);
     }
 
-    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor,
-        out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository,
-        AppCaches appCaches = null)
+    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out DataTypeRepository dtdRepository, AppCaches appCaches = null)
     {
         appCaches ??= AppCaches;
 
         var ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out TemplateRepository tr);
         var editors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
-        dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, editors,
-            LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
+        dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, editors, LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
         return ctRepository;
     }
 
-    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor,
-        out ContentTypeRepository contentTypeRepository, AppCaches appCaches = null) =>
+    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, AppCaches appCaches = null) =>
         CreateRepository(scopeAccessor, out contentTypeRepository, out TemplateRepository tr, appCaches);
 
-    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor,
-        out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository,
-        AppCaches appCaches = null)
+    private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository, AppCaches appCaches = null)
     {
         appCaches ??= AppCaches;
 
-        templateRepository = new TemplateRepository(scopeAccessor, appCaches,
-            LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper,
-            Mock.Of<IViewHelper>());
+        templateRepository = new TemplateRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, Mock.Of<IViewHelper>());
         var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
         var commonRepository =
             new ContentTypeCommonRepository(scopeAccessor, templateRepository, appCaches, ShortStringHelper);
         var languageRepository =
             new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>());
-        contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches,
-            LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository,
-            ShortStringHelper);
-        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled,
-            LoggerFactory.CreateLogger<RelationTypeRepository>());
+        contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(),
-            relationTypeRepository, entityRepository);
+        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var dataValueReferences =
@@ -215,9 +203,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository,
-                out DataTypeRepository _);
-
+            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
             var versions = new List<int>();
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
@@ -248,10 +234,9 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(true,
-                ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
+            Assert.AreEqual(true, ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // change something
             // save = update the current (draft) version
@@ -267,10 +252,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(true,
+            Assert.AreEqual(
+                true,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // unpublish = no impact on versions
             ((Content)content1).PublishedState = PublishedState.Unpublishing;
@@ -285,10 +271,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(false,
+            Assert.AreEqual(
+                false,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // change something
             // save = update the current (draft) version
@@ -303,10 +290,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(false,
+            Assert.AreEqual(
+                false,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // publish = version
             content1.PublishCulture(CultureImpact.Invariant);
@@ -322,10 +310,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(true,
+            Assert.AreEqual(
+                true,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // change something
             // save = update the current (draft) version
@@ -343,10 +332,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(true,
+            Assert.AreEqual(
+                true,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // publish = new version
             content1.Name = "name-4";
@@ -364,10 +354,11 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(versions[^1], repository.Get(content1.Id).VersionId);
 
             // misc checks
-            Assert.AreEqual(true,
+            Assert.AreEqual(
+                true,
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<bool>(
                     $"SELECT published FROM {Constants.DatabaseSchema.Tables.Document} WHERE nodeId=@id",
-                    new {id = content1.Id}));
+                    new { id = content1.Id }));
 
             // all versions
             var allVersions = repository.GetAllVersions(content1.Id).ToArray();
@@ -422,8 +413,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
 
-            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository,
-                out DataTypeRepository _);
+            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
 
             var emptyContentType = ContentTypeBuilder.CreateBasicContentType();
             var hasPropertiesContentType =
@@ -543,8 +533,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository,
-                out TemplateRepository templateRepository);
+            var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out TemplateRepository templateRepository);
 
             var template = new Template(ShortStringHelper, "hello", "hello");
             templateRepository.Save(template);
@@ -701,7 +690,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType = contentTypeRepository.Get(_contentType.Id);
-            var content = new Content("Textpage 2 Child Node", _trashed.Id, contentType) {CreatorId = 0, WriterId = 0};
+            var content = new Content("Textpage 2 Child Node", _trashed.Id, contentType) { CreatorId = 0, WriterId = 0 };
 
             repository.Save(content);
 
@@ -808,8 +797,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         // One invariant content type named "umbInvariantTextPage"
         var template = TemplateBuilder.CreateTextPageTemplate();
         FileService.SaveTemplate(template);
-        var invariantCt = ContentTypeBuilder.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage",
-            defaultTemplateId: template.Id);
+        var invariantCt = ContentTypeBuilder.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage", defaultTemplateId: template.Id);
         invariantCt.Variations = ContentVariation.Nothing;
         foreach (var p in invariantCt.PropertyTypes)
         {
@@ -820,8 +808,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
 
         // One variant (by culture) content type named "umbVariantTextPage"
         // with properties, every 2nd one being variant (by culture), the other being invariant
-        var variantCt = ContentTypeBuilder.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage",
-            defaultTemplateId: template.Id);
+        var variantCt = ContentTypeBuilder.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage", defaultTemplateId: template.Id);
         variantCt.Variations = ContentVariation.Culture;
         var propTypes = variantCt.PropertyTypes.ToList();
         for (var i = 0; i < propTypes.Count; i++)
@@ -833,7 +820,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(variantCt);
 
         invariantCt.AllowedContentTypes =
-            new[] {new ContentTypeSort(invariantCt.Id, 0), new ContentTypeSort(variantCt.Id, 1)};
+            new[] { new ContentTypeSort(invariantCt.Id, 0), new ContentTypeSort(variantCt.Id, 1) };
         ContentTypeService.Save(invariantCt);
 
         // Create content
@@ -931,14 +918,12 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
 
-                var result = repository.GetPage(query, 0, 2, out var totalRecords, null,
-                    Ordering.By("title", isCustomField: true));
+                var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("title", isCustomField: true));
 
                 Assert.AreEqual(3, totalRecords);
                 Assert.AreEqual(2, result.Count());
 
-                result = repository.GetPage(query, 1, 2, out totalRecords, null,
-                    Ordering.By("title", isCustomField: true));
+                result = repository.GetPage(query, 1, 2, out totalRecords, null, Ordering.By("title", isCustomField: true));
 
                 Assert.AreEqual(1, result.Count());
             }
@@ -988,7 +973,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("Name"));
+            var result = repository.GetPage(query, 1, 1, out var totalRecords, null, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1005,7 +990,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("Name"));
+            var result = repository.GetPage(query, 0, 2, out var totalRecords, null, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(2));
@@ -1022,8 +1007,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, null,
-                Ordering.By("Name", Direction.Descending));
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, null, Ordering.By("Name", Direction.Descending)).ToArray();
 
             Assert.That(totalRecords, Is.GreaterThanOrEqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1042,7 +1026,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
             var filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("Page 2"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.EqualTo(1));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1061,7 +1045,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
             var query = ScopeProvider.CreateQuery<IContent>().Where(x => x.Level == 2);
 
             var filterQuery = ScopeProvider.CreateQuery<IContent>().Where(x => x.Name.Contains("text"));
-            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name"));
+            var result = repository.GetPage(query, 0, 1, out var totalRecords, filterQuery, Ordering.By("Name")).ToArray();
 
             Assert.That(totalRecords, Is.EqualTo(2));
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -1077,7 +1061,7 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
-            var contents = repository.GetMany(_subpage.Id, _subpage2.Id);
+            var contents = repository.GetMany(_subpage.Id, _subpage2.Id).ToArray();
 
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
@@ -1093,18 +1077,18 @@ public class DocumentRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository((IScopeAccessor)provider, out _);
 
-            var contents = repository.GetMany();
+            var contents = repository.GetMany().ToArray();
 
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
 
-            contents = repository.GetMany(contents.Select(x => x.Id).ToArray());
+            contents = repository.GetMany(contents.Select(x => x.Id).ToArray()).ToArray();
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
 
-            contents = ((IReadRepository<Guid, IContent>)repository).GetMany(contents.Select(x => x.Key).ToArray());
+            contents = ((IReadRepository<Guid, IContent>)repository).GetMany(contents.Select(x => x.Key).ToArray()).ToArray();
             Assert.That(contents, Is.Not.Null);
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));

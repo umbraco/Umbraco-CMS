@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -46,7 +46,7 @@ public class FileSystemsTests : UmbracoIntegrationTest
         Assert.IsTrue(File.Exists(physPath));
 
         // ~/media/1234/file.txt is gone
-        mediaFileManager.DeleteMediaFiles(new[] {virtualPath});
+        mediaFileManager.DeleteMediaFiles(new[] { virtualPath });
         Assert.IsFalse(File.Exists(physPath));
 
         var scheme = GetRequiredService<IMediaPathScheme>();

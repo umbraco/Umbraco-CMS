@@ -128,7 +128,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = from;
         var properties = CreatePropertyCollection(("title", from));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // create some content of this content type
@@ -180,7 +180,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = startingContentTypeVariation;
         var properties = CreatePropertyCollection(("title", startingContentTypeVariation));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // create some content of this content type
@@ -341,7 +341,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // Update it
         contentType.Variations = contentTypeVariation;
         var properties = CreatePropertyCollection(("title", propertyTypeVariation));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // Check if property type variations have been updated correctly
@@ -359,7 +359,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // content type supports all variations
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", invariant));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // create some content of this content type
@@ -404,7 +404,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // content type supports all variations
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", variant));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // create some content of this content type
@@ -443,7 +443,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // content type supports all variations
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", variant));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // compose this from the other one
@@ -493,7 +493,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = variant;
         var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         // compose this from the other one
@@ -546,7 +546,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value1", ContentVariation.Culture),
             ("value2", ContentVariation.Nothing));
 
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         var document = (IContent)new Content("document", -1, contentType);
@@ -632,7 +632,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // can then switch one property to variant
         var globalSettings = new GlobalSettings();
 
-        var languageEn = new Language("en", "English") {IsDefault = true};
+        var languageEn = new Language("en", "English") { IsDefault = true };
         LocalizationService.Save(languageEn);
         var languageFr = new Language("fr", "French");
         LocalizationService.Save(languageFr);
@@ -643,7 +643,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value1", ContentVariation.Nothing),
             ("value2", ContentVariation.Nothing));
 
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         var document = (IContent)new Content("document", -1, contentType);
@@ -731,7 +731,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value1", ContentVariation.Culture),
             ("value2", ContentVariation.Nothing));
 
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         var document = (IContent)new Content("document", -1, contentType);
@@ -825,7 +825,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         var properties = CreatePropertyCollection(("value1", variant));
 
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         IContent document = new Content("document", -1, contentType);
@@ -949,7 +949,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         var properties = CreatePropertyCollection(("value1", invariant));
 
-        contentType.PropertyGroups.Add(new PropertyGroup(properties) {Alias = "content", Name = "Content"});
+        contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(contentType);
 
         var document = (IContent)new Content("document", -1, contentType);
@@ -1037,7 +1037,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value11", ContentVariation.Culture),
             ("value12", ContentVariation.Nothing));
 
-        composing.PropertyGroups.Add(new PropertyGroup(properties1) {Alias = "content", Name = "Content"});
+        composing.PropertyGroups.Add(new PropertyGroup(properties1) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(composing);
 
         var composed = CreateContentType(ContentVariation.Culture, "composed");
@@ -1046,7 +1046,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value21", ContentVariation.Culture),
             ("value22", ContentVariation.Nothing));
 
-        composed.PropertyGroups.Add(new PropertyGroup(properties2) {Alias = "content", Name = "Content"});
+        composed.PropertyGroups.Add(new PropertyGroup(properties2) { Alias = "content", Name = "Content" });
         composed.AddContentType(composing);
         ContentTypeService.Save(composed);
 
@@ -1138,7 +1138,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value11", ContentVariation.Culture),
             ("value12", ContentVariation.Nothing));
 
-        composing.PropertyGroups.Add(new PropertyGroup(properties1) {Alias = "content", Name = "Content"});
+        composing.PropertyGroups.Add(new PropertyGroup(properties1) { Alias = "content", Name = "Content" });
         ContentTypeService.Save(composing);
 
         var composed1 = CreateContentType(ContentVariation.Culture, "composed1");
@@ -1147,7 +1147,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value21", ContentVariation.Culture),
             ("value22", ContentVariation.Nothing));
 
-        composed1.PropertyGroups.Add(new PropertyGroup(properties2) {Alias = "content", Name = "Content"});
+        composed1.PropertyGroups.Add(new PropertyGroup(properties2) { Alias = "content", Name = "Content" });
         composed1.AddContentType(composing);
         ContentTypeService.Save(composed1);
 
@@ -1157,7 +1157,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value31", ContentVariation.Nothing),
             ("value32", ContentVariation.Nothing));
 
-        composed2.PropertyGroups.Add(new PropertyGroup(properties3) {Alias = "content", Name = "Content"});
+        composed2.PropertyGroups.Add(new PropertyGroup(properties3) { Alias = "content", Name = "Content" });
         composed2.AddContentType(composing);
         ContentTypeService.Save(composed2);
 
@@ -1278,14 +1278,14 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
     private void CreateFrenchAndEnglishLangs()
     {
-        var languageEn = new Language("en", "English") {IsDefault = true};
+        var languageEn = new Language("en", "English") { IsDefault = true };
         LocalizationService.Save(languageEn);
         var languageFr = new Language("fr", "French");
         LocalizationService.Save(languageFr);
     }
 
     private IContentType CreateContentType(ContentVariation variance, string alias = "contentType") =>
-        new ContentType(ShortStringHelper, -1) {Alias = alias, Name = alias, Variations = variance};
+        new ContentType(ShortStringHelper, -1) { Alias = alias, Name = alias, Variations = variance };
 
     private PropertyTypeCollection CreatePropertyCollection(params (string alias, ContentVariation variance)[] props)
     {
@@ -1295,7 +1295,9 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         {
             propertyCollection.Add(new PropertyType(ShortStringHelper, alias, ValueStorageType.Ntext)
             {
-                Alias = alias, DataTypeId = -88, Variations = variance
+                Alias = alias,
+                DataTypeId = -88,
+                Variations = variance
             });
         }
 

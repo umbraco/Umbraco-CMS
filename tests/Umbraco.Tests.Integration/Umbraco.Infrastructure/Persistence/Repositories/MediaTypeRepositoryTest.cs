@@ -35,11 +35,11 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var containerRepository = CreateContainerRepository(provider);
             var repository = CreateRepository(provider);
 
-            var container1 = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah1"};
+            var container1 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah1" };
             containerRepository.Save(container1);
 
             var container2 =
-                new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah2", ParentId = container1.Id};
+                new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
             containerRepository.Save(container2);
 
             IMediaType contentType =
@@ -49,7 +49,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
 
             // create a
             var contentType2 =
-                (IMediaType)new MediaType(ShortStringHelper, contentType, "hello") {Name = "Blahasdfsadf"};
+                (IMediaType)new MediaType(ShortStringHelper, contentType, "hello") { Name = "Blahasdfsadf" };
             contentType.ParentId = contentType.Id;
             repository.Save(contentType2);
 
@@ -75,7 +75,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
         {
             var containerRepository = CreateContainerRepository(provider);
 
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             containerRepository.Save(container);
 
             Assert.That(container.Id, Is.GreaterThan(0));
@@ -93,7 +93,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
         {
             var containerRepository = CreateContainerRepository(provider);
 
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             containerRepository.Save(container);
 
             Assert.That(container.Id, Is.GreaterThan(0));
@@ -115,12 +115,11 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var containerRepository = CreateContainerRepository(provider);
             var repository = CreateRepository(provider);
 
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             containerRepository.Save(container);
 
             var contentType =
-                MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup",
-                    propertyGroupName: "testGroup");
+                MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
             repository.Save(contentType);
 
@@ -137,12 +136,11 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var containerRepository = CreateContainerRepository(provider);
             var repository = CreateRepository(provider);
 
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             containerRepository.Save(container);
 
             IMediaType contentType =
-                MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup",
-                    propertyGroupName: "testGroup");
+                MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
             repository.Save(contentType);
 
@@ -179,7 +177,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             Assert.That(contentType.Path.Contains(","), Is.True);
             Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
-            TestHelper.AssertPropertyValuesAreEqual(contentType, fetched, ignoreProperties: new[] {"UpdateDate"});
+            TestHelper.AssertPropertyValuesAreEqual(contentType, fetched, ignoreProperties: new[] { "UpdateDate" });
         }
     }
 
@@ -297,7 +295,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new {NodeObjectType = Constants.ObjectTypes.MediaType});
+                    new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
             // Assert
             Assert.That(mediaTypes.Any(), Is.True);
@@ -322,7 +320,7 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new {NodeObjectType = Constants.ObjectTypes.MediaType});
+                    new { NodeObjectType = Constants.ObjectTypes.MediaType });
 
             // Assert
             Assert.That(mediaTypes.Any(), Is.True);
@@ -414,10 +412,8 @@ public class MediaTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     private MediaTypeRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(),
-            CommonRepository, LanguageRepository, ShortStringHelper);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<MediaTypeRepository>(), CommonRepository, LanguageRepository, ShortStringHelper);
 
     private EntityContainerRepository CreateContainerRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(),
-            Constants.ObjectTypes.MediaTypeContainer);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<EntityContainerRepository>(), Constants.ObjectTypes.MediaTypeContainer);
 }

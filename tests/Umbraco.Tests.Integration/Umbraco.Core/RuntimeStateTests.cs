@@ -82,11 +82,15 @@ public class RuntimeStateTests : UmbracoIntegrationTest
 
     private class TestMigration : PackageMigrationBase
     {
-        public TestMigration(IPackagingService packagingService, IMediaService mediaService,
-            MediaFileManager mediaFileManager, MediaUrlGeneratorCollection mediaUrlGenerators,
-            IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context) : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators,
-            shortStringHelper, contentTypeBaseServiceProvider, context)
+        public TestMigration(
+            IPackagingService packagingService,
+            IMediaService mediaService,
+            MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IShortStringHelper shortStringHelper,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            IMigrationContext context)
+            : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context)
         {
         }
 

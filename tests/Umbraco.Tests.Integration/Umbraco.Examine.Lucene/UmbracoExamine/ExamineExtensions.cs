@@ -29,8 +29,7 @@ internal static class ExamineExtensions
             return false;
         }
 
-        int parsedId;
-        if (int.TryParse(id, out parsedId))
+        if (int.TryParse(id, out int parsedId))
         {
             if (parsedId > 0)
             {
@@ -114,7 +113,7 @@ internal static class ExamineExtensions
         var attributeValues = xml.Attributes().ToDictionary(x => x.Name.LocalName, x => x.Value);
         var dataValues = xml.SelectExamineDataValues();
         foreach (var v in attributeValues)
-            //override the data values with attribute values if they do match, otherwise add
+        //override the data values with attribute values if they do match, otherwise add
         {
             dataValues[v.Key] = v.Value;
         }
@@ -136,7 +135,7 @@ internal static class ExamineExtensions
 
             string key;
             if (x.Name.LocalName == "data")
-                //it's the legacy schema
+            //it's the legacy schema
             {
                 key = (string)x.Attribute("alias");
             }
@@ -155,7 +154,7 @@ internal static class ExamineExtensions
                 elementValues[key] = x.Value;
             }
             else
-                //it has sub elements so serialize them
+            //it has sub elements so serialize them
             {
                 using (var reader = x.CreateReader())
                 {

@@ -74,8 +74,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
@@ -136,8 +135,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         });
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         var body = await response.Content.ReadAsStringAsync();
@@ -205,8 +203,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         var body = await response.Content.ReadAsStringAsync();
@@ -259,8 +256,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         var body = await response.Content.ReadAsStringAsync();
@@ -320,8 +316,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         var body = await response.Content.ReadAsStringAsync();
@@ -383,8 +378,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .Build();
 
         // Act
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         // Assert
         var body = await response.Content.ReadAsStringAsync();
@@ -426,8 +420,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
@@ -440,8 +433,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         {
             Assert.IsNotNull(display);
             Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
-            Assert.AreEqual(expectedMessage,
-                display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
         });
     }
 
@@ -500,18 +492,17 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         var enLanguage = localizationService.GetLanguageByIsoCode(UsIso);
         var domainService = GetRequiredService<IDomainService>();
-        var enDomain = new UmbracoDomain("/en") {RootContentId = content.Id, LanguageId = enLanguage.Id};
+        var enDomain = new UmbracoDomain("/en") { RootContentId = content.Id, LanguageId = enLanguage.Id };
         domainService.Save(enDomain);
 
         var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
-        var dkDomain = new UmbracoDomain("/dk") {RootContentId = childContent.Id, LanguageId = dkLanguage.Id};
+        var dkDomain = new UmbracoDomain("/dk") { RootContentId = childContent.Id, LanguageId = dkLanguage.Id };
         domainService.Save(dkDomain);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
         var result = JsonConvert.SerializeObject(model);
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
@@ -520,14 +511,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         var localizedTextService = GetRequiredService<ILocalizedTextService>();
         var expectedMessage =
-            localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] {"sv-SE"});
+            localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] { "sv-SE" });
 
         Assert.Multiple(() =>
         {
             Assert.NotNull(display);
             Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
-            Assert.AreEqual(expectedMessage,
-                display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
         });
     }
 
@@ -561,13 +551,12 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
         var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = content.Id, LanguageId = dkLanguage.Id};
+        var dkDomain = new UmbracoDomain("/") { RootContentId = content.Id, LanguageId = dkLanguage.Id };
         domainService.Save(dkDomain);
 
         var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
@@ -575,14 +564,13 @@ public class ContentControllerTests : UmbracoTestServerTestBase
 
 
         var localizedTextService = GetRequiredService<ILocalizedTextService>();
-        var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] {UsIso});
+        var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new[] { UsIso });
 
         Assert.Multiple(() =>
         {
             Assert.NotNull(display);
             Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
-            Assert.AreEqual(expectedMessage,
-                display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
         });
     }
 
@@ -632,9 +620,9 @@ public class ContentControllerTests : UmbracoTestServerTestBase
         var dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
         var usLanguage = localizationService.GetLanguageByIsoCode(UsIso);
         var domainService = GetRequiredService<IDomainService>();
-        var dkDomain = new UmbracoDomain("/") {RootContentId = rootNode.Id, LanguageId = dkLanguage.Id};
+        var dkDomain = new UmbracoDomain("/") { RootContentId = rootNode.Id, LanguageId = dkLanguage.Id };
 
-        var usDomain = new UmbracoDomain("/en") {RootContentId = childNode.Id, LanguageId = usLanguage.Id};
+        var usDomain = new UmbracoDomain("/en") { RootContentId = childNode.Id, LanguageId = usLanguage.Id };
 
         domainService.Save(dkDomain);
         domainService.Save(usDomain);
@@ -646,8 +634,7 @@ public class ContentControllerTests : UmbracoTestServerTestBase
             .WithAction(ContentSaveAction.Publish)
             .Build();
 
-        var response = await Client.PostAsync(url,
-            new MultipartFormDataContent {{new StringContent(JsonConvert.SerializeObject(model)), "contentItem"}});
+        var response = await Client.PostAsync(url, new MultipartFormDataContent { { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" } });
 
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);

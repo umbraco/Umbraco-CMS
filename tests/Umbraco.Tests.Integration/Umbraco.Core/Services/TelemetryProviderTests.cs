@@ -67,7 +67,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
 
     private readonly UserGroupBuilder _userGroupBuilder = new();
 
-    private ContentTypeBuilder _contentTypeBuilder = new();
+    private readonly ContentTypeBuilder _contentTypeBuilder = new();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -320,7 +320,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         _userGroupBuilder
             .WithAlias(alias)
             .WithName(alias)
-            .WithAllowedSections(new List<string> {"A", "B"})
+            .WithAllowedSections(new List<string> { "A", "B" })
             .Build();
 
     private IEnumerable<IUserGroup> BuildUserGroups(int count)
@@ -336,8 +336,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
         var scopeProvider = ScopeProvider;
         using (var scope = scopeProvider.CreateScope())
         {
-            var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled,
-                Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
+            var repository = new MacroRepository((IScopeAccessor)scopeProvider, AppCaches.Disabled, Mock.Of<ILogger<MacroRepository>>(), ShortStringHelper);
 
             repository.Save(new Macro(ShortStringHelper, "test1", "Test1", "~/views/macropartials/test1.cshtml"));
             repository.Save(new Macro(ShortStringHelper, "test2", "Test2", "~/views/macropartials/test2.cshtml"));
@@ -360,7 +359,7 @@ public class TelemetryProviderTests : UmbracoIntegrationTest
                 DataTypeId = dataTypeId
             }
         };
-        var pg = new PropertyGroup(contentCollection) {Alias = "test", Name = "test", SortOrder = 1};
+        var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
         ct.PropertyGroups.Add(pg);
     }
 }

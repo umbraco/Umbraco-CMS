@@ -26,8 +26,7 @@ public class LocalDbTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
     private readonly TestDatabaseSettings _settings;
 
     // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-    internal LocalDbTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, LocalDb localDb,
-        IUmbracoDatabaseFactory dbFactory)
+    internal LocalDbTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, LocalDb localDb, IUmbracoDatabaseFactory dbFactory)
     {
         _loggerFactory = loggerFactory;
         _databaseFactory = dbFactory;

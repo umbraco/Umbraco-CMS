@@ -40,7 +40,9 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         var testHelper = new TestHelper();
 
         // Delete all files
-        var fsViews = new PhysicalFileSystem(IOHelper, HostingEnvironment,
+        var fsViews = new PhysicalFileSystem(
+            IOHelper,
+            HostingEnvironment,
             LoggerFactory.CreateLogger<PhysicalFileSystem>(),
             HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews),
             HostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
@@ -57,8 +59,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
     private IViewHelper ViewHelper => GetRequiredService<IViewHelper>();
 
     private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled,
-            LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper);
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper);
 
     [Test]
     public void Can_Instantiate_Repository()
@@ -106,7 +107,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var template = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template);
 
             // Assert
@@ -156,10 +157,10 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var template = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template);
 
-            var template2 = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template2 = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template2);
 
             // Assert
@@ -178,10 +179,10 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var template = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template);
 
-            var template2 = new Template(ShortStringHelper, "test1", "test1") {Content = "mock-content"};
+            var template2 = new Template(ShortStringHelper, "test1", "test1") { Content = "mock-content" };
             repository.Save(template2);
 
             template.Alias = "test1";
@@ -205,7 +206,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var template = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template);
 
             template.Content += "<html></html>";
@@ -229,7 +230,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var template = new Template(ShortStringHelper, "test", "test") {Content = "mock-content"};
+            var template = new Template(ShortStringHelper, "test", "test") { Content = "mock-content" };
             repository.Save(template);
 
             // Act
@@ -257,28 +258,34 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var templateRepository = CreateRepository(provider);
             var globalSettings = new GlobalSettings();
             var serializer = new JsonNetSerializer();
-            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<TagRepository>());
+            var tagRepository = new TagRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<TagRepository>());
             var commonRepository =
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<LanguageRepository>());
-            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository,
-                ShortStringHelper);
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<RelationTypeRepository>());
+            var languageRepository = new LanguageRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
+            var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
+            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-            var relationRepository = new RelationRepository(scopeAccessor,
-                LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
+            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
             var propertyEditors =
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
                 new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
-            var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository,
-                templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository,
-                propertyEditors, dataValueReferences, dataTypeService, serializer, Mock.Of<IEventAggregator>());
+            var contentRepo = new DocumentRepository(
+                scopeAccessor,
+                AppCaches.Disabled,
+                LoggerFactory.CreateLogger<DocumentRepository>(),
+                LoggerFactory,
+                contentTypeRepository,
+                templateRepository,
+                tagRepository,
+                languageRepository,
+                relationRepository,
+                relationTypeRepository,
+                propertyEditors,
+                dataValueReferences,
+                dataTypeService,
+                serializer,
+                Mock.Of<IEventAggregator>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
             fileService.SaveTemplate(template); // else, FK violation on contentType!
@@ -316,8 +323,8 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             {
                 Content = @"<%@ Master Language=""C#"" %>"
             };
-            var child = new Template(ShortStringHelper, "child", "child") {Content = @"<%@ Master Language=""C#"" %>"};
-            var baby = new Template(ShortStringHelper, "baby", "baby") {Content = @"<%@ Master Language=""C#"" %>"};
+            var child = new Template(ShortStringHelper, "child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
+            var baby = new Template(ShortStringHelper, "baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
             child.MasterTemplateAlias = parent.Alias;
             child.MasterTemplateId = new Lazy<int>(() => parent.Id);
             baby.MasterTemplateAlias = child.Alias;
@@ -348,9 +355,9 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var created = CreateHierarchy(repository).ToArray();
 
             // Act
-            var all = repository.GetAll();
-            var allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound");
-            var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999);
+            var all = repository.GetAll().ToArray();
+            var allByAlias = repository.GetAll("parent", "child2", "baby2", "notFound").ToArray();
+            var allById = repository.GetMany(created[0].Id, created[2].Id, created[4].Id, created[5].Id, 999999).ToArray();
 
             // Assert
             Assert.AreEqual(9, all.Count());
@@ -377,7 +384,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var created = CreateHierarchy(repository).ToArray();
 
             // Act
-            var childrenById = repository.GetChildren(created[1].Id);
+            var childrenById = repository.GetChildren(created[1].Id).ToArray();
 
             // Assert
             Assert.AreEqual(2, childrenById.Count());
@@ -398,7 +405,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             CreateHierarchy(repository).ToArray();
 
             // Act
-            var children = repository.GetChildren(-1);
+            var children = repository.GetChildren(-1).ToArray();
 
             // Assert
             Assert.AreEqual(1, children.Count());
@@ -418,7 +425,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var created = CreateHierarchy(repository).ToArray();
 
             // Act
-            var descendantsById = repository.GetDescendants(created[1].Id);
+            var descendantsById = repository.GetDescendants(created[1].Id).ToArray();
 
             // Assert
             Assert.AreEqual(3, descendantsById.Count());
@@ -483,10 +490,8 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child1.Id, toddler2.Id), toddler2.Path);
             Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler3.Id), toddler3.Path);
             Assert.AreEqual(string.Format("-1,{0},{1},{2}", parent.Id, child2.Id, toddler4.Id), toddler4.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id),
-                baby1.Path);
-            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id),
-                baby2.Path);
+            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child1.Id, toddler2.Id, baby1.Id), baby1.Path);
+            Assert.AreEqual(string.Format("-1,{0},{1},{2},{3}", parent.Id, child2.Id, toddler4.Id, baby2.Id), baby2.Path);
         }
     }
 
@@ -543,7 +548,8 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
             var parent = new Template(ShortStringHelper, "parent", "parent");
             var child1 = new Template(ShortStringHelper, "child1", "child1")
             {
-                MasterTemplateAlias = parent.Alias, MasterTemplateId = new Lazy<int>(() => parent.Id)
+                MasterTemplateAlias = parent.Alias,
+                MasterTemplateId = new Lazy<int>(() => parent.Id)
             };
 
             repository.Save(parent);
@@ -573,9 +579,9 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
 
     private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository)
     {
-        var parent = new Template(ShortStringHelper, "parent", "parent") {Content = @"<%@ Master Language=""C#"" %>"};
+        var parent = new Template(ShortStringHelper, "parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
 
-        var child1 = new Template(ShortStringHelper, "child1", "child1") {Content = @"<%@ Master Language=""C#"" %>"};
+        var child1 = new Template(ShortStringHelper, "child1", "child1") { Content = @"<%@ Master Language=""C#"" %>" };
         var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1")
         {
             Content = @"<%@ Master Language=""C#"" %>"
@@ -584,9 +590,9 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             Content = @"<%@ Master Language=""C#"" %>"
         };
-        var baby1 = new Template(ShortStringHelper, "baby1", "baby1") {Content = @"<%@ Master Language=""C#"" %>"};
+        var baby1 = new Template(ShortStringHelper, "baby1", "baby1") { Content = @"<%@ Master Language=""C#"" %>" };
 
-        var child2 = new Template(ShortStringHelper, "child2", "child2") {Content = @"<%@ Master Language=""C#"" %>"};
+        var child2 = new Template(ShortStringHelper, "child2", "child2") { Content = @"<%@ Master Language=""C#"" %>" };
         var toddler3 = new Template(ShortStringHelper, "toddler3", "toddler3")
         {
             Content = @"<%@ Master Language=""C#"" %>"
@@ -595,7 +601,7 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         {
             Content = @"<%@ Master Language=""C#"" %>"
         };
-        var baby2 = new Template(ShortStringHelper, "baby2", "baby2") {Content = @"<%@ Master Language=""C#"" %>"};
+        var baby2 = new Template(ShortStringHelper, "baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
 
         child1.MasterTemplateAlias = parent.Alias;
         child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
@@ -628,6 +634,6 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
         repository.Save(baby1);
         repository.Save(baby2);
 
-        return new[] {parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2};
+        return new[] { parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2 };
     }
 }

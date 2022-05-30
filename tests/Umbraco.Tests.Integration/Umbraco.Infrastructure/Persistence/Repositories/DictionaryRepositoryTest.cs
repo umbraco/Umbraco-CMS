@@ -148,7 +148,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var dictionaryItem = repository.Get(1);
-            var dictionaryItems = repository.GetMany();
+            var dictionaryItems = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
@@ -168,7 +168,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var dictionaryItems = repository.GetMany(1, 2);
+            var dictionaryItems = repository.GetMany(1, 2).ToArray();
 
             // Assert
             Assert.That(dictionaryItems, Is.Not.Null);
@@ -189,7 +189,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IDictionaryItem>().Where(x => x.ItemKey == "Article");
-            var result = repository.Get(query);
+            var result = repository.Get(query).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -229,7 +229,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             var language = languageRepository.Get(1);
 
             var read = new DictionaryItem("Read");
-            var translations = new List<IDictionaryTranslation> {new DictionaryTranslation(language, "Read")};
+            var translations = new List<IDictionaryTranslation> { new DictionaryTranslation(language, "Read") };
             read.Translations = translations;
 
             // Act
@@ -295,8 +295,7 @@ public class DictionaryRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value,
-                Is.EqualTo("Les mer"));
+            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
         }
     }
 

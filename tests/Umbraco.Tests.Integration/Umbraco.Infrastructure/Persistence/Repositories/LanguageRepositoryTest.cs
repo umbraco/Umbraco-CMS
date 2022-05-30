@@ -55,7 +55,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             var au = CultureInfo.GetCultureInfo("en-AU");
-            ILanguage language = new Language(au.Name, au.EnglishName) {FallbackLanguageId = 1};
+            ILanguage language = new Language(au.Name, au.EnglishName) { FallbackLanguageId = 1 };
             repository.Save(language);
 
             // re-get
@@ -97,7 +97,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var languages = repository.GetMany();
+            var languages = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(languages, Is.Not.Null);
@@ -117,7 +117,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var languages = repository.GetMany(1, 2);
+            var languages = repository.GetMany(1, 2).ToArray();
 
             // Assert
             Assert.That(languages, Is.Not.Null);
@@ -138,7 +138,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode == "da-DK");
-            var result = repository.Get(query);
+            var result = repository.Get(query).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -197,7 +197,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") {IsDefault = true, IsMandatory = true};
+            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { IsDefault = true, IsMandatory = true };
             repository.Save(languageBR);
 
             // Assert
@@ -219,7 +219,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") {FallbackLanguageId = 1};
+            var languageBR = new Language("pt-BR", "Portuguese (Brazil)") { FallbackLanguageId = 1 };
             repository.Save(languageBR);
 
             // Assert
@@ -238,7 +238,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            ILanguage languageBR = new Language("pt-BR", "Portuguese (Brazil)") {IsDefault = true, IsMandatory = true};
+            ILanguage languageBR = new Language("pt-BR", "Portuguese (Brazil)") { IsDefault = true, IsMandatory = true };
             repository.Save(languageBR);
             var languageEN = new Language("en-AU", "English (Australia)");
             repository.Save(languageEN);
@@ -247,7 +247,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
             Assert.IsTrue(languageBR.IsMandatory);
 
             // Act
-            var languageNZ = new Language("en-NZ", "English (New Zealand)") {IsDefault = true, IsMandatory = true};
+            var languageNZ = new Language("en-NZ", "English (New Zealand)") { IsDefault = true, IsMandatory = true };
             repository.Save(languageNZ);
             languageBR = repository.Get(languageBR.Id);
 
@@ -365,8 +365,7 @@ public class LanguageRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider,
-        AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
+    private LanguageRepository CreateRepository(IScopeProvider provider) => new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
 
     private void CreateTestData()
     {

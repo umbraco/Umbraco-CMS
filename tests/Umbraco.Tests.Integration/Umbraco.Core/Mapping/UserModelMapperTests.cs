@@ -26,7 +26,7 @@ public class UserModelMapperTests : UmbracoIntegrationTest
     public void Map_UserGroupSave_To_IUserGroup()
     {
         IUserGroup userGroup =
-            new UserGroup(ShortStringHelper, 0, "alias", "name", new List<string> {"c"}, "icon") {Id = 42};
+            new UserGroup(ShortStringHelper, 0, "alias", "name", new List<string> { "c" }, "icon") { Id = 42 };
 
         // userGroup.permissions is List`1[System.String]
 

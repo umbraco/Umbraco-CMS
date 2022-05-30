@@ -38,11 +38,17 @@ public class ExternalLoginServiceTests : UmbracoIntegrationTest
             // insert duplicates manuall
             ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
             {
-                UserOrMemberKey = user.Key, LoginProvider = "test1", ProviderKey = providerKey, CreateDate = latest
+                UserOrMemberKey = user.Key,
+                LoginProvider = "test1",
+                ProviderKey = providerKey,
+                CreateDate = latest
             });
             ScopeAccessor.AmbientScope.Database.Insert(new ExternalLoginDto
             {
-                UserOrMemberKey = user.Key, LoginProvider = "test1", ProviderKey = providerKey, CreateDate = oldest
+                UserOrMemberKey = user.Key,
+                LoginProvider = "test1",
+                ProviderKey = providerKey,
+                CreateDate = oldest
             });
         }
 
@@ -157,7 +163,7 @@ public class ExternalLoginServiceTests : UmbracoIntegrationTest
         var user = new UserBuilder().Build();
         UserService.Save(user);
 
-        ExternalLogin[] externalLogins = {new ExternalLogin("test1", Guid.NewGuid().ToString("N"))};
+        ExternalLogin[] externalLogins = { new ExternalLogin("test1", Guid.NewGuid().ToString("N")) };
 
         ExternalLoginService.Save(user.Key, externalLogins);
 
@@ -259,7 +265,7 @@ public class ExternalLoginServiceTests : UmbracoIntegrationTest
         var user = new UserBuilder().Build();
         UserService.Save(user);
 
-        ExternalLogin[] externalLogins = {new ExternalLogin("test1", Guid.NewGuid().ToString("N"), "hello world")};
+        ExternalLogin[] externalLogins = { new ExternalLogin("test1", Guid.NewGuid().ToString("N"), "hello world") };
 
         ExternalLoginService.Save(user.Key, externalLogins);
 

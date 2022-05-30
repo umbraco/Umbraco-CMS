@@ -238,7 +238,7 @@ public class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) {IsActive = true});
+            repository.Save(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
             repository.Save(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));
             repository.Save(new ServerRegistration("https://www.another.domain.com", "Computer3", DateTime.Now));
             scope.Complete();

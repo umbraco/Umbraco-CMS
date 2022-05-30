@@ -28,14 +28,18 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
     public void SetUpFileSystem()
     {
         var path = GlobalSettings.UmbracoScriptsPath;
-        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment,
-            LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path),
-            HostingEnvironment.ToAbsolute(path));
+        _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path), HostingEnvironment.ToAbsolute(path));
 
-        _fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper,
+        _fileSystems = FileSystemsCreator.CreateTestFileSystems(
+            LoggerFactory,
+            IOHelper,
             GetRequiredService<IOptions<GlobalSettings>>(),
             HostingEnvironment,
-            null, null, null, _fileSystem, null);
+            null,
+            null,
+            null,
+            _fileSystem,
+            null);
         using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
         {
             _fileSystem.AddFile("test-script.js", stream);
@@ -86,7 +90,7 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var script = new Script("test-add-script.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script = new Script("test-add-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script);
 
             // Assert
@@ -104,7 +108,7 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository();
 
             // Act
-            var script = new Script("test-updated-script.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script);
 
             script.Content = "/// <reference name=\"MicrosoftAjax-Updated.js\"/>";
@@ -161,15 +165,15 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            var script = new Script("test-script1.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script);
-            var script2 = new Script("test-script2.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script2);
-            var script3 = new Script("test-script3.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script3);
 
             // Act
-            var scripts = repository.GetMany();
+            var scripts = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(scripts, Is.Not.Null);
@@ -187,15 +191,15 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            var script = new Script("test-script1.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script);
-            var script2 = new Script("test-script2.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script2 = new Script("test-script2.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script2);
-            var script3 = new Script("test-script3.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
+            var script3 = new Script("test-script3.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.Save(script3);
 
             // Act
-            var scripts = repository.GetMany("test-script1.js", "test-script2.js");
+            var scripts = repository.GetMany("test-script1.js", "test-script2.js").ToArray();
 
             // Assert
             Assert.That(scripts, Is.Not.Null);
@@ -231,7 +235,7 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            IScript script = new Script("test-move-script.js") {Content = content};
+            IScript script = new Script("test-move-script.js") { Content = content };
             repository.Save(script);
 
             // Act
@@ -260,7 +264,7 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            IScript script = new Script("test-path-1.js") {Content = "// script"};
+            IScript script = new Script("test-path-1.js") { Content = "// script" };
             repository.Save(script);
 
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
@@ -268,20 +272,18 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
 
             // ensure you can prefix the same path as the root path name
-            script = new Script("scripts/path-2/test-path-2.js") {Content = "// script"};
+            script = new Script("scripts/path-2/test-path-2.js") { Content = "// script" };
             repository.Save(script);
 
             Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
-            Assert.AreEqual("scripts\\path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"),
-                script.Path);
+            Assert.AreEqual("scripts\\path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
             Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
 
-            script = new Script("path-2/test-path-2.js") {Content = "// script"};
+            script = new Script("path-2/test-path-2.js") { Content = "// script" };
             repository.Save(script);
 
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
-            Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"),
-                script.Path); // fixed in 7.3 - 7.2.8 does not update the path
+            Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path); // fixed in 7.3 - 7.2.8 does not update the path
             Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
 
             script = repository.Get("path-2/test-path-2.js");
@@ -289,7 +291,7 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("path-2\\test-path-2.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
             Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
 
-            script = new Script("path-2\\test-path-3.js") {Content = "// script"};
+            script = new Script("path-2\\test-path-3.js") { Content = "// script" };
             repository.Save(script);
 
             Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
@@ -306,11 +308,11 @@ public class ScriptRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
             Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
-            script = new Script("..\\test-path-4.js") {Content = "// script"};
+            script = new Script("..\\test-path-4.js") { Content = "// script" };
             Assert.Throws<UnauthorizedAccessException>(() =>
                 repository.Save(script));
 
-            script = new Script("\\test-path-5.js") {Content = "// script"};
+            script = new Script("\\test-path-5.js") { Content = "// script" };
             repository.Save(script);
 
             script = repository.Get("\\test-path-5.js");

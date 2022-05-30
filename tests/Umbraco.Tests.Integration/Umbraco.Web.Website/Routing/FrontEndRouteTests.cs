@@ -72,10 +72,20 @@ public class SurfaceControllerTests : UmbracoTestServerTestBase
 // https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/
 public class TestSurfaceController : SurfaceController
 {
-    public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor,
-        IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-        IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider)
-        : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+    public TestSurfaceController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider)
+        : base(
+            umbracoContextAccessor,
+            databaseFactory,
+            services,
+            appCaches,
+            profilingLogger,
+            publishedUrlProvider)
     {
     }
 
@@ -87,10 +97,20 @@ public class TestSurfaceController : SurfaceController
 [PluginController("TestArea")]
 public class TestPluginController : SurfaceController
 {
-    public TestPluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
-        ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger,
-        IPublishedUrlProvider publishedUrlProvider) : base(umbracoContextAccessor, databaseFactory, services, appCaches,
-        profilingLogger, publishedUrlProvider)
+    public TestPluginController(
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IUmbracoDatabaseFactory databaseFactory,
+        ServiceContext services,
+        AppCaches appCaches,
+        IProfilingLogger profilingLogger,
+        IPublishedUrlProvider publishedUrlProvider)
+        : base(
+            umbracoContextAccessor,
+            databaseFactory,
+            services,
+            appCaches,
+            profilingLogger,
+            publishedUrlProvider)
     {
     }
 

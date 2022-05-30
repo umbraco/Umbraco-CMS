@@ -59,10 +59,10 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests/d1");
         Directory.CreateDirectory(path + "/ShadowTests/d2");
 
-        var files = fs.GetFiles("");
+        var files = fs.GetFiles(string.Empty);
         Assert.AreEqual(0, files.Count());
 
-        var dirs = fs.GetDirectories("");
+        var dirs = fs.GetDirectories(string.Empty);
         Assert.AreEqual(2, dirs.Count());
         Assert.IsTrue(dirs.Contains("d1"));
         Assert.IsTrue(dirs.Contains("d2"));
@@ -73,7 +73,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(fs.DirectoryExists("d1"));
         Assert.IsFalse(ss.DirectoryExists("d1"));
 
-        dirs = ss.GetDirectories("");
+        dirs = ss.GetDirectories(string.Empty);
         Assert.AreEqual(1, dirs.Count());
         Assert.IsTrue(dirs.Contains("d2"));
     }
@@ -94,10 +94,10 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Directory.CreateDirectory(path + "/ShadowTests/sub/d1");
         Directory.CreateDirectory(path + "/ShadowTests/sub/d2");
 
-        var files = fs.GetFiles("");
+        var files = fs.GetFiles(string.Empty);
         Assert.AreEqual(0, files.Count());
 
-        var dirs = ss.GetDirectories("");
+        var dirs = ss.GetDirectories(string.Empty);
         Assert.AreEqual(1, dirs.Count());
         Assert.IsTrue(dirs.Contains("sub"));
 
@@ -142,17 +142,17 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
 
-        var files = fs.GetFiles("");
+        var files = fs.GetFiles(string.Empty);
         Assert.AreEqual(2, files.Count());
         Assert.IsTrue(files.Contains("f1.txt"));
         Assert.IsTrue(files.Contains("f2.txt"));
 
-        files = ss.GetFiles("");
+        files = ss.GetFiles(string.Empty);
         Assert.AreEqual(2, files.Count());
         Assert.IsTrue(files.Contains("f1.txt"));
         Assert.IsTrue(files.Contains("f2.txt"));
 
-        var dirs = ss.GetDirectories("");
+        var dirs = ss.GetDirectories(string.Empty);
         Assert.AreEqual(0, dirs.Count());
 
         ss.DeleteFile("f1.txt");
@@ -161,7 +161,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(fs.FileExists("f1.txt"));
         Assert.IsFalse(ss.FileExists("f1.txt"));
 
-        files = ss.GetFiles("");
+        files = ss.GetFiles(string.Empty);
         Assert.AreEqual(1, files.Count());
         Assert.IsTrue(files.Contains("f2.txt"));
     }
@@ -191,10 +191,10 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(files.Contains("sub/f1.txt"));
         Assert.IsTrue(files.Contains("sub/f2.txt"));
 
-        files = ss.GetFiles("");
+        files = ss.GetFiles(string.Empty);
         Assert.AreEqual(0, files.Count());
 
-        var dirs = ss.GetDirectories("");
+        var dirs = ss.GetDirectories(string.Empty);
         Assert.AreEqual(1, dirs.Count());
         Assert.IsTrue(dirs.Contains("sub"));
 
@@ -272,7 +272,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsFalse(fs.FileExists("f1.txt"));
         Assert.IsTrue(ss.FileExists("f1.txt"));
 
-        var files = ss.GetFiles("");
+        var files = ss.GetFiles(string.Empty);
         Assert.AreEqual(2, files.Count());
         Assert.IsTrue(files.Contains("f1.txt"));
         Assert.IsTrue(files.Contains("f2.txt"));
@@ -311,10 +311,10 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsFalse(fs.DirectoryExists("sub"));
         Assert.IsTrue(ss.DirectoryExists("sub"));
 
-        var dirs = fs.GetDirectories("");
+        var dirs = fs.GetDirectories(string.Empty);
         Assert.AreEqual(0, dirs.Count());
 
-        dirs = ss.GetDirectories("");
+        dirs = ss.GetDirectories(string.Empty);
         Assert.AreEqual(1, dirs.Count());
         Assert.IsTrue(dirs.Contains("sub"));
 

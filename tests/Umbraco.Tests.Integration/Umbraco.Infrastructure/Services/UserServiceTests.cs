@@ -81,12 +81,12 @@ public class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new[] {userGroup.Id});
+        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[2], ActionBrowse.ActionLetter, new[] { userGroup.Id });
 
         // Act
         var permissions = UserService.GetPermissions(user, content[0].Id, content[1].Id, content[2].Id).ToArray();
@@ -115,12 +115,12 @@ public class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content.ElementAt(0), ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content.ElementAt(0), ActionMove.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content.ElementAt(1), ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content.ElementAt(1), ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new[] {userGroup.Id});
+        ContentService.SetPermission(content.ElementAt(0), ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content.ElementAt(0), ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content.ElementAt(0), ActionMove.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content.ElementAt(1), ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content.ElementAt(1), ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content.ElementAt(2), ActionBrowse.ActionLetter, new[] { userGroup.Id });
 
         // Act
         var permissions = UserService.GetPermissions(userGroup, false, content[0].Id, content[1].Id, content[2].Id)
@@ -150,11 +150,11 @@ public class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] {userGroup.Id});
+        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
 
         // Act
         var permissions = UserService.GetPermissions(userGroup, true, content[0].Id, content[1].Id, content[2].Id)
@@ -196,12 +196,12 @@ public class UserServiceTests : UmbracoIntegrationTest
         ContentService.Save(content);
 
         // assign permissions - we aren't assigning anything explicit for group3 and nothing explicit for content[2] /w group2
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] {userGroup1.Id});
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] {userGroup1.Id});
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] {userGroup2.Id});
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] {userGroup1.Id});
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] {userGroup2.Id});
-        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] {userGroup1.Id});
+        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup1.Id });
+        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup1.Id });
+        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup2.Id });
+        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup1.Id });
+        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup2.Id });
+        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] { userGroup1.Id });
 
         // Act
         // we don't pass in any nodes so it will return all of them
@@ -276,12 +276,12 @@ public class UserServiceTests : UmbracoIntegrationTest
             ContentBuilder.CreateSimpleContent(contentType)
         };
         ContentService.Save(content);
-        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] {userGroup.Id});
+        ContentService.SetPermission(content[0], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[0], ActionMove.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[1], ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(content[2], ActionDelete.ActionLetter, new[] { userGroup.Id });
 
         // Act
         // we don't pass in any nodes so it will return all of them
@@ -331,28 +331,28 @@ public class UserServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(4, result.EntityId);
         var allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] {"S", "D", "F", "R", "Q", "Z"}));
+        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
         // Permissions for Id 3
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(1).ToArray());
         Assert.AreEqual(3, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(6, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] {"S", "D", "F", "R", "Q", "Z"}));
+        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "R", "Q", "Z" }));
 
         // Permissions for Id 2
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(2).ToArray());
         Assert.AreEqual(2, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] {"S", "D", "F", "G", "R"}));
+        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "R" }));
 
         // Permissions for Id 1
         result = UserService.CalculatePermissionsForPathForUser(permissions, pathIds.Skip(3).ToArray());
         Assert.AreEqual(1, result.EntityId);
         allPermissions = result.GetAllPermissions().ToArray();
         Assert.AreEqual(5, allPermissions.Length, string.Join(",", allPermissions));
-        Assert.IsTrue(allPermissions.ContainsAll(new[] {"S", "D", "F", "G", "K"}));
+        Assert.IsTrue(allPermissions.ContainsAll(new[] { "S", "D", "F", "G", "K" }));
     }
 
     [Test]
@@ -360,7 +360,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = {"A", "B"};
+        string[] defaults = { "A", "B" };
         var permissions = new List<EntityPermission>
         {
             new(9876, 1, defaults, true), new(9876, 2, new[] {"B", "C", "D"}, false), new(9876, 3, defaults, true)
@@ -368,7 +368,7 @@ public class UserServiceTests : UmbracoIntegrationTest
         var result = UserService.GetPermissionsForPathForGroup(permissions, pathIds, true);
         Assert.AreEqual(3, result.AssignedPermissions.Length);
         Assert.IsFalse(result.IsDefaultPermissions);
-        Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] {"B", "C", "D"}));
+        Assert.IsTrue(result.AssignedPermissions.ContainsAll(new[] { "B", "C", "D" }));
         Assert.AreEqual(2, result.EntityId);
         Assert.AreEqual(9876, result.UserGroupId);
     }
@@ -378,7 +378,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = {"A", "B", "C"};
+        string[] defaults = { "A", "B", "C" };
         var permissions = new List<EntityPermission>
         {
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
@@ -392,7 +392,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     {
         var path = "-1,1,2,3";
         var pathIds = path.GetIdsFromPathReversed();
-        string[] defaults = {"A", "B"};
+        string[] defaults = { "A", "B" };
         var permissions = new List<EntityPermission>
         {
             new(9876, 1, defaults, true), new(9876, 2, defaults, true), new(9876, 3, defaults, true)
@@ -423,11 +423,11 @@ public class UserServiceTests : UmbracoIntegrationTest
         var child2 = ContentBuilder.CreateSimpleContent(contentType, "child2", child1.Id);
         ContentService.Save(child2);
 
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(parent, ActionMove.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] {userGroup.Id});
-        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] {userGroup.Id});
+        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(parent, ActionMove.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(parent, ActionBrowse.ActionLetter, new[] { userGroup.Id });
+        ContentService.SetPermission(parent, ActionDelete.ActionLetter, new[] { userGroup.Id });
 
         // Act
         var permissions = UserService.GetPermissionsForPath(userGroup, child2.Path);
@@ -611,14 +611,13 @@ public class UserServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 10;)
         {
             users[i].AddGroup(userGroup.ToReadOnlyGroup());
-            i = i + 2;
+            i += 2;
         }
 
         UserService.Save(users);
 
-        long totalRecs;
-        var found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending,
-            includeUserGroups: new[] {userGroup.Alias});
+        var found = UserService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending,
+            includeUserGroups: new[] { userGroup.Alias });
 
         Assert.AreEqual(2, found.Count());
         Assert.AreEqual(5, totalRecs);
@@ -636,20 +635,19 @@ public class UserServiceTests : UmbracoIntegrationTest
         for (var i = 0; i < 10;)
         {
             users[i].AddGroup(userGroup.ToReadOnlyGroup());
-            i = i + 2;
+            i += 2;
         }
 
         for (var i = 0; i < 10;)
         {
             users[i].Name = "blah" + users[i].Name;
-            i = i + 3;
+            i += 3;
         }
 
         UserService.Save(users);
 
-        long totalRecs;
-        var found = UserService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending,
-            userGroups: new[] {userGroup.Alias}, filter: "blah");
+        var found = UserService.GetAll(0, 2, out long totalRecs, "username", Direction.Ascending,
+            userGroups: new[] { userGroup.Alias }, filter: "blah");
 
         Assert.AreEqual(2, found.Count());
         Assert.AreEqual(2, totalRecs);
@@ -733,8 +731,10 @@ public class UserServiceTests : UmbracoIntegrationTest
         // Act
         // NOTE: Normally the hash'ing would be handled in the membership provider, so the service just saves the password
         var password = "123456";
-        var hash = new HMACSHA1();
-        hash.Key = Encoding.Unicode.GetBytes(password);
+        var hash = new HMACSHA1
+        {
+            Key = Encoding.Unicode.GetBytes(password)
+        };
         var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
         var globalSettings = new GlobalSettings();
         var membershipUser = new User(globalSettings, "JohnDoe", "john@umbraco.io", encodedPassword, encodedPassword);
@@ -751,7 +751,7 @@ public class UserServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Add_And_Remove_Sections_From_UserGroup()
     {
-        var userGroup = new UserGroup(ShortStringHelper) {Alias = "Group1", Name = "Group 1"};
+        var userGroup = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
         userGroup.AddAllowedSection("content");
         userGroup.AddAllowedSection("mediat");
         UserService.Save(userGroup);
@@ -791,8 +791,8 @@ public class UserServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Remove_Section_From_All_Assigned_UserGroups()
     {
-        var userGroup1 = new UserGroup(ShortStringHelper) {Alias = "Group1", Name = "Group 1"};
-        var userGroup2 = new UserGroup(ShortStringHelper) {Alias = "Group2", Name = "Group 2"};
+        var userGroup1 = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
+        var userGroup2 = new UserGroup(ShortStringHelper) { Alias = "Group2", Name = "Group 2" };
         UserService.Save(userGroup1);
         UserService.Save(userGroup2);
 
@@ -815,13 +815,13 @@ public class UserServiceTests : UmbracoIntegrationTest
     [Test]
     public void Can_Add_Section_To_All_UserGroups()
     {
-        var userGroup1 = new UserGroup(ShortStringHelper) {Alias = "Group1", Name = "Group 1"};
+        var userGroup1 = new UserGroup(ShortStringHelper) { Alias = "Group1", Name = "Group 1" };
         userGroup1.AddAllowedSection("test");
 
-        var userGroup2 = new UserGroup(ShortStringHelper) {Alias = "Group2", Name = "Group 2"};
+        var userGroup2 = new UserGroup(ShortStringHelper) { Alias = "Group2", Name = "Group 2" };
         userGroup2.AddAllowedSection("test");
 
-        var userGroup3 = new UserGroup(ShortStringHelper) {Alias = "Group3", Name = "Group 3"};
+        var userGroup3 = new UserGroup(ShortStringHelper) { Alias = "Group3", Name = "Group 3" };
         UserService.Save(userGroup1);
         UserService.Save(userGroup2);
         UserService.Save(userGroup3);
@@ -835,7 +835,7 @@ public class UserServiceTests : UmbracoIntegrationTest
         Assert.IsFalse(result3.AllowedSections.Contains("test"));
 
         // now add the section to all groups
-        foreach (var userGroup in new[] {userGroup1, userGroup2, userGroup3})
+        foreach (var userGroup in new[] { userGroup1, userGroup2, userGroup3 })
         {
             userGroup.AddAllowedSection("test");
             UserService.Save(userGroup);

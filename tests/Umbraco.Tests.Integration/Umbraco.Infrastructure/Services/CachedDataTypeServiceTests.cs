@@ -35,7 +35,8 @@ public class CachedDataTypeServiceTests : UmbracoIntegrationTest
         IDataType dataType =
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
-                Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
             };
         DataTypeService.Save(dataType);
 

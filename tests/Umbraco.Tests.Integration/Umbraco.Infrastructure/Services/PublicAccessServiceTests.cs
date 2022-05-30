@@ -43,7 +43,7 @@ public class PublicAccessServiceTests : UmbracoIntegrationTest
     public void Can_Add_New_Entry()
     {
         // Arrange
-        PublicAccessRule[] rules = {new PublicAccessRule {RuleType = "TestType", RuleValue = "TestVal"}};
+        PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
 
         // Act
@@ -63,7 +63,7 @@ public class PublicAccessServiceTests : UmbracoIntegrationTest
     public void Can_Add_Rule()
     {
         // Arrange
-        PublicAccessRule[] rules = {new PublicAccessRule {RuleType = "TestType", RuleValue = "TestVal"}};
+        PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
         PublicAccessService.Save(entry);
 
@@ -83,7 +83,7 @@ public class PublicAccessServiceTests : UmbracoIntegrationTest
     public void Can_Add_Multiple_Value_For_Same_Rule_Type()
     {
         // Arrange
-        PublicAccessRule[] rules = {new PublicAccessRule {RuleType = "TestType", RuleValue = "TestVal"}};
+        PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
         PublicAccessService.Save(entry);
 

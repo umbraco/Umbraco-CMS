@@ -38,7 +38,8 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         IDataType dataType =
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
-                Name = "Testing Textfield", DatabaseType = ValueStorageType.Ntext
+                Name = "Testing Textfield",
+                DatabaseType = ValueStorageType.Ntext
             };
         DataTypeService.Save(dataType);
 
@@ -85,7 +86,8 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
         var dataTypeDefinition =
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
-                Name = string.Empty, DatabaseType = ValueStorageType.Ntext
+                Name = string.Empty,
+                DatabaseType = ValueStorageType.Ntext
             };
 
         // Act & Assert

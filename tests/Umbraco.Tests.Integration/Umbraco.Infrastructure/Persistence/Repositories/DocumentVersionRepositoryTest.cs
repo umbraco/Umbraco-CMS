@@ -122,7 +122,7 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
                 .From<ContentVersionDto>();
 
             var sut = new DocumentVersionRepository(ScopeAccessor);
-            sut.DeleteVersions(new[] {1, 2, 3});
+            sut.DeleteVersions(new[] { 1, 2, 3 });
 
             var after = ScopeAccessor.AmbientScope.Database.Fetch<ContentVersionDto>(query);
 

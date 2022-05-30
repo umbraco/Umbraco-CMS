@@ -218,7 +218,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
         // get again, updated if completed
         lang = service.GetLanguageById(lang.Id);
-        Assert.AreEqual(complete ? true : false, lang.IsMandatory);
+        Assert.AreEqual(complete, lang.IsMandatory);
 
         // global cache contains the entity again
         globalFullCached = (IEnumerable<ILanguage>)globalCache.Get(GetCacheTypeKey<ILanguage>(), () => null);
@@ -226,7 +226,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         globalCached = globalFullCached.First(x => x.Id == lang.Id);
         Assert.IsNotNull(globalCached);
         Assert.AreEqual(lang.Id, globalCached.Id);
-        Assert.AreEqual(complete ? true : false, lang.IsMandatory);
+        Assert.AreEqual(complete, lang.IsMandatory);
     }
 
     [TestCase(true)]
@@ -241,7 +241,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         service.Save(lang);
 
         var item = (IDictionaryItem)new DictionaryItem("item-key");
-        item.Translations = new IDictionaryTranslation[] {new DictionaryTranslation(lang.Id, "item-value")};
+        item.Translations = new IDictionaryTranslation[] { new DictionaryTranslation(lang.Id, "item-value") };
         service.Save(item);
 
         // Refresh the cache manually because we can't unbind
@@ -326,8 +326,7 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
 
         public override void Sync() { }
 
-        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType,
-            IEnumerable<object> ids = null, string json = null)
+        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
         }
     }

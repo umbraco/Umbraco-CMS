@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Packaging;
@@ -17,7 +17,7 @@ public class CreatedPackageSchemaTests : UmbracoIntegrationTest
     [Test]
     public void PackagesRepository_Can_Save_PackageDefinition()
     {
-        var packageDefinition = new PackageDefinition {Name = "NewPack", DocumentTypes = new List<string> {"Root"}};
+        var packageDefinition = new PackageDefinition { Name = "NewPack", DocumentTypes = new List<string> { "Root" } };
         var result = CreatedPackageSchemaRepository.SavePackage(packageDefinition);
         Assert.IsTrue(result);
     }
@@ -43,7 +43,7 @@ public class CreatedPackageSchemaTests : UmbracoIntegrationTest
     [Test]
     public void PackageRepository_Can_Update_Package()
     {
-        var packageDefinition = new PackageDefinition {Name = "TestPackage"};
+        var packageDefinition = new PackageDefinition { Name = "TestPackage" };
         CreatedPackageSchemaRepository.SavePackage(packageDefinition);
 
         packageDefinition.Name = "UpdatedName";

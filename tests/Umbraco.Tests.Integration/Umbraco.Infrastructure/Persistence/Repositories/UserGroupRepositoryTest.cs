@@ -20,8 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 public class UserGroupRepositoryTest : UmbracoIntegrationTest
 {
     private UserGroupRepository CreateRepository(IScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(),
-            LoggerFactory, ShortStringHelper);
+        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
 
     [Test]
     public void Can_Perform_Add_On_UserGroupRepository()
@@ -104,7 +103,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             // Act
             var resolved = repository.Get(userGroup.Id);
             resolved.Name = "New Name";
-            resolved.Permissions = new[] {"Z", "Y", "X"};
+            resolved.Permissions = new[] { "Z", "Y", "X" };
             repository.Save(resolved);
             scope.Complete();
             var updatedItem = repository.Get(userGroup.Id);
@@ -131,8 +130,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
 
             var id = userGroup.Id;
 
-            var repository2 = new UserGroupRepository((IScopeAccessor)provider, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+            var repository2 = new UserGroupRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
             repository2.Delete(userGroup);
             scope.Complete();
 
@@ -201,7 +199,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             var userGroups = CreateAndCommitMultipleUserGroups(repository);
 
             // Act
-            var result = repository.GetMany(userGroups[0].Id, userGroups[1].Id);
+            var result = repository.GetMany(userGroups[0].Id, userGroups[1].Id).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -222,7 +220,7 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
             CreateAndCommitMultipleUserGroups(repository);
 
             // Act
-            var result = repository.GetMany();
+            var result = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -394,16 +392,16 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var user1 = UserGroupBuilder.CreateUserGroup(suffix: "1", allowedSections: new[] {"test1"});
-            var user2 = UserGroupBuilder.CreateUserGroup(suffix: "2", allowedSections: new[] {"test2"});
-            var user3 = UserGroupBuilder.CreateUserGroup(suffix: "3", allowedSections: new[] {"test1"});
+            var user1 = UserGroupBuilder.CreateUserGroup(suffix: "1", allowedSections: new[] { "test1" });
+            var user2 = UserGroupBuilder.CreateUserGroup(suffix: "2", allowedSections: new[] { "test2" });
+            var user3 = UserGroupBuilder.CreateUserGroup(suffix: "3", allowedSections: new[] { "test1" });
             repository.Save(user1);
             repository.Save(user2);
             repository.Save(user3);
             scope.Complete();
 
             // Act
-            var groups = repository.GetGroupsAssignedToSection("test1");
+            var groups = repository.GetGroupsAssignedToSection("test1").ToArray();
 
             // Assert
             Assert.AreEqual(2, groups.Count());
@@ -423,6 +421,6 @@ public class UserGroupRepositoryTest : UmbracoIntegrationTest
         repository.Save(userGroup2);
         repository.Save(userGroup3);
 
-        return new IUserGroup[] {userGroup1, userGroup2, userGroup3};
+        return new IUserGroup[] { userGroup1, userGroup2, userGroup3 };
     }
 }

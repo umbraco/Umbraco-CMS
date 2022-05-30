@@ -65,8 +65,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
             var body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
-            var actual = JsonConvert.DeserializeObject<UserDisplay>(body,
-                new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+            var actual = JsonConvert.DeserializeObject<UserDisplay>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
             Assert.AreEqual(userSave.Name, actual.Name);
             Assert.AreEqual(userSave.Id, actual.Id);
             Assert.AreEqual(userSave.Email, actual.Email);
@@ -88,8 +87,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body,
-            new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+        var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(actual);
@@ -127,8 +125,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body,
-            new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+        var actual = JsonConvert.DeserializeObject<PagedResult<UserBasic>>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(actual);
@@ -152,7 +149,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
     public async Task PostUnlockUsers_When_User_Does_Not_Exist_Expect_Zero_Users_Message()
     {
         var userId = 42; // Must not exist
-        var url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] {userId}));
+        var url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { userId }));
 
         // Act
         var response = await Client.PostAsync(url, new StringContent(string.Empty));
@@ -160,8 +157,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
-        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body,
-            new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
         Assert.Multiple(() => Assert.AreEqual("Unlocked 0 users", actual.Message));
     }
 
@@ -178,15 +174,14 @@ public class UsersControllerTests : UmbracoTestServerTestBase
             .Build();
 
         userService.Save(user);
-        var url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] {user.Id}));
+        var url = PrepareApiControllerUrl<UsersController>(x => x.PostUnlockUsers(new[] { user.Id }));
 
         // Act
         var response = await Client.PostAsync(url, new StringContent(string.Empty));
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body,
-            new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
 
         Assert.Multiple(() =>
         {
@@ -228,8 +223,7 @@ public class UsersControllerTests : UmbracoTestServerTestBase
         var body = await response.Content.ReadAsStringAsync();
         body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body,
-            new JsonSerializerSettings {ContractResolver = new IgnoreRequiredAttributesResolver()});
+        var actual = JsonConvert.DeserializeObject<SimpleNotificationModel>(body, new JsonSerializerSettings { ContractResolver = new IgnoreRequiredAttributesResolver() });
 
         Assert.Multiple(() =>
         {

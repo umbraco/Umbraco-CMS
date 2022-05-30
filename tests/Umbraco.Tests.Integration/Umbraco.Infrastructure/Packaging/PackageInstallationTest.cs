@@ -28,8 +28,7 @@ public class PackageInstallationTest : UmbracoIntegrationTest
     [Test]
     public void Can_Read_Compiled_Package_1()
     {
-        var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"),
-            DocumentTypePickerPackage));
+        var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
         using var fileStream = testPackageFile.OpenRead();
         var package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
         Assert.Multiple(() =>
@@ -67,8 +66,7 @@ public class PackageInstallationTest : UmbracoIntegrationTest
         File.WriteAllText(filePath, "test");
 
         // this is where our test zip file is
-        var packageFile = Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"),
-            DocumentTypePickerPackage);
+        var packageFile = Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage);
         Console.WriteLine(packageFile);
 
         using var fileStream = File.OpenRead(packageFile);
@@ -90,8 +88,7 @@ public class PackageInstallationTest : UmbracoIntegrationTest
     [Test]
     public void Install_Data()
     {
-        var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"),
-            DocumentTypePickerPackage));
+        var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
         using var fileStream = testPackageFile.OpenRead();
         var package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
 

@@ -195,7 +195,7 @@ public class MacroServiceTests : UmbracoIntegrationTest
         macro.Properties["blah1"].EditorAlias = "new";
         macro.Properties.Remove("blah3");
 
-        var allPropKeys = macro.Properties.Values.Select(x => new {x.Alias, x.Key}).ToArray();
+        var allPropKeys = macro.Properties.Values.Select(x => new { x.Alias, x.Key }).ToArray();
 
         MacroService.Save(macro);
 

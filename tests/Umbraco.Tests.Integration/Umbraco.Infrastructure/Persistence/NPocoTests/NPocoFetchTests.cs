@@ -34,9 +34,9 @@ public class NPocoFetchTests : UmbracoIntegrationTest
                     name NVARCHAR(255) NULL
                 );");
 
-        database.Insert(new Thing1Dto {Id = 1, Name = "one"});
+        database.Insert(new Thing1Dto { Id = 1, Name = "one" });
 
-        database.Insert(new Thing1Dto {Id = 2, Name = "two"});
+        database.Insert(new Thing1Dto { Id = 2, Name = "two" });
 
         database.Execute(@"
                 CREATE TABLE zbThing2 (
@@ -45,11 +45,11 @@ public class NPocoFetchTests : UmbracoIntegrationTest
                     thingId int NULL
                 );");
 
-        database.Insert(new Thing2Dto {Id = 1, Name = "uno", ThingId = 1});
+        database.Insert(new Thing2Dto { Id = 1, Name = "uno", ThingId = 1 });
 
-        database.Insert(new Thing2Dto {Id = 2, Name = "due", ThingId = 2});
+        database.Insert(new Thing2Dto { Id = 2, Name = "due", ThingId = 2 });
 
-        database.Insert(new Thing2Dto {Id = 3, Name = "tri", ThingId = 1});
+        database.Insert(new Thing2Dto { Id = 3, Name = "tri", ThingId = 1 });
 
         database.Execute(@"
                 CREATE TABLE zbThingGroup (
@@ -57,11 +57,11 @@ public class NPocoFetchTests : UmbracoIntegrationTest
                     name NVARCHAR(255) NULL
                 );");
 
-        database.Insert(new ThingGroupDto {Id = 1, Name = "g-one"});
+        database.Insert(new ThingGroupDto { Id = 1, Name = "g-one" });
 
-        database.Insert(new ThingGroupDto {Id = 2, Name = "g-two"});
+        database.Insert(new ThingGroupDto { Id = 2, Name = "g-two" });
 
-        database.Insert(new ThingGroupDto {Id = 3, Name = "g-three"});
+        database.Insert(new ThingGroupDto { Id = 3, Name = "g-three" });
 
         database.Execute(@"
                 CREATE TABLE zbThing2Group (
@@ -69,13 +69,13 @@ public class NPocoFetchTests : UmbracoIntegrationTest
                     groupId int NOT NULL
                 );");
 
-        database.Insert(new Thing2GroupDto {ThingId = 1, GroupId = 1});
+        database.Insert(new Thing2GroupDto { ThingId = 1, GroupId = 1 });
 
-        database.Insert(new Thing2GroupDto {ThingId = 1, GroupId = 2});
+        database.Insert(new Thing2GroupDto { ThingId = 1, GroupId = 2 });
 
-        database.Insert(new Thing2GroupDto {ThingId = 2, GroupId = 2});
+        database.Insert(new Thing2GroupDto { ThingId = 2, GroupId = 2 });
 
-        database.Insert(new Thing2GroupDto {ThingId = 3, GroupId = 3});
+        database.Insert(new Thing2GroupDto { ThingId = 3, GroupId = 3 });
 
         database.Execute(@"
                 CREATE TABLE zbThingA1 (
@@ -365,28 +365,28 @@ public class NPocoFetchTests : UmbracoIntegrationTest
     {
         using (var scope = ScopeProvider.CreateScope())
         {
-            var tA1A = new ThingA1Dto {Id = 1, Name = "a1_a"};
+            var tA1A = new ThingA1Dto { Id = 1, Name = "a1_a" };
             ScopeAccessor.AmbientScope.Database.Insert(tA1A);
-            var tA1B = new ThingA1Dto {Id = 2, Name = "a1_b"};
+            var tA1B = new ThingA1Dto { Id = 2, Name = "a1_b" };
             ScopeAccessor.AmbientScope.Database.Insert(tA1B);
-            var tA1C = new ThingA1Dto {Id = 3, Name = "a1_c"};
+            var tA1C = new ThingA1Dto { Id = 3, Name = "a1_c" };
             ScopeAccessor.AmbientScope.Database.Insert(tA1C);
 
-            var tA2A = new ThingA2Dto {Id = 1, Name = "a2_a"};
+            var tA2A = new ThingA2Dto { Id = 1, Name = "a2_a" };
             ScopeAccessor.AmbientScope.Database.Insert(tA2A);
-            var tA2B = new ThingA2Dto {Id = 2, Name = "a2_b"};
+            var tA2B = new ThingA2Dto { Id = 2, Name = "a2_b" };
             ScopeAccessor.AmbientScope.Database.Insert(tA2B);
-            var tA2C = new ThingA2Dto {Id = 3, Name = "a2_c"};
+            var tA2C = new ThingA2Dto { Id = 3, Name = "a2_c" };
             ScopeAccessor.AmbientScope.Database.Insert(tA2C);
 
-            var tA3A = new ThingA3Dto {Id = 1, Name = "a3_a"};
+            var tA3A = new ThingA3Dto { Id = 1, Name = "a3_a" };
             ScopeAccessor.AmbientScope.Database.Insert(tA3A);
-            var tA3B = new ThingA3Dto {Id = 2, Name = "a3_b"};
+            var tA3B = new ThingA3Dto { Id = 2, Name = "a3_b" };
             ScopeAccessor.AmbientScope.Database.Insert(tA3B);
 
-            var k1 = new ThingA12Dto {Name = "a", Thing1Id = tA1A.Id, Thing2Id = tA2A.Id};
+            var k1 = new ThingA12Dto { Name = "a", Thing1Id = tA1A.Id, Thing2Id = tA2A.Id };
             ScopeAccessor.AmbientScope.Database.Insert(k1);
-            var k2 = new ThingA12Dto {Name = "b", Thing1Id = tA1A.Id, Thing2Id = tA2B.Id};
+            var k2 = new ThingA12Dto { Name = "b", Thing1Id = tA1A.Id, Thing2Id = tA2B.Id };
             ScopeAccessor.AmbientScope.Database.Insert(k2);
 
             var sql = @"SELECT a1.id, a1.name,
@@ -421,9 +421,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing1Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 
     [TableName("zbThing2")]
@@ -431,11 +433,14 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing2Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-        [Column("thingId")] public int ThingId { get; set; }
+        [Column("thingId")]
+        public int ThingId { get; set; }
 
         // reference is required else value remains null
         // columnName indicates which column has the id, referenceMembreName not needed if PK
@@ -448,9 +453,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing3Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         // reference is required else FetchOneToMany aggregation does not happen
         // does not seem to require ReferenceMemberName="thingId", ColumnName not needed if PK
@@ -463,9 +470,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class ThingGroupDto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 
     [TableName("zbThing2Group")]
@@ -473,9 +482,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class Thing2GroupDto
     {
-        [Column("thingId")] public int ThingId { get; set; }
+        [Column("thingId")]
+        public int ThingId { get; set; }
 
-        [Column("groupId")] public int GroupId { get; set; }
+        [Column("groupId")]
+        public int GroupId { get; set; }
     }
 
     [TableName("zbThing1")]
@@ -512,9 +523,11 @@ JOIN zbThingA3 a3x ON a2x.id=a3x.id
     [ExplicitColumns]
     public class ThingA1Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne)]

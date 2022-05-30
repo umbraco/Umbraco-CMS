@@ -29,8 +29,7 @@ public class EnsureNotAmbiguousActionNameControllerTests : UmbracoTestServerTest
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetNiceUrl(udiId)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x => x.GetEmpty("test", 0)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentController>(x =>
-                x.GetChildren(intId, string.Empty, 0, 0, "SortOrder", Direction.Ascending, true, string.Empty,
-                    string.Empty)));
+                x.GetChildren(intId, string.Empty, 0, 0, "SortOrder", Direction.Ascending, true, string.Empty, string.Empty)));
 
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(intId)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<ContentTypeController>(x => x.GetById(guidId)));
@@ -70,14 +69,11 @@ public class EnsureNotAmbiguousActionNameControllerTests : UmbracoTestServerTest
             EnsureNotAmbiguousActionName(
                 PrepareApiControllerUrl<EntityController>(x => x.GetByIds(new int[0], UmbracoEntityTypes.Document)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x =>
-                x.GetPagedChildren(intId, UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending,
-                    string.Empty, null)));
+                x.GetPagedChildren(intId, UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x =>
-                x.GetPagedChildren(guidId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder",
-                    Direction.Ascending, string.Empty, null)));
+                x.GetPagedChildren(guidId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<EntityController>(x =>
-                x.GetPagedChildren(udiId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder",
-                    Direction.Ascending, string.Empty, null)));
+                x.GetPagedChildren(udiId.ToString(), UmbracoEntityTypes.Document, 0, 1, "SortOrder", Direction.Ascending, string.Empty, null)));
 
             EnsureNotAmbiguousActionName(PrepareApiControllerUrl<IconController>(x => x.GetIcon(string.Empty)));
 

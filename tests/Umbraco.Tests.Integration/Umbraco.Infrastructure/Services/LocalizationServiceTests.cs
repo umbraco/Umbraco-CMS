@@ -226,7 +226,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
 
         var item = (IDictionaryItem)new DictionaryItem("Testing123")
         {
-            Translations = new List<IDictionaryTranslation> {new DictionaryTranslation(english, "Hello world")}
+            Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") }
         };
         LocalizationService.Save(item);
 
@@ -274,7 +274,7 @@ public class LocalizationServiceTests : UmbracoIntegrationTest
         // re-get
         item = LocalizationService.GetDictionaryItemById(item.Id);
 
-        item.Translations = new List<IDictionaryTranslation> {new DictionaryTranslation(english, "Hello world")};
+        item.Translations = new List<IDictionaryTranslation> { new DictionaryTranslation(english, "Hello world") };
 
         LocalizationService.Save(item);
 

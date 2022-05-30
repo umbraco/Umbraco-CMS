@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Globalization;
@@ -193,7 +193,7 @@ public class UmbracoMapperTests : UmbracoIntegrationTest
 
         Assert.AreEqual(4, invariantContent.Tabs.Count());
         Assert.IsTrue(invariantContent.Tabs.First().IsActive);
-        Assert.IsTrue(invariantContent.Tabs.Except(new[] {invariantContent.Tabs.First()})
+        Assert.IsTrue(invariantContent.Tabs.Except(new[] { invariantContent.Tabs.First() })
             .All(x => x.IsActive == false));
     }
 
@@ -263,7 +263,8 @@ public class UmbracoMapperTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
         Assert.IsTrue(
             invariantContent.Tabs.Any(x => x.Label == _localizedTextService.Localize("general", "properties")));
-        Assert.AreEqual(2,
+        Assert.AreEqual(
+            2,
             invariantContent.Tabs.Where(x => x.Label == _localizedTextService.Localize("general", "properties"))
                 .SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
     }

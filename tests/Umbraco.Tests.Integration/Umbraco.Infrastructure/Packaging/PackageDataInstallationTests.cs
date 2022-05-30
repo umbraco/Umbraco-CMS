@@ -148,8 +148,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         foreach (var propertyType in mRBasePage.PropertyTypes)
         {
             var propertyTypeDto =
-                ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id",
-                    new {id = propertyType.Id});
+                ScopeAccessor.AmbientScope.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
             Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
         }
     }
@@ -368,11 +367,10 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
         var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0,
-            ContentTypeService, ContentService);
+        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
         var numberOfDocs = (from doc in element.Descendants()
-            where (string)doc.Attribute("isDoc") == string.Empty
-            select doc).Count();
+                            where (string)doc.Attribute("isDoc") == string.Empty
+                            select doc).Count();
 
         // Assert
         Assert.That(contents, Is.Not.Null);
@@ -395,11 +393,10 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         // Act
         var mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
         var importedMediaTypes = mediaTypes.ToDictionary(x => x.Alias, x => x);
-        var medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(), importedMediaTypes, 0,
-            MediaTypeService, MediaService);
+        var medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(), importedMediaTypes, 0, MediaTypeService, MediaService);
         var numberOfDocs = (from doc in element.Descendants()
-            where (string)doc.Attribute("isDoc") == string.Empty
-            select doc).Count();
+                            where (string)doc.Attribute("isDoc") == string.Empty
+                            select doc).Count();
 
         // Assert
         Assert.That(medias, Is.Not.Null);
@@ -426,17 +423,15 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
             PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
         var contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
         var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0,
-            ContentTypeService, ContentService);
+        var contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
         var numberOfDocs = (from doc in element.Descendants()
-            where (string)doc.Attribute("isDoc") == string.Empty
-            select doc).Count();
+                            where (string)doc.Attribute("isDoc") == string.Empty
+                            select doc).Count();
 
         string configuration;
         using (var scope = ScopeProvider.CreateScope())
         {
-            var dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id",
-                new {dataTypeDefinitions.First().Id});
+            var dtos = ScopeAccessor.AmbientScope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
             configuration = dtos.Single().Configuration;
         }
 
@@ -560,8 +555,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
         Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
         Assert.That(templatesAfterUpdate.Count(), Is.EqualTo(numberOfTemplates));
         Assert.That(allTemplates.Count(), Is.EqualTo(numberOfTemplates));
-        Assert.That(allTemplates.First(x => x.Alias == "umbHomepage").Content,
-            Contains.Substring("THIS HAS BEEN UPDATED!"));
+        Assert.That(allTemplates.First(x => x.Alias == "umbHomepage").Content, Contains.Substring("THIS HAS BEEN UPDATED!"));
     }
 
     [Test]
@@ -888,8 +882,7 @@ public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
             });
     }
 
-    private void AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue,
-        string expectedNorwegianParentValue)
+    private void AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue, string expectedNorwegianParentValue)
     {
         var languages = LocalizationService.GetAllLanguages().ToList();
         var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");

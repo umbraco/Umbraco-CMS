@@ -13,8 +13,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     ///     These services need to be manually added because they do not get added by the generic host
     /// </summary>
-    public static void AddRequiredNetCoreServices(this IServiceCollection services, TestHelper testHelper,
-        IWebHostEnvironment webHostEnvironment)
+    public static void AddRequiredNetCoreServices(this IServiceCollection services, TestHelper testHelper, IWebHostEnvironment webHostEnvironment)
     {
         services.AddSingleton(x => testHelper.GetHttpContextAccessor());
 

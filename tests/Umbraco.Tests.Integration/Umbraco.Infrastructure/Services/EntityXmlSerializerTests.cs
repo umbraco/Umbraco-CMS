@@ -77,7 +77,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
 
         // Act
-        var xml = Serializer.Serialize(new[] {dictionaryItem});
+        var xml = Serializer.Serialize(new[] { dictionaryItem });
 
         // Assert
         Assert.That(xml.ToString(), Is.EqualTo(dictionaryItemsElement.ToString()));
@@ -104,7 +104,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         var languageItemsElement = newPackageXml.Elements("Languages").First();
 
         // Act
-        var xml = Serializer.Serialize(new[] {languageNbNo, languageEnGb});
+        var xml = Serializer.Serialize(new[] { languageNbNo, languageEnGb });
 
         // Assert
         Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
@@ -125,7 +125,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         var nodeName = content.ContentType.Alias.ToSafeAlias(ShortStringHelper);
         var urlName =
-            content.GetUrlSegment(ShortStringHelper, new[] {new DefaultUrlSegmentProvider(ShortStringHelper)});
+            content.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
         // Act
         var element = content.ToXml(Serializer);
@@ -201,7 +201,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         media.SetValue(Constants.Conventions.Media.Extension, "png");
 
         var nodeName = media.ContentType.Alias.ToSafeAlias(ShortStringHelper);
-        var urlName = media.GetUrlSegment(ShortStringHelper, new[] {new DefaultUrlSegmentProvider(ShortStringHelper)});
+        var urlName = media.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
 
         // Act
         var element = media.ToXml(Serializer);
@@ -247,7 +247,9 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         contentType.HistoryCleanup = new HistoryCleanup
         {
-            PreventCleanup = true, KeepAllVersionsNewerThanDays = 1, KeepLatestVersionPerDayForDays = 2
+            PreventCleanup = true,
+            KeepAllVersionsNewerThanDays = 1,
+            KeepLatestVersionPerDayForDays = 2
         };
 
         ContentTypeService.Save(contentType);
@@ -304,7 +306,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
             .Build();
         localizationService.Save(languageEnGb);
 
-        var parentItem = new DictionaryItem("Parent") {Key = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3")};
+        var parentItem = new DictionaryItem("Parent") { Key = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3") };
         var parentTranslations = new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(languageNbNo, "ForelderVerdi"),
@@ -314,7 +316,7 @@ public class EntityXmlSerializerTests : UmbracoIntegrationTest
         localizationService.Save(parentItem);
 
         var childItem =
-            new DictionaryItem(parentItem.Key, "Child") {Key = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611")};
+            new DictionaryItem(parentItem.Key, "Child") { Key = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611") };
         var childTranslations = new List<IDictionaryTranslation>
         {
             new DictionaryTranslation(languageNbNo, "BarnVerdi"),

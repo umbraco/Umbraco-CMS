@@ -43,7 +43,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         // Arrange
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var display = CreateMemberTypeSave(dataType.Id);
@@ -77,12 +77,9 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             {
                 Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                 Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
-                Assert.AreEqual(propTypes.ElementAt(j).MemberCanViewProperty,
-                    result.MemberCanViewProperty(result.PropertyTypes.ElementAt(j).Alias));
-                Assert.AreEqual(propTypes.ElementAt(j).MemberCanEditProperty,
-                    result.MemberCanEditProperty(result.PropertyTypes.ElementAt(j).Alias));
-                Assert.AreEqual(propTypes.ElementAt(j).IsSensitiveData,
-                    result.IsSensitiveProperty(result.PropertyTypes.ElementAt(j).Alias));
+                Assert.AreEqual(propTypes.ElementAt(j).MemberCanViewProperty, result.MemberCanViewProperty(result.PropertyTypes.ElementAt(j).Alias));
+                Assert.AreEqual(propTypes.ElementAt(j).MemberCanEditProperty, result.MemberCanEditProperty(result.PropertyTypes.ElementAt(j).Alias));
+                Assert.AreEqual(propTypes.ElementAt(j).IsSensitiveData, result.IsSensitiveProperty(result.PropertyTypes.ElementAt(j).Alias));
             }
         }
 
@@ -98,7 +95,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         // Arrange
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var display = CreateMediaTypeSave(dataType.Id);
@@ -147,7 +144,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         // Arrange
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var templates = new ITemplate[]
@@ -199,7 +196,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         }
 
         var allowedTemplateAliases = display.AllowedTemplates
-            .Concat(new[] {display.DefaultTemplate})
+            .Concat(new[] { display.DefaultTemplate })
             .Distinct();
 
         Assert.AreEqual(allowedTemplateAliases.Count(), result.AllowedTemplates.Count());
@@ -220,7 +217,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         // Arrange
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var display = CreateCompositionMediaTypeSave(dataType.Id);
@@ -240,7 +237,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         // Arrange
 
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var display = CreateCompositionContentTypeSave(dataType.Id);
@@ -291,21 +288,17 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             for (var j = 0; j < propTypes.Count(); j++)
             {
                 Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                Assert.AreEqual(propTypes.ElementAt(j).DataTypeId,
-                    result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
 
-                Assert.AreEqual(memberType.MemberCanViewProperty(propTypes.ElementAt(j).Alias),
-                    result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanViewProperty);
-                Assert.AreEqual(memberType.MemberCanEditProperty(propTypes.ElementAt(j).Alias),
-                    result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanEditProperty);
+                Assert.AreEqual(memberType.MemberCanViewProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanViewProperty);
+                Assert.AreEqual(memberType.MemberCanEditProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanEditProperty);
             }
         }
 
         Assert.AreEqual(memberType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
         for (var i = 0; i < memberType.AllowedContentTypes.Count(); i++)
         {
-            Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value,
-                result.AllowedContentTypes.ElementAt(i));
+            Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
         }
     }
 
@@ -343,16 +336,14 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             for (var j = 0; j < propTypes.Count(); j++)
             {
                 Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
-                Assert.AreEqual(propTypes.ElementAt(j).DataTypeId,
-                    result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
             }
         }
 
         Assert.AreEqual(mediaType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
         for (var i = 0; i < mediaType.AllowedContentTypes.Count(); i++)
         {
-            Assert.AreEqual(mediaType.AllowedContentTypes.ElementAt(i).Id.Value,
-                result.AllowedContentTypes.ElementAt(i));
+            Assert.AreEqual(mediaType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
         }
     }
 
@@ -409,8 +400,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
         for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
         {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value,
-                result.AllowedContentTypes.ElementAt(i));
+            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
         }
     }
 
@@ -418,7 +408,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
     {
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
@@ -460,7 +450,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             }
         };
 
-        var contentType = new MemberTypeSave {Id = 0, ParentId = -1, Alias = "alias", Groups = new[] {basic}};
+        var contentType = new MemberTypeSave { Id = 0, ParentId = -1, Alias = "alias", Groups = new[] { basic } };
 
         // proper group properties mapping takes place when mapping the content type,
         // not when mapping the group - because of inherited properties and such
@@ -476,7 +466,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     [Test]
     public void PropertyGroupBasic_To_PropertyGroup()
     {
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var basic = new PropertyGroupBasic<PropertyTypeBasic>
@@ -518,7 +508,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             ParentId = -1,
             Alias = "alias",
             AllowedTemplates = Enumerable.Empty<string>(),
-            Groups = new[] {basic}
+            Groups = new[] { basic }
         };
 
         // proper group properties mapping takes place when mapping the content type,
@@ -572,7 +562,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     public void PropertyTypeBasic_To_PropertyType()
     {
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
         _dataTypeService.Save(dataType);
 
         var basic = new PropertyTypeBasic
@@ -636,7 +626,9 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
                 Mandatory = false,
                 SortOrder = 1,
                 DataTypeId = -88
-            }, "anotherTab", "Another tab");
+            },
+            "anotherTab",
+            "Another tab");
         MediaTypeBuilder.EnsureAllIds(ctChild1, 7777);
         var contentType =
             MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "customGroup", "CustomGroup");
@@ -670,11 +662,9 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.CreateDate, result.CreateDate);
         Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
 
-        Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(),
-            result.Groups.Count(x => x.IsGenericProperties == false));
+        Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
         Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
-        Assert.AreEqual(contentType.PropertyGroups.Count(),
-            result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
+        Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
 
         var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
         var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
@@ -686,13 +676,12 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
 
         Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
         Assert.IsTrue(
-            result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] {ctMain.Id, ctChild1.Id}));
+            result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
 
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
         for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
         {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value,
-                result.AllowedContentTypes.ElementAt(i));
+            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
         }
     }
 
@@ -724,10 +713,11 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
                 Mandatory = false,
                 SortOrder = 1,
                 DataTypeId = -88
-            }, "anotherTab", "Another tab");
+            },
+            "anotherTab",
+            "Another tab");
         ContentTypeBuilder.EnsureAllIds(ctChild1, 7777);
-        var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1,
-            randomizeAliases: true, propertyGroupAlias: "customGroup", propertyGroupName: "CustomGroup");
+        var contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupAlias: "customGroup", propertyGroupName: "CustomGroup");
 
         // not assigned to tab
         contentType.AddPropertyType(
@@ -759,11 +749,9 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
         Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
-        Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(),
-            result.Groups.Count(x => x.IsGenericProperties == false));
+        Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
         Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
-        Assert.AreEqual(contentType.PropertyGroups.Count(),
-            result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
+        Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
 
         var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
         var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
@@ -775,7 +763,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
 
         Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
         Assert.IsTrue(
-            result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] {ctMain.Id, ctChild1.Id}));
+            result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
 
         Assert.AreEqual(contentType.AllowedTemplates.Count(), result.AllowedTemplates.Count());
         for (var i = 0; i < contentType.AllowedTemplates.Count(); i++)
@@ -786,8 +774,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
         for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
         {
-            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value,
-                result.AllowedContentTypes.ElementAt(i));
+            Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
         }
     }
 
@@ -806,7 +793,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             MemberCanViewProperty = true,
             MemberCanEditProperty = true,
             IsSensitiveData = true,
-            Validation = new PropertyTypeValidation {Mandatory = true, Pattern = "xyz"}
+            Validation = new PropertyTypeValidation { Mandatory = true, Pattern = "xyz" }
         };
 
         var result = _sut.Map<MemberPropertyTypeDisplay>(basic);
@@ -828,7 +815,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     public void PropertyTypeBasic_To_PropertyTypeDisplay()
     {
         // TODO use builder
-        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) {Name = "TODO"};
+        var dataType = new DataType(Services.GetRequiredService<LabelPropertyEditor>(), _serializer) { Name = "TODO" };
 
         var basic = new PropertyTypeBasic
         {
@@ -839,7 +826,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
             DataTypeId = dataType.Id,
             GroupId = 222,
             Label = "Prop 1",
-            Validation = new PropertyTypeValidation {Mandatory = true, Pattern = "xyz"}
+            Validation = new PropertyTypeValidation { Mandatory = true, Pattern = "xyz" }
         };
 
         var result = _sut.Map<PropertyTypeDisplay>(basic);
@@ -859,7 +846,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         {
             Alias = "test",
             AllowAsRoot = true,
-            AllowedContentTypes = new[] {666, 667},
+            AllowedContentTypes = new[] { 666, 667 },
             Description = "hello world",
             Icon = "tree-icon",
             Id = 1234,
@@ -906,7 +893,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         {
             Alias = "test",
             AllowAsRoot = true,
-            AllowedContentTypes = new[] {666, 667},
+            AllowedContentTypes = new[] { 666, 667 },
             Description = "hello world",
             Icon = "tree-icon",
             Id = 1234,
@@ -947,8 +934,8 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         {
             Alias = "test",
             AllowAsRoot = true,
-            AllowedTemplates = new[] {"template1", "template2"},
-            AllowedContentTypes = new[] {666, 667},
+            AllowedTemplates = new[] { "template1", "template2" },
+            AllowedContentTypes = new[] { 666, 667 },
             DefaultTemplate = "test",
             Description = "hello world",
             Icon = "tree-icon",
@@ -994,7 +981,7 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         {
             Alias = "test",
             AllowAsRoot = true,
-            AllowedContentTypes = new[] {666, 667},
+            AllowedContentTypes = new[] { 666, 667 },
             Description = "hello world",
             Icon = "tree-icon",
             Id = 1234,
@@ -1058,8 +1045,8 @@ public class ContentTypeModelMappingTests : UmbracoIntegrationTest
         {
             Alias = "test",
             AllowAsRoot = true,
-            AllowedTemplates = new[] {"template1", "template2"},
-            AllowedContentTypes = new[] {666, 667},
+            AllowedTemplates = new[] { "template1", "template2" },
+            AllowedContentTypes = new[] { 666, 667 },
             DefaultTemplate = "test",
             Description = "hello world",
             Icon = "tree-icon",

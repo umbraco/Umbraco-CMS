@@ -63,7 +63,7 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
         IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
         MediaTypeService.Save(contentType3);
 
-        IMediaType[] contentTypes = {contentType1, contentType2, contentType3};
+        IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
 
         var ids = new List<int>();
@@ -107,7 +107,7 @@ public class MediaTypeServiceTests : UmbracoIntegrationTest
             IMediaType contentType3 = MediaTypeBuilder.CreateSimpleMediaType("test3", "Test3");
             MediaTypeService.Save(contentType3);
 
-            IMediaType[] contentTypes = {contentType1, contentType2, contentType3};
+            IMediaType[] contentTypes = { contentType1, contentType2, contentType3 };
             var parentId = -1;
 
             var ids = new List<int>();

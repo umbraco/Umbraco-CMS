@@ -30,8 +30,7 @@ using DataType = Umbraco.Cms.Core.Models.DataType;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters;
 
 [TestFixture]
-[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true,
-    Logger = UmbracoTestOptions.Logger.Console)]
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]
 public class ContentModelValidatorTests : UmbracoIntegrationTest
 {
     [SetUp]
@@ -39,7 +38,7 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
     {
         var complexEditorConfig = new NestedContentConfiguration
         {
-            ContentTypes = new[] {new NestedContentConfiguration.ContentType {Alias = "feature"}}
+            ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "feature" } }
         };
 
         var complexTestEditor = Services.GetRequiredService<ComplexTestEditor>();
@@ -49,10 +48,11 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
 
         var complexDataType = new DataType(complexTestEditor, serializer)
         {
-            Name = "ComplexTest", Configuration = complexEditorConfig
+            Name = "ComplexTest",
+            Configuration = complexEditorConfig
         };
 
-        var testDataType = new DataType(testEditor, serializer) {Name = "Test"};
+        var testDataType = new DataType(testEditor, serializer) { Name = "Test" };
         dataTypeService.Save(complexDataType);
         dataTypeService.Save(testDataType);
 
@@ -78,7 +78,8 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
                 SortOrder = 1,
                 DataTypeId = complexDataType.Id
             },
-            "content", "Content");
+            "content",
+            "Content");
 
         // make them all validate with a regex rule that will not pass
         foreach (var prop in _contentType.PropertyTypes)
@@ -181,7 +182,7 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
         // var saveProperties = content.Properties.Select(x => Mapper.Map<ContentPropertyBasic>(x)).ToList();
         var saveProperties = content.Properties.Select(x =>
         {
-            return new ContentPropertyBasic {Alias = x.Alias, Id = x.Id, Value = x.GetValue()};
+            return new ContentPropertyBasic { Alias = x.Alias, Id = x.Id, Value = x.GetValue() };
         }).ToList();
 
         var saveVariants = new List<ContentVariantSave>
@@ -249,7 +250,10 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
             "_Properties.bodyText.invariant.null.innerFieldId", "_Properties.bodyText.invariant.null.value"
         };
         AssertNestedValidation(jsonError, 0, id1, modelStateKeys);
-        AssertNestedValidation(jsonError, 1, id2,
+        AssertNestedValidation(
+            jsonError,
+            1,
+            id2,
             modelStateKeys.Concat(new[]
             {
                 "_Properties.complex.invariant.null.innerFieldId", "_Properties.complex.invariant.null.value"
@@ -294,8 +298,7 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
     }
 
     // [HideFromTypeFinder]
-    [DataEditor("test", "test",
-        "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
+    [DataEditor("test", "test", "test")] // This alias aligns with the prop editor alias for all properties created from MockedContentTypes.CreateTextPageContentType
     public class TestEditor : DataEditor
     {
         public TestEditor(
@@ -324,7 +327,7 @@ public class ContentModelValidatorTests : UmbracoIntegrationTest
     {
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
-            yield return new ValidationResult("WRONG!", new[] {"innerFieldId"});
+            yield return new ValidationResult("WRONG!", new[] { "innerFieldId" });
         }
     }
 }

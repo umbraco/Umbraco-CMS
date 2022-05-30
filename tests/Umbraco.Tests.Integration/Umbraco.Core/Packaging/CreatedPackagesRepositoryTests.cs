@@ -85,7 +85,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public void Delete()
     {
-        var def1 = new PackageDefinition {Name = "test"};
+        var def1 = new PackageDefinition { Name = "test" };
 
         var result = PackageBuilder.SavePackage(def1);
         Assert.IsTrue(result);
@@ -99,7 +99,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public void Create_New()
     {
-        var def1 = new PackageDefinition {Name = "test"};
+        var def1 = new PackageDefinition { Name = "test" };
 
         var result = PackageBuilder.SavePackage(def1);
 
@@ -107,7 +107,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         Assert.AreEqual(1, def1.Id);
         Assert.AreNotEqual(default(Guid).ToString(), def1.PackageId);
 
-        var def2 = new PackageDefinition {Name = "test2"};
+        var def2 = new PackageDefinition { Name = "test2" };
 
         result = PackageBuilder.SavePackage(def2);
 
@@ -133,7 +133,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public void Update()
     {
-        var def = new PackageDefinition {Name = "test"};
+        var def = new PackageDefinition { Name = "test" };
         var result = PackageBuilder.SavePackage(def);
         //Update values and save
         def.Name = "updated";
@@ -168,15 +168,15 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
     [Test]
     public void GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
     {
-        var parent = new DictionaryItem("Parent") {Key = Guid.NewGuid()};
+        var parent = new DictionaryItem("Parent") { Key = Guid.NewGuid() };
         LocalizationService.Save(parent);
-        var child1 = new DictionaryItem(parent.Key, "Child1") {Key = Guid.NewGuid()};
+        var child1 = new DictionaryItem(parent.Key, "Child1") { Key = Guid.NewGuid() };
         LocalizationService.Save(child1);
-        var child2 = new DictionaryItem(child1.Key, "Child2") {Key = Guid.NewGuid()};
+        var child2 = new DictionaryItem(child1.Key, "Child2") { Key = Guid.NewGuid() };
         LocalizationService.Save(child2);
-        var child3 = new DictionaryItem(child2.Key, "Child3") {Key = Guid.NewGuid()};
+        var child3 = new DictionaryItem(child2.Key, "Child3") { Key = Guid.NewGuid() };
         LocalizationService.Save(child3);
-        var child4 = new DictionaryItem(child3.Key, "Child4") {Key = Guid.NewGuid()};
+        var child4 = new DictionaryItem(child3.Key, "Child4") { Key = Guid.NewGuid() };
         LocalizationService.Save(child4);
 
         var def = new PackageDefinition
@@ -232,7 +232,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
             file1.WriteLine("hello");
         }
 
-        var def = new PackageDefinition {Name = "test", MediaUdis = new List<GuidUdi> {m1.GetUdi()}};
+        var def = new PackageDefinition { Name = "test", MediaUdis = new List<GuidUdi> { m1.GetUdi() } };
 
         var result = PackageBuilder.SavePackage(def);
         Assert.IsTrue(result);
@@ -255,7 +255,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
                 Assert.AreEqual(test, mediaEntry.Name);
                 Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
                 Assert.AreEqual(
-                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate.ToString("s")}\" updateDate=\"{m1.UpdateDate.ToString("s")}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
+                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate:s}\" updateDate=\"{m1.UpdateDate:s}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
                     packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
                 Assert.AreEqual(2, zipArchive.Entries.Count());
                 Assert.AreEqual(ZipArchiveMode.Read, zipArchive.Mode);
@@ -275,7 +275,7 @@ public class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
         FileService.SaveTemplate(template);
 
-        var def = new PackageDefinition {Name = "test", Templates = new[] {template.Id.ToString()}};
+        var def = new PackageDefinition { Name = "test", Templates = new[] { template.Id.ToString() } };
         var result = PackageBuilder.SavePackage(def);
         Assert.IsTrue(result);
         Assert.IsTrue(def.PackagePath.IsNullOrWhiteSpace());

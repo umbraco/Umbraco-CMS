@@ -107,7 +107,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
                 11,
                 out var total,
                 provider.CreateQuery<IMedia>()
-                    .Where(x => new[] {mediaType1.Id, mediaType2.Id}.Contains(x.ContentTypeId)),
+                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                 Ordering.By("SortOrder"));
             Assert.AreEqual(11, result.Count());
             Assert.AreEqual(20, total);
@@ -118,7 +118,7 @@ public class MediaServiceTests : UmbracoIntegrationTest
                 11,
                 out total,
                 provider.CreateQuery<IMedia>()
-                    .Where(x => new[] {mediaType1.Id, mediaType2.Id}.Contains(x.ContentTypeId)),
+                    .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                 Ordering.By("SortOrder"));
             Assert.AreEqual(9, result.Count());
             Assert.AreEqual(20, total);

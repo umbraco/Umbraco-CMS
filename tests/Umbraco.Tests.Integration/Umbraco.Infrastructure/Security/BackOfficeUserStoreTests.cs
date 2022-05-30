@@ -42,7 +42,9 @@ public class BackOfficeUserStoreTests : UmbracoIntegrationTest
         var userStore = GetUserStore();
         var user = new BackOfficeIdentityUser(GlobalSettings, 1, new List<IReadOnlyUserGroup>())
         {
-            Name = "Test", Email = "test@test.com", UserName = "test@test.com"
+            Name = "Test",
+            Email = "test@test.com",
+            UserName = "test@test.com"
         };
         var createResult = await userStore.CreateAsync(user);
         Assert.IsTrue(createResult.Succeeded);

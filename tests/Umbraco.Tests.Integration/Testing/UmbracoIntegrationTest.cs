@@ -146,8 +146,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
             AppCaches.NoCache,
             Configuration,
             TestHelper.Profiler);
-        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory,
-            TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
+        var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 
         builder.AddConfiguration()
             .AddUmbracoCore()

@@ -67,7 +67,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
         var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", template.Id);
         var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", template.Id);
         var contentType3 = ContentTypeBuilder.CreateTextPageContentType("test3", "test3", template.Id);
-        ContentTypeService.Save(new[] {contentType1, contentType2, contentType3});
+        ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
         contentType1.AllowedContentTypes = new[]
         {
             new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
@@ -83,7 +83,7 @@ public class ContentServicePerformanceTest : UmbracoIntegrationTest
             new ContentTypeSort(new Lazy<int>(() => contentType1.Id), 0, contentType1.Alias),
             new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
         };
-        ContentTypeService.Save(new[] {contentType1, contentType2, contentType3});
+        ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
 
         var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
         ContentService.Save(roots);

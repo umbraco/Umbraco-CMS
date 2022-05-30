@@ -33,10 +33,9 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
-            PublicAccessRule[] rules = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
             repo.Save(entry);
 
@@ -56,10 +55,9 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
-            PublicAccessRule[] rules = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
             repo.Save(entry);
 
@@ -90,8 +88,7 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
             PublicAccessRule[] rules =
             {
@@ -125,10 +122,9 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
-            PublicAccessRule[] rules = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
             repo.Save(entry);
 
@@ -155,10 +151,9 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
-            PublicAccessRule[] rules = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry = new PublicAccessEntry(content[0], content[1], content[2], rules);
             repo.Save(entry);
 
@@ -177,8 +172,7 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
             var allEntries = new List<PublicAccessEntry>();
             for (var i = 0; i < 10; i++)
@@ -186,7 +180,7 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
                 var rules = new List<PublicAccessRule>();
                 for (var j = 0; j < 50; j++)
                 {
-                    rules.Add(new PublicAccessRule {RuleValue = "test" + j, RuleType = "RoleName" + j});
+                    rules.Add(new PublicAccessRule { RuleValue = "test" + j, RuleType = "RoleName" + j });
                 }
 
                 var entry1 = new PublicAccessEntry(content[i], content[i + 1], content[i + 2], rules);
@@ -238,14 +232,13 @@ public class PublicAccessRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches,
-                LoggerFactory.CreateLogger<PublicAccessRepository>());
+            var repo = new PublicAccessRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<PublicAccessRepository>());
 
-            PublicAccessRule[] rules1 = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules1 = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry1 = new PublicAccessEntry(content[0], content[1], content[2], rules1);
             repo.Save(entry1);
 
-            PublicAccessRule[] rules2 = {new PublicAccessRule {RuleValue = "test", RuleType = "RoleName"}};
+            PublicAccessRule[] rules2 = { new PublicAccessRule { RuleValue = "test", RuleType = "RoleName" } };
             var entry2 = new PublicAccessEntry(content[1], content[0], content[2], rules2);
             repo.Save(entry2);
 

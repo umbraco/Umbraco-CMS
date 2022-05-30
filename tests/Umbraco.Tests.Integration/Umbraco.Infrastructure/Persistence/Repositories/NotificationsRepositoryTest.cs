@@ -95,8 +95,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 var result = ScopeAccessor.AmbientScope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity,
-                    i.ToString(CultureInfo.InvariantCulture));
+                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
             }
 
             var notifications = repo.GetUserNotifications(userAdmin);
@@ -158,8 +157,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2,
-                    i.ToString(CultureInfo.InvariantCulture));
+                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
             }
 
             var notifications = repo.GetEntityNotifications(entity1);
@@ -221,8 +219,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 ScopeAccessor.AmbientScope.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2,
-                    i.ToString(CultureInfo.InvariantCulture));
+                var notification = repo.CreateNotification(userNew, i % 2 == 0 ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
             }
 
             var delCount = repo.DeleteNotifications(entity1);
@@ -271,8 +268,7 @@ public class NotificationsRepositoryTest : UmbracoIntegrationTest
                 };
                 var result = ScopeAccessor.AmbientScope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity,
-                    i.ToString(CultureInfo.InvariantCulture));
+                var notification = repo.CreateNotification(i % 2 == 0 ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
             }
 
             var delCount = repo.DeleteNotifications(userAdmin);

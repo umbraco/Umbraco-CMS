@@ -42,10 +42,8 @@ public class TemplateQueryControllerTests : UmbracoTestServerTestBase
             {
                 var alias = nameof(ContentTypeModel.Alias);
                 var camelCaseAlias = alias.ToCamelCase();
-                Assert.IsNotNull(jToken.Value<string>(camelCaseAlias),
-                    $"'{jToken}' do not contain the key '{camelCaseAlias}' in the expected casing");
-                Assert.IsNull(jToken.Value<string>(alias),
-                    $"'{jToken}' do contain the key '{alias}', which was not expect in that casing");
+                Assert.IsNotNull(jToken.Value<string>(camelCaseAlias), $"'{jToken}' do not contain the key '{camelCaseAlias}' in the expected casing");
+                Assert.IsNull(jToken.Value<string>(alias), $"'{jToken}' do contain the key '{alias}', which was not expect in that casing");
             }
         });
     }

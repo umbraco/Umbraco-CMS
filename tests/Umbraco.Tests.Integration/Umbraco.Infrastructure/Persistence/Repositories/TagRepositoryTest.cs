@@ -38,7 +38,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var tag = new Tag {Group = "Test", Text = "Test"};
+            var tag = new Tag { Group = "Test", Text = "Test" };
 
             repository.Save(tag);
 
@@ -54,11 +54,11 @@ public class TagRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository(provider);
 
-            var tag = new Tag {Group = "Test", Text = "Test"};
+            var tag = new Tag { Group = "Test", Text = "Test" };
 
             repository.Save(tag);
 
-            var tag2 = new Tag {Group = "Test", Text = "Test2"};
+            var tag2 = new Tag { Group = "Test", Text = "Test2" };
 
             repository.Save(tag2);
 
@@ -87,7 +87,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content);
 
             var repository = CreateRepository(provider);
-            Tag[] tags = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -117,14 +117,14 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content);
 
             var repository = CreateRepository(provider);
-            Tag[] tags = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag3", Group = "test"}, new Tag {Text = "tag4", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag3", Group = "test" }, new Tag { Text = "tag4", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -154,14 +154,14 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content);
 
             var repository = CreateRepository(provider);
-            Tag[] tags = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag3", Group = "test"}, new Tag {Text = "tag4", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag3", Group = "test" }, new Tag { Text = "tag4", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -193,14 +193,14 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content);
 
             var repository = CreateRepository(provider);
-            Tag[] tags = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag2", Group = "test"}, new Tag {Text = "tag3", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag2", Group = "test" }, new Tag { Text = "tag3", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -231,7 +231,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             DocumentRepository.Save(content);
 
             var repository = CreateRepository(provider);
-            Tag[] tags = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -278,7 +278,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tagsToRemove = {new Tag {Text = "tag2", Group = "test"}, new Tag {Text = "tag3", Group = "test"}};
+            Tag[] tagsToRemove = { new Tag { Text = "tag2", Group = "test" }, new Tag { Text = "tag3", Group = "test" } };
             repository.Remove(
                 content.Id,
                 contentType.PropertyTypes.First().Id,
@@ -323,7 +323,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content2.Id,
                 contentType.PropertyTypes.First().Id,
@@ -367,7 +367,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content2.Id,
                 contentType.PropertyTypes.First().Id,
@@ -490,7 +490,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content2.Id,
                 contentType.PropertyTypes.First().Id,
@@ -532,7 +532,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content1.Id,
                 contentType.PropertyTypes.Last().Id,
@@ -576,7 +576,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test" } };
             repository.Assign(
                 content1.Id,
                 contentType.PropertyTypes.Last().Id,
@@ -621,7 +621,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test1"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test1" } };
             repository.Assign(
                 content1.Id,
                 contentType.PropertyTypes.Last().Id,
@@ -674,7 +674,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag4", Group = "test1"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag4", Group = "test1" } };
             repository.Assign(
                 media1.Id,
                 mediaType.PropertyTypes.Last().Id,
@@ -731,7 +731,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test1"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test1" } };
             repository.Assign(
                 media1.Id,
                 mediaType.PropertyTypes.Last().Id,
@@ -780,7 +780,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
 
             Assert.AreEqual(0, ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                 "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
-                new {nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id}));
+                new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
         }
     }
 
@@ -834,7 +834,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags2,
                 false);
 
-            Tag[] tags3 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test1"}};
+            Tag[] tags3 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test1" } };
             repository.Assign(
                 media1.Id,
                 mediaType.PropertyTypes.Last().Id,
@@ -850,7 +850,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
 
             // there are a total of 2 tags tagged against the 'test' group
-            Assert.AreEqual(2,
+            Assert.AreEqual(
+                2,
                 contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
                     .Count());
 
@@ -864,7 +865,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(2, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
 
             // there are a total of 1 tags tagged against the 'test1' group
-            Assert.AreEqual(1,
+            Assert.AreEqual(
+                1,
                 contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
                     .Count());
 
@@ -915,14 +917,14 @@ public class TagRepositoryTest : UmbracoIntegrationTest
                 tags,
                 false);
 
-            Tag[] tags2 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test1"}};
+            Tag[] tags2 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test1" } };
             repository.Assign(
                 content2.Id,
                 contentType.PropertyTypes.Last().Id,
                 tags2,
                 false);
 
-            Tag[] tags3 = {new Tag {Text = "tag1", Group = "test"}, new Tag {Text = "tag2", Group = "test1"}};
+            Tag[] tags3 = { new Tag { Text = "tag1", Group = "test" }, new Tag { Text = "tag2", Group = "test1" } };
             repository.Assign(
                 media1.Id,
                 mediaType.PropertyTypes.Last().Id,
@@ -938,7 +940,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(2, contentTestIds.SelectMany(x => x.TaggedProperties).Count());
 
             // there are a total of 1 tags since we're only looking against one tag
-            Assert.AreEqual(1,
+            Assert.AreEqual(
+                1,
                 contentTestIds.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
                     .Count());
 
@@ -951,7 +954,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(1, contentTest1Ids.SelectMany(x => x.TaggedProperties).Count());
 
             // there are a total of 1 tags since we're only looking against one tag
-            Assert.AreEqual(1,
+            Assert.AreEqual(
+                1,
                 contentTest1Ids.SelectMany(x => x.TaggedProperties).SelectMany(x => x.Tags).Select(x => x.Id).Distinct()
                     .Count());
 

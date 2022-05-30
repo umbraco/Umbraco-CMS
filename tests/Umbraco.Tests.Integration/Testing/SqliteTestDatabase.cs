@@ -28,8 +28,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
     protected UmbracoDatabase.CommandInfo[] _cachedDatabaseInitCommands = new UmbracoDatabase.CommandInfo[0];
 
-    public SqliteTestDatabase(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactoryProvider,
-        ILoggerFactory loggerFactory)
+    public SqliteTestDatabase(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactoryProvider, ILoggerFactory loggerFactory)
     {
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _dbFactoryProvider = dbFactoryProvider;
@@ -119,7 +118,7 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
 
         var options =
             new TestOptionsMonitor<InstallDefaultDataSettings>(
-                new InstallDefaultDataSettings {InstallData = InstallDefaultDataOption.All});
+                new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
 
         var schemaCreator = new DatabaseSchemaCreator(
             database,
@@ -145,13 +144,16 @@ public class SqliteTestDatabase : BaseTestDatabase, ITestDatabase
         }
 
         _prepareQueue.CompleteAdding();
-        while (_prepareQueue.TryTake(out _)) { }
+        while (_prepareQueue.TryTake(out _))
+        { }
 
         _readyEmptyQueue.CompleteAdding();
-        while (_readyEmptyQueue.TryTake(out _)) { }
+        while (_readyEmptyQueue.TryTake(out _))
+        { }
 
         _readySchemaQueue.CompleteAdding();
-        while (_readySchemaQueue.TryTake(out _)) { }
+        while (_readySchemaQueue.TryTake(out _))
+        { }
     }
 
     private TestDbMeta CreateSqLiteMeta(bool empty)

@@ -86,7 +86,9 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
             return new Report
             {
-                ContentVersions = contentVersions, DocumentVersions = documentVersions, PropertyData = propertyData
+                ContentVersions = contentVersions,
+                DocumentVersions = documentVersions,
+                PropertyData = propertyData
             };
         }
     }

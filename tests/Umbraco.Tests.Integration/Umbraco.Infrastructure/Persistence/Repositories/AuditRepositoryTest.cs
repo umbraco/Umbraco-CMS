@@ -31,8 +31,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var repo = new AuditRepository((IScopeAccessor)sp, _logger);
-            repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(),
-                "This is a System audit trail"));
+            repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
 
@@ -51,10 +50,8 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
             }
 
             scope.Complete();
@@ -64,8 +61,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
         {
             var repo = new AuditRepository((IScopeAccessor)sp, _logger);
 
-            var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total,
-                Direction.Descending, null, null);
+            var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
             Assert.AreEqual(10, page.Count());
             Assert.AreEqual(200, total);
@@ -82,10 +78,8 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
             }
 
             scope.Complete();
@@ -108,7 +102,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
                     10,
                     out var total,
                     Direction.Descending,
-                    new[] {AuditType.Publish},
+                    new[] { AuditType.Publish },
                     sp.CreateQuery<IAuditItem>()
                         .Where(x => x.UserId > -2));
 
@@ -133,10 +127,8 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(),
-                    $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
             }
 
             scope.Complete();
@@ -152,7 +144,7 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
                     9,
                     out var total,
                     Direction.Descending,
-                    new[] {AuditType.Publish},
+                    new[] { AuditType.Publish },
                     null)
                 .ToArray();
 
@@ -172,10 +164,8 @@ public class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(),
-                    "Content created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(),
-                    "Content published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), "Content created"));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), "Content published"));
             }
 
             scope.Complete();

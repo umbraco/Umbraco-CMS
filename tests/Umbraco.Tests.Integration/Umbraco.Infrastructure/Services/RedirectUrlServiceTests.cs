@@ -46,12 +46,12 @@ public class RedirectUrlServiceTests : UmbracoIntegrationTestWithContent
             _thirdSubPage = subPages[2];
 
 
-            repository.Save(new RedirectUrl {ContentKey = _firstSubPage.Key, Url = Url, Culture = CultureEnglish});
+            repository.Save(new RedirectUrl { ContentKey = _firstSubPage.Key, Url = Url, Culture = CultureEnglish });
             Thread.Sleep(
                 1000); //Added delay to ensure timestamp difference as sometimes they seem to have the same timestamp
-            repository.Save(new RedirectUrl {ContentKey = _secondSubPage.Key, Url = Url, Culture = CultureGerman});
+            repository.Save(new RedirectUrl { ContentKey = _secondSubPage.Key, Url = Url, Culture = CultureGerman });
             Thread.Sleep(1000);
-            repository.Save(new RedirectUrl {ContentKey = _thirdSubPage.Key, Url = UrlAlt, Culture = string.Empty});
+            repository.Save(new RedirectUrl { ContentKey = _thirdSubPage.Key, Url = UrlAlt, Culture = string.Empty });
 
             scope.Complete();
         }

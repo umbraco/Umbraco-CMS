@@ -103,7 +103,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
             var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
             var m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
 
-            var members = repository.GetMany(m1.Id, m2.Id);
+            var members = repository.GetMany(m1.Id, m2.Id).ToArray();
 
             Assert.That(members, Is.Not.Null);
             Assert.That(members.Count(), Is.EqualTo(2));
@@ -126,7 +126,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
                 CreateTestMember(type, "Test " + i, "test" + i + "@test.com", "pass" + i, "test" + i);
             }
 
-            var members = repository.GetMany();
+            var members = repository.GetMany().ToArray();
 
             Assert.That(members, Is.Not.Null);
             Assert.That(members.Any(x => x == null), Is.False);
@@ -149,7 +149,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var query = provider.CreateQuery<IMember>().Where(x => x.Key == key);
-            var result = repository.Get(query);
+            var result = repository.Get(query).ToArray();
 
             // Assert
             Assert.That(result.Count(), Is.EqualTo(1));
@@ -198,10 +198,8 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
             var sut = repository.Get(member.Id);
 
             Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
-            Assert.That(memberType.CompositionPropertyTypes.Count(),
-                Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
-            Assert.That(sut.Properties.Count(),
-                Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
+            Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
+            Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
             var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x =>
                 x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
             Assert.IsNotNull(grp);
@@ -294,8 +292,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null,
-        string password = null, string username = null, Guid? key = null)
+    private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -308,8 +305,7 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
                 MemberTypeRepository.Save(memberType);
             }
 
-            var member = MemberBuilder.CreateSimpleMember(memberType, name ?? "Johnny Hefty",
-                email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
+            var member = MemberBuilder.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
             repository.Save(member);
             scope.Complete();
 

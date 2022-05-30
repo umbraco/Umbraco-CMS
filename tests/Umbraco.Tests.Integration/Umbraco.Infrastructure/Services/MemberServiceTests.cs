@@ -78,7 +78,8 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var memberType = MemberTypeService.Get("member");
         IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
         {
-            LastLoginDate = now, UpdateDate = now
+            LastLoginDate = now,
+            UpdateDate = now
         };
         MemberService.Save(member);
 
@@ -133,7 +134,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
     {
         var memberType = MemberTypeService.Get("member");
         IMember member =
-            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) {IsLockedOut = false};
+            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { IsLockedOut = false };
         MemberService.Save(member);
 
         member.IsLockedOut = true;
@@ -150,7 +151,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var now = DateTime.Now;
         var memberType = MemberTypeService.Get("member");
         IMember member =
-            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) {LastLockoutDate = now};
+            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLockoutDate = now };
         MemberService.Save(member);
 
         var newDate = now.AddDays(10);
@@ -169,7 +170,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var now = DateTime.Now;
         var memberType = MemberTypeService.Get("member");
         IMember member =
-            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) {LastLoginDate = now};
+            new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true) { LastLoginDate = now };
         MemberService.Save(member);
 
         var newDate = now.AddDays(10);
@@ -324,13 +325,13 @@ public class MemberServiceTests : UmbracoIntegrationTest
         IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
         MemberService.Save(member);
 
-        string[] roleNames1 = {"TR1", "TR2"};
-        MemberService.AssignRoles(new[] {member.Id}, roleNames1);
+        string[] roleNames1 = { "TR1", "TR2" };
+        MemberService.AssignRoles(new[] { member.Id }, roleNames1);
         var memberRoles = MemberService.GetAllRoles(member.Id);
         CollectionAssert.AreEquivalent(roleNames1, memberRoles);
 
-        string[] roleNames2 = {"TR3", "TR4"};
-        MemberService.ReplaceRoles(new[] {member.Id}, roleNames2);
+        string[] roleNames2 = { "TR3", "TR4" };
+        MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
         memberRoles = MemberService.GetAllRoles(member.Id);
         CollectionAssert.AreEquivalent(roleNames2, memberRoles);
     }
@@ -346,7 +347,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         MemberService.AddRole("MyTestRole1");
         MemberService.AddRole("MyTestRole2");
         MemberService.AddRole("MyTestRole3");
-        MemberService.AssignRoles(new[] {member.Id}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
         var memberRoles = MemberService.GetAllRoles(member.Id);
 
@@ -364,7 +365,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         MemberService.AddRole("MyTestRole1");
         MemberService.AddRole("MyTestRole2");
         MemberService.AddRole("MyTestRole3");
-        MemberService.AssignRoles(new[] {member.Id}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
         var memberRoles = MemberService.GetAllRolesIds(member.Id);
 
@@ -387,7 +388,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         MemberService.AddRole("MyTestRole1");
         MemberService.AddRole("MyTestRole2");
         MemberService.AddRole("MyTestRole3");
-        MemberService.AssignRoles(new[] {member.Id, member2.Id}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
         var memberRoles = MemberService.GetAllRoles("test");
         Assert.AreEqual(2, memberRoles.Count());
@@ -417,7 +418,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         MemberService.Save(member);
 
         MemberService.AddRole("MyTestRole1");
-        MemberService.AssignRoles(new[] {member.Id}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
         Assert.Throws<InvalidOperationException>(() => MemberService.DeleteRole("MyTestRole1", true));
     }
@@ -445,11 +446,13 @@ public class MemberServiceTests : UmbracoIntegrationTest
         {
             ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto
             {
-                MemberGroup = roleId, Member = member1.Id
+                MemberGroup = roleId,
+                Member = member1.Id
             });
             ScopeAccessor.AmbientScope.Database.Insert(new Member2MemberGroupDto
             {
-                MemberGroup = roleId, Member = member2.Id
+                MemberGroup = roleId,
+                Member = member2.Id
             });
             scope.Complete();
         }
@@ -487,7 +490,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var member3 = MemberBuilder.CreateSimpleMember(memberType, "test3", "test3@test.com", "pass", "test3");
         MemberService.Save(member3);
 
-        MemberService.AssignRoles(new[] {member1.Id, member2.Id, member3.Id}, new[] {roleName1});
+        MemberService.AssignRoles(new[] { member1.Id, member2.Id, member3.Id }, new[] { roleName1 });
 
         var result = MemberService.FindMembersInRole(roleName1, usernameToMatch, matchType);
         Assert.AreEqual(resultCount, result.Count());
@@ -509,7 +512,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(MemberService.GetById(member1.Id));
         Assert.IsNotNull(MemberService.GetById(member2.Id));
 
-        MemberService.AssignRoles(new[] {member1.Id, member2.Id}, new[] {"MyTestRole1"});
+        MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
@@ -532,7 +535,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         Assert.IsNotNull(MemberService.GetById(member1.Id));
         Assert.IsNotNull(MemberService.GetById(member2.Id));
 
-        MemberService.AssignRoles(new[] {member1.Id, member2.Id}, new[] {"mytestrole1"});
+        MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "mytestrole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
@@ -551,7 +554,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
         MemberService.Save(member2);
 
-        MemberService.AssignRoles(new[] {member1.Username, member2.Username}, new[] {"MyTestRole1"});
+        MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
@@ -570,7 +573,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
         MemberService.Save(member2);
 
-        MemberService.AssignRoles(new[] {member1.Username, member2.Username}, new[] {"MyTestRole1"});
+        MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
@@ -588,7 +591,7 @@ public class MemberServiceTests : UmbracoIntegrationTest
         MemberService.Save(member2);
 
         // implicitly create the role
-        MemberService.AssignRoles(new[] {member1.Username, member2.Username}, new[] {"MyTestRole1"});
+        MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
 
@@ -605,10 +608,10 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
         MemberService.Save(member2);
 
-        MemberService.AssignRoles(new[] {member1.Id, member2.Id}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
 
-        MemberService.DissociateRoles(new[] {member1.Id}, new[] {"MyTestRole1"});
-        MemberService.DissociateRoles(new[] {member1.Id, member2.Id}, new[] {"MyTestRole2"});
+        MemberService.DissociateRoles(new[] { member1.Id }, new[] { "MyTestRole1" });
+        MemberService.DissociateRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole2" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
         Assert.AreEqual(1, membersInRole.Count());
@@ -626,10 +629,10 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var member2 = MemberBuilder.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
         MemberService.Save(member2);
 
-        MemberService.AssignRoles(new[] {member1.Username, member2.Username}, new[] {"MyTestRole1", "MyTestRole2"});
+        MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1", "MyTestRole2" });
 
-        MemberService.DissociateRoles(new[] {member1.Username}, new[] {"MyTestRole1"});
-        MemberService.DissociateRoles(new[] {member1.Username, member2.Username}, new[] {"MyTestRole2"});
+        MemberService.DissociateRoles(new[] { member1.Username }, new[] { "MyTestRole1" });
+        MemberService.DissociateRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole2" });
 
         var membersInRole = MemberService.GetMembersInRole("MyTestRole1");
         Assert.AreEqual(1, membersInRole.Count());

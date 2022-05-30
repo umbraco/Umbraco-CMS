@@ -57,7 +57,7 @@ public class IndexInitializer
     {
         var contentValueSetBuilder = new ContentValueSetBuilder(
             _propertyEditors,
-            new UrlSegmentProviderCollection(() => new[] {new DefaultUrlSegmentProvider(_shortStringHelper)}),
+            new UrlSegmentProviderCollection(() => new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
             GetMockUserService(),
             _shortStringHelper,
             _scopeProvider,
@@ -66,8 +66,7 @@ public class IndexInitializer
         return contentValueSetBuilder;
     }
 
-    public ContentIndexPopulator GetContentIndexRebuilder(IContentService contentService, bool publishedValuesOnly,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory)
+    public ContentIndexPopulator GetContentIndexRebuilder(IContentService contentService, bool publishedValuesOnly, IUmbracoDatabaseFactory umbracoDatabaseFactory)
     {
         var contentValueSetBuilder = GetContentValueSetBuilder(publishedValuesOnly);
         var contentIndexDataSource = new ContentIndexPopulator(
@@ -84,7 +83,7 @@ public class IndexInitializer
     {
         var mediaValueSetBuilder = new MediaValueSetBuilder(
             _propertyEditors,
-            new UrlSegmentProviderCollection(() => new[] {new DefaultUrlSegmentProvider(_shortStringHelper)}),
+            new UrlSegmentProviderCollection(() => new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
             _mediaUrlGenerators,
             GetMockUserService(),
             _shortStringHelper,
@@ -126,9 +125,7 @@ public class IndexInitializer
 
 
         return Mock.Of<IContentService>(
-            x => x.GetPagedDescendants(
-                     It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs,
-                     It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
+            x => x.GetPagedDescendants(It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs, It.IsAny<IQuery<IContent>>(), It.IsAny<Ordering>())
                  == allRecs);
     }
 
@@ -168,9 +165,13 @@ public class IndexInitializer
 
         mediaServiceMock
             .Setup(x => x.GetPagedDescendants(
-                It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<IQuery<IMedia>>(),
-                It.IsAny<Ordering>())
-            ).Returns(() => allRecs);
+                It.IsAny<int>(),
+                It.IsAny<long>(),
+                It.IsAny<int>(),
+                out totalRecs,
+                It.IsAny<IQuery<IMedia>>(),
+                It.IsAny<Ordering>()))
+            .Returns(() => allRecs);
 
         //mediaServiceMock.Setup(service => service.GetPagedXmlEntries(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<int>(), out longTotalRecs))
         //    .Returns(() => allRecs.Select(x => x.ToXml()));
@@ -259,8 +260,7 @@ public class IndexInitializer
     //    return i;
     //}
 
-    public static IOptionsMonitor<LuceneDirectoryIndexOptions> GetOptions(string indexName,
-        LuceneDirectoryIndexOptions options)
+    public static IOptionsMonitor<LuceneDirectoryIndexOptions> GetOptions(string indexName, LuceneDirectoryIndexOptions options)
         => Mock.Of<IOptionsMonitor<LuceneDirectoryIndexOptions>>(x => x.Get(indexName) == options);
 
     internal void IndexingError(object sender, IndexingErrorEventArgs e) =>

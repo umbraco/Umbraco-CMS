@@ -35,8 +35,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relateMemberToContent = new RelationType("Relate Member to Content", "relateMemberToContent", true,
-                Constants.ObjectTypes.Member, Constants.ObjectTypes.Document, true);
+            var relateMemberToContent = new RelationType("Relate Member to Content", "relateMemberToContent", true, Constants.ObjectTypes.Member, Constants.ObjectTypes.Document, true);
 
             repository.Save(relateMemberToContent);
 
@@ -125,7 +124,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationTypes = repository.GetMany();
+            var relationTypes = repository.GetMany().ToArray();
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
@@ -145,7 +144,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationTypes = repository.GetMany(2, 3);
+            var relationTypes = repository.GetMany(2, 3).ToArray();
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
@@ -204,7 +203,7 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
             // Act
             var childObjType = Constants.ObjectTypes.DocumentType;
             var query = provider.CreateQuery<IRelationType>().Where(x => x.ChildObjectType == childObjType);
-            var result = repository.Get(query);
+            var result = repository.Get(query).ToArray();
 
             // Assert
             Assert.That(result, Is.Not.Null);
@@ -216,18 +215,32 @@ public class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
     public void CreateTestData()
     {
-        var relateContent = new RelationType("Relate Content on Copy", "relateContentOnCopy", true,
-            Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
-        var relateContentType = new RelationType("Relate ContentType on Copy", "relateContentTypeOnCopy", true,
-            Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentType, false);
-        var relateContentMedia = new RelationType("Relate Content to Media", "relateContentToMedia", true,
-            Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, true);
+        var relateContent = new RelationType(
+            "Relate Content on Copy",
+            "relateContentOnCopy",
+            true,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Document,
+            false);
+        var relateContentType = new RelationType(
+            "Relate ContentType on Copy",
+            "relateContentTypeOnCopy",
+            true,
+            Constants.ObjectTypes.DocumentType,
+            Constants.ObjectTypes.DocumentType,
+            false);
+        var relateContentMedia = new RelationType(
+            "Relate Content to Media",
+            "relateContentToMedia",
+            true,
+            Constants.ObjectTypes.Document,
+            Constants.ObjectTypes.Media,
+            true);
 
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<RelationTypeRepository>());
+            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
 
             repository.Save(relateContent); // Id 2
             repository.Save(relateContentType); // Id 3

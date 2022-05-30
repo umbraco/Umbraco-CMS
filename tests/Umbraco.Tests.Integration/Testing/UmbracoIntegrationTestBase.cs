@@ -222,8 +222,7 @@ public abstract class UmbracoIntegrationTestBase
     }
 
 
-    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory,
-        TestUmbracoDatabaseFactoryProvider dbFactory)
+    private ITestDatabase GetOrCreateDatabase(ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
     {
         lock (s_dbLocker)
         {

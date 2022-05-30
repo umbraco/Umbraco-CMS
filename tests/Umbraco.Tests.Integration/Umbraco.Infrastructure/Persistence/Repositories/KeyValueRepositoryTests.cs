@@ -26,7 +26,7 @@ public class KeyValueRepositoryTests : UmbracoIntegrationTest
         // Insert new key/value
         using (var scope = provider.CreateCoreScope())
         {
-            var keyValue = new KeyValue {Identifier = "foo", Value = "bar", UpdateDate = DateTime.Now};
+            var keyValue = new KeyValue { Identifier = "foo", Value = "bar", UpdateDate = DateTime.Now };
             var repo = CreateRepository(provider);
             repo.Save(keyValue);
             scope.Complete();

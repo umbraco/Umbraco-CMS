@@ -64,7 +64,7 @@ public class ScopedNuCacheTests : UmbracoIntegrationTest
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
 
         // create document type, document
-        var contentType = new ContentType(ShortStringHelper, -1) {Alias = "CustomDocument", Name = "Custom Document"};
+        var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
         ContentTypeService.Save(contentType);
         var item = new Content("name", -1, contentType);
 

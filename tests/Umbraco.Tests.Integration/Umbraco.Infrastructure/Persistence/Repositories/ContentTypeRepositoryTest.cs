@@ -77,8 +77,13 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var templateRepo = new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled,
-                LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper,
+            var templateRepo = new TemplateRepository(
+                (IScopeAccessor)provider,
+                AppCaches.Disabled,
+                LoggerFactory.CreateLogger<TemplateRepository>(),
+                FileSystems,
+                IOHelper,
+                ShortStringHelper,
                 Mock.Of<IViewHelper>());
             var repository = ContentTypeRepository;
             Template[] templates =
@@ -92,7 +97,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             }
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType();
-            contentType.AllowedTemplates = new[] {templates[0], templates[1]};
+            contentType.AllowedTemplates = new[] { templates[0], templates[1] };
             contentType.SetDefaultTemplate(templates[0]);
             repository.Save(contentType);
 
@@ -111,11 +116,11 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "blah1"};
+            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah1" };
             DocumentTypeContainerRepository.Save(container1);
 
             var container2 =
-                new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "blah2", ParentId = container1.Id};
+                new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah2", ParentId = container1.Id };
             DocumentTypeContainerRepository.Save(container2);
 
             var contentType = (IContentType)ContentTypeBuilder.CreateBasicContentType("asdfasdf");
@@ -124,7 +129,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
             // create a
             var contentType2 =
-                (IContentType)new ContentType(ShortStringHelper, contentType, "hello") {Name = "Blahasdfsadf"};
+                (IContentType)new ContentType(ShortStringHelper, contentType, "hello") { Name = "Blahasdfsadf" };
             contentType.ParentId = contentType.Id;
             repository.Save(contentType2);
 
@@ -148,7 +153,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
             DocumentTypeContainerRepository.Save(container);
 
             Assert.That(container.Id, Is.GreaterThan(0));
@@ -166,11 +171,11 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container1"};
+            container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
             DocumentTypeContainerRepository.Save(container1);
-            container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container2"};
+            container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
             DocumentTypeContainerRepository.Save(container2);
-            container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container3"};
+            container3 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container3" };
             DocumentTypeContainerRepository.Save(container3);
 
             Assert.That(container1.Id, Is.GreaterThan(0));
@@ -194,7 +199,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "blah" };
             DocumentTypeContainerRepository.Save(container);
 
             // Act
@@ -212,11 +217,10 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repository = ContentTypeRepository;
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             MediaTypeContainerRepository.Save(container);
 
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test",
-                propertyGroupAlias: "testGroup", propertyGroupName: "testGroup", defaultTemplateId: 0);
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup", defaultTemplateId: 0);
             contentType.ParentId = container.Id;
             repository.Save(contentType);
 
@@ -230,11 +234,10 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
-            var container = new EntityContainer(Constants.ObjectTypes.MediaType) {Name = "blah"};
+            var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
             MediaTypeContainerRepository.Save(container);
 
-            IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test",
-                propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
+            IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             contentType.ParentId = container.Id;
             MediaTypeRepository.Save(contentType);
 
@@ -258,8 +261,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             // Act
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test",
-                propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
             ContentTypeRepository.Save(contentType);
 
             var fetched = ContentTypeRepository.Get(contentType.Id);
@@ -280,8 +282,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 Assert.AreNotEqual(propertyType.Key, Guid.Empty);
             }
 
-            TestHelper.AssertPropertyValuesAreEqual(fetched, contentType,
-                ignoreProperties: new[] {"DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup"});
+            TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, ignoreProperties: new[] { "DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup" });
         }
     }
 
@@ -295,8 +296,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test",
-                propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
+            var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
 
             Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
@@ -513,10 +513,8 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = ContentTypeRepository;
             var ctMain = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: 0);
-            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain,
-                randomizeAliases: true, defaultTemplateId: 0);
-            var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1,
-                randomizeAliases: true, defaultTemplateId: 0);
+            var ctChild1 = ContentTypeBuilder.CreateSimpleContentType("child1", "Child 1", ctMain, randomizeAliases: true, defaultTemplateId: 0);
+            var ctChild2 = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, defaultTemplateId: 0);
 
             repository.Save(ctMain);
             repository.Save(ctChild1);
@@ -544,14 +542,11 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = ContentTypeRepository;
             contentType = repository.Get(_textpageContentType.Id);
-            var child1 = ContentTypeBuilder.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true,
-                defaultTemplateId: 0);
+            var child1 = ContentTypeBuilder.CreateSimpleContentType("abc", "abc", contentType, randomizeAliases: true, defaultTemplateId: 0);
             repository.Save(child1);
-            var child3 = ContentTypeBuilder.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true,
-                defaultTemplateId: 0);
+            var child3 = ContentTypeBuilder.CreateSimpleContentType("zyx", "zyx", contentType, randomizeAliases: true, defaultTemplateId: 0);
             repository.Save(child3);
-            var child2 = ContentTypeBuilder.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true,
-                defaultTemplateId: 0);
+            var child2 = ContentTypeBuilder.CreateSimpleContentType("a123", "a123", contentType, randomizeAliases: true, defaultTemplateId: 0);
             repository.Save(child2);
 
             scope.Complete();
@@ -562,8 +557,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes =
-                repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id));
+            var contentTypes = repository.Get(provider.CreateQuery<IContentType>().Where(x => x.ParentId == contentType.Id)).ToArray();;
 
             // Assert
             Assert.That(contentTypes.Count(), Is.EqualTo(3));
@@ -600,8 +594,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = ContentTypeRepository;
             var contentType = repository.Get(_textpageContentType.Id);
-            var childContentType = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", contentType,
-                randomizeAliases: true, defaultTemplateId: 0);
+            var childContentType = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases: true, defaultTemplateId: 0);
             repository.Save(childContentType);
 
             // Act
@@ -640,11 +633,11 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var repository = ContentTypeRepository;
 
             // Act
-            var contentTypes = repository.GetMany();
+            var contentTypes = repository.GetMany().ToArray();
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new {NodeObjectType = Constants.ObjectTypes.DocumentType});
+                    new { NodeObjectType = Constants.ObjectTypes.DocumentType });
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -663,11 +656,11 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             var allGuidIds = repository.GetMany().Select(x => x.Key).ToArray();
 
             // Act
-            var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetMany(allGuidIds);
+            var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetMany(allGuidIds).ToArray();
             var count =
                 ScopeAccessor.AmbientScope.Database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
-                    new {NodeObjectType = Constants.ObjectTypes.DocumentType});
+                    new { NodeObjectType = Constants.ObjectTypes.DocumentType });
 
             // Assert
             Assert.That(contentTypes.Any(), Is.True);
@@ -844,8 +837,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Assert
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "keywords"), Is.False);
-            Assert.That(subpage.Properties.First(x => x.Alias == "description").GetValue(),
-                Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(subpage.Properties.First(x => x.Alias == "description").GetValue(), Is.EqualTo("This is the meta description for a textpage"));
         }
     }
 
@@ -959,8 +951,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
             // Assert
             var updated = DocumentRepository.Get(subpage.Id);
             Assert.That(updated.GetValue("metaAuthor").ToString(), Is.EqualTo("John Doe"));
-            Assert.That(updated.Properties.First(x => x.Alias == "description").GetValue(),
-                Is.EqualTo("This is the meta description for a textpage"));
+            Assert.That(updated.Properties.First(x => x.Alias == "description").GetValue(), Is.EqualTo("This is the meta description for a textpage"));
 
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(4));
             Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "metaAuthor"), Is.True);
@@ -1018,20 +1009,22 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 Variations = ContentVariation.Nothing
             };
 
-            var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext)
+            var contentCollection = new PropertyTypeCollection(true)
             {
-                Alias = "title",
-                Name = "Title",
-                Description = "",
-                Mandatory = false,
-                SortOrder = 1,
-                DataTypeId = Constants.DataTypes.Textbox,
-                LabelOnTop = true,
-                Variations = ContentVariation.Nothing
-            });
+                new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext)
+                {
+                    Alias = "title",
+                    Name = "Title",
+                    Description = string.Empty,
+                    Mandatory = false,
+                    SortOrder = 1,
+                    DataTypeId = Constants.DataTypes.Textbox,
+                    LabelOnTop = true,
+                    Variations = ContentVariation.Nothing
+                }
+            };
             elementType.PropertyGroups.Add(
-                new PropertyGroup(contentCollection) {Name = "Content", Alias = "content", SortOrder = 1});
+                new PropertyGroup(contentCollection) { Name = "Content", Alias = "content", SortOrder = 1 });
             elementType.ResetDirtyProperties(false);
             elementType.SetDefaultTemplate(new Template(ShortStringHelper, "ElementType", "elementType"));
             repository.Save(elementType);
@@ -1049,14 +1042,16 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 Trashed = false,
                 Variations = ContentVariation.Nothing
             };
-            var comp = new List<IContentTypeComposition>();
-            comp.Add(elementType);
+            var comp = new List<IContentTypeComposition>
+            {
+                elementType
+            };
             docType.ContentTypeComposition = comp;
             repository.Save(docType);
 
             // Create "home" content
-            var content = new Content("Home", -1, docType) {Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0};
-            object obj = new {title = "test title"};
+            var content = new Content("Home", -1, docType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            object obj = new { title = "test title" };
             content.PropertyValues(obj);
             content.ResetDirtyProperties(false);
             contentRepository.Save(content);

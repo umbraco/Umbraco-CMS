@@ -277,7 +277,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         vRoot.SetValue("vp", "changed.es", "es");
         ContentService.Save(vRoot); // now root has drafts in all cultures
 
-        ContentService.SaveAndPublish(iv1, new[] {"de", "ru"}); // now iv1 de and ru are published
+        ContentService.SaveAndPublish(iv1, new[] { "de", "ru" }); // now iv1 de and ru are published
 
         iv1.SetValue("ip", "changed");
         iv1.SetValue("vp", "changed.de", "de");
@@ -358,7 +358,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
         ContentService.Save(iv11);
 
         iv11.SetCultureName("iv11.ru", "ru");
-        var xxx = ContentService.SaveAndPublish(iv11, new[] {"de", "ru"});
+        var xxx = ContentService.SaveAndPublish(iv11, new[] { "de", "ru" });
 
         Assert.AreEqual("iv11.de", iv11.GetValue("vp", "de", published: true));
         Assert.AreEqual("iv11.ru", iv11.GetValue("vp", "ru", published: true));
@@ -400,7 +400,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
     {
         Can_Publish_Mixed_Branch(out var iRoot, out var ii1, out var iv11);
 
-        var r = ContentService.SaveAndPublishBranch(iRoot, false, new[] {"de", "ru"}).ToArray();
+        var r = ContentService.SaveAndPublishBranch(iRoot, false, new[] { "de", "ru" }).ToArray();
         AssertPublishResults(r, x => x.Content.Name, "iroot", "ii1", "iv11.de");
         AssertPublishResults(
             r,
@@ -442,7 +442,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
     private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
     {
-        var langDe = new Language("de", "German") {IsDefault = true};
+        var langDe = new Language("de", "German") { IsDefault = true };
         LocalizationService.Save(langDe);
         var langRu = new Language("ru", "Russian");
         LocalizationService.Save(langRu);
@@ -451,23 +451,30 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
 
         iContentType = new ContentType(ShortStringHelper, -1)
         {
-            Alias = "ict", Name = "Invariant Content Type", Variations = ContentVariation.Nothing
+            Alias = "ict",
+            Name = "Invariant Content Type",
+            Variations = ContentVariation.Nothing
         };
         iContentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
-                "ip") {Variations = ContentVariation.Nothing});
+                "ip")
+            { Variations = ContentVariation.Nothing });
         ContentTypeService.Save(iContentType);
 
         vContentType = new ContentType(ShortStringHelper, -1)
         {
-            Alias = "vct", Name = "Variant Content Type", Variations = ContentVariation.Culture
+            Alias = "vct",
+            Name = "Variant Content Type",
+            Variations = ContentVariation.Culture
         };
         vContentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
-                "ip") {Variations = ContentVariation.Nothing});
+                "ip")
+            { Variations = ContentVariation.Nothing });
         vContentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar,
-                "vp") {Variations = ContentVariation.Culture});
+                "vp")
+            { Variations = ContentVariation.Culture });
         ContentTypeService.Save(vContentType);
     }
 
@@ -480,7 +487,7 @@ public class ContentServicePublishBranchTests : UmbracoIntegrationTest
             case 1:
                 return ContentService.SaveAndPublishBranch(content, force, "*");
             case 2:
-                return ContentService.SaveAndPublishBranch(content, force, cultures: new[] {"*"});
+                return ContentService.SaveAndPublishBranch(content, force, cultures: new[] { "*" });
             default:
                 throw new ArgumentOutOfRangeException(nameof(method));
         }

@@ -31,7 +31,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah"};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
             repo.Save(rurl);
             scope.Complete();
 
@@ -56,7 +56,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var repo = CreateRepository(ScopeProvider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah", Culture = culture};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = culture };
             repo.Save(rurl);
             scope.Complete();
 
@@ -85,7 +85,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah"};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
             repo.Save(rurl);
             scope.Complete();
 
@@ -128,7 +128,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var repo = CreateRepository(ScopeProvider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah", Culture = cultureA};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = cultureA };
             repo.Save(rurl);
             scope.Complete();
 
@@ -171,7 +171,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah"};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
             repo.Save(rurl);
             scope.Complete();
 
@@ -210,13 +210,13 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         using (var scope = provider.CreateScope())
         {
             var repo = CreateRepository(provider);
-            var rurl = new RedirectUrl {ContentKey = _textpage.Key, Url = "blah"};
+            var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
             repo.Save(rurl);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
 
-            rurl = new RedirectUrl {ContentKey = _otherpage.Key, Url = "durg"};
+            rurl = new RedirectUrl { ContentKey = _otherpage.Key, Url = "durg" };
             repo.Save(rurl);
             scope.Complete();
 
@@ -236,8 +236,7 @@ public class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
-        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches,
-            LoggerFactory.CreateLogger<RedirectUrlRepository>());
+        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>());
 
     private IContent _textpage;
     private IContent _subpage;

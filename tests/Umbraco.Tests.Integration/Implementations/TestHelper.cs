@@ -45,9 +45,9 @@ public class TestHelper : TestHelperBase
     private readonly IApplicationShutdownRegistry _hostingLifetime;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IIpResolver _ipResolver;
-    private IBackOfficeInfo _backOfficeInfo;
+    private readonly IBackOfficeInfo _backOfficeInfo;
     private IHostingEnvironment _hostingEnvironment;
-    private string _tempWorkingDir;
+    private readonly string _tempWorkingDir;
 
     public TestHelper()
         : base(typeof(TestHelper).Assembly)
@@ -146,8 +146,7 @@ public class TestHelper : TestHelperBase
         return relativePath.Replace("~/", bin + "/");
     }
 
-    public void AssertPropertyValuesAreEqual(object actual, object expected,
-        Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
+    public void AssertPropertyValuesAreEqual(object actual, object expected, Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
     {
         const int dateDeltaMilliseconds = 1000; // 1s
 
@@ -174,8 +173,7 @@ public class TestHelper : TestHelperBase
         }
     }
 
-    private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual,
-        Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+    private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
     {
         if (sorter == null)
         {
@@ -195,7 +193,10 @@ public class TestHelper : TestHelperBase
         {
             Assert.Fail(
                 "Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements",
-                property.PropertyType.Name, property.Name, expectedListEx.Count, actualListEx.Count);
+                property.PropertyType.Name,
+                property.Name,
+                expectedListEx.Count,
+                actualListEx.Count);
         }
 
         for (var i = 0; i < actualListEx.Count; i++)
@@ -204,8 +205,7 @@ public class TestHelper : TestHelperBase
         }
     }
 
-    private static void AssertAreEqual(PropertyInfo property, object expected, object actual,
-        Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+    private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
     {
         if (!(expected is string) && expected is IEnumerable enumerable)
         {
@@ -224,9 +224,13 @@ public class TestHelper : TestHelperBase
             // compare date & time with delta
             var actualDateTime = (DateTime)actual;
             var delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
-            Assert.IsTrue(Math.Abs(delta) <= dateDeltaMilliseconds,
-                "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name,
-                property.Name, expected, actual);
+            Assert.IsTrue(
+                Math.Abs(delta) <= dateDeltaMilliseconds,
+                "Property {0}.{1} does not match. Expected: {2} but was: {3}",
+                property.DeclaringType.Name,
+                property.Name,
+                expected,
+                actual);
         }
         else if (expected is Property expectedProperty)
         {
@@ -248,26 +252,34 @@ public class TestHelper : TestHelperBase
                 if (expectedPropertyValues[i].EditedValue is DateTime expectedEditDateTime)
                 {
                     var actualEditDateTime = (DateTime)actualPropertyValues[i].EditedValue;
-                    AssertDateTime(expectedEditDateTime, actualEditDateTime,
+                    AssertDateTime(
+                        expectedEditDateTime,
+                        actualEditDateTime,
                         $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".",
                         dateDeltaMilliseconds);
                 }
                 else
                 {
-                    Assert.AreEqual(expectedPropertyValues[i].EditedValue, actualPropertyValues[i].EditedValue,
+                    Assert.AreEqual(
+                        expectedPropertyValues[i].EditedValue,
+                        actualPropertyValues[i].EditedValue,
                         $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
                 }
 
                 if (expectedPropertyValues[i].PublishedValue is DateTime expectedPublishDateTime)
                 {
                     var actualPublishedDateTime = (DateTime)actualPropertyValues[i].PublishedValue;
-                    AssertDateTime(expectedPublishDateTime, actualPublishedDateTime,
+                    AssertDateTime(
+                        expectedPublishDateTime,
+                        actualPublishedDateTime,
                         $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].PublishedValue}\" but got \"{actualPropertyValues[i].PublishedValue}\".",
                         dateDeltaMilliseconds);
                 }
                 else
                 {
-                    Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue,
+                    Assert.AreEqual(
+                        expectedPropertyValues[i].PublishedValue,
+                        actualPropertyValues[i].PublishedValue,
                         $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].PublishedValue}\" but got \"{actualPropertyValues[i].PublishedValue}\".");
                 }
             }
@@ -294,8 +306,7 @@ public class TestHelper : TestHelperBase
         }
     }
 
-    private static void AssertDateTime(DateTime expected, DateTime actual, string failureMessage,
-        int dateDeltaMiliseconds = 0)
+    private static void AssertDateTime(DateTime expected, DateTime actual, string failureMessage, int dateDeltaMiliseconds = 0)
     {
         var delta = (actual - expected).TotalMilliseconds;
         Assert.IsTrue(Math.Abs(delta) <= dateDeltaMiliseconds, failureMessage);

@@ -46,7 +46,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
 
             ct = ContentTypeBuilder.CreateBasicContentType("test", "Test");
             ContentTypeRepository.Save(ct);
-            var content = new Content("test", -1, ct) {CreatorId = 0, WriterId = 0};
+            var content = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
             DocumentRepository.Save(content);
             scope.Complete();
             return content.Id;
@@ -66,7 +66,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
-            var domain = (IDomain)new UmbracoDomain("test.com") {RootContentId = content.Id, LanguageId = lang.Id};
+            var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
             repo.Save(domain);
 
             // re-get
@@ -94,7 +94,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
 
             var content = DocumentRepository.Get(contentId);
 
-            var domain = (IDomain)new UmbracoDomain("test.com") {RootContentId = content.Id};
+            var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id };
             repo.Save(domain);
 
             // re-get
@@ -122,10 +122,10 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
-            var domain1 = (IDomain)new UmbracoDomain("test.com") {RootContentId = content.Id, LanguageId = lang.Id};
+            var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
             repo.Save(domain1);
 
-            var domain2 = (IDomain)new UmbracoDomain("test.com") {RootContentId = content.Id, LanguageId = lang.Id};
+            var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
 
             Assert.Throws<DuplicateNameException>(() => repo.Save(domain2));
         }
@@ -144,7 +144,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             var lang = LanguageRepository.GetByIsoCode("en-AU");
             var content = DocumentRepository.Get(contentId);
 
-            var domain = (IDomain)new UmbracoDomain("test.com") {RootContentId = content.Id, LanguageId = lang.Id};
+            var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
             repo.Save(domain);
 
             repo.Delete(domain);
@@ -173,10 +173,10 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             var globalSettings = new GlobalSettings();
             var lang2 = new Language("es", "Spanish");
             LanguageRepository.Save(lang2);
-            var content2 = new Content("test", -1, ct) {CreatorId = 0, WriterId = 0};
+            var content2 = new Content("test", -1, ct) { CreatorId = 0, WriterId = 0 };
             DocumentRepository.Save(content2);
 
-            var domain = (IDomain)new UmbracoDomain("test.com") {RootContentId = content1.Id, LanguageId = lang1.Id};
+            var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content1.Id, LanguageId = lang1.Id };
             repo.Save(domain);
 
             // re-get
@@ -213,7 +213,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 10; i++)
             {
                 var domain =
-                    (IDomain)new UmbracoDomain("test" + i + ".com") {RootContentId = content.Id, LanguageId = lang.Id};
+                    (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.Save(domain);
             }
 
@@ -239,7 +239,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 10; i++)
             {
                 var domain =
-                    (IDomain)new UmbracoDomain("test" + i + ".com") {RootContentId = content.Id, LanguageId = lang.Id};
+                    (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.Save(domain);
             }
 
@@ -265,7 +265,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 10; i++)
             {
                 var domain =
-                    (IDomain)new UmbracoDomain("test " + i + ".com") {RootContentId = content.Id, LanguageId = lang.Id};
+                    (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.Save(domain);
             }
 
@@ -292,7 +292,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             for (var i = 0; i < 10; i++)
             {
                 var domain =
-                    (IDomain)new UmbracoDomain("test " + i + ".com") {RootContentId = content.Id, LanguageId = lang.Id};
+                    (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.Save(domain);
                 ids.Add(domain.Id);
             }
@@ -320,7 +320,8 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             {
                 var domain = (IDomain)new UmbracoDomain(i % 2 == 0 ? "test " + i + ".com" : "*" + i)
                 {
-                    RootContentId = content.Id, LanguageId = lang.Id
+                    RootContentId = content.Id,
+                    LanguageId = lang.Id
                 };
                 repo.Save(domain);
             }
@@ -349,7 +350,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             // more test data (3 content items total)
             for (var i = 0; i < 2; i++)
             {
-                var c = new Content("test" + i, -1, ct) {CreatorId = 0, WriterId = 0};
+                var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
                 DocumentRepository.Save(c);
                 contentItems.Add(c);
             }
@@ -358,7 +359,8 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             {
                 var domain = (IDomain)new UmbracoDomain(i % 2 == 0 ? "test " + i + ".com" : "*" + i)
                 {
-                    RootContentId = (i % 2 == 0 ? contentItems[0] : contentItems[1]).Id, LanguageId = lang.Id
+                    RootContentId = (i % 2 == 0 ? contentItems[0] : contentItems[1]).Id,
+                    LanguageId = lang.Id
                 };
                 repo.Save(domain);
             }
@@ -392,7 +394,7 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             // more test data (3 content items total)
             for (var i = 0; i < 2; i++)
             {
-                var c = new Content("test" + i, -1, ct) {CreatorId = 0, WriterId = 0};
+                var c = new Content("test" + i, -1, ct) { CreatorId = 0, WriterId = 0 };
                 DocumentRepository.Save(c);
                 contentItems.Add(c);
             }
@@ -401,7 +403,8 @@ public class DomainRepositoryTest : UmbracoIntegrationTest
             {
                 var domain = (IDomain)new UmbracoDomain(i % 2 == 0 ? "test " + i + ".com" : "*" + i)
                 {
-                    RootContentId = (i % 2 == 0 ? contentItems[0] : contentItems[1]).Id, LanguageId = lang.Id
+                    RootContentId = (i % 2 == 0 ? contentItems[0] : contentItems[1]).Id,
+                    LanguageId = lang.Id
                 };
                 repo.Save(domain);
             }

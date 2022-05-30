@@ -46,8 +46,7 @@ public class ScopeFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment,
-            GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -76,8 +75,7 @@ public class ScopeFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment,
-            GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
@@ -108,8 +106,7 @@ public class ScopeFileSystemsTests : UmbracoIntegrationTest
     {
         var rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPhysicalRootPath);
         var rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
-        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment,
-            GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
+        var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
         var mediaFileManager = MediaFileManager;
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
 

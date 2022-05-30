@@ -45,17 +45,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Media};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Media };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {mediaItems[0].Id, mediaItems[1].Id}};
+        var payload = new { ids = new[] { mediaItems[0].Id, mediaItems[1].Id } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<int, string>>();
 
@@ -70,17 +69,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task GetUrlsByIds_Media_ReturnsEmptyStringsInMapForUnknownItems()
     {
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Media};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Media };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {1, 2}};
+        var payload = new { ids = new[] { 1, 2 } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<int, string>>();
 
@@ -114,17 +112,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Media};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Media };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {mediaItems[0].Key.ToString(), mediaItems[1].Key.ToString()}};
+        var payload = new { ids = new[] { mediaItems[0].Key.ToString(), mediaItems[1].Key.ToString() } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<string, string>>();
 
@@ -158,17 +155,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Media};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Media };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {mediaItems[0].GetUdi().ToString(), mediaItems[1].GetUdi().ToString()}};
+        var payload = new { ids = new[] { mediaItems[0].GetUdi().ToString(), mediaItems[1].GetUdi().ToString() } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<string, string>>();
 
@@ -183,17 +179,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     [Test]
     public async Task GetUrlsByIds_Documents_ReturnsHashesInMapForUnknownItems()
     {
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Document};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {1, 2}};
+        var payload = new { ids = new[] { 1, 2 } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<int, string>>();
 
@@ -233,17 +228,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Document};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {contentItems[0].Id, contentItems[1].Id}};
+        var payload = new { ids = new[] { contentItems[0].Id, contentItems[1].Id } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<int, string>>();
 
@@ -283,17 +277,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Document};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {contentItems[0].Key.ToString(), contentItems[1].Key.ToString()}};
+        var payload = new { ids = new[] { contentItems[0].Key.ToString(), contentItems[1].Key.ToString() } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<string, string>>();
 
@@ -333,17 +326,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Document};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetUrlsByIds", typeof(EntityController), queryParameters);
 
-        var payload = new {ids = new[] {contentItems[0].GetUdi().ToString(), contentItems[1].GetUdi().ToString()}};
+        var payload = new { ids = new[] { contentItems[0].GetUdi().ToString(), contentItems[1].GetUdi().ToString() } };
 
         var response = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, payload);
 
         // skip pointless un-parseable cruft.
-        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length,
-            SeekOrigin.Begin);
+        (await response.Content.ReadAsStreamAsync()).Seek(AngularJsonMediaTypeFormatter.XsrfPrefix.Length, SeekOrigin.Begin);
 
         var results = await response.Content.ReadFromJsonAsync<IDictionary<string, string>>();
 
@@ -383,13 +375,13 @@ public class EntityControllerTests : UmbracoTestServerTestBase
             }
         }
 
-        var queryParameters = new Dictionary<string, object> {["type"] = Constants.UdiEntityType.Document};
+        var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
 
         var url = LinkGenerator.GetUmbracoControllerUrl("GetByIds", typeof(EntityController), queryParameters);
 
-        var udiPayload = new {ids = new[] {contentItems[0].GetUdi().ToString(), contentItems[1].GetUdi().ToString()}};
+        var udiPayload = new { ids = new[] { contentItems[0].GetUdi().ToString(), contentItems[1].GetUdi().ToString() } };
 
-        var intPayload = new {ids = new[] {contentItems[0].Id, contentItems[1].Id}};
+        var intPayload = new { ids = new[] { contentItems[0].Id, contentItems[1].Id } };
 
         var udiResponse = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, udiPayload);
         var intResponse = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, intPayload);

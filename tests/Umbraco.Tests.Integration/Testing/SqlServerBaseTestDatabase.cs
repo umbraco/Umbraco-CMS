@@ -103,11 +103,12 @@ public abstract class SqlServerBaseTestDatabase : BaseTestDatabase
             {
                 var options =
                     new TestOptionsMonitor<InstallDefaultDataSettings>(
-                        new InstallDefaultDataSettings {InstallData = InstallDefaultDataOption.All});
+                        new InstallDefaultDataSettings { InstallData = InstallDefaultDataOption.All });
 
                 var schemaCreator = new DatabaseSchemaCreator(
                     database,
-                    _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory,
+                    _loggerFactory.CreateLogger<DatabaseSchemaCreator>(),
+                    _loggerFactory,
                     new UmbracoVersion(),
                     Mock.Of<IEventAggregator>(),
                     options);

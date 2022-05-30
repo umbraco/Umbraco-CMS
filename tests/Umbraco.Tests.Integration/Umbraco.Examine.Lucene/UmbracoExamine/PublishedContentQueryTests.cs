@@ -29,7 +29,8 @@ public class PublishedContentQueryTests : ExamineBaseTest
             : base(
                 loggerFactory,
                 name,
-                IndexInitializer.GetOptions(name,
+                IndexInitializer.GetOptions(
+                    name,
                     new LuceneDirectoryIndexOptions
                     {
                         DirectoryFactory = new GenericDirectoryFactory(s => luceneDirectory)
@@ -48,19 +49,25 @@ public class PublishedContentQueryTests : ExamineBaseTest
         using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
         {
             //populate with some test data
-            index.IndexItem(new ValueSet("1", "content",
+            index.IndexItem(new ValueSet(
+                "1",
+                "content",
                 new Dictionary<string, object>
                 {
                     [fieldNames[0]] = "Hello world, there are products here",
                     [UmbracoExamineFieldNames.VariesByCultureFieldName] = "n"
                 }));
-            index.IndexItem(new ValueSet("2", "content",
+            index.IndexItem(new ValueSet(
+                "2",
+                "content",
                 new Dictionary<string, object>
                 {
                     [fieldNames[1]] = "Hello world, there are products here",
                     [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
                 }));
-            index.IndexItem(new ValueSet("3", "content",
+            index.IndexItem(new ValueSet(
+                "3",
+                "content",
                 new Dictionary<string, object>
                 {
                     [fieldNames[2]] = "Hello world, there are products here",
@@ -87,18 +94,15 @@ public class PublishedContentQueryTests : ExamineBaseTest
         return new PublishedContentQuery(snapshot, variationContextAccessor, examineManager.Object);
     }
 
-    [TestCase("fr-fr", ExpectedResult = "1, 3",
-        Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
-    [TestCase("en-us", ExpectedResult = "1, 2",
-        Description = "Search Culture: en-us. Must return both en-us and invariant results")]
-    [TestCase("*", ExpectedResult = "1, 2, 3",
-        Description = "Search Culture: *. Must return all cultures and all invariant results")]
+    [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
+    [TestCase("en-us", ExpectedResult = "1, 2", Description = "Search Culture: en-us. Must return both en-us and invariant results")]
+    [TestCase("*", ExpectedResult = "1, 2, 3", Description = "Search Culture: *. Must return all cultures and all invariant results")]
     [TestCase(null, ExpectedResult = "1", Description = "Search Culture: null. Must return only invariant results")]
     public string Search(string culture)
     {
         using (var luceneDir = new RandomIdRAMDirectory())
         {
-            var fieldNames = new[] {"title", "title_en-us", "title_fr-fr"};
+            var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
             using (var indexer = CreateTestIndex(luceneDir, fieldNames))
             {
                 var pcq = CreatePublishedContentQuery(indexer);

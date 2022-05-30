@@ -135,7 +135,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
     {
         var context = GetMigrationContext(out var db);
 
-        var createExpression = new CreateIndexExpression(context) {Index = {Name = "IX_A"}};
+        var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_A" } };
 
         new CreateIndexBuilder(createExpression)
             .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().NonClustered()
@@ -150,7 +150,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
     {
         var context = GetMigrationContext(out var db);
 
-        var createExpression = new CreateIndexExpression(context) {Index = {Name = "IX_A"}};
+        var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_A" } };
 
         new CreateIndexBuilder(createExpression)
             .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Unique()
@@ -165,7 +165,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
     {
         var context = GetMigrationContext(out var db);
 
-        var createExpression = new CreateIndexExpression(context) {Index = {Name = "IX_AB"}};
+        var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_AB" } };
 
         new CreateIndexBuilder(createExpression)
             .OnTable("TheTable").OnColumn("A").Ascending().OnColumn("B").Ascending().WithOptions().Unique()
@@ -180,7 +180,7 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
     {
         var context = GetMigrationContext(out var db);
 
-        var createExpression = new CreateIndexExpression(context) {Index = {Name = "IX_A"}};
+        var createExpression = new CreateIndexExpression(context) { Index = { Name = "IX_A" } };
 
         new CreateIndexBuilder(createExpression)
             .OnTable("TheTable").OnColumn("A").Ascending().WithOptions().Clustered()
@@ -191,5 +191,5 @@ WHERE (({t("umbracoNode")}.{c("nodeObjectType")} = @0))) x)".Replace(Environment
     }
 
     private static IndexDefinition CreateIndexDefinition() =>
-        new IndexDefinition {ColumnName = "A", Name = "IX_A", TableName = "TheTable", SchemaName = "dbo"};
+        new IndexDefinition { ColumnName = "A", Name = "IX_A", TableName = "TheTable", SchemaName = "dbo" };
 }

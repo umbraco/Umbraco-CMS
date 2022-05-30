@@ -26,8 +26,12 @@ public class SchemaValidationTest : UmbracoIntegrationTest
 
         using (ScopeProvider.CreateScope(autoComplete: true))
         {
-            var schema = new DatabaseSchemaCreator(ScopeAccessor.AmbientScope.Database,
-                LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator,
+            var schema = new DatabaseSchemaCreator(
+                ScopeAccessor.AmbientScope.Database,
+                LoggerFactory.CreateLogger<DatabaseSchemaCreator>(),
+                LoggerFactory,
+                UmbracoVersion,
+                EventAggregator,
                 Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x =>
                     x.CurrentValue == new InstallDefaultDataSettings()));
             schema.InitializeDatabaseSchema();

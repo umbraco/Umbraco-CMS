@@ -58,7 +58,9 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         };
         contentType.PropertyGroups.Add(new PropertyGroup(contentCollection)
         {
-            Alias = "content", Name = "Content", SortOrder = 1
+            Alias = "content",
+            Name = "Content",
+            SortOrder = 1
         });
         ContentTypeService.Save(contentType);
 
@@ -91,7 +93,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         FileService.SaveTemplate(contentType3.DefaultTemplate);
         ContentTypeService.Save(contentType3);
 
-        IContentType[] contentTypes = {contentType1, contentType2, contentType3};
+        IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
         var parentId = -1;
 
         var ids = new List<int>();
@@ -146,7 +148,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
             FileService.SaveTemplate(contentType3.DefaultTemplate);
             ContentTypeService.Save(contentType3);
 
-            IContentType[] contentTypes = {contentType1, contentType2, contentType3};
+            IContentType[] contentTypes = { contentType1, contentType2, contentType3 };
             var parentId = -1;
 
             for (var i = 0; i < 2; i++)
@@ -322,7 +324,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var dtdYesNo = DataTypeService.GetDataType(-49);
         var ctBase = new ContentType(ShortStringHelper, -1)
         {
-            Name = "Base", Alias = "Base", Icon = "folder.gif", Thumbnail = "folder.png"
+            Name = "Base",
+            Alias = "Base",
+            Icon = "folder.gif",
+            Thumbnail = "folder.png"
         };
         ctBase.AddPropertyType(new PropertyType(ShortStringHelper, dtdYesNo, Constants.Conventions.Content.NaviHide)
         {
@@ -341,7 +346,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
             AllowedAsRoot = true
         };
         ctHomePage.AddPropertyType(
-            new PropertyType(ShortStringHelper, dtdYesNo, "someProperty") {Name = "Some property"});
+            new PropertyType(ShortStringHelper, dtdYesNo, "someProperty") { Name = "Some property" });
         /*,"Navigation"*/
         cts.Save(ctHomePage);
 
@@ -373,13 +378,16 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
 
         contentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
-                "title") {Name = "Title", Description = string.Empty, Mandatory = false, DataTypeId = -88});
+                "title")
+            { Name = "Title", Description = string.Empty, Mandatory = false, DataTypeId = -88 });
         contentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext,
-                "bodyText") {Name = "Body Text", Description = string.Empty, Mandatory = false, DataTypeId = -87});
+                "bodyText")
+            { Name = "Body Text", Description = string.Empty, Mandatory = false, DataTypeId = -87 });
         contentType.AddPropertyType(
             new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext,
-                "author") {Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88});
+                "author")
+            { Name = "Author", Description = "Name of the author", Mandatory = false, DataTypeId = -88 });
 
         ContentTypeService.Save(contentType);
 
@@ -462,7 +470,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var cts = ContentTypeService;
 
         // Act
-        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container1"};
+        var container = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
         cts.SaveContainer(container);
 
         // Assert
@@ -477,10 +485,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var cts = ContentTypeService;
 
         // Act
-        var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container1"};
+        var container1 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container1" };
         cts.SaveContainer(container1);
 
-        var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) {Name = "container2"};
+        var container2 = new EntityContainer(Constants.ObjectTypes.DocumentType) { Name = "container2" };
         cts.SaveContainer(container2);
 
         // Assert
@@ -1249,7 +1257,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var propertyGroup = contentPage.PropertyGroups["content2"];
         Assert.Throws<ArgumentException>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
         {
-            Id = propertyGroup.Id, Alias = "content", Name = "Content", SortOrder = 0
+            Id = propertyGroup.Id,
+            Alias = "content",
+            Name = "Content",
+            SortOrder = 0
         }));
 
         // Assert
@@ -1588,7 +1599,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var propertyGroup = page.PropertyGroups["content2"];
         page.PropertyGroups.Add(new PropertyGroup(true)
         {
-            Id = propertyGroup.Id, Name = "Content", Alias = "content", SortOrder = 0
+            Id = propertyGroup.Id,
+            Name = "Content",
+            Alias = "content",
+            SortOrder = 0
         });
         ContentTypeService.Save(page);
 
@@ -1675,7 +1689,10 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var propertyGroup = page.PropertyGroups["content2"];
         page.PropertyGroups.Add(new PropertyGroup(true)
         {
-            Id = propertyGroup.Id, Alias = "content", Name = "Content", SortOrder = 0
+            Id = propertyGroup.Id,
+            Alias = "content",
+            Name = "Content",
+            SortOrder = 0
         });
         ContentTypeService.Save(page);
 
@@ -1975,7 +1992,9 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
 
         component.PropertyGroups.Add(new PropertyGroup(contentCollection)
         {
-            Alias = "component", Name = "Component", SortOrder = 1
+            Alias = "component",
+            Name = "Component",
+            SortOrder = 1
         });
 
         return component;
@@ -2034,7 +2053,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
             }
         };
         site.PropertyGroups.Add(
-            new PropertyGroup(contentCollection) {Name = "Site Settings", Alias = "siteSettings", SortOrder = 1});
+            new PropertyGroup(contentCollection) { Name = "Site Settings", Alias = "siteSettings", SortOrder = 1 });
 
         return site;
     }
@@ -2058,7 +2077,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         ContentTypeService.Save(masterContentType);
 
         // add the one we just created
-        var list = new List<IContentType> {masterContentType};
+        var list = new List<IContentType> { masterContentType };
 
         for (var i = 0; i < 10; i++)
         {
