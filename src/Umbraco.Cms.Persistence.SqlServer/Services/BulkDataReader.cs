@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Persistence.SqlServer.Services;
 ///     rapid transfer of data to SQL Server.
 ///     Subclasses should implement <see cref="BulkDataReader.SchemaName" />, <see cref="BulkDataReader.TableName" />,
 ///     <see cref="BulkDataReader.AddSchemaTableRows()" />, <see cref="BulkDataReader.Read()" />,
-///     <see cref="BulkDataReader.GetValue(Int32)" />.
-///     If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(Boolean)" />.
+///     <see cref="BulkDataReader.GetValue(int)" />.
+///     If they contain disposable resources they should override <see cref="BulkDataReader.Dispose(bool)" />.
 ///     SD: Alternatively, we could have used a LinqEntityDataReader which is nicer to use but it uses quite a lot of
 ///     reflection and
 ///     I thought this would just be quicker.
@@ -105,11 +105,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <remarks>
     ///     Call
     ///     <see
-    ///         cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)" />
+    ///         cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     ///     to do this for each row.
     /// </remarks>
     /// <seealso
-    ///     cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)" />
+    ///     cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     protected abstract void AddSchemaTableRows();
 
     /// <summary>
@@ -118,11 +118,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <remarks>
     ///     This is used for checking the parameters of
     ///     <see
-    ///         cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)" />
+    ///         cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     ///     .
     /// </remarks>
     /// <seealso
-    ///     cref="AddSchemaTableRow(String,Nullable{Int32},Nullable{Int16},Nullable{Int16},Boolean,Boolean,Boolean,SqlDbType,String,String,String,String,String)" />
+    ///     cref="AddSchemaTableRow(string,Nullable{Int32},Nullable{Int16},Nullable{Int16},bool,bool,bool,SqlDbType,string,string,string,string,string)" />
     private static readonly Dictionary<SqlDbType, List<string>> AllowedOptionalColumnCombinations = new()
     {
         {SqlDbType.BigInt, new List<string>()},
@@ -253,9 +253,8 @@ internal abstract class BulkDataReader : IDataReader
             throw new ArgumentOutOfRangeException("columnSize");
         }
 
-        List<string>? allowedOptionalColumnList;
 
-        if (AllowedOptionalColumnCombinations.TryGetValue(providerType, out allowedOptionalColumnList))
+        if (AllowedOptionalColumnCombinations.TryGetValue(providerType, out List<string>? allowedOptionalColumnList))
         {
             if ((columnSize.HasValue && !allowedOptionalColumnList.Contains(SchemaTableColumn.ColumnSize)) ||
                 (numericPrecision.HasValue &&
@@ -661,9 +660,7 @@ internal abstract class BulkDataReader : IDataReader
                         schemaCollection.Append("[" + xmlSchemaCollectionDatabase + "]");
                     }
 
-                    schemaCollection.Append("[" + (xmlSchemaCollectionOwningSchema == null
-                        ? SchemaName
-                        : xmlSchemaCollectionOwningSchema) + "]");
+                    schemaCollection.Append("[" + (xmlSchemaCollectionOwningSchema ?? SchemaName) + "]");
                     schemaCollection.Append("[" + xmlSchemaCollectionName + "]");
 
                     dataTypeName = schemaCollection.ToString();
@@ -800,7 +797,7 @@ internal abstract class BulkDataReader : IDataReader
     ///     The zero-based index of the column to get.
     /// </param>
     /// <returns>
-    ///     The column located at the specified index as an <see cref="Object" />.
+    ///     The column located at the specified index as an <see cref="object" />.
     /// </returns>
     /// <seealso cref="P:IDataRecord.Item(Int32)" />
     public object this[int i] => GetValue(i);
@@ -815,7 +812,7 @@ internal abstract class BulkDataReader : IDataReader
     ///     The name of the column to find.
     /// </param>
     /// <returns>
-    ///     The column located at the specified name as an <see cref="Object" />.
+    ///     The column located at the specified name as an <see cref="object" />.
     /// </returns>
     /// <seealso cref="P:IDataRecord.Item(String)" />
     public object this[string name] => GetValue(GetOrdinal(name));
@@ -837,7 +834,7 @@ internal abstract class BulkDataReader : IDataReader
     public void Close() => _isOpen = false;
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Boolean" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="bool" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -848,11 +845,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetBoolean(Int32)" />
+    /// <seealso cref="IDataRecord.GetBoolean(int)" />
     public bool GetBoolean(int i) => (bool)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Byte" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="byte" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -863,7 +860,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetByte(Int32)" />
+    /// <seealso cref="IDataRecord.GetByte(int)" />
     public byte GetByte(int i) => (byte)GetValue(i);
 
     /// <summary>
@@ -895,7 +892,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The actual number of bytes read.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetBytes(Int32,Int64,Byte[],Int32,Int32)" />
+    /// <seealso cref="IDataRecord.GetBytes(int,long,byte[],int,int)" />
     public long GetBytes(int i,
         long fieldOffset,
         byte[]? buffer,
@@ -913,7 +910,7 @@ internal abstract class BulkDataReader : IDataReader
     }
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Char" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="char" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -924,26 +921,24 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetChar(Int32)" />
+    /// <seealso cref="IDataRecord.GetChar(int)" />
     public char GetChar(int i)
     {
         char result;
 
         var data = GetValue(i);
         var dataAsChar = data as char?;
-        var dataAsCharArray = data as char[];
-        var dataAsString = data as string;
 
         if (dataAsChar.HasValue)
         {
             result = dataAsChar.Value;
         }
-        else if (dataAsCharArray != null &&
+        else if (data is char[] dataAsCharArray &&
                  dataAsCharArray.Length == 1)
         {
             result = dataAsCharArray[0];
         }
-        else if (dataAsString != null &&
+        else if (data is string dataAsString &&
                  dataAsString.Length == 1)
         {
             result = dataAsString[0];
@@ -985,7 +980,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The actual number of characters read.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetChars(Int32,Int64,Char[],Int32,Int32)" />
+    /// <seealso cref="IDataRecord.GetChars(int,long,char[],int,int)" />
     public long GetChars(int i,
         long fieldoffset,
         char[]? buffer,
@@ -994,10 +989,9 @@ internal abstract class BulkDataReader : IDataReader
     {
         var data = GetValue(i);
 
-        var dataAsString = data as string;
         var dataAsCharArray = data as char[];
 
-        if (dataAsString != null)
+        if (data is string dataAsString)
         {
             dataAsCharArray = dataAsString.ToCharArray((int)fieldoffset, length);
         }
@@ -1029,7 +1023,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The <see cref="IDataReader" /> for the specified column ordinal (null).
     /// </returns>
-    /// <seealso cref="IDataRecord.GetData(Int32)" />
+    /// <seealso cref="IDataRecord.GetData(int)" />
     public IDataReader GetData(int i)
     {
         if (i < 0 || i >= FieldCount)
@@ -1052,7 +1046,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The data type information for the specified field.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetDataTypeName(Int32)" />
+    /// <seealso cref="IDataRecord.GetDataTypeName(int)" />
     public string GetDataTypeName(int i) => GetFieldType(i).Name;
 
     /// <summary>
@@ -1067,7 +1061,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetDateTime(Int32)" />
+    /// <seealso cref="IDataRecord.GetDateTime(int)" />
     public DateTime GetDateTime(int i) => (DateTime)GetValue(i);
 
     /// <summary>
@@ -1085,7 +1079,7 @@ internal abstract class BulkDataReader : IDataReader
     public DateTimeOffset GetDateTimeOffset(int i) => (DateTimeOffset)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Decimal" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="decimal" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1096,11 +1090,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetDecimal(Int32)" />
+    /// <seealso cref="IDataRecord.GetDecimal(int)" />
     public decimal GetDecimal(int i) => (decimal)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Double" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="double" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1111,11 +1105,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetDouble(Int32)" />
+    /// <seealso cref="IDataRecord.GetDouble(int)" />
     public double GetDouble(int i) => (double)GetValue(i);
 
     /// <summary>
-    ///     Gets the <see cref="Type" /> information corresponding to the type of <see cref="Object" /> that would be returned
+    ///     Gets the <see cref="Type" /> information corresponding to the type of <see cref="object" /> that would be returned
     ///     from <see cref="GetValue" />.
     ///     (Inherited from <see cref="IDataReader" />.)
     /// </summary>
@@ -1126,14 +1120,14 @@ internal abstract class BulkDataReader : IDataReader
     ///     The zero-based column ordinal.
     /// </param>
     /// <returns>
-    ///     The <see cref="Type" /> information corresponding to the type of <see cref="Object" /> that would be returned from
+    ///     The <see cref="Type" /> information corresponding to the type of <see cref="object" /> that would be returned from
     ///     <see cref="GetValue" />.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetFieldType(Int32)" />
+    /// <seealso cref="IDataRecord.GetFieldType(int)" />
     public Type GetFieldType(int i) => (Type)GetSchemaTable().Rows[i][SchemaTableColumn.DataType];
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Single" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="float" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1144,7 +1138,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetFloat(Int32)" />
+    /// <seealso cref="IDataRecord.GetFloat(int)" />
     public float GetFloat(int i) => (float)this[i];
 
     /// <summary>
@@ -1159,11 +1153,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetGuid(Int32)" />
+    /// <seealso cref="IDataRecord.GetGuid(int)" />
     public Guid GetGuid(int i) => (Guid)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Int16" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="short" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1174,11 +1168,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetInt16(Int32)" />
+    /// <seealso cref="IDataRecord.GetInt16(int)" />
     public short GetInt16(int i) => (short)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Int32" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="int" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1189,11 +1183,11 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetInt32(Int32)" />
+    /// <seealso cref="IDataRecord.GetInt32(int)" />
     public int GetInt32(int i) => (int)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Int64" />.  (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="long" />.  (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1204,7 +1198,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetInt64(Int32)" />
+    /// <seealso cref="IDataRecord.GetInt64(int)" />
     public long GetInt64(int i) => (long)GetValue(i);
 
     /// <summary>
@@ -1219,7 +1213,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The name of the field or the empty string (""), if there is no value to return.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetName(Int32)" />
+    /// <seealso cref="IDataRecord.GetName(int)" />
     public string GetName(int i) => (string)GetSchemaTable().Rows[i][SchemaTableColumn.ColumnName];
 
     /// <summary>
@@ -1234,7 +1228,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The index of the named field.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetOrdinal(String)" />
+    /// <seealso cref="IDataRecord.GetOrdinal(string)" />
     public int GetOrdinal(string name)
     {
         if (name == null) // Empty strings are handled as a IndexOutOfRangeException.
@@ -1311,7 +1305,7 @@ internal abstract class BulkDataReader : IDataReader
     }
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="String" />. (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="string" />. (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1322,7 +1316,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetString(Int32)" />
+    /// <seealso cref="IDataRecord.GetString(int)" />
     public string GetString(int i) => (string)GetValue(i);
 
     /// <summary>
@@ -1340,7 +1334,7 @@ internal abstract class BulkDataReader : IDataReader
     public TimeSpan GetTimeSpan(int i) => (TimeSpan)GetValue(i);
 
     /// <summary>
-    ///     Gets the value of the specified column as a <see cref="Object" />. (Inherited from <see cref="IDataReader" />.)
+    ///     Gets the value of the specified column as a <see cref="object" />. (Inherited from <see cref="IDataReader" />.)
     /// </summary>
     /// <exception cref="IndexOutOfRangeException">
     ///     The index passed was outside the range of 0 through <see cref="FieldCount" />.
@@ -1351,7 +1345,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     The value of the column.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetValue(Int32)" />
+    /// <seealso cref="IDataRecord.GetValue(int)" />
     public abstract object GetValue(int i);
 
     /// <summary>
@@ -1362,12 +1356,12 @@ internal abstract class BulkDataReader : IDataReader
     ///     <paramref name="values" /> was null.
     /// </exception>
     /// <param name="values">
-    ///     An array of <see cref="Object" /> to copy the attribute fields into.
+    ///     An array of <see cref="object" /> to copy the attribute fields into.
     /// </param>
     /// <returns>
-    ///     The number of instances of <see cref="Object" /> in the array.
+    ///     The number of instances of <see cref="object" /> in the array.
     /// </returns>
-    /// <seealso cref="IDataRecord.GetValues(Object[])" />
+    /// <seealso cref="IDataRecord.GetValues(object[])" />
     public int GetValues(object[] values)
     {
         if (values == null)
@@ -1397,7 +1391,7 @@ internal abstract class BulkDataReader : IDataReader
     /// <returns>
     ///     True if the specified field is set to null; otherwise, false.
     /// </returns>
-    /// <seealso cref="IDataRecord.IsDBNull(Int32)" />
+    /// <seealso cref="IDataRecord.IsDBNull(int)" />
     public bool IsDBNull(int i)
     {
         var data = GetValue(i);

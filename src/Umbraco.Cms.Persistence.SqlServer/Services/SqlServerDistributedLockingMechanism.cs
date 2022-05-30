@@ -136,7 +136,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
 
-            var i = db.ExecuteScalar<int?>(query, new {id = LockId});
+            var i = db.ExecuteScalar<int?>(query, new { id = LockId });
 
             if (i == null)
             {
@@ -171,7 +171,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
             db.Execute("SET LOCK_TIMEOUT " + _timeout.TotalMilliseconds + ";");
 
-            var i = db.Execute(query, new {id = LockId});
+            var i = db.Execute(query, new { id = LockId });
 
             if (i == 0)
             {

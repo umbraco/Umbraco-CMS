@@ -54,20 +54,19 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
                 NPocoDatabaseExtensions.GetTypedTransaction<SqlTransaction>(command.Transaction);
             var tableName = pocoData.TableInfo.TableName;
 
-            var syntax = database.SqlContext.SqlSyntax as SqlServerSyntaxProvider;
-            if (syntax == null)
+            if (database.SqlContext.SqlSyntax is not SqlServerSyntaxProvider syntax)
             {
                 throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
             }
 
             using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction)
-                   {
-                       BulkCopyTimeout =
+            {
+                BulkCopyTimeout =
                            0, // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
-                       DestinationTableName = tableName,
-                       // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
-                       BatchSize = 4096
-                   })
+                DestinationTableName = tableName,
+                // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
+                BatchSize = 4096
+            })
             using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
             {
                 //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared

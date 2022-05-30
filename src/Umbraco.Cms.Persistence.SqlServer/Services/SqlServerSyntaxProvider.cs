@@ -82,7 +82,7 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         var fromSettings = false;
 
         if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")
-                                         || !Enum<VersionName>.TryParse(setting.Substring("SqlServer.".Length),
+                                         || !Enum<VersionName>.TryParse(setting["SqlServer.".Length..],
                                              out VersionName versionName, true))
         {
             versionName = GetSetVersion(connectionString, ProviderName, _logger).ProductVersionName;
@@ -280,7 +280,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         var result =
             db.ExecuteScalar<long>(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName AND TABLE_SCHEMA = (SELECT SCHEMA_NAME())",
-                new {TableName = tableName});
+                new { TableName = tableName });
 
         return result > 0;
     }
@@ -307,10 +307,10 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
                 return "NEWID()";
             case SystemMethods.CurrentDateTime:
                 return "GETDATE()";
-            //case SystemMethods.NewSequentialId:
-            //    return "NEWSEQUENTIALID()";
-            //case SystemMethods.CurrentUTCDateTime:
-            //    return "GETUTCDATE()";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
         }
 
         return null;
@@ -425,7 +425,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
     private static SqlInspectionUtilities? _sqlInspector;
 
     private static SqlInspectionUtilities SqlInspector =>
-        _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
+_sqlInspector ??= new SqlInspectionUtilities();
 
     private class SqlInspectionUtilities
     {

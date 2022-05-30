@@ -14,7 +14,8 @@ public class SqlServerDatabaseCreator : IDatabaseCreator
         // Get connection string without database specific information
         var masterBuilder = new SqlConnectionStringBuilder(builder.ConnectionString)
         {
-            AttachDBFilename = string.Empty, InitialCatalog = string.Empty
+            AttachDBFilename = string.Empty,
+            InitialCatalog = string.Empty
         };
         var masterConnectionString = masterBuilder.ConnectionString;
 

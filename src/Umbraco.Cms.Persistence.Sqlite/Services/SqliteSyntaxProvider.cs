@@ -34,7 +34,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
         ScalarMappers = new Dictionary<Type, IScalarMapper>
         {
-            [typeof(Guid)] = new SqliteGuidScalarMapper(), [typeof(Guid?)] = new SqliteNullableGuidScalarMapper()
+            [typeof(Guid)] = new SqliteGuidScalarMapper(),
+            [typeof(Guid?)] = new SqliteNullableGuidScalarMapper()
         };
     }
 
