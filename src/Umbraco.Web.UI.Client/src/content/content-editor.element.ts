@@ -1,9 +1,12 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '../core/context';
+import { DocumentNode, UmbContentService } from './content.service';
+import { Subscription } from 'rxjs';
 
 @customElement('umb-content-editor')
-class UmbContentEditor extends LitElement {
+class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -41,17 +44,39 @@ class UmbContentEditor extends LitElement {
     `,
   ];
 
+  @state()
+  _node?: DocumentNode;
+
   @property()
   id!: string;
 
+  private _contentService?: UmbContentService;
+  private _nodeSubscription?: Subscription;
+
+  constructor () {
+    super();
+
+    this.consumeContext('umbContentService', (contentService: UmbContentService) => {
+      this._contentService = contentService;
+      this._useNode();
+    });
+  }
 
   private _onPropertyDataTypeChange(e: CustomEvent) {
-
     const target = (e.target as any)
     console.log(target.value)
 
     // TODO: Set value.
     //this.nodeData.properties.find(x => x.propertyAlias === target.propertyAlias)?.tempValue = target.value;
+  }
+
+  private _useNode() {
+    this._nodeSubscription?.unsubscribe();
+
+    this._nodeSubscription = this._contentService?.getById(this.id).subscribe(node => {
+      if (!node) return;
+      this._node = node;
+    });
   }
 
   private _onSaveAndPublish() {
@@ -66,89 +91,24 @@ class UmbContentEditor extends LitElement {
     console.log('Save and preview');
   }
 
-  /*
-  // Properties mock data:
-  private properties = [
-    {
-      propertyAlias: 'myHeadline',
-      label: 'Text string label',
-      description: 'This is the a text string property',
-      dataTypeAlias: 'myTextStringEditor'
-    },
-    {
-      propertyAlias: 'myDescription',
-      label: 'Textarea label',
-      description: 'this is a textarea property',
-      dataTypeAlias: 'myTextAreaEditor'
-    }
-  ];
-  */
-
-  private nodeData = {
-    name: 'my node 1',
-    key: '1234-1234-1234',
-    alias: 'myNode1',
-    documentTypeAlias: 'myDocumentType',
-    documentTypeKey: '1234-1234-1234',
-    /* example of layout:
-    layout: [
-      {
-        type: 'group',
-        children: [
-          {
-            type: 'property',
-            alias: 'myHeadline'
-          },
-          {
-            type: 'property',
-            alias: 'myDescription'
-          }
-        ]
-      }
-    ],
-    */
-    properties: [
-      {
-        alias: 'myHeadline',
-        label: 'Textarea label',
-        description: 'this is a textarea property',
-        dataTypeAlias: 'myTextStringEditor',
-        tempValue: 'hello world'
-      },
-      {
-        alias: 'myDescription',
-        label: 'Text string label',
-        description: 'This is the a text string property',
-        dataTypeAlias: 'myTextAreaEditor',
-        tempValue: 'Tex areaaaa'
-      },
-    ],
-    data: [
-      {
-        alias: 'myHeadline',
-        value: 'hello world',
-      },
-      {
-        alias: 'myDescription',
-        value: 'Teeeeexxxt areaaaaaa',
-      },
-    ]
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._nodeSubscription?.unsubscribe();
   }
 
   render() {
     return html`
       <umb-node-editor-layout>
-        <uui-input slot="name" value="Home"></uui-input>
+        <uui-input slot="name" .value="${this._node?.name}"></uui-input>
         <uui-tab-group slot="apps">
-          <uui-tab active>Content</uui-tab>
-          <uui-tab>Info</uui-tab>
-          <uui-tab disabled>Actions</uui-tab>
+          <uui-tab label="Content" active></uui-tab>
+          <uui-tab label="Info"></uui-tab>
+          <uui-tab label="Actions" disabled></uui-tab>
         </uui-tab-group>
 
         <uui-box slot="content">
-          <h1 style="margin-bottom: 40px;">RENDER NODE WITH ID: ${this.id}</h1>
           <!-- TODO: Make sure map get data from data object?, parse on property object. -->
-          ${this.nodeData.properties.map(
+          ${this._node?.properties.map(
             property => html`
             <umb-node-property 
               .property=${property}
@@ -160,9 +120,9 @@ class UmbContentEditor extends LitElement {
         </uui-box>
 
         <div slot="actions">
-          <uui-button @click=${this._onSaveAndPreview}>Save and preview</uui-button>
-          <uui-button @click=${this._onSave} look="secondary">Save</uui-button>
-          <uui-button @click=${this._onSaveAndPublish} look="primary" color="positive">Save and publish</uui-button>
+          <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
+          <uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>
+          <uui-button @click=${this._onSaveAndPublish} look="primary" color="positive" label="Save and publish"></uui-button>
         </div>
       </umb-node-editor-layout>
     `;

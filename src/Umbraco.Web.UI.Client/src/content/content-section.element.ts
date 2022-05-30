@@ -1,14 +1,16 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { css, html, LitElement, PropertyValueMap } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../core/context';
+import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
+import { UmbContentService } from './content.service';
 
 import './content-tree.element';
 import './content-dashboards.element';
 import './content-editor.element';
+
 @customElement('umb-content-section')
-export class UmbContentSection extends UmbContextConsumerMixin(LitElement) {
+export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
   static styles = [
     UUITextStyles,
     css`
@@ -25,6 +27,8 @@ export class UmbContentSection extends UmbContextConsumerMixin(LitElement) {
 
   constructor () {
     super();
+
+    this.provideContext('umbContentService', new UmbContentService());
 
     this.consumeContext('umbRouter', (_instance: UmbRouter) => {
       this._router = _instance;
