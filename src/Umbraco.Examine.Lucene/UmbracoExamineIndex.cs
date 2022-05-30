@@ -33,8 +33,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
         : base(loggerFactory, name, indexOptions)
     {
         _runtimeState = runtimeState;
-        _diagnostics = new UmbracoExamineIndexDiagnostics(this,
-            loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
+        _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
         _logger = loggerFactory.CreateLogger<UmbracoExamineIndex>();
     }
 
@@ -54,8 +53,7 @@ public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDi
     /// <remarks>
     ///     This check is required since the base examine lib will try to rebuild on startup
     /// </remarks>
-    protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds,
-        Action<IndexOperationEventArgs>? onComplete)
+    protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs>? onComplete)
     {
         if (CanInitialize())
         {

@@ -32,7 +32,8 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public BackOfficeExamineSearcher(IExamineManager examineManager,
+    public BackOfficeExamineSearcher(
+        IExamineManager examineManager,
         ILocalizationService languageService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IEntityService entityService,
@@ -51,8 +52,14 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         _publishedUrlProvider = publishedUrlProvider;
     }
 
-    public IEnumerable<ISearchResult> Search(string query, UmbracoEntityTypes entityType, int pageSize, long pageIndex,
-        out long totalFound, string? searchFrom = null, bool ignoreUserStartNodes = false)
+    public IEnumerable<ISearchResult> Search(
+        string query,
+        UmbracoEntityTypes entityType,
+        int pageSize,
+        long pageIndex,
+        out long totalFound,
+        string? searchFrom = null,
+        bool ignoreUserStartNodes = false)
     {
         var sb = new StringBuilder();
 
@@ -108,8 +115,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 var allMediaStartNodes = currentUser != null
                     ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes,
-                    _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                 break;
             case UmbracoEntityTypes.Document:
                 type = "content";
@@ -122,8 +128,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
                 var allContentStartNodes = currentUser != null
                     ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                     : Array.Empty<int>();
-                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes,
-                    _entityService);
+                AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                 break;
             default:
                 throw new NotSupportedException("The " + typeof(BackOfficeExamineSearcher) +
@@ -164,7 +169,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
         // the chars [*-_] in the query will mess everything up so let's remove those
-        query = Regex.Replace(query, "[\\*\\-_]", "");
+        query = Regex.Replace(query, "[\\*\\-_]", string.Empty);
 
         //check if text is surrounded by single or double quotes, if so, then exact match
         var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
@@ -336,8 +341,7 @@ public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
         }
     }
 
-    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom,
-        bool ignoreUserStartNodes, IEntityService entityService)
+    private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
     {
         if (sb == null)
         {

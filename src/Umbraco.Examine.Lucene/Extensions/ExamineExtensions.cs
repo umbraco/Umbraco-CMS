@@ -28,8 +28,7 @@ public static class ExamineExtensions
         try
         {
             //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
-            Query? parsed = new QueryParser(LuceneInfo.CurrentVersion, UmbracoExamineFieldNames.NodeNameFieldName,
-                new KeywordAnalyzer()).Parse(query);
+            Query? parsed = new QueryParser(LuceneInfo.CurrentVersion, UmbracoExamineFieldNames.NodeNameFieldName, new KeywordAnalyzer()).Parse(query);
             return true;
         }
         catch (ParseException)

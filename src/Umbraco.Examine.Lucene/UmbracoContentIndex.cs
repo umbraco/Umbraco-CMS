@@ -14,9 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// <summary>
 ///     An indexer for Umbraco content and media
 /// </summary>
-public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
+public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
 {
-    private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> {"id"};
+    private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
     private readonly ILogger<UmbracoContentIndex> _logger;
 
     public UmbracoContentIndex(
@@ -120,8 +120,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, ID
     /// </remarks>
     /// <param name="itemIds">ID of the node to delete</param>
     /// <param name="onComplete"></param>
-    protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds,
-        Action<IndexOperationEventArgs>? onComplete)
+    protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs>? onComplete)
     {
         var idsAsList = itemIds.ToList();
 
@@ -137,8 +136,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, ID
             IOrdering? selectedFields = filtered.SelectFields(_idOnlyFieldSet);
             ISearchResults? results = selectedFields.Execute();
 
-            _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery,
-                results.TotalItemCount);
+            _logger.LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
             var toRemove = results.Select(x => x.Id).ToList();
             // delete those descendants (ensure base. is used here so we aren't calling ourselves!)
