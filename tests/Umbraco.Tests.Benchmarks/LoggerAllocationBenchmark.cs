@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Tests.Benchmarks.Config;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Benchmarks;
 public class LoggerAllocationBenchmark
 {
     private readonly string rawQuery = "";
-    private int totalItemCount;
+    private readonly int totalItemCount;
 
     [Benchmark(Baseline = true)]
     public void Baseline()

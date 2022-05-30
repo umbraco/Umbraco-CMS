@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Tests.Benchmarks.Config;
@@ -121,7 +121,7 @@ public class StringReplaceManyBenchmarks
     private static readonly string Text;
 
     // replaced chars for ReplaceMany with chars
-    private static readonly char[] ReplacedChars = {',', '.', ':', '&', '#'};
+    private static readonly char[] ReplacedChars = { ',', '.', ':', '&', '#' };
 
     // replacement char for ReplaceMany with chars
     private static readonly char ReplacementChar = '*';

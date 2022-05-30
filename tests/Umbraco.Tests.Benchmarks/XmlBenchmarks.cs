@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Tests.Benchmarks.Config;
@@ -86,7 +86,7 @@ public class XmlBenchmarks
     public void XmlWithNavigation()
     {
         var elt = _xml.DocumentElement;
-        var id = NavigateElementRoute(elt, new[] {"home", "sub1", "sub2"});
+        var id = NavigateElementRoute(elt, new[] { "home", "sub1", "sub2" });
         if (id <= 0)
         {
             Console.WriteLine("ERR");

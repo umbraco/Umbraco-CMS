@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnosers;
 
 namespace Umbraco.Tests.Benchmarks.Config;
 

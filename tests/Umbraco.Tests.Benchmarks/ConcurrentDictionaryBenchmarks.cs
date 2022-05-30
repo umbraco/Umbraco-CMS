@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using BenchmarkDotNet.Attributes;
 using Umbraco.Cms.Core.Collections;
@@ -31,8 +31,7 @@ public class ConcurrentDictionaryBenchmarks
     {
         // This method is 10% faster
         var key = new CompositeTypeTypeKey(source, target);
-        bool canConvert;
-        if (AssignableTypeCache.TryGetValue(key, out canConvert))
+        if (AssignableTypeCache.TryGetValue(key, out bool canConvert))
         {
             return canConvert;
         }

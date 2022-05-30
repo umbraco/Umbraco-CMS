@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Benchmarks;
 [MemoryDiagnoser]
 public class TryConvertToBenchmarks
 {
-    private static readonly List<string> List = new() {"hello", "world", "awesome"};
+    private static readonly List<string> List = new() { "hello", "world", "awesome" };
     private static readonly string Date = "Saturday 10, November 2012";
 
     [Benchmark(Description = "List<string> to IEnumerable<string>")]

@@ -195,7 +195,9 @@ public class LoadTestController : Controller
         var def = _dataTypeService.GetDataType(TextboxDefinitionId);
         contentType.AddPropertyType(new PropertyType(_shortStringHelper, def)
         {
-            Name = "Origin", Alias = "origin", Description = "The origin of the content."
+            Name = "Origin",
+            Alias = "origin",
+            Description = "The origin of the content."
         });
         _contentTypeService.Save(contentType);
 
@@ -217,7 +219,7 @@ public class LoadTestController : Controller
         {
             new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
         });
-        containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] {containerTemplate});
+        containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
         containerType.SetDefaultTemplate(containerTemplate);
         _contentTypeService.Save(containerType);
 
@@ -229,7 +231,7 @@ public class LoadTestController : Controller
 
     private Template ImportTemplate(string name, string alias, string text, ITemplate master = null)
     {
-        var t = new Template(_shortStringHelper, name, alias) {Content = text};
+        var t = new Template(_shortStringHelper, name, alias) { Content = text };
         if (master != null)
         {
             t.SetMasterTemplate(master);
@@ -283,7 +285,7 @@ public class LoadTestController : Controller
         }
 
         return ContentHtml("Created " + n + " content"
-                           + (restart ? ", and restarted" : "")
+                           + (restart ? ", and restarted" : string.Empty)
                            + ".");
     }
 

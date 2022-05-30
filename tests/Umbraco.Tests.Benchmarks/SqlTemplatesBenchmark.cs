@@ -24,11 +24,9 @@ public class SqlTemplatesBenchmark
     public SqlTemplatesBenchmark()
     {
         var mappers = new MapperCollection();
-        var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(),
-            mappers);
+        var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(), mappers);
 
-        SqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-            DatabaseType.SQLCe, factory);
+        SqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);
         SqlTemplates = new SqlTemplates(SqlContext);
     }
 
@@ -61,7 +59,7 @@ public class SqlTemplatesBenchmark
                 .From<Thing1Dto>()
                 .Where<Thing1Dto>(x => x.Name == SqlTemplate.Arg<string>("name")));
 
-            var sql = template.Sql(new {name = "yada"});
+            var sql = template.Sql(new { name = "yada" });
 
             var sqlString = sql.SQL; // force-build the SQL
         }
@@ -77,8 +75,10 @@ public class SqlTemplatesBenchmark
     [ExplicitColumns]
     public class Thing1Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 }

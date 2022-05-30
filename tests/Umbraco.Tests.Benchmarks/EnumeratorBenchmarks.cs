@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 
 namespace Umbraco.Tests.Benchmarks;
@@ -24,7 +24,7 @@ public class EnumeratorBenchmarks
         }
     }
 
-    private IEnumerable<T> EnumerateOneWithArray<T>(T o) => new[] {o};
+    private IEnumerable<T> EnumerateOneWithArray<T>(T o) => new[] { o };
 
     private IEnumerable<T> EnumerateOneWithYield<T>(T o)
     {

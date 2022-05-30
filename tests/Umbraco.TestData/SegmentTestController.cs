@@ -87,8 +87,7 @@ public class SegmentTestController : SurfaceController
         return Content($"The document type {alias} no longer allows segments");
     }
 
-    public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment,
-        string? culture = null)
+    public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string? culture = null)
     {
         var content = Services.ContentService.GetById(contentId);
         if (content == null)

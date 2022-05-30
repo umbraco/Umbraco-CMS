@@ -128,9 +128,7 @@ public class UmbracoTestDataController : SurfaceController
     ///     For media, a container will be another folder, for content the container will be the Content itself.
     /// </param>
     /// <returns></returns>
-    private IEnumerable<Udi> CreateHierarchy<T>(
-        T parent, int count, int depth,
-        Func<T, (T content, Func<T> container)> create)
+    private IEnumerable<Udi> CreateHierarchy<T>(T parent, int count, int depth, Func<T, (T content, Func<T> container)> create)
         where T : class, IContentBase
     {
         yield return parent.GetUdi();
@@ -146,8 +144,8 @@ public class UmbracoTestDataController : SurfaceController
 
         for (var i = 0; i < count; i++)
         {
-            var created = create(parent);
-            var contentItem = created.content;
+            var (content, container) = create(parent);
+            var contentItem = content;
 
             yield return contentItem.GetUdi();
 
@@ -170,7 +168,7 @@ public class UmbracoTestDataController : SurfaceController
                 tracked.Push((parent, currChildCount));
 
                 // not at max depth, create below
-                parent = created.container();
+                parent = container();
 
                 currChildCount = 0;
             }
@@ -202,17 +200,16 @@ public class UmbracoTestDataController : SurfaceController
             // if we don't do this we don't get thumbnails in the back office.
             imageUrl += "&ext=.jpg";
 
-            var media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent,
-                Constants.Conventions.MediaTypes.Image);
+            var media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image);
             media.SetValue(Constants.Conventions.Media.File, imageUrl);
             Services.MediaService.Save(media);
             return (media, () =>
             {
                 // create a folder to contain child media
-                var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent,
-                    Constants.Conventions.MediaTypes.Folder);
+                var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder);
                 return container;
-            });
+            }
+            );
         });
     }
 
@@ -224,9 +221,9 @@ public class UmbracoTestDataController : SurfaceController
     /// <param name="count"></param>
     /// <param name="depth"></param>
     /// <param name="imageIds"></param>
+    /// <param name="root"></param>
     /// <returns></returns>
-    private IEnumerable<Udi> CreateContentTree(string company, Faker faker, int count, int depth, List<Udi> imageIds,
-        out IContent root)
+    private IEnumerable<Udi> CreateContentTree(string company, Faker faker, int count, int depth, List<Udi> imageIds, out IContent root)
     {
         var random = new Random(company.GetHashCode());
 
@@ -248,8 +245,7 @@ public class UmbracoTestDataController : SurfaceController
 
             // give it some reasonable data (100 reviews)
             content.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
-            content.SetValue("desc",
-                string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
+            content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
             content.SetValue("media", imageIds[random.Next(0, imageIds.Count - 1)]);
 
             Services.ContentService.Save(content);
@@ -267,7 +263,9 @@ public class UmbracoTestDataController : SurfaceController
 
         docType = new ContentType(_shortStringHelper, -1)
         {
-            Alias = TestDataContentTypeAlias, Name = "Umbraco Test Data Content", Icon = "icon-science color-green"
+            Alias = TestDataContentTypeAlias,
+            Name = "Umbraco Test Data Content",
+            Icon = "icon-science color-green"
         };
         docType.AddPropertyGroup("content", "Content");
         docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateRichText(), "review")
@@ -275,10 +273,10 @@ public class UmbracoTestDataController : SurfaceController
             Name = "Review"
         });
         docType.AddPropertyType(
-            new PropertyType(_shortStringHelper, GetOrCreateMediaPicker(), "media") {Name = "Media"});
-        docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateText(), "desc") {Name = "Description"});
+            new PropertyType(_shortStringHelper, GetOrCreateMediaPicker(), "media") { Name = "Media" });
+        docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateText(), "desc") { Name = "Description" });
         Services.ContentTypeService.Save(docType);
-        docType.AllowedContentTypes = new[] {new ContentTypeSort(docType.Id, 0)};
+        docType.AllowedContentTypes = new[] { new ContentTypeSort(docType.Id, 0) };
         Services.ContentTypeService.Save(docType);
         return docType;
     }

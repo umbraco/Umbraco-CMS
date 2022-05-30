@@ -30,7 +30,7 @@ public static class UmbracoBuilderExtensions
 
         if (config.IgnoreLocalDb)
         {
-            builder.Services.AddSingleton(factory => new PublishedSnapshotServiceOptions {IgnoreLocalDb = true});
+            builder.Services.AddSingleton(factory => new PublishedSnapshotServiceOptions { IgnoreLocalDb = true });
         }
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
@@ -40,7 +40,7 @@ public static class UmbracoBuilderExtensions
                     endpoints.MapControllerRoute(
                         "LoadTest",
                         "/LoadTest/{action}",
-                        new {controller = "LoadTest", Action = "Index"}))
+                        new { controller = "LoadTest", Action = "Index" }))
             }));
 
         builder.Services.AddScoped(typeof(LoadTestController));
