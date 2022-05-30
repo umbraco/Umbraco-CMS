@@ -16,8 +16,13 @@ class UmbPropertyEditorText extends LitElement {
   @property()
   value = '';
 
+  private onInput(e: InputEvent) {
+    this.value = (e.target as HTMLInputElement).value;
+    this.dispatchEvent(new CustomEvent('property-editor-change', { bubbles: true, composed: true }));
+  }
+
   render() {
-    return html`<uui-input .value=${this.value} type="text"></uui-input>`;
+    return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
   }
 }
 

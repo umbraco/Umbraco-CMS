@@ -7,7 +7,7 @@ import './auth/login/login.element';
 import './auth/auth-layout.element';
 import './backoffice/backoffice.element';
 import './node-editor/node-editor-layout.element';
-import './node-editor/node-property-control.element';
+import './node-editor/node-property-data-type.element';
 import './node-editor/node-property.element';
 import './property-editors/property-editor-text.element';
 import './property-editors/property-editor-textarea.element';

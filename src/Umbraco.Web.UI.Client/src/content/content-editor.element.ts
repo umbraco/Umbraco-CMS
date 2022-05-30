@@ -44,6 +44,16 @@ class UmbContentEditor extends LitElement {
   @property()
   id!: string;
 
+
+  private _onPropertyDataTypeChange(e: CustomEvent) {
+
+    const target = (e.target as any)
+    console.log(target.value)
+
+    // TODO: Set value.
+    //this.nodeData.properties.find(x => x.propertyAlias === target.propertyAlias)?.tempValue = target.value;
+  }
+
   private _onSaveAndPublish() {
     console.log('Save and publish');
   }
@@ -56,21 +66,74 @@ class UmbContentEditor extends LitElement {
     console.log('Save and preview');
   }
 
-  /** Properties mock data: */
+  /*
+  // Properties mock data:
   private properties = [
     {
+      propertyAlias: 'myHeadline',
       label: 'Text string label',
       description: 'This is the a text string property',
-      dataTypeAlias: 'myTextStringEditor',
-      value: 'hello world'
+      dataTypeAlias: 'myTextStringEditor'
     },
     {
+      propertyAlias: 'myDescription',
       label: 'Textarea label',
       description: 'this is a textarea property',
-      dataTypeAlias: 'myTextAreaEditor',
-      value: 'Teeeeexxxt areaaaaaa'
+      dataTypeAlias: 'myTextAreaEditor'
     }
   ];
+  */
+
+  private nodeData = {
+    name: 'my node 1',
+    key: '1234-1234-1234',
+    alias: 'myNode1',
+    documentTypeAlias: 'myDocumentType',
+    documentTypeKey: '1234-1234-1234',
+    /* example of layout:
+    layout: [
+      {
+        type: 'group',
+        children: [
+          {
+            type: 'property',
+            alias: 'myHeadline'
+          },
+          {
+            type: 'property',
+            alias: 'myDescription'
+          }
+        ]
+      }
+    ],
+    */
+    properties: [
+      {
+        alias: 'myHeadline',
+        label: 'Textarea label',
+        description: 'this is a textarea property',
+        dataTypeAlias: 'myTextStringEditor',
+        tempValue: 'hello world'
+      },
+      {
+        alias: 'myDescription',
+        label: 'Text string label',
+        description: 'This is the a text string property',
+        dataTypeAlias: 'myTextAreaEditor',
+        tempValue: 'Tex areaaaa'
+      },
+    ],
+    data: [
+      {
+        alias: 'myHeadline',
+        value: 'hello world',
+      },
+      {
+        alias: 'myDescription',
+        value: 'Teeeeexxxt areaaaaaa',
+      },
+    ]
+  }
 
   render() {
     return html`
@@ -84,10 +147,13 @@ class UmbContentEditor extends LitElement {
 
         <uui-box slot="content">
           <h1 style="margin-bottom: 40px;">RENDER NODE WITH ID: ${this.id}</h1>
-          ${this.properties.map(
+          <!-- TODO: Make sure map get data from data object?, parse on property object. -->
+          ${this.nodeData.properties.map(
             property => html`
-            <umb-node-property label="${property.label}" description="${property.description}">
-              <umb-node-property-control .dataTypeAlias=${property.dataTypeAlias} .value=${property.value}></umb-node-property-control>
+            <umb-node-property 
+              .property=${property}
+              .value=${property.tempValue} 
+              @property-data-type-change=${this._onPropertyDataTypeChange}>
             </umb-node-property>
             <hr />
           `)}
