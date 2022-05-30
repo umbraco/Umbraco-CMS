@@ -56,6 +56,7 @@ class UmbContentEditor extends LitElement {
     console.log('Save and preview');
   }
 
+  /** Properties mock data: */
   private properties = [
     {
       label: 'Text string label',
