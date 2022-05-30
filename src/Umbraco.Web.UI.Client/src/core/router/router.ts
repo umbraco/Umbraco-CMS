@@ -12,7 +12,6 @@ export interface UmbRoute {
 export interface UmbRouteLocation {
   pathname: string;
   params: Record<string, any>;
-  fullPath: string;
   route: UmbRoute;
 }
 
@@ -75,7 +74,6 @@ export class UmbRouter {
   }
 
   public push(pathname: string) {
-    history.pushState(null, '', pathname);
     this._navigate(pathname);
   }
 
@@ -137,7 +135,6 @@ export class UmbRouter {
         location = {
           pathname: result.pathname.input,
           params: result.pathname.groups,
-          fullPath: result.pathname.input,
           route,
         };
       }
