@@ -86,7 +86,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
 
         var providerKey = auth.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var provider = items[UmbracoSignInMgrLoginProviderKey];
-        if (providerKey == null || provider is not null)
+        if (providerKey == null || provider is null)
         {
             return null;
         }
