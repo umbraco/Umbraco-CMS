@@ -1,24 +1,21 @@
-import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
-import '@umbraco-ui/uui-css/dist/uui-css.css';
-
-// TODO: lazy load these
-import './installer/installer.element';
-import './auth/login/login.element';
 import './auth/auth-layout.element';
+import './auth/login/login.element';
 import './backoffice/backoffice.element';
+import './installer/installer.element';
 import './node-editor/node-editor-layout.element';
 import './node-editor/node-property-data-type.element';
 import './node-editor/node-property.element';
 import './property-editors/property-editor-text.element';
 import './property-editors/property-editor-textarea.element';
+import '@umbraco-ui/uui-css/dist/uui-css.css';
 
-import { UmbSectionContext } from './section.context';
-
+import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
 import { getInitStatus } from './api/fetcher';
+import { UmbContextProviderMixin } from './core/context';
 import {
   isUmbRouterBeforeEnterEvent,
   UmbRoute,
@@ -27,8 +24,9 @@ import {
   UmbRouterBeforeEnterEvent,
   umbRouterBeforeEnterEventType,
 } from './core/router';
-import { UmbContextProviderMixin } from './core/context';
+import { UmbSectionContext } from './section.context';
 
+// TODO: lazy load these
 const routes: Array<UmbRoute> = [
   {
     path: '/login',
@@ -54,7 +52,7 @@ const routes: Array<UmbRoute> = [
     path: '/section/:section/node/:nodeId',
     alias: 'node',
     meta: { requiresAuth: true },
-  }
+  },
 ];
 
 // Import somewhere else?
@@ -111,6 +109,8 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     // TODO: find a solution for magic strings
     this.provideContext('umbRouter', this._router);
 
+    this._useLocation(); // TODO: Are we sure we want to do this here? The installer cannot be shown if we don't act on the routes at this point...
+
     // TODO: this is a temporary routing solution for shell elements
     try {
       const { data } = await getInitStatus({});
@@ -128,8 +128,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
         const next = window.location.pathname === '/' ? '/section/Content' : window.location.pathname;
         this._router.push(next);
       }
-
-      this._useLocation();
     } catch (error) {
       console.log(error);
     }
