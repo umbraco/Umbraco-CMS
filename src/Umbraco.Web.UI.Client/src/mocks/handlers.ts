@@ -1,5 +1,6 @@
 import { rest } from 'msw';
 import { InitResponse } from '../models';
+import { handlers as contentHandlers } from './domains/content.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import { handlers as manifestsHandlers } from './domains/manifests.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
@@ -15,6 +16,7 @@ export const handlers = [
       })
     );
   }),
+  ...contentHandlers,
   ...installHandlers,
   ...manifestsHandlers,
   ...userHandlers,

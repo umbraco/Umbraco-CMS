@@ -4,6 +4,7 @@ import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { UmbContentService } from './content.service';
+import { Subscription } from 'rxjs';
 
 import './content-tree.element';
 import './content-dashboards.element';
@@ -23,6 +24,7 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
   ];
 
   private _router?: UmbRouter;
+  private _locationSubscription?: Subscription;
   private _outlet?: HTMLElement;
 
   constructor () {
@@ -36,8 +38,10 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
     });
   }
 
-  private _useLocation () {      
-    this._router?.location
+  private _useLocation () {
+    this._locationSubscription?.unsubscribe();
+
+    this._locationSubscription = this._router?.location
     .subscribe((location: UmbRouteLocation) => {
       // TODO: temp outlet solution
       const nodeId = location.params.nodeId;
@@ -54,6 +58,11 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
       this._outlet = dashboards;
       this.requestUpdate();      
     });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._locationSubscription?.unsubscribe();
   }
 
   render() {
