@@ -51,30 +51,34 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   @state()
   _node?: DocumentNode;
 
-  private _contentService?: UmbNodeStore;
+  private _nodeStore?: UmbNodeStore;
   private _nodeSubscription?: Subscription;
 
   constructor () {
     super();
 
-    this.consumeContext('umbNodeStore', (contentService: UmbNodeStore) => {
-      this._contentService = contentService;
+    this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
+      this._nodeStore = nodeStore;
       this._useNode();
     });
   }
 
-  private _onPropertyDataTypeChange(e: CustomEvent) {
-    const target = (e.target as any)
-    console.log(target.value)
+  private _onPropertyValueChange(e: CustomEvent) {
+    const target = (e.target as any);
 
     // TODO: Set value.
-    //this.nodeData.properties.find(x => x.propertyAlias === target.propertyAlias)?.tempValue = target.value;
+    const property = this._node?.properties.find(x => x.alias === target.property.alias);
+    if(property) {
+      property.tempValue = target.value;
+    } else {
+      console.error('property was not found', target.property.alias);
+    }
   }
 
   private _useNode() {
     this._nodeSubscription?.unsubscribe();
 
-    this._nodeSubscription = this._contentService?.getById(parseInt(this.id)).subscribe(node => {
+    this._nodeSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe(node => {
       if (!node) return; // TODO: Handle nicely if there is no node.
       this._node = node;
     });
@@ -85,7 +89,10 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _onSave() {
-    console.log('Save');
+    // TODO: What if store is not present, what if node is not loaded....
+    if(this._node) {
+      this._nodeStore?.save([this._node]);
+    }
   }
 
   private _onSaveAndPreview() {
@@ -95,6 +102,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this._nodeSubscription?.unsubscribe();
+    delete this._node;
   }
 
   render() {
@@ -114,7 +122,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
             <umb-node-property 
               .property=${property}
               .value=${property.tempValue} 
-              @property-data-type-change=${this._onPropertyDataTypeChange}>
+              @property-value-change=${this._onPropertyValueChange}>
             </umb-node-property>
             <hr />
           `)}

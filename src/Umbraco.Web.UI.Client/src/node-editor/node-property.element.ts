@@ -32,8 +32,11 @@ class UmbNodeProperty extends LitElement {
   value?:string;
 
   // TODO: maybe a bit messy with all the event listeners on the different levels:
-  private _onPropertyDataTypeChange = (e :CustomEvent) => {
+  private _onPropertyDataTypeChange = ( e:CustomEvent) => {
     this.value = (e.target as any).value;
+    this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
+    // No need for this event to leave scope.
+    e.stopPropagation();
   }
 
   render() {

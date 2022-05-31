@@ -3,7 +3,6 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
-import { UmbNodeStore as UmbNodeStore } from '../core/stores/node.store';
 import { Subscription } from 'rxjs';
 
 import './content-tree.element';
@@ -43,6 +42,8 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
     .subscribe((location: UmbRouteLocation) => {
       // TODO: temp outlet solution
       const nodeId = location.params.nodeId;
+
+      this._outlet?.parentNode?.removeChild(this._outlet);
 
       if (nodeId !== undefined) {
         const contentEditor = document.createElement('umb-content-editor');

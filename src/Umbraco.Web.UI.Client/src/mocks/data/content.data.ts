@@ -5,8 +5,8 @@ export interface DocumentNode {
   alias: string;
   icon: string; // TODO: should come from the doc type?
   properties: NodeProperty[];
-  data: any; // TODO: define data type
-  layout?: any; // TODO: define layout type - make it non-optional
+  //data: any; // TODO: define data type
+  //layout?: any; // TODO: define layout type - make it non-optional
 }
 
 export interface DataTypeEntity {
@@ -27,29 +27,32 @@ export interface NodeProperty {
   tempValue: string; // TODO: remove this - only used for testing
 }
 
-export const data = [
+
+export const data: Array<DocumentNode> = [
   {
     id: 1,
-    key: '74e4008a-ea4f-4793-b924-15e02fd380d3',
+    key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
     name: 'Document 1',
     alias: 'document1',
     icon: 'document',
     properties: [
       {
         alias: 'myHeadline',
-        label: 'Textarea label',
+        label: 'Textarea label 1',
         description: 'this is a textarea property',
         dataTypeKey: 'dt-1',
         tempValue: 'hello world 1'
       },
       {
         alias: 'myDescription',
-        label: 'Text string label',
+        label: 'Text string label 1',
         description: 'This is the a text string property',
         dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 1'
       },
     ],
+    /*
+    // Concept for stored values, better approach for variants, separating data from structure/configuration
     data: [
       {
         alias: 'myHeadline',
@@ -60,7 +63,9 @@ export const data = [
         value: 'Teeeeexxxt areaaaaaa',
       },
     ],
+    */
     /*
+    // Concept for node layout, separation of design from config and data.
     layout: [
       {
         type: 'group',
@@ -80,53 +85,26 @@ export const data = [
   },
   {
     id: 2,
-    key: '74e4008a-ea4f-4793-b924-15e02fd380d3',
+    key: '74e4008a-ea4f-4793-b924-15e02fd380d2',
     name: 'Document 2',
     alias: 'document2',
     icon: 'favorite',
     properties: [
       {
         alias: 'myHeadline',
-        label: 'Textarea label',
+        label: 'Textarea label 2',
         description: 'this is a textarea property',
         dataTypeKey: 'dt-1',
         tempValue: 'hello world 2'
       },
       {
         alias: 'myDescription',
-        label: 'Text string label',
+        label: 'Text string label 2',
         description: 'This is the a text string property',
         dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 2'
       },
     ],
-    data: [
-      {
-        alias: 'myHeadline',
-        value: 'hello world',
-      },
-      {
-        alias: 'myDescription',
-        value: 'Teeeeexxxt areaaaaaa',
-      },
-    ],
-    /*
-    layout: [
-      {
-        type: 'group',
-        children: [
-          {
-            type: 'property',
-            alias: 'myHeadline'
-          },
-          {
-            type: 'property',
-            alias: 'myDescription'
-          }
-        ]
-      }
-    ],
-    */
   }
 ];
 
@@ -140,6 +118,21 @@ class UmbContentData {
 
   getById (id: number) {
     return this._data.find(item => item.id === id);
+  }
+
+  save(nodes: DocumentNode[]) {
+    nodes.forEach( node => {
+      const foundIndex = this._data.findIndex(item => item.id === node.id);
+      if(foundIndex !== -1) {
+        // replace
+        this._data[foundIndex] = node;
+      } else {
+        // new
+        this._data.push(node);
+      }
+    });
+    //console.log('save:', nodes);
+    return nodes;
   }
 }
 
