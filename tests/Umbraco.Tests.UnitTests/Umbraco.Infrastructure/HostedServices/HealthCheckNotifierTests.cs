@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockMainDom = new Mock<IMainDom>();
             mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
-            var mockScopeProvider = new Mock<IScopeProvider>();
+            var mockScopeProvider = new Mock<global::Umbraco.Cms.Infrastructure.Scoping.IScopeProvider>();
             var mockLogger = new Mock<ILogger<HealthCheckNotifier>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 

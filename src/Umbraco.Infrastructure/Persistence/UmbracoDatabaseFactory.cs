@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
-            ConnectionStrings umbracoConnectionString = connectionStrings.Get(Constants.System.UmbracoConnectionName);
+            ConnectionStrings umbracoConnectionString = connectionStrings.CurrentValue;
             if (!umbracoConnectionString.IsConnectionStringConfigured())
             {
                 logger.LogDebug("Missing connection string, defer configuration.");

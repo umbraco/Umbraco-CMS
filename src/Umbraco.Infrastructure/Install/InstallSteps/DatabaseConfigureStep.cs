@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -13,9 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall,
-        "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website",
-        PerformsAppRestart = true)]
+    [InstallSetupStep(InstallationType.NewInstall, "DatabaseConfigure", "database", 10, "Setting up a database, so Umbraco has a place to store your website", PerformsAppRestart = true)]
     public class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly DatabaseBuilder _databaseBuilder;
@@ -45,44 +39,32 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             return Task.FromResult<InstallSetupResult?>(null);
         }
 
-        public override object ViewModel
+        public override object ViewModel => new
         {
-            get
-            {
-                var options = _databaseProviderMetadata
-                    .Where(x => x.IsAvailable)
-                    .OrderBy(x => x.SortOrder)
-                    .ToList();
+            databases = _databaseProviderMetadata.GetAvailable().ToList()
+        };
 
-                return new
-                {
-                    databases = options
-                };
-            }
-        }
-
-        public override string View => ShouldDisplayView() ? base.View : "";
+        public override string View => ShouldDisplayView() ? base.View : string.Empty;
 
         public override bool RequiresExecution(DatabaseModel model) => ShouldDisplayView();
 
         private bool ShouldDisplayView()
         {
-            //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
-
-            if (databaseSettings.IsConnectionStringConfigured())
+            // If the connection string is already present in config we don't need to show the settings page and we jump to installing/upgrading.
+            if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())
             {
                 try
                 {
-                    //Since a connection string was present we verify the db can connect and query
-                    _ = _databaseBuilder.ValidateSchema();
+                    // Since a connection string was present we verify the db can connect and query
+                    _databaseBuilder.ValidateSchema();
 
                     return false;
                 }
                 catch (Exception ex)
                 {
+                    // Something went wrong, could not connect so probably need to reconfigure
                     _logger.LogError(ex, "An error occurred, reconfiguring...");
-                    //something went wrong, could not connect so probably need to reconfigure
+
                     return true;
                 }
             }

@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
             DomainService = serviceContext.DomainService;
 
             // create a scope provider
-            IScopeProvider scopeProvider = Mock.Of<IScopeProvider>();
+            Infrastructure.Scoping.IScopeProvider scopeProvider = Mock.Of<Infrastructure.Scoping.IScopeProvider>();
             Mock.Get(scopeProvider)
                 .Setup(x => x.CreateScope(
                     It.IsAny<IsolationLevel>(),

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -28,7 +26,8 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private InstallationType? _installationType;
 
-        public InstallHelper(DatabaseBuilder databaseBuilder,
+        public InstallHelper(
+            DatabaseBuilder databaseBuilder,
             ILogger<InstallHelper> logger,
             IUmbracoVersion umbracoVersion,
             IOptionsMonitor<ConnectionStrings> connectionStrings,
@@ -75,10 +74,17 @@ namespace Umbraco.Cms.Infrastructure.Install
                     dbProvider = _umbracoDatabaseFactory.SqlContext.SqlSyntax.DbProvider;
                 }
 
-                var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
-                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Version.Major,
-                    versionMinor: _umbracoVersion.Version.Minor, versionPatch: _umbracoVersion.Version.Build,
-                    versionComment: _umbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
+                var installLog = new InstallLog(
+                    installId: installId,
+                    isUpgrade: IsBrandNewInstall == false,
+                    installCompleted: isCompleted,
+                    timestamp: DateTime.Now,
+                    versionMajor: _umbracoVersion.Version.Major,
+                    versionMinor: _umbracoVersion.Version.Minor,
+                    versionPatch: _umbracoVersion.Version.Build,
+                    versionComment: _umbracoVersion.Comment,
+                    error: errorMsg,
+                    userAgent: userAgent,
                     dbProvider: dbProvider);
 
                 await _installationService.LogInstall(installLog);
@@ -96,7 +102,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         ///   <c>true</c> if this is a brand new install; otherwise, <c>false</c>.
         /// </value>
         private bool IsBrandNewInstall =>
-            _connectionStrings.Get(Constants.System.UmbracoConnectionName).IsConnectionStringConfigured() == false ||
+            _connectionStrings.CurrentValue.IsConnectionStringConfigured() == false ||
             _databaseBuilder.IsDatabaseConfigured == false ||
             _databaseBuilder.CanConnectToDatabase == false ||
             _databaseBuilder.IsUmbracoInstalled() == false;

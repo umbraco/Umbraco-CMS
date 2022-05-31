@@ -3,18 +3,17 @@
     {
       "src": [
         {
-          "src": "../",
+          "src": "../../src",
           "files": [
-            "**/*.csproj",
-            "**/Umbraco.Infrastructure/**/*.cs"
+            "**/*.csproj"
           ],
           "exclude": [
             "**/obj/**",
             "**/bin/**",
             "**/Umbraco.Web.csproj",
-            "**/Umbraco.Infrastructure.csproj",
             "**/Umbraco.Web.UI.csproj",
-            "**/**.Test**/*.csproj"
+            "**/Umbraco.Cms.StaticAssets.csproj",
+            "**/JsonSchema.csproj"
           ]
         }
       ],

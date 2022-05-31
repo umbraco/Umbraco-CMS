@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
         public void CanConvertIntToNullableInt()
         {
             int i = 1;
-            Attempt<int?> result = i.TryConvertTo<int?>();
+            Attempt<int> result = i.TryConvertTo<int>();
             Assert.That(result.Success, Is.True);
         }
 

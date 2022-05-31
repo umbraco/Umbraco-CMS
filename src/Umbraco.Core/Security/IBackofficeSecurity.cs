@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The current user's Id that has been authenticated for the request.</returns>
         /// <remarks>If authentication hasn't taken place this will be unsuccessful.</remarks>
         // TODO: This should just be an extension method on ClaimsIdentity
-        Attempt<int?> GetUserId();
+        Attempt<int> GetUserId();
 
         /// <summary>
         /// Checks if the specified user as access to the app

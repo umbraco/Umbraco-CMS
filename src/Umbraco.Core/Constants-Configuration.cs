@@ -58,6 +58,7 @@ namespace Umbraco.Cms.Core
             public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
             public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
             public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
+            public const string ConfigDataTypes = ConfigPrefix + "DataTypes";
 
             public static class NamedOptions
             {

@@ -68,6 +68,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
             builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
             builder.Services.AddUnique<IIdKeyMapRepository, IdKeyMapRepository>();
+            builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
+            builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
 
             return builder;
         }

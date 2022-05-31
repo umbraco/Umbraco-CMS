@@ -31,7 +31,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             var templateId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var properties = _dictionaryOfPropertyDataSerializer?.ReadFrom(stream); // TODO: We don't want to allocate empty arrays
             var cultureInfos = s_defaultCultureVariationsSerializer.ReadFrom(stream); // TODO: We don't want to allocate empty arrays
-            return new ContentData(name, urlSegment, versionId, versionDate, writerId, templateId, published, properties, cultureInfos);
+            var cachedTemplateId = templateId == 0 ? (int?)null : templateId;
+            return new ContentData(name, urlSegment, versionId, versionDate, writerId, cachedTemplateId, published, properties, cultureInfos);
         }
 
         public void WriteTo(ContentData value, Stream stream)

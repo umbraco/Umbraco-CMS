@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
 
-            builder.MediaUrlGenerators()?
+            builder.MediaUrlGenerators()
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We will remove the basic one defined
             // in core so that the more enhanced version is active.
-            builder.PropertyValueConverters()?
+            builder.PropertyValueConverters()
                 .Remove<SimpleTinyMceValueConverter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
         {
-            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()?
+            builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>()
                 .Append<RenamingPreValueMigrator>()
                 .Append<RichTextPreValueMigrator>()
                 .Append<UmbracoSliderPreValueMigrator>()
