@@ -30,9 +30,9 @@ export type UmbExtensionManifestSection = {
 export type UmbManifestPropertyEditorMeta = {
   icon: string;
   group: string; // TODO: use group alias or other name to indicate that it could be used to look up translation.
-  groupAlias: string;
-  description: string;
-  configConfig: unknown;
+  //groupAlias: string;
+  //description: string;
+  //configConfig: unknown;
 }
 export type UmbExtensionManifestPropertyEditor = {
   type: 'propertyEditorUI';
