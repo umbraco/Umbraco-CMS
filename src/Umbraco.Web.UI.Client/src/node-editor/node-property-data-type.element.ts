@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '../core/context';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { mergeMap, Subscription, map } from 'rxjs';
 import { DataTypeEntity } from '../mocks/data/content.data';
-import { UmbExtensionRegistry } from '../core/extension';
+import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-node-property-data-type')
 class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
@@ -39,6 +39,12 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
   @property()
   value?:string;
 
+  @state()
+  _dataType?: DataTypeEntity;
+
+  @state()
+  _propertyEditorUI?: UmbExtensionManifest;
+
   private _extensionRegistry?: UmbExtensionRegistry;
   private _dataTypeStore?: UmbDataTypeStore;
   private _dataTypeSubscription?: Subscription;
@@ -68,24 +74,35 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
       .pipe(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        map((dataTypeEntity: DataTypeEntity) => dataTypeEntity.propertyEditorUIAlias),
+        map((dataTypeEntity: DataTypeEntity) => {
+          this._dataType = dataTypeEntity;
+          return dataTypeEntity.propertyEditorUIAlias;
+        }),
         mergeMap((alias: string) => this._extensionRegistry?.getByAlias(alias) as any)
       )
-      .subscribe((dataType) => {
-        console.log('dataType:', dataType);
+      .subscribe((propertyEditorUI: any) => {
+        this._propertyEditorUI = propertyEditorUI;
+        this._gotData(this._dataType, this._propertyEditorUI);
       });
     }
   }
 
-  private _gotDataType(_data: DataTypeEntity | null) {
+  private _gotData(_data?: DataTypeEntity, _propertyEditorUI?: UmbExtensionManifest) {
 
-    if(_data === null) {
+    if(!_data || !_propertyEditorUI) {
       // TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
       return;
     }
 
     const oldValue = this._element;
-    this._element = document.createElement(_data.elementName);
+
+    if (typeof _propertyEditorUI.js === 'function') {
+      this._element = _propertyEditorUI.js();
+    }
+
+    if (_propertyEditorUI.elementName) {
+      this._element = document.createElement(_propertyEditorUI.elementName);
+    }
 
     // TODO: Set/Parse Data-Type-UI-configuration
     this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);

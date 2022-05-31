@@ -5,8 +5,6 @@ import './installer/installer.element';
 import './node-editor/node-editor-layout.element';
 import './node-editor/node-property-data-type.element';
 import './node-editor/node-property.element';
-import './property-editors/property-editor-text.element';
-import './property-editors/property-editor-textarea.element';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
