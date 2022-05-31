@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
-import { UmbContentService } from './content.service';
+import { UmbNodesStore } from '../core/stores/nodes.store';
 import { Subscription } from 'rxjs';
 
 import './content-tree.element';
@@ -30,7 +30,7 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
   constructor () {
     super();
 
-    this.provideContext('umbContentService', new UmbContentService());
+    this.provideContext('umbContentService', new UmbNodesStore());
 
     this.consumeContext('umbRouter', (_instance: UmbRouter) => {
       this._router = _instance;

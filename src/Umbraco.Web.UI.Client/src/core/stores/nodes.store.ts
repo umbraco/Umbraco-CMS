@@ -1,7 +1,8 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DocumentNode } from '../mocks/data/content.data';
+import { DocumentNode } from '../../mocks/data/content.data';
 
-export class UmbContentService {
+export class UmbNodesStore {
+
   private _nodes: BehaviorSubject<Array<DocumentNode>> = new BehaviorSubject(<Array<DocumentNode>>[]);
   public readonly nodes: Observable<Array<DocumentNode>> = this._nodes.asObservable();
 
@@ -16,7 +17,7 @@ export class UmbContentService {
     return this.nodes.pipe(map(((nodes: Array<DocumentNode>) => nodes.find((node: DocumentNode) => node.id === id) || null)));
   }
 
-  _updateStore (fetchedNodes: Array<any>) {
+  private _updateStore (fetchedNodes: Array<any>) {
     const storedNodes = this._nodes.getValue();
     let updated: any = [...storedNodes];
 

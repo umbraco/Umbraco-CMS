@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../core/context';
-import { UmbContentService } from './content.service';
+import { UmbNodesStore } from '../core/stores/nodes.store';
 import { Subscription } from 'rxjs';
 import { DocumentNode } from '../mocks/data/content.data';
 
@@ -51,13 +51,13 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   @state()
   _node?: DocumentNode;
 
-  private _contentService?: UmbContentService;
+  private _contentService?: UmbNodesStore;
   private _nodeSubscription?: Subscription;
 
   constructor () {
     super();
 
-    this.consumeContext('umbContentService', (contentService: UmbContentService) => {
+    this.consumeContext('umbContentService', (contentService: UmbNodesStore) => {
       this._contentService = contentService;
       this._useNode();
     });
@@ -75,7 +75,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this._nodeSubscription?.unsubscribe();
 
     this._nodeSubscription = this._contentService?.getById(parseInt(this.id)).subscribe(node => {
-      if (!node) return;
+      if (!node) return; // TODO: Handle nicely if there is no node.
       this._node = node;
     });
   }
