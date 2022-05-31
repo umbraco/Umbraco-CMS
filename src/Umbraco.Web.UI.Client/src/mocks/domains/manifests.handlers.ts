@@ -14,6 +14,7 @@ export const handlers = [
             name: 'Custom',
             elementName: 'umb-custom-section',
             meta: {
+              pathname: 'my-custom',
               weight: 30,
             },
           },

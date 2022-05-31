@@ -10,7 +10,7 @@ export interface UmbExtensionManifestBase {
   name: string;
   js?: string | (() => Promise<unknown>);
   elementName?: string;
-  meta: unknown;
+  meta: any;
 }
 
 export type UmbExtensionManifestSection = {
@@ -31,6 +31,7 @@ export type UmbExtensionManifestDashboard = {
 export type UmbExtensionManifest = UmbExtensionManifestBase | UmbExtensionManifestSection | UmbExtensionManifestPropertyEditor;
 
 export interface UmbManifestSectionMeta {
+  pathname: string, // TODO: how to we want to support pretty urls?
   weight: number;
 }
 
@@ -43,6 +44,7 @@ export interface UmbManifestPropertyEditorMeta {
 
 export interface UmbManifestDashboardMeta {
   sections: Array<string>;
+  pathname: string; // TODO: how to we want to support pretty urls?
   weight: number;
 }
 

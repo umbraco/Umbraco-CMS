@@ -34,6 +34,7 @@ const registerInternalManifests = async () => {
       elementName: 'umb-content-section',
       js: () => import('./content/content-section.element'),
       meta: {
+        pathname: 'content', // TODO: how to we want to support pretty urls?
         weight: 50
       }
     },
@@ -43,6 +44,7 @@ const registerInternalManifests = async () => {
       name: 'Members',
       elementName: 'umb-members-section',
       meta: {
+        pathname: 'members',
         weight: 30
       }
     },
@@ -53,6 +55,7 @@ const registerInternalManifests = async () => {
       elementName: 'umb-settings-section',
       js: () => import('./settings/settings-section.element'),
       meta: {
+        pathname: 'settings', // TODO: how to we want to support pretty urls?
         weight: 20
       }
     },
@@ -64,6 +67,7 @@ const registerInternalManifests = async () => {
       js: () => import('./dashboards/dashboard-welcome.element'),
       meta: {
         sections: ['Umb.Section.Content'],
+        pathname: 'welcome', // TODO: how to we want to support pretty urls?
         weight: 20
       }
     },
@@ -75,6 +79,7 @@ const registerInternalManifests = async () => {
       js: () => import('./dashboards/dashboard-redirect-management.element'),
       meta: {
         sections: ['Umb.Section.Content'],
+        pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
         weight: 10
       }
     },

@@ -133,7 +133,7 @@ export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
     }
 
     // TODO: this could maybe be handled by an anchor tag
-    this._router?.push(`/section/${section.name}`);
+    this._router?.push(`/section/${section.meta.pathname}`);
     this._sectionContext?.setCurrent(section.alias);
   }
 
@@ -177,9 +177,7 @@ export class UmbBackofficeHeader extends UmbContextConsumerMixin(LitElement) {
       .subscribe((sectionExtensions: any) => {
         this._sections = sectionExtensions.filter((section: any) => this._allowedSection.includes(section.alias));
         this._visibleSections = this._sections;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const currentSectionAlias = this._sections.find(section => section.name === this._location?.params?.section)?.alias;
+        const currentSectionAlias = this._sections.find(section => section.meta.pathname === this._location?.params?.section)?.alias;
         if (!currentSectionAlias) return;
         this._sectionContext?.setCurrent(currentSectionAlias);
       });

@@ -125,7 +125,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
       if (!this._isAuthorized() || window.location.pathname === '/install') {
         this._router.push('/login');
       } else {
-        const next = window.location.pathname === '/' ? '/section/Content' : window.location.pathname;
+        const next = window.location.pathname === '/' ? '/section/content' : window.location.pathname;
         this._router.push(next);
       }
     } catch (error) {
