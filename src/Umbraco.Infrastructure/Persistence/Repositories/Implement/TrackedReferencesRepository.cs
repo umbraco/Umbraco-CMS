@@ -194,7 +194,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                                                                         .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId, aliasLeft: "c",
                                                                             aliasRight: "ct")
                                                                         .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
-                                                                            aliasLeft: "ct", aliasRight: "ctn");
+                                                                            aliasLeft: "ct", aliasRight: "ctn")
+                                                                        .Where<UnionHelperDto>(x => x.OtherId != id, "x");
 
             if (filterMustBeIsDependency)
             {
