@@ -1,5 +1,10 @@
 import { rest } from 'msw';
-import { UmbracoInstaller } from '../../models';
+import {
+  ErrorResponse,
+  UmbracoInstaller,
+  UmbracoPerformInstallDatabaseConfiguration,
+  UmbracoPerformInstallRequest,
+} from '../../models';
 
 export const handlers = [
   rest.get('/umbraco/backoffice/install', (_req, res, ctx) => {
@@ -71,7 +76,17 @@ export const handlers = [
     );
   }),
 
-  rest.post('/umbraco/backoffice/install', (_req, res, ctx) => {
+  rest.post<UmbracoPerformInstallRequest>('/umbraco/backoffice/install', (req, res, ctx) => {
+    console.log(req.body);
+    if (req.body.database.databaseName === 'fail') {
+      return res(
+        // Respond with a 200 status code
+        ctx.status(400),
+        ctx.json<ErrorResponse>({
+          errorMessage: 'Database name is invalid',
+        })
+      );
+    }
     return res(
       // Respond with a 200 status code
       ctx.status(201)

@@ -1,7 +1,11 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUISelectElement } from '@umbraco-ui/uui';
-import { PostInstallRequest, UmbracoInstallerDatabaseModel } from '../models';
+import {
+  PostInstallRequest,
+  UmbracoInstallerDatabaseModel,
+  UmbracoPerformInstallDatabaseConfiguration,
+} from '../models';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends LitElement {
@@ -68,14 +72,24 @@ export class UmbInstallerDatabase extends LitElement {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
-    const database: Record<string, FormDataEntryValue> = {};
-
     const formData = new FormData(form);
-    for (const pair of formData.entries()) {
-      database[pair[0]] = pair[1];
-    }
+    const password = formData.get('password') as string;
+    const server = formData.get('server') as string;
+    const username = formData.get('username') as string;
+    const databaseName = formData.get('databaseName') as string;
+    const databaseType = formData.get('databaseType') as string;
+    const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
-    this.dispatchEvent(new CustomEvent('submit', { detail: { database } }));
+    const databaseConfig: UmbracoPerformInstallDatabaseConfiguration = {
+      password,
+      server,
+      username,
+      databaseName,
+      databaseType,
+      useIntegratedAuthentication,
+    };
+
+    this.dispatchEvent(new CustomEvent('submit', { detail: { database: databaseConfig } }));
   };
 
   private _onBack() {
@@ -85,11 +99,7 @@ export class UmbInstallerDatabase extends LitElement {
   private _renderSettings() {
     if (!this._selectedDatabase) return;
 
-    if (this._selectedDatabase.providerName === 'Microsoft.Data.SQLite') {
-      return this._renderSQLite();
-    }
-
-    if (this._selectedDatabase.providerName === null) {
+    if (this._selectedDatabase.displayName.toLowerCase() === 'custom') {
       return this._renderCustom();
     }
 
@@ -98,22 +108,15 @@ export class UmbInstallerDatabase extends LitElement {
     if (this._selectedDatabase.requiresServer) {
       result.push(this._renderServer());
     }
+
+    result.push(this._renderDatabaseName());
+
     if (this._selectedDatabase.requiresCredentials) {
       result.push(this._renderCredentials());
     }
 
     return result;
   }
-  private _renderSQLite = () => html` <uui-form-layout-item>
-    <uui-label for="database-file-name" slot="label" required>Database file name</uui-label>
-    <uui-input
-      type="text"
-      id="database-file-name"
-      name="databaseFileName"
-      value="Umbraco"
-      required
-      required-message="Database file name is required"></uui-input>
-  </uui-form-layout-item>`;
 
   private _renderServer = () => html`
     <h4>Connection</h4>
@@ -128,25 +131,26 @@ export class UmbInstallerDatabase extends LitElement {
         required
         required-message="Server is required"></uui-input>
     </uui-form-layout-item>
-    <uui-form-layout-item>
-      <uui-label for="database-name" slot="label" required>Database Name</uui-label>
-      <uui-input
-        type="text"
-        id="database-name"
-        name="databaseName"
-        placeholder="umbraco-cms"
-        required
-        required-message="Database name is required"></uui-input>
-    </uui-form-layout-item>
   `;
+
+  private _renderDatabaseName = () => html` <uui-form-layout-item>
+    <uui-label for="database-name" slot="label" required>Database Name</uui-label>
+    <uui-input
+      type="text"
+      id="database-name"
+      name="databaseName"
+      placeholder="umbraco-cms"
+      required
+      required-message="Database name is required"></uui-input>
+  </uui-form-layout-item>`;
 
   private _renderCredentials = () => html`
     <h4>Credentials</h4>
     <hr />
     <uui-form-layout-item>
       <uui-checkbox
-        name="intAuth"
-        label="int-auth"
+        name="useIntegratedAuthentication"
+        label="use-integrated-authentication"
         @change=${(e: UUIBooleanInputEvent) => (this._useIntegratedAuthentication = e.target.checked)}
         .checked=${this._useIntegratedAuthentication}
         >Use integrated authentication</uui-checkbox

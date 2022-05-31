@@ -74,10 +74,13 @@ export interface components {
       databases: components["schemas"]["UmbracoInstallerDatabaseModel"][];
     };
     UmbracoPerformInstallDatabaseConfiguration: {
-      connectionString: string;
-      providerName: string;
-      integratedAuth: boolean;
-      databaseProviderMetadataId: string;
+      server?: string | null;
+      password?: string | null;
+      username?: string | null;
+      databaseName?: string | null;
+      databaseType?: string | null;
+      useIntegratedAuthentication?: boolean | null;
+      connectionString?: string | null;
     };
     UmbracoPerformInstallRequest: {
       name: string;

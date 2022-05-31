@@ -7,7 +7,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import { getInstall, postInstall } from '../api/fetcher';
-import { PostInstallRequest, UmbracoInstaller } from '../models';
+import { PostInstallRequest, UmbracoInstaller, UmbracoPerformInstallRequest } from '../models';
 
 @customElement('umb-installer')
 export class UmbInstaller extends LitElement {
@@ -20,7 +20,7 @@ export class UmbInstaller extends LitElement {
   user = {};
 
   @state()
-  data?: PostInstallRequest;
+  data?: UmbracoPerformInstallRequest;
 
   private _handleSubmit(e: CustomEvent) {
     this.data = { ...this.data, ...e.detail };
