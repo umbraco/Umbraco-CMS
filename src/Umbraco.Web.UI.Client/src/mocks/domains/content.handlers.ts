@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { DocumentNode, umbContentData } from '../data/content.data';
+import { umbContentData } from '../data/content.data';
 
 
 // TODO: add schema
