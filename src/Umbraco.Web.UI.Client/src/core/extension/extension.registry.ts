@@ -32,7 +32,7 @@ export type UmbManifestPropertyEditorMeta = {
   group: string; // TODO: use group alias or other name to indicate that it could be used to look up translation.
   //groupAlias: string;
   //description: string;
-  //configConfig: unknown;
+  //configConfig: unknown; // we need a name and concept for how to setup editor-UI for 
 }
 export type UmbExtensionManifestPropertyEditor = {
   type: 'propertyEditorUI';
