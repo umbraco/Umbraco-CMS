@@ -1,26 +1,14 @@
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-
-// TODO: get from Data Type Service?
-// TODO: do not have elementName, instead use extension-alias(property editor UI alias) to retrieve element Name, and ensure loaded JS resource.
-const DataTypeInGlobalService = [
-  {
-    alias: 'myTextStringEditor',
-    /*
-    TODO: use this instead, look up extension API.
-    propertyEditorUIAlias: 'Umb.PropertyEditorUI.TextString',
-    */
-    elementName: 'umb-property-editor-text'
-  },
-  {
-    alias: 'myTextAreaEditor',
-    elementName: 'umb-property-editor-textarea'
-  }
-];
+import { UmbContextConsumerMixin } from '../core/context';
+import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { mergeMap, Subscription, map } from 'rxjs';
+import { DataTypeEntity } from '../mocks/data/content.data';
+import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-node-property-data-type')
-class UmbNodePropertyDataType extends LitElement {
+class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -33,26 +21,14 @@ class UmbNodePropertyDataType extends LitElement {
   ];
 
   @property()
-  private _dataTypeAlias?: string | undefined;
-  public get dataTypeAlias(): string | undefined {
-    return this._dataTypeAlias;
+  private _dataTypeKey?: string | undefined;
+  public get dataTypeKey(): string | undefined {
+    return this._dataTypeKey;
   }
-  public set dataTypeAlias(alias: string | undefined) {
-    const oldValue = this._dataTypeAlias
-    this._dataTypeAlias = alias;
-
-    const found = DataTypeInGlobalService.find(x => x.alias === alias);
-    if(!found) {
-      // TODO: did not find data-type..
-      // TODO: Consider error if undefined, showing a error-data-type, if super duper admin we might show a good error message(as always) and a editable textarea with the value, so there is some debug option available?
-      return;
-    }
-    this._element = document.createElement(found.elementName);
-    // TODO: Set/Parse Data-Type-UI-configuration
-    this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
-
-    this._element.value = this.value;// Be aware its duplicated code
-    this.requestUpdate('element', oldValue);
+  public set dataTypeKey(key: string | undefined) {
+    const oldValue = this._dataTypeKey
+    this._dataTypeKey = key;
+    this._useDataType();
   }
   
 
@@ -62,6 +38,78 @@ class UmbNodePropertyDataType extends LitElement {
 
   @property()
   value?:string;
+
+  @state()
+  _dataType?: DataTypeEntity;
+
+  @state()
+  _propertyEditorUI?: UmbExtensionManifest;
+
+  private _extensionRegistry?: UmbExtensionRegistry;
+  private _dataTypeStore?: UmbDataTypeStore;
+  private _dataTypeSubscription?: Subscription;
+  
+  constructor() {
+    super();
+    this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
+      this._dataTypeStore = _instance;
+      this._useDataType();
+    })
+    this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
+      this._extensionRegistry = _instance;
+      this._useDataType();
+    })
+
+    // TODO: solution to know when both contexts are available
+
+  }
+
+  // TODO: use subscribtion, rename to _useDataType:
+  private _useDataType() {
+    this._dataTypeSubscription?.unsubscribe();
+    if(this._dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
+      //this._dataTypeSubscription = this._dataTypeStore.getByKey(this._dataTypeKey).subscribe(this._gotDataType);
+
+      this._dataTypeSubscription = this._dataTypeStore.getByKey(this._dataTypeKey)
+      .pipe(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        map((dataTypeEntity: DataTypeEntity) => {
+          this._dataType = dataTypeEntity;
+          return dataTypeEntity.propertyEditorUIAlias;
+        }),
+        mergeMap((alias: string) => this._extensionRegistry?.getByAlias(alias) as any)
+      )
+      .subscribe((propertyEditorUI: any) => {
+        this._propertyEditorUI = propertyEditorUI;
+        this._gotData(this._dataType, this._propertyEditorUI);
+      });
+    }
+  }
+
+  private _gotData(_data?: DataTypeEntity, _propertyEditorUI?: UmbExtensionManifest) {
+
+    if(!_data || !_propertyEditorUI) {
+      // TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
+      return;
+    }
+
+    const oldValue = this._element;
+
+    if (typeof _propertyEditorUI.js === 'function') {
+      this._element = _propertyEditorUI.js();
+    }
+
+    if (_propertyEditorUI.elementName) {
+      this._element = document.createElement(_propertyEditorUI.elementName);
+    }
+
+    // TODO: Set/Parse Data-Type-UI-configuration
+    this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
+
+    this._element.value = this.value;// Be aware its duplicated code
+    this.requestUpdate('element', oldValue);
+  }
 
   private _onPropertyEditorChange = ( e:CustomEvent) => {
     if(e.currentTarget === this._element) {
@@ -83,6 +131,11 @@ class UmbNodePropertyDataType extends LitElement {
     if(hasChangedProps && this._element) {
       this._element.value = this.value;// Be aware its duplicated code
     }
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._dataTypeSubscription?.unsubscribe();
   }
 
 

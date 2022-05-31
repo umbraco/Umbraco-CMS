@@ -1,5 +1,5 @@
 import { firstValueFrom, map, Observable, ReplaySubject } from 'rxjs';
-import { UmbExtensionManifest, UmbExtensionRegistry, UmbManifestSectionMeta } from './core/extension';
+import { UmbExtensionManifest, UmbExtensionRegistry } from './core/extension';
 
 export class UmbSectionContext {
   private _extensionRegistry!: UmbExtensionRegistry;
