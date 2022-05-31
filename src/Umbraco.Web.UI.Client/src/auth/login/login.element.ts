@@ -62,7 +62,7 @@ export class UmbLogin extends UmbContextConsumerMixin(LitElement) {
       await postUserLogin({ username, password, persist });
       this._loggingIn = false;
       // TODO: how do we know where to go?
-      this._router?.push('/section/Content');
+      this._router?.push('/section/content');
     } catch (error) {
       console.log(error);
       this._loggingIn = false;
