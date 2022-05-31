@@ -46,18 +46,22 @@ public class InstallAreaRoutesTests
         Assert.AreEqual("install/api/{action}/{id?}", endpoint1.RoutePattern.RawText);
         Assert.AreEqual(Constants.Web.Mvc.InstallArea, endpoint1.RoutePattern.Defaults[AreaToken]);
         Assert.AreEqual("Index", endpoint1.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(ControllerExtensions.GetControllerName<InstallApiController>(),
+        Assert.AreEqual(
+            ControllerExtensions.GetControllerName<InstallApiController>(),
             endpoint1.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(endpoint1.RoutePattern.Defaults[AreaToken],
+        Assert.AreEqual(
+            endpoint1.RoutePattern.Defaults[AreaToken],
             typeof(InstallApiController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
         var endpoint2 = (RouteEndpoint)route.Endpoints[1];
         Assert.AreEqual("install/{action}/{id?}", endpoint2.RoutePattern.RawText);
         Assert.AreEqual(Constants.Web.Mvc.InstallArea, endpoint2.RoutePattern.Defaults[AreaToken]);
         Assert.AreEqual("Index", endpoint2.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(ControllerExtensions.GetControllerName<InstallController>(),
+        Assert.AreEqual(
+            ControllerExtensions.GetControllerName<InstallController>(),
             endpoint2.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(endpoint2.RoutePattern.Defaults[AreaToken],
+        Assert.AreEqual(
+            endpoint2.RoutePattern.Defaults[AreaToken],
             typeof(InstallController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
         var fallbackRoute = endpoints.DataSources.Last();

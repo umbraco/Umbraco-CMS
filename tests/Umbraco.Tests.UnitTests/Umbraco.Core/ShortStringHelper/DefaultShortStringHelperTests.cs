@@ -26,44 +26,50 @@ public class DefaultShortStringHelperTests
                 IsTerm = (c, leading) =>
                     (char.IsLetterOrDigit(c) || c == '_') && DefaultShortStringHelper.IsValidFileNameChar(c),
                 StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                Separator = '-'
+                Separator = '-',
             })
-            .WithConfig(CleanStringType.UrlSegment,
+            .WithConfig(
+                CleanStringType.UrlSegment,
                 new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = StripQuotes,
                     IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                    Separator = '-'
+                    Separator = '-',
                 })
-            .WithConfig("fr-FR", CleanStringType.UrlSegment,
+            .WithConfig(
+                "fr-FR",
+                CleanStringType.UrlSegment,
                 new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = FilterFrenchElisions,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c) || c == '_',
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
-                    Separator = '-'
+                    Separator = '-',
                 })
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = StripQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
-                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
+                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii,
                 })
-            .WithConfig("fr-FR", CleanStringType.Alias,
+            .WithConfig(
+                "fr-FR",
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = WhiteQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
-                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
+                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii,
                 })
             .WithConfig(CleanStringType.ConvertCase, new DefaultShortStringHelperConfig.Config
             {
                 PreFilter = null,
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
                 StringType = CleanStringType.Ascii,
-                BreakTermsOnUpper = true
+                BreakTermsOnUpper = true,
             }));
 
     private IShortStringHelper ShortStringHelper { get; set; }
@@ -127,8 +133,7 @@ public class DefaultShortStringHelperTests
     [TestCase("Shannon's Home Page!", "shannons-home-page")]
     [TestCase("#Someones's Twitter $h1z%n", "someoness-twitter-h1z-n")]
     [TestCase("Räksmörgås", "raksmorgas")]
-    [TestCase("'em guys-over there, are#goin' a \"little\"bit crazy eh!! :)",
-        "em-guys-over-there-are-goin-a-little-bit-crazy-eh")]
+    [TestCase("'em guys-over there, are#goin' a \"little\"bit crazy eh!! :)", "em-guys-over-there-are-goin-a-little-bit-crazy-eh")]
     [TestCase("汉#字*/漢?字", "")]
     [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
     [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
@@ -158,16 +163,15 @@ public class DefaultShortStringHelperTests
         Assert.AreEqual(expected, output);
     }
 
-    [TestCase("sauté dans l'espace", "saute-dans-espace", "fr-FR",
+    [TestCase(
+        "sauté dans l'espace",
+        "saute-dans-espace",
+        "fr-FR",
         CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
-    [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR",
-        CleanStringType.UrlSegment | CleanStringType.Utf8 | CleanStringType.LowerCase)]
-    [TestCase("sauté dans l'espace", "SauteDansLEspace", "fr-FR",
-        CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.PascalCase)]
-    [TestCase("he doesn't want", "he-doesnt-want", null,
-        CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
-    [TestCase("he doesn't want", "heDoesntWant", null,
-        CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase)]
+    [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Utf8 | CleanStringType.LowerCase)]
+    [TestCase("sauté dans l'espace", "SauteDansLEspace", "fr-FR", CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.PascalCase)]
+    [TestCase("he doesn't want", "he-doesnt-want", null, CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
+    [TestCase("he doesn't want", "heDoesntWant", null, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase)]
     public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
     {
         // picks the proper config per culture

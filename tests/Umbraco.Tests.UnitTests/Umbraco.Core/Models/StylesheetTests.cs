@@ -50,8 +50,7 @@ public class StylesheetTests
         Assert.AreEqual(1, stylesheet.Properties.Count());
         Assert.AreEqual("Test", stylesheet.Properties.Single().Name);
         Assert.AreEqual("p", stylesheet.Properties.Single().Alias);
-        Assert.AreEqual("font-weight:bold;" + Environment.NewLine + "font-family:Arial;",
-            stylesheet.Properties.Single().Value);
+        Assert.AreEqual("font-weight:bold;" + Environment.NewLine + "font-family:Arial;", stylesheet.Properties.Single().Value);
     }
 
     [Test]
@@ -94,7 +93,8 @@ public class StylesheetTests
         Assert.AreEqual("font-size:5em;", prop.Value);
         Assert.AreEqual(
             "body { color:#000; } /**umb_name:Hello*/" + Environment.NewLine + "li {" + Environment.NewLine +
-            "\tfont-size:5em;" + Environment.NewLine + "} .bold {font-weight:bold;}", stylesheet.Content);
+            "\tfont-size:5em;" + Environment.NewLine + "} .bold {font-weight:bold;}",
+            stylesheet.Content);
     }
 
     [Test]

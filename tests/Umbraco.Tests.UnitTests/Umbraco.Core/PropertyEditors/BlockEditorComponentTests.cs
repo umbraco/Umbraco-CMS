@@ -20,7 +20,7 @@ public class BlockEditorComponentTests
     private readonly JsonSerializerSettings _serializerSettings = new()
     {
         Formatting = Formatting.None,
-        NullValueHandling = NullValueHandling.Ignore
+        NullValueHandling = NullValueHandling.Ignore,
     };
 
     private const string ContentGuid1 = "036ce82586a64dfba2d523a99ed80f58";
@@ -32,7 +32,6 @@ public class BlockEditorComponentTests
 
     private static readonly ILogger<BlockEditorPropertyHandler> s_logger =
         Mock.Of<ILogger<BlockEditorPropertyHandler>>();
-
 
     [Test]
     public void Cannot_Have_Null_Udi()
@@ -60,10 +59,8 @@ public class BlockEditorComponentTests
         var component = new BlockEditorPropertyHandler(s_logger);
         var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings),
-            _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings),
-            _serializerSettings);
+        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
+        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
         Console.WriteLine(expectedJson);
         Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -104,10 +101,8 @@ public class BlockEditorComponentTests
             SubContentGuid2,
             SubSettingsGuid1);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings),
-            _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings),
-            _serializerSettings);
+        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
+        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
         Console.WriteLine(expectedJson);
         Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -143,10 +138,8 @@ public class BlockEditorComponentTests
         var component = new BlockEditorPropertyHandler(s_logger);
         var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings),
-            _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings),
-            _serializerSettings);
+        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
+        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
         Console.WriteLine(expectedJson);
         Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);
@@ -188,10 +181,8 @@ public class BlockEditorComponentTests
             SubContentGuid2,
             SubSettingsGuid1);
 
-        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings),
-            _serializerSettings);
-        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings),
-            _serializerSettings);
+        var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
+        var resultJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result, _serializerSettings), _serializerSettings);
         Console.WriteLine(expectedJson);
         Console.WriteLine(resultJson);
         Assert.AreEqual(expectedJson, resultJson);

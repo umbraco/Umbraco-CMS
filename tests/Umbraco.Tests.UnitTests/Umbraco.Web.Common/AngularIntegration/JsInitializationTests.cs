@@ -27,6 +27,7 @@ public class JsInitializationTests
         angular.bootstrap(document, ['Blah']);
 
     });
-});".StripWhitespace(), result.StripWhitespace());
+});".StripWhitespace(),
+            result.StripWhitespace());
     }
 }

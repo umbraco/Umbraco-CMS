@@ -52,8 +52,8 @@ public class UmbracoRouteValuesFactoryTests
             {
                 ControllerName = ControllerExtensions.GetControllerName<RenderController>(),
                 ActionName = nameof(RenderController.Index),
-                ControllerTypeInfo = typeof(RenderController).GetTypeInfo()
-            }
+                ControllerTypeInfo = typeof(RenderController).GetTypeInfo(),
+            },
         };
         var actionSelector = new Mock<IActionSelector>();
         actionSelector.Setup(x => x.SelectCandidates(It.IsAny<RouteContext>())).Returns(actionDescriptors);
@@ -75,7 +75,7 @@ public class UmbracoRouteValuesFactoryTests
     {
         var factory = GetFactory(out var publishedRouter, out _, out var request);
 
-        var result = await factory.CreateAsync(new DefaultHttpContext(), request);
+        await factory.CreateAsync(new DefaultHttpContext(), request);
 
         // The request has content, no template, no hijacked route and no disabled template features so UpdateRequestToNotFound will be called
         publishedRouter.Verify(m => m.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null), Times.Once);

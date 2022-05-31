@@ -20,7 +20,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
         {
             CharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
-            ConvertUrlsToAscii = "false"
+            ConvertUrlsToAscii = "false",
         };
 
         const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
@@ -36,7 +36,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
             {
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.LowerCase | CleanStringType.Ascii, // ascii
-                Separator = '-'
+                Separator = '-',
             }));
         output = helper.CleanStringForUrlSegment(input);
         Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
@@ -49,7 +49,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
         {
             CharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
-            ConvertUrlsToAscii = "false"
+            ConvertUrlsToAscii = "false",
         };
 
         const string input1 = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
@@ -58,8 +58,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
         var helper =
             new DefaultShortStringHelper(
                 new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)); // unicode
-        Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page",
-            helper.CleanStringForUrlSegment(input1));
+        Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
         Assert.AreEqual("æøå-and-æøå-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input2));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(requestHandlerSettings)
@@ -67,10 +66,9 @@ public class DefaultShortStringHelperTestsWithoutSetup
             {
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.LowerCase | CleanStringType.TryAscii, // try ascii
-                Separator = '-'
+                Separator = '-',
             }));
-        Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page",
-            helper.CleanStringForUrlSegment(input1));
+        Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", helper.CleanStringForUrlSegment(input1));
         Assert.AreEqual("aeoa-and-aeoa-and-grosser-bbddzhzh-page", helper.CleanStringForUrlSegment(input2));
     }
 
@@ -84,7 +82,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // underscore is accepted within terms
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
 
@@ -95,7 +93,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // underscore is not accepted within terms
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo*bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
     }
@@ -110,10 +108,9 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // letters and digits are valid leading chars
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                Separator = '*'
+                Separator = '*',
             }));
-        Assert.AreEqual("0123foo*bar*543*nil*321",
-            helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
+        Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
@@ -122,7 +119,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
                 // only letters are valid leading chars
                 IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
         Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
@@ -143,7 +140,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
                 // uppercase letter means new term
                 BreakTermsOnUpper = true,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
 
@@ -155,7 +152,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
                 // uppercase letter is part of term
                 BreakTermsOnUpper = false,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("fooBar", helper.CleanString("fooBar", CleanStringType.Alias));
     }
@@ -171,7 +168,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
                 // non-uppercase letter means cut acronym
                 CutAcronymOnNonUpper = true,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
@@ -186,7 +183,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
                 // non-uppercase letter means word
                 CutAcronymOnNonUpper = false,
-                Separator = '*'
+                Separator = '*',
             }));
         Assert.AreEqual("foo*BARRnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BARnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
@@ -199,13 +196,14 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = true,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("foo*BARR*nil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BAR*nil", helper.CleanString("foo BARnil", CleanStringType.Alias));
@@ -214,13 +212,14 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     CutAcronymOnNonUpper = true,
                     GreedyAcronyms = false,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
         Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
@@ -233,11 +232,12 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("foo", helper.CleanString("   foo   ", CleanStringType.Alias));
         Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
@@ -248,40 +248,44 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = ' '
+                    Separator = ' ',
                 }));
         Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
-                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                 }));
         Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = '文'
+                    Separator = '文',
                 }));
         Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
     }
@@ -291,11 +295,12 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
@@ -350,22 +355,24 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
 
         helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
-                    Separator = '*'
+                    Separator = '*',
                 }));
         Assert.AreEqual(string.Empty, helper.CleanString("中文测试", CleanStringType.Alias));
         Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
@@ -378,7 +385,7 @@ public class DefaultShortStringHelperTestsWithoutSetup
         {
             CharCollection = Array.Empty<CharItem>(),
             EnableDefaultCharReplacements = false,
-            ConvertUrlsToAscii = "false"
+            ConvertUrlsToAscii = "false",
         };
 
         var helper =
@@ -405,11 +412,12 @@ public class DefaultShortStringHelperTestsWithoutSetup
     {
         var helper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig()
             .WithDefault(new RequestHandlerSettings())
-            .WithConfig(CleanStringType.Alias,
+            .WithConfig(
+                CleanStringType.Alias,
                 new DefaultShortStringHelperConfig.Config
                 {
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
-                    Separator = ' '
+                    Separator = ' ',
                 }));
 
         // BBB is an acronym
@@ -418,17 +426,21 @@ public class DefaultShortStringHelperTestsWithoutSetup
 
         // FIXME: "C" can't be an acronym
         // FIXME: "DBXreview" = acronym?!
-        Assert.AreEqual("aaa BBB CCc Ddd E FF",
+        Assert.AreEqual(
+            "aaa BBB CCc Ddd E FF",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias)); // unchanged
-        Assert.AreEqual("aaa Bbb Ccc Ddd E FF",
+        Assert.AreEqual(
+            "aaa Bbb Ccc Ddd E FF",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("Aaa Bbb Ccc Ddd E FF",
-            helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("aaa bbb ccc ddd e ff",
+        Assert.AreEqual("Aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.PascalCase));
+        Assert.AreEqual(
+            "aaa bbb ccc ddd e ff",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.LowerCase));
-        Assert.AreEqual("AAA BBB CCC DDD E FF",
+        Assert.AreEqual(
+            "AAA BBB CCC DDD E FF",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.UpperCase));
-        Assert.AreEqual("aaa BBB CCc Ddd E FF",
+        Assert.AreEqual(
+            "aaa BBB CCc Ddd E FF",
             helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.UmbracoCase));
 
         // MS rules & guidelines:
@@ -438,32 +450,44 @@ public class DefaultShortStringHelperTestsWithoutSetup
         //     eg "XmlWriter (pascal) or "htmlReader" (camel) - "SpecialXmlWriter" (pascal) or "specialHtmlReader" (camel)
         // - Do not capitalize any of the characters of any acronyms, whatever their length, at the beginning of a camel-cased identifier.
         //     eg "xmlWriter" or "dbWriter" (camel)
-        Assert.AreEqual("aaa BB Ccc",
+        Assert.AreEqual(
+            "aaa BB Ccc",
             helper.CleanString("aaa BB ccc", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("aa Bb Ccc",
+        Assert.AreEqual(
+            "aa Bb Ccc",
             helper.CleanString("AA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("aaa Bb Ccc",
+        Assert.AreEqual(
+            "aaa Bb Ccc",
             helper.CleanString("AAA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
         Assert.AreEqual("db Rate", helper.CleanString("DB rate", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("special DB Rate",
+        Assert.AreEqual(
+            "special DB Rate",
             helper.CleanString("special DB rate", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("xml Writer",
+        Assert.AreEqual(
+            "xml Writer",
             helper.CleanString("XML writer", CleanStringType.Alias | CleanStringType.CamelCase));
-        Assert.AreEqual("special Xml Writer",
+        Assert.AreEqual(
+            "special Xml Writer",
             helper.CleanString("special XML writer", CleanStringType.Alias | CleanStringType.CamelCase));
 
-        Assert.AreEqual("Aaa BB Ccc",
+        Assert.AreEqual(
+            "Aaa BB Ccc",
             helper.CleanString("aaa BB ccc", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("AA Bb Ccc",
+        Assert.AreEqual(
+            "AA Bb Ccc",
             helper.CleanString("AA bb ccc", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("Aaa Bb Ccc",
+        Assert.AreEqual(
+            "Aaa Bb Ccc",
             helper.CleanString("AAA bb ccc", CleanStringType.Alias | CleanStringType.PascalCase));
         Assert.AreEqual("DB Rate", helper.CleanString("DB rate", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("Special DB Rate",
+        Assert.AreEqual(
+            "Special DB Rate",
             helper.CleanString("special DB rate", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("Xml Writer",
+        Assert.AreEqual(
+            "Xml Writer",
             helper.CleanString("XML writer", CleanStringType.Alias | CleanStringType.PascalCase));
-        Assert.AreEqual("Special Xml Writer",
+        Assert.AreEqual(
+            "Special Xml Writer",
             helper.CleanString("special XML writer", CleanStringType.Alias | CleanStringType.PascalCase));
     }
 

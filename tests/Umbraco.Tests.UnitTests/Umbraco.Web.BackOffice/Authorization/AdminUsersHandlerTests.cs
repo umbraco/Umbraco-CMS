@@ -12,7 +12,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -60,7 +59,8 @@ public class AdminUsersHandlerTests
     public async Task Editing_Single_Admin_User_By_Admin_User_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var sut = CreateHandler(queryStringValue: Admin2UserId.ToString(CultureInfo.InvariantCulture),
+        var sut = CreateHandler(
+            queryStringValue: Admin2UserId.ToString(CultureInfo.InvariantCulture),
             editingWithAdmin: true);
 
         await sut.HandleAsync(authHandlerContext);
@@ -132,19 +132,22 @@ public class AdminUsersHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private AdminUsersHandler CreateHandler(string queryStringName = SingleUserEditQueryStringName,
-        string queryStringValue = "", bool editingWithAdmin = false)
+    private AdminUsersHandler CreateHandler(
+        string queryStringName = SingleUserEditQueryStringName,
+        string queryStringValue = "",
+        bool editingWithAdmin = false)
     {
         var mockHttpContextAccessor = CreateMockHttpContextAccessor(queryStringName, queryStringValue);
-        CreateMockUserServiceAndSecurityAccessor(editingWithAdmin, out var mockUserService,
-            out var mockBackOfficeSecurityAccessor);
+        CreateMockUserServiceAndSecurityAccessor(editingWithAdmin, out var mockUserService, out var mockBackOfficeSecurityAccessor);
         var userEditorAuthorizationHelper = CreateUserEditorAuthorizationHelper();
-        return new AdminUsersHandler(mockHttpContextAccessor.Object, mockUserService.Object,
-            mockBackOfficeSecurityAccessor.Object, userEditorAuthorizationHelper);
+        return new AdminUsersHandler(
+            mockHttpContextAccessor.Object,
+            mockUserService.Object,
+            mockBackOfficeSecurityAccessor.Object,
+            userEditorAuthorizationHelper);
     }
 
-    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName,
-        string queryStringValue)
+    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName, string queryStringValue)
     {
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
         var mockHttpContext = new Mock<HttpContext>();
@@ -156,11 +159,12 @@ public class AdminUsersHandlerTests
         return mockHttpContextAccessor;
     }
 
-    private static void CreateMockUserServiceAndSecurityAccessor(bool editingWithAdmin,
-        out Mock<IUserService> mockUserService, out Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor)
+    private static void CreateMockUserServiceAndSecurityAccessor(
+        bool editingWithAdmin,
+        out Mock<IUserService> mockUserService,
+        out Mock<IBackOfficeSecurityAccessor> mockBackOfficeSecurityAccessor)
     {
         mockUserService = new Mock<IUserService>();
-        var globalSettings = new GlobalSettings();
         var adminUser1 = CreateUser(Admin1UserId, mockUserService, true);
         var adminUser2 = CreateUser(Admin2UserId, mockUserService, true);
         var nonAdminUser1 = CreateUser(NonAdmin1UserId, mockUserService);
@@ -205,7 +209,10 @@ public class AdminUsersHandlerTests
         var mockContentService = new Mock<IContentService>();
         var mockMediaService = new Mock<IMediaService>();
         var mockEntityService = new Mock<IEntityService>();
-        return new UserEditorAuthorizationHelper(mockContentService.Object, mockMediaService.Object,
-            mockEntityService.Object, AppCaches.Disabled);
+        return new UserEditorAuthorizationHelper(
+            mockContentService.Object,
+            mockMediaService.Object,
+            mockEntityService.Object,
+            AppCaches.Disabled);
     }
 }

@@ -22,16 +22,21 @@ public abstract class ComposingTestBase
     protected virtual IEnumerable<Assembly> AssembliesToScan
         => new[]
         {
-            GetType().Assembly // this assembly only
+            GetType().Assembly, // this assembly only
         };
 
     [SetUp]
     public void Initialize()
     {
         var typeFinder = TestHelper.GetTypeFinder();
-        TypeLoader = new TypeLoader(typeFinder, new VaryingRuntimeHash(), NoAppCache.Instance,
-            new DirectoryInfo(TestHelper.GetHostingEnvironment()
-                .MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(),
-            Mock.Of<IProfiler>(), false, AssembliesToScan);
+        TypeLoader = new TypeLoader(
+            typeFinder,
+            new VaryingRuntimeHash(),
+            NoAppCache.Instance,
+            new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
+            Mock.Of<ILogger<TypeLoader>>(),
+            Mock.Of<IProfiler>(),
+            false,
+            AssembliesToScan);
     }
 }

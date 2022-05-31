@@ -139,10 +139,10 @@ public class FilterAllowedOutgoingContentAttributeTests
         // We're only assigning 3 nodes browse permissions so that is what we expect as a result
         var permissions = new EntityPermissionCollection
         {
-            new(9876, 1, new[] {ActionBrowse.ActionLetter.ToString()}),
-            new(9876, 2, new[] {ActionBrowse.ActionLetter.ToString()}),
-            new(9876, 3, new[] {ActionBrowse.ActionLetter.ToString()}),
-            new(9876, 4, new[] {ActionUpdate.ActionLetter.ToString()})
+            new(9876, 1, new[] { ActionBrowse.ActionLetter.ToString() }),
+            new(9876, 2, new[] { ActionBrowse.ActionLetter.ToString() }),
+            new(9876, 3, new[] { ActionBrowse.ActionLetter.ToString() }),
+            new(9876, 4, new[] { ActionUpdate.ActionLetter.ToString() }),
         };
         userServiceMock.Setup(x => x.GetPermissions(user, ids)).Returns(permissions);
         var userService = userServiceMock.Object;

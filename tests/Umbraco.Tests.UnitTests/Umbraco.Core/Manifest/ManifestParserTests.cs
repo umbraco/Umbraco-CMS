@@ -32,7 +32,8 @@ public class ManifestParserTests
         var validators = new IManifestValueValidator[]
         {
             new RequiredValidator(Mock.Of<ILocalizedTextService>()),
-            new RegexValidator(Mock.Of<ILocalizedTextService>(), null), new DelimitedValueValidator()
+            new RegexValidator(Mock.Of<ILocalizedTextService>(), null),
+            new DelimitedValueValidator(),
         };
         _ioHelper = TestHelper.IOHelper;
         var loggerFactory = NullLoggerFactory.Instance;
@@ -320,8 +321,7 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
         Assert.AreEqual("some config val", config["key1"]);
 
         var valueEditor = editor.GetValueEditor();
-        Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html"),
-            valueEditor.View);
+        Assert.AreEqual(_ioHelper.ResolveUrl("/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html"), valueEditor.View);
 
         editor = manifest.ParameterEditors[2];
         Assert.Throws<InvalidOperationException>(() =>

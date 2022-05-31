@@ -71,8 +71,7 @@ public class MemberSignInManagerTests
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
             Mock.Of<IMemberExternalLoginProviders>(),
-            Mock.Of<IEventAggregator>()
-        );
+            Mock.Of<IEventAggregator>());
     }
 
     private static Mock<MemberManager> MockMemberManager()
@@ -94,7 +93,7 @@ public class MemberSignInManagerTests
     public async Task
         WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()
     {
-        //arrange
+        // arrange
         var userId = "bo8w3d32q9b98";
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
@@ -109,27 +108,27 @@ public class MemberSignInManagerTests
         _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
         _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
 
-        //act
+        // act
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
-        //assert
+        // assert
         Assert.IsTrue(actual.Succeeded);
     }
 
     [Test]
     public async Task WhenPasswordSignInAsyncIsCalled_AndTheResultFails_ThenASignInFailedResultShouldBeReturnedAsync()
     {
-        //arrange
+        // arrange
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
         var password = "testPassword";
         var lockoutOnFailure = false;
         var isPersistent = true;
 
-        //act
+        // act
         var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
-        //assert
+        // assert
         Assert.IsFalse(actual.Succeeded);
     }
 }

@@ -29,14 +29,14 @@ public class BuilderTests
             Name = "type1Name",
             ParentId = 0,
             BaseType = null,
-            ItemType = TypeModel.ItemTypes.Content
+            ItemType = TypeModel.ItemTypes.Content,
         };
         type1.Properties.Add(new PropertyModel
         {
             Alias = "prop1",
             ClrName = "Prop1",
             Name = "prop1Name",
-            ModelClrType = typeof(string)
+            ModelClrType = typeof(string),
         });
 
         TypeModel[] types = { type1 };
@@ -130,13 +130,13 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ClrName = "Type1",
             ParentId = 0,
             BaseType = null,
-            ItemType = TypeModel.ItemTypes.Content
+            ItemType = TypeModel.ItemTypes.Content,
         };
         type1.Properties.Add(new PropertyModel
         {
             Alias = "foo",
             ClrName = "Foo",
-            ModelClrType = typeof(IEnumerable<>).MakeGenericType(ModelType.For("foo"))
+            ModelClrType = typeof(IEnumerable<>).MakeGenericType(ModelType.For("foo")),
         });
 
         var type2 = new TypeModel
@@ -146,7 +146,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ClrName = "Foo",
             ParentId = 0,
             BaseType = null,
-            ItemType = TypeModel.ItemTypes.Element
+            ItemType = TypeModel.ItemTypes.Element,
         };
 
         TypeModel[] types = { type1, type2 };
@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types)
         {
-            ModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels"
+            ModelsNamespace = "Umbraco.Cms.Web.Common.PublishedModels",
         };
 
         var sb1 = new StringBuilder();
@@ -246,32 +246,32 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ParentId = 0,
             BaseType = null,
             ItemType = TypeModel.ItemTypes.Content,
-            IsMixin = true
+            IsMixin = true,
         };
         type1.Properties.Add(new PropertyModel
         {
             Alias = "prop1",
             ClrName = "Prop1",
-            ModelClrType = typeof(IPublishedContent)
+            ModelClrType = typeof(IPublishedContent),
         });
         type1.Properties.Add(new PropertyModel
         {
             Alias = "prop2",
             ClrName = "Prop2",
-            ModelClrType = typeof(StringBuilder)
+            ModelClrType = typeof(StringBuilder),
         });
         type1.Properties.Add(new PropertyModel
         {
             Alias = "prop3",
             ClrName = "Prop3",
-            ModelClrType = typeof(BootFailedException)
+            ModelClrType = typeof(BootFailedException),
         });
         TypeModel[] types = { type1 };
 
         var modelsBuilderConfig = new ModelsBuilderSettings();
         var builder = new TextBuilder(modelsBuilderConfig, types)
         {
-            ModelsNamespace = "Umbraco.ModelsBuilder.Models" // forces conflict with Umbraco.ModelsBuilder.Umbraco
+            ModelsNamespace = "Umbraco.ModelsBuilder.Models", // forces conflict with Umbraco.ModelsBuilder.Umbraco
         };
 
         var sb = new StringBuilder();
@@ -301,14 +301,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ParentId = 0,
             IsParent = true,
             BaseType = null,
-            ItemType = TypeModel.ItemTypes.Content
+            ItemType = TypeModel.ItemTypes.Content,
         };
         parentType.Properties.Add(new PropertyModel
         {
             Alias = "prop1",
             ClrName = "Prop1",
             Name = "prop1Name",
-            ModelClrType = typeof(string)
+            ModelClrType = typeof(string),
         });
 
         var childType = new TypeModel
@@ -319,7 +319,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             Name = "childTypeName",
             ParentId = 1,
             BaseType = parentType,
-            ItemType = TypeModel.ItemTypes.Content
+            ItemType = TypeModel.ItemTypes.Content,
         };
 
         TypeModel[] docTypes = { parentType, childType };
@@ -481,7 +481,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ParentId = 0,
             BaseType = null,
             ItemType = TypeModel.ItemTypes.Content,
-            IsMixin = true
+            IsMixin = true,
         };
         composition1.Properties.Add(new PropertyModel
         {
@@ -489,7 +489,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             ClrName = "CompositionProp",
             Name = "compositionPropName",
             ModelClrType = typeof(string),
-            ClrTypeName = typeof(string).FullName
+            ClrTypeName = typeof(string).FullName,
         });
 
         var type1 = new TypeModel
@@ -500,14 +500,14 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
             Name = "type1Name",
             ParentId = 0,
             BaseType = null,
-            ItemType = TypeModel.ItemTypes.Content
+            ItemType = TypeModel.ItemTypes.Content,
         };
         type1.Properties.Add(new PropertyModel
         {
             Alias = "prop1",
             ClrName = "Prop1",
             Name = "prop1Name",
-            ModelClrType = typeof(string)
+            ModelClrType = typeof(string),
         });
         type1.MixinTypes.Add(composition1);
 
@@ -694,8 +694,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
     [TestCase("int", typeof(int))]
     [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
-    [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1",
-        typeof(BuilderTestsClass1))]
+    [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
     public void WriteClrType(string expected, Type input)
     {
@@ -709,8 +708,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
     [TestCase("int", typeof(int))]
     [TestCase("global::System.Collections.Generic.IEnumerable<int>", typeof(IEnumerable<int>))]
-    [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1",
-        typeof(BuilderTestsClass1))]
+    [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTestsClass1", typeof(BuilderTestsClass1))]
     [TestCase("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.BuilderTests.Class1", typeof(Class1))]
     public void WriteClrTypeUsing(string expected, Type input)
     {
@@ -743,7 +741,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
     {
         var builder = new TextBuilder
         {
-            ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models"
+            ModelsNamespaceForTests = "Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Models",
         };
         var sb = new StringBuilder();
         builder.WriteClrType(sb, typeof(StringBuilder));
@@ -792,8 +790,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding",
-            sb.ToString());
+        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
     }
 
     [Test]
@@ -808,8 +805,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding",
-            sb.ToString());
+        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding", sb.ToString());
     }
 
     [Test]
@@ -824,8 +820,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
         // note - these assertions differ from the original tests in MB because in the embedded version, the result of Builder.IsAmbiguousSymbol is always true
         // which means global:: syntax will be applied to most things
-        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding.Nested",
-            sb.ToString());
+        Assert.AreEqual("global::Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded.ASCIIEncoding.Nested", sb.ToString());
     }
 
     public class Class1

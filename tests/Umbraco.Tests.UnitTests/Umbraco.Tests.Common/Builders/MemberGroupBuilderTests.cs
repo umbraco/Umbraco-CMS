@@ -48,9 +48,9 @@ public class MemberGroupBuilderTests
         Assert.AreEqual(testCreateDate, group.CreateDate);
         Assert.AreEqual(testUpdateDate, group.UpdateDate);
         Assert.AreEqual(testCreatorId, group.CreatorId);
-        Assert.AreEqual(3,
-            group.AdditionalData
-                .Count); // previousName is added as part of the MemberGroup construction, plus the 2 we've added.
+
+        // previousName is added as part of the MemberGroup construction, plus the 2 we've added.
+        Assert.AreEqual(3, group.AdditionalData.Count);
         Assert.AreEqual(testAdditionalData1.Value, group.AdditionalData[testAdditionalData1.Key]);
         Assert.AreEqual(testAdditionalData2.Value, group.AdditionalData[testAdditionalData2.Key]);
     }

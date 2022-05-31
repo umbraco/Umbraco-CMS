@@ -121,7 +121,6 @@ public class ContentControllerTests
         domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
             .Returns(new[] { new UmbracoDomain("/", "da-dk") });
 
-
         var rootNode = new ContentBuilder()
             .WithContentType(CreateContentType())
             .WithId(1060)
@@ -190,6 +189,7 @@ public class ContentControllerTests
         var notifications = new SimpleNotificationModel();
 
         contentController.AddDomainWarnings(level3Node, culturesPublished, notifications);
+
         // We expect one error because all domains except "de-de" is registered somewhere in the ancestor path
         Assert.AreEqual(1, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
     }
@@ -235,8 +235,11 @@ public class ContentControllerTests
         // We have to configure ILocalizedTextService to return a new string every time Localize is called
         // Otherwise it won't add the notification because it skips dupes
         var localizedTextServiceMock = new Mock<ILocalizedTextService>();
-        localizedTextServiceMock.Setup(x => x.Localize(It.IsAny<string>(),
-                It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
+        localizedTextServiceMock.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
             .Returns(() => Guid.NewGuid().ToString());
 
         var controller = new ContentController(
@@ -262,8 +265,7 @@ public class ContentControllerTests
             Mock.Of<IJsonSerializer>(),
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<IAuthorizationService>(),
-            Mock.Of<IContentVersionService>()
-        );
+            Mock.Of<IContentVersionService>());
 
         return controller;
     }

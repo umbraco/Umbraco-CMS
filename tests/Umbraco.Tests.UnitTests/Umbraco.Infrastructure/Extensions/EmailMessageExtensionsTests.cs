@@ -108,10 +108,10 @@ public class EmailMessageExtensionsTests
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
         Assert.AreEqual(from, result.From.Address);
-        Assert.AreEqual("", result.From.DisplayName);
+        Assert.AreEqual(string.Empty, result.From.DisplayName);
         Assert.AreEqual(1, result.To.Count());
         Assert.AreEqual(to, result.To.First().Address);
-        Assert.AreEqual("", result.To.First().DisplayName);
+        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
         Assert.AreEqual(subject, result.Subject);
         Assert.AreEqual(body, result.Body);
         Assert.IsTrue(result.IsBodyHtml);
@@ -130,10 +130,10 @@ public class EmailMessageExtensionsTests
         var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
         Assert.AreEqual(ConfiguredSender, result.From.Address);
-        Assert.AreEqual("", result.From.DisplayName);
+        Assert.AreEqual(string.Empty, result.From.DisplayName);
         Assert.AreEqual(1, result.To.Count());
         Assert.AreEqual(to, result.To.First().Address);
-        Assert.AreEqual("", result.To.First().DisplayName);
+        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
         Assert.AreEqual(subject, result.Subject);
         Assert.AreEqual(body, result.Body);
         Assert.IsTrue(result.IsBodyHtml);
@@ -163,7 +163,6 @@ public class EmailMessageExtensionsTests
         Assert.IsFalse(result.HasAttachments);
     }
 
-
     [Test]
     public void Can_Construct_NotificationEmailModel_From_Full_EmailMessage()
     {
@@ -187,7 +186,7 @@ public class EmailMessageExtensionsTests
 
         Assert.AreEqual(2, result.To.Count());
         Assert.AreEqual("to@email.com", result.To.First().Address);
-        Assert.AreEqual("", result.To.First().DisplayName);
+        Assert.AreEqual(string.Empty, result.To.First().DisplayName);
         Assert.AreEqual("to2@email.com", result.To.Skip(1).First().Address);
         Assert.AreEqual("Second Email", result.To.Skip(1).First().DisplayName);
 
@@ -195,19 +194,19 @@ public class EmailMessageExtensionsTests
         Assert.AreEqual("cc@email.com", result.Cc.First().Address);
         Assert.AreEqual("First CC", result.Cc.First().DisplayName);
         Assert.AreEqual("cc2@email.com", result.Cc.Skip(1).First().Address);
-        Assert.AreEqual("", result.Cc.Skip(1).First().DisplayName);
+        Assert.AreEqual(string.Empty, result.Cc.Skip(1).First().DisplayName);
 
         Assert.AreEqual(3, result.Bcc.Count());
         Assert.AreEqual("bcc@email.com", result.Bcc.First().Address);
-        Assert.AreEqual("", result.Bcc.First().DisplayName);
+        Assert.AreEqual(string.Empty, result.Bcc.First().DisplayName);
         Assert.AreEqual("bcc2@email.com", result.Bcc.Skip(1).First().Address);
-        Assert.AreEqual("", result.Bcc.Skip(1).First().DisplayName);
+        Assert.AreEqual(string.Empty, result.Bcc.Skip(1).First().DisplayName);
         Assert.AreEqual("bcc3@email.com", result.Bcc.Skip(2).First().Address);
         Assert.AreEqual("Third BCC", result.Bcc.Skip(2).First().DisplayName);
 
         Assert.AreEqual(1, result.ReplyTo.Count());
         Assert.AreEqual("replyto@email.com", result.ReplyTo.First().Address);
-        Assert.AreEqual("", result.ReplyTo.First().DisplayName);
+        Assert.AreEqual(string.Empty, result.ReplyTo.First().DisplayName);
 
         Assert.AreEqual(subject, result.Subject);
         Assert.AreEqual(body, result.Body);

@@ -39,8 +39,11 @@ public class PhysicalFileSystemTests : AbstractFileSystemTests
     }
 
     public PhysicalFileSystemTests()
-        : base(new PhysicalFileSystem(TestHelper.IOHelper, TestHelper.GetHostingEnvironment(),
-            Mock.Of<ILogger<PhysicalFileSystem>>(), Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
+        : base(new PhysicalFileSystem(
+            TestHelper.IOHelper,
+            TestHelper.GetHostingEnvironment(),
+            Mock.Of<ILogger<PhysicalFileSystem>>(),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FileSysTests"),
             "/Media/"))
     {
     }

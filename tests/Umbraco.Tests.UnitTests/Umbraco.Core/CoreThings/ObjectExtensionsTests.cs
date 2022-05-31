@@ -77,15 +77,15 @@ public class ObjectExtensionsTests
     {
         var testCases = new Dictionary<string, bool>
         {
-            {"TRUE", true},
-            {"True", true},
-            {"true", true},
-            {"1", true},
-            {"FALSE", false},
-            {"False", false},
-            {"false", false},
-            {"0", false},
-            {string.Empty, false}
+            { "TRUE", true },
+            { "True", true },
+            { "true", true },
+            { "1", true },
+            { "FALSE", false },
+            { "False", false },
+            { "false", false },
+            { "0", false },
+            { string.Empty, false },
         };
 
         foreach (var testCase in testCases)

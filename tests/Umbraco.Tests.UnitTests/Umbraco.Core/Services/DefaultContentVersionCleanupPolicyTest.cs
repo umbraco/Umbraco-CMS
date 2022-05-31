@@ -38,8 +38,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -74,8 +74,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 2,
-                    KeepLatestVersionPerDayForDays = 2
-                }
+                    KeepLatestVersionPerDayForDays = 2,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -105,12 +105,12 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 4, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 6, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-1), false, false, false, null),
+
                 // another content
                 new ContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
-
 
             contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
             {
@@ -118,8 +118,8 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 3
-                }
+                    KeepLatestVersionPerDayForDays = 3,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
@@ -155,6 +155,7 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -167,14 +168,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = true }
+                    new() { ContentTypeId = 2, PreventCleanup = true },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
@@ -197,6 +198,7 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -209,14 +211,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = false, KeepAllVersionsNewerThanDays = 3 }
+                    new() { ContentTypeId = 2, PreventCleanup = false, KeepAllVersionsNewerThanDays = 3 },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())
@@ -239,10 +241,12 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content
                 new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+
                 // another content & type
                 new ContentVersionMeta(versionId: 7, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 8, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
@@ -255,14 +259,14 @@ namespace Umbraco.Tests.Services
                 {
                     EnableCleanup = true,
                     KeepAllVersionsNewerThanDays = 0,
-                    KeepLatestVersionPerDayForDays = 0
-                }
+                    KeepLatestVersionPerDayForDays = 0,
+                },
             });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
                 {
-                    new ContentVersionCleanupPolicySettings{ ContentTypeId = 2, PreventCleanup = false, KeepLatestVersionPerDayForDays = 3 }
+                    new() { ContentTypeId = 2, PreventCleanup = false, KeepLatestVersionPerDayForDays = 3 },
                 });
 
             documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup())

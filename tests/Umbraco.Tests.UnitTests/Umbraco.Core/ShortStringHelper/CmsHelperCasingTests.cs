@@ -21,8 +21,7 @@ public class CmsHelperCasingTests
     [TestCase("thisis", "Thisis")]
     [TestCase("ThisIsTheEnd", "This Is The End")]
     //// [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6In The Village")] // note the issue with Number6In
-    [TestCase("WhoIsNumber6InTheVillage",
-        "Who Is Number6 In The Village")] // now fixed since DefaultShortStringHelper is the default
+    [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // now fixed since DefaultShortStringHelper is the default
     public void SpaceCamelCasing(string input, string expected)
     {
         var output = input.SpaceCamelCasing(ShortStringHelper);

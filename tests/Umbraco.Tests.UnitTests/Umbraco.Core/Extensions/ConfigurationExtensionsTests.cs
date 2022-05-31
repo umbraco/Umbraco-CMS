@@ -102,8 +102,7 @@ public class ConfigurationExtensionsTests
             providerName);
     }
 
-    private static Mock<IConfiguration> CreateConfig(string configuredConnectionString,
-        string configuredProviderName = ConnectionStrings.DefaultProviderName)
+    private static Mock<IConfiguration> CreateConfig(string configuredConnectionString, string configuredProviderName = ConnectionStrings.DefaultProviderName)
     {
         var mockConfigSection = new Mock<IConfigurationSection>();
         mockConfigSection
@@ -127,8 +126,7 @@ public class ConfigurationExtensionsTests
     private static void SetDataDirectory() =>
         AppDomain.CurrentDomain.SetData("DataDirectory", DataDirectory);
 
-    private static void AssertResults(string expectedConnectionString, string expectedProviderName,
-        string connectionString, string providerName)
+    private static void AssertResults(string expectedConnectionString, string expectedProviderName, string connectionString, string providerName)
     {
         Assert.AreEqual(expectedConnectionString, connectionString);
         Assert.AreEqual(expectedProviderName, providerName);

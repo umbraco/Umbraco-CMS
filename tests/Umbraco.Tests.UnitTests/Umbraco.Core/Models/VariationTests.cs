@@ -436,8 +436,7 @@ public class VariationTests
         Assert.IsTrue(
             content.PublishCulture(langFrImpact)); // succeeds because names are ok (not validating properties here)
         Assert.IsFalse(
-            propertyValidationService.IsPropertyDataValid(content, out _,
-                langFrImpact)); // fails because prop1 is mandatory
+            propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact)); // fails because prop1 is mandatory
 
         content.SetValue("prop1", "a", langFr);
         Assert.IsTrue(
@@ -590,9 +589,12 @@ public class VariationTests
 
         var attribute = new DataEditorAttribute("a", "a", "a");
         var dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
-            => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(attribute,
-                localizedTextService, Mock.Of<IShortStringHelper>(), new JsonNetSerializer(), Mock.Of<IIOHelper>()));
-
+            => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(
+                attribute,
+                localizedTextService,
+                Mock.Of<IShortStringHelper>(),
+                new JsonNetSerializer(),
+                Mock.Of<IIOHelper>()));
 
         var textBoxEditor = new TextboxPropertyEditor(
             dataValueEditorFactory,

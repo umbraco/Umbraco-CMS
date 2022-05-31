@@ -34,10 +34,9 @@ public class ContentFinderByUrlAliasTests
         IFileService fileService,
         ContentFinderByUrlAlias sut,
         IPublishedContent[] rootContents,
-        IPublishedProperty urlProperty
-    )
+        IPublishedProperty urlProperty)
     {
-        //Arrange
+        // Arrange
         var absoluteUrl = "http://localhost" + relativeUrl;
         var variationContext = new VariationContext();
 
@@ -51,7 +50,8 @@ public class ContentFinderByUrlAliasTests
 
         Mock.Get(variationContextAccessor).Setup(x => x.VariationContext).Returns(variationContext);
         var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
-        //Act
+
+        // Act
         var result = await sut.TryFindContent(publishedRequestBuilder);
 
         Assert.IsTrue(result);

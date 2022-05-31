@@ -20,7 +20,8 @@ public class AlterMigrationTests
 
     private class TestPlan : MigrationPlan
     {
-        public TestPlan() : base("Test")
+        public TestPlan()
+            : base("Test")
         {
         }
     }

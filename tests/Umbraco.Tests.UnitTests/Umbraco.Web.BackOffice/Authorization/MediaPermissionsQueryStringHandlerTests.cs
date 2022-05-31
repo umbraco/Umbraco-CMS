@@ -140,7 +140,8 @@ public class MediaPermissionsQueryStringHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName = QueryStringName,
+    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(
+        string queryStringName = QueryStringName,
         string queryStringValue = "")
     {
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
@@ -154,14 +155,19 @@ public class MediaPermissionsQueryStringHandlerTests
         return mockHttpContextAccessor;
     }
 
-    private MediaPermissionsQueryStringHandler CreateHandler(IHttpContextAccessor httpContextAccessor, int nodeId,
+    private MediaPermissionsQueryStringHandler CreateHandler(
+        IHttpContextAccessor httpContextAccessor,
+        int nodeId,
         int startMediaId = -1)
     {
         var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(startMediaId);
         var mockEntityService = CreateMockEntityService();
         var mediaPermissions = CreateMediaPermissions(mockEntityService.Object, nodeId);
-        return new MediaPermissionsQueryStringHandler(mockBackOfficeSecurityAccessor.Object, httpContextAccessor,
-            mockEntityService.Object, mediaPermissions);
+        return new MediaPermissionsQueryStringHandler(
+            mockBackOfficeSecurityAccessor.Object,
+            httpContextAccessor,
+            mockEntityService.Object,
+            mediaPermissions);
     }
 
     private static Mock<IEntityService> CreateMockEntityService()
@@ -171,7 +177,8 @@ public class MediaPermissionsQueryStringHandlerTests
             .Setup(x => x.GetId(It.Is<Udi>(y => y == s_nodeUdi)))
             .Returns(Attempt<int>.Succeed(NodeId));
         mockEntityService
-            .Setup(x => x.GetId(It.Is<Guid>(y => y == s_nodeGuid),
+            .Setup(x => x.GetId(
+                It.Is<Guid>(y => y == s_nodeGuid),
                 It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document)))
             .Returns(Attempt<int>.Succeed(NodeId));
         return mockEntityService;
@@ -209,6 +216,7 @@ public class MediaPermissionsQueryStringHandlerTests
     }
 
     private static void AssertMediaCached(Mock<IHttpContextAccessor> mockHttpContextAccessor) =>
-        Assert.AreEqual(NodeId,
+        Assert.AreEqual(
+            NodeId,
             ((IMedia)mockHttpContextAccessor.Object.HttpContext.Items[typeof(IMedia).ToString()]).Id);
 }

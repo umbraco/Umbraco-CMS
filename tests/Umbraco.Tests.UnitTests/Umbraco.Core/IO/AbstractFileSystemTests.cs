@@ -35,7 +35,7 @@ public abstract class AbstractFileSystemTests
         _fileSystem.AddFile("test/test.txt", CreateStream());
         _fileSystem.AddFile("test/test.txt", CreateStream());
 
-        var files = _fileSystem.GetFiles("test");
+        var files = _fileSystem.GetFiles("test").ToArray();
 
         Assert.AreEqual(1, files.Count());
 

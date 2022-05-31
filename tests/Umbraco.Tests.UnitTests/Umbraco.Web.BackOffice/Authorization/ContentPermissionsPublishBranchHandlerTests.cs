@@ -31,7 +31,8 @@ public class ContentPermissionsPublishBranchHandlerTests
     public async Task User_With_Access_To_All_Descendent_Nodes_Is_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockUserService = CreateMockUserService(NodeId,
+        var mockUserService = CreateMockUserService(
+            NodeId,
             new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "A" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
@@ -45,7 +46,8 @@ public class ContentPermissionsPublishBranchHandlerTests
     public async Task User_Without_Access_To_One_Descendent_Node_Is_Not_Authorized()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockUserService = CreateMockUserService(NodeId,
+        var mockUserService = CreateMockUserService(
+            NodeId,
             new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "A" } }, { DescendentNodeId2, new[] { "B" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
@@ -59,7 +61,8 @@ public class ContentPermissionsPublishBranchHandlerTests
     public async Task User_Without_Access_To_First_Descendent_Node_Is_Not_Authorized_And_Checks_Exit_Early()
     {
         var authHandlerContext = CreateAuthorizationHandlerContext();
-        var mockUserService = CreateMockUserService(NodeId,
+        var mockUserService = CreateMockUserService(
+            NodeId,
             new Dictionary<int, string[]> { { DescendentNodeId1, new[] { "B" } }, { DescendentNodeId2, new[] { "A" } } });
         var sut = CreateHandler(mockUserService.Object, NodeId);
 
@@ -77,30 +80,35 @@ public class ContentPermissionsPublishBranchHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private static Mock<IUserService> CreateMockUserService(int parentNodeId,
+    private static Mock<IUserService> CreateMockUserService(
+        int parentNodeId,
         Dictionary<int, string[]> descendendNodePermissionsForPath)
     {
         var mockUserService = new Mock<IUserService>();
 
         mockUserService
-            .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(),
+            .Setup(x => x.GetPermissionsForPath(
+                It.IsAny<IUser>(),
                 It.Is<string>(y =>
                     y ==
                     $"{Constants.System.RootString},{parentNodeId.ToString(CultureInfo.InvariantCulture)},{DescendentNodeId1}")))
-            .Returns(new EntityPermissionSet(parentNodeId,
+            .Returns(new EntityPermissionSet(
+                parentNodeId,
                 new EntityPermissionCollection(new List<EntityPermission>
                 {
-                    new(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId1])
+                    new(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId1]),
                 })));
         mockUserService
-            .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(),
+            .Setup(x => x.GetPermissionsForPath(
+                It.IsAny<IUser>(),
                 It.Is<string>(y =>
                     y ==
                     $"{Constants.System.RootString},{parentNodeId.ToString(CultureInfo.InvariantCulture)},{DescendentNodeId1},{DescendentNodeId2}")))
-            .Returns(new EntityPermissionSet(parentNodeId,
+            .Returns(new EntityPermissionSet(
+                parentNodeId,
                 new EntityPermissionCollection(new List<EntityPermission>
                 {
-                    new(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId2])
+                    new(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId2]),
                 })));
 
         return mockUserService;
@@ -111,8 +119,7 @@ public class ContentPermissionsPublishBranchHandlerTests
         var mockEntityService = CreateMockEntityService();
         var contentPermissions = CreateContentPermissions(mockEntityService.Object, userService, nodeId);
         var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
-        return new ContentPermissionsPublishBranchHandler(mockEntityService.Object, contentPermissions,
-            mockBackOfficeSecurityAccessor.Object);
+        return new ContentPermissionsPublishBranchHandler(mockEntityService.Object, contentPermissions, mockBackOfficeSecurityAccessor.Object);
     }
 
     private static Mock<IEntityService> CreateMockEntityService()
@@ -120,22 +127,26 @@ public class ContentPermissionsPublishBranchHandlerTests
         long totalRecords;
         var mockEntityService = new Mock<IEntityService>();
         mockEntityService
-            .Setup(x => x.GetPagedDescendants(It.Is<int>(y => y == NodeId),
-                It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document), It.IsAny<long>(), It.IsAny<int>(),
-                out totalRecords, It.IsAny<IQuery<IUmbracoEntity>>(), It.IsAny<Ordering>()))
+            .Setup(x => x.GetPagedDescendants(
+                It.Is<int>(y => y == NodeId),
+                It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document),
+                It.IsAny<long>(),
+                It.IsAny<int>(),
+                out totalRecords,
+                It.IsAny<IQuery<IUmbracoEntity>>(),
+                It.IsAny<Ordering>()))
             .Returns(new List<IEntitySlim>
             {
-                new EntitySlim {Id = DescendentNodeId1, Path = $"-1,{NodeId},{DescendentNodeId1}"},
+                new EntitySlim { Id = DescendentNodeId1, Path = $"-1,{NodeId},{DescendentNodeId1}" },
                 new EntitySlim
                 {
-                    Id = DescendentNodeId2, Path = $"-1,{NodeId},{DescendentNodeId1},{DescendentNodeId2}"
-                }
+                    Id = DescendentNodeId2, Path = $"-1,{NodeId},{DescendentNodeId1},{DescendentNodeId2}",
+                },
             });
         return mockEntityService;
     }
 
-    private static ContentPermissions CreateContentPermissions(IEntityService entityService, IUserService userService,
-        int nodeId)
+    private static ContentPermissions CreateContentPermissions(IEntityService entityService, IUserService userService, int nodeId)
     {
         var mockContentService = new Mock<IContentService>();
         mockContentService

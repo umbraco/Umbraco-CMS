@@ -24,15 +24,19 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Select("*")
             .From<PropertyDataDto>()
             .Where<PropertyDataDto>(x => x.LanguageId == null);
-        Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] is null))",
-            sql.SQL, sql.SQL);
+        Assert.AreEqual(
+            "SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] is null))",
+            sql.SQL,
+            sql.SQL);
 
         sql = new Sql<ISqlContext>(SqlContext)
             .Select("*")
             .From<PropertyDataDto>()
             .Where<PropertyDataDto>(x => x.LanguageId == 123);
-        Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
-            sql.SQL, sql.SQL);
+        Assert.AreEqual(
+            "SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
+            sql.SQL,
+            sql.SQL);
 
         var id = 123;
 
@@ -40,8 +44,10 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Select("*")
             .From<PropertyDataDto>()
             .Where<PropertyDataDto>(x => x.LanguageId == id);
-        Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
-            sql.SQL, sql.SQL);
+        Assert.AreEqual(
+            "SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
+            sql.SQL,
+            sql.SQL);
 
         int? nid = 123;
 
@@ -49,8 +55,10 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Select("*")
             .From<PropertyDataDto>()
             .Where<PropertyDataDto>(x => x.LanguageId == nid);
-        Assert.AreEqual("SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
-            sql.SQL, sql.SQL);
+        Assert.AreEqual(
+            "SELECT *\nFROM [umbracoPropertyData]\nWHERE (([umbracoPropertyData].[languageId] = @0))",
+            sql.SQL,
+            sql.SQL);
 
         // but the above comparison fails if @0 is null
         // what we want is something similar to:
@@ -60,7 +68,8 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Where<PropertyDataDto>(x => (nid == null && x.LanguageId == null) || (nid != null && x.LanguageId == nid));
         Assert.AreEqual(
             "SELECT *\nFROM [umbracoPropertyData]\nWHERE ((((@0 is null) AND ([umbracoPropertyData].[languageId] is null)) OR ((@1 is not null) AND ([umbracoPropertyData].[languageId] = @2))))",
-            sql.SQL, sql.SQL);
+            sql.SQL,
+            sql.SQL);
 
         // new SqlNullableEquals method does it automatically
         // 'course it would be nicer if '==' could do it
@@ -80,7 +89,8 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             .Where<PropertyDataDto>(x => x.LanguageId.SqlNullableEquals(nid, -1));
         Assert.AreEqual(
             "SELECT *\nFROM [umbracoPropertyData]\nWHERE ((COALESCE([umbracoPropertyData].[languageId],@0) = COALESCE(@1,@0)))",
-            sql.SQL, sql.SQL);
+            sql.SQL,
+            sql.SQL);
     }
 
     [Test]
@@ -126,7 +136,8 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
         var sql = Sql()
             .Select<Dto1>()
             .From<Dto1>();
-        Assert.AreEqual("SELECT [dto1].[id] AS [Id], [dto1].[name] AS [Name], [dto1].[value] AS [Value] FROM [dto1]",
+        Assert.AreEqual(
+            "SELECT [dto1].[id] AS [Id], [dto1].[name] AS [Name], [dto1].[value] AS [Value] FROM [dto1]",
             sql.SQL.NoCrLf());
 
         // select only 1 field
@@ -150,7 +161,9 @@ public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax
             @"SELECT [dto1].[id] AS [Id], [dto1].[name] AS [Name], [dto1].[value] AS [Value]
 , [dto2].[id] AS [Dto2__Id], [dto2].[dto1id] AS [Dto2__Dto1Id], [dto2].[name] AS [Dto2__Name]
 FROM [dto1]
-INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf(), sql.SQL);
+INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
+            sql.SQL.NoCrLf(),
+            sql.SQL);
 
         // select the whole DTO and nested referenced DTOs
         sql = Sql()
@@ -164,7 +177,8 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf(), 
 , [dto3].[id] AS [Dto2__Dto3__Id], [dto3].[dto2id] AS [Dto2__Dto3__Dto2Id], [dto3].[name] AS [Dto2__Dto3__Name]
 FROM [dto1]
 INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]
-INNER JOIN [dto3] ON [dto2].[id] = [dto3].[dto2id]".NoCrLf(), sql.SQL.NoCrLf());
+INNER JOIN [dto3] ON [dto2].[id] = [dto3].[dto2id]".NoCrLf(),
+            sql.SQL.NoCrLf());
 
         // select the whole DTO and referenced DTOs
         sql = Sql()
@@ -175,7 +189,8 @@ INNER JOIN [dto3] ON [dto2].[id] = [dto3].[dto2id]".NoCrLf(), sql.SQL.NoCrLf());
             @"SELECT [dto1].[id] AS [Id], [dto1].[name] AS [Name], [dto1].[value] AS [Value]
 , [dto2].[id] AS [Dto2s__Id], [dto2].[dto1id] AS [Dto2s__Dto1Id], [dto2].[name] AS [Dto2s__Name]
 FROM [dto1]
-INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
+INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(),
+            sql.SQL.NoCrLf());
     }
 
     [Test]
@@ -213,15 +228,20 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
     [ExplicitColumns]
     public class Dto1
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-        [Column("value")] public int Value { get; set; }
+        [Column("value")]
+        public int Value { get; set; }
 
-        [Reference] public Dto2 Dto2 { get; set; }
+        [Reference]
+        public Dto2 Dto2 { get; set; }
 
-        [Reference] public List<Dto2> Dto2s { get; set; }
+        [Reference]
+        public List<Dto2> Dto2s { get; set; }
     }
 
     [TableName("dto2")]
@@ -229,13 +249,17 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
     [ExplicitColumns]
     public class Dto2
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("dto1id")] public int Dto1Id { get; set; }
+        [Column("dto1id")]
+        public int Dto1Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-        [Reference] public Dto3 Dto3 { get; set; }
+        [Reference]
+        public Dto3 Dto3 { get; set; }
     }
 
     [TableName("dto3")]
@@ -243,10 +267,13 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
     [ExplicitColumns]
     public class Dto3
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("dto2id")] public int Dto2Id { get; set; }
+        [Column("dto2id")]
+        public int Dto2Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 }

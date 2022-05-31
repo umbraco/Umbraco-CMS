@@ -80,7 +80,8 @@ public class AppendUserModifiedHeaderAttributeTests
         Assert.AreEqual("1", headerValue[0]);
     }
 
-    private static ActionExecutingContext CreateContext(string headerValue = null,
+    private static ActionExecutingContext CreateContext(
+        string headerValue = null,
         KeyValuePair<string, object> actionArgument = default)
     {
         var httpContext = new DefaultHttpContext();

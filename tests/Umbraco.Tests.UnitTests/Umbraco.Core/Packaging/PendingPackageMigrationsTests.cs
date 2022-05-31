@@ -17,7 +17,8 @@ public class PendingPackageMigrationsTests
 
     private class TestPackageMigrationPlan : PackageMigrationPlan
     {
-        public TestPackageMigrationPlan() : base(TestPackageName)
+        public TestPackageMigrationPlan()
+            : base(TestPackageName)
         {
         }
 
@@ -48,7 +49,7 @@ public class PendingPackageMigrationsTests
         var pendingPackageMigrations = GetPendingPackageMigrations();
         var registeredMigrations = new Dictionary<string, string>
         {
-            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step2.ToString()
+            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step2.ToString(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
         Assert.AreEqual(0, pending.Count);
@@ -60,7 +61,7 @@ public class PendingPackageMigrationsTests
         var pendingPackageMigrations = GetPendingPackageMigrations();
         var registeredMigrations = new Dictionary<string, string>
         {
-            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString()
+            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
         Assert.AreEqual(1, pending.Count);
@@ -72,7 +73,7 @@ public class PendingPackageMigrationsTests
         var pendingPackageMigrations = GetPendingPackageMigrations();
         var registeredMigrations = new Dictionary<string, string>
         {
-            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString().ToUpper()
+            [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString().ToUpper(),
         };
         var pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
         Assert.AreEqual(1, pending.Count);

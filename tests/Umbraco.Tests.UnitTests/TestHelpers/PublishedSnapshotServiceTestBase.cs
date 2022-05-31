@@ -46,17 +46,29 @@ public class PublishedSnapshotServiceTestBase
     public void Teardown() => SnapshotService?.Dispose();
 
     protected IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
+
     protected virtual IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+
     protected IContentTypeService ContentTypeService { get; private set; }
+
     protected IMediaTypeService MediaTypeService { get; private set; }
+
     protected IDataTypeService DataTypeService { get; private set; }
+
     protected IDomainService DomainService { get; private set; }
+
     protected IPublishedValueFallback PublishedValueFallback { get; private set; }
+
     protected IPublishedSnapshotService SnapshotService { get; private set; }
+
     protected IVariationContextAccessor VariationContextAccessor { get; private set; }
+
     protected TestPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
+
     protected TestNuCacheContentService NuCacheContentService { get; private set; }
+
     protected PublishedContentTypeFactory PublishedContentTypeFactory { get; private set; }
+
     protected GlobalSettings GlobalSettings { get; } = new();
 
     protected virtual PropertyValueConverterCollection PropertyValueConverterCollection =>
@@ -91,8 +103,7 @@ public class PublishedSnapshotServiceTestBase
             new SiteDomainMapper(),
             umbracoContextAccessor,
             uriUtility,
-            Mock.Of<ILocalizationService>(x => x.GetDefaultLanguageIsoCode() == GlobalSettings.DefaultUILanguage)
-        );
+            Mock.Of<ILocalizationService>(x => x.GetDefaultLanguageIsoCode() == GlobalSettings.DefaultUILanguage));
 
         var publishedUrlProvider = new UrlProvider(
             umbracoContextAccessor,
@@ -110,10 +121,17 @@ public class PublishedSnapshotServiceTestBase
         IPublishedUrlProvider publishedUrlProvider = null) => new(
         Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
         new ContentFinderCollection(() => contentFinders ?? Enumerable.Empty<IContentFinder>()),
-        new TestLastChanceFinder(), new TestVariationContextAccessor(), Mock.Of<IProfilingLogger>(),
-        Mock.Of<ILogger<PublishedRouter>>(), publishedUrlProvider ?? Mock.Of<IPublishedUrlProvider>(),
-        Mock.Of<IRequestAccessor>(), Mock.Of<IPublishedValueFallback>(), Mock.Of<IFileService>(),
-        Mock.Of<IContentTypeService>(), umbracoContextAccessor, Mock.Of<IEventAggregator>());
+        new TestLastChanceFinder(),
+        new TestVariationContextAccessor(),
+        Mock.Of<IProfilingLogger>(),
+        Mock.Of<ILogger<PublishedRouter>>(),
+        publishedUrlProvider ?? Mock.Of<IPublishedUrlProvider>(),
+        Mock.Of<IRequestAccessor>(),
+        Mock.Of<IPublishedValueFallback>(),
+        Mock.Of<IFileService>(),
+        Mock.Of<IContentTypeService>(),
+        umbracoContextAccessor,
+        Mock.Of<IEventAggregator>());
 
     protected IUmbracoContextAccessor GetUmbracoContextAccessor(string urlAsString)
     {
@@ -151,8 +169,7 @@ public class PublishedSnapshotServiceTestBase
         return new[] { dataType };
     }
 
-    protected virtual ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes,
-        IDataType[] dataTypes)
+    protected virtual ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
     {
         var contentTypeService = new Mock<IContentTypeService>();
         contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
@@ -181,8 +198,7 @@ public class PublishedSnapshotServiceTestBase
             mediaTypeService: mediaTypeService.Object,
             localizationService: Mock.Of<ILocalizationService>(),
             domainService: Mock.Of<IDomainService>(),
-            fileService: Mock.Of<IFileService>()
-        );
+            fileService: Mock.Of<IFileService>());
     }
 
     /// <summary>
@@ -199,8 +215,6 @@ public class PublishedSnapshotServiceTestBase
     /// <summary>
     ///     Initializes the <see cref="IPublishedSnapshotService'" /> with a source of data
     /// </summary>
-    /// <param name="contentNodeKits"></param>
-    /// <param name="contentTypes"></param>
     protected void InitializedCache(
         IEnumerable<ContentNodeKit> contentNodeKits,
         IContentType[] contentTypes,
@@ -267,7 +281,6 @@ public class PublishedSnapshotServiceTestBase
             PublishedModelFactory,
             TestHelper.GetHostingEnvironment(),
             Options.Create(nuCacheSettings),
-            //ContentNestedDataSerializerFactory,
             new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
 
         // invariant is the current default

@@ -35,12 +35,12 @@ public class UmbracoApplicationTests
     {
         var typeModels = new List<TypeModel>
         {
-            new() {ItemType = TypeModel.ItemTypes.Content, Alias = "content1"},
-            new() {ItemType = TypeModel.ItemTypes.Content, Alias = "content2"},
-            new() {ItemType = TypeModel.ItemTypes.Media, Alias = "media1"},
-            new() {ItemType = TypeModel.ItemTypes.Media, Alias = "media2"},
-            new() {ItemType = TypeModel.ItemTypes.Member, Alias = "member1"},
-            new() {ItemType = TypeModel.ItemTypes.Member, Alias = "member2"}
+            new() { ItemType = TypeModel.ItemTypes.Content, Alias = "content1" },
+            new() { ItemType = TypeModel.ItemTypes.Content, Alias = "content2" },
+            new() { ItemType = TypeModel.ItemTypes.Media, Alias = "media1" },
+            new() { ItemType = TypeModel.ItemTypes.Media, Alias = "media2" },
+            new() { ItemType = TypeModel.ItemTypes.Member, Alias = "member1" },
+            new() { ItemType = TypeModel.ItemTypes.Member, Alias = "member2" },
         };
 
         Assert.AreEqual(6, UmbracoServices.EnsureDistinctAliases(typeModels).Count);

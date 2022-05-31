@@ -39,23 +39,21 @@ public class PublishContentCacheTests : PublishedSnapshotServiceTestBase
     [Test]
     public void Has_Content() => Assert.IsTrue(_cache.HasContent());
 
-
     [Test]
     public void Get_Root_Docs()
     {
-        var result = _cache.GetAtRoot();
-        Assert.AreEqual(2, result.Count());
+        var result = _cache.GetAtRoot().ToArray();
+        Assert.AreEqual(2, result.Length);
         Assert.AreEqual(1046, result.ElementAt(0).Id);
         Assert.AreEqual(1172, result.ElementAt(1).Id);
     }
 
-
     [TestCase("/", 1046)]
     [TestCase("/home", 1046)]
-    [TestCase("/Home", 1046)] //test different cases
+    [TestCase("/Home", 1046)] // test different cases
     [TestCase("/home/sub1", 1173)]
     [TestCase("/Home/sub1", 1173)]
-    [TestCase("/home/Sub1", 1173)] //test different cases
+    [TestCase("/home/Sub1", 1173)] // test different cases
     [TestCase("/home/Sub'Apostrophe", 1177)]
     public void Get_Node_By_Route(string route, int nodeId)
     {
@@ -63,7 +61,6 @@ public class PublishContentCacheTests : PublishedSnapshotServiceTestBase
         Assert.IsNotNull(result);
         Assert.AreEqual(nodeId, result.Id);
     }
-
 
     [TestCase("/", 1046)]
     [TestCase("/sub1", 1173)]

@@ -15,10 +15,8 @@ public class UmbracoPasswordHasherTests
 {
     // Technically MD5, HMACSHA384 & HMACSHA512 were also possible but opt in as opposed to historic defaults.
     [Test]
-    [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!",
-        "uB/pLEhhe1W7EtWMv/pSgg==1y8+aso9+h3AKRtJXlVYeg2TZKJUr64hccj82ZZ7Ksk=")] // Actually HMACSHA256
-    [InlineAutoMoqData("SHA1", "Umbraco9Rocks!",
-        "6tZGfG9NTxJJYp19Fac9og==zzRggqANxhb+CbD/VabEt8cIde8=")] // When SHA1 is set on machine key.
+    [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!", "uB/pLEhhe1W7EtWMv/pSgg==1y8+aso9+h3AKRtJXlVYeg2TZKJUr64hccj82ZZ7Ksk=")] // Actually HMACSHA256
+    [InlineAutoMoqData("SHA1", "Umbraco9Rocks!", "6tZGfG9NTxJJYp19Fac9og==zzRggqANxhb+CbD/VabEt8cIde8=")] // When SHA1 is set on machine key.
     public void VerifyHashedPassword_ValidHashWithoutLegacyEncoding_ReturnsSuccessRehashNeeded(
         string algorithm,
         string providedPassword,
@@ -60,8 +58,7 @@ public class UmbracoPasswordHasherTests
     }
 
     [Test]
-    [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!",
-        "aB/cDeFaBcDefAbcD/EfaB==1y8+aso9+h3AKRtJXlVYeg2TZKJUr64hccj82ZZ7Ksk=")]
+    [InlineAutoMoqData("HMACSHA256", "Umbraco9Rocks!", "aB/cDeFaBcDefAbcD/EfaB==1y8+aso9+h3AKRtJXlVYeg2TZKJUr64hccj82ZZ7Ksk=")]
     public void VerifyHashedPassword_WithIncorrectPassword_ReturnsFailed(
         string algorithm,
         string providedPassword,
@@ -87,7 +84,7 @@ public class UmbracoPasswordHasherTests
     {
         var options = Options.Create(new PasswordHasherOptions
         {
-            CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+            CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2,
         });
 
         var upstreamHasher = new PasswordHasher<TestUserStub>(options);
@@ -107,7 +104,7 @@ public class UmbracoPasswordHasherTests
     {
         var options = Options.Create(new PasswordHasherOptions
         {
-            CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3
+            CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3,
         });
 
         var upstreamHasher = new PasswordHasher<TestUserStub>(options);

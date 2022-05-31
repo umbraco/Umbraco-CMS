@@ -48,7 +48,8 @@ public class UmbracoBuilderExtensionsTests
 
     private class CustomizationAttribute : AutoDataAttribute
     {
-        public CustomizationAttribute() : base(() =>
+        public CustomizationAttribute()
+            : base(() =>
         {
             var fixture = new Fixture();
 
@@ -64,25 +65,37 @@ public class UmbracoBuilderExtensionsTests
     private class UmbracoBuildStub : IUmbracoBuilder
     {
         public UmbracoBuildStub() => Services = new ServiceCollection();
-        public IServiceCollection Services { get; }
-        public IConfiguration Config { get; }
-        public TypeLoader TypeLoader { get; }
-        public ILoggerFactory BuilderLoggerFactory { get; }
-        public IHostingEnvironment BuilderHostingEnvironment { get; }
-        public IProfiler Profiler { get; }
-        public AppCaches AppCaches { get; }
-        public TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder => default;
 
-        public void Build() { }
+        public IServiceCollection Services { get; }
+
+        public IConfiguration Config { get; }
+
+        public TypeLoader TypeLoader { get; }
+
+        public ILoggerFactory BuilderLoggerFactory { get; }
+
+        public IHostingEnvironment BuilderHostingEnvironment { get; }
+
+        public IProfiler Profiler { get; }
+
+        public AppCaches AppCaches { get; }
+
+        public TBuilder WithCollectionBuilder<TBuilder>()
+            where TBuilder : ICollectionBuilder => default;
+
+        public void Build()
+        {
+        }
     }
 
     private class StubNotificationHandler
-        : INotificationHandler<ContentPublishedNotification>
-            , INotificationAsyncHandler<ContentPublishedNotification>
+        : INotificationHandler<ContentPublishedNotification>,
+            INotificationAsyncHandler<ContentPublishedNotification>
     {
-        public Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken) =>
-            Task.CompletedTask;
+        public Task HandleAsync(ContentPublishedNotification notification, CancellationToken cancellationToken) => Task.CompletedTask;
 
-        public void Handle(ContentPublishedNotification notification) { }
+        public void Handle(ContentPublishedNotification notification)
+        {
+        }
     }
 }

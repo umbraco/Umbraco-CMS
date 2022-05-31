@@ -34,13 +34,24 @@ public class ReflectionUtilitiesTests
     [Test]
     public void EmitCtorEmitsFromInfo()
     {
-        var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null,
-            CallingConventions.Any, Array.Empty<Type>(), null);
+        var ctorInfo = typeof(Class1).GetConstructor(
+            BindingFlags.Public | BindingFlags.Instance,
+            null,
+            CallingConventions.Any,
+            Array.Empty<Type>(),
+            null);
         var ctor1 = ReflectionUtilities.EmitConstructor<Func<Class1>>(ctorInfo);
         Assert.IsInstanceOf<Class1>(ctor1());
 
-        ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null,
-            CallingConventions.Any, new[] { typeof(int) }, null);
+        ctorInfo = typeof(Class1).GetConstructor(
+            BindingFlags.Public | BindingFlags.Instance,
+            null,
+            CallingConventions.Any,
+            new[]
+            {
+                typeof(int),
+            },
+            null);
         var ctor3 = ReflectionUtilities.EmitConstructor<Func<int, object>>(ctorInfo);
         Assert.IsInstanceOf<Class1>(ctor3(42));
 
@@ -61,8 +72,12 @@ public class ReflectionUtilitiesTests
     [Test]
     public void EmitCtorThrowsIfInvalid()
     {
-        var ctorInfo = typeof(Class1).GetConstructor(BindingFlags.Public | BindingFlags.Instance, null,
-            CallingConventions.Any, Array.Empty<Type>(), null);
+        var ctorInfo = typeof(Class1).GetConstructor(
+            BindingFlags.Public | BindingFlags.Instance,
+            null,
+            CallingConventions.Any,
+            Array.Empty<Type>(),
+            null);
         Assert.Throws<ArgumentException>(() => ReflectionUtilities.EmitConstructor<Func<Class2>>(ctorInfo));
     }
 
@@ -120,8 +135,15 @@ public class ReflectionUtilitiesTests
         var method1 = ReflectionUtilities.EmitMethod<Action<Class1>>(methodInfo);
         method1(class1);
 
-        methodInfo = typeof(Class1).GetMethod("Method2", BindingFlags.Instance | BindingFlags.Public, null,
-            new[] { typeof(int) }, null);
+        methodInfo = typeof(Class1).GetMethod(
+            "Method2",
+            BindingFlags.Instance | BindingFlags.Public,
+            null,
+            new[]
+            {
+                typeof(int),
+            },
+            null);
         var method2 = ReflectionUtilities.EmitMethod<Action<Class1, int>>(methodInfo);
         method2(class1, 42);
 
@@ -129,8 +151,15 @@ public class ReflectionUtilitiesTests
         var method3 = ReflectionUtilities.EmitMethod<Func<Class1, int>>(methodInfo);
         Assert.AreEqual(42, method3(class1));
 
-        methodInfo = typeof(Class1).GetMethod("Method4", BindingFlags.Instance | BindingFlags.Public, null,
-            new[] { typeof(string) }, null);
+        methodInfo = typeof(Class1).GetMethod(
+            "Method4",
+            BindingFlags.Instance | BindingFlags.Public,
+            null,
+            new[]
+            {
+                typeof(string),
+            },
+            null);
         var method4 = ReflectionUtilities.EmitMethod<Func<Class1, string, int>>(methodInfo);
         Assert.AreEqual(42, method4(class1, "42"));
 
@@ -138,8 +167,7 @@ public class ReflectionUtilitiesTests
         var smethod1 = ReflectionUtilities.EmitMethod<Action>(methodInfo);
         smethod1();
 
-        methodInfo = typeof(Class1).GetMethod("SMethod2", BindingFlags.Static | BindingFlags.Public, null,
-            new[] { typeof(int) }, null);
+        methodInfo = typeof(Class1).GetMethod("SMethod2", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(int) }, null);
         var smethod2 = ReflectionUtilities.EmitMethod<Action<int>>(methodInfo);
         smethod2(42);
 
@@ -147,8 +175,12 @@ public class ReflectionUtilitiesTests
         var smethod3 = ReflectionUtilities.EmitMethod<Func<int>>(methodInfo);
         Assert.AreEqual(42, smethod3());
 
-        methodInfo = typeof(Class1).GetMethod("SMethod4", BindingFlags.Static | BindingFlags.Public, null,
-            new[] { typeof(string) }, null);
+        methodInfo = typeof(Class1).GetMethod(
+            "SMethod4",
+            BindingFlags.Static | BindingFlags.Public,
+            null,
+            new[] { typeof(string) },
+            null);
         var smethod4 = ReflectionUtilities.EmitMethod<Func<string, int>>(methodInfo);
         Assert.AreEqual(42, smethod4("42"));
 
@@ -491,7 +523,7 @@ public class ReflectionUtilitiesTests
             StringValue = "foo",
             StringValue2 = "foo",
             ClassValue = new Class2(),
-            ClassValue2 = new Class2()
+            ClassValue2 = new Class2(),
         };
 
         Console.WriteLine("Getting object5 values...");
@@ -551,7 +583,6 @@ public class ReflectionUtilitiesTests
     }
 
     // FIXME: missing tests specifying 'returned' on method, property
-
     [Test]
     public void DeconstructAnonymousType()
     {
@@ -722,7 +753,8 @@ public class ReflectionUtilitiesTests
 
     public class Class5 : Class4
     {
-        [JsonProperty("intValue2")] public int IntValue2 { get; set; }
+        [JsonProperty("intValue2")]
+        public int IntValue2 { get; set; }
 
         public string StringValue2 { get; set; }
 

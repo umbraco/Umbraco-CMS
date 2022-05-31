@@ -132,7 +132,8 @@ public class MappingTests
     {
         var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
         {
-            new MapperDefinition1(), new MapperDefinition3()
+            new MapperDefinition1(),
+            new MapperDefinition3(),
         });
         var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
@@ -247,7 +248,7 @@ public class MappingTests
     {
         Apple = 0,
         Banana = 1,
-        Cherry = 2
+        Cherry = 2,
     }
 
     private class Thing6
@@ -263,7 +264,7 @@ public class MappingTests
     {
         Apple = 0,
         Banana = 1,
-        Cherry = 2
+        Cherry = 2,
     }
 
     private class Thing7

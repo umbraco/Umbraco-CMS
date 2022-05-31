@@ -53,12 +53,14 @@ public class PreviewRoutesTests
 
         var endpoint3 = (RouteEndpoint)endpoints.DataSources.Last().Endpoints[0];
         var previewControllerName = ControllerExtensions.GetControllerName<PreviewController>();
-        Assert.AreEqual($"umbraco/{previewControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
+        Assert.AreEqual(
+            $"umbraco/{previewControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
             endpoint3.RoutePattern.RawText);
         Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint3.RoutePattern.Defaults["area"]);
         Assert.AreEqual("Index", endpoint3.RoutePattern.Defaults[ActionToken]);
         Assert.AreEqual(previewControllerName, endpoint3.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(endpoint3.RoutePattern.Defaults["area"],
+        Assert.AreEqual(
+            endpoint3.RoutePattern.Defaults["area"],
             typeof(PreviewController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
     }
 

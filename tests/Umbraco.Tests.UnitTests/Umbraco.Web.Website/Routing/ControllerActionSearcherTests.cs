@@ -28,7 +28,7 @@ public class ControllerActionSearcherTests
             ActionName = action,
             ControllerName = ControllerExtensions.GetControllerName<T>(),
             ControllerTypeInfo = typeof(RenderController).GetTypeInfo(),
-            DisplayName = $"{ControllerExtensions.GetControllerName<T>()}.{action}"
+            DisplayName = $"{ControllerExtensions.GetControllerName<T>()}.{action}",
         };
 
     private IReadOnlyList<ControllerActionDescriptor> GetActionDescriptors() => new List<ControllerActionDescriptor>
@@ -36,7 +36,7 @@ public class ControllerActionSearcherTests
         GetDescriptor<RenderController>(nameof(RenderController.Index)),
         GetDescriptor<Render1Controller>(nameof(Render1Controller.Index)),
         GetDescriptor<Render1Controller>(nameof(Render1Controller.Custom)),
-        GetDescriptor<Render2Controller>(nameof(Render2Controller.Index))
+        GetDescriptor<Render2Controller>(nameof(Render2Controller.Index)),
     };
 
     private class Render1Controller : ControllerBase, IRenderController
@@ -48,7 +48,9 @@ public class ControllerActionSearcherTests
 
     private class Render2Controller : RenderController
     {
-        public Render2Controller(ILogger<Render2Controller> logger, ICompositeViewEngine compositeViewEngine,
+        public Render2Controller(
+            ILogger<Render2Controller> logger,
+            ICompositeViewEngine compositeViewEngine,
             IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger, compositeViewEngine, umbracoContextAccessor)
         {
@@ -88,10 +90,8 @@ public class ControllerActionSearcherTests
         Assert.IsTrue(matches == (result != null));
         if (matches)
         {
-            Assert.IsTrue(result.ActionName.InvariantEquals(resultAction),
-                "expected {0} does not match resulting action {1}", resultAction, result.ActionName);
-            Assert.IsTrue(result.ControllerName.InvariantEquals(controller),
-                "expected {0} does not match resulting controller {1}", controller, result.ControllerName);
+            Assert.IsTrue(result.ActionName.InvariantEquals(resultAction), "expected {0} does not match resulting action {1}", resultAction, result.ActionName);
+            Assert.IsTrue(result.ControllerName.InvariantEquals(controller), "expected {0} does not match resulting controller {1}", controller, result.ControllerName);
         }
     }
 }

@@ -77,8 +77,7 @@ public static class TestHelper
 
     public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(),
-        new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>());
+    public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>());
 
     public static ITypeFinder GetTypeFinder() => s_testHelperInternal.GetTypeFinder();
 
@@ -103,13 +102,15 @@ public static class TestHelper
 
     public static void InitializeContentDirectories() => CreateDirectories(new[]
     {
-        Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath,
-        Constants.SystemDirectories.AppPlugins
+        Constants.SystemDirectories.MvcViews,
+        new GlobalSettings().UmbracoMediaPhysicalRootPath,
+        Constants.SystemDirectories.AppPlugins,
     });
 
     public static void CleanContentDirectories() => CleanDirectories(new[]
     {
-        Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath
+        Constants.SystemDirectories.MvcViews,
+        new GlobalSettings().UmbracoMediaPhysicalRootPath,
     });
 
     public static void CreateDirectories(string[] directories)
@@ -156,8 +157,12 @@ public static class TestHelper
 
     // TODO: Move to Assertions or AssertHelper
     // FIXME: obsolete the dateTimeFormat thing and replace with dateDelta
-    public static void AssertPropertyValuesAreEqual(object actual, object expected, string dateTimeFormat = null,
-        Func<IEnumerable, IEnumerable> sorter = null, string[] ignoreProperties = null)
+    public static void AssertPropertyValuesAreEqual(
+        object actual,
+        object expected,
+        string dateTimeFormat = null,
+        Func<IEnumerable, IEnumerable> sorter = null,
+        string[] ignoreProperties = null)
     {
         const int dateDeltaMilliseconds = 500; // .5s
 
@@ -184,8 +189,7 @@ public static class TestHelper
         }
     }
 
-    private static void AssertAreEqual(PropertyInfo property, object expected, object actual,
-        Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+    private static void AssertAreEqual(PropertyInfo property, object expected, object actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
     {
         if (!(expected is string) && expected is IEnumerable enumerable)
         {
@@ -204,9 +208,13 @@ public static class TestHelper
             // compare date & time with delta
             var actualDateTime = (DateTime)actual;
             var delta = (actualDateTime - expectedDateTime).TotalMilliseconds;
-            Assert.IsTrue(Math.Abs(delta) <= dateDeltaMilliseconds,
-                "Property {0}.{1} does not match. Expected: {2} but was: {3}", property.DeclaringType.Name,
-                property.Name, expected, actual);
+            Assert.IsTrue(
+                Math.Abs(delta) <= dateDeltaMilliseconds,
+                "Property {0}.{1} does not match. Expected: {2} but was: {3}",
+                property.DeclaringType.Name,
+                property.Name,
+                expected,
+                actual);
         }
         else if (expected is Property expectedProperty)
         {
@@ -223,9 +231,13 @@ public static class TestHelper
 
             for (var i = 0; i < expectedPropertyValues.Length; i++)
             {
-                Assert.AreEqual(expectedPropertyValues[i].EditedValue, actualPropertyValues[i].EditedValue,
+                Assert.AreEqual(
+                    expectedPropertyValues[i].EditedValue,
+                    actualPropertyValues[i].EditedValue,
                     $"{property.DeclaringType.Name}.{property.Name}: Expected draft value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
-                Assert.AreEqual(expectedPropertyValues[i].PublishedValue, actualPropertyValues[i].PublishedValue,
+                Assert.AreEqual(
+                    expectedPropertyValues[i].PublishedValue,
+                    actualPropertyValues[i].PublishedValue,
                     $"{property.DeclaringType.Name}.{property.Name}: Expected published value \"{expectedPropertyValues[i].EditedValue}\" but got \"{actualPropertyValues[i].EditedValue}\".");
             }
         }
@@ -251,8 +263,12 @@ public static class TestHelper
         }
     }
 
-    private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual,
-        Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
+    private static void AssertListsAreEqual(
+        PropertyInfo property,
+        IEnumerable expected,
+        IEnumerable actual,
+        Func<IEnumerable, IEnumerable> sorter = null,
+        int dateDeltaMilliseconds = 0)
     {
         if (sorter == null)
         {
@@ -272,7 +288,10 @@ public static class TestHelper
         {
             Assert.Fail(
                 "Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements",
-                property.PropertyType.Name, property.Name, expectedListEx.Count, actualListEx.Count);
+                property.PropertyType.Name,
+                property.Name,
+                expectedListEx.Count,
+                actualListEx.Count);
         }
 
         for (var i = 0; i < actualListEx.Count; i++)

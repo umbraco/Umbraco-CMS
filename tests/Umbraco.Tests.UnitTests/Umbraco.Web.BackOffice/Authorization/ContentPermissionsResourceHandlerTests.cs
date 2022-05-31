@@ -67,7 +67,8 @@ public class ContentPermissionsResourceHandlerTests
         Assert.IsFalse(authHandlerContext.HasSucceeded);
     }
 
-    private static AuthorizationHandlerContext CreateAuthorizationHandlerContext(int nodeId,
+    private static AuthorizationHandlerContext CreateAuthorizationHandlerContext(
+        int nodeId,
         bool createWithNodeId = false)
     {
         var requirement = new ContentPermissionsResourceRequirement();
@@ -112,9 +113,11 @@ public class ContentPermissionsResourceHandlerTests
         var mockUserService = new Mock<IUserService>();
 
         mockUserService
-            .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(),
+            .Setup(x => x.GetPermissionsForPath(
+                It.IsAny<IUser>(),
                 It.Is<string>(y => y == $"{Constants.System.RootString},{nodeId.ToInvariantString()}")))
-            .Returns(new EntityPermissionSet(nodeId,
+            .Returns(new EntityPermissionSet(
+                nodeId,
                 new EntityPermissionCollection(new List<EntityPermission> { new(1, nodeId, permissionsForPath) })));
 
         var mockContentService = new Mock<IContentService>();
@@ -123,7 +126,10 @@ public class ContentPermissionsResourceHandlerTests
             .Returns(CreateContent(nodeId));
 
         var mockEntityService = new Mock<IEntityService>();
-        return new ContentPermissions(mockUserService.Object, mockContentService.Object, mockEntityService.Object,
+        return new ContentPermissions(
+            mockUserService.Object,
+            mockContentService.Object,
+            mockEntityService.Object,
             AppCaches.Disabled);
     }
 }

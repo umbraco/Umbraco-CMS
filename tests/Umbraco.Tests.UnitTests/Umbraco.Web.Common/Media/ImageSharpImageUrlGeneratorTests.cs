@@ -12,8 +12,7 @@ public class ImageSharpImageUrlGeneratorTests
 {
     private const string MediaPath = "/media/1005/img_0671.jpg";
 
-    private static readonly ImageUrlGenerationOptions.CropCoordinates s_crop = new(0.58729977382575338m,
-        0.055768992440203169m, 0m, 0.32457553600198386m);
+    private static readonly ImageUrlGenerationOptions.CropCoordinates s_crop = new(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
 
     private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus1 = new(0.96m, 0.80827067669172936m);
     private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus2 = new(0.4275m, 0.41m);
@@ -56,7 +55,7 @@ public class ImageSharpImageUrlGeneratorTests
             FocalPoint = s_focus1,
             Width = 200,
             Height = 300,
-            FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff"
+            FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff",
         });
         Assert.AreEqual(
             MediaPath +
@@ -103,7 +102,8 @@ public class ImageSharpImageUrlGeneratorTests
         var urlString =
             s_generator.GetImageUrl(
                 new ImageUrlGenerationOptions(string.Empty) { Crop = s_crop, Width = 100, Height = 100 });
-        Assert.AreEqual("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
+        Assert.AreEqual(
+            "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100",
             urlString);
     }
 
@@ -118,35 +118,35 @@ public class ImageSharpImageUrlGeneratorTests
             {
                 ImageCropMode = ImageCropMode.Min,
                 Width = 300,
-                Height = 150
+                Height = 150,
             });
         var urlStringBoxPad =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
                 ImageCropMode = ImageCropMode.BoxPad,
                 Width = 300,
-                Height = 150
+                Height = 150,
             });
         var urlStringPad =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
                 ImageCropMode = ImageCropMode.Pad,
                 Width = 300,
-                Height = 150
+                Height = 150,
             });
         var urlStringMax =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
                 ImageCropMode = ImageCropMode.Max,
                 Width = 300,
-                Height = 150
+                Height = 150,
             });
         var urlStringStretch =
             s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
             {
                 ImageCropMode = ImageCropMode.Stretch,
                 Width = 300,
-                Height = 150
+                Height = 150,
             });
 
         Assert.AreEqual(MediaPath + "?rmode=min&width=300&height=150", urlStringMin);
@@ -167,7 +167,7 @@ public class ImageSharpImageUrlGeneratorTests
             ImageCropMode = ImageCropMode.Crop,
             ImageCropAnchor = ImageCropAnchor.Center,
             Width = 100,
-            Height = 270
+            Height = 270,
         });
         Assert.AreEqual(MediaPath + "?rmode=crop&ranchor=center&width=100&height=270", urlString);
     }
@@ -225,7 +225,7 @@ public class ImageSharpImageUrlGeneratorTests
             ImageCropMode = ImageCropMode.Pad,
             Width = 400,
             Height = 400,
-            FurtherOptions = "&bgcolor=fff"
+            FurtherOptions = "&bgcolor=fff",
         });
         Assert.AreEqual(MediaPath + "?rmode=pad&width=400&height=400&bgcolor=fff", urlString);
     }

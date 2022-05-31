@@ -131,8 +131,8 @@ public class DeepCloneHelperTests
                 new Test1(), "hello",
 
                 // Not cloneable so this property will get skipped.
-                new Test2()
-            }
+                new Test2(),
+            },
         };
 
         var clone = (Test3)test1.DeepClone();

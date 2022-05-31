@@ -37,8 +37,10 @@ public class MigrationPlanTests
             .Setup(x => x.Database)
             .Returns(database);
 
-        var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-            DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+        var sqlContext = new SqlContext(
+            new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
+            DatabaseType.SQLCe,
+            Mock.Of<IPocoDataFactory>());
         var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
         var migrationBuilder = Mock.Of<IMigrationBuilder>();
@@ -74,7 +76,7 @@ public class MigrationPlanTests
             // read current state
             var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
-            // execute plan                
+            // execute plan
             state = executor.Execute(plan, sourceState);
 
             // save new state

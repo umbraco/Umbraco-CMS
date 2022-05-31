@@ -37,7 +37,7 @@ public class HealthChecksSettingsValidatorTests
             {
                 Enabled = true,
                 FirstRunTime = firstRunTime,
-                Period = TimeSpan.FromHours(1)
-            }
+                Period = TimeSpan.FromHours(1),
+            },
         };
 }

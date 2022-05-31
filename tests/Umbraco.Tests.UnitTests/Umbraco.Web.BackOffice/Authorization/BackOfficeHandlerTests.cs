@@ -92,8 +92,10 @@ public class BackOfficeHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private BackOfficeHandler CreateHandler(RuntimeLevel runtimeLevel = RuntimeLevel.Run,
-        bool currentUserIsAuthenticated = false, bool currentUserIsApproved = false)
+    private BackOfficeHandler CreateHandler(
+        RuntimeLevel runtimeLevel = RuntimeLevel.Run,
+        bool currentUserIsAuthenticated = false,
+        bool currentUserIsApproved = false)
     {
         var mockBackOfficeSecurityAccessor =
             CreateMockBackOfficeSecurityAccessor(currentUserIsAuthenticated, currentUserIsApproved);
@@ -107,7 +109,6 @@ public class BackOfficeHandlerTests
         var user = new UserBuilder()
             .WithIsApproved(currentUserIsApproved)
             .Build();
-        var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
         var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
         mockBackOfficeSecurity.Setup(x => x.IsAuthenticated()).Returns(currentUserIsAuthenticated);
         if (currentUserIsAuthenticated)
@@ -115,7 +116,7 @@ public class BackOfficeHandlerTests
             mockBackOfficeSecurity.Setup(x => x.CurrentUser).Returns(user);
         }
 
-        mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
+        var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();
         mockBackOfficeSecurityAccessor.Setup(x => x.BackOfficeSecurity).Returns(mockBackOfficeSecurity.Object);
         return mockBackOfficeSecurityAccessor;
     }

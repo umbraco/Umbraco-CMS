@@ -24,8 +24,11 @@ public class MemberRoleStoreTests
     }
 
     private Mock<IMemberGroupService> _mockMemberGroupService;
+
     private IdentityErrorDescriber ErrorDescriber => new();
+
     private UmbracoIdentityRoleBuilder _roleBuilder;
+
     private MemberGroupBuilder _groupBuilder;
 
     public MemberRoleStore CreateSut()
@@ -41,7 +44,7 @@ public class MemberRoleStoreTests
     {
         // arrange
         var sut = CreateSut();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
@@ -57,7 +60,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 77);
@@ -80,7 +83,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 777);
@@ -104,7 +107,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithName("fakeGroup777").WithId("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 777);
@@ -128,7 +131,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -146,7 +149,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("7a77").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         var identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -163,7 +166,7 @@ public class MemberRoleStoreTests
     {
         // arrange
         var sut = CreateSut();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         Action actual = () => sut.UpdateAsync(null, fakeCancellationToken);
@@ -180,7 +183,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 77);
@@ -205,16 +208,14 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("7a77").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 77);
 
-
         // act
         Assert.ThrowsAsync<ArgumentException>(async () => await sut.DeleteAsync(fakeRole, fakeCancellationToken));
     }
-
 
     [Test]
     public async Task
@@ -223,11 +224,10 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         var mockMemberGroup = Mock.Of<IMemberGroup>(m =>
             m.Name == "fakeGroupName" && m.CreatorId == 77);
-
 
         // act
         var identityResult = await sut.DeleteAsync(fakeRole, fakeCancellationToken);
@@ -269,7 +269,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithTestName("7a77").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         Action actual = () => sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
@@ -304,7 +304,6 @@ public class MemberRoleStoreTests
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 
-
     [Test]
     public async Task
         GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAGuidButCanBeToInt_ThenIShouldGetASuccessResultAsync()
@@ -330,7 +329,6 @@ public class MemberRoleStoreTests
         _mockMemberGroupService.VerifyNoOtherCalls();
     }
 
-
     [Test]
     public async Task GivenIFindAMemberRoleByRoleName_AndRoleNameExists_ThenIShouldGetASuccessResultAsync()
     {
@@ -342,7 +340,6 @@ public class MemberRoleStoreTests
             m.Name == "fakeGroupName" &&
             m.CreatorId == 123 &&
             m.Id == 777);
-
 
         _mockMemberGroupService.Setup(x => x.GetByName(fakeRole.Name)).Returns(mockMemberGroup);
 
@@ -361,7 +358,7 @@ public class MemberRoleStoreTests
         // arrange
         var sut = CreateSut();
         var fakeRole = _roleBuilder.WithId("777").Build();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         Action actual = () => sut.FindByNameAsync(fakeRole.Name, fakeCancellationToken);
@@ -376,7 +373,7 @@ public class MemberRoleStoreTests
     {
         // arrange
         var sut = CreateSut();
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         Action actual = () => sut.GetRoleIdAsync(null, fakeCancellationToken);
@@ -393,7 +390,7 @@ public class MemberRoleStoreTests
         var fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
         var fakeRoleId = fakeRole.Id;
 
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         // act
         var actual = sut.GetRoleIdAsync(fakeRole, fakeCancellationToken);

@@ -44,8 +44,9 @@ public class ContentFinderByIdTests : PublishedSnapshotServiceTestBase
         var webRoutingSettings = new WebRoutingSettings();
         var lookup = new ContentFinderByIdPath(
             Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings),
-            Mock.Of<ILogger<ContentFinderByIdPath>>(), Mock.Of<IRequestAccessor>(), umbracoContextAccessor);
-
+            Mock.Of<ILogger<ContentFinderByIdPath>>(),
+            Mock.Of<IRequestAccessor>(),
+            umbracoContextAccessor);
 
         var result = await lookup.TryFindContent(frequest);
 

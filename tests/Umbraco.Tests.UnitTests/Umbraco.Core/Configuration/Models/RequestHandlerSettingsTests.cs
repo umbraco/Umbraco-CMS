@@ -13,9 +13,9 @@ public class RequestHandlerSettingsTests
     {
         var userCollection = new CharItem[]
         {
-            new() {Char = "test", Replacement = "replace"}, new() {Char = "test2", Replacement = "replace2"}
+            new() { Char = "test", Replacement = "replace" },
+            new() { Char = "test2", Replacement = "replace2" },
         };
-
 
         var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
         var actual = settings.GetCharReplacements().ToList();
@@ -32,13 +32,14 @@ public class RequestHandlerSettingsTests
     {
         var userCollection = new CharItem[]
         {
-            new() {Char = "test", Replacement = "replace"}, new() {Char = "test2", Replacement = "replace2"}
+            new() { Char = "test", Replacement = "replace" },
+            new() { Char = "test2", Replacement = "replace2" },
         };
 
         var settings = new RequestHandlerSettings
         {
             UserDefinedCharCollection = userCollection,
-            EnableDefaultCharReplacements = false
+            EnableDefaultCharReplacements = false,
         };
         var actual = settings.GetCharReplacements().ToList();
 
@@ -51,7 +52,8 @@ public class RequestHandlerSettingsTests
     {
         var userCollection = new CharItem[]
         {
-            new() {Char = "%", Replacement = "percent"}, new() {Char = ".", Replacement = "dot"}
+            new() { Char = "%", Replacement = "percent" },
+            new() { Char = ".", Replacement = "dot" },
         };
 
         var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
@@ -70,8 +72,9 @@ public class RequestHandlerSettingsTests
     {
         var userCollection = new CharItem[]
         {
-            new() {Char = "%", Replacement = "percent"}, new() {Char = ".", Replacement = "dot"},
-            new() {Char = "new", Replacement = "new"}
+            new() { Char = "%", Replacement = "percent" },
+            new() { Char = ".", Replacement = "dot" },
+            new() { Char = "new", Replacement = "new" },
         };
 
         var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };

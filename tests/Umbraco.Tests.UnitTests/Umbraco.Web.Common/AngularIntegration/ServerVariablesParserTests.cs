@@ -21,11 +21,11 @@ public class ServerVariablesParserTests
 
         var d = new Dictionary<string, object>
         {
-            {"test1", "Test 1"},
-            {"test2", "Test 2"},
-            {"test3", "Test 3"},
-            {"test4", "Test 4"},
-            {"test5", "Test 5"}
+            { "test1", "Test 1" },
+            { "test2", "Test 2" },
+            { "test3", "Test 3" },
+            { "test4", "Test 4" },
+            { "test5", "Test 5" },
         };
 
         var output = (await parser.ParseAsync(d)).StripWhitespace();

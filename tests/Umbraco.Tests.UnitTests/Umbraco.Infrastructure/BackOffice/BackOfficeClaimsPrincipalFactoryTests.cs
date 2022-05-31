@@ -31,7 +31,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
             Name = TestUserGivenName,
             Email = "bob@umbraco.test",
             SecurityStamp = TestUserSecurityStamp,
-            Culture = TestUserCulture
+            Culture = TestUserCulture,
         };
 
         _mockUserManager = GetMockedUserManager();
@@ -144,7 +144,7 @@ public class BackOfficeClaimsPrincipalFactoryTests
         _testUser.Claims.Add(new IdentityUserClaim<string>
         {
             ClaimType = expectedClaimType,
-            ClaimValue = expectedClaimValue
+            ClaimValue = expectedClaimValue,
         });
         _mockUserManager.Setup(x => x.SupportsUserClaim).Returns(true);
         _mockUserManager.Setup(x => x.GetClaimsAsync(_testUser)).ReturnsAsync(

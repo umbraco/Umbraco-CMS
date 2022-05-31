@@ -44,12 +44,14 @@ public class PropertyValidationServiceTests
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
             .Returns(new CustomTextOnlyValueEditor(
                 new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
-                textService.Object, Mock.Of<IShortStringHelper>(), new JsonNetSerializer(), Mock.Of<IIOHelper>()));
+                textService.Object,
+                Mock.Of<IShortStringHelper>(),
+                new JsonNetSerializer(),
+                Mock.Of<IIOHelper>()));
 
         var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
-        validationService = new PropertyValidationService(propEditors, dataTypeService.Object,
-            Mock.Of<ILocalizedTextService>(), new ValueEditorCache());
+        validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>(), new ValueEditorCache());
     }
 
     [Test]
@@ -61,28 +63,28 @@ public class PropertyValidationServiceTests
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p1.SetValue("Hello", "en-US");
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p2.SetValue("Hello");
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p4.SetValue(null); // invalid
 
@@ -106,28 +108,28 @@ public class PropertyValidationServiceTests
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p1.SetValue("Hello", "en-US");
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p2.SetValue("Hello");
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p4.SetValue(null); // invalid
 
@@ -153,28 +155,28 @@ public class PropertyValidationServiceTests
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p1.SetValue(null, "en-US"); // invalid
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p3.SetValue(null, "en-US"); // ignored because the impact isn't the default lang + the content is published
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p4.SetValue(null); // ignored because the impact isn't the default lang + the content is published
 
@@ -198,28 +200,28 @@ public class PropertyValidationServiceTests
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p1.SetValue(null, "en-US"); // ignored since this is variant
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p3.SetValue("Hello", "en-US"); // ignored since this is variant
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p4.SetValue(null); // invalid
 
@@ -241,28 +243,28 @@ public class PropertyValidationServiceTests
             new PropertyType(ShortStringHelper, dataType, "test1")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p1.SetValue(null, "en-US"); // invalid
         var p2 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test2")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p2.SetValue(null); // invalid
         var p3 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test3")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             });
         p3.SetValue(null, "en-US"); // invalid
         var p4 = new Property(
             new PropertyType(ShortStringHelper, dataType, "test4")
             {
                 Mandatory = true,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             });
         p4.SetValue(null); // invalid
 

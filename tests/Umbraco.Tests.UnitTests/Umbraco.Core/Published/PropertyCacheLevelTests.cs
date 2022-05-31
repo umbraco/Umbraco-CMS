@@ -32,13 +32,11 @@ public class PropertyCacheLevelTests
         var configurationEditorJsonSerializer = new ConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
-            dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -59,8 +57,7 @@ public class PropertyCacheLevelTests
         // anything else is not > None, use Content
         //
         // for standalone elements, it's only None or Content
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } },
-            false);
+        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -119,13 +116,11 @@ public class PropertyCacheLevelTests
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
-            dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -148,8 +143,16 @@ public class PropertyCacheLevelTests
         // pretend we're creating this set as a value for a property
         // referenceCacheLevel is the cache level for this fictious property
         // converterCacheLevel is the cache level specified by the converter
-        var set1 = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } },
-            false, referenceCacheLevel, publishedSnapshotAccessor.Object);
+        var set1 = new PublishedElement(
+            setType1,
+            Guid.NewGuid(),
+            new Dictionary<string, object>
+            {
+                { "prop1", "1234" },
+            },
+            false,
+            referenceCacheLevel,
+            publishedSnapshotAccessor.Object);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -187,8 +190,7 @@ public class PropertyCacheLevelTests
         Assert.AreEqual(elementsCount2, oldElementsCache.Count);
         Assert.AreEqual(snapshotCount2, snapshotCache.Count);
 
-        Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Count + elementsCache.Count,
-            converter.InterConverts);
+        Assert.AreEqual((interConverts == 1 ? 1 : 4) + snapshotCache.Count + elementsCache.Count, converter.InterConverts);
     }
 
     [Test]
@@ -200,13 +202,11 @@ public class PropertyCacheLevelTests
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters,
-            dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -217,8 +217,7 @@ public class PropertyCacheLevelTests
 
         Assert.Throws<Exception>(() =>
         {
-            var unused = new PublishedElement(setType1, Guid.NewGuid(),
-                new Dictionary<string, object> { { "prop1", "1234" } }, false);
+            var unused = new PublishedElement(setType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
         });
     }
 
@@ -244,22 +243,29 @@ public class PropertyCacheLevelTests
         public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => _cacheLevel;
 
-        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-            object source, bool preview)
+        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             SourceConverts++;
             return int.TryParse(source as string, out var i) ? i : 0;
         }
 
-        public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToObject(
+            IPublishedElement owner,
+            IPublishedPropertyType propertyType,
+            PropertyCacheLevel referenceCacheLevel,
+            object inter,
+            bool preview)
         {
             InterConverts++;
             return (int)inter;
         }
 
-        public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToXPath(
+            IPublishedElement owner,
+            IPublishedPropertyType propertyType,
+            PropertyCacheLevel referenceCacheLevel,
+            object inter,
+            bool preview)
             => ((int)inter).ToString();
     }
 }

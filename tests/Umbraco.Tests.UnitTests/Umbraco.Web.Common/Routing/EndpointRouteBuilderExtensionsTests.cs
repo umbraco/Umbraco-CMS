@@ -30,8 +30,7 @@ public class EndpointRouteBuilderExtensionsTests
     [TestCase("umbraco", null, "test", "GetStuff", false)]
     [TestCase("umbraco", null, null, null, false)]
     [TestCase("umbraco", null, null, "GetStuff", false)]
-    public void MapUmbracoRoute(string umbracoPath, string area, string prefix, string defaultAction,
-        bool includeControllerName)
+    public void MapUmbracoRoute(string umbracoPath, string area, string prefix, string defaultAction, bool includeControllerName)
     {
         var endpoints = new TestRouteBuilder();
         endpoints.MapUmbracoRoute<Testing1Controller>(umbracoPath, area, prefix, defaultAction, includeControllerName);
@@ -46,12 +45,14 @@ public class EndpointRouteBuilderExtensionsTests
         {
             if (prefix.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual($"{umbracoPath}/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
             else
             {
-                Assert.AreEqual($"{umbracoPath}/{prefix}/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/{prefix}/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
         }
@@ -104,12 +105,14 @@ public class EndpointRouteBuilderExtensionsTests
         {
             if (area.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual($"{umbracoPath}/backoffice/api/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/backoffice/api/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
             else
             {
-                Assert.AreEqual($"{umbracoPath}/backoffice/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/backoffice/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
         }
@@ -117,12 +120,14 @@ public class EndpointRouteBuilderExtensionsTests
         {
             if (area.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual($"{umbracoPath}/api/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/api/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
             else
             {
-                Assert.AreEqual($"{umbracoPath}/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}",
+                Assert.AreEqual(
+                    $"{umbracoPath}/{areaPattern}/{controllerNamePattern}/{{action}}/{{id?}}",
                     endpoint.RoutePattern.RawText);
             }
         }

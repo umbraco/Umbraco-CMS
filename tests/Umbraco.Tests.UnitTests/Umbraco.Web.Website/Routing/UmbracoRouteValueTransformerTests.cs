@@ -39,8 +39,7 @@ public class UmbracoRouteValueTransformerTests
         IRoutableDocumentFilter filter = null,
         IPublishedRouter router = null,
         IUmbracoRouteValuesFactory routeValuesFactory = null)
-        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router,
-            routeValuesFactory);
+        => GetTransformer(ctx, Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run), filter, router, routeValuesFactory);
 
     private UmbracoRouteValueTransformer GetTransformer(
         IUmbracoContextAccessor ctx,
@@ -90,7 +89,7 @@ public class UmbracoRouteValueTransformerTests
             new ControllerActionDescriptor
             {
                 ControllerTypeInfo = typeof(TestController).GetTypeInfo(),
-                ControllerName = ControllerExtensions.GetControllerName<TestController>()
+                ControllerName = ControllerExtensions.GetControllerName<TestController>(),
             });
 
     private IUmbracoRouteValuesFactory GetRouteValuesFactory(IPublishedRequest request)
@@ -161,7 +160,7 @@ public class UmbracoRouteValueTransformerTests
             router: GetRouter(request),
             routeValuesFactory: GetRouteValuesFactory(request));
 
-        var result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
+        await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
         Assert.AreEqual(request, umbracoContext.PublishedRequest);
     }
 
@@ -196,7 +195,7 @@ public class UmbracoRouteValueTransformerTests
             routeValuesFactory: GetRouteValuesFactory(request));
 
         var httpContext = new DefaultHttpContext();
-        var result = await transformer.TransformAsync(httpContext, new RouteValueDictionary());
+        await transformer.TransformAsync(httpContext, new RouteValueDictionary());
 
         var routeVals = httpContext.Features.Get<UmbracoRouteValues>();
         Assert.IsNotNull(routeVals);
@@ -226,7 +225,7 @@ public class UmbracoRouteValueTransformerTests
     {
         var umbracoContext = GetUmbracoContext(true);
         var request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == null);
-        var routeValues = GetRouteValues(request);
+        GetRouteValues(request);
 
         var transformer = GetTransformerWithRunState(
             Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
@@ -240,8 +239,7 @@ public class UmbracoRouteValueTransformerTests
 
     private class TestController : RenderController
     {
-        public TestController(ILogger<TestController> logger, ICompositeViewEngine compositeViewEngine,
-            IUmbracoContextAccessor umbracoContextAccessor)
+        public TestController(ILogger<TestController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger, compositeViewEngine, umbracoContextAccessor)
         {
         }

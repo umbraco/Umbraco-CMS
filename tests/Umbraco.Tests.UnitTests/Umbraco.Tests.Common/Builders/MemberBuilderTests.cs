@@ -51,7 +51,7 @@ public class MemberBuilderTests
             Name = "Author",
             Description = "Writer of the article",
             SortOrder = 1,
-            DataTypeId = -88
+            DataTypeId = -88,
         };
         var testGroups = new[] { "group1", "group2" };
         var testPropertyData1 = new KeyValuePair<string, object>("title", "Name member");
@@ -151,7 +151,7 @@ public class MemberBuilderTests
         Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
         Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
 
-        var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x);
+        var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyIdsIncrementingFrom + 1, propertyIds.Min());
         Assert.AreEqual(testPropertyIdsIncrementingFrom + 4, propertyIds.Max());
 

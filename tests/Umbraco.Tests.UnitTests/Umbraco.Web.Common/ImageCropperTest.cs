@@ -23,9 +23,6 @@ public class ImageCropperTest
         "{\"focalPoint\": {\"left\": 0.96,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
 
     private const string CropperJson2 =
-        "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
-
-    private const string CropperJson3 =
         "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": []}";
 
     private const string MediaPath = "/media/1005/img_0671.jpg";
@@ -34,7 +31,7 @@ public class ImageCropperTest
     public void CanConvertImageCropperDataSetSrcToString()
     {
         // cropperJson3 - has no crops
-        var cropperValue = CropperJson3.DeserializeImageCropperValue();
+        var cropperValue = CropperJson2.DeserializeImageCropperValue();
         var serialized = cropperValue.TryConvertTo<string>();
         Assert.IsTrue(serialized.Success);
         Assert.AreEqual("/media/1005/img_0672.jpg", serialized.Result);
@@ -44,7 +41,7 @@ public class ImageCropperTest
     public void CanConvertImageCropperDataSetJObject()
     {
         // cropperJson3 - has no crops
-        var cropperValue = CropperJson3.DeserializeImageCropperValue();
+        var cropperValue = CropperJson2.DeserializeImageCropperValue();
         var serialized = cropperValue.TryConvertTo<JObject>();
         Assert.IsTrue(serialized.Success);
         Assert.AreEqual(cropperValue, serialized.Result.ToObject<ImageCropperValue>());
@@ -57,11 +54,12 @@ public class ImageCropperTest
         var serialized = cropperValue.TryConvertTo<string>();
         Assert.IsTrue(serialized.Success);
         Assert.IsTrue(serialized.Result.DetectIsJson());
-        var obj = JsonConvert.DeserializeObject<ImageCropperValue>(CropperJson1,
+        var obj = JsonConvert.DeserializeObject<ImageCropperValue>(
+            CropperJson1,
             new JsonSerializerSettings
             {
                 Culture = CultureInfo.InvariantCulture,
-                FloatParseHandling = FloatParseHandling.Decimal
+                FloatParseHandling = FloatParseHandling.Decimal,
             });
         Assert.AreEqual(cropperValue, obj);
     }
@@ -120,13 +118,16 @@ public class ImageCropperTest
     //         Current.Reset();
     //     }
     // }
-
     [Test]
     public void GetCropUrl_CropAliasTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            cropAlias: "Thumb", useCropDimensions: true);
-        Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100",
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            cropAlias: "Thumb",
+            useCropDimensions: true);
+        Assert.AreEqual(
+            MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100",
             urlString);
     }
 
@@ -136,33 +137,44 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_CropAliasIgnoreWidthHeightTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            cropAlias: "Thumb", useCropDimensions: true, width: 50, height: 50);
-        Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100",
-            urlString);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            cropAlias: "Thumb",
+            useCropDimensions: true,
+            width: 50,
+            height: 50);
+        Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
     }
 
     [Test]
     public void GetCropUrl_WidthHeightTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200,
-            height: 300);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200, height: 300);
         Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=200&h=300", urlString);
     }
 
     [Test]
     public void GetCropUrl_FocalPointTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            cropAlias: "thumb",
+            preferFocalPoint: true,
+            useCropDimensions: true);
         Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=100&h=100", urlString);
     }
 
     [Test]
     public void GetCropUrlFurtherOptionsTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200,
-            height: 300, furtherOptions: "filter=comic&roundedcorners=radius-26|bgcolor-fff");
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 200,
+            height: 300,
+            furtherOptions: "filter=comic&roundedcorners=radius-26|bgcolor-fff");
         Assert.AreEqual(
             MediaPath + "?f=0.80827067669172936,0.96&w=200&h=300&filter=comic&roundedcorners=radius-26|bgcolor-fff",
             urlString);
@@ -174,8 +186,11 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrlNullTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            cropAlias: "Banner", useCropDimensions: true);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            cropAlias: "Banner",
+            useCropDimensions: true);
         Assert.AreEqual(null, urlString);
     }
 
@@ -196,10 +211,12 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_CropAliasHeightRatioModeTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            cropAlias: "Thumb", useCropDimensions: true);
-        Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100",
-            urlString);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            cropAlias: "Thumb",
+            useCropDimensions: true);
+        Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
     }
 
     /// <summary>
@@ -208,8 +225,7 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_WidthHeightRatioModeTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300,
-            height: 150);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150);
         Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=300&h=150", urlString);
     }
 
@@ -219,8 +235,7 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_HeightWidthRatioModeTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300,
-            height: 150);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150);
         Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=300&h=150", urlString);
     }
 
@@ -230,16 +245,36 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_SpecifiedCropModeTest()
     {
-        var urlStringMin = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            width: 300, height: 150, imageCropMode: ImageCropMode.Min);
-        var urlStringBoxPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            width: 300, height: 150, imageCropMode: ImageCropMode.BoxPad);
-        var urlStringPad = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            width: 300, height: 150, imageCropMode: ImageCropMode.Pad);
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300,
-            height: 150, imageCropMode: ImageCropMode.Max);
-        var urlStringStretch = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1,
-            width: 300, height: 150, imageCropMode: ImageCropMode.Stretch);
+        var urlStringMin = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 300,
+            height: 150,
+            imageCropMode: ImageCropMode.Min);
+        var urlStringBoxPad = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 300,
+            height: 150,
+            imageCropMode: ImageCropMode.BoxPad);
+        var urlStringPad = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 300,
+            height: 150,
+            imageCropMode: ImageCropMode.Pad);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 300,
+            height: 150,
+            imageCropMode: ImageCropMode.Max);
+        var urlStringStretch = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: CropperJson1,
+            width: 300,
+            height: 150,
+            imageCropMode: ImageCropMode.Stretch);
 
         Assert.AreEqual(MediaPath + "?m=min&w=300&h=150", urlStringMin);
         Assert.AreEqual(MediaPath + "?m=boxpad&w=300&h=150", urlStringBoxPad);
@@ -254,7 +289,11 @@ public class ImageCropperTest
     [Test]
     public void GetCropUrl_UploadTypeTest()
     {
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), 100, 270, imageCropMode: ImageCropMode.Crop,
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            100,
+            270,
+            imageCropMode: ImageCropMode.Crop,
             imageCropAnchor: ImageCropAnchor.Center);
         Assert.AreEqual(MediaPath + "?m=crop&a=center&w=100&h=270", urlString);
     }
@@ -268,8 +307,12 @@ public class ImageCropperTest
         const string cropperJson =
             "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, width: 300,
-            height: 150, preferFocalPoint: true);
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            imageCropperValue: cropperJson,
+            width: 300,
+            height: 150,
+            preferFocalPoint: true);
         Assert.AreEqual(MediaPath + "?w=300&h=150", urlString);
     }
 
@@ -283,8 +326,7 @@ public class ImageCropperTest
         const string cropperJson =
             "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson,
-            cropAlias: "home", width: 200);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200);
         Assert.AreEqual(MediaPath + "?w=200&h=119", urlString);
     }
 
@@ -298,8 +340,7 @@ public class ImageCropperTest
         const string cropperJson =
             "{\"focalPoint\": {\"left\": 0.4275,\"top\": 0.41},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson,
-            cropAlias: "home", width: 200);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200);
         Assert.AreEqual(MediaPath + "?f=0.41,0.4275&w=200&h=119", urlString);
     }
 
@@ -312,8 +353,7 @@ public class ImageCropperTest
         const string cropperJson =
             "{\"focalPoint\": {\"left\": 0.4275,\"top\": 0.41},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson,
-            cropAlias: "home", width: 200, useCropDimensions: true);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", width: 200, useCropDimensions: true);
         Assert.AreEqual(MediaPath + "?f=0.41,0.4275&w=270&h=161", urlString);
     }
 
@@ -327,8 +367,7 @@ public class ImageCropperTest
         const string cropperJson =
             "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson,
-            cropAlias: "home", height: 200);
+        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: cropperJson, cropAlias: "home", height: 200);
         Assert.AreEqual(MediaPath + "?w=335&h=200", urlString);
     }
 
@@ -367,8 +406,13 @@ public class ImageCropperTest
         var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + MediaPath +
                           "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-        var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), 400, 400, cropperJson,
-            imageCropMode: ImageCropMode.Pad, furtherOptions: "bgcolor=fff");
+        var urlString = MediaPath.GetCropUrl(
+            new TestImageUrlGenerator(),
+            400,
+            400,
+            cropperJson,
+            imageCropMode: ImageCropMode.Pad,
+            furtherOptions: "bgcolor=fff");
         Assert.AreEqual(MediaPath + "?m=pad&w=400&h=400&bgcolor=fff", urlString);
     }
 

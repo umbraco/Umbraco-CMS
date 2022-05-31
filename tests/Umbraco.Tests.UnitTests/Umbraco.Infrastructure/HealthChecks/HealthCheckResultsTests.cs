@@ -67,7 +67,7 @@ public class HealthCheckResultsTests
         var checks = new List<HealthCheck>
         {
             new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
-            new StubHealthCheck2(StatusResultType.Success, "Second check was successful")
+            new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
         };
         var results = await HealthCheckResults.Create(checks);
 
@@ -84,7 +84,7 @@ public class HealthCheckResultsTests
         var checks = new List<HealthCheck>
         {
             new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
-            new StubHealthCheck2(StatusResultType.Error, "Second check was not successful")
+            new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
         };
         var results = await HealthCheckResults.Create(checks);
 
@@ -102,7 +102,7 @@ public class HealthCheckResultsTests
         {
             new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
             new StubHealthCheck3(StatusResultType.Error, "Third check was not successful"),
-            new StubHealthCheck2(StatusResultType.Error, "Second check was not successful")
+            new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
         };
         var results = await HealthCheckResults.Create(checks);
 
@@ -120,7 +120,7 @@ public class HealthCheckResultsTests
         var checks = new List<HealthCheck>
         {
             new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
-            new StubHealthCheck2(StatusResultType.Success, "Second check was successful")
+            new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
         };
         var results = await HealthCheckResults.Create(checks);
 
@@ -134,7 +134,7 @@ public class HealthCheckResultsTests
         var checks = new List<HealthCheck>
         {
             new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
-            new StubHealthCheck2(StatusResultType.Success, "Second check was successful")
+            new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
         };
         var results = await HealthCheckResults.Create(checks);
 

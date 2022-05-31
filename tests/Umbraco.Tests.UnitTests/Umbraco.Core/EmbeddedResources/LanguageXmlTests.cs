@@ -16,8 +16,7 @@ public class LanguageXmlTests
         var readFilesCount = 0;
         var xmlDocument = new XmlDocument();
 
-        var languageProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly,
-            "Umbraco.Cms.Core.EmbeddedResources.Lang");
+        var languageProvider = new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang");
         var files = languageProvider.GetDirectoryContents(string.Empty)
             .Where(x => !x.IsDirectory && x.Name.EndsWith(".xml"));
 

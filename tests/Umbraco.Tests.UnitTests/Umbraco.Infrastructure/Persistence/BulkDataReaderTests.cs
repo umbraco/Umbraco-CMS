@@ -92,7 +92,8 @@ public class BulkDataReaderTests
             {
                 var schemaTable = testReader.GetSchemaTable();
                 Assert.IsNotNull(schemaTable);
-                Assert.AreEqual(testReader.GetDataTypeName(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDataTypeName(currentColumn),
                     ((Type)schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]).Name);
             }
         }
@@ -113,7 +114,8 @@ public class BulkDataReaderTests
             {
                 var schemaTable = testReader.GetSchemaTable();
                 Assert.IsNotNull(schemaTable);
-                Assert.AreEqual(testReader.GetFieldType(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetFieldType(currentColumn),
                     schemaTable.Rows[currentColumn][SchemaTableColumn.DataType]);
             }
         }
@@ -133,7 +135,8 @@ public class BulkDataReaderTests
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
                 Assert.AreEqual(testReader.GetOrdinal(testReader.GetName(currentColumn)), currentColumn);
-                Assert.AreEqual(testReader.GetOrdinal(testReader.GetName(currentColumn).ToUpperInvariant()),
+                Assert.AreEqual(
+                    testReader.GetOrdinal(testReader.GetName(currentColumn).ToUpperInvariant()),
                     currentColumn);
             }
         }
@@ -1478,7 +1481,7 @@ public class BulkDataReaderTests
                          SqlDbType.Udt,
                          SqlDbType.UniqueIdentifier,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1538,7 +1541,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1601,7 +1604,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1664,7 +1667,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1728,7 +1731,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1792,7 +1795,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Xml
+                         SqlDbType.Xml,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1856,7 +1859,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Udt
+                         SqlDbType.Udt,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1920,7 +1923,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Udt
+                         SqlDbType.Udt,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -1984,7 +1987,7 @@ public class BulkDataReaderTests
                          SqlDbType.VarBinary,
                          SqlDbType.VarChar,
                          SqlDbType.Variant,
-                         SqlDbType.Udt
+                         SqlDbType.Udt,
                      })
             {
                 testReader.ProviderType = dbtype;
@@ -2076,10 +2079,12 @@ public class BulkDataReaderTests
             // this[string]
             for (var column = 0; column < BulkDataReaderSubclass.ExpectedResultSet.Count; column++)
             {
-                Assert.AreEqual(testReader[testReader.GetName(column)],
+                Assert.AreEqual(
+                    testReader[testReader.GetName(column)],
                     BulkDataReaderSubclass.ExpectedResultSet[column]);
 
-                Assert.AreEqual(testReader[testReader.GetName(column).ToUpperInvariant()],
+                Assert.AreEqual(
+                    testReader[testReader.GetName(column).ToUpperInvariant()],
                     BulkDataReaderSubclass.ExpectedResultSet[column]);
             }
 
@@ -2099,7 +2104,8 @@ public class BulkDataReaderTests
             {
                 var currentColumn = 0;
 
-                Assert.AreEqual(testReader.GetInt64(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetInt64(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
                 {
@@ -2114,27 +2120,33 @@ public class BulkDataReaderTests
 
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetBoolean(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetBoolean(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.IsDBNull(currentColumn),
+                Assert.AreEqual(
+                    testReader.IsDBNull(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetChar(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetChar(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetChar(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetChar(currentColumn),
                     ((char[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetChar(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetChar(currentColumn),
                     ((string)BulkDataReaderSubclass.ExpectedResultSet[currentColumn])[0]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 {
                     var expectedResult =
@@ -2149,110 +2161,43 @@ public class BulkDataReaderTests
 
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTime(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTime(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTime(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTime(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTime(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTime(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTime(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTime(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTimeOffset(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTimeOffset(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDateTimeOffset(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDateTimeOffset(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDecimal(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDecimal(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetDouble(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-                {
-                    var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
-                    var expectedLength = expectedResult.Length;
-                    var buffer = new byte[expectedLength];
-
-                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
-
-                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
-                }
-
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetInt32(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetDecimal(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetFloat(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetDateTime(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetInt16(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetDecimal(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetString(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetTimeSpan(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetTimeSpan(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetByte(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetValue(currentColumn),
-                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
-                currentColumn++;
-
-                Assert.AreEqual(testReader.GetGuid(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetDouble(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
                 {
@@ -2266,6 +2211,97 @@ public class BulkDataReaderTests
                 }
 
                 currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetInt32(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetDecimal(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetFloat(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetDateTime(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetInt16(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetDecimal(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetTimeSpan(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetTimeSpan(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetByte(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetValue(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+
+                Assert.AreEqual(
+                    testReader.GetGuid(currentColumn),
+                    BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
+                currentColumn++;
+                {
+                    var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
+                    var expectedLength = expectedResult.Length;
+                    var buffer = new byte[expectedLength];
+
+                    Assert.AreEqual(testReader.GetBytes(currentColumn, 0, buffer, 0, expectedLength), expectedLength);
+
+                    Assert.IsTrue(ArraysMatch(buffer, expectedResult));
+                }
+
+                currentColumn++;
                 {
                     var expectedResult = (byte[])BulkDataReaderSubclass.ExpectedResultSet[currentColumn];
                     var expectedLength = expectedResult.Length;
@@ -2278,35 +2314,43 @@ public class BulkDataReaderTests
 
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetValue(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetValue(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
                 currentColumn++;
 
-                Assert.AreEqual(testReader.GetString(currentColumn),
+                Assert.AreEqual(
+                    testReader.GetString(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn]);
             }
         }
@@ -2410,7 +2454,8 @@ public class BulkDataReaderTests
         {
             for (var currentColumn = 0; currentColumn < testReader.FieldCount; currentColumn++)
             {
-                Assert.AreEqual(testReader.IsDBNull(currentColumn),
+                Assert.AreEqual(
+                    testReader.IsDBNull(currentColumn),
                     BulkDataReaderSubclass.ExpectedResultSet[currentColumn] == null);
             }
         }
@@ -2538,7 +2583,7 @@ public class BulkDataReaderTests
             true,
             null,
             'c',
-            new[] {'c'},
+            new[] { 'c' },
             "c",
             "char 20",
             DateTime.UtcNow,
@@ -2575,7 +2620,7 @@ public class BulkDataReaderTests
             @"<?xml version=string.Empty1.0string.Empty encoding=string.Emptyutf-16string.Empty?><body/>",
             @"<?xml version=string.Empty1.0string.Empty encoding=string.Emptyutf-16string.Empty?><body/>",
             @"<?xml version=string.Empty1.0string.Empty encoding=string.Emptyutf-16string.Empty?><body/>",
-            @"<?xml version=string.Empty1.0string.Empty encoding=string.Emptyutf-16string.Empty?><body/>"
+            @"<?xml version=string.Empty1.0string.Empty encoding=string.Emptyutf-16string.Empty?><body/>",
         });
 
         /// <summary>
@@ -2614,91 +2659,49 @@ public class BulkDataReaderTests
         /// </remarks>
         protected override void AddSchemaTableRows()
         {
-            AddSchemaTableRow("BigInt", null, null, null, true, false, false, SqlDbType.BigInt, null, null, null, null,
-                null);
-            AddSchemaTableRow("Binary_20", 20, null, null, false, true, false, SqlDbType.Binary, null, null, null, null,
-                null);
+            AddSchemaTableRow("BigInt", null, null, null, true, false, false, SqlDbType.BigInt, null, null, null, null, null);
+            AddSchemaTableRow("Binary_20", 20, null, null, false, true, false, SqlDbType.Binary, null, null, null, null, null);
             AddSchemaTableRow("Bit", null, null, null, false, false, true, SqlDbType.Bit, null, null, null, null, null);
-            AddSchemaTableRow("Bit_null", null, null, null, false, false, true, SqlDbType.Bit, null, null, null, null,
-                null);
-            AddSchemaTableRow("Char_Char", 1, null, null, false, false, false, SqlDbType.Char, null, null, null, null,
-                null);
-            AddSchemaTableRow("Char_Char_Array", 1, null, null, false, false, false, SqlDbType.Char, null, null, null,
-                null, null);
-            AddSchemaTableRow("Char_String", 1, null, null, false, false, false, SqlDbType.Char, null, null, null, null,
-                null);
-            AddSchemaTableRow("Char_20_String", 20, null, null, false, false, false, SqlDbType.Char, null, null, null,
-                null, null);
-            AddSchemaTableRow("Date", null, null, null, false, false, false, SqlDbType.Date, null, null, null, null,
-                null);
-            AddSchemaTableRow("DateTime", null, null, null, false, false, false, SqlDbType.DateTime, null, null, null,
-                null, null);
-            AddSchemaTableRow("DateTime2", null, null, null, false, false, false, SqlDbType.DateTime2, null, null, null,
-                null, null);
-            AddSchemaTableRow("DateTime2_5", null, 5, null, false, false, false, SqlDbType.DateTime2, null, null, null,
-                null, null);
-            AddSchemaTableRow("DateTimeOffset", null, null, null, false, false, false, SqlDbType.DateTimeOffset, null,
-                null, null, null, null);
-            AddSchemaTableRow("DateTimeOffset_5", null, 5, null, false, false, false, SqlDbType.DateTimeOffset, null,
-                null, null, null, null);
-            AddSchemaTableRow("Decimal_20_10", null, 20, 10, false, false, false, SqlDbType.Decimal, null, null, null,
-                null, null);
-            AddSchemaTableRow("Float_50", null, 50, null, false, false, false, SqlDbType.Float, null, null, null, null,
-                null);
-            AddSchemaTableRow("Image", null, null, null, false, false, false, SqlDbType.Image, null, null, null, null,
-                null);
-            AddSchemaTableRow("Int", null, null, null, false, false, false, SqlDbType.Int, null, null, null, null,
-                null);
-            AddSchemaTableRow("Money", null, null, null, false, false, false, SqlDbType.Money, null, null, null, null,
-                null);
-            AddSchemaTableRow("NChar_20", 20, null, null, false, false, false, SqlDbType.NChar, null, null, null, null,
-                null);
-            AddSchemaTableRow("NText", null, null, null, false, false, false, SqlDbType.NText, null, null, null, null,
-                null);
-            AddSchemaTableRow("NVarChar_20", 20, null, null, false, false, false, SqlDbType.NVarChar, null, null, null,
-                null, null);
-            AddSchemaTableRow("NVarChar_Max", null, null, null, false, false, false, SqlDbType.NVarChar, null, null,
-                null, null, null);
-            AddSchemaTableRow("Real", null, null, null, false, false, false, SqlDbType.Real, null, null, null, null,
-                null);
-            AddSchemaTableRow("SmallDateTime", null, null, null, false, false, false, SqlDbType.SmallDateTime, null,
-                null, null, null, null);
-            AddSchemaTableRow("SmallInt", null, null, null, false, false, false, SqlDbType.SmallInt, null, null, null,
-                null, null);
-            AddSchemaTableRow("SmallMoney", null, null, null, false, false, false, SqlDbType.SmallMoney, null, null,
-                null, null, null);
-            AddSchemaTableRow("Text", null, null, null, false, false, false, SqlDbType.Text, null, null, null, null,
-                null);
-            AddSchemaTableRow("Time", null, null, null, false, false, false, SqlDbType.Time, null, null, null, null,
-                null);
-            AddSchemaTableRow("Time_5", null, 5, null, false, false, false, SqlDbType.Time, null, null, null, null,
-                null);
-            AddSchemaTableRow("TinyInt", null, null, null, false, false, false, SqlDbType.TinyInt, null, null, null,
-                null, null);
-            AddSchemaTableRow("Udt", null, null, null, false, false, false, SqlDbType.Udt, TestUdtSchemaName,
-                TestUdtName, null, null, null);
-            AddSchemaTableRow("UniqueIdentifier", null, null, null, false, false, false, SqlDbType.UniqueIdentifier,
-                null, null, null, null, null);
-            AddSchemaTableRow("VarBinary_20", 20, null, null, false, false, false, SqlDbType.VarBinary, null, null,
-                null, null, null);
-            AddSchemaTableRow("VarBinary_Max", null, null, null, false, false, false, SqlDbType.VarBinary, null, null,
-                null, null, null);
-            AddSchemaTableRow("VarChar_20", 20, null, null, false, false, false, SqlDbType.VarChar, null, null, null,
-                null, null);
-            AddSchemaTableRow("VarChar_Max", null, null, null, false, false, false, SqlDbType.VarChar, null, null, null,
-                null, null);
-            AddSchemaTableRow("Variant", null, null, null, false, false, false, SqlDbType.Variant, null, null, null,
-                null, null);
-            AddSchemaTableRow("Xml_Database", null, null, null, false, false, false, SqlDbType.Xml, null, null,
-                TestXmlSchemaCollectionDatabaseName, TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
-            AddSchemaTableRow("Xml_Database_XML", null, null, null, false, false, false, SqlDbType.Xml, null, null,
-                TestXmlSchemaCollectionDatabaseName, TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
-            AddSchemaTableRow("Xml_Schema", null, null, null, false, false, false, SqlDbType.Xml, null, null, null,
-                TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
-            AddSchemaTableRow("Xml_Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null,
-                TestXmlSchemaCollectionName);
-            AddSchemaTableRow("Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null,
-                null);
+            AddSchemaTableRow("Bit_null", null, null, null, false, false, true, SqlDbType.Bit, null, null, null, null, null);
+            AddSchemaTableRow("Char_Char", 1, null, null, false, false, false, SqlDbType.Char, null, null, null, null, null);
+            AddSchemaTableRow("Char_Char_Array", 1, null, null, false, false, false, SqlDbType.Char, null, null, null, null, null);
+            AddSchemaTableRow("Char_String", 1, null, null, false, false, false, SqlDbType.Char, null, null, null, null, null);
+            AddSchemaTableRow("Char_20_String", 20, null, null, false, false, false, SqlDbType.Char, null, null, null, null, null);
+            AddSchemaTableRow("Date", null, null, null, false, false, false, SqlDbType.Date, null, null, null, null, null);
+            AddSchemaTableRow("DateTime", null, null, null, false, false, false, SqlDbType.DateTime, null, null, null, null, null);
+            AddSchemaTableRow("DateTime2", null, null, null, false, false, false, SqlDbType.DateTime2, null, null, null, null, null);
+            AddSchemaTableRow("DateTime2_5", null, 5, null, false, false, false, SqlDbType.DateTime2, null, null, null, null, null);
+            AddSchemaTableRow("DateTimeOffset", null, null, null, false, false, false, SqlDbType.DateTimeOffset, null, null, null, null, null);
+            AddSchemaTableRow("DateTimeOffset_5", null, 5, null, false, false, false, SqlDbType.DateTimeOffset, null, null, null, null, null);
+            AddSchemaTableRow("Decimal_20_10", null, 20, 10, false, false, false, SqlDbType.Decimal, null, null, null, null, null);
+            AddSchemaTableRow("Float_50", null, 50, null, false, false, false, SqlDbType.Float, null, null, null, null, null);
+            AddSchemaTableRow("Image", null, null, null, false, false, false, SqlDbType.Image, null, null, null, null, null);
+            AddSchemaTableRow("Int", null, null, null, false, false, false, SqlDbType.Int, null, null, null, null, null);
+            AddSchemaTableRow("Money", null, null, null, false, false, false, SqlDbType.Money, null, null, null, null, null);
+            AddSchemaTableRow("NChar_20", 20, null, null, false, false, false, SqlDbType.NChar, null, null, null, null, null);
+            AddSchemaTableRow("NText", null, null, null, false, false, false, SqlDbType.NText, null, null, null, null, null);
+            AddSchemaTableRow("NVarChar_20", 20, null, null, false, false, false, SqlDbType.NVarChar, null, null, null, null, null);
+            AddSchemaTableRow("NVarChar_Max", null, null, null, false, false, false, SqlDbType.NVarChar, null, null, null, null, null);
+            AddSchemaTableRow("Real", null, null, null, false, false, false, SqlDbType.Real, null, null, null, null, null);
+            AddSchemaTableRow("SmallDateTime", null, null, null, false, false, false, SqlDbType.SmallDateTime, null, null, null, null, null);
+            AddSchemaTableRow("SmallInt", null, null, null, false, false, false, SqlDbType.SmallInt, null, null, null, null, null);
+            AddSchemaTableRow("SmallMoney", null, null, null, false, false, false, SqlDbType.SmallMoney, null, null, null, null, null);
+            AddSchemaTableRow("Text", null, null, null, false, false, false, SqlDbType.Text, null, null, null, null, null);
+            AddSchemaTableRow("Time", null, null, null, false, false, false, SqlDbType.Time, null, null, null, null, null);
+            AddSchemaTableRow("Time_5", null, 5, null, false, false, false, SqlDbType.Time, null, null, null, null, null);
+            AddSchemaTableRow("TinyInt", null, null, null, false, false, false, SqlDbType.TinyInt, null, null, null, null, null);
+            AddSchemaTableRow("Udt", null, null, null, false, false, false, SqlDbType.Udt, TestUdtSchemaName, TestUdtName, null, null, null);
+            AddSchemaTableRow("UniqueIdentifier", null, null, null, false, false, false, SqlDbType.UniqueIdentifier, null, null, null, null, null);
+            AddSchemaTableRow("VarBinary_20", 20, null, null, false, false, false, SqlDbType.VarBinary, null, null, null, null, null);
+            AddSchemaTableRow("VarBinary_Max", null, null, null, false, false, false, SqlDbType.VarBinary, null, null, null, null, null);
+            AddSchemaTableRow("VarChar_20", 20, null, null, false, false, false, SqlDbType.VarChar, null, null, null, null, null);
+            AddSchemaTableRow("VarChar_Max", null, null, null, false, false, false, SqlDbType.VarChar, null, null, null, null, null);
+            AddSchemaTableRow("Variant", null, null, null, false, false, false, SqlDbType.Variant, null, null, null, null, null);
+            AddSchemaTableRow("Xml_Database", null, null, null, false, false, false, SqlDbType.Xml, null, null, TestXmlSchemaCollectionDatabaseName, TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
+            AddSchemaTableRow("Xml_Database_XML", null, null, null, false, false, false, SqlDbType.Xml, null, null, TestXmlSchemaCollectionDatabaseName, TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
+            AddSchemaTableRow("Xml_Schema", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, TestXmlSchemaCollectionSchemaName, TestXmlSchemaCollectionName);
+            AddSchemaTableRow("Xml_Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null, TestXmlSchemaCollectionName);
+            AddSchemaTableRow("Xml", null, null, null, false, false, false, SqlDbType.Xml, null, null, null, null, null);
         }
 
         /// <summary>

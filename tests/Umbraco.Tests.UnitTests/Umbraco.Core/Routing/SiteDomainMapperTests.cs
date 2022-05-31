@@ -193,7 +193,7 @@ public class SiteDomainMapperTests
         Domain[] domains =
         {
             new Domain(1, "domain2.com", -1, s_cultureFr, false),
-            new Domain(1, "domain1.com", -1, s_cultureGb, false)
+            new Domain(1, "domain1.com", -1, s_cultureGb, false),
         };
         var domainAndUris = DomainAndUris(current, domains);
         var output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
@@ -204,7 +204,7 @@ public class SiteDomainMapperTests
         domains = new[]
         {
             new Domain(1, "https://domain1.com", -1, s_cultureFr, false),
-            new Domain(1, "https://domain2.com", -1, s_cultureGb, false)
+            new Domain(1, "https://domain2.com", -1, s_cultureGb, false),
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
@@ -214,7 +214,7 @@ public class SiteDomainMapperTests
         domains = new[]
         {
             new Domain(1, "https://domain1.com", -1, s_cultureFr, false),
-            new Domain(1, "https://domain4.com", -1, s_cultureGb, false)
+            new Domain(1, "https://domain4.com", -1, s_cultureGb, false),
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
@@ -224,7 +224,7 @@ public class SiteDomainMapperTests
         domains = new[]
         {
             new Domain(1, "https://domain1.com", -1, s_cultureFr, false),
-            new Domain(1, "https://domain4.com", -1, s_cultureGb, false)
+            new Domain(1, "https://domain4.com", -1, s_cultureGb, false),
         };
         domainAndUris = DomainAndUris(current, domains);
         output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
@@ -248,8 +248,9 @@ public class SiteDomainMapperTests
             new[]
             {
                 new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current),
-                new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current)
-            }, current,
+                new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current),
+            },
+            current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
         Assert.AreEqual("http://domain1.com/", output);
@@ -261,8 +262,9 @@ public class SiteDomainMapperTests
             new[]
             {
                 new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current),
-                new DomainAndUri(new Domain(1, "domain2.net", -1, s_cultureGb, false), current)
-            }, current,
+                new DomainAndUri(new Domain(1, "domain2.net", -1, s_cultureGb, false), current),
+            },
+            current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
         Assert.AreEqual("http://domain1.net/", output);
@@ -275,8 +277,9 @@ public class SiteDomainMapperTests
             new[]
             {
                 new DomainAndUri(new Domain(1, "domain2.net", -1, s_cultureFr, false), current),
-                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureGb, false), current)
-            }, current,
+                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureGb, false), current),
+            },
+            current,
             s_cultureFr,
             s_cultureFr).Uri.ToString();
         Assert.AreEqual("http://domain1.net/", output);
@@ -302,13 +305,11 @@ public class SiteDomainMapperTests
         var output = siteDomainMapper.MapDomains(
             new[]
             {
-                new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false),
-                    current), // no: current + what MapDomain would pick
+                new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current), // no: current + what MapDomain would pick
                 new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain3.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain4.com", -1, s_cultureGb, false), current), // no: not same site
-                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false),
-                    current) // yes: same site (though bogus setup)
+                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false), current), // yes: same site (though bogus setup)
             },
             current,
             true,
@@ -323,13 +324,11 @@ public class SiteDomainMapperTests
         output = siteDomainMapper.MapDomains(
             new[]
             {
-                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false),
-                    current), // no: what MapDomain would pick
+                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current), // no: what MapDomain would pick
                 new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain3.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain4.com", -1, s_cultureGb, false), current), // no: not same site
-                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false),
-                    current) // yes: same site (though bogus setup)
+                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false), current), // yes: same site (though bogus setup)
             },
             current,
             true,
@@ -347,14 +346,12 @@ public class SiteDomainMapperTests
         output = siteDomainMapper.MapDomains(
             new[]
             {
-                new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false),
-                    current), // no: current + what MapDomain would pick
+                new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current), // no: current + what MapDomain would pick
                 new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain3.com", -1, s_cultureGb, false), current), // yes: bound site
                 new DomainAndUri(new Domain(1, "domain3.org", -1, s_cultureGb, false), current), // yes: bound site
                 new DomainAndUri(new Domain(1, "domain4.com", -1, s_cultureGb, false), current), // no: not same site
-                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false),
-                    current) // yes: same site (though bogus setup)
+                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false), current), // yes: same site (though bogus setup)
             },
             current,
             true,
@@ -371,15 +368,14 @@ public class SiteDomainMapperTests
         output = siteDomainMapper.MapDomains(
             new[]
             {
-                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false),
-                    current), // no: what MapDomain would pick
+                new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current), // no: what MapDomain would pick
                 new DomainAndUri(new Domain(1, "domain2.com", -1, s_cultureGb, false), current), // no: not same site
                 new DomainAndUri(new Domain(1, "domain3.com", -1, s_cultureGb, false), current), // yes: bound site
                 new DomainAndUri(new Domain(1, "domain3.org", -1, s_cultureGb, false), current), // yes: bound site
                 new DomainAndUri(new Domain(1, "domain4.com", -1, s_cultureGb, false), current), // no: not same site
-                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false),
-                    current) // yes: same site (though bogus setup)
-            }, current,
+                new DomainAndUri(new Domain(1, "domain1.org", -1, s_cultureGb, false), current), // yes: same site (though bogus setup)
+            },
+            current,
             true,
             s_cultureFr,
             s_cultureFr).ToArray();

@@ -36,11 +36,9 @@ public abstract class BaseUsingSqlSyntax
         var factory = composition.CreateServiceProvider();
         var pocoMappers = new MapperCollection { new NullableDateMapper() };
         var pocoDataFactory =
-            new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(),
-                pocoMappers);
+            new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(), pocoMappers);
         var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-        SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory,
-            factory.GetRequiredService<IMapperCollection>());
+        SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, factory.GetRequiredService<IMapperCollection>());
         Mappers = factory.GetRequiredService<IMapperCollection>();
     }
 

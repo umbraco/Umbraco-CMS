@@ -38,7 +38,7 @@ public class EncryptionHelperTests
     {
         var additionalRouteValues = new Dictionary<string, object>
         {
-            {"key1", "value1"}, {"key2", "value2"}, {"Key3", "Value3"}, {"keY4", "valuE4"}
+            { "key1", "value1" }, { "key2", "value2" }, { "Key3", "Value3" }, { "keY4", "valuE4" },
         };
 
         var encryptedRouteString = EncryptionHelper.CreateEncryptedRouteString(

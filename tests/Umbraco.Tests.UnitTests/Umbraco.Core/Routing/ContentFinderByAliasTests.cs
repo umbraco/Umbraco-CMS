@@ -7,8 +7,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
-// TODO: We should be able to decouple this from the base db tests since we're just mocking the services now
 
+// TODO: We should be able to decouple this from the base db tests since we're just mocking the services now
 [TestFixture]
 public class ContentFinderByAliasTests : UrlRoutingTestBase
 {
@@ -27,8 +27,7 @@ public class ContentFinderByAliasTests : UrlRoutingTestBase
 
         var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
         var lookup =
-            new ContentFinderByUrlAlias(Mock.Of<ILogger<ContentFinderByUrlAlias>>(), Mock.Of<IPublishedValueFallback>(),
-                VariationContextAccessor, umbracoContextAccessor);
+            new ContentFinderByUrlAlias(Mock.Of<ILogger<ContentFinderByUrlAlias>>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, umbracoContextAccessor);
 
         var result = await lookup.TryFindContent(frequest);
 

@@ -29,8 +29,7 @@ public class UserExtensionsTests
     [TestCase(6, "-1,1,2,3,4,5,6", "-1,1,2,3,4,5", false)] // above start node
     [TestCase(-1, "-1", "-1,-20,1,2,3,4,5", true)] // below root start node, bin
     [TestCase(1, "-1,-20,1", "-1,-20,1,2,3,4,5", false)] // below bin start node
-    public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath,
-        bool outcome)
+    public void Determines_Path_Based_Access_To_Content(int startNodeId, string startNodePath, string contentPath, bool outcome)
     {
         var user = _userBuilder
             .WithStartContentIds(new[] { startNodeId })
@@ -77,14 +76,14 @@ public class UserExtensionsTests
         //   8
         var paths = new Dictionary<int, string>
         {
-            {1, "-1,1"},
-            {2, "-1,2"},
-            {3, "-1,1,3"},
-            {4, "-1,2,4"},
-            {5, "-1,1,3,5"},
-            {6, "-1,-20,6"},
-            {7, "-1,-20,7"},
-            {8, "-1,-20,7,8"}
+            { 1, "-1,1" },
+            { 2, "-1,2" },
+            { 3, "-1,1,3" },
+            { 4, "-1,2,4" },
+            { 5, "-1,1,3,5" },
+            { 6, "-1,-20,6" },
+            { 7, "-1,-20,7" },
+            { 8, "-1,-20,7,8" },
         };
 
         var esmock = new Mock<IEntityService>();

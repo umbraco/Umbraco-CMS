@@ -20,7 +20,8 @@ public class DefaultViewContentProviderTests
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
@@ -32,7 +33,8 @@ public class DefaultViewContentProviderTests
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = ""Dharznoik.cshtml"";
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
@@ -44,7 +46,8 @@ public class DefaultViewContentProviderTests
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ClassName>
 @{
     Layout = null;
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
@@ -56,35 +59,39 @@ public class DefaultViewContentProviderTests
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
     public void ClassNameAndNamespace()
     {
-        var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName",
-            modelNamespace: "My.Models");
+        var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName", modelNamespace: "My.Models");
         Assert.AreEqual(
             FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.ClassName>
 @using ContentModels = My.Models;
 @{
     Layout = null;
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
     public void ClassNameAndNamespaceAndAlias()
     {
-        var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName",
-            modelNamespace: "My.Models", modelNamespaceAlias: "MyModels");
+        var view = DefaultViewContentProvider.GetDefaultFileContent(
+            modelClassName: "ClassName",
+            modelNamespace: "My.Models",
+            modelNamespaceAlias: "MyModels");
         Assert.AreEqual(
             FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MyModels.ClassName>
 @using MyModels = My.Models;
 @{
     Layout = null;
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     [Test]
@@ -97,7 +104,8 @@ public class DefaultViewContentProviderTests
 @using MyModels = My.Models;
 @{
     Layout = ""Dharznoik.cshtml"";
-}"), FixView(view));
+}"),
+            FixView(view));
     }
 
     private static string FixView(string view)

@@ -37,7 +37,8 @@ public class IdentityExtensionsTests
         const string error2 = "invalid something else";
         var errors = new List<IdentityError>
         {
-            new() {Code = "1", Description = error1}, new() {Code = "2", Description = error2}
+            new() { Code = "1", Description = error1 },
+            new() { Code = "2", Description = error2 },
         };
 
         var errorMessage = errors.ToErrorMessage();

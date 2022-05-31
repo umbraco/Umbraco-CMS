@@ -122,7 +122,7 @@ public class ContentTypeBuilderTests
         Assert.IsFalse(contentType.IsContainer);
         Assert.AreEqual(2, contentType.PropertyTypes.Count());
 
-        var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
+        var propertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 2, propertyTypeIds.Max());
 

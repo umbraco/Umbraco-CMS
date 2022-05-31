@@ -26,8 +26,7 @@ public class LegacyPasswordSecurityTests
         var storedPassword =
             passwordSecurity.FormatPasswordForStorage(passwordConfiguration.HashAlgorithmType, hashed, salt);
 
-        var result = passwordSecurity.VerifyPassword(passwordConfiguration.HashAlgorithmType, "ThisIsAHashedPassword",
-            storedPassword);
+        var result = passwordSecurity.VerifyPassword(passwordConfiguration.HashAlgorithmType, "ThisIsAHashedPassword", storedPassword);
 
         Assert.IsTrue(result);
     }
@@ -44,7 +43,9 @@ public class LegacyPasswordSecurityTests
         var storedPassword =
             passwordSecurity.FormatPasswordForStorage(passwordConfiguration.HashAlgorithmType, hashed, salt);
 
-        var result = passwordSecurity.VerifyPassword(passwordConfiguration.HashAlgorithmType, "ThisIsAHashedPassword",
+        var result = passwordSecurity.VerifyPassword(
+            passwordConfiguration.HashAlgorithmType,
+            "ThisIsAHashedPassword",
             storedPassword);
 
         Assert.IsTrue(result);
@@ -89,7 +90,7 @@ public class LegacyPasswordSecurityTests
         var stored = salt + "ThisIsAHashedPassword";
 
         var result =
-            passwordSecurity.ParseStoredHashPassword(passwordConfiguration.HashAlgorithmType, stored, out var initSalt);
+            passwordSecurity.ParseStoredHashPassword(passwordConfiguration.HashAlgorithmType, stored, out _);
 
         Assert.AreEqual("ThisIsAHashedPassword", result);
     }

@@ -21,16 +21,16 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
             {
                 new UmbracoDomain("domain1.com/")
                 {
-                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"
+                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE",
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
-                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
+                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
-                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"
-                }
+                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR",
+                },
             });
     }
 
@@ -43,46 +43,45 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
             {
                 new UmbracoDomain("domain1.com/")
                 {
-                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"
+                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE",
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
-                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
+                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
-                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"
+                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR",
                 },
                 new UmbracoDomain("*1001")
                 {
-                    Id = 4, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"
+                    Id = 4, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE",
                 },
                 new UmbracoDomain("*10011")
                 {
-                    Id = 5, LanguageId = LangCzId, RootContentId = 10011, LanguageIsoCode = "cs-CZ"
+                    Id = 5, LanguageId = LangCzId, RootContentId = 10011, LanguageIsoCode = "cs-CZ",
                 },
                 new UmbracoDomain("*100112")
                 {
-                    Id = 6, LanguageId = LangNlId, RootContentId = 100112, LanguageIsoCode = "nl-NL"
+                    Id = 6, LanguageId = LangNlId, RootContentId = 100112, LanguageIsoCode = "nl-NL",
                 },
                 new UmbracoDomain("*1001122")
                 {
-                    Id = 7, LanguageId = LangDkId, RootContentId = 1001122, LanguageIsoCode = "da-DK"
+                    Id = 7, LanguageId = LangDkId, RootContentId = 1001122, LanguageIsoCode = "da-DK",
                 },
                 new UmbracoDomain("*10012")
                 {
-                    Id = 8, LanguageId = LangNlId, RootContentId = 10012, LanguageIsoCode = "nl-NL"
+                    Id = 8, LanguageId = LangNlId, RootContentId = 10012, LanguageIsoCode = "nl-NL",
                 },
                 new UmbracoDomain("*10031")
                 {
-                    Id = 9, LanguageId = LangNlId, RootContentId = 10031, LanguageIsoCode = "nl-NL"
-                }
+                    Id = 9, LanguageId = LangNlId, RootContentId = 10031, LanguageIsoCode = "nl-NL",
+                },
             });
     }
 
     // domains such as "/en" are natively supported, and when instanciating
     // DomainAndUri for them, the host will come from the current request
-    //
     private void SetDomains3()
     {
         var domainService = Mock.Get(DomainService);
@@ -92,12 +91,12 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
             {
                 new UmbracoDomain("/en")
                 {
-                    Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
+                    Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("/fr")
                 {
-                    Id = 2, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"
-                }
+                    Id = 2, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR",
+                },
             });
     }
 
@@ -325,7 +324,6 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
     }
 
-
     #region Cases
 
     [TestCase("http://domain1.com/en", "en-US", 10011)]
@@ -340,7 +338,6 @@ public class DomainsAndCulturesTests : UrlRoutingTestBase
         SetDomains3();
 
         GlobalSettings.HideTopLevelNodeFromPath = false;
-
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(inputUrl);
         var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);

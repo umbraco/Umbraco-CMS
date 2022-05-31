@@ -28,7 +28,6 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
 
         var authHelper = new UserEditorAuthorizationHelper(
@@ -50,7 +49,6 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
 
         var authHelper = new UserEditorAuthorizationHelper(
@@ -72,7 +70,6 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
 
         var authHelper = new UserEditorAuthorizationHelper(
@@ -94,7 +91,6 @@ public class UserEditorAuthorizationHelperTests
 
         var contentService = new Mock<IContentService>();
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
 
         var authHelper = new UserEditorAuthorizationHelper(
@@ -114,19 +110,18 @@ public class UserEditorAuthorizationHelperTests
     [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = false)]
     [TestCase(Constants.Security.EditorGroupAlias, "SomethingElse", ExpectedResult = false)]
     [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.EditorGroupAlias, ExpectedResult = true)]
-    public bool Can_only_add_user_groups_you_are_part_of_yourself_unless_you_are_admin(string groupAlias,
+    public bool Can_only_add_user_groups_you_are_part_of_yourself_unless_you_are_admin(
+        string groupAlias,
         string groupToAdd)
     {
         var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
         {
-            new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new string[0],
-                new string[0])
+            new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new string[0], new string[0]),
         });
         IUser savingUser = null; // This means it is a new created user
 
         var contentService = new Mock<IContentService>();
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
 
         var authHelper = new UserEditorAuthorizationHelper(
@@ -145,7 +140,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startContentIds: new[] { 9876 });
@@ -155,7 +150,6 @@ public class UserEditorAuthorizationHelperTests
         contentService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -178,7 +172,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startContentIds: new[] { 9876 });
@@ -188,7 +182,6 @@ public class UserEditorAuthorizationHelperTests
         contentService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -211,7 +204,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startContentIds: new[] { 9876 });
@@ -221,7 +214,6 @@ public class UserEditorAuthorizationHelperTests
         contentService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -244,7 +236,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startContentIds: new[] { 9876 });
@@ -254,7 +246,6 @@ public class UserEditorAuthorizationHelperTests
         contentService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IContent>(content => content.Path == nodePaths[id]));
         var mediaService = new Mock<IMediaService>();
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -277,7 +268,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startMediaIds: new[] { 9876 });
@@ -287,7 +278,6 @@ public class UserEditorAuthorizationHelperTests
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -310,7 +300,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startMediaIds: new[] { 9876 });
@@ -320,7 +310,6 @@ public class UserEditorAuthorizationHelperTests
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -343,7 +332,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startMediaIds: new[] { 9876 });
@@ -353,7 +342,6 @@ public class UserEditorAuthorizationHelperTests
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>
@@ -376,7 +364,7 @@ public class UserEditorAuthorizationHelperTests
     {
         var nodePaths = new Dictionary<int, string>
         {
-            {1234, "-1,1234"}, {9876, "-1,9876"}, {5555, "-1,9876,5555"}, {4567, "-1,4567"}
+            { 1234, "-1,1234" }, { 9876, "-1,9876" }, { 5555, "-1,9876,5555" }, { 4567, "-1,4567" },
         };
 
         var currentUser = CreateUser(startMediaIds: new[] { 9876 });
@@ -386,7 +374,6 @@ public class UserEditorAuthorizationHelperTests
         var mediaService = new Mock<IMediaService>();
         mediaService.Setup(x => x.GetById(It.IsAny<int>()))
             .Returns((int id) => Mock.Of<IMedia>(content => content.Path == nodePaths[id]));
-        var userService = new Mock<IUserService>();
         var entityService = new Mock<IEntityService>();
         entityService.Setup(service => service.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
             .Returns((UmbracoObjectTypes objType, int[] ids) =>

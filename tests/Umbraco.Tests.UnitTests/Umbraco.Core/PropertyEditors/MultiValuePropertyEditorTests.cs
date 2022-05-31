@@ -33,20 +33,23 @@ public class MultiValuePropertyEditorTests
     {
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
         var serializer = new ConfigurationEditorJsonSerializer();
-        var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object,
-            Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
+            dataValueEditorFactoryMock.Object,
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IIOHelper>(),
+            Mock.Of<IEditorConfigurationParser>());
         var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
             Configuration = new ValueListConfiguration
             {
                 Items = new List<ValueListConfiguration.ValueListItem>
                 {
-                    new() {Id = 4567, Value = "Value 1"},
-                    new() {Id = 1234, Value = "Value 2"},
-                    new() {Id = 8910, Value = "Value 3"}
-                }
+                    new() { Id = 4567, Value = "Value 1" },
+                    new() { Id = 1234, Value = "Value 2" },
+                    new() { Id = 8910, Value = "Value 3" },
+                },
             },
-            Id = 1
+            Id = 1,
         };
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
@@ -54,9 +57,12 @@ public class MultiValuePropertyEditorTests
             .Setup(x => x.GetDataType(It.IsAny<int>()))
             .Returns(dataType);
 
-        //TODO use builders instead of this mess
-        var multipleValueEditor = new MultipleValueEditor(Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(),
+        // TODO use builders instead of this mess
+        var multipleValueEditor = new MultipleValueEditor(
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IShortStringHelper>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IIOHelper>(),
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"));
         dataValueEditorFactoryMock
             .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
@@ -78,20 +84,23 @@ public class MultiValuePropertyEditorTests
         var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
 
         var serializer = new ConfigurationEditorJsonSerializer();
-        var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object,
-            Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
+        var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(
+            dataValueEditorFactoryMock.Object,
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IIOHelper>(),
+            Mock.Of<IEditorConfigurationParser>());
         var dataType = new DataType(checkBoxListPropertyEditor, serializer)
         {
             Configuration = new ValueListConfiguration
             {
                 Items = new List<ValueListConfiguration.ValueListItem>
                 {
-                    new() {Id = 10, Value = "Value 1"},
-                    new() {Id = 1234, Value = "Value 2"},
-                    new() {Id = 11, Value = "Value 3"}
-                }
+                    new() { Id = 10, Value = "Value 1" },
+                    new() { Id = 1234, Value = "Value 2" },
+                    new() { Id = 11, Value = "Value 3" },
+                },
             },
-            Id = 1
+            Id = 1,
         };
 
         var dataTypeServiceMock = new Mock<IDataTypeService>();
@@ -99,9 +108,12 @@ public class MultiValuePropertyEditorTests
             .Setup(x => x.GetDataType(It.IsAny<int>()))
             .Returns(dataType);
 
-        //TODO use builders instead of this mess
-        var multipleValueEditor = new MultipleValueEditor(Mock.Of<ILocalizedTextService>(),
-            Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(),
+        // TODO use builders instead of this mess
+        var multipleValueEditor = new MultipleValueEditor(
+            Mock.Of<ILocalizedTextService>(),
+            Mock.Of<IShortStringHelper>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IIOHelper>(),
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"));
         dataValueEditorFactoryMock
             .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
@@ -121,8 +133,12 @@ public class MultiValuePropertyEditorTests
         // editor wants ApplicationContext.Current.Services.TextService
         // (that should be fixed with proper injection)
         var textService = new Mock<ILocalizedTextService>();
-        textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CultureInfo>(),
-            It.IsAny<IDictionary<string, string>>())).Returns("blah");
+        textService.Setup(x => x.Localize(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CultureInfo>(),
+                It.IsAny<IDictionary<string, string>>()))
+            .Returns("blah");
 
         //// var appContext = new ApplicationContext(
         ////    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),
@@ -140,14 +156,13 @@ public class MultiValuePropertyEditorTests
         {
             Items = new List<ValueListConfiguration.ValueListItem>
             {
-                new() {Id = 1, Value = "Item 1"},
-                new() {Id = 2, Value = "Item 2"},
-                new() {Id = 3, Value = "Item 3"}
-            }
+                new() { Id = 1, Value = "Item 1" },
+                new() { Id = 2, Value = "Item 2" },
+                new() { Id = 3, Value = "Item 3" },
+            },
         };
 
-        var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+        var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
 
         var result = editor.ToConfigurationEditor(configuration);
 

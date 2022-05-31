@@ -80,16 +80,13 @@ public class NavigableNavigatorTests
     {
         // in non-native we can't have Value dump everything, else
         // we'd dump the entire database? Makes not much sense.
-        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty,
-            nav.Value.Lf()); // !!
+        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
         Assert.IsTrue(nav.MoveToFirstChild());
         Assert.AreEqual("root", nav.Name);
-        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty,
-            nav.Value.Lf()); // !!
+        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
         Assert.IsTrue(nav.MoveToFirstChild());
         Assert.AreEqual("wrap", nav.Name);
-        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty,
-            nav.Value.Lf()); // !!
+        Assert.AreEqual(native ? "\n        blah\n            blah\n        bam\n        " : string.Empty, nav.Value.Lf()); // !!
 
         Assert.IsTrue(nav.MoveToFirstChild());
         Assert.AreEqual("item1", nav.Name);
@@ -787,7 +784,7 @@ public class NavigableNavigatorTests
             macro = new MacroNavigator(new[]
             {
                 // it even fails like that => macro nav. issue?
-                new MacroNavigator.MacroParameter("nav", x.CreateNavigator()) // nav.Clone())
+                new MacroNavigator.MacroParameter("nav", x.CreateNavigator()), // nav.Clone())
             });
         }
         else
@@ -902,7 +899,8 @@ public class NavigableNavigatorTests
   <item id=""5"" attr=""  ooo  "">
     <prop>   ooo   </prop>
   </item>
-</root>".Lf(), nav.OuterXml.Lf());
+</root>".Lf(),
+            nav.OuterXml.Lf());
     }
 }
 

@@ -29,8 +29,7 @@ public class ConvertersTests
         var serializer = new ConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), serializer)
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -44,14 +43,12 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(),
-            new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
         Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
-        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } },
-            false);
+        var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false);
         Assert.IsFalse(e.HasValue("prop1"));
 
         // '0' would not - it's a valid integer - but the converter knows better
@@ -83,16 +80,13 @@ public class ConvertersTests
         public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
-        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-            object source, bool preview)
+        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
             => int.TryParse(source as string, out var i) ? i : 0;
 
-        public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => (int)inter;
 
-        public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             => ((int)inter).ToString();
     }
 
@@ -112,14 +106,13 @@ public class ConvertersTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
         {
-            new SimpleConverter2(publishedSnapshotAccessor)
+            new SimpleConverter2(publishedSnapshotAccessor),
         });
 
         var serializer = new ConfigurationEditorJsonSerializer();
         var dataTypeServiceMock = new Mock<IDataTypeService>();
         var dataType = new DataType(
-            new VoidEditor(
-                Mock.Of<IDataValueEditorFactory>()), serializer)
+            new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
         { Id = 1 };
         dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -133,11 +126,9 @@ public class ConvertersTests
 
         var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
-        var element1 = new PublishedElement(elementType1, Guid.NewGuid(),
-            new Dictionary<string, object> { { "prop1", "1234" } }, false);
+        var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-        var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1",
-            t => Enumerable.Empty<PublishedPropertyType>());
+        var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };
         cacheContent[cnt1.Id] = cnt1;
 
@@ -149,8 +140,7 @@ public class ConvertersTests
         private readonly PropertyCacheLevel _cacheLevel;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
-        public SimpleConverter2(IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
+        public SimpleConverter2(IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel cacheLevel = PropertyCacheLevel.None)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _cacheLevel = cacheLevel;
@@ -173,19 +163,26 @@ public class ConvertersTests
         public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => _cacheLevel;
 
-        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType,
-            object source, bool preview)
+        public object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
             => int.TryParse(source as string, out var i) ? i : -1;
 
-        public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToObject(
+            IPublishedElement owner,
+            IPublishedPropertyType propertyType,
+            PropertyCacheLevel referenceCacheLevel,
+            object inter,
+            bool preview)
         {
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             return publishedSnapshot.Content.GetById((int)inter);
         }
 
-        public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType,
-            PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public object ConvertIntermediateToXPath(
+            IPublishedElement owner,
+            IPublishedPropertyType propertyType,
+            PropertyCacheLevel referenceCacheLevel,
+            object inter,
+            bool preview)
             => ((int)inter).ToString();
     }
 }

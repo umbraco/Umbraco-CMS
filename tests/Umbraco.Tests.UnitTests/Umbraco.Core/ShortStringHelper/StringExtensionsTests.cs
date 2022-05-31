@@ -25,10 +25,14 @@ public class StringExtensionsTests
     [TestCase("hello", "world", false)]
     [TestCase("hello", "hello", true)]
     [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]
-    [TestCase("hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
-        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohelloo", false)]
-    [TestCase("hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
-        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", true)]
+    [TestCase(
+        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
+        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohelloo",
+        false)]
+    [TestCase(
+        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
+        "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello",
+        true)]
     public void String_To_Guid(string first, string second, bool result)
     {
         Debug.Print("First: " + first.ToGuid());
@@ -97,19 +101,43 @@ public class StringExtensionsTests
         Assert.AreEqual(shouldBe, trimmed);
     }
 
-    [TestCase("Hello this is my string", "hello", "replaced", "replaced this is my string",
+    [TestCase(
+        "Hello this is my string",
+        "hello",
+        "replaced",
+        "replaced this is my string",
         StringComparison.CurrentCultureIgnoreCase)]
-    [TestCase("Hello this is hello my string", "hello", "replaced", "replaced this is replaced my string",
+    [TestCase(
+        "Hello this is hello my string",
+        "hello",
+        "replaced",
+        "replaced this is replaced my string",
         StringComparison.CurrentCultureIgnoreCase)]
-    [TestCase("Hello this is my string", "nonexistent", "replaced", "Hello this is my string",
+    [TestCase(
+        "Hello this is my string",
+        "nonexistent",
+        "replaced",
+        "Hello this is my string",
         StringComparison.CurrentCultureIgnoreCase)]
-    [TestCase("Hellohello this is my string", "hello", "replaced", "replacedreplaced this is my string",
+    [TestCase(
+        "Hellohello this is my string",
+        "hello",
+        "replaced",
+        "replacedreplaced this is my string",
         StringComparison.CurrentCultureIgnoreCase)]
 
     // Ensure replacing with the same string doesn't cause infinite loop.
-    [TestCase("Hello this is my string", "hello", "hello", "hello this is my string",
+    [TestCase(
+        "Hello this is my string",
+        "hello",
+        "hello",
+        "hello this is my string",
         StringComparison.CurrentCultureIgnoreCase)]
-    public void ReplaceWithStringComparison(string input, string oldString, string newString, string shouldBe,
+    public void ReplaceWithStringComparison(
+        string input,
+        string oldString,
+        string newString,
+        string shouldBe,
         StringComparison stringComparison)
     {
         var replaced = input.Replace(oldString, newString, stringComparison);
@@ -139,12 +167,9 @@ public class StringExtensionsTests
     }
 
     [TestCase("pineapple", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
-    [TestCase("PINEAPPLE", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture,
-        false)]
-    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture,
-        false)]
-    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase,
-        true)]
+    [TestCase("PINEAPPLE", new[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+    [TestCase("pineapple", new[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, true)]
     [TestCase("pineapple", new[] { "banana", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, false)]
     [TestCase("Strawberry unicorn pie", new[] { "Berry" }, StringComparison.OrdinalIgnoreCase, true)]
     [TestCase("empty pie", new string[0], StringComparison.OrdinalIgnoreCase, false)]
@@ -161,7 +186,8 @@ public class StringExtensionsTests
     [TestCase(
         @"
         Hello
-        ", false)]
+        ",
+        false)]
     [TestCase(null, true)]
     [TestCase("a", false)]
     [TestCase("abc", false)]
@@ -196,7 +222,6 @@ public class StringExtensionsTests
 
     // note: here we just ensure that the proper helper gets called properly
     // but the "legacy" tests have moved to the legacy helper tests
-
     [Test]
     public void ToUrlAlias()
     {
@@ -281,11 +306,11 @@ public class StringExtensionsTests
         const string expected = "television tzvar ssup   pof";
         IDictionary<string, string> replacements = new Dictionary<string, string>
         {
-            {"é", "e"},
-            {"ö", "o"},
-            {"â", "a"},
-            {"ß", "ss"},
-            {"&nbsp;", " "}
+            { "é", "e" },
+            { "ö", "o" },
+            { "â", "a" },
+            { "ß", "ss" },
+            { "&nbsp;", " " },
         };
         var output = input.ReplaceMany(replacements);
         Assert.AreEqual(expected, output);

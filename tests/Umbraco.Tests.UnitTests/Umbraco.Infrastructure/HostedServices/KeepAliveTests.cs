@@ -92,7 +92,9 @@ public class KeepAliveTests
 
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         _mockHttpMessageHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK))
             .Verifiable();

@@ -27,14 +27,14 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
             {
                 Alias = "prop",
                 DataTypeId = 3,
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             };
         _contentTypeInvariant =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
                 Id = 2,
                 Alias = "itype",
-                Variations = ContentVariation.Nothing
+                Variations = ContentVariation.Nothing,
             };
         _contentTypeInvariant.AddPropertyType(propertyType);
 
@@ -43,14 +43,14 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
             {
                 Alias = "prop",
                 DataTypeId = 3,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             };
         _contentTypeVariant =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
                 Id = 3,
                 Alias = "vtype",
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             };
         _contentTypeVariant.AddPropertyType(propertyType);
 
@@ -65,20 +65,20 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-        //1x variant (root)
+        // 1x variant (root)
         yield return CreateVariantKit(1, -1, 1, paths);
 
-        //1x invariant under root
+        // 1x invariant under root
         yield return CreateInvariantKit(4, 1, 1, paths);
 
-        //1x variant under root
+        // 1x variant under root
         yield return CreateVariantKit(7, 1, 4, paths);
 
-        //2x mixed under invariant
+        // 2x mixed under invariant
         yield return CreateVariantKit(10, 4, 1, paths);
         yield return CreateInvariantKit(11, 4, 2, paths);
 
-        //2x mixed under variant
+        // 2x mixed under variant
         yield return CreateVariantKit(12, 7, 1, paths);
         yield return CreateInvariantKit(13, 7, 2, paths);
     }
@@ -120,7 +120,14 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         return ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            id, path, sortOrder, level, parentId, 0, Guid.NewGuid(), DateTime.Now,
+            id,
+            path,
+            sortOrder,
+            level,
+            parentId,
+            0,
+            Guid.NewGuid(),
+            DateTime.Now,
             null,
             contentData);
     }
@@ -184,7 +191,11 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         return ContentNodeKitBuilder.CreateWithContent(
             _contentTypeVariant.Id,
-            id, path, sortOrder, level, parentId,
+            id,
+            path,
+            sortOrder,
+            level,
+            parentId,
             draftData: null,
             publishedData: contentData);
     }
@@ -237,7 +248,11 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
             return ContentNodeKitBuilder.CreateWithContent(
                 _contentTypeVariant.Id,
-                id, path, sortOrder, level, parentId,
+                id,
+                path,
+                sortOrder,
+                level,
+                parentId,
                 draftData: withDraft ? CreateContentData(false) : null,
                 publishedData: withPublished ? CreateContentData(true) : null);
         }
@@ -334,7 +349,11 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var kit = NuCacheContentService.ContentKits[10];
         NuCacheContentService.ContentKits[10] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, "-1,10", 4, 1, -1,
+            kit.Node.Id,
+            "-1,10",
+            4,
+            1,
+            -1,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
@@ -364,7 +383,11 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var kit = NuCacheContentService.ContentKits[1];
         NuCacheContentService.ContentKits[1] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, "-1,3,10,1", 1, 1, 10,
+            kit.Node.Id,
+            "-1,3,10,1",
+            1,
+            1,
+            10,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
@@ -394,21 +417,33 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var kit = NuCacheContentService.ContentKits[7];
         NuCacheContentService.ContentKits[7] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 1, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            1,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
         kit = NuCacheContentService.ContentKits[8];
         NuCacheContentService.ContentKits[8] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 3, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            3,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
         kit = NuCacheContentService.ContentKits[9];
         NuCacheContentService.ContentKits[9] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 2, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            2,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
@@ -416,9 +451,10 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         SnapshotService.Notify(
             new[]
             {
-                new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty,
-                    TreeChangeTypes.RefreshBranch)
-            }, out _, out _);
+                new ContentCacheRefresher.JsonPayload(kit.Node.ParentContentId, Guid.Empty, TreeChangeTypes.RefreshBranch),
+            },
+            out _,
+            out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetById(kit.Node.ParentContentId).Children(VariationContextAccessor).ToArray();
@@ -437,39 +473,57 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var kit = NuCacheContentService.ContentKits[4];
         NuCacheContentService.ContentKits[4] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 2, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            2,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
         kit = NuCacheContentService.ContentKits[5];
         NuCacheContentService.ContentKits[5] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 3, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            3,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
         kit = NuCacheContentService.ContentKits[6];
         NuCacheContentService.ContentKits[6] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, kit.Node.Path, 4, kit.Node.Level, kit.Node.ParentContentId,
+            kit.Node.Id,
+            kit.Node.Path,
+            4,
+            kit.Node.Level,
+            kit.Node.ParentContentId,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
-        ;
 
         kit = NuCacheContentService.ContentKits[7];
         NuCacheContentService.ContentKits[7] = ContentNodeKitBuilder.CreateWithContent(
             _contentTypeInvariant.Id,
-            kit.Node.Id, "-1,1,7", 1, kit.Node.Level, 1,
+            kit.Node.Id,
+            "-1,1,7",
+            1,
+            kit.Node.Level,
+            1,
             draftData: null,
             publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
         // notify
-        SnapshotService.Notify(new[]
+        SnapshotService.Notify(
+            new[]
         {
             // removal must come first
             new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshBranch),
-            new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch)
-        }, out _, out _);
+            new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
+        },
+            out _,
+            out _);
 
         // changes that *I* make are immediately visible on the current snapshot
         var documents = snapshot.Content.GetById(1).Children(VariationContextAccessor).ToArray();
@@ -486,10 +540,10 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         // This test replicates an issue we saw here https://github.com/umbraco/Umbraco-CMS/pull/7907#issuecomment-610259393
         // The data was sent to me and this replicates it's structure
-
         var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-        InitializedCache(new List<ContentNodeKit>
+        InitializedCache(
+            new List<ContentNodeKit>
         {
             CreateInvariantKit(1, -1, 1, paths), // first level
             CreateInvariantKit(2, 1, 1, paths), // second level
@@ -503,15 +557,17 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
             CreateInvariantKit(7, 5, 3, paths),
             CreateInvariantKit(8, 5, 4, paths),
             CreateInvariantKit(9, 5, 5, paths),
-            CreateInvariantKit(10, 5, 6, paths)
-        }, _contentTypes);
+            CreateInvariantKit(10, 5, 6, paths),
+        },
+            _contentTypes);
 
         // get snapshot
         var snapshot = GetPublishedSnapshot();
 
         var snapshotService = (PublishedSnapshotService)SnapshotService;
         var contentStore = snapshotService.GetContentStore();
-        //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+
+        // This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
         contentStore.CreateSnapshot();
 
         // notify - which ensures there are 2 generations in the cache meaning each LinkedNode has a Next value.
@@ -524,8 +580,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // this value before recursing.
         Assert.DoesNotThrow(() =>
             SnapshotService.Notify(
-                new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _,
-                out _));
+                new[] { new ContentCacheRefresher.JsonPayload(4, Guid.Empty, TreeChangeTypes.RefreshBranch) }, out _, out _));
     }
 
     [Test]
@@ -536,8 +591,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         // get snapshot
         var snapshot = GetPublishedSnapshot();
 
-        //TEST with en-us variation context
-
+        // TEST with en-us variation context
         VariationContextAccessor.VariationContext = new VariationContext("en-US");
 
         var documents = snapshot.Content.GetAtRoot().ToArray();
@@ -546,16 +600,15 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         documents = snapshot.Content.GetById(1).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N4", "N7-en-US");
 
-        //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
+        // Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
         documents = snapshot.Content.GetById(4).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N10-en-US", "N11");
 
-        //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
+        // Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
         documents = snapshot.Content.GetById(7).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N12-en-US", "N13");
 
-        //TEST with fr-fr variation context
-
+        // TEST with fr-fr variation context
         VariationContextAccessor.VariationContext = new VariationContext("fr-FR");
 
         documents = snapshot.Content.GetAtRoot().ToArray();
@@ -564,55 +617,55 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         documents = snapshot.Content.GetById(1).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N4", "N7-fr-FR");
 
-        //Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
+        // Get the invariant and list children, there's a variation context so it should return invariant AND en-us variants
         documents = snapshot.Content.GetById(4).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N10-fr-FR", "N11");
 
-        //Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
+        // Get the variant and list children, there's a variation context so it should return invariant AND en-us variants
         documents = snapshot.Content.GetById(7).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N12-fr-FR", "N13");
 
-        //TEST specific cultures
-
+        // TEST specific cultures
         documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
         AssertDocuments(documents, "N1-fr-FR");
 
         documents = snapshot.Content.GetById(1).Children(VariationContextAccessor, "fr-FR").ToArray();
-        AssertDocuments(documents, "N4", "N7-fr-FR"); //NOTE: Returns invariant, this is expected
-        documents = snapshot.Content.GetById(1).Children(VariationContextAccessor, "").ToArray();
-        AssertDocuments(documents, "N4"); //Only returns invariant since that is what was requested
+        AssertDocuments(documents, "N4", "N7-fr-FR"); // NOTE: Returns invariant, this is expected
+        documents = snapshot.Content.GetById(1).Children(VariationContextAccessor, string.Empty).ToArray();
+        AssertDocuments(documents, "N4"); // Only returns invariant since that is what was requested
 
         documents = snapshot.Content.GetById(4).Children(VariationContextAccessor, "fr-FR").ToArray();
-        AssertDocuments(documents, "N10-fr-FR", "N11"); //NOTE: Returns invariant, this is expected
-        documents = snapshot.Content.GetById(4).Children(VariationContextAccessor, "").ToArray();
-        AssertDocuments(documents, "N11"); //Only returns invariant since that is what was requested
+        AssertDocuments(documents, "N10-fr-FR", "N11"); // NOTE: Returns invariant, this is expected
+        documents = snapshot.Content.GetById(4).Children(VariationContextAccessor, string.Empty).ToArray();
+        AssertDocuments(documents, "N11"); // Only returns invariant since that is what was requested
 
         documents = snapshot.Content.GetById(7).Children(VariationContextAccessor, "fr-FR").ToArray();
-        AssertDocuments(documents, "N12-fr-FR", "N13"); //NOTE: Returns invariant, this is expected
-        documents = snapshot.Content.GetById(7).Children(VariationContextAccessor, "").ToArray();
-        AssertDocuments(documents, "N13"); //Only returns invariant since that is what was requested
+        AssertDocuments(documents, "N12-fr-FR", "N13"); // NOTE: Returns invariant, this is expected
+        documents = snapshot.Content.GetById(7).Children(VariationContextAccessor, string.Empty).ToArray();
+        AssertDocuments(documents, "N13"); // Only returns invariant since that is what was requested
 
-        //TEST without variation context
+        // TEST without variation context
         // This will actually convert the culture to "" which will be invariant since that's all it will know how to do
         // This will return a NULL name for culture specific entities because there is no variation context
-
         VariationContextAccessor.VariationContext = null;
 
         documents = snapshot.Content.GetAtRoot().ToArray();
-        //will return nothing because there's only variant at root
+
+        // will return nothing because there's only variant at root
         Assert.AreEqual(0, documents.Length);
-        //so we'll continue to getting the known variant, do not fully assert this because the Name will NULL
+
+        // so we'll continue to getting the known variant, do not fully assert this because the Name will NULL
         documents = snapshot.Content.GetAtRoot("fr-FR").ToArray();
         Assert.AreEqual(1, documents.Length);
 
         documents = snapshot.Content.GetById(1).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N4");
 
-        //Get the invariant and list children
+        // Get the invariant and list children
         documents = snapshot.Content.GetById(4).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N11");
 
-        //Get the variant and list children
+        // Get the variant and list children
         documents = snapshot.Content.GetById(7).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents, "N13");
     }
@@ -644,7 +697,6 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         documents = snapshot.Content.GetById(10).Children(VariationContextAccessor).ToArray();
         AssertDocuments(documents);
-
 
         VariationContextAccessor.VariationContext = new VariationContext("fr-FR");
 
@@ -678,7 +730,6 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
         AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
-
         documents = snapshot.Content.GetAtRoot("*").ToArray();
         AssertDocuments(documents, "N1-fr-FR", null, "N3-fr-FR");
 
@@ -707,12 +758,15 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         AssertDocuments(documents, "N9", "N8", "N7");
 
         // notify
-        SnapshotService.Notify(new[]
+        SnapshotService.Notify(
+            new[]
         {
             new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove last
             new ContentCacheRefresher.JsonPayload(5, Guid.Empty, TreeChangeTypes.Remove), // remove middle
-            new ContentCacheRefresher.JsonPayload(9, Guid.Empty, TreeChangeTypes.Remove) // remove first
-        }, out _, out _);
+            new ContentCacheRefresher.JsonPayload(9, Guid.Empty, TreeChangeTypes.Remove), // remove first
+        },
+            out _,
+            out _);
 
         documents = snapshot.Content.GetAtRoot().ToArray();
         AssertDocuments(documents, "N1", "N2");
@@ -724,12 +778,15 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         AssertDocuments(documents, "N8", "N7");
 
         // notify
-        SnapshotService.Notify(new[]
+        SnapshotService.Notify(
+            new[]
         {
             new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.Remove), // remove first
             new ContentCacheRefresher.JsonPayload(8, Guid.Empty, TreeChangeTypes.Remove), // remove
-            new ContentCacheRefresher.JsonPayload(7, Guid.Empty, TreeChangeTypes.Remove) // remove
-        }, out _, out _);
+            new ContentCacheRefresher.JsonPayload(7, Guid.Empty, TreeChangeTypes.Remove), // remove
+        },
+            out _,
+            out _);
 
         documents = snapshot.Content.GetAtRoot().ToArray();
         AssertDocuments(documents, "N2");
@@ -768,8 +825,10 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
             new[]
             {
                 new ContentCacheRefresher.JsonPayload(1, Guid.Empty, TreeChangeTypes.RefreshBranch),
-                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode)
-            }, out _, out _);
+                new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.RefreshNode),
+            },
+            out _,
+            out _);
 
         parentNodes = contentStore.Test.GetValues(1);
         Assert.AreEqual(2, parentNodes.Length);
@@ -801,7 +860,6 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         VariationContextAccessor.VariationContext = new VariationContext("en-US");
 
         // N2 is draft only
-
         var documents = snapshot.Content.GetAtRoot().ToArray();
         AssertDocuments(documents, "N1-en-US", /*"N2-en-US",*/ "N3-en-US");
 
@@ -812,8 +870,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     [Test]
     public void Set_All_Fast_Sorted_Ensure_LastChildContentId()
     {
-        //see https://github.com/umbraco/Umbraco-CMS/issues/6353
-
+        // see https://github.com/umbraco/Umbraco-CMS/issues/6353
         IEnumerable<ContentNodeKit> GetKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
@@ -831,8 +888,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         var parentNode = parentNodes[0];
         AssertLinkedNode(parentNode.contentNode, -1, -1, -1, 2, 2);
 
-        SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove) },
-            out _, out _);
+        SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(2, Guid.Empty, TreeChangeTypes.Remove) }, out _, out _);
 
         parentNodes = contentStore.Test.GetValues(1);
         parentNode = parentNodes[0];
@@ -845,17 +901,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         // NOTE: these tests are not using real scopes, in which case a Scope does not control
         // how the snapshots generations work. We are forcing new snapshot generations manually.
-
         IEnumerable<ContentNodeKit> GetKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            //root
+            // root
             yield return CreateInvariantKit(1, -1, 1, paths);
 
-            //children
+            // children
             yield return CreateInvariantKit(2, 1, 1, paths);
-            yield return CreateInvariantKit(3, 1, 2, paths); //middle child
+            yield return CreateInvariantKit(3, 1, 2, paths); // middle child
             yield return CreateInvariantKit(4, 1, 3, paths);
         }
 
@@ -883,15 +938,18 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         Assert.AreEqual(1, child3.gen);
         AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
 
-        //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+        // This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
         contentStore.CreateSnapshot();
 
         Assert.IsFalse(contentStore.Test.NextGen);
 
-        SnapshotService.Notify(new[]
+        SnapshotService.Notify(
+            new[]
         {
-            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove) //remove middle child
-        }, out _, out _);
+            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.Remove), // remove middle child
+        },
+            out _,
+            out _);
 
         Assert.AreEqual(2, contentStore.Test.LiveGen);
         Assert.IsTrue(contentStore.Test.NextGen);
@@ -920,20 +978,19 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         // NOTE: these tests are not using real scopes, in which case a Scope does not control
         // how the snapshots generations work. We are forcing new snapshot generations manually.
-
         IEnumerable<ContentNodeKit> GetKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            //root
+            // root
             yield return CreateInvariantKit(100, -1, 1, paths);
 
-            //site
+            // site
             yield return CreateInvariantKit(2, 100, 1, paths);
-            yield return CreateInvariantKit(1, 100, 2, paths); //middle child
+            yield return CreateInvariantKit(1, 100, 2, paths); // middle child
             yield return CreateInvariantKit(3, 100, 3, paths);
 
-            //children of 1
+            // children of 1
             yield return CreateInvariantKit(20, 1, 1, paths);
             yield return CreateInvariantKit(30, 1, 2, paths);
             yield return CreateInvariantKit(40, 1, 3, paths);
@@ -951,7 +1008,7 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         Assert.AreEqual(1, middleNode.gen);
         AssertLinkedNode(middleNode.contentNode, 100, 2, 3, 20, 40);
 
-        //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+        // This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
         contentStore.CreateSnapshot();
 
         Assert.IsFalse(contentStore.Test.NextGen);
@@ -988,26 +1045,25 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         // NOTE: these tests are not using real scopes, in which case a Scope does not control
         // how the snapshots generations work. We are forcing new snapshot generations manually.
-
         IEnumerable<ContentNodeKit> GetKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            //root
+            // root
             yield return CreateInvariantKit(100, -1, 1, paths);
 
-            //site
+            // site
             yield return CreateInvariantKit(2, 100, 1, paths);
-            yield return CreateInvariantKit(1, 100, 2, paths); //middle child
+            yield return CreateInvariantKit(1, 100, 2, paths); // middle child
             yield return CreateInvariantKit(3, 100, 3, paths);
 
-            //children of 1
+            // children of 1
             yield return CreateInvariantKit(20, 1, 1, paths);
             yield return CreateInvariantKit(30, 1, 2, paths);
             yield return CreateInvariantKit(40, 1, 3, paths);
         }
 
-        //init with all published
+        // init with all published
         InitializedCache(GetKits(), _contentTypes);
 
         var snapshotService = (PublishedSnapshotService)SnapshotService;
@@ -1017,44 +1073,44 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
 
         void ChangePublishFlagOfRoot(bool published, int assertGen, TreeChangeTypes changeType)
         {
-            //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+            // This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
             contentStore.CreateSnapshot();
 
             Assert.IsFalse(contentStore.Test.NextGen);
 
-            //Change the root publish flag
+            // Change the root publish flag
             var kit = rootKit.Clone(
                 PublishedModelFactory,
                 published ? null : rootKit.PublishedData,
                 published ? rootKit.PublishedData : null);
             NuCacheContentService.ContentKits[1] = kit;
 
-            SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType) }, out _,
-                out _);
+            SnapshotService.Notify(new[] { new ContentCacheRefresher.JsonPayload(1, Guid.Empty, changeType) }, out _, out _);
 
             Assert.AreEqual(assertGen, contentStore.Test.LiveGen);
             Assert.IsTrue(contentStore.Test.NextGen);
 
-            //get the latest gen for content Id 1
+            // get the latest gen for content Id 1
             var (gen, contentNode) = contentStore.Test.GetValues(1)[0];
             Assert.AreEqual(assertGen, gen);
-            //even when unpublishing/re-publishing/etc... the linked list is always maintained
+
+            // even when unpublishing/re-publishing/etc... the linked list is always maintained
             AssertLinkedNode(contentNode, 100, 2, 3, 20, 40);
         }
 
-        //unpublish the root
+        // unpublish the root
         ChangePublishFlagOfRoot(false, 2, TreeChangeTypes.RefreshBranch);
 
-        //publish the root (since it's not published, it will cause a RefreshBranch)
+        // publish the root (since it's not published, it will cause a RefreshBranch)
         ChangePublishFlagOfRoot(true, 3, TreeChangeTypes.RefreshBranch);
 
-        //publish root + descendants
+        // publish root + descendants
         ChangePublishFlagOfRoot(true, 4, TreeChangeTypes.RefreshBranch);
 
-        //save/publish the root (since it's already published, it will just cause a RefreshNode
+        // save/publish the root (since it's already published, it will just cause a RefreshNode
         ChangePublishFlagOfRoot(true, 5, TreeChangeTypes.RefreshNode);
 
-        //publish root + descendants
+        // publish root + descendants
         ChangePublishFlagOfRoot(true, 6, TreeChangeTypes.RefreshBranch);
     }
 
@@ -1063,17 +1119,16 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     {
         // NOTE: these tests are not using real scopes, in which case a Scope does not control
         // how the snapshots generations work. We are forcing new snapshot generations manually.
-
         IEnumerable<ContentNodeKit> GetKits()
         {
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            //root
+            // root
             yield return CreateInvariantKit(1, -1, 1, paths);
 
-            //children
+            // children
             yield return CreateInvariantKit(2, 1, 1, paths);
-            yield return CreateInvariantKit(3, 1, 2, paths); //middle child
+            yield return CreateInvariantKit(3, 1, 2, paths); // middle child
             yield return CreateInvariantKit(4, 1, 3, paths);
         }
 
@@ -1101,15 +1156,18 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
         Assert.AreEqual(1, child3.gen);
         AssertLinkedNode(child3.contentNode, 1, 3, -1, -1, -1);
 
-        //This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
+        // This will set a flag to force creating a new Gen next time the store is locked (i.e. In Notify)
         contentStore.CreateSnapshot();
 
         Assert.IsFalse(contentStore.Test.NextGen);
 
-        SnapshotService.Notify(new[]
+        SnapshotService.Notify(
+            new[]
         {
-            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.RefreshBranch) //remove middle child
-        }, out _, out _);
+            new ContentCacheRefresher.JsonPayload(3, Guid.Empty, TreeChangeTypes.RefreshBranch), // remove middle child
+        },
+            out _,
+            out _);
 
         Assert.AreEqual(2, contentStore.Test.LiveGen);
         Assert.IsTrue(contentStore.Test.NextGen);
@@ -1136,16 +1194,15 @@ public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceT
     [Test]
     public void MultipleCacheIteration()
     {
-        //see https://github.com/umbraco/Umbraco-CMS/issues/7798
+        // see https://github.com/umbraco/Umbraco-CMS/issues/7798
         InitializedCache(GetInvariantKits(), _contentTypes);
         var snapshot = GetPublishedSnapshot();
 
-        var items = snapshot.Content.GetByXPath("/root/itype");
+        var items = snapshot.Content.GetByXPath("/root/itype").ToArray();
         Assert.AreEqual(items.Count(), items.Count());
     }
 
-    private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild,
-        int lastChild)
+    private void AssertLinkedNode(ContentNode node, int parent, int prevSibling, int nextSibling, int firstChild, int lastChild)
     {
         Assert.AreEqual(parent, node.ParentContentId);
         Assert.AreEqual(prevSibling, node.PreviousSiblingContentId);

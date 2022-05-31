@@ -20,15 +20,12 @@ public class ModelTypeTests
         Assert.IsTrue(ModelType.Equals(ModelType.For("alias1"), ModelType.For("alias1")));
         Assert.IsFalse(ModelType.Equals(ModelType.For("alias1"), ModelType.For("alias2")));
 
-        Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")),
-            typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1"))));
-        Assert.IsFalse(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")),
-            typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias2"))));
+        Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1"))));
+        Assert.IsFalse(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias1")), typeof(IEnumerable<>).MakeGenericType(ModelType.For("alias2"))));
 
         Assert.IsTrue(
             ModelType.Equals(ModelType.For("alias1").MakeArrayType(), ModelType.For("alias1").MakeArrayType()));
-        Assert.IsFalse(ModelType.Equals(ModelType.For("alias1").MakeArrayType(),
-            ModelType.For("alias2").MakeArrayType()));
+        Assert.IsFalse(ModelType.Equals(ModelType.For("alias1").MakeArrayType(), ModelType.For("alias2").MakeArrayType()));
     }
 
     [Test]
@@ -37,8 +34,7 @@ public class ModelTypeTests
         var type = typeof(int);
         Assert.AreEqual("System.Int32", type.ToString());
         Assert.AreEqual("System.Int32[]", type.MakeArrayType().ToString());
-        Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]",
-            typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
+        Assert.AreEqual("System.Collections.Generic.IEnumerable`1[System.Int32[]]", typeof(IEnumerable<>).MakeGenericType(type.MakeArrayType()).ToString());
     }
 
     [Test]
@@ -59,8 +55,8 @@ public class ModelTypeTests
     {
         var map = new Dictionary<string, Type>
         {
-            {"alias1", typeof(PublishedSnapshotTestObjects.TestElementModel1)},
-            {"alias2", typeof(PublishedSnapshotTestObjects.TestElementModel2)}
+            { "alias1", typeof(PublishedSnapshotTestObjects.TestElementModel1) },
+            { "alias2", typeof(PublishedSnapshotTestObjects.TestElementModel2) },
         };
 
         Assert.AreEqual(

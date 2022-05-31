@@ -23,8 +23,7 @@ public class CultureImpactTests
             Mock.Of<IContent>(x => x.Published == false),
             new[] { "fr-FR" },
             "en-US");
-        Assert.AreEqual("fr-FR",
-            result); // default culture not being saved with not published version, use the first culture being saved
+        Assert.AreEqual("fr-FR", result); // default culture not being saved with not published version, use the first culture being saved
 
         result = CultureImpact.GetCultureForInvariantErrors(
             Mock.Of<IContent>(x => x.Published == true),

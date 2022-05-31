@@ -125,10 +125,15 @@ public class DistributedCacheTests
     {
         // Used for tests
         public List<int> IntIdsRefreshed { get; } = new();
+
         public List<Guid> GuidIdsRefreshed { get; } = new();
+
         public List<int> IntIdsRemoved { get; } = new();
+
         public List<string> PayloadsRemoved { get; } = new();
+
         public List<string> PayloadsRefreshed { get; } = new();
+
         public int CountOfFullRefreshes { get; private set; }
 
         public void QueueRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
@@ -156,9 +161,13 @@ public class DistributedCacheTests
 
         public void QueueRefreshAll(ICacheRefresher refresher) => CountOfFullRefreshes++;
 
-        public void Sync() { }
+        public void Sync()
+        {
+        }
 
-        public void SendMessages() { }
+        public void SendMessages()
+        {
+        }
 
         public void PerformRefresh(ICacheRefresher refresher, string jsonPayload) => PayloadsRefreshed.Add(jsonPayload);
 
@@ -169,7 +178,7 @@ public class DistributedCacheTests
     {
         public IEnumerable<IServerAddress> Registrations => new List<IServerAddress>
         {
-            new TestServerAddress("localhost")
+            new TestServerAddress("localhost"),
         };
 
         public ServerRole CurrentServerRole => throw new NotImplementedException();

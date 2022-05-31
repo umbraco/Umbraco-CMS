@@ -34,8 +34,7 @@ public class NestedContentTests
         var localizationService = Mock.Of<ILocalizationService>();
 
         PropertyEditorCollection editors = null;
-        var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(),
-            Mock.Of<IEditorConfigurationParser>());
+        var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
         editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
         var serializer = new ConfigurationEditorJsonSerializer();
@@ -47,8 +46,8 @@ public class NestedContentTests
             {
                 MinItems = 1,
                 MaxItems = 1,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } }
-            }
+                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+            },
         };
 
         var dataType2 = new DataType(editor, serializer)
@@ -58,14 +57,13 @@ public class NestedContentTests
             {
                 MinItems = 1,
                 MaxItems = 99,
-                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } }
-            }
+                ContentTypes = new[] { new NestedContentConfiguration.ContentType { Alias = "contentN1" } },
+            },
         };
 
         var dataType3 =
             new DataType(
-                new TextboxPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(),
-                    Mock.Of<IEditorConfigurationParser>()), serializer)
+                new TextboxPropertyEditor(Mock.Of<IDataValueEditorFactory>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>()), serializer)
             { Id = 3 };
 
         // mocked dataservice returns nested content preValues
@@ -119,10 +117,8 @@ public class NestedContentTests
 
         var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
         {
-            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object,
-                proflog),
-            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object,
-                proflog)
+            new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
+            new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
         });
 
         var factory =
@@ -183,8 +179,8 @@ public class NestedContentTests
                 new TestPublishedProperty(
                     contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
-                ]")
-            }
+                ]"),
+            },
         };
         var value = content.Value(Mock.Of<IPublishedValueFallback>(), "property1");
 
@@ -215,8 +211,8 @@ public class NestedContentTests
                 new TestPublishedProperty(contentType2.GetPropertyType("property2"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }},
                     {{ ""key"": ""{keyB}"", ""propertyN1"": ""bar"", ""ncContentTypeAlias"": ""contentN1"" }}
-                ]")
-            }
+                ]"),
+            },
         };
         var value = content.Value(Mock.Of<IPublishedValueFallback>(), "property2");
 
@@ -254,8 +250,7 @@ public class NestedContentTests
             _hasValue = source != null && (!(source is string ssource) || !string.IsNullOrWhiteSpace(ssource));
         }
 
-        public TestPublishedProperty(IPublishedPropertyType propertyType, IPublishedElement element, bool preview,
-            PropertyCacheLevel referenceCacheLevel, object source)
+        public TestPublishedProperty(IPublishedPropertyType propertyType, IPublishedElement element, bool preview, PropertyCacheLevel referenceCacheLevel, object source)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = source;

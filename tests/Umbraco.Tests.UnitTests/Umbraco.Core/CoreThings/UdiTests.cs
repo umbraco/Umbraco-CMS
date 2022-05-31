@@ -68,8 +68,7 @@ public class UdiTests
         Assert.AreEqual(udi, udi2);
 
         var udi3 = new StringUdi(Constants.UdiEntityType.AnyString, "path to/this is a test.xyz");
-        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz",
-            udi3.ToString());
+        Assert.AreEqual("umb://" + Constants.UdiEntityType.AnyString + "/path%20to/this%20is%20a%20test.xyz", udi3.ToString());
     }
 
     [Test]
@@ -77,8 +76,7 @@ public class UdiTests
     {
         // reserved = : / ? # [ ] @ ! $ & ' ( ) * + , ; =
         // unreserved = alpha digit - . _ ~
-        Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25",
-            Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
+        Assert.AreEqual("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2B%2C%3B%3D.-_~%25", Uri.EscapeDataString(":/?#[]@!$&'()+,;=.-_~%"));
         Assert.AreEqual(":/?#[]@!$&'()+,;=.-_~%25", Uri.EscapeUriString(":/?#[]@!$&'()+,;=.-_~%"));
 
         // we cannot have reserved chars at random places
@@ -146,7 +144,8 @@ public class UdiTests
         GuidUdi[] entities =
         {
             new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
-            new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1), new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1)
+            new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
+            new GuidUdi(Constants.UdiEntityType.AnyGuid, guid1),
         };
         Assert.AreEqual(1, entities.Distinct().Count());
     }
@@ -212,7 +211,7 @@ public class UdiTests
     {
         var settings = new JsonSerializerSettings
         {
-            Converters = new JsonConverter[] { new UdiJsonConverter(), new UdiRangeJsonConverter() }
+            Converters = new JsonConverter[] { new UdiJsonConverter(), new UdiRangeJsonConverter() },
         };
 
         var guid = Guid.NewGuid();
@@ -253,15 +252,16 @@ public class UdiTests
 
                 if (types.ContainsKey(value) == false)
                 {
-                    Assert.Fail("Error in class Constants.UdiEntityType, type \"{0}\" is not declared by GetTypes.",
-                        value);
+                    Assert.Fail("Error in class Constants.UdiEntityType, type \"{0}\" is not declared by GetTypes.", value);
                 }
 
                 types.Remove(value);
             }
         }
 
-        Assert.AreEqual(0, types.Count,
+        Assert.AreEqual(
+            0,
+            types.Count,
             "Error in class Constants.UdiEntityType, GetTypes declares types that don't exist ({0}).",
             string.Join(",", types.Keys.Select(x => "\"" + x + "\"")));
     }
@@ -300,8 +300,7 @@ public class UdiTests
         Assert.IsInstanceOf<GuidUdi>(udi);
 
         // can get method for Deploy compatibility
-        var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null,
-            new[] { typeof(string), typeof(bool) }, null);
+        var method = typeof(UdiParser).GetMethod("Parse", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string), typeof(bool) }, null);
         Assert.IsNotNull(method);
     }
 

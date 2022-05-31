@@ -21,8 +21,9 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
             {
                 new UmbracoDomain("domain1.com/")
                 {
-                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"
-                }
+                    Id = 1, LanguageId = LangDeId, RootContentId = 1001,
+                    LanguageIsoCode = "de-DE",
+                },
             });
     }
 
@@ -35,28 +36,28 @@ public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
             {
                 new UmbracoDomain("domain1.com/")
                 {
-                    Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"
+                    Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
-                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
+                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
-                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"
+                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR",
                 },
                 new UmbracoDomain("http://domain3.com/")
                 {
-                    Id = 4, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"
+                    Id = 4, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("http://domain3.com/en")
                 {
-                    Id = 5, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"
+                    Id = 5, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("http://domain3.com/fr")
                 {
-                    Id = 6, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"
-                }
+                    Id = 6, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR",
+                },
             });
     }
 

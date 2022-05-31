@@ -15,8 +15,7 @@ public class AspNetCoreHostingEnvironmentTests
     [InlineAutoMoqData("~/Scripts", "/Scripts", null)]
     [InlineAutoMoqData("/Scripts", "/Scripts", null)]
     [InlineAutoMoqData("../Scripts", "/Scripts", typeof(InvalidOperationException))]
-    public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType,
-        AspNetCoreHostingEnvironment sut)
+    public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType, AspNetCoreHostingEnvironment sut)
     {
         if (expectedExceptionType != null)
         {
@@ -33,12 +32,9 @@ public class AspNetCoreHostingEnvironmentTests
     public void EnsurePathIsApplicationRootPrefixed()
     {
         // Assert
-        Assert.AreEqual("~/Views/Template.cshtml",
-            PathUtility.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"));
-        Assert.AreEqual("~/Views/Template.cshtml",
-            PathUtility.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"));
-        Assert.AreEqual("~/Views/Template.cshtml",
-            PathUtility.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"));
+        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"));
+        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"));
+        Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"));
     }
 
     [AutoMoqData]

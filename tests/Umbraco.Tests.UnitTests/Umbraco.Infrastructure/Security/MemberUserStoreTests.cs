@@ -30,9 +30,14 @@ public class MemberUserStoreTests
         var mockScope = new Mock<IScope>();
         var mockScopeProvider = new Mock<IScopeProvider>();
         mockScopeProvider
-            .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(),
-                It.IsAny<bool>(), It.IsAny<bool>()))
+            .Setup(x => x.CreateScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
             .Returns(mockScope.Object);
 
         return new MemberUserStore(
@@ -42,8 +47,7 @@ public class MemberUserStoreTests
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
-            Mock.Of<ITwoFactorLoginService>()
-        );
+            Mock.Of<ITwoFactorLoginService>());
     }
 
     [Test]
@@ -160,11 +164,10 @@ public class MemberUserStoreTests
             LockoutEnd = DateTime.UtcNow.AddDays(10),
             IsApproved = true,
             PasswordHash = "abcde",
-            SecurityStamp = "abc"
+            SecurityStamp = "abc",
         };
         fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role1", UserId = "123" });
         fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role2", UserId = "123" });
-
 
         IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
         var mockMember = Mock.Of<IMember>(m =>
@@ -233,7 +236,7 @@ public class MemberUserStoreTests
         // arrange
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser(777);
-        var fakeCancellationToken = new CancellationToken();
+        var fakeCancellationToken = CancellationToken.None;
 
         IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
         IMember mockMember = new Member(fakeMemberType)
@@ -242,7 +245,7 @@ public class MemberUserStoreTests
             Name = "fakeName",
             Email = "fakeemail@umbraco.com",
             Username = "fakeUsername",
-            RawPasswordValue = "fakePassword"
+            RawPasswordValue = "fakePassword",
         };
 
         _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);

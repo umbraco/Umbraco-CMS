@@ -103,7 +103,7 @@ public class MediaTypeBuilderTests
         Assert.IsFalse(mediaType.IsContainer);
         Assert.AreEqual(7, mediaType.PropertyTypes.Count()); // 5 from media properties group, 2 custom
 
-        var propertyTypeIds = mediaType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
+        var propertyTypeIds = mediaType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 7, propertyTypeIds.Max());
     }

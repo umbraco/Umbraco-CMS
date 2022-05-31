@@ -53,7 +53,8 @@ public class BackOfficeAreaRoutesTests
 
         var endpoint4 = (RouteEndpoint)route.Endpoints[2];
         var apiControllerName = ControllerExtensions.GetControllerName<Testing1Controller>();
-        Assert.AreEqual($"umbraco/backoffice/api/{apiControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
+        Assert.AreEqual(
+            $"umbraco/backoffice/api/{apiControllerName.ToLowerInvariant()}/{{action}}/{{id?}}",
             endpoint4.RoutePattern.RawText);
         Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey(AreaToken));
         Assert.IsFalse(endpoint4.RoutePattern.Defaults.ContainsKey(ActionToken));
@@ -66,9 +67,11 @@ public class BackOfficeAreaRoutesTests
         Assert.AreEqual("umbraco/{action}/{id?}", endpoint1.RoutePattern.RawText);
         Assert.AreEqual(Constants.Web.Mvc.BackOfficeArea, endpoint1.RoutePattern.Defaults[AreaToken]);
         Assert.AreEqual("Default", endpoint1.RoutePattern.Defaults[ActionToken]);
-        Assert.AreEqual(ControllerExtensions.GetControllerName<BackOfficeController>(),
+        Assert.AreEqual(
+            ControllerExtensions.GetControllerName<BackOfficeController>(),
             endpoint1.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(endpoint1.RoutePattern.Defaults[AreaToken],
+        Assert.AreEqual(
+            endpoint1.RoutePattern.Defaults[AreaToken],
             typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
 
         var endpoint2 = (RouteEndpoint)route.Endpoints[1];
@@ -79,7 +82,8 @@ public class BackOfficeAreaRoutesTests
         Assert.AreEqual(Constants.Web.Mvc.BackOfficeApiArea, endpoint2.RoutePattern.Defaults[AreaToken]);
         Assert.IsFalse(endpoint2.RoutePattern.Defaults.ContainsKey(ActionToken));
         Assert.AreEqual(controllerName, endpoint2.RoutePattern.Defaults[ControllerToken]);
-        Assert.AreEqual(endpoint1.RoutePattern.Defaults[AreaToken],
+        Assert.AreEqual(
+            endpoint1.RoutePattern.Defaults[AreaToken],
             typeof(BackOfficeController).GetCustomAttribute<AreaAttribute>(false).RouteValue);
     }
 

@@ -65,7 +65,8 @@ public class MediaPermissionsResourceHandlerTests
         Assert.IsFalse(authHandlerContext.HasSucceeded);
     }
 
-    private static AuthorizationHandlerContext CreateAuthorizationHandlerContext(int nodeId,
+    private static AuthorizationHandlerContext CreateAuthorizationHandlerContext(
+        int nodeId,
         bool createWithNodeId = false)
     {
         var requirement = new MediaPermissionsResourceRequirement();

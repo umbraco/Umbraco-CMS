@@ -44,8 +44,7 @@ public class UriExtensionsTests
     [TestCase("http://www.domain.com/foo/bar", "/path/to/page", "?x=12", "http://www.domain.com/path/to/page?x=12")]
     [TestCase("http://www.domain.com/foo/bar#hop", "/path/to/page", "?x=12", "http://www.domain.com/path/to/page?x=12")]
     [TestCase("http://www.domain.com/foo/bar?k=3", "/path/to/page", "?x=12", "http://www.domain.com/path/to/page?x=12")]
-    [TestCase("http://www.domain.com/foo/bar?k=3#hop", "/path/to/page", "?x=12",
-        "http://www.domain.com/path/to/page?x=12")]
+    [TestCase("http://www.domain.com/foo/bar?k=3#hop", "/path/to/page", "?x=12", "http://www.domain.com/path/to/page?x=12")]
     public void RewritePathAndQuery(string input, string path, string query, string expected)
     {
         var source = new Uri(input);

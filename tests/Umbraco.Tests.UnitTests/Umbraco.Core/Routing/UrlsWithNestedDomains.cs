@@ -25,7 +25,6 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
     // but only one route can be cached - the 'canonical' route ie the route
     // using the closest domain to the node - here we test that if we request
     // a non-canonical route, it is not cached / the cache is not polluted
-
     [Test]
     public async Task DoNotPolluteCache()
     {
@@ -57,7 +56,6 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
         // check that the proper route has been cached
         var cache = (FastDictionaryAppCache)umbracoContext.PublishedSnapshot.ElementsCache;
 
-        var cachedRoutes = cache.Keys.Where(x => x.StartsWith(cacheKeyPrefix)).ToList();
         var cacheKey = $"{cacheKeyPrefix}[P:100111]";
         Assert.AreEqual("10011/1001-1-1", cache.Get(cacheKey));
 
@@ -75,15 +73,11 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
         Assert.AreEqual(100111, frequest.PublishedContent.Id);
 
         // has the cache been polluted?
-        cachedRoutes = cache.Keys.Where(x => x.StartsWith(cacheKeyPrefix)).ToList();
         Assert.AreEqual("10011/1001-1-1", cache.Get(cacheKey)); // no
 
         // what's the nice URL now?
         Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111)); // good
     }
-
-    private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, object urlProvider) =>
-        throw new NotImplementedException();
 
     private void SetDomains1()
     {
@@ -94,17 +88,16 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
             {
                 new UmbracoDomain("http://domain1.com/")
                 {
-                    Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"
+                    Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("http://domain2.com/")
                 {
-                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
-                }
+                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
+                },
             });
     }
 
-    private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext,
-        DefaultUrlProvider urlProvider)
+    private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
     {
         var webRoutingSettings = new WebRoutingSettings();
         return new UrlProvider(
@@ -112,8 +105,7 @@ public class UrlsWithNestedDomains : UrlRoutingTestBase
             Options.Create(webRoutingSettings),
             new UrlProviderCollection(() => new[] { urlProvider }),
             new MediaUrlProviderCollection(() => Enumerable.Empty<IMediaUrlProvider>()),
-            Mock.Of<IVariationContextAccessor>()
-        );
+            Mock.Of<IVariationContextAccessor>());
     }
 
     protected override string GetXmlContent(int templateId)

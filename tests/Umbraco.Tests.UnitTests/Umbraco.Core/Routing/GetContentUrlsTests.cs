@@ -51,8 +51,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CultureInfo>(),
-                It.IsAny<IDictionary<string, string>>()
-            ))
+                It.IsAny<IDictionary<string, string>>()))
             .Returns((string key, string alias, CultureInfo culture, IDictionary<string, string> args)
                 => $"{key}/{alias}");
 
@@ -65,7 +64,6 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
             .Select(CultureInfo.GetCultureInfo)
             .Select(culture => new Language(culture.Name, culture.EnglishName) { IsDefault = true, IsMandatory = true })
             .ToArray();
-
 
         var langServiceMock = new Mock<ILocalizationService>();
         langServiceMock.Setup(x => x.GetAllLanguages()).Returns(allLangs);
@@ -88,8 +86,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
             new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings,
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out var uriUtility);
 
         var urls = (await content.GetContentUrlsAsync(
             publishedRouter,
@@ -122,8 +119,7 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
             new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings,
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out var uriUtility);
 
         var urls = (await content.GetContentUrlsAsync(
             publishedRouter,
@@ -135,7 +131,6 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
             Mock.Of<ILogger<IContent>>(),
             uriUtility,
             urlProvider)).ToList();
-
 
         Assert.AreEqual(2, urls.Count);
 
@@ -165,17 +160,14 @@ public class GetContentUrlsTests : PublishedSnapshotServiceTestBase
         child.Path = "-1,1046,1173";
         child.Published = true;
 
-
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://localhost:8000");
         var publishedRouter = CreatePublishedRouter(
             umbracoContextAccessor,
             new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-
         var localizationService = GetLangService("en-US", "fr-FR");
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings,
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out var uriUtility);
 
         var urls = (await child.GetContentUrlsAsync(
             publishedRouter,

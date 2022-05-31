@@ -10,7 +10,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
@@ -37,7 +36,6 @@ public class SurfaceControllerTests
     [Test]
     public void Can_Construct_And_Get_Result()
     {
-        var hostingEnvironment = Mock.Of<IHostingEnvironment>();
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
         var globalSettings = new GlobalSettings();
@@ -49,8 +47,7 @@ public class SurfaceControllerTests
 
         var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
-        var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(),
-            Mock.Of<IPublishedUrlProvider>());
+        var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>());
 
         var result = ctrl.Index();
 
@@ -61,7 +58,6 @@ public class SurfaceControllerTests
     public void Umbraco_Context_Not_Null()
     {
         var globalSettings = new GlobalSettings();
-        var hostingEnvironment = Mock.Of<IHostingEnvironment>();
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
         var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
@@ -71,8 +67,7 @@ public class SurfaceControllerTests
 
         var umbracoContextAccessor = new TestUmbracoContextAccessor(umbCtx);
 
-        var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(),
-            Mock.Of<IPublishedUrlProvider>());
+        var ctrl = new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>());
 
         Assert.IsNotNull(ctrl.UmbracoContext);
     }
@@ -86,8 +81,6 @@ public class SurfaceControllerTests
         content.Setup(x => x.Id).Returns(2);
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-        var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
-        var hostingEnvironment = Mock.Of<IHostingEnvironment>();
         var globalSettings = new GlobalSettings();
 
         var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
@@ -99,8 +92,7 @@ public class SurfaceControllerTests
 
         var publishedContentQuery = Mock.Of<IPublishedContentQuery>(query => query.Content(2) == content.Object);
 
-        var ctrl = new TestSurfaceController(umbracoContextAccessor, publishedContentQuery,
-            Mock.Of<IPublishedUrlProvider>());
+        var ctrl = new TestSurfaceController(umbracoContextAccessor, publishedContentQuery, Mock.Of<IPublishedUrlProvider>());
         var result = ctrl.GetContent(2) as PublishedContentResult;
 
         Assert.IsNotNull(result);
@@ -112,7 +104,6 @@ public class SurfaceControllerTests
     public void Mock_Current_Page()
     {
         var globalSettings = new GlobalSettings();
-        var hostingEnvironment = Mock.Of<IHostingEnvironment>();
         var backofficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
         Mock.Get(backofficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
         var umbracoContextFactory = TestUmbracoContextFactory.Create(globalSettings, _umbracoContextAccessor);
@@ -133,10 +124,9 @@ public class SurfaceControllerTests
         httpContext.Features.Set(routeDefinition);
 
         var ctrl =
-            new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(),
-                Mock.Of<IPublishedUrlProvider>())
+            new TestSurfaceController(umbracoContextAccessor, Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>())
             {
-                ControllerContext = new ControllerContext { HttpContext = httpContext, RouteData = new RouteData() }
+                ControllerContext = new ControllerContext { HttpContext = httpContext, RouteData = new RouteData() },
             };
 
         var result = ctrl.GetContentFromCurrentPage() as PublishedContentResult;
@@ -148,10 +138,11 @@ public class SurfaceControllerTests
     {
         private readonly IPublishedContentQuery _publishedContentQuery;
 
-        public TestSurfaceController(IUmbracoContextAccessor umbracoContextAccessor,
-            IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider)
-            : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null,
-                publishedUrlProvider) =>
+        public TestSurfaceController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedContentQuery publishedContentQuery,
+            IPublishedUrlProvider publishedUrlProvider)
+            : base(umbracoContextAccessor, null, ServiceContext.CreatePartial(), AppCaches.Disabled, null, publishedUrlProvider) =>
             _publishedContentQuery = publishedContentQuery;
 
         public IActionResult Index() =>
@@ -177,6 +168,7 @@ public class SurfaceControllerTests
     public class PublishedContentResult : IActionResult
     {
         public PublishedContentResult(IPublishedContent content) => Content = content;
+
         public IPublishedContent Content { get; set; }
 
         public Task ExecuteResultAsync(ActionContext context) => Task.CompletedTask;

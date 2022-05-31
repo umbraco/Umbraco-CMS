@@ -43,8 +43,7 @@ public class ScopedNotificationPublisherTests
                 innerScope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
 
                 notificationPublisherMock.Verify(x => x.Publish(It.IsAny<INotification>()), Times.Exactly(2));
-                notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()),
-                    Times.Exactly(2));
+                notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Exactly(2));
             }
 
             // Ensure scope exit is not called until outermost scope is being disposed
@@ -52,6 +51,7 @@ public class ScopedNotificationPublisherTests
         }
 
         notificationPublisherMock.Verify(x => x.ScopeExit(It.IsAny<bool>()), Times.Once());
+
         // Ensure that the event aggregator isn't used directly.
         eventAggregatorMock.Verify(x => x.Publish(It.IsAny<INotification>()), Times.Never);
         eventAggregatorMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Never);
@@ -98,7 +98,6 @@ public class ScopedNotificationPublisherTests
             mediaFileManager,
             loggerFactory,
             Mock.Of<IRequestCache>(),
-            eventAggregatorMock.Object
-        );
+            eventAggregatorMock.Object);
     }
 }

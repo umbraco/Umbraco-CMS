@@ -37,7 +37,7 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
             [string.Empty] = _dataTypes[0],
 
             // content uses the RTE
-            ["content"] = _dataTypes[1]
+            ["content"] = _dataTypes[1],
         };
     }
 
@@ -53,12 +53,14 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
             .WithProperties(new PropertyDataBuilder()
                 .WithPropertyData("content", "<div>This is some content</div>")
                 .Build())
+
             // build with a dynamically created media type
             .Build(ShortStringHelper, _propertyDataTypes, mediaType, "image2");
 
         var item1 = ContentNodeKitBuilder.CreateWithContent(
             mediaType.Id,
-            1, "-1,1",
+            1,
+            "-1,1",
             draftData: item1Data,
             publishedData: item1Data);
 
@@ -86,7 +88,8 @@ public class PublishedMediaTests : PublishedSnapshotServiceTestBase
 
             var item1 = ContentNodeKitBuilder.CreateWithContent(
                 mediaType.Id,
-                id, $"{parentPath},{id}",
+                id,
+                $"{parentPath},{id}",
                 draftData: item1Data,
                 publishedData: item1Data);
 

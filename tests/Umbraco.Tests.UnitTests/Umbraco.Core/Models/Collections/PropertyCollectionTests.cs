@@ -19,10 +19,8 @@ public class PropertyCollectionTests
     {
         var collection = new PropertyCollection
         {
-            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar,
-                "test")),
-            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar,
-                "Test"))
+            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")),
+            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "Test")),
         };
 
         Assert.AreEqual(1, collection.Count);
@@ -33,8 +31,7 @@ public class PropertyCollectionTests
     {
         var collection = new PropertyCollection
         {
-            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar,
-                "test"))
+            new Property(new PropertyType(TestHelper.ShortStringHelper, "propEditor", ValueStorageType.Nvarchar, "test")),
         };
 
         Assert.IsTrue(collection.Contains("Test"));
@@ -89,8 +86,7 @@ public class PropertyCollectionTests
         var contentType = ContentTypeBuilder.CreateTextPageContentType();
 
         Assert.That(contentType.PropertyGroups, Is.Not.Null);
-        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")) == null,
-            Is.False);
+        Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Content")) == null, Is.False);
         Assert.That(contentType.PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals("Test")) == null, Is.True);
         Assert.That(contentType.PropertyGroups.Any(x => x.Name.InvariantEquals("Test")), Is.False);
     }

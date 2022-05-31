@@ -169,7 +169,8 @@ public class ContentPermissionsQueryStringHandlerTests
         return new AuthorizationHandlerContext(new List<IAuthorizationRequirement> { requirement }, user, resource);
     }
 
-    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(string queryStringName = QueryStringName,
+    private static Mock<IHttpContextAccessor> CreateMockHttpContextAccessor(
+        string queryStringName = QueryStringName,
         string queryStringValue = "")
     {
         var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
@@ -183,14 +184,19 @@ public class ContentPermissionsQueryStringHandlerTests
         return mockHttpContextAccessor;
     }
 
-    private ContentPermissionsQueryStringHandler CreateHandler(IHttpContextAccessor httpContextAccessor, int nodeId,
+    private ContentPermissionsQueryStringHandler CreateHandler(
+        IHttpContextAccessor httpContextAccessor,
+        int nodeId,
         string[] permissionsForPath)
     {
         var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor();
         var mockEntityService = CreateMockEntityService();
         var contentPermissions = CreateContentPermissions(mockEntityService.Object, nodeId, permissionsForPath);
-        return new ContentPermissionsQueryStringHandler(mockBackOfficeSecurityAccessor.Object, httpContextAccessor,
-            mockEntityService.Object, contentPermissions);
+        return new ContentPermissionsQueryStringHandler(
+            mockBackOfficeSecurityAccessor.Object,
+            httpContextAccessor,
+            mockEntityService.Object,
+            contentPermissions);
     }
 
     private static Mock<IEntityService> CreateMockEntityService()
@@ -200,7 +206,8 @@ public class ContentPermissionsQueryStringHandlerTests
             .Setup(x => x.GetId(It.Is<Udi>(y => y == s_nodeUdi)))
             .Returns(Attempt<int>.Succeed(NodeId));
         mockEntityService
-            .Setup(x => x.GetId(It.Is<Guid>(y => y == s_nodeGuid),
+            .Setup(x => x.GetId(
+                It.Is<Guid>(y => y == s_nodeGuid),
                 It.Is<UmbracoObjectTypes>(y => y == UmbracoObjectTypes.Document)))
             .Returns(Attempt<int>.Succeed(NodeId));
         return mockEntityService;
@@ -220,15 +227,19 @@ public class ContentPermissionsQueryStringHandlerTests
         new UserBuilder()
             .Build();
 
-    private static ContentPermissions CreateContentPermissions(IEntityService entityService, int nodeId,
+    private static ContentPermissions CreateContentPermissions(
+        IEntityService entityService,
+        int nodeId,
         string[] permissionsForPath)
     {
         var mockUserService = new Mock<IUserService>();
 
         mockUserService
-            .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(),
+            .Setup(x => x.GetPermissionsForPath(
+                It.IsAny<IUser>(),
                 It.Is<string>(y => y == $"{Constants.System.RootString},{nodeId.ToInvariantString()}")))
-            .Returns(new EntityPermissionSet(nodeId,
+            .Returns(new EntityPermissionSet(
+                nodeId,
                 new EntityPermissionCollection(new List<EntityPermission> { new(1, nodeId, permissionsForPath) })));
 
         var mockContentService = new Mock<IContentService>();
@@ -236,7 +247,10 @@ public class ContentPermissionsQueryStringHandlerTests
             .Setup(x => x.GetById(It.Is<int>(y => y == nodeId)))
             .Returns(CreateContent(nodeId));
 
-        return new ContentPermissions(mockUserService.Object, mockContentService.Object, entityService,
+        return new ContentPermissions(
+            mockUserService.Object,
+            mockContentService.Object,
+            entityService,
             AppCaches.Disabled);
     }
 
@@ -247,6 +261,7 @@ public class ContentPermissionsQueryStringHandlerTests
     }
 
     private static void AssertContentCached(Mock<IHttpContextAccessor> mockHttpContextAccessor) =>
-        Assert.AreEqual(NodeId,
+        Assert.AreEqual(
+            NodeId,
             ((IContent)mockHttpContextAccessor.Object.HttpContext.Items[typeof(IContent).ToString()]).Id);
 }

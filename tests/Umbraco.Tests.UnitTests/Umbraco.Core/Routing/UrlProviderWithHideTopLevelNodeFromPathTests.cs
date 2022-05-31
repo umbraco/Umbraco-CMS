@@ -43,8 +43,7 @@ public class UrlProviderWithHideTopLevelNodeFromPathTests : PublishedSnapshotSer
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
 
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out var uriUtility);
 
         var result = urlProvider.GetUrl(nodeId);
         Assert.AreEqual(niceUrlMatch, result);

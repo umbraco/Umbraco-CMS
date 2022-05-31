@@ -9,8 +9,8 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing;
-// FIXME: not testing virtual directory!
 
+// FIXME: not testing virtual directory!
 [TestFixture]
 public class UriUtilityTests
 {

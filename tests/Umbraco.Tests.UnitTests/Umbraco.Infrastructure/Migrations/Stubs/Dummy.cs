@@ -12,7 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 /// </summary>
 public class Dummy : MigrationBase
 {
-    public Dummy(IMigrationContext context) : base(context)
+    public Dummy(IMigrationContext context)
+        : base(context)
     {
     }
 

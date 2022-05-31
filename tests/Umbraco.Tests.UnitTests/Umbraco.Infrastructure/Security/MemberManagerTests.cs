@@ -45,7 +45,7 @@ public class MemberManagerTests
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IEntityService>(),
                 new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
-                AppCaches.Disabled)
+                AppCaches.Disabled),
         };
 
         _fakeMemberStore = new MemberUserStore(
@@ -98,37 +98,36 @@ public class MemberManagerTests
     [Test]
     public async Task GivenICreateUser_AndTheIdentityResultFailed_ThenIShouldGetAFailedResultAsync()
     {
-        //arrange
+        // arrange
         var sut = CreateSut();
         var fakeUser = new MemberIdentityUser { PasswordConfig = "testConfig" };
 
-        //act
+        // act
         var identityResult = await sut.CreateAsync(fakeUser);
 
-        //assert
+        // assert
         Assert.IsFalse(identityResult.Succeeded);
         Assert.IsFalse(!identityResult.Errors.Any());
     }
 
-
     [Test]
     public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
     {
-        //arrange
+        // arrange
         var sut = CreateSut();
         IdentityError[] identityErrors =
         {
-            new() {Code = "IdentityError1", Description = "There was an identity error when creating a user"}
+            new() { Code = "IdentityError1", Description = "There was an identity error when creating a user" },
         };
 
-        //act
+        // act
         Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
     }
 
     [Test]
     public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
     {
-        //arrange
+        // arrange
         var sut = CreateSut();
         var fakeUser = CreateValidUser();
 
@@ -136,10 +135,10 @@ public class MemberManagerTests
 
         MockMemberServiceForCreateMember(fakeMember);
 
-        //act
+        // act
         var identityResult = await sut.CreateAsync(fakeUser);
 
-        //assert
+        // assert
         Assert.IsTrue(identityResult.Succeeded);
         Assert.IsTrue(!identityResult.Errors.Any());
     }
@@ -147,7 +146,7 @@ public class MemberManagerTests
     [Test]
     public async Task GivenAUserExists_AndTheCorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldSucceed()
     {
-        //arrange
+        // arrange
         var password = "password";
         var sut = CreateSut();
 
@@ -163,18 +162,18 @@ public class MemberManagerTests
             .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(PasswordVerificationResult.Success);
 
-        //act
+        // act
         await sut.CreateAsync(fakeUser);
         var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
 
-        //assert
+        // assert
         Assert.IsTrue(result);
     }
 
     [Test]
     public async Task GivenAUserExists_AndIncorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldFail()
     {
-        //arrange
+        // arrange
         var password = "password";
         var sut = CreateSut();
 
@@ -190,27 +189,27 @@ public class MemberManagerTests
             .Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(PasswordVerificationResult.Failed);
 
-        //act
+        // act
         await sut.CreateAsync(fakeUser);
         var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
 
-        //assert
+        // assert
         Assert.IsFalse(result);
     }
 
     [Test]
     public async Task GivenAUserDoesExists_AndCredentialsAreProvided_ThenACheckOfCredentialsShouldFail()
     {
-        //arrange
+        // arrange
         var password = "password";
         var sut = CreateSut();
 
         _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == "testUser"))).Returns((IMember)null);
 
-        //act
+        // act
         var result = await sut.ValidateCredentialsAsync("testUser", password);
 
-        //assert
+        // assert
         Assert.IsFalse(result);
     }
 
@@ -222,7 +221,7 @@ public class MemberManagerTests
             Name = "Test",
             MemberTypeAlias = "Anything",
             PasswordConfig = "testConfig",
-            PasswordHash = "hashedPassword"
+            PasswordHash = "hashedPassword",
         };
 
     private static IMember CreateMember(MemberIdentityUser fakeUser)

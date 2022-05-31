@@ -29,11 +29,11 @@ public class AddPropertyTypeGroupColumnsTests
 
         var dtos = new[]
         {
-            new PropertyTypeGroupDto {Id = 0, Text = "Content"}, new PropertyTypeGroupDto {Id = 1, Text = "Content"},
-            new PropertyTypeGroupDto {Id = 2, Text = "Settings"},
-            new PropertyTypeGroupDto {Id = 3, Text = "Content "}, // The trailing space is intentional
-            new PropertyTypeGroupDto {Id = 4, Text = "SEO/OpenGraph"},
-            new PropertyTypeGroupDto {Id = 5, Text = "Site defaults"}
+            new PropertyTypeGroupDto { Id = 0, Text = "Content" }, new PropertyTypeGroupDto { Id = 1, Text = "Content" },
+            new PropertyTypeGroupDto { Id = 2, Text = "Settings" },
+            new PropertyTypeGroupDto { Id = 3, Text = "Content " }, // The trailing space is intentional
+            new PropertyTypeGroupDto { Id = 4, Text = "SEO/OpenGraph" },
+            new PropertyTypeGroupDto { Id = 5, Text = "Site defaults" },
         };
 
         var populatedDtos = migration.PopulateAliases(dtos)

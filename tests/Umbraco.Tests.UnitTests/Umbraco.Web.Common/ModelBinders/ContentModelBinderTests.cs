@@ -86,7 +86,6 @@ public class ContentModelBinderTests
     public void Throws_When_Source_Not_Of_Expected_Type()
     {
         // Arrange
-        var pc = CreatePublishedContent();
         var bindingContext = new DefaultModelBindingContext();
 
         // Act/Assert
@@ -116,7 +115,8 @@ public class ContentModelBinderTests
         ModelBindingContext bindingContext = new DefaultModelBindingContext();
 
         // Act
-        _contentModelBinder.BindModel(bindingContext,
+        _contentModelBinder.BindModel(
+            bindingContext,
             new ContentModel<ContentType2>(new ContentType2(pc, Mock.Of<IPublishedValueFallback>())),
             typeof(ContentModel<ContentType1>));
 
@@ -182,7 +182,6 @@ public class ContentModelBinderTests
     [Test]
     public void Null_Model_Binds_To_Null()
     {
-        var pc = Mock.Of<IPublishedContent>();
         var bindingContext = new DefaultModelBindingContext();
         _contentModelBinder.BindModel(bindingContext, null, typeof(ContentModel));
         Assert.IsNull(bindingContext.Result.Model);
@@ -191,7 +190,6 @@ public class ContentModelBinderTests
     [Test]
     public void Invalid_Model_Type_Throws_Exception()
     {
-        var pc = Mock.Of<IPublishedContent>();
         var bindingContext = new DefaultModelBindingContext();
         Assert.Throws<ModelBindingException>(() =>
             _contentModelBinder.BindModel(bindingContext, "Hello", typeof(IPublishedContent)));
@@ -200,7 +198,8 @@ public class ContentModelBinderTests
     /// <summary>
     ///     Creates a binding context with the route values populated to similute an Umbraco dynamically routed request
     /// </summary>
-    private ModelBindingContext CreateBindingContextForUmbracoRequest(Type modelType,
+    private ModelBindingContext CreateBindingContextForUmbracoRequest(
+        Type modelType,
         IPublishedContent publishedContent)
     {
         var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
@@ -220,7 +219,7 @@ public class ContentModelBinderTests
             ActionContext = actionContext,
             ModelMetadata = metadataProvider.GetMetadataForType(modelType),
             ModelName = modelType.Name,
-            ValueProvider = valueProvider
+            ValueProvider = valueProvider,
         };
     }
 

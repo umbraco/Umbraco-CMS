@@ -104,7 +104,7 @@ public class MemberTypeBuilderTests
         Assert.IsFalse(memberType.IsContainer);
         Assert.AreEqual(3, memberType.PropertyTypes.Count()); // 1 from membership properties group, 2 custom
 
-        var propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x);
+        var propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 3, propertyTypeIds.Max());
 

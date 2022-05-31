@@ -90,6 +90,7 @@ public class DeepCloneAppCacheTests : RuntimeAppCacheTests
     private class TestClass : BeingDirtyBase, IDeepCloneable
     {
         private string _name;
+
         public TestClass() => CloneId = Guid.NewGuid();
 
         public string Name

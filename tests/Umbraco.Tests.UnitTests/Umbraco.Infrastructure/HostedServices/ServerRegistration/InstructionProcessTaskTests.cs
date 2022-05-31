@@ -50,8 +50,11 @@ public class InstructionProcessTaskTests
 
         var settings = new GlobalSettings();
 
-        return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object,
-            mockLogger.Object, Options.Create(settings));
+        return new InstructionProcessTask(
+            mockRunTimeState.Object,
+            _mockDatabaseServerMessenger.Object,
+            mockLogger.Object,
+            Options.Create(settings));
     }
 
     private void VerifyMessengerNotSynced() => VerifyMessengerSyncedTimes(Times.Never());

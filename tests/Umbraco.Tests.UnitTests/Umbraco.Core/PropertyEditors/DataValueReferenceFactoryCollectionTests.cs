@@ -25,8 +25,12 @@ public class DataValueReferenceFactoryCollectionTests
 {
     private IDataValueEditorFactory DataValueEditorFactory { get; } = Mock.Of<IDataValueEditorFactory>(
         x => x.Create<MediaPickerPropertyEditor.MediaPickerPropertyValueEditor>(It.IsAny<DataEditorAttribute>())
-             == new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(Mock.Of<ILocalizedTextService>(),
-                 Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(),
+             ==
+             new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(
+                 Mock.Of<ILocalizedTextService>(),
+                 Mock.Of<IShortStringHelper>(),
+                 Mock.Of<IJsonSerializer>(),
+                 Mock.Of<IIOHelper>(),
                  new DataEditorAttribute("a", "a", "a")));
 
     private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
@@ -55,25 +59,25 @@ public class DataValueReferenceFactoryCollectionTests
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(labelEditor, serializer))
                 {
-                    Variations = ContentVariation.CultureAndSegment
+                    Variations = ContentVariation.CultureAndSegment,
                 })
             {
                 Values = new List<PropertyValue>
                 {
                     // Ignored (no culture)
-                    new() {EditedValue = trackedUdi1},
-                    new() {Culture = "en-US", EditedValue = trackedUdi2},
-                    new() {Culture = "en-US", Segment = "A", EditedValue = trackedUdi3},
+                    new() { EditedValue = trackedUdi1 },
+                    new() { Culture = "en-US", EditedValue = trackedUdi2 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3 },
 
                     // Ignored (no culture)
-                    new() {Segment = "A", EditedValue = trackedUdi4},
+                    new() { Segment = "A", EditedValue = trackedUdi4 },
 
                     // Duplicate
-                    new() {Culture = "en-US", Segment = "B", EditedValue = trackedUdi3}
-                }
+                    new() { Culture = "en-US", Segment = "B", EditedValue = trackedUdi3 },
+                },
             };
         var properties = new PropertyCollection { property };
-        var result = collection.GetAllReferences(properties, propertyEditors);
+        var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
@@ -100,25 +104,25 @@ public class DataValueReferenceFactoryCollectionTests
             new Property(
                 new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
                 {
-                    Variations = ContentVariation.CultureAndSegment
+                    Variations = ContentVariation.CultureAndSegment,
                 })
             {
                 Values = new List<PropertyValue>
                 {
                     // Ignored (no culture)
-                    new() {EditedValue = trackedUdi1},
-                    new() {Culture = "en-US", EditedValue = trackedUdi2},
-                    new() {Culture = "en-US", Segment = "A", EditedValue = trackedUdi3},
+                    new() { EditedValue = trackedUdi1 },
+                    new() { Culture = "en-US", EditedValue = trackedUdi2 },
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3 },
 
                     // Ignored (no culture)
-                    new() {Segment = "A", EditedValue = trackedUdi4},
+                    new() { Segment = "A", EditedValue = trackedUdi4 },
 
                     // Duplicate
-                    new() {Culture = "en-US", Segment = "B", EditedValue = trackedUdi3}
-                }
+                    new() { Culture = "en-US", Segment = "B", EditedValue = trackedUdi3 },
+                },
             };
         var properties = new PropertyCollection { property };
-        var result = collection.GetAllReferences(properties, propertyEditors);
+        var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual(trackedUdi2, result.ElementAt(0).Udi.ToString());
@@ -144,26 +148,26 @@ public class DataValueReferenceFactoryCollectionTests
         var property =
             new Property(new PropertyType(ShortStringHelper, new DataType(mediaPicker, serializer))
             {
-                Variations = ContentVariation.Nothing | ContentVariation.Segment
+                Variations = ContentVariation.Nothing | ContentVariation.Segment,
             })
             {
                 Values = new List<PropertyValue>
                 {
-                    new() {EditedValue = trackedUdi1},
+                    new() { EditedValue = trackedUdi1 },
 
                     // Ignored (has culture)
-                    new() {Culture = "en-US", EditedValue = trackedUdi2},
+                    new() { Culture = "en-US", EditedValue = trackedUdi2 },
 
                     // Ignored (has culture)
-                    new() {Culture = "en-US", Segment = "A", EditedValue = trackedUdi3},
-                    new() {Segment = "A", EditedValue = trackedUdi4},
+                    new() { Culture = "en-US", Segment = "A", EditedValue = trackedUdi3 },
+                    new() { Segment = "A", EditedValue = trackedUdi4 },
 
                     // Duplicate
-                    new() {Segment = "B", EditedValue = trackedUdi4}
-                }
+                    new() { Segment = "B", EditedValue = trackedUdi4 },
+                },
             };
         var properties = new PropertyCollection { property };
-        var result = collection.GetAllReferences(properties, propertyEditors);
+        var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
 
         Assert.AreEqual(2, result.Count());
         Assert.AreEqual(trackedUdi1, result.ElementAt(0).Udi.ToString());

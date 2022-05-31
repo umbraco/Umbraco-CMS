@@ -35,7 +35,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent);
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _);
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -62,7 +62,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.NotFound, result);
@@ -91,7 +91,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -118,7 +118,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -145,7 +145,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
+        var result = contentPermissions.CheckPermissions(1234, user, out IContent _, new[] { 'F' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -207,7 +207,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent);
+        var result = contentPermissions.CheckPermissions(-20, user, out IContent _);
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -230,7 +230,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent);
+        var result = contentPermissions.CheckPermissions(-1, user, out IContent _);
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -254,7 +254,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'A' });
+        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { 'A' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -278,7 +278,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'B' });
+        var result = contentPermissions.CheckPermissions(-1, user, out IContent _, new[] { 'B' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);
@@ -303,7 +303,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'A' });
+        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { 'A' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Granted, result);
@@ -327,7 +327,7 @@ public class ContentPermissionsTests
         var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
         // Act
-        var result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'B' });
+        var result = contentPermissions.CheckPermissions(-20, user, out IContent _, new[] { 'B' });
 
         // Assert
         Assert.AreEqual(ContentPermissions.ContentAccess.Denied, result);

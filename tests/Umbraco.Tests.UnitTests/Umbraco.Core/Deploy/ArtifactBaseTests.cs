@@ -52,7 +52,8 @@ public class ArtifactBaseTests
 
     private class TestArtifact : ArtifactBase<GuidUdi>
     {
-        public TestArtifact(GuidUdi udi, IEnumerable<ArtifactDependency> dependencies = null) : base(udi, dependencies)
+        public TestArtifact(GuidUdi udi, IEnumerable<ArtifactDependency> dependencies = null)
+            : base(udi, dependencies)
         {
         }
 

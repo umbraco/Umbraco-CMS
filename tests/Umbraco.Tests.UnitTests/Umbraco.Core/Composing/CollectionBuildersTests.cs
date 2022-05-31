@@ -452,8 +452,7 @@ public class CollectionBuildersTests
         }
     }
 
-    private static void AssertSameCollection(IServiceProvider factory, IEnumerable<Resolved> col1,
-        IEnumerable<Resolved> col2)
+    private static void AssertSameCollection(IServiceProvider factory, IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
     {
         Assert.AreSame(col1, col2);
 
@@ -548,7 +547,8 @@ public class CollectionBuildersTests
     // ReSharper disable once ClassNeverInstantiated.Local
     private class TestCollection : BuilderCollectionBase<Resolved>
     {
-        public TestCollection(Func<IEnumerable<Resolved>> items) : base(items)
+        public TestCollection(Func<IEnumerable<Resolved>> items)
+            : base(items)
         {
         }
     }

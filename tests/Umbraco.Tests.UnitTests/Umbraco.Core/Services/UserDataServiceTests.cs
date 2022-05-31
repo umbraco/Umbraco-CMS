@@ -120,8 +120,10 @@ public class UserDataServiceTests
         Assert.AreEqual(isDebug.ToString(), actual.Data);
     }
 
-    private SystemInformationTelemetryProvider CreateUserDataService(string culture = "",
-        ModelsMode modelsMode = ModelsMode.InMemoryAuto, bool isDebug = true)
+    private SystemInformationTelemetryProvider CreateUserDataService(
+        string culture = "",
+        ModelsMode modelsMode = ModelsMode.InMemoryAuto,
+        bool isDebug = true)
     {
         var localizationService = CreateILocalizationService(culture);
 

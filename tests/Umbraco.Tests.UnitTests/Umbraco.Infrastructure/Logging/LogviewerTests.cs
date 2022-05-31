@@ -103,7 +103,7 @@ public class LogviewerTests
     [Test]
     public void Logs_Contains_Correct_Message_Templates()
     {
-        var templates = _logViewer.GetMessageTemplates(_logTimePeriod);
+        var templates = _logViewer.GetMessageTemplates(_logTimePeriod).ToArray();
 
         // Count no of templates
         Assert.AreEqual(25, templates.Count());
@@ -178,7 +178,10 @@ public class LogviewerTests
 
         // Query @Level='Warning' BUT we pass in array of LogLevels for Debug & Info (Expect to get 0 results)
         string[] logLevelMismatch = { "Debug", "Information" };
-        var filterLevelQuery = _logViewer.GetLogs(_logTimePeriod, 1, filterExpression: "@Level='Warning'",
+        var filterLevelQuery = _logViewer.GetLogs(
+            _logTimePeriod,
+            1,
+            filterExpression: "@Level='Warning'",
             logLevels: logLevelMismatch);
         Assert.AreEqual(0, filterLevelQuery.TotalItems);
     }
@@ -209,8 +212,6 @@ public class LogviewerTests
 
         var searches = _logViewer.GetSavedSearches();
 
-        var savedSearch = new SavedLogSearch { Name = "Unit Test Example", Query = "Has(UnitTest)" };
-
         // Check if we can find the newly added item from the results we get back
         var findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");
 
@@ -237,8 +238,8 @@ internal class TestLogViewerQueryRepository : ILogViewerQueryRepository
             .Select(LogViewerQueryModelFactory.BuildEntity));
 
     private IList<ILogViewerQuery> Store { get; }
-    private LogViewerQueryRepository.LogViewerQueryModelFactory LogViewerQueryModelFactory { get; } = new();
 
+    private LogViewerQueryRepository.LogViewerQueryModelFactory LogViewerQueryModelFactory { get; } = new();
 
     public ILogViewerQuery Get(int id) => Store.FirstOrDefault(x => x.Id == id);
 

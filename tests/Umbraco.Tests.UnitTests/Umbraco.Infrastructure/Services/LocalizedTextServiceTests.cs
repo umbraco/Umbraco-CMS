@@ -32,15 +32,16 @@ public class LocalizedTextServiceTests
                         {
                             {
                                 "testArea1",
-                                new Dictionary<string, string> {{"testKey1", "testValue1"}, {"testKey2", "testValue2"}}
+                                new Dictionary<string, string> { { "testKey1", "testValue1" }, { "testKey2", "testValue2" } }
                             },
                             {
                                 "testArea2",
-                                new Dictionary<string, string> {{"blah1", "blahValue1"}, {"blah2", "blahValue2"}}
-                            }
+                                new Dictionary<string, string> { { "blah1", "blahValue1" }, { "blah2", "blahValue2" } }
+                            },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.GetAllStoredValues(culture);
 
@@ -66,14 +67,19 @@ public class LocalizedTextServiceTests
                     culture, new Lazy<XDocument>(() => new XDocument(
                         new XElement(
                             "language",
-                            new XElement("area", new XAttribute("alias", "testArea1"),
+                            new XElement(
+                                "area",
+                                new XAttribute("alias", "testArea1"),
                                 new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
                                 new XElement("key", new XAttribute("alias", "testKey2"), "testValue2")),
-                            new XElement("area", new XAttribute("alias", "testArea2"),
+                            new XElement(
+                                "area",
+                                new XAttribute("alias", "testArea2"),
                                 new XElement("key", new XAttribute("alias", "blah1"), "blahValue1"),
                                 new XElement("key", new XAttribute("alias", "blah2"), "blahValue2")))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.GetAllStoredValues(culture);
 
@@ -99,11 +105,14 @@ public class LocalizedTextServiceTests
                     culture, new Lazy<XDocument>(() => new XDocument(
                         new XElement(
                             "language",
-                            new XElement("area", new XAttribute("alias", "testArea1"),
+                            new XElement(
+                                "area",
+                                new XAttribute("alias", "testArea1"),
                                 new XElement("key", new XAttribute("alias", "testKey1"), "testValue1"),
                                 new XElement("key", new XAttribute("alias", "testKey1"), "testValue1")))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.GetAllStoredValues(culture);
 
@@ -122,10 +131,11 @@ public class LocalizedTextServiceTests
                     new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
                         new Dictionary<string, IDictionary<string, string>>
                         {
-                            {"testArea", new Dictionary<string, string> {{"testKey", "testValue"}}}
+                            { "testArea", new Dictionary<string, string> { { "testKey", "testValue" } } },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testArea/testKey", culture);
 
@@ -144,10 +154,11 @@ public class LocalizedTextServiceTests
                     new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
                         new Dictionary<string, IDictionary<string, string>>
                         {
-                            {"testArea", new Dictionary<string, string> {{"testKey", "testValue"}}}
+                            { "testArea", new Dictionary<string, string> { { "testKey", "testValue" } } },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testKey", culture);
 
@@ -166,10 +177,11 @@ public class LocalizedTextServiceTests
                     new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
                         new Dictionary<string, IDictionary<string, string>>
                         {
-                            {"testArea", new Dictionary<string, string> {{"testKey", "testValue"}}}
+                            { "testArea", new Dictionary<string, string> { { "testKey", "testValue" } } },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testArea/doNotFind", culture);
 
@@ -189,10 +201,11 @@ public class LocalizedTextServiceTests
                     new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
                         new Dictionary<string, IDictionary<string, string>>
                         {
-                            {"testArea", new Dictionary<string, string> {{"testKey", "testValue"}}}
+                            { "testArea", new Dictionary<string, string> { { "testKey", "testValue" } } },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("doNotFind", culture);
 
@@ -213,11 +226,12 @@ public class LocalizedTextServiceTests
                         {
                             {
                                 "testArea",
-                                new Dictionary<string, string> {{"testKey", "Hello %0%, you are such a %1% %2%"}}
-                            }
+                                new Dictionary<string, string> { { "testKey", "Hello %0%, you are such a %1% %2%" } }
+                            },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize(
             "testKey",
@@ -236,11 +250,10 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"),
-                                "testValue"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement("area", new XAttribute("alias", "testArea"), new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testArea/testKey", culture);
 
@@ -256,11 +269,10 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"),
-                                "testValue"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement("area", new XAttribute("alias", "testArea"), new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testKey", culture);
 
@@ -276,11 +288,10 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"),
-                                "testValue"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement("area", new XAttribute("alias", "testArea"), new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("testArea/doNotFind", culture);
 
@@ -297,11 +308,10 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"),
-                                "testValue"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement("area", new XAttribute("alias", "testArea"), new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         var result = txtService.Localize("doNotFind", culture);
 
@@ -317,14 +327,15 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"),
-                                "Hello %0%, you are such a %1% %2%"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement(
+                            "area",
+                            new XAttribute("alias", "testArea"),
+                            new XElement("key", new XAttribute("alias", "testKey"), "Hello %0%, you are such a %1% %2%"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
-        var result = txtService.Localize("testKey", culture,
-            new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
+        var result = txtService.Localize("testKey", culture, new Dictionary<string, string> { { "0", "world" }, { "1", "great" }, { "2", "planet" } });
 
         Assert.AreEqual("Hello world, you are such a great planet", result);
     }
@@ -341,10 +352,11 @@ public class LocalizedTextServiceTests
                     new Lazy<IDictionary<string, IDictionary<string, string>>>(() =>
                         new Dictionary<string, IDictionary<string, string>>
                         {
-                            {"testArea", new Dictionary<string, string> {{"testKey", "testValue"}}}
+                            { "testArea", new Dictionary<string, string> { { "testKey", "testValue" } } },
                         })
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
     }
@@ -358,10 +370,10 @@ public class LocalizedTextServiceTests
             {
                 {
                     culture, new Lazy<XDocument>(() => new XDocument(
-                        new XElement("area", new XAttribute("alias", "testArea"),
-                            new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
-                }
-            }, s_loggerFactory.CreateLogger<LocalizedTextService>());
+                        new XElement("area", new XAttribute("alias", "testArea"), new XElement("key", new XAttribute("alias", "testKey"), "testValue"))))
+                },
+            },
+            s_loggerFactory.CreateLogger<LocalizedTextService>());
 
         Assert.AreEqual("[testKey]", txtService.Localize("testArea/testKey", CultureInfo.GetCultureInfo("en-AU")));
     }

@@ -33,7 +33,7 @@ public class ContentModelSerializationTests
                     Config = new Dictionary<string, object> { { propertyIndex.ToInvariantString(), "value" } },
                     Description = "Description " + propertyIndex,
                     View = "~/Views/View" + propertyIndex,
-                    HideLabel = false
+                    HideLabel = false,
                 });
             }
 
@@ -41,14 +41,14 @@ public class ContentModelSerializationTests
             {
                 Alias = "Tab" + tabIndex,
                 Label = "Tab" + tabIndex,
-                Properties = props
+                Properties = props,
             });
         }
 
         var displayModel = new ContentItemDisplay
         {
             Id = 1234,
-            Variants = new List<ContentVariantDisplay> { new() { Name = "Test", Tabs = tabs } }
+            Variants = new List<ContentVariantDisplay> { new() { Name = "Test", Tabs = tabs } },
         };
 
         var json = JsonConvert.SerializeObject(displayModel);
@@ -71,8 +71,7 @@ public class ContentModelSerializationTests
                 Assert.AreEqual("Property " + prop, jsonTabs[tab]["properties"][prop]["label"].ToString());
                 Assert.AreEqual(prop, jsonTabs[tab]["properties"][prop]["id"].Value<int>());
                 Assert.AreEqual("value" + prop, jsonTabs[tab]["properties"][prop]["value"].ToString());
-                Assert.AreEqual("{\"" + prop + "\":\"value\"}",
-                    jsonTabs[tab]["properties"][prop]["config"].ToString(Formatting.None));
+                Assert.AreEqual("{\"" + prop + "\":\"value\"}", jsonTabs[tab]["properties"][prop]["config"].ToString(Formatting.None));
                 Assert.AreEqual("Description " + prop, jsonTabs[tab]["properties"][prop]["description"].ToString());
                 Assert.AreEqual(false, jsonTabs[tab]["properties"][prop]["hideLabel"].Value<bool>());
             }

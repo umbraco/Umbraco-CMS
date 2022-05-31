@@ -27,7 +27,8 @@ public class RenamedRootNavigatorTests
             EnsureNativeLineEndings(@"<root foo=""bar"">
   <a></a>
   <b x=""1""></b>
-</root>"), xml);
+</root>"),
+            xml);
     }
 
     [Test]
@@ -44,7 +45,8 @@ public class RenamedRootNavigatorTests
             EnsureNativeLineEndings(@"<xx:root foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
-</xx:root>"), xml);
+</xx:root>"),
+            xml);
     }
 
     [Test]
@@ -61,7 +63,8 @@ public class RenamedRootNavigatorTests
             EnsureNativeLineEndings(@"<test foo=""bar"">
   <a></a>
   <b x=""1""></b>
-</test>"), xml);
+</test>"),
+            xml);
     }
 
     private string EnsureNativeLineEndings(string text)
@@ -84,7 +87,8 @@ public class RenamedRootNavigatorTests
             EnsureNativeLineEndings(@"<xx:test foo=""bar"" xmlns:xx=""uri"">
   <a></a>
   <b x=""1""></b>
-</xx:test>"), xml);
+</xx:test>"),
+            xml);
     }
 
     [Test]

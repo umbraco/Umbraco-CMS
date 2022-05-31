@@ -54,8 +54,12 @@ public class PathValidationTests
             .Build();
 
         // no id assigned
-        Assert.Throws<InvalidOperationException>(() => entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(),
-            umbracoEntity => new EntitySlim(), umbracoEntity => { }));
+        Assert.Throws<InvalidOperationException>(() => entity.EnsureValidPath(
+            Mock.Of<ILogger<EntitySlim>>(),
+            umbracoEntity => new EntitySlim(),
+            umbracoEntity =>
+            {
+            }));
     }
 
     [Test]
@@ -92,7 +96,8 @@ public class PathValidationTests
             .WithParentId(888)
             .Build();
 
-        entity.EnsureValidPath(Mock.Of<ILogger<EntitySlim>>(),
+        entity.EnsureValidPath(
+            Mock.Of<ILogger<EntitySlim>>(),
             umbracoEntity => umbracoEntity.ParentId == 888 ? new EntitySlim { Id = 888, Path = "-1,888" } : null,
             umbracoEntity => { });
 

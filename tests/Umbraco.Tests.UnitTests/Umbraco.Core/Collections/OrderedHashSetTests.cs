@@ -28,7 +28,7 @@ public class OrderedHashSetTests
     [Test]
     public void Keeps_First()
     {
-        var list = new OrderedHashSet<MyClass>(true);
+        var list = new OrderedHashSet<MyClass>();
         MyClass[] items = { new MyClass("test"), new MyClass("test"), new MyClass("test") };
         foreach (var item in items)
         {

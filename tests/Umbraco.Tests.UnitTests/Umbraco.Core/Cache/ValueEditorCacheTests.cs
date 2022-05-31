@@ -79,18 +79,13 @@ public class ValueEditorCacheTests
         sut.ClearCache(new[] { dataType1.Id });
 
         // New value editor objects should be created after it's cleared
-        Assert.AreNotSame(editor1DataType1, sut.GetValueEditor(dataEditor1, dataType1),
-            "Value editor was not cleared from cache");
-        Assert.AreNotSame(editor2DataType1, sut.GetValueEditor(dataEditor2, dataType1),
-            "Value editor was not cleared from cache");
+        Assert.AreNotSame(editor1DataType1, sut.GetValueEditor(dataEditor1, dataType1), "Value editor was not cleared from cache");
+        Assert.AreNotSame(editor2DataType1, sut.GetValueEditor(dataEditor2, dataType1), "Value editor was not cleared from cache");
 
         // But the value editors for data type 2 should be the same
-        Assert.AreSame(editor1Datatype2, sut.GetValueEditor(dataEditor1, dataType2),
-            "Too many editors was cleared from cache");
-        Assert.AreSame(editor2Datatype2, sut.GetValueEditor(dataEditor2, dataType2),
-            "Too many editors was cleared from cache");
+        Assert.AreSame(editor1Datatype2, sut.GetValueEditor(dataEditor1, dataType2), "Too many editors was cleared from cache");
+        Assert.AreSame(editor2Datatype2, sut.GetValueEditor(dataEditor2, dataType2), "Too many editors was cleared from cache");
     }
-
 
     private Mock<IDataType> CreateDataTypeMock(int id)
     {
@@ -112,10 +107,15 @@ public class ValueEditorCacheTests
         public FakeDataEditor(string alias) => Alias = alias;
 
         public string Alias { get; }
+
         public EditorType Type { get; }
+
         public string Name { get; }
+
         public string Icon { get; }
+
         public string Group { get; }
+
         public bool IsDeprecated { get; }
 
         public IDataValueEditor GetValueEditor()
@@ -127,6 +127,7 @@ public class ValueEditorCacheTests
         public IDataValueEditor GetValueEditor(object configuration) => GetValueEditor();
 
         public IDictionary<string, object> DefaultConfiguration { get; }
+
         public IConfigurationEditor GetConfigurationEditor() => throw new NotImplementedException();
 
         public IPropertyIndexValueFactory PropertyIndexValueFactory { get; }

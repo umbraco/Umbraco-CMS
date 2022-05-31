@@ -22,8 +22,10 @@ public class NPocoSqlTemplateTests
     [Test]
     public void SqlTemplates()
     {
-        var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-            DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
+        var sqlContext = new SqlContext(
+            new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
+            DatabaseType.SqlServer2012,
+            Mock.Of<IPocoDataFactory>());
         var sqlTemplates = new SqlTemplates(sqlContext);
 
         // this can be used for queries that we know we'll use a *lot* and
@@ -45,11 +47,14 @@ public class NPocoSqlTemplateTests
     public void SqlTemplateArgs()
     {
         var mappers = new MapperCollection { new NullableDateMapper() };
-        var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(),
+        var factory = new FluentPocoDataFactory(
+            (type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(),
             mappers);
 
-        var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
-            DatabaseType.SQLCe, factory);
+        var sqlContext = new SqlContext(
+            new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
+            DatabaseType.SQLCe,
+            factory);
         var sqlTemplates = new SqlTemplates(sqlContext);
 
         const string sqlBase = "SELECT [zbThing1].[id] AS [Id], [zbThing1].[name] AS [Name] FROM [zbThing1] WHERE ";
@@ -212,8 +217,10 @@ public class NPocoSqlTemplateTests
     [ExplicitColumns]
     public class Thing1Dto
     {
-        [Column("id")] public int Id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
-        [Column("name")] public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
     }
 }

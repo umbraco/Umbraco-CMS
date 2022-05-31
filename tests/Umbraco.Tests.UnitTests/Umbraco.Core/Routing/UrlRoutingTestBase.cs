@@ -30,28 +30,27 @@ public abstract class UrlRoutingTestBase : PublishedSnapshotServiceTestBase
     }
 
     // Sets up the mock domain service
-    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes,
-        IDataType[] dataTypes)
+    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
     {
         var serviceContext = base.CreateServiceContext(contentTypes, mediaTypes, dataTypes);
 
-        //setup mock domain service
+        // setup mock domain service
         var domainService = Mock.Get(serviceContext.DomainService);
         domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
             .Returns((bool incWildcards) => new[]
             {
                 new UmbracoDomain("domain1.com/")
                 {
-                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"
+                    Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE",
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
-                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"
+                    Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US",
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
-                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"
-                }
+                    Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR",
+                },
             });
 
         return serviceContext;

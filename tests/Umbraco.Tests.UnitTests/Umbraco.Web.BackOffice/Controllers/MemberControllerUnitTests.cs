@@ -58,7 +58,8 @@ public class MemberControllerUnitTests
         var exception = Assert.ThrowsAsync<ArgumentNullException>(() => sut.PostSave(null));
 
         // assert
-        Assert.That(exception.Message,
+        Assert.That(
+            exception.Message,
             Is.EqualTo("Value cannot be null. (Parameter 'The member content item was null')"));
     }
 
@@ -76,9 +77,16 @@ public class MemberControllerUnitTests
         IUser user)
     {
         // arrange
-        var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
         sut.ModelState.AddModelError("key", "Invalid model state");
 
         Mock.Get(umbracoMembersUserManager)
@@ -87,8 +95,6 @@ public class MemberControllerUnitTests
         Mock.Get(umbracoMembersUserManager)
             .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
             .ReturnsAsync(() => IdentityResult.Success);
-
-        var value = new MemberDisplay();
 
         // act
         var result = sut.PostSave(fakeMemberData).Result;
@@ -133,8 +139,15 @@ public class MemberControllerUnitTests
             .Returns(() => member);
         Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
 
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -178,8 +191,15 @@ public class MemberControllerUnitTests
             .Returns(() => member);
         Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
 
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -189,7 +209,6 @@ public class MemberControllerUnitTests
         Assert.IsNotNull(result.Value);
         AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
     }
-
 
     [Test]
     [AutoMoqData]
@@ -234,9 +253,15 @@ public class MemberControllerUnitTests
             .Returns(() => null)
             .Returns(() => member);
 
-
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -262,7 +287,7 @@ public class MemberControllerUnitTests
         IUser user)
     {
         // arrange
-        var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.Save);
+        var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.Save);
         var membersIdentityUser = new MemberIdentityUser(123);
         Mock.Get(umbracoMembersUserManager)
             .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
@@ -286,9 +311,15 @@ public class MemberControllerUnitTests
             .Returns(() => null)
             .Returns(() => member);
 
-
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -298,23 +329,25 @@ public class MemberControllerUnitTests
         Assert.IsNull(result.Value);
     }
 
-    private static void SetupUserAccess(IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IBackOfficeSecurity backOfficeSecurity, IUser user)
+    private static void SetupUserAccess(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IBackOfficeSecurity backOfficeSecurity, IUser user)
     {
         Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
         Mock.Get(user).Setup(x => x.AllowedSections).Returns(new[] { "member" });
         Mock.Get(backOfficeSecurity).Setup(x => x.CurrentUser).Returns(user);
     }
 
-    private static void SetupPasswordSuccess(IMemberManager umbracoMembersUserManager,
-        IPasswordChanger<MemberIdentityUser> passwordChanger, bool successful = true)
+    private static void SetupPasswordSuccess(
+        IMemberManager umbracoMembersUserManager,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
+        bool successful = true)
     {
         var passwordChanged = new PasswordChangedModel { ChangeError = null, ResetPassword = null };
         if (!successful)
         {
             var attempt = Attempt.Fail(passwordChanged);
             Mock.Get(passwordChanger)
-                .Setup(x => x.ChangePasswordWithIdentityAsync(It.IsAny<ChangingPasswordModel>(),
+                .Setup(x => x.ChangePasswordWithIdentityAsync(
+                    It.IsAny<ChangingPasswordModel>(),
                     umbracoMembersUserManager))
                 .ReturnsAsync(() => attempt);
         }
@@ -322,7 +355,8 @@ public class MemberControllerUnitTests
         {
             var attempt = Attempt.Succeed(passwordChanged);
             Mock.Get(passwordChanger)
-                .Setup(x => x.ChangePasswordWithIdentityAsync(It.IsAny<ChangingPasswordModel>(),
+                .Setup(x => x.ChangePasswordWithIdentityAsync(
+                    It.IsAny<ChangingPasswordModel>(),
                     umbracoMembersUserManager))
                 .ReturnsAsync(() => attempt);
         }
@@ -343,7 +377,7 @@ public class MemberControllerUnitTests
         IUser user)
     {
         // arrange
-        var member = SetupMemberTestData(out var fakeMemberData, out var memberDisplay, ContentSaveAction.SaveNew);
+        var member = SetupMemberTestData(out var fakeMemberData, out _, ContentSaveAction.SaveNew);
         Mock.Get(umbracoMembersUserManager)
             .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>()))
             .ReturnsAsync(() => IdentityResult.Success);
@@ -360,8 +394,15 @@ public class MemberControllerUnitTests
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => member);
 
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = sut.PostSave(fakeMemberData).Result;
@@ -420,8 +461,15 @@ public class MemberControllerUnitTests
                 x => x.GetByEmail(It.IsAny<string>()))
             .Returns(() => null)
             .Returns(() => member);
-        var sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager,
-            dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
+        var sut = CreateSut(
+            memberService,
+            memberTypeService,
+            memberGroupService,
+            umbracoMembersUserManager,
+            dataTypeService,
+            backOfficeSecurityAccessor,
+            passwordChanger,
+            globalSettings);
 
         // act
         var result = await sut.PostSave(fakeMemberData);
@@ -449,7 +497,8 @@ public class MemberControllerUnitTests
     /// <param name="membersUserManager">Members user manager</param>
     /// <param name="dataTypeService">Data type service</param>
     /// <param name="backOfficeSecurityAccessor">Back office security accessor</param>
-    /// <param name="mockPasswordChanger">Password changer class</param>
+    /// <param name="passwordChanger">Password changer class</param>
+    /// <param name="globalSettings">The global settings</param>
     /// <returns>A member controller for the tests</returns>
     private MemberController CreateSut(
         IMemberService memberService,
@@ -459,8 +508,7 @@ public class MemberControllerUnitTests
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IPasswordChanger<MemberIdentityUser> passwordChanger,
-        IOptions<GlobalSettings> globalSettings,
-        IUser user)
+        IOptions<GlobalSettings> globalSettings)
     {
         var httpContextAccessor = new HttpContextAccessor();
 
@@ -491,7 +539,10 @@ public class MemberControllerUnitTests
                  && x.Alias == Constants.PropertyEditors.Aliases.Label);
         Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(
             new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),
-            textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>()));
+            textService.Object,
+            Mock.Of<IShortStringHelper>(),
+            Mock.Of<IJsonSerializer>(),
+            Mock.Of<IIOHelper>()));
 
         var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
@@ -525,7 +576,7 @@ public class MemberControllerUnitTests
                 mockShortStringHelper,
                 globalSettings,
                 new Mock<IHostingEnvironment>().Object,
-                new Mock<IOptionsMonitor<ContentSettings>>().Object)
+                new Mock<IOptionsMonitor<ContentSettings>>().Object),
         });
         var scopeProvider = Mock.Of<ICoreScopeProvider>(x => x.CreateCoreScope(
             It.IsAny<IsolationLevel>(),
@@ -556,8 +607,7 @@ public class MemberControllerUnitTests
             backOfficeSecurityAccessor,
             new ConfigurationEditorJsonSerializer(),
             passwordChanger,
-            scopeProvider
-        );
+            scopeProvider);
     }
 
     /// <summary>
@@ -588,11 +638,12 @@ public class MemberControllerUnitTests
             PersistedContent = member,
             PropertyCollectionDto = new ContentPropertyCollectionDto(),
             Groups = new List<string>(),
-            //Alias = "fakeAlias",
+
+            // Alias = "fakeAlias",
             ContentTypeAlias = member.ContentTypeAlias,
             Action = contentAction,
             Icon = "icon-document",
-            Path = member.Path
+            Path = member.Path,
         };
 
         memberDisplay = new MemberDisplay
@@ -604,7 +655,8 @@ public class MemberControllerUnitTests
             Name = member.Name,
             Email = member.Email,
             Username = member.Username,
-            //Alias = "fakeAlias",
+
+            // Alias = "fakeAlias",
             ContentTypeAlias = member.ContentTypeAlias,
             ContentType = new ContentTypeBasic(),
             ContentTypeName = member.ContentType.Name,
@@ -618,51 +670,51 @@ public class MemberControllerUnitTests
                     Id = 77,
                     Properties = new List<ContentPropertyDisplay>
                     {
-                        new() {Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login"},
-                        new() {Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email"},
+                        new() { Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login" },
+                        new() { Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email" },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}failedPasswordAttempts",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}approved",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lockedOut",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLockoutDate",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate"
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastLoginDate",
                         },
                         new()
                         {
                             Alias =
-                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate"
-                        }
-                    }
-                }
-            }
+                                $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}lastPasswordChangeDate",
+                        },
+                    },
+                },
+            },
         };
 
         return member;
@@ -695,18 +747,20 @@ public class MemberControllerUnitTests
         Assert.AreEqual(memberDisplay.Trashed, resultValue.Trashed);
         Assert.AreEqual(memberDisplay.TreeNodeUrl, resultValue.TreeNodeUrl);
 
-        //TODO: can we check create/update dates when saving?
-        //Assert.AreEqual(memberDisplay.CreateDate, resultValue.CreateDate);
-        //Assert.AreEqual(memberDisplay.UpdateDate, resultValue.UpdateDate);
+        // TODO: can we check create/update dates when saving?
+        // Assert.AreEqual(memberDisplay.CreateDate, resultValue.CreateDate);
+        // Assert.AreEqual(memberDisplay.UpdateDate, resultValue.UpdateDate);
 
-        //TODO: check all properties
+        // TODO: check all properties
         Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
         Assert.AreNotSame(memberDisplay.Properties, resultValue.Properties);
         for (var index = 0; index < resultValue.Properties.Count(); index++)
         {
-            Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index),
+            Assert.AreNotSame(
+                memberDisplay.Properties.GetItemByIndex(index),
                 resultValue.Properties.GetItemByIndex(index));
-            //Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+
+            // Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
         }
     }
 }

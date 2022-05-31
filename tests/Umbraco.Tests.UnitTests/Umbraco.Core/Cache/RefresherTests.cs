@@ -17,7 +17,7 @@ public class RefresherTests
     {
         MediaCacheRefresher.JsonPayload[] source =
         {
-            new MediaCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None)
+            new MediaCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None),
         };
         var json = JsonConvert.SerializeObject(source);
         var payload = JsonConvert.DeserializeObject<MediaCacheRefresher.JsonPayload[]>(json);
@@ -31,7 +31,7 @@ public class RefresherTests
     {
         ContentCacheRefresher.JsonPayload[] source =
         {
-            new ContentCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None)
+            new ContentCacheRefresher.JsonPayload(1234, Guid.NewGuid(), TreeChangeTypes.None),
         };
         var json = JsonConvert.SerializeObject(source);
         var payload = JsonConvert.DeserializeObject<ContentCacheRefresher.JsonPayload[]>(json);
@@ -45,7 +45,7 @@ public class RefresherTests
     {
         ContentTypeCacheRefresher.JsonPayload[] source =
         {
-            new ContentTypeCacheRefresher.JsonPayload("xxx", 1234, ContentTypeChangeTypes.None)
+            new ContentTypeCacheRefresher.JsonPayload("xxx", 1234, ContentTypeChangeTypes.None),
         };
         var json = JsonConvert.SerializeObject(source);
         var payload = JsonConvert.DeserializeObject<ContentTypeCacheRefresher.JsonPayload[]>(json);
@@ -59,7 +59,7 @@ public class RefresherTests
     {
         DataTypeCacheRefresher.JsonPayload[] source =
         {
-            new DataTypeCacheRefresher.JsonPayload(1234, Guid.NewGuid(), true)
+            new DataTypeCacheRefresher.JsonPayload(1234, Guid.NewGuid(), true),
         };
         var json = JsonConvert.SerializeObject(source);
         var payload = JsonConvert.DeserializeObject<DataTypeCacheRefresher.JsonPayload[]>(json);

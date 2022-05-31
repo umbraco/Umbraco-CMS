@@ -269,7 +269,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
     public void Get_Property_Value_Recursive()
     {
         // TODO: We need to use a different fallback?
-
         var doc = GetContent(1174);
         var rVal = doc.Value(PublishedValueFallback, "testRecursive", fallback: Fallback.ToAncestors);
         var nullVal = doc.Value(PublishedValueFallback, "DoNotFindThis", fallback: Fallback.ToAncestors);
@@ -304,8 +303,7 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
             .Single()
             .Descendants(Mock.Of<IVariationContextAccessor>())
             .FirstOrDefault(x =>
-                x.Value(PublishedValueFallback, "selectedNodes", fallback: Fallback.ToDefaultValue, defaultValue: "")
-                    .Split(',').Contains("1173"));
+                x.Value(PublishedValueFallback, "selectedNodes", fallback: Fallback.ToDefaultValue, defaultValue: string.Empty).Split(',').Contains("1173"));
 
         Assert.IsNotNull(result);
     }
@@ -313,15 +311,14 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
     [Test]
     public void Children_GroupBy_DocumentTypeAlias()
     {
-        //var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
-        //var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
-        //var contentTypes = new Dictionary<string, PublishedContentType>
-        //{
+        // var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
+        // var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
+        // var contentTypes = new Dictionary<string, PublishedContentType>
+        // {
         //    { home.Alias, home },
         //    { custom.Alias, custom }
-        //};
-        //ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
-
+        // };
+        // ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
         var doc = GetContent(1046);
 
         var found1 = doc.Children(VariationContextAccessor).GroupBy(x => x.ContentType.Alias).ToArray();
@@ -334,15 +331,14 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
     [Test]
     public void Children_Where_DocumentTypeAlias()
     {
-        //var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
-        //var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
-        //var contentTypes = new Dictionary<string, PublishedContentType>
-        //{
-        //    { home.Alias, home },
-        //    { custom.Alias, custom }
-        //};
-        //ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
-
+        // var home = new AutoPublishedContentType(Guid.NewGuid(), 22, "Home", new PublishedPropertyType[] { });
+        // var custom = new AutoPublishedContentType(Guid.NewGuid(), 23, "CustomDocument", new PublishedPropertyType[] { });
+        // var contentTypes = new Dictionary<string, PublishedContentType>
+        // {
+        //     { home.Alias, home },
+        //     { custom.Alias, custom }
+        // };
+        // ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
         var doc = GetContent(1046);
 
         var found1 = doc.Children(VariationContextAccessor).Where(x => x.ContentType.Alias == "CustomDocument");
@@ -506,7 +502,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // --- Custom Doc2: 1179 (parent: 1178)
         // -- Custom Doc4: 117 (parent 1173)
         // - Custom Doc3: 1172 (no parent)
-
         var home = GetContent(1173);
         var root = GetContent(1046);
         var customDoc = GetContent(1178);
@@ -555,7 +550,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // --- Custom Doc2: 1179 (parent: 1178)
         // -- Custom Doc4: 117 (parent 1173)
         // - Custom Doc3: 1172 (no parent)
-
         var home = GetContent(1173);
         var root = GetContent(1046);
         var customDoc = GetContent(1178);
@@ -595,7 +589,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         Assert.IsTrue(customDoc3.IsAncestorOrSelf(customDoc3));
     }
 
-
     [Test]
     public void Descendants_Or_Self()
     {
@@ -632,7 +625,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // --- Custom Doc2: 1179 (parent: 1178)
         // -- Custom Doc4: 117 (parent 1173)
         // - Custom Doc3: 1172 (no parent)
-
         var home = GetContent(1173);
         var root = GetContent(1046);
         var customDoc = GetContent(1178);
@@ -681,7 +673,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // --- Custom Doc2: 1179 (parent: 1178)
         // -- Custom Doc4: 117 (parent 1173)
         // - Custom Doc3: 1172 (no parent)
-
         var home = GetContent(1173);
         var root = GetContent(1046);
         var customDoc = GetContent(1178);
@@ -735,7 +726,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // -- Level1.2: 1175 (parent 1046)
         // -- Level1.3: 4444 (parent 1046)
         // - Root : 1172 (no parent)
-
         var root = GetContent(1046);
         var level1_1 = GetContent(1173);
         var level1_1_1 = GetContent(1174);
@@ -749,26 +739,17 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         var publishedSnapshot = GetPublishedSnapshot();
 
-        CollectionAssertAreEqual(new[] { root, root2 },
-            root.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { root, root2 }, root.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
-            level1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
-            level1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 },
-            level1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 }, level1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 }, level1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1, level1_2, level1_3 }, level1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_4.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_5.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_1.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_2.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_3.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_4.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_5.SiblingsAndSelf(publishedSnapshot, VariationContextAccessor));
     }
 
     [Test]
@@ -786,7 +767,6 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         // -- Level1.2: 1175 (parent 1046)
         // -- Level1.3: 4444 (parent 1046)
         // - Root : 1172 (no parent)
-
         var root = GetContent(1046);
         var level1_1 = GetContent(1173);
         var level1_1_1 = GetContent(1174);
@@ -802,30 +782,22 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         CollectionAssertAreEqual(new[] { root2 }, root.Siblings(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] { level1_2, level1_3 },
-            level1_1.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1, level1_3 },
-            level1_2.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1, level1_2 },
-            level1_3.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_2, level1_3 }, level1_1.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1, level1_3 }, level1_2.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1, level1_2 }, level1_3.Siblings(publishedSnapshot, VariationContextAccessor));
 
-        CollectionAssertAreEqual(new[] { level1_1_2, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_1.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_3, level1_1_4, level1_1_5 },
-            level1_1_2.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_4, level1_1_5 },
-            level1_1_3.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_5 },
-            level1_1_4.Siblings(publishedSnapshot, VariationContextAccessor));
-        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4 },
-            level1_1_5.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_2, level1_1_3, level1_1_4, level1_1_5 }, level1_1_1.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_3, level1_1_4, level1_1_5 }, level1_1_2.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_4, level1_1_5 }, level1_1_3.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_5 }, level1_1_4.Siblings(publishedSnapshot, VariationContextAccessor));
+        CollectionAssertAreEqual(new[] { level1_1_1, level1_1_2, level1_1_3, level1_1_4 }, level1_1_5.Siblings(publishedSnapshot, VariationContextAccessor));
     }
 
     private void CollectionAssertAreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
         where T : IPublishedContent
     {
-        var e = expected.Select(x => x.Id);
-        var a = actual.Select(x => x.Id);
+        var e = expected.Select(x => x.Id).ToArray();
+        var a = actual.Select(x => x.Id).ToArray();
         CollectionAssert.AreEquivalent(e, a, $"\nExpected:\n{string.Join(", ", e)}\n\nActual:\n{string.Join(", ", a)}");
     }
 
@@ -862,8 +834,11 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
         var ct = PublishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 0, "alias", CreatePropertyTypes);
 
-        var c = new ImageWithLegendModel(ct, guid,
-            new Dictionary<string, object> { { "legend", val1 }, { "image", val2 }, { "size", val3 } }, false);
+        var c = new ImageWithLegendModel(
+            ct,
+            guid,
+            new Dictionary<string, object> { { "legend", val1 }, { "image", val2 }, { "size", val3 } },
+            false);
 
         Assert.AreEqual(val1, c.Legend);
         Assert.AreEqual(val3, c.Size);
@@ -952,12 +927,14 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
 
     private class ImageWithLegendModel : PublishedElement
     {
-        public ImageWithLegendModel(IPublishedContentType contentType, Guid fragmentKey,
-            Dictionary<string, object> values, bool previewing)
+        public ImageWithLegendModel(
+            IPublishedContentType contentType,
+            Guid fragmentKey,
+            Dictionary<string, object> values,
+            bool previewing)
             : base(contentType, fragmentKey, values, previewing)
         {
         }
-
 
         public string Legend => this.Value<string>(Mock.Of<IPublishedValueFallback>(), "legend");
 
@@ -966,29 +943,29 @@ public class PublishedContentTests : PublishedSnapshotServiceTestBase
         public int Size => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "size");
     }
 
-    //[PublishedModel("ContentType2")]
-    //public class ContentType2 : PublishedContentModel
-    //{
-    //    #region Plumbing
+    // [PublishedModel("ContentType2")]
+    // public class ContentType2 : PublishedContentModel
+    // {
+    //     #region Plumbing
 
-    //    public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
-    //        : base(content, fallback)
-    //    { }
+    // public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
+    // : base(content, fallback)
+    // { }
 
-    //    #endregion
+    // #endregion
 
-    //    public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
-    //}
+    // public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
+    // }
 
-    //[PublishedModel("ContentType2Sub")]
-    //public class ContentType2Sub : ContentType2
-    //{
-    //    #region Plumbing
+    // [PublishedModel("ContentType2Sub")]
+    // public class ContentType2Sub : ContentType2
+    // {
+    //     #region Plumbing
 
-    //    public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
-    //        : base(content, fallback)
-    //    { }
+    // public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
+    // : base(content, fallback)
+    // { }
 
-    //    #endregion
-    //}
+    // #endregion
+    // }
 }

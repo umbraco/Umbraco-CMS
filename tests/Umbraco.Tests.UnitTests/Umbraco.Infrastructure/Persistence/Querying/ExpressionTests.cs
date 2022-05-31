@@ -6,10 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence;
@@ -17,7 +15,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying;
@@ -28,8 +25,9 @@ public class ExpressionTests : BaseUsingSqlSyntax
     [Test]
     public void Equals_Claus_With_Two_Entity_Values()
     {
-        var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()),
-            new ConfigurationEditorJsonSerializer())
+        var dataType = new DataType(
+                new VoidEditor(Mock.Of<IDataValueEditorFactory>()),
+                new ConfigurationEditorJsonSerializer())
         { Id = 12345 };
         Expression<Func<PropertyType, bool>> predicate = p => p.DataTypeId == dataType.Id;
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<PropertyType>(SqlContext.SqlSyntax, Mappers);
@@ -153,7 +151,6 @@ public class ExpressionTests : BaseUsingSqlSyntax
     [Test]
     public void Equals_Method_For_Value_Gets_Escaped()
     {
-        var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
         Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
         var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);
         var result = modelToSqlExpressionHelper.Visit(predicate);

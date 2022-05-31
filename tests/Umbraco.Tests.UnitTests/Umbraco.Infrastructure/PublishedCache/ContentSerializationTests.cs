@@ -26,14 +26,14 @@ public class ContentSerializationTests
                     new[] { new PropertyData { Culture = "en-US", Segment = "test", Value = "hello world" } },
                 ["propertyTwo"] = new[]
                 {
-                    new PropertyData {Culture = "en-US", Segment = "test", Value = "Lorem ipsum"}
-                }
+                    new PropertyData { Culture = "en-US", Segment = "test", Value = "Lorem ipsum" },
+                },
             },
             CultureData = new Dictionary<string, CultureVariation>
             {
-                ["en-US"] = new() { Date = now, IsDraft = false, Name = "Home", UrlSegment = "home" }
+                ["en-US"] = new() { Date = now, IsDraft = false, Name = "Home", UrlSegment = "home" },
             },
-            UrlSegment = "home"
+            UrlSegment = "home",
         };
 
         var content = Mock.Of<IReadOnlyContentBase>(x => x.ContentTypeId == 1);
@@ -47,13 +47,10 @@ public class ContentSerializationTests
         var jsonContent = jsonSerializer.Deserialize(content, json, null, false);
         var msgPackContent = msgPackSerializer.Deserialize(content, null, msgPack, false);
 
-
         CollectionAssert.AreEqual(jsonContent.CultureData.Keys, msgPackContent.CultureData.Keys);
         CollectionAssert.AreEqual(jsonContent.PropertyData.Keys, msgPackContent.PropertyData.Keys);
-        CollectionAssert.AreEqual(jsonContent.CultureData.Values, msgPackContent.CultureData.Values,
-            new CultureVariationComparer());
-        CollectionAssert.AreEqual(jsonContent.PropertyData.Values, msgPackContent.PropertyData.Values,
-            new PropertyDataComparer());
+        CollectionAssert.AreEqual(jsonContent.CultureData.Values, msgPackContent.CultureData.Values, new CultureVariationComparer());
+        CollectionAssert.AreEqual(jsonContent.PropertyData.Values, msgPackContent.PropertyData.Values, new PropertyDataComparer());
         Assert.AreEqual(jsonContent.UrlSegment, msgPackContent.UrlSegment);
     }
 

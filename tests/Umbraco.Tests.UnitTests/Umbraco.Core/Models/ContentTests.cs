@@ -547,8 +547,7 @@ public class ContentTests
         Assert.That(content.Properties["title"], Is.Not.Null);
         Assert.That(content.Properties["title"].Alias, Is.EqualTo("title"));
         Assert.That(content.Properties["title"].GetValue(), Is.EqualTo("This is the new title"));
-        Assert.That(content.Properties["description"].GetValue(),
-            Is.EqualTo("This is the meta description for a textpage"));
+        Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
     }
 
     [Test]
@@ -752,8 +751,7 @@ public class ContentTests
         Assert.That(content.Properties.Contains("keywords"), Is.True);
         Assert.That(content.Properties.Contains("description"), Is.True);
         Assert.That(content.Properties["keywords"].GetValue(), Is.EqualTo("text,page,meta"));
-        Assert.That(content.Properties["description"].GetValue(),
-            Is.EqualTo("This is the meta description for a textpage"));
+        Assert.That(content.Properties["description"].GetValue(), Is.EqualTo("This is the meta description for a textpage"));
     }
 
     [Test]

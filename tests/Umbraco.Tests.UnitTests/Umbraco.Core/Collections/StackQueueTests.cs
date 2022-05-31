@@ -63,7 +63,6 @@ public class StackQueueTests
         // 2 (push)
         // 1 (enqueue)
         // 0 (push)
-
         Assert.AreEqual(4, sq.Pop());
         Assert.AreEqual(0, sq.Dequeue());
         Assert.AreEqual(3, sq.Pop());

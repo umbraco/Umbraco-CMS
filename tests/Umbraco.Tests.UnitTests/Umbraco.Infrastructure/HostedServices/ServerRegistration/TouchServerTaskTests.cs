@@ -60,8 +60,10 @@ public class TouchServerTaskTests
         VerifyServerNotTouched();
     }
 
-    private TouchServerTask CreateTouchServerTask(RuntimeLevel runtimeLevel = RuntimeLevel.Run,
-        string applicationUrl = ApplicationUrl, bool useElection = true)
+    private TouchServerTask CreateTouchServerTask(
+        RuntimeLevel runtimeLevel = RuntimeLevel.Run,
+        string applicationUrl = ApplicationUrl,
+        bool useElection = true)
     {
         var mockRequestAccessor = new Mock<IHostingEnvironment>();
         mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl)
@@ -76,7 +78,7 @@ public class TouchServerTaskTests
 
         var settings = new GlobalSettings
         {
-            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings { StaleServerTimeout = _staleServerTimeout }
+            DatabaseServerRegistrar = new DatabaseServerRegistrarSettings { StaleServerTimeout = _staleServerTimeout },
         };
 
         IServerRoleAccessor roleAccessor = useElection

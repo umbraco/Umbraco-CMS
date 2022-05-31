@@ -70,12 +70,12 @@ public class EnumerableExtensionsTests
                                 {
                                     Children = new List<TestItem>
                                     {
-                                        new("1.1.1.1.1"), new("1.1.1.1.2")
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        new("1.1.1.1.1"), new("1.1.1.1.2"),
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 new("1.2")
                 {
@@ -85,19 +85,19 @@ public class EnumerableExtensionsTests
                         {
                             Children = new List<TestItem>
                             {
-                                new("1.2.1.1") {Children = new List<TestItem>()}
-                            }
+                                new("1.2.1.1") { Children = new List<TestItem>() },
+                            },
                         },
                         new("1.2.2")
                         {
                             Children = new List<TestItem>
                             {
-                                new("1.2.2.1") {Children = new List<TestItem>()}
-                            }
-                        }
-                    }
-                }
-            }
+                                new("1.2.2.1") { Children = new List<TestItem>() },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
@@ -157,14 +157,14 @@ public class EnumerableExtensionsTests
         var list = new List<Tuple<string, string>> { tuple1, tuple2, tuple3, tuple4 };
 
         // Act
-        var iteratorSource = list.DistinctBy(x => x.Item2);
+        var iteratorSource = list.DistinctBy(x => x.Item2).ToArray();
 
         // Assert
         // First check distinction
         Assert.AreEqual(3, iteratorSource.Count());
 
         // Check for iterator block mistakes - reset to original query first
-        iteratorSource = list.DistinctBy(x => x.Item2);
-        Assert.AreEqual(iteratorSource.Count(), iteratorSource.ToList().Count());
+        iteratorSource = list.DistinctBy(x => x.Item2).ToArray();
+        Assert.AreEqual(iteratorSource.Length, iteratorSource.ToList().Count);
     }
 }

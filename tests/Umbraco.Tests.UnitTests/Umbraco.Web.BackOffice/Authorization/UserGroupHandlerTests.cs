@@ -117,8 +117,13 @@ public class UserGroupHandlerTests
 
         var mockBackOfficeSecurityAccessor = CreateMockBackOfficeSecurityAccessor(userIsAdmin);
 
-        return new UserGroupHandler(mockHttpContextAccessor.Object, mockUserService.Object, mockContentService.Object,
-            mockMediaService.Object, mockEntityService.Object, mockBackOfficeSecurityAccessor.Object,
+        return new UserGroupHandler(
+            mockHttpContextAccessor.Object,
+            mockUserService.Object,
+            mockContentService.Object,
+            mockMediaService.Object,
+            mockEntityService.Object,
+            mockBackOfficeSecurityAccessor.Object,
             AppCaches.Disabled);
     }
 
@@ -147,13 +152,15 @@ public class UserGroupHandlerTests
             .Setup(x => x.GetAllUserGroups(It.Is<int[]>(y => y.Length == 2 && y[0] == Group1Id && y[1] == Group2Id)))
             .Returns(new List<IUserGroup>
             {
-                CreateUserGroup(Group1Id, Group1Alias), CreateUserGroup(Group2Id, Group2Alias)
+                CreateUserGroup(Group1Id, Group1Alias),
+                CreateUserGroup(Group2Id, Group2Alias),
             });
         mockUserService
             .Setup(x => x.GetAllUserGroups(It.Is<int[]>(y => y.Length == 2 && y[0] == Group2Id && y[1] == Group3Id)))
             .Returns(new List<IUserGroup>
             {
-                CreateUserGroup(Group2Id, Group2Alias), CreateUserGroup(Group3Id, Group3Alias)
+                CreateUserGroup(Group2Id, Group2Alias),
+                CreateUserGroup(Group3Id, Group3Alias),
             });
         return mockUserService;
     }

@@ -51,11 +51,8 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
     /// <summary>
     ///     Override to mock localization service
     /// </summary>
-    /// <param name="contentTypes"></param>
-    /// <param name="dataTypes"></param>
     /// <returns></returns>
-    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes,
-        IDataType[] dataTypes)
+    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
     {
         var serviceContext = base.CreateServiceContext(contentTypes, mediaTypes, dataTypes);
 
@@ -63,15 +60,15 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
 
         var languages = new List<Language>
         {
-            new("en-US", "English (United States)") {Id = 1, IsDefault = true},
-            new("fr", "French") {Id = 2},
-            new("es", "Spanish") {Id = 3, FallbackLanguageId = 1},
-            new("it", "Italian") {Id = 4, FallbackLanguageId = 3},
-            new("de", "German") {Id = 5},
-            new Language("da", "Danish") {Id = 6, FallbackLanguageId = 8},
-            new Language("sv", "Swedish") {Id = 7, FallbackLanguageId = 6},
-            new Language("no", "Norweigan") {Id = 8, FallbackLanguageId = 7},
-            new Language("nl", "Dutch") {Id = 9, FallbackLanguageId = 1}
+            new("en-US", "English (United States)") { Id = 1, IsDefault = true },
+            new("fr", "French") { Id = 2 },
+            new("es", "Spanish") { Id = 3, FallbackLanguageId = 1 },
+            new("it", "Italian") { Id = 4, FallbackLanguageId = 3 },
+            new("de", "German") { Id = 5 },
+            new Language("da", "Danish") { Id = 6, FallbackLanguageId = 8 },
+            new Language("sv", "Swedish") { Id = 7, FallbackLanguageId = 6 },
+            new Language("no", "Norweigan") { Id = 8, FallbackLanguageId = 7 },
+            new Language("nl", "Dutch") { Id = 9, FallbackLanguageId = 1 },
         };
 
         localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
@@ -105,7 +102,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         var propertyDataTypes = new Dictionary<string, IDataType>
         {
             // we only have one data type for this test which will be resolved with string empty.
-            [string.Empty] = dataTypes[0]
+            [string.Empty] = dataTypes[0],
         };
 
         var contentType1 = new ContentType(ShortStringHelper, -1);
@@ -121,12 +118,14 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
                 .WithPropertyData("welcomeText2", "Welcome", "en-US")
                 .WithPropertyData("noprop", "xxx")
                 .Build())
+
             // build with a dynamically created content type
             .Build(ShortStringHelper, propertyDataTypes, contentType1, "ContentType1");
 
         var item1 = ContentNodeKitBuilder.CreateWithContent(
             contentType1.Id,
-            1, "-1,1",
+            1,
+            "-1,1",
             draftData: item1Data,
             publishedData: item1Data);
 
@@ -139,12 +138,14 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
                 .WithPropertyData("welcomeText", "Welcome", "en-US")
                 .WithPropertyData("noprop", "xxx")
                 .Build())
+
             // build while dynamically updating the same content type
             .Build(ShortStringHelper, propertyDataTypes, contentType1);
 
         var item2 = ContentNodeKitBuilder.CreateWithContent(
             contentType1.Id,
-            2, "-1,1,2",
+            2,
+            "-1,1,2",
             parentContentId: 1,
             draftData: item2Data,
             publishedData: item2Data);
@@ -159,12 +160,14 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
                 .WithPropertyData("prop3", "Oxxo")
                 .WithPropertyData("prop3", "Oxxo", "en-US")
                 .Build())
+
             // build with a dynamically created content type
             .Build(ShortStringHelper, propertyDataTypes, contentType2, "ContentType2");
 
         var item3 = ContentNodeKitBuilder.CreateWithContent(
             contentType2.Id,
-            3, "-1,1,2,3",
+            3,
+            "-1,1,2,3",
             parentContentId: 2,
             draftData: item3Data,
             publishedData: item3Data);
@@ -226,8 +229,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
     {
         var snapshot = GetPublishedSnapshot();
         var content = snapshot.Content.GetAtRoot().First();
-        var value = content.Value(PublishedValueFallback, "welcomeText", "it",
-            fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
+        var value = content.Value(PublishedValueFallback, "welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
         Assert.AreEqual("Welcome", value);
     }
 
@@ -236,8 +238,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
     {
         var snapshot = GetPublishedSnapshot();
         var content = snapshot.Content.GetAtRoot().First();
-        var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "no",
-            fallback: Fallback.ToLanguage);
+        var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "no", fallback: Fallback.ToLanguage);
         Assert.IsNull(value);
     }
 
@@ -286,6 +287,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         var content = snapshot.Content.GetAtRoot().First().Children.First().Children.First();
         Assert.IsNull(content.GetProperty("noprop"));
         var value = content.Value(PublishedValueFallback, "noprop", fallback: Fallback.ToAncestors);
+
         // property has no value - based on the converter
         // but we still get the value (ie, the converter would do something)
         Assert.AreEqual("xxx", value.ToString());
@@ -299,8 +301,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         var snapshot = GetPublishedSnapshot();
         var content = snapshot.Content.GetAtRoot().First().Children.First();
 
-        var value = content.Value(PublishedValueFallback, "welcomeText", "nl",
-            fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
+        var value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
         // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
         Assert.AreEqual("Welkom", value);
@@ -343,8 +344,7 @@ public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTest
         Assert.IsNull(value);
 
         // but it works with proper fallback settings
-        value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.ToDefaultValue,
-            defaultValue: "woop");
+        value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
         Assert.AreEqual("woop", value);
     }
 }

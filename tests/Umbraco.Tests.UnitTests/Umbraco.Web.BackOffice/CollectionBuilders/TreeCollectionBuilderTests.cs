@@ -11,7 +11,14 @@ public class TreeCollectionBuilderTests
     public void Adding_Tree_To_Collection_Builder()
     {
         var collectionBuilder = new TreeCollectionBuilder();
-        var treeDefinition = new Tree(0, "test", "test", "test", "test", TreeUse.Main, typeof(LanguageTreeController),
+        var treeDefinition = new Tree(
+            0,
+            "test",
+            "test",
+            "test",
+            "test",
+            TreeUse.Main,
+            typeof(LanguageTreeController),
             false);
 
         collectionBuilder.AddTree(treeDefinition);
@@ -25,8 +32,7 @@ public class TreeCollectionBuilderTests
     public void Remove_Tree_From_Collection_Builder()
     {
         var collectionBuilder = new TreeCollectionBuilder();
-        var treeDefinition = new Tree(0, "test", "test", "test", "test", TreeUse.Main, typeof(LanguageTreeController),
-            false);
+        var treeDefinition = new Tree(0, "test", "test", "test", "test", TreeUse.Main, typeof(LanguageTreeController), false);
 
         collectionBuilder.AddTree(treeDefinition);
         collectionBuilder.RemoveTreeController<LanguageTreeController>();

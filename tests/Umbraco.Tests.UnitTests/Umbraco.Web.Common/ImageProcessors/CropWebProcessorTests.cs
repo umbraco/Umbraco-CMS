@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ImageProcessors;
 public class CropWebProcessorTests
 {
     [Test]
+
     // Coordinates are percentages to crop from the left, top, right and bottom sides
     [TestCase("0,0,0,0", 50, 90)]
     [TestCase("0.1,0.0,0.0,0.0", 45, 90)]
@@ -38,7 +39,8 @@ public class CropWebProcessorTests
         var commands = new CommandCollection { { CropWebProcessor.Coordinates, coordinates } };
         var parser = new CommandParser(new ICommandConverter[]
         {
-            new ArrayConverter<float>(), new SimpleCommandConverter<float>()
+            new ArrayConverter<float>(),
+            new SimpleCommandConverter<float>(),
         });
         var culture = CultureInfo.InvariantCulture;
 

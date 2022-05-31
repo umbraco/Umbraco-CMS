@@ -41,7 +41,9 @@ internal class ContentVersionCleanupServiceTest
 
         Assert.Multiple(() =>
         {
-            eventAggregator.Verify(x => x.PublishCancelable(It.IsAny<ContentDeletingVersionsNotification>()),
+            eventAggregator.Verify(
+                x => x.PublishCancelable(
+                    It.IsAny<ContentDeletingVersionsNotification>()),
                 Times.Exactly(someHistoricVersions.Count));
             Assert.AreEqual(0, report.Count);
         });
@@ -70,8 +72,7 @@ internal class ContentVersionCleanupServiceTest
         // # Act
         sut.PerformContentVersionCleanup(aDateTime);
 
-        eventAggregator.Verify(x => x.Publish(It.IsAny<ContentDeletedVersionsNotification>()),
-            Times.Exactly(someHistoricVersions.Count));
+        eventAggregator.Verify(x => x.Publish(It.IsAny<ContentDeletedVersionsNotification>()), Times.Exactly(someHistoricVersions.Count));
     }
 
     [Test]
@@ -159,13 +160,14 @@ internal class ContentVersionCleanupServiceTest
             .Returns<DateTime, IEnumerable<ContentVersionMeta>>((_, items) => filteredSet);
 
         // # Act
-        var report = sut.PerformContentVersionCleanup(aDateTime);
+        sut.PerformContentVersionCleanup(aDateTime);
 
         Debug.Assert(someHistoricVersions.Any());
 
         var expectedId = filteredSet.First().VersionId;
 
-        documentVersionRepository.Verify(x => x.DeleteVersions(It.Is<IEnumerable<int>>(y => y.Single() == expectedId)),
+        documentVersionRepository.Verify(
+            x => x.DeleteVersions(It.Is<IEnumerable<int>>(y => y.Single() == expectedId)),
             Times.Once);
     }
 }

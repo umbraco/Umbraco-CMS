@@ -25,16 +25,15 @@ public class ContentTypeServiceExtensionsTests
         {
             var contentCollection = new PropertyTypeCollection(true)
             {
-                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox,
-                    ValueStorageType.Ntext)
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
                 {
                     Alias = alias,
                     Name = "Title",
                     Description = string.Empty,
                     Mandatory = false,
                     SortOrder = 1,
-                    DataTypeId = -88
-                }
+                    DataTypeId = -88,
+                },
             };
             var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);
@@ -74,16 +73,15 @@ public class ContentTypeServiceExtensionsTests
         {
             var contentCollection = new PropertyTypeCollection(true)
             {
-                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox,
-                    ValueStorageType.Ntext)
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
                 {
                     Alias = "title",
                     Name = "Title",
                     Description = string.Empty,
                     Mandatory = false,
                     SortOrder = 1,
-                    DataTypeId = -88
-                }
+                    DataTypeId = -88,
+                },
             };
             var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);
@@ -120,16 +118,15 @@ public class ContentTypeServiceExtensionsTests
         {
             var contentCollection = new PropertyTypeCollection(true)
             {
-                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox,
-                    ValueStorageType.Ntext)
+                new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
                 {
                     Alias = "title",
                     Name = "Title",
                     Description = string.Empty,
                     Mandatory = false,
                     SortOrder = 1,
-                    DataTypeId = -88
-                }
+                    DataTypeId = -88,
+                },
             };
             var pg = new PropertyGroup(contentCollection) { Alias = "test", Name = "test", SortOrder = 1 };
             ct.PropertyGroups.Add(pg);

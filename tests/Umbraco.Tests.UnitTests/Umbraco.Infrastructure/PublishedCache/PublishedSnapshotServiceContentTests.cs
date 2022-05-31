@@ -28,14 +28,14 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
             {
                 Alias = "prop",
                 DataTypeId = 3,
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             };
         _contentType =
             new ContentType(TestHelper.ShortStringHelper, -1)
             {
                 Id = 2,
                 Alias = "alias-ct",
-                Variations = ContentVariation.Culture
+                Variations = ContentVariation.Culture,
             };
         _contentType.AddPropertyType(_propertyType);
 
@@ -56,12 +56,12 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
             {
                 ["prop"] = new[]
                 {
-                    new PropertyData {Culture = "", Segment = "", Value = "val2"},
-                    new PropertyData {Culture = "fr-FR", Segment = "", Value = "val-fr2"},
-                    new PropertyData {Culture = "en-UK", Segment = "", Value = "val-uk2"},
-                    new PropertyData {Culture = "dk-DA", Segment = "", Value = "val-da2"},
-                    new PropertyData {Culture = "de-DE", Segment = "", Value = "val-de2"}
-                }
+                    new PropertyData { Culture = string.Empty, Segment = string.Empty, Value = "val2" },
+                    new PropertyData { Culture = "fr-FR", Segment = string.Empty, Value = "val-fr2" },
+                    new PropertyData { Culture = "en-UK", Segment = string.Empty, Value = "val-uk2" },
+                    new PropertyData { Culture = "dk-DA", Segment = string.Empty, Value = "val-da2" },
+                    new PropertyData { Culture = "de-DE", Segment = string.Empty, Value = "val-de2" },
+                },
             })
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
@@ -69,7 +69,7 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
                 ["fr-FR"] = new() { Name = "name-fr2", IsDraft = true, Date = new DateTime(2018, 01, 03, 01, 00, 00) },
                 ["en-UK"] = new() { Name = "name-uk2", IsDraft = true, Date = new DateTime(2018, 01, 04, 01, 00, 00) },
                 ["dk-DA"] = new() { Name = "name-da2", IsDraft = true, Date = new DateTime(2018, 01, 05, 01, 00, 00) },
-                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) }
+                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) },
             })
             .Build();
 
@@ -80,23 +80,25 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
             {
                 ["prop"] = new[]
                 {
-                    new PropertyData {Culture = "", Segment = "", Value = "val1"},
-                    new PropertyData {Culture = "fr-FR", Segment = "", Value = "val-fr1"},
-                    new PropertyData {Culture = "en-UK", Segment = "", Value = "val-uk1"}
-                }
+                    new PropertyData { Culture = string.Empty, Segment = string.Empty, Value = "val1" },
+                    new PropertyData { Culture = "fr-FR", Segment = string.Empty, Value = "val-fr1" },
+                    new PropertyData { Culture = "en-UK", Segment = string.Empty, Value = "val-uk1" },
+                },
             })
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
                 // published data = only what's actually published, and IsDraft has to be false
                 ["fr-FR"] = new() { Name = "name-fr1", IsDraft = false, Date = new DateTime(2018, 01, 01, 01, 00, 00) },
                 ["en-UK"] = new() { Name = "name-uk1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) },
-                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) }
+                ["de-DE"] = new() { Name = "name-de1", IsDraft = false, Date = new DateTime(2018, 01, 02, 01, 00, 00) },
             })
             .Build();
 
         var kit = ContentNodeKitBuilder.CreateWithContent(
             2,
-            1, "-1,1", 0,
+            1,
+            "-1,1",
+            0,
             draftData: draftData,
             publishedData: publishedData);
 
@@ -144,7 +146,7 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
         Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate(VariationContextAccessor));
 
         // invariant needs to be retrieved explicitly, when it's not default
-        Assert.AreEqual("val1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", ""));
+        Assert.AreEqual("val1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", string.Empty));
 
         // but,
         // if the content type / property type does not vary, then it's all invariant again
@@ -153,8 +155,7 @@ public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTest
         _propertyType.Variations = ContentVariation.Nothing;
         SnapshotService.Notify(new[]
         {
-            new ContentTypeCacheRefresher.JsonPayload("IContentType", publishedContent.ContentType.Id,
-                ContentTypeChangeTypes.RefreshMain)
+            new ContentTypeCacheRefresher.JsonPayload("IContentType", publishedContent.ContentType.Id, ContentTypeChangeTypes.RefreshMain),
         });
 
         // get a new snapshot (nothing changed in the old one), get the published content again

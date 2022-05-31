@@ -22,21 +22,20 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
 {
     private readonly DataType[] _dataTypes = GetDefaultDataTypes();
 
-    private static ContentType CreateContentType(string name, IDataType dataType,
-        IReadOnlyDictionary<string, string> propertyAliasesAndNames)
+    private static ContentType CreateContentType(string name, IDataType dataType, IReadOnlyDictionary<string, string> propertyAliasesAndNames)
     {
         var contentType = new ContentType(TestHelper.ShortStringHelper, -1)
         {
             Alias = name,
             Name = name,
             Key = Guid.NewGuid(),
-            Id = name.GetHashCode()
+            Id = name.GetHashCode(),
         };
         foreach (var prop in propertyAliasesAndNames)
         {
             contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, dataType, prop.Key)
             {
-                Name = prop.Value
+                Name = prop.Value,
             });
         }
 
@@ -54,11 +53,17 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
 
         var properties = new Dictionary<string, string> { ["property1"] = "Property 1", ["property2"] = "Property 2" };
 
-        var parentContentType = CreateContentType("Parent", dataType,
+        var parentContentType = CreateContentType(
+            "Parent",
+            dataType,
             new Dictionary<string, string>(properties) { ["property3"] = "Property 3" });
-        var childContentType = CreateContentType("Child", dataType,
+        var childContentType = CreateContentType(
+            "Child",
+            dataType,
             new Dictionary<string, string>(properties) { ["property4"] = "Property 4" });
-        var child2ContentType = CreateContentType("Child2", dataType,
+        var child2ContentType = CreateContentType(
+            "Child2",
+            dataType,
             new Dictionary<string, string>(properties) { ["property4"] = "Property 4" });
 
         contentTypes = new[] { parentContentType, childContentType, child2ContentType };
@@ -74,7 +79,8 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
 
         var parent = ContentNodeKitBuilder.CreateWithContent(
             parentContentType.Id,
-            parentId, $"-1,{parentId}",
+            parentId,
+            $"-1,{parentId}",
             draftData: parentData,
             publishedData: parentData);
 
@@ -98,7 +104,9 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
 
                 var child = ContentNodeKitBuilder.CreateWithContent(
                     i > 0 ? childContentType.Id : child2ContentType.Id,
-                    childId, $"-1,{parentId},{childId}", i,
+                    childId,
+                    $"-1,{parentId},{childId}",
+                    i,
                     draftData: childData,
                     publishedData: childData);
 
@@ -181,7 +189,7 @@ public class PublishedContentDataTableTests : PublishedSnapshotServiceTestBase
             Mock.Of<IMemberTypeService>(),
             Mock.Of<IPublishedUrlProvider>());
 
-        //will return an empty data table
+        // will return an empty data table
         Assert.AreEqual(0, dt.Columns.Count);
         Assert.AreEqual(0, dt.Rows.Count);
     }

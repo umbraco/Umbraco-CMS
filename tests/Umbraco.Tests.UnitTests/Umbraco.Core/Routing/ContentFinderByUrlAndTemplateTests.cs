@@ -37,8 +37,7 @@ public class ContentFinderByUrlAndTemplateTests : PublishedSnapshotServiceTestBa
 
     private IFileService _fileService;
 
-    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes,
-        IDataType[] dataTypes)
+    protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
     {
         var serviceContext = base.CreateServiceContext(contentTypes, mediaTypes, dataTypes);
 
@@ -53,7 +52,7 @@ public class ContentFinderByUrlAndTemplateTests : PublishedSnapshotServiceTestBa
 
     [TestCase("/blah")]
     [TestCase("/home/Sub1/blah")]
-    [TestCase("/Home/Sub1/Blah")] //different cases
+    [TestCase("/Home/Sub1/Blah")] // different cases
     public async Task Match_Document_By_Url_With_Template(string urlAsString)
     {
         GlobalSettings.HideTopLevelNodeFromPath = false;

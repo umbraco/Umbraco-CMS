@@ -42,8 +42,9 @@ public class ConvertersTests
                 typeof(PublishedSnapshotTestObjects.TestElementModel1),
                 typeof(PublishedSnapshotTestObjects.TestElementModel2),
                 typeof(PublishedSnapshotTestObjects.TestContentModel1),
-                typeof(PublishedSnapshotTestObjects.TestContentModel2)
-            }, Mock.Of<IPublishedValueFallback>());
+                typeof(PublishedSnapshotTestObjects.TestContentModel2),
+            },
+            Mock.Of<IPublishedValueFallback>());
         register.AddTransient(f => factory);
 
         var cacheMock = new Mock<IPublishedContentCache>();
@@ -108,16 +109,16 @@ public class ConvertersTests
             Id = 1003,
             Properties = new[]
             {
-                new InternalPublishedProperty {Alias = "prop1", SolidHasValue = true, SolidValue = "val1"}
-            }
+                new InternalPublishedProperty { Alias = "prop1", SolidHasValue = true, SolidValue = "val1" },
+            },
         };
         var cnt2 = new InternalPublishedContent(contentType1)
         {
             Id = 1004,
             Properties = new[]
             {
-                new InternalPublishedProperty {Alias = "prop2", SolidHasValue = true, SolidValue = "1003"}
-            }
+                new InternalPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" },
+            },
         };
 
         var publishedModelFactory = registerFactory.GetRequiredService<IPublishedModelFactory>();
@@ -149,8 +150,7 @@ public class ConvertersTests
             model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2"));
         Assert.AreEqual(
             1,
-            ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(),
-                "prop2")).Length);
+            ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value(Mock.Of<IPublishedValueFallback>(), "prop2")).Length);
 
         // and get model property
         Assert.IsInstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>(mmodel2.Prop2);

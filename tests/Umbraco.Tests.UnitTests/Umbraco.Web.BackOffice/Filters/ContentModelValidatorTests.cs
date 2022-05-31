@@ -32,8 +32,7 @@ public class ContentModelValidatorTests
         var id2 = Guid.NewGuid();
         var addressBookElementTypeResult = new ComplexEditorElementTypeValidationResult("addressBook", id2);
         var addressesPropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("addresses");
-        addressesPropertyTypeResult.AddValidationResult(new ValidationResult("Must have at least 3 addresses",
-            new[] { "counter" }));
+        addressesPropertyTypeResult.AddValidationResult(new ValidationResult("Must have at least 3 addresses", new[] { "counter" }));
         addressesPropertyTypeResult.AddValidationResult(nestedLevel2); // This is a nested result within the level 1
         addressBookElementTypeResult.ValidationResults.Add(addressesPropertyTypeResult);
         var bookNamePropertyTypeResult = new ComplexEditorPropertyTypeValidationResult("bookName");
@@ -45,8 +44,7 @@ public class ContentModelValidatorTests
         var id3 = Guid.NewGuid();
         var addressBookElementTypeResult2 = new ComplexEditorElementTypeValidationResult("addressBook", id3);
         var addressesPropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("addresses");
-        addressesPropertyTypeResult2.AddValidationResult(new ValidationResult("Must have at least 2 addresses",
-            new[] { "counter" }));
+        addressesPropertyTypeResult2.AddValidationResult(new ValidationResult("Must have at least 2 addresses", new[] { "counter" }));
         addressBookElementTypeResult2.ValidationResults.Add(addressesPropertyTypeResult);
         var bookNamePropertyTypeResult2 = new ComplexEditorPropertyTypeValidationResult("bookName");
         bookNamePropertyTypeResult2.AddValidationResult(new ValidationResult("Name is too long"));
@@ -71,16 +69,14 @@ public class ContentModelValidatorTests
         Assert.IsNotNull(jsonError.SelectToken("$[0]"));
         Assert.AreEqual(id4.ToString(), jsonError.SelectToken("$[0].$id").Value<string>());
         Assert.AreEqual("addressBookCollection", jsonError.SelectToken("$[0].$elementTypeAlias").Value<string>());
-        Assert.AreEqual(string.Empty,
-            jsonError.SelectToken("$[0].ModelState['_Properties.books.invariant.null'][0]").Value<string>());
+        Assert.AreEqual(string.Empty, jsonError.SelectToken("$[0].ModelState['_Properties.books.invariant.null'][0]").Value<string>());
 
         var error0 = jsonError.SelectToken("$[0].books") as JArray;
         Assert.IsNotNull(error0);
         Assert.AreEqual(id2.ToString(), error0.SelectToken("$[0].$id").Value<string>());
         Assert.AreEqual("addressBook", error0.SelectToken("$[0].$elementTypeAlias").Value<string>());
         Assert.IsNotNull(error0.SelectToken("$[0].ModelState"));
-        Assert.AreEqual(string.Empty,
-            error0.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
+        Assert.AreEqual(string.Empty, error0.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
         var error1 = error0.SelectToken("$[0].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
         Assert.IsNotNull(error1);
         Assert.AreEqual(1, error1.Count);
@@ -91,8 +87,7 @@ public class ContentModelValidatorTests
         Assert.AreEqual(id3.ToString(), error0.SelectToken("$[1].$id").Value<string>());
         Assert.AreEqual("addressBook", error0.SelectToken("$[1].$elementTypeAlias").Value<string>());
         Assert.IsNotNull(error0.SelectToken("$[1].ModelState"));
-        Assert.AreEqual(string.Empty,
-            error0.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
+        Assert.AreEqual(string.Empty, error0.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null'][0]").Value<string>());
         var error6 = error0.SelectToken("$[1].ModelState['_Properties.addresses.invariant.null.counter']") as JArray;
         Assert.IsNotNull(error6);
         Assert.AreEqual(1, error6.Count);

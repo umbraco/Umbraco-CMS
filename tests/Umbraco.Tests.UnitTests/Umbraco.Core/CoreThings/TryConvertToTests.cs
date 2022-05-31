@@ -47,7 +47,6 @@ public class TryConvertToTests
         Assert.AreEqual(false, conv.Result);
     }
 
-
     [Test]
     [TestCase("en-US", -1, ExpectedResult = -1)]
     [TestCase("en-US", "-1", ExpectedResult = -1)]

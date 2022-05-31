@@ -29,8 +29,11 @@ public class PublicAccessCheckerTests
         return Mock.Of<IHttpContextAccessor>(x => x.HttpContext == localHttpContext);
     }
 
-    private PublicAccessChecker CreateSut(IMemberManager memberManager, IPublicAccessService publicAccessService,
-        IContentService contentService, out HttpContext httpContext)
+    private PublicAccessChecker CreateSut(
+        IMemberManager memberManager,
+        IPublicAccessService publicAccessService,
+        IContentService contentService,
+        out HttpContext httpContext)
     {
         var publicAccessChecker = new PublicAccessChecker(
             GetHttpContextAccessor(memberManager, out httpContext),
@@ -64,15 +67,19 @@ public class PublicAccessCheckerTests
             .Returns(Task.FromResult(memberIdentityUser));
 
     private PublicAccessEntry GetPublicAccessEntry(string usernameRuleValue, string roleRuleValue)
-        => new(Guid.NewGuid(), 123, 987, 987,
+        => new(
+            Guid.NewGuid(),
+            123,
+            987,
+            987,
             new List<PublicAccessRule>
             {
                 new()
                 {
                     RuleType = Constants.Conventions.PublicAccess.MemberUsernameRuleType,
-                    RuleValue = usernameRuleValue
+                    RuleValue = usernameRuleValue,
                 },
-                new() {RuleType = Constants.Conventions.PublicAccess.MemberRoleRuleType, RuleValue = roleRuleValue}
+                new() { RuleType = Constants.Conventions.PublicAccess.MemberRoleRuleType, RuleValue = roleRuleValue },
             });
 
     [AutoMoqData]
@@ -119,14 +126,17 @@ public class PublicAccessCheckerTests
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
 
         Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(It.IsAny<IContent>()))
-            .Returns(new PublicAccessEntry(protectedNode, loginNode, noAccessNode,
+            .Returns(new PublicAccessEntry(
+                protectedNode,
+                loginNode,
+                noAccessNode,
                 new[]
                 {
                     new PublicAccessRule(Guid.Empty, Guid.Empty)
                     {
                         RuleType = Constants.Conventions.PublicAccess.MemberUsernameRuleType,
-                        RuleValue = "AnotherUsername"
-                    }
+                        RuleValue = "AnotherUsername",
+                    },
                 }));
         httpContext.User = GetLoggedInUser();
         MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true, UserName = username });
@@ -146,7 +156,8 @@ public class PublicAccessCheckerTests
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
 
         httpContext.User = GetLoggedInUser();
-        MockGetUserAsync(memberManager,
+        MockGetUserAsync(
+            memberManager,
             new MemberIdentityUser { IsApproved = true, LockoutEnd = DateTime.UtcNow.AddDays(10) });
         MockGetRolesAsync(memberManager);
 

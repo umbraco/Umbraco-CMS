@@ -46,7 +46,10 @@ public class ValidateUmbracoFormRouteStringFilterTests
             filter.ValidateRouteString(validUfprt, null, ControllerAction, Area));
 
         Assert.DoesNotThrow(() => filter.ValidateRouteString(validUfprt, ControllerName, ControllerAction, Area));
-        Assert.DoesNotThrow(() => filter.ValidateRouteString(validUfprt, ControllerName.ToLowerInvariant(),
-            ControllerAction.ToLowerInvariant(), Area.ToLowerInvariant()));
+        Assert.DoesNotThrow(() => filter.ValidateRouteString(
+            validUfprt,
+            ControllerName.ToLowerInvariant(),
+            ControllerAction.ToLowerInvariant(),
+            Area.ToLowerInvariant()));
     }
 }

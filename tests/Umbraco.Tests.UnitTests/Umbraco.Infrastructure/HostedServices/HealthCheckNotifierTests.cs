@@ -100,7 +100,8 @@ public class HealthCheckNotifierTests
         _mockNotificationMethod.Verify(
             x => x.SendAsync(
                 It.Is<HealthCheckResults>(y =>
-                    y.ResultsAsDictionary.Count == 1 && y.ResultsAsDictionary.ContainsKey("Check1"))), Times.Once);
+                    y.ResultsAsDictionary.Count == 1 && y.ResultsAsDictionary.ContainsKey("Check1"))),
+            Times.Once);
     }
 
     private HealthCheckNotifier CreateHealthCheckNotifier(
@@ -115,13 +116,15 @@ public class HealthCheckNotifierTests
             Notification = new HealthChecksNotificationSettings
             {
                 Enabled = enabled,
-                DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check3Id) } }
+                DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check3Id) } },
             },
-            DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check2Id) } }
+            DisabledChecks = new List<DisabledHealthCheckSettings> { new() { Id = Guid.Parse(Check2Id) } },
         };
         var checks = new HealthCheckCollection(() => new List<HealthCheck>
         {
-            new TestHealthCheck1(), new TestHealthCheck2(), new TestHealthCheck3()
+            new TestHealthCheck1(),
+            new TestHealthCheck2(),
+            new TestHealthCheck3(),
         });
 
         _mockNotificationMethod = new Mock<IHealthCheckNotificationMethod>();

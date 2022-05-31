@@ -34,9 +34,13 @@ public class TypeLoaderTests
         // TODO: Should probably update this so it only searches this assembly and add custom types to be found
         Assembly[] assemblies =
         {
-            GetType().Assembly, typeof(Guid).Assembly, typeof(Assert).Assembly, typeof(NameTable).Assembly,
+            GetType().Assembly,
+            typeof(Guid).Assembly,
+            typeof(Assert).Assembly,
+            typeof(NameTable).Assembly,
             ////typeof(TabPage).Assembly,
-            typeof(TypeFinder).Assembly, typeof(UmbracoContext).Assembly, typeof(CheckBoxListPropertyEditor).Assembly
+            typeof(TypeFinder).Assembly, typeof(UmbracoContext).Assembly,
+            typeof(CheckBoxListPropertyEditor).Assembly,
         };
         _typeLoader = new TypeLoader(
             typeFinder,
@@ -111,7 +115,6 @@ public class TypeLoaderTests
     ////    Debug.WriteLine("TOTAL TIME (2nd round): " + watch.ElapsedMilliseconds);
     ////}
 
-
     [Test]
     public void Get_Plugins_Hash_With_Hash_Generator()
     {
@@ -149,8 +152,7 @@ public class TypeLoaderTests
         Assert.AreNotEqual(hash1, hash3);
         Assert.AreNotEqual(hash2, hash3);
 
-        Assert.AreEqual(hash1,
-            GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())));
+        Assert.AreEqual(hash1, GetFileHash(list1, new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>())));
     }
 
     [Test]

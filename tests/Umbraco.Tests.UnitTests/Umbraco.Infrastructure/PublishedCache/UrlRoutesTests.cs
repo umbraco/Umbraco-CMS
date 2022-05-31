@@ -6,10 +6,10 @@ using Umbraco.Cms.Tests.Common.Published;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache;
+
 // purpose: test the values returned by PublishedContentCache.GetRouteById
 // and .GetByRoute (no caching at all, just routing nice URLs) including all
 // the quirks due to hideTopLevelFromPath and backward compatibility.
-
 public class UrlRoutesTests : PublishedSnapshotServiceTestBase
 {
     private static string GetXmlContent(int templateId)
@@ -263,7 +263,6 @@ return route
         InitializedCache(kits, contentTypes, dataTypes);
 
         var cache = GetPublishedSnapshot().Content;
-
 
         var route = cache.GetRouteById(false, 1000);
         Assert.AreEqual("/a", route);

@@ -25,17 +25,17 @@ public class HttpContextExtensionTests
     [Test]
     public void TryGetBasicAuthCredentials_WithHeader_ReturnsTrueWithCredentials()
     {
-        const string Username = "fred";
-        const string Password = "test";
+        const string testUsername = "fred";
+        const string testPassword = "test";
 
         var httpContext = new DefaultHttpContext();
-        var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{Username}:{Password}"));
+        var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{testUsername}:{testPassword}"));
         httpContext.Request.Headers.Add("Authorization", $"Basic {credentials}");
 
         var result = httpContext.TryGetBasicAuthCredentials(out var username, out var password);
 
         Assert.IsTrue(result);
-        Assert.AreEqual(Username, username);
-        Assert.AreEqual(Password, password);
+        Assert.AreEqual(testUsername, username);
+        Assert.AreEqual(testPassword, password);
     }
 }

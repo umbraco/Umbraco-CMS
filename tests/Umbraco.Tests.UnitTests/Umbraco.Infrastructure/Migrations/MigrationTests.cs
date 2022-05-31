@@ -48,6 +48,7 @@ public class MigrationTests
         public IScope DetachScope() => throw new NotImplementedException();
 
         public IScopeContext Context { get; set; }
+
         public IQuery<T> CreateQuery<T>() => SqlContext.Query<T>();
 
         public ISqlContext SqlContext { get; set; }
@@ -64,13 +65,17 @@ public class MigrationTests
 
     private class TestPlan : MigrationPlan
     {
-        public TestPlan() : base("Test")
+        public TestPlan()
+            : base("Test")
         {
         }
     }
 
-    private MigrationContext GetMigrationContext() => new(new TestPlan(), Mock.Of<IUmbracoDatabase>(),
-        Mock.Of<ILogger<MigrationContext>>());
+    private MigrationContext GetMigrationContext() =>
+        new(
+            new TestPlan(),
+            Mock.Of<IUmbracoDatabase>(),
+            Mock.Of<ILogger<MigrationContext>>());
 
     [Test]
     public void RunGoodMigration()

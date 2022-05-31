@@ -71,7 +71,6 @@ public class ClaimsPrincipalExtensionsTests
 
         var expires = now.AddSeconds(expireSeconds).ToString("o");
 
-
         var claim = new Claim(
             Constants.Security.TicketExpiresClaimType,
             expires,

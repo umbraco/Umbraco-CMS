@@ -91,18 +91,21 @@ public class TreeHandlerTests
             .WithSectionAlias(sectionAlias)
             .Build();
 
-    private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(bool userIsAuthorized,
+    private static Mock<IBackOfficeSecurityAccessor> CreateMockBackOfficeSecurityAccessor(
+        bool userIsAuthorized,
         bool userCanAccessContentSection)
     {
         var user = CreateUser();
         var mockBackOfficeSecurity = new Mock<IBackOfficeSecurity>();
         mockBackOfficeSecurity.SetupGet(x => x.CurrentUser).Returns(userIsAuthorized ? user : null);
         mockBackOfficeSecurity
-            .Setup(x => x.UserHasSectionAccess(Constants.Applications.Content,
+            .Setup(x => x.UserHasSectionAccess(
+                Constants.Applications.Content,
                 It.Is<IUser>(y => y.Username == user.Username)))
             .Returns(userCanAccessContentSection);
         mockBackOfficeSecurity
-            .Setup(x => x.UserHasSectionAccess(Constants.Applications.Media,
+            .Setup(x => x.UserHasSectionAccess(
+                Constants.Applications.Media,
                 It.Is<IUser>(y => y.Username == user.Username)))
             .Returns(false);
         var mockBackOfficeSecurityAccessor = new Mock<IBackOfficeSecurityAccessor>();

@@ -25,7 +25,6 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
     {
         base.Setup();
 
-
         GlobalSettings.HideTopLevelNodeFromPath = false;
     }
 
@@ -37,7 +36,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         var propertyDataTypes = new Dictionary<string, IDataType>
         {
             // we only have one data type for this test which will be resolved with string empty.
-            [string.Empty] = dataTypes[0]
+            [string.Empty] = dataTypes[0],
         };
         var contentType1 = new ContentType(ShortStringHelper, -1);
 
@@ -45,13 +44,14 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() { Name = "root", IsDraft = true, Date = DateTime.Now, UrlSegment = "root" }
+                [culture] = new() { Name = "root", IsDraft = true, Date = DateTime.Now, UrlSegment = "root" },
             })
             .Build(ShortStringHelper, propertyDataTypes, contentType1, "alias");
 
         var root = ContentNodeKitBuilder.CreateWithContent(
             contentType1.Id,
-            9876, "-1,9876",
+            9876,
+            "-1,9876",
             draftData: rootData,
             publishedData: rootData);
 
@@ -59,13 +59,14 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() { Name = "home", IsDraft = true, Date = DateTime.Now, UrlSegment = "home" }
+                [culture] = new() { Name = "home", IsDraft = true, Date = DateTime.Now, UrlSegment = "home" },
             })
             .Build();
 
         var parent = ContentNodeKitBuilder.CreateWithContent(
             contentType1.Id,
-            5432, "-1,9876,5432",
+            5432,
+            "-1,9876,5432",
             parentContentId: 9876,
             draftData: parentData,
             publishedData: parentData);
@@ -74,13 +75,14 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             .WithName("Page" + Guid.NewGuid())
             .WithCultureInfos(new Dictionary<string, CultureVariation>
             {
-                [culture] = new() { Name = "name-fr2", IsDraft = true, Date = DateTime.Now, UrlSegment = "test-fr" }
+                [culture] = new() { Name = "name-fr2", IsDraft = true, Date = DateTime.Now, UrlSegment = "test-fr" },
             })
             .Build();
 
         var content = ContentNodeKitBuilder.CreateWithContent(
             contentType1.Id,
-            1234, "-1,9876,5432,1234",
+            1234,
+            "-1,9876,5432,1234",
             parentContentId: 5432,
             draftData: contentData,
             publishedData: contentData);
@@ -95,8 +97,8 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
             .Returns((bool incWildcards) => new[]
             {
-                new UmbracoDomain("http://example.us/") {Id = 1, RootContentId = 9876, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://example.fr/") {Id = 2, RootContentId = 9876, LanguageIsoCode = "fr-FR"}
+                new UmbracoDomain("http://example.us/") { Id = 1, RootContentId = 9876, LanguageIsoCode = "en-US" },
+                new UmbracoDomain("http://example.fr/") { Id = 2, RootContentId = 9876, LanguageIsoCode = "fr-FR" },
             });
     }
 
@@ -121,19 +123,18 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
         var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
         var samples = new Dictionary<int, string>
         {
-            {1046, "/home"},
-            {1173, "/home/sub1"},
-            {1174, "/home/sub1/sub2"},
-            {1176, "/home/sub1/sub-3"},
-            {1177, "/home/sub1/custom-sub-1"},
-            {1178, "/home/sub1/custom-sub-2"},
-            {1175, "/home/sub-2"},
-            {1172, "/test-page"}
+            { 1046, "/home" },
+            { 1173, "/home/sub1" },
+            { 1174, "/home/sub1/sub2" },
+            { 1176, "/home/sub1/sub-3" },
+            { 1177, "/home/sub1/custom-sub-1" },
+            { 1178, "/home/sub1/custom-sub-2" },
+            { 1175, "/home/sub-2" },
+            { 1172, "/test-page" },
         };
 
         foreach (var sample in samples)
@@ -148,7 +149,6 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
             var result = urlProvider.GetUrl(randomSample.Key);
             Assert.AreEqual(randomSample.Value, result);
         }
-
 
         var cache = (FastDictionaryAppCache)umbracoContext.PublishedSnapshot.ElementsCache;
         var cachedRoutes = cache.Keys.Where(x => x.StartsWith(CacheKeyPrefix)).ToList();
@@ -186,8 +186,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         InitializedCache(kits, contentTypes, dataTypes);
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
         var result = urlProvider.GetUrl(nodeId);
         Assert.AreEqual(niceUrlMatch, result);
@@ -205,11 +204,9 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         PopulateCache(culture);
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(currentUri);
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
-
-        //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative URL.
+        // even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative URL.
         var url = urlProvider.GetUrl(1234, culture: culture);
 
         return url;
@@ -230,8 +227,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         SetDomains1();
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(currentUri);
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
         var url = urlProvider.GetUrl(1234, culture: "fr-FR");
 
@@ -254,11 +250,10 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
         SetDomains1();
 
         var umbracoContextAccessor = GetUmbracoContextAccessor(currentUri);
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
         var url = urlProvider.GetUrl(1234, culture: "fr-FR");
 
-        //the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
+        // the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
         Assert.AreEqual("http://example.fr/home/test-fr/", url);
     }
 
@@ -279,8 +274,7 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://example.com/test");
 
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
         Assert.AreEqual("/home/sub1/custom-sub-1/", urlProvider.GetUrl(1177));
 
@@ -305,11 +299,9 @@ public class UrlProviderWithoutHideTopLevelNodeFromPathTests : PublishedSnapshot
 
         var umbracoContextAccessor = GetUmbracoContextAccessor("http://example.com/test");
 
-        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(),
-            out var uriUtility);
+        var urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out _);
 
-        //mock the Umbraco settings that we need
-
+        // mock the Umbraco settings that we need
         Assert.AreEqual("#", urlProvider.GetUrl(999999));
 
         urlProvider.Mode = UrlMode.Absolute;

@@ -15,7 +15,8 @@ public class TestNuCacheContentService : INuCacheContentService
     {
     }
 
-    public TestNuCacheContentService(IEnumerable<ContentNodeKit> contentKits,
+    public TestNuCacheContentService(
+        IEnumerable<ContentNodeKit> contentKits,
         IEnumerable<ContentNodeKit> mediaKits = null)
     {
         ContentKits = contentKits?.ToDictionary(x => x.Node.Id, x => x) ?? new Dictionary<int, ContentNodeKit>();
@@ -25,6 +26,7 @@ public class TestNuCacheContentService : INuCacheContentService
     private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 
     public Dictionary<int, ContentNodeKit> ContentKits { get; }
+
     public Dictionary<int, ContentNodeKit> MediaKits { get; }
 
     // note: it is important to clone the returned kits, as the inner
@@ -82,17 +84,26 @@ public class TestNuCacheContentService : INuCacheContentService
             .Select(x => x.Clone(PublishedModelFactory));
 
     public void DeleteContentItem(IContentBase item) => throw new NotImplementedException();
+
     public void DeleteContentItems(IEnumerable<IContentBase> items) => throw new NotImplementedException();
+
     public void RefreshContent(IContent content) => throw new NotImplementedException();
 
     public void RebuildDatabaseCacheIfSerializerChanged() => throw new NotImplementedException();
+
     public void RefreshMedia(IMedia media) => throw new NotImplementedException();
+
     public void RefreshMember(IMember member) => throw new NotImplementedException();
 
-    public void Rebuild(IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null,
-        IReadOnlyCollection<int> memberTypeIds = null) => throw new NotImplementedException();
+    public void Rebuild(
+        IReadOnlyCollection<int> contentTypeIds = null,
+        IReadOnlyCollection<int> mediaTypeIds = null,
+        IReadOnlyCollection<int> memberTypeIds = null) =>
+        throw new NotImplementedException();
 
     public bool VerifyContentDbCache() => throw new NotImplementedException();
+
     public bool VerifyMediaDbCache() => throw new NotImplementedException();
+
     public bool VerifyMemberDbCache() => throw new NotImplementedException();
 }

@@ -86,7 +86,7 @@ public class HttpQueryStringModelBinderTests
             ActionContext = actionContext,
             ModelMetadata = metadataProvider.GetMetadataForType(modelType),
             ModelName = modelType.Name,
-            ValueProvider = valueProvider
+            ValueProvider = valueProvider,
         };
     }
 }

@@ -28,8 +28,10 @@ public class PostMigrationTests
 {
     private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
 
-    private IMigrationPlanExecutor GetMigrationPlanExecutor(ICoreScopeProvider scopeProvider,
-        IScopeAccessor scopeAccessor, IMigrationBuilder builder)
+    private IMigrationPlanExecutor GetMigrationPlanExecutor(
+        ICoreScopeProvider scopeProvider,
+        IScopeAccessor scopeAccessor,
+        IMigrationBuilder builder)
         => new MigrationPlanExecutor(scopeProvider, scopeAccessor, s_loggerFactory, builder);
 
     [Test]
@@ -150,7 +152,8 @@ public class PostMigrationTests
 
     public class TestPostMigration : MigrationBase
     {
-        public TestPostMigration(IMigrationContext context) : base(context)
+        public TestPostMigration(IMigrationContext context)
+            : base(context)
         {
         }
 

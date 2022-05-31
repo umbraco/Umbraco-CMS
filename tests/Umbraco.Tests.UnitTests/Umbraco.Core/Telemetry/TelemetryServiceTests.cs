@@ -21,11 +21,15 @@ public class TelemetryServiceTests
         var version = CreateUmbracoVersion(9, 3, 1);
         var siteIdentifierServiceMock = new Mock<ISiteIdentifierService>();
         var usageInformationServiceMock = new Mock<IUsageInformationService>();
-        var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, siteIdentifierServiceMock.Object,
-            usageInformationServiceMock.Object, Mock.Of<IMetricsConsentService>());
+        var sut = new TelemetryService(
+            Mock.Of<IManifestParser>(),
+            version,
+            siteIdentifierServiceMock.Object,
+            usageInformationServiceMock.Object,
+            Mock.Of<IMetricsConsentService>());
         Guid guid;
 
-        var result = sut.TryGetTelemetryReportData(out var telemetryReportData);
+        sut.TryGetTelemetryReportData(out _);
         siteIdentifierServiceMock.Verify(x => x.TryGetOrCreateSiteIdentifier(out guid), Times.Once);
     }
 
@@ -33,8 +37,12 @@ public class TelemetryServiceTests
     public void SkipsIfCantGetOrCreateId()
     {
         var version = CreateUmbracoVersion(9, 3, 1);
-        var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(false),
-            Mock.Of<IUsageInformationService>(), Mock.Of<IMetricsConsentService>());
+        var sut = new TelemetryService(
+            Mock.Of<IManifestParser>(),
+            version,
+            CreateSiteIdentifierService(false),
+            Mock.Of<IUsageInformationService>(),
+            Mock.Of<IMetricsConsentService>());
 
         var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -49,8 +57,12 @@ public class TelemetryServiceTests
 
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Detailed);
-        var sut = new TelemetryService(Mock.Of<IManifestParser>(), version, createSiteIdentifierService(),
-            Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
+        var sut = new TelemetryService(
+            Mock.Of<IManifestParser>(),
+            version,
+            CreateSiteIdentifierService(),
+            Mock.Of<IUsageInformationService>(),
+            metricsConsentService.Object);
 
         var result = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -67,14 +79,18 @@ public class TelemetryServiceTests
         var noVersionPackageName = "NoVersionPackage";
         PackageManifest[] manifests =
         {
-            new() {PackageName = versionPackageName, Version = packageVersion},
-            new() {PackageName = noVersionPackageName}
+            new() { PackageName = versionPackageName, Version = packageVersion },
+            new() { PackageName = noVersionPackageName },
         };
         var manifestParser = CreateManifestParser(manifests);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
-        var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(),
-            Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
+        var sut = new TelemetryService(
+            manifestParser,
+            version,
+            CreateSiteIdentifierService(),
+            Mock.Of<IUsageInformationService>(),
+            metricsConsentService.Object);
 
         var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -98,14 +114,18 @@ public class TelemetryServiceTests
         var version = CreateUmbracoVersion(9, 1, 1);
         PackageManifest[] manifests =
         {
-            new() {PackageName = "DoNotTrack", AllowPackageTelemetry = false},
-            new() {PackageName = "TrackingAllowed", AllowPackageTelemetry = true}
+            new() { PackageName = "DoNotTrack", AllowPackageTelemetry = false },
+            new() { PackageName = "TrackingAllowed", AllowPackageTelemetry = true },
         };
         var manifestParser = CreateManifestParser(manifests);
         var metricsConsentService = new Mock<IMetricsConsentService>();
         metricsConsentService.Setup(x => x.GetConsentLevel()).Returns(TelemetryLevel.Basic);
-        var sut = new TelemetryService(manifestParser, version, createSiteIdentifierService(),
-            Mock.Of<IUsageInformationService>(), metricsConsentService.Object);
+        var sut = new TelemetryService(
+            manifestParser,
+            version,
+            CreateSiteIdentifierService(),
+            Mock.Of<IUsageInformationService>(),
+            metricsConsentService.Object);
 
         var success = sut.TryGetTelemetryReportData(out var telemetry);
 
@@ -117,7 +137,6 @@ public class TelemetryServiceTests
         });
     }
 
-
     private IManifestParser CreateManifestParser(IEnumerable<PackageManifest> manifests)
     {
         var manifestParserMock = new Mock<IManifestParser>();
@@ -125,14 +144,13 @@ public class TelemetryServiceTests
         return manifestParserMock.Object;
     }
 
-    private IUmbracoVersion CreateUmbracoVersion(int major, int minor, int patch, string prerelease = "",
-        string build = "")
+    private IUmbracoVersion CreateUmbracoVersion(int major, int minor, int patch, string prerelease = "", string build = "")
     {
         var version = new SemVersion(major, minor, patch, prerelease, build);
         return Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == version);
     }
 
-    private ISiteIdentifierService createSiteIdentifierService(bool shouldSucceed = true)
+    private ISiteIdentifierService CreateSiteIdentifierService(bool shouldSucceed = true)
     {
         var mock = new Mock<ISiteIdentifierService>();
         var siteIdentifier = shouldSucceed ? Guid.NewGuid() : Guid.Empty;

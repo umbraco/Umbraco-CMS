@@ -13,8 +13,7 @@ public class EventNameExtractorTests
     [Test]
     public void Find_Event_Ing()
     {
-        var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"),
-            EventNameExtractor.MatchIngNames);
+        var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"), EventNameExtractor.MatchIngNames);
         Assert.IsTrue(found.Success);
         Assert.AreEqual("FoundMe", found.Result.Name);
     }
@@ -22,8 +21,7 @@ public class EventNameExtractorTests
     [Test]
     public void Find_Event_Non_Ing()
     {
-        var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"),
-            EventNameExtractor.MatchNonIngNames);
+        var found = EventNameExtractor.FindEvent(this, new SaveEventArgs<string>("test"), EventNameExtractor.MatchNonIngNames);
         Assert.IsTrue(found.Success);
         Assert.AreEqual("FindingMe", found.Result.Name);
     }

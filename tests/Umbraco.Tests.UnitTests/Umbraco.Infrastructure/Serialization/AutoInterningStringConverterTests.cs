@@ -31,7 +31,7 @@ public class AutoInterningStringConverterTests
         var str1 = "key";
         var obj = new Test
         {
-            Values = new Dictionary<string, int> { [str1 + Guid.NewGuid()] = 0, [str1 + Guid.NewGuid()] = 1 }
+            Values = new Dictionary<string, int> { [str1 + Guid.NewGuid()] = 0, [str1 + Guid.NewGuid()] = 1 },
         };
 
         // ensure the raw value is not interned

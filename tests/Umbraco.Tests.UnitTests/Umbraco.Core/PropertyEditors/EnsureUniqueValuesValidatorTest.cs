@@ -19,7 +19,6 @@ public class EnsureUniqueValuesValidatorTest
 {
     private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
-
     private ColorPickerPropertyEditor ColorPickerPropertyEditor => new(
         Mock.Of<IDataValueEditorFactory>(),
         Mock.Of<IIOHelper>(),

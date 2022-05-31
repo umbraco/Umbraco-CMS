@@ -74,18 +74,20 @@ public class BlockListPropertyValueConverterTests
         {
             new BlockListConfiguration.BlockConfiguration
             {
-                ContentElementTypeKey = _contentKey1, SettingsElementTypeKey = _settingKey2
+                ContentElementTypeKey = _contentKey1,
+                SettingsElementTypeKey = _settingKey2,
             },
             new BlockListConfiguration.BlockConfiguration
             {
-                ContentElementTypeKey = _contentKey2, SettingsElementTypeKey = _settingKey1
-            }
-        }
+                ContentElementTypeKey = _contentKey2,
+                SettingsElementTypeKey = _settingKey1,
+            },
+        },
     };
 
     private BlockListConfiguration ConfigForSingle() => new()
     {
-        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } }
+        Blocks = new[] { new BlockListConfiguration.BlockConfiguration { ContentElementTypeKey = _contentKey1 } },
     };
 
     private IPublishedPropertyType GetPropertyType(BlockListConfiguration config)
@@ -154,8 +156,7 @@ public class BlockListPropertyValueConverterTests
         Assert.AreEqual(0, converted.Count);
 
         json = string.Empty;
-        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json,
-            false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -180,8 +181,7 @@ public class BlockListPropertyValueConverterTests
         json = @"{
 layout: {},
 data: []}";
-        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json,
-            false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -199,8 +199,7 @@ data: []}";
     contentData: []
 }";
 
-        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json,
-            false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -222,8 +221,7 @@ data: []}";
     ]
 }";
 
-        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json,
-            false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -246,8 +244,7 @@ data: []}";
     ]
 }";
 
-        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json,
-            false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -375,9 +372,10 @@ data: []}";
             {
                 new BlockListConfiguration.BlockConfiguration
                 {
-                    ContentElementTypeKey = _contentKey2, SettingsElementTypeKey = null
-                }
-            }
+                    ContentElementTypeKey = _contentKey2,
+                    SettingsElementTypeKey = null,
+                },
+            },
         };
 
         var propertyType = GetPropertyType(config);
