@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
-import { mergeMap, Subscription, map } from 'rxjs';
+import { mergeMap, Subscription, map, switchMap } from 'rxjs';
 import { DataTypeEntity } from '../mocks/data/content.data';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
 
@@ -78,7 +78,7 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
           this._dataType = dataTypeEntity;
           return dataTypeEntity.propertyEditorUIAlias;
         }),
-        mergeMap((alias: string) => this._extensionRegistry?.getByAlias(alias) as any)
+        switchMap((alias: string) => this._extensionRegistry?.getByAlias(alias) as any)
       )
       .subscribe((propertyEditorUI: any) => {
         this._propertyEditorUI = propertyEditorUI;
@@ -98,6 +98,11 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
 
     if (typeof _propertyEditorUI.js === 'function') {
       this._element = _propertyEditorUI.js();
+      // TODO: Niels: I guess this is not the element returned but a Promise of loading the JS, which hopefully exports the Class or maybe an ElementName prop?
+    }
+    if (typeof _propertyEditorUI.js === 'string') {
+      // const loadJsPromise = (() => import(_propertyEditorUI.js as string))();
+      // TODO: show a loader until JS is loaded?
     }
 
     if (_propertyEditorUI.elementName) {
@@ -105,6 +110,10 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
     }
 
     // TODO: Set/Parse Data-Type-UI-configuration
+
+    if(oldValue) {
+      oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange);
+    }
     this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
 
     this._element.value = this.value;// Be aware its duplicated code
