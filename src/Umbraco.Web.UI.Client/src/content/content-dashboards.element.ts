@@ -72,15 +72,15 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
 
       // TODO: Temp redirect solution
       if (dashboardLocation === 'undefined') {
-        this._router?.push(`/section/${sectionLocation}/dashboard/${this._dashboards[0].name}`);
+        this._router?.push(`/section/${sectionLocation}/dashboard/${this._dashboards[0].meta.pathname}`);
         this._setCurrent(this._dashboards[0]);
         return;
       }
 
-      const dashboard = this._dashboards.find(dashboard => dashboard.name === dashboardLocation);
+      const dashboard = this._dashboards.find(dashboard => dashboard.meta.pathname === dashboardLocation);
 
       if (!dashboard) {
-        this._router?.push(`/section/${sectionLocation}/dashboard/${this._dashboards[0].name}`);
+        this._router?.push(`/section/${sectionLocation}/dashboard/${this._dashboards[0].meta.pathname}`);
         this._setCurrent(this._dashboards[0]);
         return;
       }
@@ -92,7 +92,7 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   private _handleTabClick(e: PointerEvent, dashboard: UmbExtensionManifest) {
     // TODO: this could maybe be handled by an anchor tag
     const section = this._location?.params?.section;
-    this._router?.push(`/section/${section}/dashboard/${dashboard.name}`);
+    this._router?.push(`/section/${section}/dashboard/${dashboard.meta.pathname}`);
     this._setCurrent(dashboard);
   }
 
@@ -124,7 +124,6 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
             label=${dashboard.name}
             ?active="${this._current === dashboard.name}"
             @click="${(e: PointerEvent) => this._handleTabClick(e, dashboard)}"></uui-tab>
-          
         `)}
       </uui-tab-group>
       ${ this._outlet }

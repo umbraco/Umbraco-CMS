@@ -1,11 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUISelectElement } from '@umbraco-ui/uui';
-import {
-  PostInstallRequest,
-  UmbracoInstallerDatabaseModel,
-  UmbracoPerformInstallDatabaseConfiguration,
-} from '../models';
+import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends LitElement {

@@ -1,7 +1,5 @@
-import { BehaviorSubject, map, Observable } from 'rxjs';
-
 export interface DocumentNode {
-  id: string;
+  id: number;
   key: string;
   name: string;
   alias: string;
@@ -19,9 +17,9 @@ export interface NodeProperty {
   tempValue: string; // TODO: remove this - only used for testing
 }
 
-export const data: Array<DocumentNode> = [
+export const data = [
   {
-    id: '1',
+    id: 1,
     key: '74e4008a-ea4f-4793-b924-15e02fd380d3',
     name: 'Document 1',
     alias: 'document1',
@@ -71,7 +69,7 @@ export const data: Array<DocumentNode> = [
     */
   },
   {
-    id: '2',
+    id: 2,
     key: '74e4008a-ea4f-4793-b924-15e02fd380d3',
     name: 'Document 2',
     alias: 'document2',
@@ -122,17 +120,17 @@ export const data: Array<DocumentNode> = [
   }
 ];
 
-export class UmbContentService {
-
-  private _nodes: BehaviorSubject<Array<DocumentNode>> = new BehaviorSubject(<Array<DocumentNode>>[]);
-  public readonly nodes: Observable<Array<DocumentNode>> = this._nodes.asObservable();
+// Temp mocked database
+class UmbContentData {
+  private _data: Array<DocumentNode> = [];
 
   constructor () {
-    this._nodes.next(data);
+    this._data = data;
   }
 
-  getById (id: string): Observable<DocumentNode | null> {
-    return this.nodes.pipe(map(((nodes: Array<DocumentNode>) => nodes.find((node: DocumentNode) => node.id === id) || null)));
+  getById (id: number) {
+    return this._data.find(item => item.id === id);
   }
-
 }
+
+export const umbContentData = new UmbContentData();

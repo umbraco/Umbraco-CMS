@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { AllowedSectionsResponse, UserResponse } from '../../models';
+import { AllowedSectionsResponse, UserResponse } from '../../core/models';
 
 export const handlers = [
   rest.post('/umbraco/backoffice/user/login', (_req, res, ctx) => {
@@ -46,7 +46,7 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json<AllowedSectionsResponse>({
-        sections: ['Umb.Section.Content', 'Umb.Section.Media', 'Umb.Section.Settings', 'My.Section.Custom'],
+        sections: ['Umb.Section.Content', 'Umb.Section.Settings', 'My.Section.Custom'],
       })
     );
   }),

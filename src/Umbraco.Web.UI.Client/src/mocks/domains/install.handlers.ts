@@ -1,10 +1,5 @@
 import { rest } from 'msw';
-import {
-  ErrorResponse,
-  UmbracoInstaller,
-  UmbracoPerformInstallDatabaseConfiguration,
-  UmbracoPerformInstallRequest,
-} from '../../models';
+import { ErrorResponse, UmbracoInstaller, UmbracoPerformInstallRequest } from '../../core/models';
 
 export const handlers = [
   rest.get('/umbraco/backoffice/install', (_req, res, ctx) => {

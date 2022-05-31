@@ -14,7 +14,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 
-import { getInitStatus } from './api/fetcher';
+import { getInitStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import {
   isUmbRouterBeforeEnterEvent,
@@ -125,7 +125,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
       if (!this._isAuthorized() || window.location.pathname === '/install') {
         this._router.push('/login');
       } else {
-        const next = window.location.pathname === '/' ? '/section/Content' : window.location.pathname;
+        const next = window.location.pathname === '/' ? '/section/content' : window.location.pathname;
         this._router.push(next);
       }
     } catch (error) {

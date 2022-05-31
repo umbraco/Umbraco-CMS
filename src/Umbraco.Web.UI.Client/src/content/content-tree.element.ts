@@ -4,8 +4,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { Subscription } from 'rxjs';
+import { data } from '../mocks/data/content.data';
 import { UUIMenuItemElement } from '@umbraco-ui/uui';
-import { data } from './content.service';
 
 @customElement('umb-content-tree')
 class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
@@ -27,7 +27,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
   _section?: string;
 
   @state()
-  _currentNodeId?: string;
+  _currentNodeId?: number;
 
   private _router?: UmbRouter;
   private _location?: UmbRouteLocation;
@@ -51,8 +51,13 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
     this._locationSubscription = this._router?.location.subscribe(location => {
       this._location = location;
       this._section = location.params.section;
-      this._currentNodeId = location.params.nodeId;
+      this._currentNodeId = parseInt(location.params.nodeId);
     });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._locationSubscription?.unsubscribe();
   }
 
   /* TODO: there are some problems with menu items and click events. They can happen on element inside and outside of the shadow dom 
@@ -62,6 +67,8 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
   */
   private _handleMenuItemClick (e: PointerEvent) {
     e.preventDefault();
+    e.stopPropagation();
+
     const target = e.target as UUIMenuItemElement;
     if (!target) return;
 
@@ -69,11 +76,6 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
     if (!href) return;
 
     this._router?.push(href);
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._locationSubscription?.unsubscribe();
   }
 
   render () {
@@ -86,54 +88,14 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
         <!-- TODO: make menu item events bubble so we don't have to attach event listeners on every item -->
         ${ this._tree.map(item => html`
           <uui-menu-item
-            ?active="${item.id === this._currentNodeId}"
             @click="${this._handleMenuItemClick}"
+            ?active="${item.id === this._currentNodeId}"
             data-id="${item.id}"
             label="${item.name}"
             href="/section/${this._section}/node/${item.id}">
             <uui-icon slot="icon" name="${item.icon}"></uui-icon>
           </uui-menu-item>
         `)}
-
-        <!--
-        <uui-menu-item label="Hello World">
-          <uui-icon slot="icon" name="document"></uui-icon>
-        </uui-menu-item>
-        <uui-menu-item label="Home" active has-children show-children>
-          <uui-icon slot="icon" name="document"></uui-icon>
-          <uui-menu-item label="Products">
-            <uui-icon slot="icon" name="document"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="People">
-            <uui-icon slot="icon" name="document"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="About Us" disabled has-children>
-            <uui-icon slot="icon" name="document"></uui-icon>
-            <uui-menu-item label="History">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-            <uui-menu-item label="Team">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-          </uui-menu-item>
-          <uui-menu-item label="MyMenuItem" selected has-children>
-            <uui-icon slot="icon" name="document"></uui-icon>
-            <uui-menu-item label="History">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-            <uui-menu-item label="Team">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-          </uui-menu-item>
-          <uui-menu-item label="Blog">
-            <uui-icon slot="icon" name="calendar"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="Contact"></uui-menu-item>
-        </uui-menu-item>
-        <uui-menu-item label="Recycle Bin">
-          <uui-icon slot="icon" name="delete"></uui-icon>
-        </uui-menu-item>
-        -->
       </div>
     `;
   }

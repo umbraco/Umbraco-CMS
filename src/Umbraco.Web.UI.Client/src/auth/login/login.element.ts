@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
-import { postUserLogin } from '../../api/fetcher';
+import { postUserLogin } from '../../core/api/fetcher';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbRouter } from '../../core/router';
 
