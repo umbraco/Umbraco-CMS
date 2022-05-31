@@ -83,18 +83,30 @@ const registerInternalManifests = async () => {
         weight: 10
       }
     },
+    {
+      type: 'propertyEditorUI',
+      alias: 'Umb.PropertyEditorUI.Text',
+      name: 'Text',
+      elementName: 'umb-property-editor-text',
+      js: () => import('./property-editors/property-editor-text.element'),
+      meta: {
+        icon: 'document',
+        group: 'common',
+      }
+    },
+    {
+      type: 'propertyEditorUI',
+      alias: 'Umb.PropertyEditorUI.Textarea',
+      name: 'Textarea',
+      elementName: 'umb-property-editor-textarea',
+      js: () => import('./property-editors/property-editor-textarea.element'),
+      meta: {
+        icon: 'document',
+        group: 'common',
+      }
+    },
   ];
   manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
-
-  extensionRegistry.register({
-    type: 'propertyEditor',
-    alias: 'Umb.PropertyEditor.MyPropertyEditor',
-    name: 'Settings',
-    elementName: 'umb-settings-section',
-    meta: {
-      test: 20
-    }
-  });
 }
 
 const setup = async () => {
