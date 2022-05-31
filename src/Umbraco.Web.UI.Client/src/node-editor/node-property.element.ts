@@ -44,7 +44,7 @@ class UmbNodeProperty extends LitElement {
           <p>${this.property.description}</p>
         </div>
         <div class="editor">
-          <umb-node-property-data-type .dataTypeAlias=${this.property.dataTypeAlias} .value=${this.value} @property-data-type-change=${this._onPropertyDataTypeChange}></umb-node-property-data-type>
+          <umb-node-property-data-type .dataTypeKey=${this.property.dataTypeKey} .value=${this.value} @property-data-type-change=${this._onPropertyDataTypeChange}></umb-node-property-data-type>
         </div>
       </div>
     `;

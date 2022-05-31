@@ -1,7 +1,7 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { DocumentNode } from '../../mocks/data/content.data';
 
-export class UmbNodesStore {
+export class UmbNodeStore {
 
   private _nodes: BehaviorSubject<Array<DocumentNode>> = new BehaviorSubject(<Array<DocumentNode>>[]);
   public readonly nodes: Observable<Array<DocumentNode>> = this._nodes.asObservable();

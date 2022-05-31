@@ -25,6 +25,8 @@ import {
   umbRouterBeforeEnterEventType,
 } from './core/router';
 import { UmbSectionContext } from './section.context';
+import { UmbNodeStore } from './core/stores/node.store';
+import { UmbDataTypeStore } from './core/stores/data-type.store';
 
 // TODO: lazy load these
 const routes: Array<UmbRoute> = [
@@ -84,6 +86,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
     this.provideContext('umbExtensionRegistry', window.Umbraco.extensionRegistry);
     this.provideContext('umbSectionContext', new UmbSectionContext(extensionRegistry));
+
+    // TODO: consider providing somethings for install/login and some only for 'backoffice'.
+    this.provideContext('umbNodeStore', new UmbNodeStore());
+    this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
   }
 
   private _onBeforeEnter = (event: Event) => {

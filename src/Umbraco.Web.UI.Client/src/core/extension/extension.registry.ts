@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 // TODO: how do we want to type extensions?
 export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'dashboard';
@@ -48,7 +48,9 @@ export interface UmbManifestDashboardMeta {
   weight: number;
 }
 
+// TODO: consider making a UmbStore base class for...
 export class UmbExtensionRegistry {
+
   private _extensions: BehaviorSubject<Array<UmbExtensionManifest>> = new BehaviorSubject(<Array<UmbExtensionManifest>>[]);
   public readonly extensions: Observable<Array<UmbExtensionManifest>> = this._extensions.asObservable();
 
@@ -63,6 +65,13 @@ export class UmbExtensionRegistry {
 
     this._extensions.next([...extensionsValues, manifest]);
   }
+
+  getByAlias (alias: string): Observable<UmbExtensionManifest | null> {
+    // TODO: make pipes prettier/simpler/reuseable
+    return this.extensions.pipe(map(((dataTypes: Array<UmbExtensionManifest>) => dataTypes.find((extension: UmbExtensionManifest) => extension.alias === alias) || null)));
+  }
+
+
 
   // TODO: implement unregister of extension
 }

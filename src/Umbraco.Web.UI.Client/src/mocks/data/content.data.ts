@@ -9,11 +9,21 @@ export interface DocumentNode {
   layout?: any; // TODO: define layout type - make it non-optional
 }
 
+export interface DataTypeEntity {
+  id: number;
+  key: string;
+  name: string;
+  //icon: string; // TODO: should come from the doc type?
+  //configUI: any; // this is the prevalues...
+  propertyEditorUIAlias: string;
+}
+
+
 export interface NodeProperty {
   alias: string;
   label: string;
   description: string;
-  dataTypeAlias: string;
+  dataTypeKey: string;
   tempValue: string; // TODO: remove this - only used for testing
 }
 
@@ -29,14 +39,14 @@ export const data = [
         alias: 'myHeadline',
         label: 'Textarea label',
         description: 'this is a textarea property',
-        dataTypeAlias: 'myTextStringEditor',
+        dataTypeKey: 'dt-1',
         tempValue: 'hello world 1'
       },
       {
         alias: 'myDescription',
         label: 'Text string label',
         description: 'This is the a text string property',
-        dataTypeAlias: 'myTextAreaEditor',
+        dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 1'
       },
     ],
@@ -79,14 +89,14 @@ export const data = [
         alias: 'myHeadline',
         label: 'Textarea label',
         description: 'this is a textarea property',
-        dataTypeAlias: 'myTextStringEditor',
+        dataTypeKey: 'dt-1',
         tempValue: 'hello world 2'
       },
       {
         alias: 'myDescription',
         label: 'Text string label',
         description: 'This is the a text string property',
-        dataTypeAlias: 'myTextAreaEditor',
+        dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 2'
       },
     ],
