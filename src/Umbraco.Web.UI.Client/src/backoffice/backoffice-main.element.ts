@@ -6,13 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbSectionContext } from '../section.context';
-
-import { UmbExtensionManifest, UmbManifestSectionMeta } from '../core/extension';
-
-// TODO: lazy load these. How to we handle dynamic import of our typescript file?
-import '../content/content-section.element';
-import '../media/media-section.element';
-import '../settings/settings-section.element';
+import { UmbExtensionManifest } from '../core/extension';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
@@ -59,8 +53,12 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
     if (!section) return;
 
     // TODO: How do we handle dynamic imports of our files?
-    if (section.js) {
-      await import(/* @vite-ignore */ section.js);
+    if (typeof section.js === 'string') {
+      await import(/* @vite-ignore */section.js);
+    }
+
+    if (typeof section.js === 'function') {
+      await section.js();
     }
 
     if (section.elementName) {

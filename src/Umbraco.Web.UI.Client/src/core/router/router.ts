@@ -12,7 +12,6 @@ export interface UmbRoute {
 export interface UmbRouteLocation {
   pathname: string;
   params: Record<string, any>;
-  fullPath: string;
   route: UmbRoute;
 }
 
@@ -34,10 +33,15 @@ export class UmbRouter {
     this._host = host;
 
     // Anchor Hijacker
-    this._host.addEventListener('click', async (event: any) => {
-      const target = event.composedPath()[0];
-      const href = target.href;
+    this._host.addEventListener('click', async (event: MouseEvent) => {
+      const anchor = ('composedPath' in event as any) ? event.composedPath().find(element => element instanceof HTMLAnchorElement) : event.target;
+      if (anchor == null || !(anchor instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      const href = anchor.href;
       if (!href) return;
+
       event.preventDefault();
 
       const url = new URL(href);
@@ -70,7 +74,6 @@ export class UmbRouter {
   }
 
   public push(pathname: string) {
-    history.pushState(null, '', pathname);
     this._navigate(pathname);
   }
 
@@ -132,7 +135,6 @@ export class UmbRouter {
         location = {
           pathname: result.pathname.input,
           params: result.pathname.groups,
-          fullPath: result.pathname.input,
           route,
         };
       }

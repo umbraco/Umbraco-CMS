@@ -2,10 +2,6 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 
-import '../properties/node-property.element.ts';
-import '../properties/property-editor-text.element.ts';
-import '../properties/property-editor-textarea.element.ts';
-
 @customElement('umb-node-editor-layout')
 class UmbNodeEditorLayout extends LitElement {
   static styles = [

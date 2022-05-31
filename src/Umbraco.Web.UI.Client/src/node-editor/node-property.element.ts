@@ -26,20 +26,28 @@ class UmbNodeProperty extends LitElement {
   ];
 
   @property()
-  label = '';
+  property:any; // TODO: property data model interface..
 
   @property()
-  description = '';
+  value?:string;
+
+  // TODO: maybe a bit messy with all the event listeners on the different levels:
+  private _onPropertyDataTypeChange = ( e:CustomEvent) => {
+    this.value = (e.target as any).value;
+    this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
+    // No need for this event to leave scope.
+    e.stopPropagation();
+  }
 
   render() {
     return html`
       <div class="property">
         <div class="header">
-          <uui-label>${this.label}</uui-label>
-          <p>${this.description}</p>
+          <uui-label>${this.property.label}</uui-label>
+          <p>${this.property.description}</p>
         </div>
         <div class="editor">
-          <slot></slot>
+          <umb-node-property-data-type .dataTypeKey=${this.property.dataTypeKey} .value=${this.value} @property-data-type-change=${this._onPropertyDataTypeChange}></umb-node-property-data-type>
         </div>
       </div>
     `;

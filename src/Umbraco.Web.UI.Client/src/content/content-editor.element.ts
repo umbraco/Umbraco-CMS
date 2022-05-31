@@ -1,14 +1,13 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
-
-import '../properties/node-property.element.ts';
-import '../properties/property-editor-text.element.ts';
-import '../properties/property-editor-textarea.element.ts';
-import '../backoffice/node-editor-layout.element.ts';
+import { customElement, property, state } from 'lit/decorators.js';
+import { UmbContextConsumerMixin } from '../core/context';
+import { UmbNodeStore } from '../core/stores/node.store';
+import { Subscription } from 'rxjs';
+import { DocumentNode } from '../mocks/data/content.data';
 
 @customElement('umb-content-editor')
-class UmbContentEditor extends LitElement {
+class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -46,42 +45,93 @@ class UmbContentEditor extends LitElement {
     `,
   ];
 
+  @property()
+  id!: string;
+
+  @state()
+  _node?: DocumentNode;
+
+  private _nodeStore?: UmbNodeStore;
+  private _nodeSubscription?: Subscription;
+
+  constructor () {
+    super();
+
+    this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
+      this._nodeStore = nodeStore;
+      this._useNode();
+    });
+  }
+
+  private _onPropertyValueChange(e: CustomEvent) {
+    const target = (e.target as any);
+
+    // TODO: Set value.
+    const property = this._node?.properties.find(x => x.alias === target.property.alias);
+    if(property) {
+      property.tempValue = target.value;
+    } else {
+      console.error('property was not found', target.property.alias);
+    }
+  }
+
+  private _useNode() {
+    this._nodeSubscription?.unsubscribe();
+
+    this._nodeSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe(node => {
+      if (!node) return; // TODO: Handle nicely if there is no node.
+      this._node = node;
+    });
+  }
+
   private _onSaveAndPublish() {
     console.log('Save and publish');
   }
 
   private _onSave() {
-    console.log('Save');
+    // TODO: What if store is not present, what if node is not loaded....
+    if(this._node) {
+      this._nodeStore?.save([this._node]);
+    }
   }
 
   private _onSaveAndPreview() {
     console.log('Save and preview');
   }
 
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._nodeSubscription?.unsubscribe();
+    delete this._node;
+  }
+
   render() {
     return html`
       <umb-node-editor-layout>
-        <uui-input slot="name" value="Home"></uui-input>
+        <uui-input slot="name" .value="${this._node?.name}"></uui-input>
         <uui-tab-group slot="apps">
-          <uui-tab active>Content</uui-tab>
-          <uui-tab>Info</uui-tab>
-          <uui-tab disabled>Actions</uui-tab>
+          <uui-tab label="Content" active></uui-tab>
+          <uui-tab label="Info"></uui-tab>
+          <uui-tab label="Actions" disabled></uui-tab>
         </uui-tab-group>
 
         <uui-box slot="content">
-          <umb-node-property label="Text string label" description="This is the a text string property">
-            <umb-property-editor-text></umb-property-editor-text>
-          </umb-node-property>
-          <hr />
-          <umb-node-property label="Textarea label" description="this is a textarea property">
-            <umb-property-editor-textarea></umb-property-editor-textarea>
-          </umb-node-property>
+          <!-- TODO: Make sure map get data from data object?, parse on property object. -->
+          ${this._node?.properties.map(
+            property => html`
+            <umb-node-property 
+              .property=${property}
+              .value=${property.tempValue} 
+              @property-value-change=${this._onPropertyValueChange}>
+            </umb-node-property>
+            <hr />
+          `)}
         </uui-box>
 
         <div slot="actions">
-          <uui-button @click=${this._onSaveAndPreview}>Save and preview</uui-button>
-          <uui-button @click=${this._onSave} look="secondary">Save</uui-button>
-          <uui-button @click=${this._onSaveAndPublish} look="primary" color="positive">Save and publish</uui-button>
+          <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
+          <uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>
+          <uui-button @click=${this._onSaveAndPublish} look="primary" color="positive" label="Save and publish"></uui-button>
         </div>
       </umb-node-editor-layout>
     `;

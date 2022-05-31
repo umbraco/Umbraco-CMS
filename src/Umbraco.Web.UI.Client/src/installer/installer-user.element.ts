@@ -1,7 +1,6 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
-
-import { postInstall } from '../api/fetcher';
+import { customElement, property } from 'lit/decorators.js';
+import { PostInstallRequest, UmbracoInstallerUserModel } from '../core/models';
 
 @customElement('umb-installer-user')
 export class UmbInstallerUser extends LitElement {
@@ -33,6 +32,12 @@ export class UmbInstallerUser extends LitElement {
     `,
   ];
 
+  @property({ attribute: false })
+  public userModel?: UmbracoInstallerUserModel; //TODO: Use this to validate the form
+
+  @property({ attribute: false })
+  public data?: PostInstallRequest;
+
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -42,44 +47,15 @@ export class UmbInstallerUser extends LitElement {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
+    const user: Record<string, FormDataEntryValue> = {};
+
     const formData = new FormData(form);
-
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const news = formData.has('news');
-
-    this._next(name, email, password, news);
-  };
-
-  private async _next(name: string, email: string, password: string, subscribeToNewsletter: boolean) {
-    console.log('Next', name, email, password, subscribeToNewsletter);
-
-    try {
-      await postInstall({
-        name,
-        email,
-        password,
-        telemetryLevel: 'Basic',
-        subscribeToNewsletter,
-        database: {
-          connectionString: '',
-          databaseProviderMetadataId: '1',
-          integratedAuth: false,
-          providerName: 'SQLite',
-        },
-      });
-
-      // TODO: Change to redirect when router has been added.
-      this.dispatchEvent(new CustomEvent('database', { bubbles: true, composed: true }));
-    } catch (error) {
-      console.log(error);
+    for (const pair of formData.entries()) {
+      user[pair[0]] = pair[1];
     }
-  }
 
-  private _onCustomize() {
-    this.dispatchEvent(new CustomEvent('customize', { bubbles: true, composed: true }));
-  }
+    this.dispatchEvent(new CustomEvent('submit', { detail: user }));
+  };
 
   render() {
     return html` <div class="uui-text">
@@ -88,12 +64,24 @@ export class UmbInstallerUser extends LitElement {
         <form id="LoginForm" name="login" @submit="${this._handleSubmit}">
           <uui-form-layout-item>
             <uui-label for="name" slot="label" required>Name</uui-label>
-            <uui-input type="text" id="name" name="name" required required-message="Name is required"></uui-input>
+            <uui-input
+              type="text"
+              id="name"
+              .value=${this.data?.name || ''}
+              name="name"
+              required
+              required-message="Name is required"></uui-input>
           </uui-form-layout-item>
 
           <uui-form-layout-item>
             <uui-label for="email" slot="label" required>Email</uui-label>
-            <uui-input type="email" id="email" name="email" required required-message="Email is required"></uui-input>
+            <uui-input
+              type="email"
+              id="email"
+              .value=${this.data?.email || ''}
+              name="email"
+              required
+              required-message="Email is required"></uui-input>
           </uui-form-layout-item>
 
           <uui-form-layout-item>
@@ -101,12 +89,16 @@ export class UmbInstallerUser extends LitElement {
             <uui-input-password
               id="password"
               name="password"
+              .value=${this.data?.password || ''}
               required
               required-message="Password is required"></uui-input-password>
           </uui-form-layout-item>
 
           <uui-form-layout-item id="news-checkbox">
-            <uui-checkbox name="persist" label="Remember me">
+            <uui-checkbox
+              name="subscribeToNewsletter"
+              label="Remember me"
+              .checked=${this.data?.subscribeToNewsletter || false}>
               Keep me updated on Umbraco Versions, Security Bulletins and Community News
             </uui-checkbox>
           </uui-form-layout-item>

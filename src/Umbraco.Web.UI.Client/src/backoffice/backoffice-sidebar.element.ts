@@ -16,56 +16,11 @@ export class UmbBackofficeSidebar extends LitElement {
         display: flex;
         flex-direction: column;
       }
-
-      h3 {
-        padding: var(--uui-size-4) var(--uui-size-8);
-      }
     `,
   ];
 
   render() {
-    return html`
-      <h3>Content</h3>
-      <div class="nav-list">
-        <uui-menu-item label="Hello World">
-          <uui-icon slot="icon" name="document"></uui-icon>
-        </uui-menu-item>
-        <uui-menu-item label="Home" active has-children show-children>
-          <uui-icon slot="icon" name="document"></uui-icon>
-          <uui-menu-item label="Products">
-            <uui-icon slot="icon" name="document"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="People">
-            <uui-icon slot="icon" name="document"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="About Us" disabled has-children>
-            <uui-icon slot="icon" name="document"></uui-icon>
-            <uui-menu-item label="History">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-            <uui-menu-item label="Team">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-          </uui-menu-item>
-          <uui-menu-item label="MyMenuItem" selected has-children>
-            <uui-icon slot="icon" name="document"></uui-icon>
-            <uui-menu-item label="History">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-            <uui-menu-item label="Team">
-              <uui-icon slot="icon" name="document"></uui-icon>
-            </uui-menu-item>
-          </uui-menu-item>
-          <uui-menu-item label="Blog">
-            <uui-icon slot="icon" name="calendar"></uui-icon>
-          </uui-menu-item>
-          <uui-menu-item label="Contact"></uui-menu-item>
-        </uui-menu-item>
-        <uui-menu-item label="Recycle Bin">
-          <uui-icon slot="icon" name="delete"></uui-icon>
-        </uui-menu-item>
-      </div>
-    `;
+    return html`<slot></slot>`;
   }
 }
 

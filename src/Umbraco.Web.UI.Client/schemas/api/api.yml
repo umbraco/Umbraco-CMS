@@ -256,19 +256,27 @@ components:
     UmbracoPerformInstallDatabaseConfiguration:
       type: object
       properties:
+        server:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+        databaseName:
+          type: string
+          nullable: true
+        databaseType:
+          type: string
+          nullable: true
+        useIntegratedAuthentication:
+          type: boolean
+          nullable: true
         connectionString:
           type: string
-        providerName:
-          type: string
-        integratedAuth:
-          type: boolean
-        databaseProviderMetadataId:
-          type: string
-      required:
-        - connectionString
-        - providerName
-        - integratedAuth
-        - databaseProviderMetadataId
+          nullable: true
     UmbracoPerformInstallRequest:
       type: object
       properties:

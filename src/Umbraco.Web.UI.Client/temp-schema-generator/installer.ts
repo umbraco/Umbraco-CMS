@@ -51,10 +51,13 @@ export interface UmbracoPerformInstallRequest {
 }
 
 export interface UmbracoPerformInstallDatabaseConfiguration {
-  connectionString: string;
-  providerName: string;
-  integratedAuth: boolean;
-  databaseProviderMetadataId: string;
+  server?: string | null;
+  password?: string | null;
+  username?: string | null;
+  databaseName?: string | null;
+  databaseType?: string | null;
+  useIntegratedAuthentication?: boolean | null;
+  connectionString?: string | null;
 }
 
 export interface UmbracoInstaller {
