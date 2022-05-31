@@ -16,3 +16,4 @@ export type UmbracoPerformInstallDatabaseConfiguration =
 // Models
 export type UmbracoInstallerDatabaseModel = components['schemas']['UmbracoInstallerDatabaseModel'];
 export type UmbracoInstallerUserModel = components['schemas']['UmbracoInstallerUserModel'];
+export type TelemetryModel = components['schemas']['TelemetryModel'];

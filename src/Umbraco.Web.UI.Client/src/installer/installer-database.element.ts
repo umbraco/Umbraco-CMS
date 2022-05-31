@@ -203,6 +203,7 @@ export class UmbInstallerDatabase extends LitElement {
             <uui-select
               id="database-type"
               name="databaseType"
+              label="database-type"
               .options=${this._options || []}
               @change=${this._handleDatabaseTypeChange}></uui-select>
           </uui-form-layout-item>

@@ -1,4 +1,5 @@
 import './installer-database.element';
+import './installer-consent.element';
 import './installer-installing.element';
 import './installer-layout.element';
 import './installer-user.element';
@@ -34,11 +35,16 @@ export class UmbInstaller extends LitElement {
   private _renderSection() {
     switch (this.step) {
       case 2:
+        return html`<umb-installer-consent
+          .telemetryLevels=${this.installerSettings?.user.consentLevels}
+          .data=${this.data}
+          @submit=${this._handleSubmit}></umb-installer-consent>`;
+      case 3:
         return html`<umb-installer-database
           .databases=${this.installerSettings?.databases}
           .data=${this.data}
           @submit=${this._handleSubmit}></umb-installer-database>`;
-      case 3:
+      case 4:
         return html`<umb-installer-installing></umb-installer-installing>`;
 
       default:
@@ -62,7 +68,7 @@ export class UmbInstaller extends LitElement {
 
   private _goToNextStep() {
     //TODO: Fix with router
-    if (this.step === 2) {
+    if (this.step === 3) {
       if (this.data) {
         this._postInstall(this.data);
       }

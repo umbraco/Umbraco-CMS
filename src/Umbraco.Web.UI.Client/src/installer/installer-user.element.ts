@@ -58,7 +58,6 @@ export class UmbInstallerUser extends LitElement {
   };
 
   render() {
-    console.log('data?', this.data);
     return html` <div class="uui-text">
       <h1>Install Umbraco</h1>
       <uui-form>

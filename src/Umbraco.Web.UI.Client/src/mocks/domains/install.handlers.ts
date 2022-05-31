@@ -72,7 +72,6 @@ export const handlers = [
   }),
 
   rest.post<UmbracoPerformInstallRequest>('/umbraco/backoffice/install', (req, res, ctx) => {
-    console.log(req.body);
     if (req.body.database.databaseName === 'fail') {
       return res(
         // Respond with a 200 status code
