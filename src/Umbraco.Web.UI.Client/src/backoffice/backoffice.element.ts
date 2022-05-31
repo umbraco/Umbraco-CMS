@@ -1,10 +1,10 @@
-import './backoffice-header.element';
-import './backoffice-sidebar.element';
-import './backoffice-main.element';
-
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+
+import './backoffice-header.element';
+import './backoffice-sidebar.element';
+import './backoffice-main.element';
 
 @defineElement('umb-backoffice')
 export class UmbBackoffice extends LitElement {
