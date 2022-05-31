@@ -5,14 +5,9 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
-
-/// <summary>
-///     Default <see cref="IDistributedCacheBinder" /> implementation.
-/// </summary>
 public class DistributedCacheBinder :
     INotificationHandler<DictionaryItemDeletedNotification>,
     INotificationHandler<DictionaryItemSavedNotification>,
@@ -47,29 +42,30 @@ public class DistributedCacheBinder :
     private readonly DistributedCache _distributedCache;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DistributedCacheBinder" /> class.
+    /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
     /// </summary>
-    public DistributedCacheBinder(DistributedCache distributedCache) => _distributedCache = distributedCache;
-
-    #region MediaService
-
-    public void Handle(MediaTreeChangeNotification notification) =>
-        _distributedCache.RefreshMediaCache(notification.Changes.ToArray());
-
-    #endregion
+    public DistributedCacheBinder(DistributedCache distributedCache)
+    {
+        _distributedCache = distributedCache;
+    }
 
     #region PublicAccessService
 
-    public void Handle(PublicAccessEntrySavedNotification notification) => _distributedCache.RefreshPublicAccess();
+    public void Handle(PublicAccessEntrySavedNotification notification)
+    {
+        _distributedCache.RefreshPublicAccess();
+    }
 
     public void Handle(PublicAccessEntryDeletedNotification notification) => _distributedCache.RefreshPublicAccess();
-
-    public void Handle(ContentTreeChangeNotification notification) =>
-        _distributedCache.RefreshContentCache(notification.Changes.ToArray());
 
     #endregion
 
     #region ContentService
+
+    public void Handle(ContentTreeChangeNotification notification)
+    {
+        _distributedCache.RefreshContentCache(notification.Changes.ToArray());
+    }
 
     // private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
     // {
@@ -83,7 +79,6 @@ public class DistributedCacheBinder :
     #endregion
 
     #region LocalizationService / Dictionary
-
     public void Handle(DictionaryItemSavedNotification notification)
     {
         foreach (IDictionaryItem entity in notification.SavedEntities)
@@ -149,7 +144,7 @@ public class DistributedCacheBinder :
     #region LocalizationService / Language
 
     /// <summary>
-    ///     Fires when a language is deleted
+    /// Fires when a language is deleted
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(LanguageDeletedNotification notification)
@@ -161,7 +156,7 @@ public class DistributedCacheBinder :
     }
 
     /// <summary>
-    ///     Fires when a language is saved
+    /// Fires when a language is saved
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(LanguageSavedNotification notification)
@@ -226,7 +221,7 @@ public class DistributedCacheBinder :
     #region FileService
 
     /// <summary>
-    ///     Removes cache for template
+    /// Removes cache for template
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(TemplateDeletedNotification notification)
@@ -238,7 +233,7 @@ public class DistributedCacheBinder :
     }
 
     /// <summary>
-    ///     Refresh cache for template
+    /// Refresh cache for template
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(TemplateSavedNotification notification)
@@ -271,20 +266,33 @@ public class DistributedCacheBinder :
 
     #endregion
 
+    #region MediaService
+
+    public void Handle(MediaTreeChangeNotification notification)
+    {
+        _distributedCache.RefreshMediaCache(notification.Changes.ToArray());
+    }
+
+    #endregion
+
     #region MemberService
 
-    public void Handle(MemberDeletedNotification notification) =>
+    public void Handle(MemberDeletedNotification notification)
+    {
         _distributedCache.RemoveMemberCache(notification.DeletedEntities.ToArray());
+    }
 
-    public void Handle(MemberSavedNotification notification) =>
+    public void Handle(MemberSavedNotification notification)
+    {
         _distributedCache.RefreshMemberCache(notification.SavedEntities.ToArray());
+    }
 
     #endregion
 
     #region MemberGroupService
 
     /// <summary>
-    ///     Fires when a member group is deleted
+    /// Fires when a member group is deleted
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(MemberGroupDeletedNotification notification)
@@ -296,7 +304,7 @@ public class DistributedCacheBinder :
     }
 
     /// <summary>
-    ///     Fires when a member group is saved
+    /// Fires when a member group is saved
     /// </summary>
     /// <param name="notification"></param>
     public void Handle(MemberGroupSavedNotification notification)
