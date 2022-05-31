@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
 // TODO: how do we want to type extensions?
-export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditor' | 'dashboard';
+export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'dashboard';
 
 
 export interface UmbExtensionManifestBase {
@@ -19,7 +19,7 @@ export type UmbExtensionManifestSection = {
 } & UmbExtensionManifestBase;
 
 export type UmbExtensionManifestPropertyEditor = {
-  type: 'propertyEditor';
+  type: 'propertyEditorUI';
   meta: UmbManifestPropertyEditorMeta;
 } & UmbExtensionManifestBase;
 
