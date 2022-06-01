@@ -66,7 +66,6 @@ public class ReportSiteTask : RecurringHostedServiceBase
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
-                // CONTENT-TYPE header
                 request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json");
 
                 // Make a HTTP Post to telemetry service
