@@ -114,6 +114,7 @@ export class UmbExtensionRegistry {
   extensionsOfType(type: 'propertyEditor'): Observable<Array<UmbExtensionManifestPropertyEditor>>;
   extensionsOfType(type: UmbExtensionManifestCoreTypes): Observable<Array<UmbExtensionManifestCore>>;
   extensionsOfType(type: string): Observable<Array<UmbExtensionManifestOther>>;
+  extensionsOfType<T extends UmbExtensionManifestBase>(type: string): Observable<Array<T>>;
   extensionsOfType(type: string) {
     return this.extensions.pipe(
       map((exts: Array<UmbExtensionManifest>) => exts
