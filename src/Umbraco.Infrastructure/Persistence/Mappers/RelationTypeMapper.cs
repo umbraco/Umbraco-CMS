@@ -20,9 +20,7 @@ public sealed class RelationTypeMapper : BaseMapper
     {
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Id), nameof(RelationTypeDto.Id));
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.Alias), nameof(RelationTypeDto.Alias));
-        DefineMap<RelationType, RelationTypeDto>(
-            nameof(RelationType.ChildObjectType),
-            nameof(RelationTypeDto.ChildObjectType));
+        DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.ChildObjectType), nameof(RelationTypeDto.ChildObjectType));
         DefineMap<RelationType, RelationTypeDto>(nameof(RelationType.IsBidirectional), nameof(RelationTypeDto.Dual));
         DefineMap<RelationType, RelationTypeDto>(
             nameof(RelationType.IsDependency),
