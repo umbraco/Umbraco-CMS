@@ -5,7 +5,7 @@ export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'das
 
 export type UmbExtensionManifestJSModel = {
   elementName?: string;
-}
+};
 
 export type UmbExtensionManifestBase = {
   //type: string;
@@ -14,21 +14,19 @@ export type UmbExtensionManifestBase = {
   js?: string | (() => Promise<unknown>);
   elementName?: string;
   //meta: undefined;
-}
-
+};
 
 // Core manifest types:
 
 // Section:
 export type UmbManifestSectionMeta = {
-  pathname: string, // TODO: how to we want to support pretty urls?
+  pathname: string; // TODO: how to we want to support pretty urls?
   weight: number;
-}
+};
 export type UmbExtensionManifestSection = {
   type: 'section';
   meta: UmbManifestSectionMeta;
 } & UmbExtensionManifestBase;
-
 
 // propertyEditor:
 export type UmbManifestPropertyEditorMeta = {
@@ -36,60 +34,47 @@ export type UmbManifestPropertyEditorMeta = {
   group: string; // TODO: use group alias or other name to indicate that it could be used to look up translation.
   //groupAlias: string;
   //description: string;
-  //configConfig: unknown; // we need a name and concept for how to setup editor-UI for 
-}
+  //configConfig: unknown; // we need a name and concept for how to setup editor-UI for
+};
 export type UmbExtensionManifestPropertyEditor = {
   type: 'propertyEditorUI';
   meta: UmbManifestPropertyEditorMeta;
 } & UmbExtensionManifestBase;
-
-
 
 // Dashboard:
 export type UmbManifestDashboardMeta = {
   sections: Array<string>;
   pathname: string; // TODO: how to we want to support pretty urls?
   weight: number;
-}
+};
 export type UmbExtensionManifestDashboard = {
   type: 'dashboard';
   meta: UmbManifestDashboardMeta;
 } & UmbExtensionManifestBase;
 
-
-
-export type UmbExtensionManifestCore = 
-UmbExtensionManifestSection | 
-UmbExtensionManifestDashboard |
-UmbExtensionManifestPropertyEditor;
-
-
+export type UmbExtensionManifestCore =
+  | UmbExtensionManifestSection
+  | UmbExtensionManifestDashboard
+  | UmbExtensionManifestPropertyEditor;
 
 // the 'Other' manifest type:
 
-type UmbExtensionManifestOther = 
-{
+type UmbExtensionManifestOther = {
   type: string;
   meta: unknown;
 } & UmbExtensionManifestBase;
 
-export type UmbExtensionManifest = 
-UmbExtensionManifestCore |
-UmbExtensionManifestOther;
+export type UmbExtensionManifest = UmbExtensionManifestCore | UmbExtensionManifestOther;
 
 type UmbExtensionManifestCoreTypes = Pick<UmbExtensionManifestCore, 'type'>['type'];
 
-
-
-
 export class UmbExtensionRegistry {
-
-  private _extensions: BehaviorSubject<Array<UmbExtensionManifest>> = new BehaviorSubject(<Array<UmbExtensionManifest>>[]);
+  private _extensions = new BehaviorSubject(<Array<UmbExtensionManifest>>[]);
   public readonly extensions: Observable<Array<UmbExtensionManifest>> = this._extensions.asObservable();
 
-  register<T extends UmbExtensionManifest = UmbExtensionManifestCore>(manifest: T):void {
+  register<T extends UmbExtensionManifest = UmbExtensionManifestCore>(manifest: T): void {
     const extensionsValues = this._extensions.getValue();
-    const extension = extensionsValues.find(extension => extension.alias === manifest.alias);
+    const extension = extensionsValues.find((extension) => extension.alias === manifest.alias);
 
     if (extension) {
       console.error(`Extension with alias ${manifest.alias} is already registered`);
@@ -99,12 +84,15 @@ export class UmbExtensionRegistry {
     this._extensions.next([...extensionsValues, manifest]);
   }
 
-  getByAlias (alias: string): Observable<UmbExtensionManifest | null> {
+  getByAlias(alias: string): Observable<UmbExtensionManifest | null> {
     // TODO: make pipes prettier/simpler/reuseable
-    return this.extensions.pipe(map(((dataTypes: Array<UmbExtensionManifest>) => dataTypes.find((extension: UmbExtensionManifest) => extension.alias === alias) || null)));
+    return this.extensions.pipe(
+      map(
+        (dataTypes: Array<UmbExtensionManifest>) =>
+          dataTypes.find((extension: UmbExtensionManifest) => extension.alias === alias) || null
+      )
+    );
   }
-
-
 
   // TODO: implement unregister of extension
 
@@ -116,9 +104,6 @@ export class UmbExtensionRegistry {
   extensionsOfType(type: string): Observable<Array<UmbExtensionManifestOther>>;
   extensionsOfType<T extends UmbExtensionManifestBase>(type: string): Observable<Array<T>>;
   extensionsOfType(type: string) {
-    return this.extensions.pipe(
-      map((exts: Array<UmbExtensionManifest>) => exts
-        .filter(ext => ext.type === type)
-    ))
+    return this.extensions.pipe(map((exts) => exts.filter((ext) => ext.type === type)));
   }
 }
