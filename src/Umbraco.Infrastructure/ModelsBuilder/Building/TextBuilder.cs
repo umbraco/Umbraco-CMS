@@ -626,7 +626,7 @@ public class TextBuilder : Builder
         var p = typeName.LastIndexOf('.');
         if (p > 0)
         {
-            var x = typeName[..p];
+            var x = typeName.Substring(0, p);
             if (Using.Contains(x))
             {
                 typeName = typeName[(p + 1)..];
