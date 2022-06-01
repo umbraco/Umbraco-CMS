@@ -1,7 +1,6 @@
 import { getInstall, postInstall } from '../core/api/fetcher';
 import { PostInstallRequest, UmbracoInstaller } from '../core/models';
-import { ApiResponse } from 'openapi-typescript-fetch';
-import { BehaviorSubject, Observable, ReplaySubject, Subject, timeout } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 
 export class UmbInstallerContext {
   private _data: BehaviorSubject<PostInstallRequest> = new BehaviorSubject<PostInstallRequest>({
