@@ -178,7 +178,7 @@ public class MacroTagParser
 
                 fieldResult.Remove(0, tagIndex);
 
-                var tag = fieldResult.ToString()[..(fieldResult.ToString().IndexOf(">", StringComparison.InvariantCulture) + 1)];
+                var tag = fieldResult.ToString().Substring(0, fieldResult.ToString().IndexOf(">", StringComparison.InvariantCulture) + 1);
                 Dictionary<string, string> attributes = XmlHelper.GetAttributesFromElement(tag);
 
                 // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
