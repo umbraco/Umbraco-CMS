@@ -645,7 +645,7 @@ public class TextBuilder : Builder
         // symbol to test is the first part of the name
         // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
         p = typeName.IndexOf('.');
-        var symbol = p > 0 ? typeName[..p] : typeName;
+        var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
 
         // what we should find - WITHOUT any generic <T> thing - just the type
         // no 'using' = the exact symbol
