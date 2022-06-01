@@ -840,7 +840,7 @@ internal abstract class ExpressionVisitorBase
         return (c == '"' || c == '`' || c == '\'') && exp[^1] == c
             ? exp.Length == 1
                 ? string.Empty
-                : exp[1..^1]
+                : exp.Substring(1, exp.Length - 2)
             : exp;
     }
 }
