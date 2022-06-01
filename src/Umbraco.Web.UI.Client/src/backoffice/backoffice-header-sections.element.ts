@@ -1,14 +1,14 @@
-import { Subscription } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
+import { Subscription } from 'rxjs';
 
 import { getUserSections } from '../core/api/fetcher';
-import { UmbExtensionManifest } from '../core/extension';
+import { UmbContextConsumerMixin } from '../core/context';
+import { UmbExtensionManifestSection } from '../core/extension';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 import { UmbSectionContext } from '../section.context';
-import { UmbContextConsumerMixin } from '../core/context';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
@@ -45,13 +45,13 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
   private _allowedSection: Array<string> = [];
 
   @state()
-  private _sections: Array<UmbExtensionManifest> = [];
+  private _sections: Array<UmbExtensionManifestSection> = [];
 
   @state()
-  private _visibleSections: Array<UmbExtensionManifest> = [];
+  private _visibleSections: Array<UmbExtensionManifestSection> = [];
 
   @state()
-  private _extraSections: Array<UmbExtensionManifest> = [];
+  private _extraSections: Array<UmbExtensionManifestSection> = [];
 
   @state()
   private _currentSectionAlias = '';
@@ -61,9 +61,9 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
   private _sectionSubscription?: Subscription;
   private _currentSectionSubscription?: Subscription;
   private _locationSubscription?: Subscription;
-  private _location? : UmbRouteLocation;
+  private _location?: UmbRouteLocation;
 
-  constructor () {
+  constructor() {
     super();
 
     this.consumeContext('umbRouter', (_instance: UmbRouter) => {
@@ -83,8 +83,8 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     this._open = !this._open;
   }
 
-  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifest) {
-    const tab = e.currentTarget as any;
+  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifestSection) {
+    const tab = e.currentTarget as HTMLElement;
 
     // TODO: we need to be able to prevent the tab from setting the active state
     if (tab.id === 'moreTab') {
@@ -108,38 +108,37 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     this._open = false;
   }
 
-  private _useLocation () {
+  private _useLocation() {
     this._locationSubscription?.unsubscribe();
-      
-    this._locationSubscription = this._router?.location
-    .subscribe((location: UmbRouteLocation) => {
+
+    this._locationSubscription = this._router?.location.subscribe((location: UmbRouteLocation) => {
       this._location = location;
     });
   }
 
-  private _useCurrentSection () {
+  private _useCurrentSection() {
     this._currentSectionSubscription?.unsubscribe();
 
-    this._currentSectionSubscription = this._sectionContext?.getCurrent()
-    .subscribe(section => {
+    this._currentSectionSubscription = this._sectionContext?.getCurrent().subscribe((section) => {
       this._currentSectionAlias = section.alias;
     });
   }
 
   private async _useSections() {
     this._sectionSubscription?.unsubscribe();
-    
+
     const { data } = await getUserSections({});
     this._allowedSection = data.sections;
 
-    this._sectionSubscription = this._sectionContext?.getSections()
-      .subscribe((sectionExtensions: any) => {
-        this._sections = sectionExtensions.filter((section: any) => this._allowedSection.includes(section.alias));
-        this._visibleSections = this._sections;
-        const currentSectionAlias = this._sections.find(section => section.meta.pathname === this._location?.params?.section)?.alias;
-        if (!currentSectionAlias) return;
-        this._sectionContext?.setCurrent(currentSectionAlias);
-      });
+    this._sectionSubscription = this._sectionContext?.getSections().subscribe((sectionExtensions) => {
+      this._sections = sectionExtensions.filter((section) => this._allowedSection.includes(section.alias));
+      this._visibleSections = this._sections;
+      const currentSectionAlias = this._sections.find(
+        (section) => section.meta.pathname === this._location?.params?.section
+      )?.alias;
+      if (!currentSectionAlias) return;
+      this._sectionContext?.setCurrent(currentSectionAlias);
+    });
   }
 
   disconnectedCallback(): void {
