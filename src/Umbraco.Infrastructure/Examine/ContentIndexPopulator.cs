@@ -49,10 +49,8 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
         IValueSetBuilder<IContent> contentValueSetBuilder)
     {
         _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-        _umbracoDatabaseFactory =
-            umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
-        _contentValueSetBuilder =
-            contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
+        _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
+        _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishedValuesOnly = publishedValuesOnly;
         _parentId = parentId;
