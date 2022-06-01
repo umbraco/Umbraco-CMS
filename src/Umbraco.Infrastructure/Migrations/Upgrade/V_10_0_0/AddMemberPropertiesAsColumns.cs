@@ -138,8 +138,12 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         // Hard coding the aliases, since we want to be able to delete the constants...
         string[] propertyTypesToDelete =
         {
-            "umbracoMemberFailedPasswordAttempts", "umbracoMemberApproved", "umbracoMemberLockedOut",
-            "umbracoMemberLastLockoutDate", "umbracoMemberLastLogin", "umbracoMemberLastPasswordChangeDate",
+            "umbracoMemberFailedPasswordAttempts",
+            "umbracoMemberApproved",
+            "umbracoMemberLockedOut",
+            "umbracoMemberLastLockoutDate",
+            "umbracoMemberLastLogin",
+            "umbracoMemberLastPasswordChangeDate",
         };
 
         Sql<ISqlContext> idQuery = Database.SqlContext.Sql().Select<PropertyTypeDto>(x => x.Id)
