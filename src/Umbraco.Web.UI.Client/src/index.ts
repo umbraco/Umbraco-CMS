@@ -96,6 +96,17 @@ const registerInternalManifests = async () => {
     },
     {
       type: 'propertyEditorUI',
+      alias: 'External.PropertyEditorUI.Test',
+      name: 'Text',
+      elementName: 'external-property-editor-test', //Gets the element name from JS file.
+      js: '/src/property-editors/external-property-editor-test.js',
+      meta: {
+        icon: 'document',
+        group: 'common',
+      }
+    },
+    {
+      type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Textarea',
       name: 'Textarea',
       elementName: 'umb-property-editor-textarea',

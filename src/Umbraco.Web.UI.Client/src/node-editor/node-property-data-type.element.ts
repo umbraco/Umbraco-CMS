@@ -6,6 +6,7 @@ import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { mergeMap, Subscription, map, switchMap } from 'rxjs';
 import { DataTypeEntity } from '../mocks/data/content.data';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
+import { loadExtension } from '../core/extension/load-extension.function';
 
 @customElement('umb-node-property-data-type')
 class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
@@ -96,28 +97,30 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
 
     const oldValue = this._element;
 
-    if (typeof _propertyEditorUI.js === 'function') {
-      this._element = _propertyEditorUI.js();
-      // TODO: Niels: I guess this is not the element returned but a Promise of loading the JS, which hopefully exports the Class or maybe an ElementName prop?
-    }
-    if (typeof _propertyEditorUI.js === 'string') {
-      // const loadJsPromise = (() => import(_propertyEditorUI.js as string))();
-      // TODO: show a loader until JS is loaded?
-    }
+    loadExtension(_propertyEditorUI)?.then(js => {
 
-    if (_propertyEditorUI.elementName) {
-      this._element = document.createElement(_propertyEditorUI.elementName);
-    }
+      // TODO: something with JS
+      console.log('ext js', js);
+      // IF we got a JS file loaded, we can use its elementName prop.
+      const elementName = _propertyEditorUI.elementName || js?.elementName;
 
-    // TODO: Set/Parse Data-Type-UI-configuration
+      if (elementName) {
+        this._element = document.createElement(elementName);
+      }
+  
+      // TODO: Set/Parse Data-Type-UI-configuration
+  
+      if(oldValue) {
+        oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange);
+      }
+      this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
+  
+      this._element.value = this.value;// Be aware its duplicated code
+      this.requestUpdate('element', oldValue);
+    }).catch(() => {
+      // TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
+    });
 
-    if(oldValue) {
-      oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange);
-    }
-    this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
-
-    this._element.value = this.value;// Be aware its duplicated code
-    this.requestUpdate('element', oldValue);
   }
 
   private _onPropertyEditorChange = ( e:CustomEvent) => {

@@ -26,6 +26,8 @@ class UmbPropertyEditorText extends LitElement {
   }
 }
 
+export const elementName = 'umb-property-editor-text';
+
 declare global {
   interface HTMLElementTagNameMap {
     'umb-property-editor-text': UmbPropertyEditorText;
