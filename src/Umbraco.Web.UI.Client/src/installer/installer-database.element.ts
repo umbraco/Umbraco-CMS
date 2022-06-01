@@ -35,11 +35,18 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
         margin-left: auto;
         min-width: 120px;
       }
+
+      #error-message {
+        color: var(--uui-color-error, red);
+      }
     `,
   ];
 
   @query('#button-install')
   private _installButton!: UUIButtonElement;
+
+  @query('#error-message')
+  private _errorMessage!: HTMLElement;
 
   @property({ attribute: false })
   public databaseFormData!: UmbracoPerformInstallDatabaseConfiguration;
@@ -127,9 +134,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   private _handleFulfilled() {
     this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
   }
-  private _handleRejected(error: Error) {
+  private _handleRejected(error: any) {
     this._installButton.state = 'failed';
-    console.log('ERROR hallo', error);
+    this._errorMessage.innerText = error.errorMessage;
   }
 
   private _onBack() {
@@ -265,6 +272,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
           </uui-form-layout-item>
 
           ${this._renderSettings()}
+
+          <!-- Maybe move this error message to the installer.element -->
+          <p id="error-message"></p>
 
           <div id="buttons">
             <uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>

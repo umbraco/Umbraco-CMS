@@ -29,7 +29,11 @@ export class UmbInstallerContext {
   }
 
   public requestInstall() {
-    return postInstall(this._data.getValue());
+    return new Promise((resolve, reject) => {
+      postInstall(this._data.getValue()).then(resolve, ({ data }) => {
+        reject(data);
+      });
+    });
   }
 
   private loadIntallerSettings() {
