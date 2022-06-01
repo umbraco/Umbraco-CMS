@@ -170,7 +170,7 @@ public class TextBuilder : Builder
                 break;
             }
 
-            yield return error[p..n];
+            yield return error.Substring(p, n - p);
             p = n + 1;
         }
 
