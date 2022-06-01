@@ -31,11 +31,7 @@ public sealed class MediaMapper : BaseMapper
         DefineMap<Core.Models.Media, NodeDto>(nameof(Core.Models.Media.Name), nameof(NodeDto.Text));
         DefineMap<Core.Models.Media, NodeDto>(nameof(Core.Models.Media.Trashed), nameof(NodeDto.Trashed));
         DefineMap<Core.Models.Media, NodeDto>(nameof(Core.Models.Media.CreatorId), nameof(NodeDto.UserId));
-        DefineMap<Core.Models.Media, ContentDto>(
-            nameof(Core.Models.Media.ContentTypeId),
-            nameof(ContentDto.ContentTypeId));
-        DefineMap<Core.Models.Media, ContentVersionDto>(
-            nameof(Core.Models.Media.UpdateDate),
-            nameof(ContentVersionDto.VersionDate));
+        DefineMap<Core.Models.Media, ContentDto>(nameof(Core.Models.Media.ContentTypeId), nameof(ContentDto.ContentTypeId));
+        DefineMap<Core.Models.Media, ContentVersionDto>(nameof(Core.Models.Media.UpdateDate), nameof(ContentVersionDto.VersionDate));
     }
 }
