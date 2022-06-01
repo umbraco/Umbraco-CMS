@@ -108,10 +108,7 @@ public static class LoggerConfigExtensions
             .Enrich.WithProcessId()
             .Enrich.WithProcessName()
             .Enrich.WithThreadId()
-            .Enrich
-            .WithProperty(
-                "ApplicationId",
-                hostEnvironment.GetTemporaryApplicationId()) // Updated later by ApplicationIdEnricher
+            .Enrich.WithProperty("ApplicationId", hostingEnvironment.ApplicationId) // Updated later by ApplicationIdEnricher
             .Enrich.WithProperty("MachineName", Environment.MachineName)
             .Enrich.With<Log4NetLevelMapperEnricher>()
             .Enrich.FromLogContext(); // allows us to dynamically enrich
