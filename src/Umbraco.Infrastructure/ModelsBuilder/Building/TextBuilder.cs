@@ -672,7 +672,7 @@ public class TextBuilder : Builder
         // note: all-or-nothing, not trying to segment the using clause
         typeName = s.Replace("+", ".");
         p = typeName.IndexOf('.');
-        symbol = typeName[..p];
+        symbol = typeName.Substring(0, p);
         match = symbol;
 
         // still ambiguous, must prepend global::
