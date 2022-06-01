@@ -11,7 +11,7 @@ export type UmbExtensionManifestBase = {
   //type: string;
   alias: string;
   name: string;
-  js?: string | (() => Promise<UmbExtensionManifestJSModel>);
+  js?: string | (() => Promise<unknown>);
   elementName?: string;
   //meta: undefined;
 }
