@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
                 // Check for current install ID
                 var installCookie = _cookieManager.GetCookieValue(Constants.Web.InstallerCookieName);
-                if (!Guid.TryParse(installCookie, out var installId))
+                if (!Guid.TryParse(installCookie, out Guid installId))
                 {
                     installId = Guid.NewGuid();
 
