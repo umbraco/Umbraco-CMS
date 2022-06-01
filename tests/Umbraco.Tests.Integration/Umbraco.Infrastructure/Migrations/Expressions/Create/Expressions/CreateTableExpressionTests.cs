@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             var builder = GetBuilder(database);
             builder.Table("foo")
-                .WithColumn("bar").AsInt32().PrimaryKey()
+                .WithColumn("bar").AsInt32().PrimaryKey("PK_foo")
                 .Do();
 
             // (TableName, ColumnName, ConstraintName) 
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Expres
 
             var builder = GetBuilder(database);
             builder.Table("foo")
-                .WithColumn("bar").AsInt32()
+                .WithColumn("bar").AsInt32().PrimaryKey("PK_foo")
                 .Do();
 
             builder = GetBuilder(database);
