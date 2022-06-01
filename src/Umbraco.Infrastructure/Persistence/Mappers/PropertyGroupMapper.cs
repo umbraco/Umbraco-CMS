@@ -18,9 +18,7 @@ public sealed class PropertyGroupMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Id), nameof(PropertyTypeGroupDto.Id));
-        DefineMap<PropertyGroup, PropertyTypeGroupDto>(
-            nameof(PropertyGroup.Key),
-            nameof(PropertyTypeGroupDto.UniqueId));
+        DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Key), nameof(PropertyTypeGroupDto.UniqueId));
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Type), nameof(PropertyTypeGroupDto.Type));
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Name), nameof(PropertyTypeGroupDto.Text));
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Alias), nameof(PropertyTypeGroupDto.Alias));
