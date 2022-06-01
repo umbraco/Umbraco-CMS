@@ -25,21 +25,18 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     private readonly IEntityRepositoryExtended _entityRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
-    public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger,
-        IRelationTypeRepository relationTypeRepository, IEntityRepositoryExtended entityRepository)
+    public RelationRepository(IScopeAccessor scopeAccessor, ILogger<RelationRepository> logger, IRelationTypeRepository relationTypeRepository, IEntityRepositoryExtended entityRepository)
         : base(scopeAccessor, AppCaches.NoCache, logger)
     {
         _relationTypeRepository = relationTypeRepository;
         _entityRepository = entityRepository;
     }
 
-    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize,
-        out long totalRecords, params Guid[] entityTypes) => GetPagedParentEntitiesByChildId(childId, pageIndex,
-        pageSize, out totalRecords, new int[0], entityTypes);
+    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
 
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize,
-        out long totalRecords, params Guid[] entityTypes) => GetPagedChildEntitiesByParentId(parentId, pageIndex,
-        pageSize, out totalRecords, new int[0], entityTypes);
+    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
+        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, new int[0], entityTypes);
 
     public void Save(IEnumerable<IRelation> relations)
     {
@@ -71,7 +68,6 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
                         return r;
                     },
                     RelationFactory.BuildDto); // value = DTO
-
 
                 foreach (RelationDto dto in entitiesAndDtos.Values)
                 {
@@ -116,8 +112,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         }
     }
 
-    public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize,
-        out long totalRecords, Ordering? ordering)
+    public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
 
@@ -137,15 +132,14 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         List<RelationDto>? dtos = page.Items;
         totalRecords = page.TotalItems;
 
-        var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())
+        var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())?
             .ToDictionary(x => x.Id, x => x);
 
         var result = dtos.Select(r =>
         {
-            if (!relTypes.TryGetValue(r.RelationType, out IRelationType? relType))
+            if (relTypes is null || !relTypes.TryGetValue(r.RelationType, out IRelationType? relType))
             {
-                throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist",
-                    r.RelationType));
+                throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", r.RelationType));
             }
 
             return DtoToEntity(r, relType);
@@ -153,7 +147,6 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
 
         return result;
     }
-
 
     public void DeleteByParent(int parentId, params string[] relationTypeAliases)
     {
@@ -222,15 +215,14 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
             .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
     }
 
-    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize,
-        out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
+    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
+
         // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
         // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
         // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
         // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
         // will just return the bare minimum entity data.
-        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize,
-            out totalRecords, null, null, sql =>
+        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
             {
                 SqlJoinRelations(sql);
 
@@ -243,15 +235,14 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
                 }
             });
 
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize,
-        out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
+    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
+
         // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
         // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
         // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
         // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
         // will just return the bare minimum entity data.
-        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize,
-            out totalRecords, null, null, sql =>
+        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
             {
                 SqlJoinRelations(sql);
 
@@ -321,7 +312,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     protected override IRelation? PerformGet(int id)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new {id});
+        sql.Where(GetBaseWhereClause(), new { id });
 
         RelationDto? dto = Database.Fetch<RelationDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
         if (dto == null)
@@ -332,8 +323,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
         IRelationType? relationType = _relationTypeRepository.Get(dto.RelationType);
         if (relationType == null)
         {
-            throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist",
-                dto.RelationType));
+            throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
         }
 
         return DtoToEntity(dto, relationType);
@@ -363,7 +353,8 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
     }
 
     private IEnumerable<IRelation> DtosToEntities(IEnumerable<RelationDto> dtos) =>
-        //NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
+
+        // NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
         dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).WhereNotNull().ToList();
 
     private static IRelation? DtoToEntity(RelationDto dto, IRelationType? relationType)
@@ -401,7 +392,6 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
             .InnerJoin<NodeDto>("uparent")
             .On<RelationDto, NodeDto>((rel, node) => rel.ParentId == node.NodeId, aliasRight: "uparent");
 
-
         return sql;
     }
 
@@ -409,7 +399,7 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
 
     protected override IEnumerable<string> GetDeleteClauses()
     {
-        var list = new List<string> {"DELETE FROM umbracoRelation WHERE id = @id"};
+        var list = new List<string> { "DELETE FROM umbracoRelation WHERE id = @id" };
         return list;
     }
 
@@ -448,23 +438,32 @@ internal class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelat
 
 internal class RelationItemDto
 {
-    [Column(Name = "nodeId")] public int ChildNodeId { get; set; }
+    [Column(Name = "nodeId")]
+    public int ChildNodeId { get; set; }
 
-    [Column(Name = "nodeKey")] public Guid ChildNodeKey { get; set; }
+    [Column(Name = "nodeKey")]
+    public Guid ChildNodeKey { get; set; }
 
-    [Column(Name = "nodeName")] public string? ChildNodeName { get; set; }
+    [Column(Name = "nodeName")]
+    public string? ChildNodeName { get; set; }
 
-    [Column(Name = "nodeObjectType")] public Guid ChildNodeObjectType { get; set; }
+    [Column(Name = "nodeObjectType")]
+    public Guid ChildNodeObjectType { get; set; }
 
-    [Column(Name = "contentTypeIcon")] public string? ChildContentTypeIcon { get; set; }
+    [Column(Name = "contentTypeIcon")]
+    public string? ChildContentTypeIcon { get; set; }
 
-    [Column(Name = "contentTypeAlias")] public string? ChildContentTypeAlias { get; set; }
+    [Column(Name = "contentTypeAlias")]
+    public string? ChildContentTypeAlias { get; set; }
 
-    [Column(Name = "contentTypeName")] public string? ChildContentTypeName { get; set; }
+    [Column(Name = "contentTypeName")]
+    public string? ChildContentTypeName { get; set; }
 
-    [Column(Name = "relationTypeName")] public string? RelationTypeName { get; set; }
+    [Column(Name = "relationTypeName")]
+    public string? RelationTypeName { get; set; }
 
-    [Column(Name = "relationTypeAlias")] public string? RelationTypeAlias { get; set; }
+    [Column(Name = "relationTypeAlias")]
+    public string? RelationTypeAlias { get; set; }
 
     [Column(Name = "relationTypeIsDependency")]
     public bool RelationTypeIsDependency { get; set; }

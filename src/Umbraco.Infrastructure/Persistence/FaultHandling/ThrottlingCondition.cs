@@ -291,33 +291,15 @@ public class ThrottlingCondition
             var groupCode = reasonCode >> 8;
 
             // Determine throttling type for all well-known resources that may be subject to throttling conditions.
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.PhysicalDatabaseSpace,
-                (ThrottlingType)(groupCode & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.PhysicalLogSpace,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.LogWriteIoDelay,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.DataReadIoDelay,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.Cpu,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.DatabaseSize,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.Internal,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.WorkerThreads,
-                (ThrottlingType)((groupCode >>= 2) & 3)));
-            condition._throttledResources.Add(Tuple.Create(
-                ThrottledResourceType.Internal,
-                (ThrottlingType)((groupCode >> 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.PhysicalDatabaseSpace, (ThrottlingType)(groupCode & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.PhysicalLogSpace, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.LogWriteIoDelay, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.DataReadIoDelay, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Cpu, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.DatabaseSize, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.WorkerThreads, (ThrottlingType)((groupCode >>= 2) & 3)));
+            condition._throttledResources.Add(Tuple.Create(ThrottledResourceType.Internal, (ThrottlingType)((groupCode >> 2) & 3)));
 
             return condition;
         }

@@ -149,13 +149,9 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            db.Execute(
-                "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
-                new { groupId, nodeIds = group });
+            db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds)", new { groupId, nodeIds = group });
 
-            db.Execute(
-                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
-                new { groupId, nodeIds = group });
+            db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)", new { groupId, nodeIds = group });
         }
 
         if (permissions is not null)
@@ -170,9 +166,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
                 {
                     toInsertPermissions.Add(new UserGroup2NodePermissionDto
                     {
-                        NodeId = e,
-                        Permission = p.ToString(CultureInfo.InvariantCulture),
-                        UserGroupId = groupId,
+                        NodeId = e, Permission = p.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
                     });
                 }
             }
@@ -192,9 +186,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     {
         IUmbracoDatabase db = AmbientScope.Database;
 
-        db.Execute(
-            "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds)",
-            new { groupId, entityIds });
+        db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds)", new { groupId, entityIds });
         db.Execute(
             "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)",
             new { groupId, permission = permission.ToString(CultureInfo.InvariantCulture), entityIds });
@@ -204,9 +196,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         UserGroup2NodePermissionDto[] actions = entityIds.Select(id => new UserGroup2NodePermissionDto
         {
-            NodeId = id,
-            Permission = permission.ToString(CultureInfo.InvariantCulture),
-            UserGroupId = groupId,
+            NodeId = id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId,
         }).ToArray();
 
         db.BulkInsertRecords(actions);
@@ -224,9 +214,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         IUmbracoDatabase db = AmbientScope.Database;
         var groupIdsA = groupIds.ToArray();
 
-        db.Execute(
-            "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds)",
-            new { nodeId = entity.Id, groupIds = groupIdsA });
+        db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds)", new { nodeId = entity.Id, groupIds = groupIdsA });
         db.Execute(
             "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)",
             new
@@ -238,15 +226,12 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         UserGroup2NodePermissionDto[] actionsPermissions = groupIdsA.Select(id => new UserGroup2NodePermissionDto
         {
-            NodeId = entity.Id,
-            Permission = permission.ToString(CultureInfo.InvariantCulture),
-            UserGroupId = id,
+            NodeId = entity.Id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = id,
         }).ToArray();
 
         UserGroup2NodeDto[] actions = groupIdsA.Select(id => new UserGroup2NodeDto
         {
-            NodeId = entity.Id,
-            UserGroupId = id,
+            NodeId = entity.Id, UserGroupId = id,
         }).ToArray();
 
         db.BulkInsertRecords(actions);
@@ -266,9 +251,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         IUmbracoDatabase db = AmbientScope.Database;
 
         db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
-        db.Execute(
-            "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId",
-            new { nodeId = permissionSet.EntityId });
+        db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
 
         var toInsert = new List<UserGroup2NodeDto>();
         var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
@@ -276,8 +259,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
         {
             toInsert.Add(new UserGroup2NodeDto
             {
-                NodeId = permissionSet.EntityId,
-                UserGroupId = entityPermission.UserGroupId,
+                NodeId = permissionSet.EntityId, UserGroupId = entityPermission.UserGroupId,
             });
             foreach (var permission in entityPermission.AssignedPermissions)
             {
@@ -300,7 +282,7 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
     /// <param name="entity"></param>
     protected override void PersistNewItem(ContentPermissionSet entity) =>
 
-        // does the same thing as update
+        // Does the same thing as update
         PersistUpdatedItem(entity);
 
     /// <summary>
@@ -317,11 +299,6 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         ReplaceEntityPermissions(entity);
     }
-
-    #region Not implemented (don't need to for the purposes of this repo)
-
-    protected override ContentPermissionSet PerformGet(int id) =>
-        throw new InvalidOperationException("This method won't be implemented.");
 
     private static EntityPermissionCollection ConvertToPermissionList(
         IEnumerable<UserGroup2NodePermissionDto> result)
@@ -343,6 +320,11 @@ internal class PermissionRepository<TEntity> : EntityRepositoryBase<int, Content
 
         return permissions;
     }
+
+    #region Not implemented (don't need to for the purposes of this repo)
+
+    protected override ContentPermissionSet PerformGet(int id) =>
+        throw new InvalidOperationException("This method won't be implemented.");
 
     protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[]? ids) =>
         throw new InvalidOperationException("This method won't be implemented.");

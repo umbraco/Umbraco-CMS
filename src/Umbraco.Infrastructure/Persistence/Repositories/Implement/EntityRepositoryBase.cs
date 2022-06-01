@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteQueryRepository<TId, TEntity>
     where TEntity : class, IEntity
 {
-    private static RepositoryCachePolicyOptions? defaultOptions;
+    private static RepositoryCachePolicyOptions? _defaultOptions;
     private IRepositoryCachePolicy<TEntity, TId>? _cachePolicy;
     private IQuery<TEntity>? _hasIdQuery;
 
@@ -66,7 +66,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Gets the default <see cref="RepositoryCachePolicyOptions" />
     /// </summary>
-    protected virtual RepositoryCachePolicyOptions DefaultOptions => defaultOptions
+    protected virtual RepositoryCachePolicyOptions DefaultOptions => _defaultOptions
         ??= new RepositoryCachePolicyOptions(() =>
         {
             // get count of all entities of current type (TEntity) to ensure cached result is correct

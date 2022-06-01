@@ -50,12 +50,12 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return groupId.Value;
             });
 
-            // Return from the normal method which will cache
+            // return from the normal method which will cache
             return Get(id);
         }
         catch (InvalidOperationException)
         {
-            // If this is caught it's because we threw this in the caching method
+            // if this is caught it's because we threw this in the caching method
             return null;
         }
     }
@@ -200,7 +200,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
 
         protected override void PersistNewItem(UserGroupWithUsers entity)
         {
-            // Save the user group
+            // save the user group
             _userGroupRepo.PersistNewItem(entity.UserGroup);
 
             if (entity.UserIds == null)
@@ -208,13 +208,13 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return;
             }
 
-            // Now the user association
+            // now the user association
             RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
         }
 
         protected override void PersistUpdatedItem(UserGroupWithUsers entity)
         {
-            // Save the user group
+            // save the user group
             _userGroupRepo.PersistUpdatedItem(entity.UserGroup);
 
             if (entity.UserIds == null)
@@ -222,7 +222,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 return;
             }
 
-            // Now the user association
+            // now the user association
             RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
         }
 
@@ -358,10 +358,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 break;
             case QueryType.Single:
             case QueryType.Many:
-                sql
-                    .Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos),
-                        s => s.Append(
-                            $", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
+                sql.Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos), s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
                 addFrom = true;
                 break;
             default:
@@ -385,9 +382,8 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         GetBaseQuery(isCount ? QueryType.Count : QueryType.Many);
 
     private static void AppendGroupBy(Sql<ISqlContext> sql) =>
-        sql
-            .GroupBy<UserGroupDto>(x =>
-                    x.CreateDate,
+        sql.GroupBy<UserGroupDto>(
+                x => x.CreateDate,
                 x => x.Icon,
                 x => x.Id,
                 x => x.StartContentId,
@@ -408,7 +404,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
             "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
             "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
-            "DELETE FROM umbracoUserGroup WHERE id = @id"
+            "DELETE FROM umbracoUserGroup WHERE id = @id",
         };
         return list;
     }

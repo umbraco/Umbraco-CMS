@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 /// </summary>
 public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionStrategy
 {
-    #region ITransientErrorDetectionStrategy implementation
-
     /// <summary>
     ///     Determines whether the specified exception represents a transient failure that can be compensated by a retry.
     /// </summary>
@@ -113,10 +111,6 @@ public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionS
         return false;
     }
 
-    #endregion
-
-    #region ProcessNetLibErrorCode enumeration
-
     /// <summary>
     ///     Error codes reported by the DBNETLIB module.
     /// </summary>
@@ -168,6 +162,4 @@ public class SqlAzureTransientErrorDetectionStrategy : ITransientErrorDetectionS
 
         EncryptionNotSupported = 20,
     }
-
-    #endregion
 }

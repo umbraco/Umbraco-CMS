@@ -39,12 +39,12 @@ internal class SimilarNodeName
         var model = new StructuredName(name);
         IEnumerable<StructuredName> items = names
             .Where(x => x?.InvariantStartsWith(model.Text) ?? false) // ignore non-matching names
-            .Select(x => new StructuredName(x));
+            .Select(x => new StructuredName(x)).ToArray();
 
         // name is empty, and there are no other names with suffixes, so just return " (1)"
         if (model.IsEmptyName() && !items.Any())
         {
-            model.Suffix = StructuredName.INITIALSUFFIX;
+            model.Suffix = StructuredName.Initialsuffix;
 
             return model.FullName;
         }
@@ -65,7 +65,7 @@ internal class SimilarNodeName
         // no suffix - name without suffix does NOT exist - we can just use the name without suffix.
         if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
         {
-            model.Suffix = StructuredName.NOSUFFIX;
+            model.Suffix = StructuredName._nosuffix;
 
             return model.FullName;
         }
@@ -80,7 +80,7 @@ internal class SimilarNodeName
         // no suffix - name without suffix does NOT exist, AND name with suffix does NOT exist
         if (!model.Suffix.HasValue && !items.SimpleNameExists(model.Text) && !items.SuffixedNameExists())
         {
-            model.Suffix = StructuredName.NOSUFFIX;
+            model.Suffix = StructuredName._nosuffix;
 
             return model.FullName;
         }
@@ -126,7 +126,7 @@ internal class SimilarNodeName
         if (model.Suffix.HasValue && !items.SimpleNameExists(model.Text))
         {
             model.Text = model.FullName;
-            model.Suffix = StructuredName.NOSUFFIX;
+            model.Suffix = StructuredName._nosuffix;
 
             // filter items based on full name with suffix
             items = items.Where(x => x.Text.InvariantStartsWith(model.FullName));
@@ -183,28 +183,27 @@ internal class SimilarNodeName
 
     internal class StructuredName
     {
-        internal const uint INITIALSUFFIX = 1;
-        private const string SPACECHARACTER = " ";
-        private const string SUFFIXEDPATTERN = @"(.*) \(([1-9]\d*)\)$";
-        internal static readonly uint? NOSUFFIX = default;
+        internal const uint Initialsuffix = 1;
+        private const string Spacecharacter = " ";
+        private const string Suffixedpattern = @"(.*) \(([1-9]\d*)\)$";
+        internal static readonly uint? _nosuffix = default;
 
         internal StructuredName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                Text = SPACECHARACTER;
+                Text = Spacecharacter;
 
                 return;
             }
 
-            var rg = new Regex(SUFFIXEDPATTERN);
+            var rg = new Regex(Suffixedpattern);
             MatchCollection matches = rg.Matches(name);
             if (matches.Count > 0)
             {
                 Match match = matches[0];
                 Text = match.Groups[1].Value;
-                int number = int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture,
-                    out number)
+                int number = int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out number)
                     ? number
                     : 0;
                 Suffix = (uint?)number;
@@ -219,7 +218,7 @@ internal class SimilarNodeName
         {
             get
             {
-                var text = Text == SPACECHARACTER ? Text.Trim() : Text;
+                var text = Text == Spacecharacter ? Text.Trim() : Text;
 
                 return Suffix > 0 ? $"{text} ({Suffix})" : text;
             }

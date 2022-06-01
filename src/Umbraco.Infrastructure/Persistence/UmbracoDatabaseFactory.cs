@@ -81,7 +81,7 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory;
 
-        ConnectionStrings umbracoConnectionString = connectionStrings.Get(Constants.System.UmbracoConnectionName);
+        ConnectionStrings umbracoConnectionString = connectionStrings.CurrentValue;
         if (!umbracoConnectionString.IsConnectionStringConfigured())
         {
             logger.LogDebug("Missing connection string, defer configuration.");
@@ -89,18 +89,6 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         }
 
         Configure(umbracoConnectionString);
-    }
-
-    /// <inheritdoc />
-    public bool Configured
-    {
-        get
-        {
-            lock (_lock)
-            {
-                return !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace();
-            }
-        }
     }
 
     #endregion
@@ -117,6 +105,18 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
             }
 
             return _dbProviderFactory;
+        }
+    }
+
+    /// <inheritdoc />
+    public bool Configured
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return !ConnectionString.IsNullOrWhiteSpace() && !ProviderName.IsNullOrWhiteSpace();
+            }
         }
     }
 
@@ -191,17 +191,6 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
         EnsureInitialized();
         return (IUmbracoDatabase)_npocoDatabaseFactory!.GetDatabase();
     }
-
-    protected override void DisposeResources() =>
-
-        // this is weird, because hybrid accessors store different databases per
-        // thread, so we don't really know what we are disposing here...
-        // besides, we don't really want to dispose the factory, which is a singleton...
-        // TODO: the class does not need be disposable
-        // var db = _umbracoDatabaseAccessor.UmbracoDatabase;
-        // _umbracoDatabaseAccessor.UmbracoDatabase = null;
-        // db?.Dispose();
-        Volatile.Write(ref _initialized, false);
 
     private void EnsureInitialized() =>
         LazyInitializer.EnsureInitialized(ref _sqlContext, ref _initialized, ref _lock, Initialize);
@@ -299,4 +288,15 @@ public class UmbracoDatabaseFactory : DisposableObjectSlim, IUmbracoDatabaseFact
             _databaseSchemaCreatorFactory,
             _pocoMappers);
     }
+
+    protected override void DisposeResources() =>
+
+        // this is weird, because hybrid accessors store different databases per
+        // thread, so we don't really know what we are disposing here...
+        // besides, we don't really want to dispose the factory, which is a singleton...
+        // TODO: the class does not need be disposable
+        // var db = _umbracoDatabaseAccessor.UmbracoDatabase;
+        // _umbracoDatabaseAccessor.UmbracoDatabase = null;
+        // db?.Dispose();
+        Volatile.Write(ref _initialized, false);
 }

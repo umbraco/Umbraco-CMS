@@ -45,12 +45,12 @@ internal class RelationTypeRepository : EntityRepositoryBase<int, IRelationType>
     protected override IRelationType? PerformGet(int id) =>
 
         // use the underlying GetAll which will force cache all content types
-        GetMany().FirstOrDefault(x => x.Id == id);
+        GetMany()?.FirstOrDefault(x => x.Id == id);
 
     public IRelationType? Get(Guid id) =>
 
         // use the underlying GetAll which will force cache all content types
-        GetMany().FirstOrDefault(x => x.Key == id);
+        GetMany()?.FirstOrDefault(x => x.Key == id);
 
     public bool Exists(Guid id) => Get(id) != null;
 
