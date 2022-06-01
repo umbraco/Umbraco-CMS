@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Security;
 public class MemberIdentityUser : UmbracoIdentityUser
 {
     // Custom comparer for enumerables
-    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> SGroupsComparer = new(
+    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> _groupsComparer = new(
         (groups, enumerable) =>
             groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
         groups => groups.GetHashCode());

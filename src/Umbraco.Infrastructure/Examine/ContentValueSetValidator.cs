@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
 {
     private const string PathKey = "path";
-    private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Content, IndexTypes.Media };
+    private static readonly IEnumerable<string> _validCategories = new[] { IndexTypes.Content, IndexTypes.Media };
     private readonly IPublicAccessService? _publicAccessService;
     private readonly IScopeProvider? _scopeProvider;
 
@@ -42,7 +42,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
 
     public bool PublishedValuesOnly { get; }
 
-    protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
+    protected override IEnumerable<string> ValidIndexCategories => _validCategories;
 
     public bool SupportProtectedContent { get; }
 

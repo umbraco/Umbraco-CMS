@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class BackOfficeIdentityUser : UmbracoIdentityUser
 {
-    private static readonly DelegateEqualityComparer<int[]> SStartIdsComparer = new(
+    private static readonly DelegateEqualityComparer<int[]> _startIdsComparer = new(
         (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
         groups => groups.GetHashCode());
 
@@ -67,7 +67,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
                 value = new int[0];
             }
 
-            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), SStartIdsComparer);
+            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startContentIds!, nameof(StartContentIds), _startIdsComparer);
         }
     }
 
@@ -84,7 +84,7 @@ public class BackOfficeIdentityUser : UmbracoIdentityUser
                 value = new int[0];
             }
 
-            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds), SStartIdsComparer);
+            BeingDirty.SetPropertyValueAndDetectChanges(value, ref _startMediaIds!, nameof(StartMediaIds), _startIdsComparer);
         }
     }
 

@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure;
 /// <seealso cref="Umbraco.Cms.Core.IPublishedContentQuery" />
 public class PublishedContentQuery : IPublishedContentQuery
 {
-    private static readonly HashSet<string> s_itemIdFieldNameHashSet = new() {ExamineFieldNames.ItemIdFieldName};
+    private static readonly HashSet<string> _itemIdFieldNameHashSet = new() {ExamineFieldNames.ItemIdFieldName};
 
     private readonly IExamineManager _examineManager;
     private readonly IPublishedSnapshot _publishedSnapshot;
@@ -294,7 +294,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         }
 
         // Only select item ID field, because results are loaded from the published snapshot based on this single value
-        IOrdering? queryExecutor = ordering.SelectFields(s_itemIdFieldNameHashSet);
+        IOrdering? queryExecutor = ordering.SelectFields(_itemIdFieldNameHashSet);
 
 
         ISearchResults? results = skip == 0 && take == 0
@@ -329,7 +329,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         if (query is IOrdering ordering)
         {
             // Only select item ID field, because results are loaded from the published snapshot based on this single value
-            query = ordering.SelectFields(s_itemIdFieldNameHashSet);
+            query = ordering.SelectFields(_itemIdFieldNameHashSet);
         }
 
         ISearchResults? results = skip == 0 && take == 0

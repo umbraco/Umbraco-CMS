@@ -70,7 +70,7 @@ public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
             return false;
         }
 
-        Match match = UmbracoExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
+        Match match = UmbracoExamineExtensions._cultureIsoCodeFieldNameMatchExpression.Match(fieldName);
         if (match.Success)
         {
             var nonCultureFieldName = match.Groups["FieldName"].Value;

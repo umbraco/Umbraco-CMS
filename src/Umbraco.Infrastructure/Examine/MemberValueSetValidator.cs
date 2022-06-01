@@ -11,7 +11,7 @@ public class MemberValueSetValidator : ValueSetValidator
         UmbracoExamineFieldNames.NodeKeyFieldName,
     };
 
-    private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Member };
+    private static readonly IEnumerable<string> _validCategories = new[] { IndexTypes.Member };
 
     public MemberValueSetValidator()
         : base(null, null, DefaultMemberIndexFields, null)
@@ -28,5 +28,5 @@ public class MemberValueSetValidator : ValueSetValidator
     {
     }
 
-    protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
+    protected override IEnumerable<string> ValidIndexCategories => _validCategories;
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Cache;
 public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
     where TEntity : class, IEntity
 {
-    private static readonly TEntity[] SEmptyEntities = new TEntity[0]; // const
+    private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
     public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
@@ -255,7 +255,7 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
             // getting all of them, and finding nothing.
             // if we can cache a zero count, cache an empty array,
             // for as long as the cache is not cleared (no expiration)
-            Cache.Insert(EntityTypeCacheKey, () => SEmptyEntities);
+            Cache.Insert(EntityTypeCacheKey, () => _emptyEntities);
         }
         else
         {

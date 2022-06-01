@@ -19,16 +19,16 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 /// </remarks>
 public class NoTypeConverterJsonConverter<T> : JsonConverter
 {
-    private static readonly IContractResolver Resolver = new NoTypeConverterContractResolver();
-    private static readonly JsonSerializerSettings JsonSerializerSettings = new() { ContractResolver = Resolver };
+    private static readonly IContractResolver _resolver = new NoTypeConverterContractResolver();
+    private static readonly JsonSerializerSettings _jsonSerializerSettings = new() { ContractResolver = _resolver };
 
     public override bool CanConvert(Type objectType) => typeof(T).IsAssignableFrom(objectType);
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) =>
-        JsonSerializer.CreateDefault(JsonSerializerSettings).Deserialize(reader, objectType);
+        JsonSerializer.CreateDefault(_jsonSerializerSettings).Deserialize(reader, objectType);
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>
-        JsonSerializer.CreateDefault(JsonSerializerSettings).Serialize(writer, value);
+        JsonSerializer.CreateDefault(_jsonSerializerSettings).Serialize(writer, value);
 
     private class NoTypeConverterContractResolver : DefaultContractResolver
     {

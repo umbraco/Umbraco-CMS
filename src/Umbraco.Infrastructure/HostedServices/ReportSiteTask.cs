@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 
 public class ReportSiteTask : RecurringHostedServiceBase
 {
-    private static HttpClient s_httpClient = new();
+    private static HttpClient _httpClient = new();
     private readonly ILogger<ReportSiteTask> _logger;
     private readonly ITelemetryService _telemetryService;
 
@@ -24,7 +24,7 @@ public class ReportSiteTask : RecurringHostedServiceBase
     {
         _logger = logger;
         _telemetryService = telemetryService;
-        s_httpClient = new HttpClient();
+        _httpClient = new HttpClient();
     }
 
     [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
@@ -51,18 +51,18 @@ public class ReportSiteTask : RecurringHostedServiceBase
 
         try
         {
-            if (s_httpClient.BaseAddress is null)
+            if (_httpClient.BaseAddress is null)
             {
                 // Send data to LIVE telemetry
-                s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
                 // Send data to DEBUG telemetry service
-                s_httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
             }
 
-            s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+            _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
@@ -72,7 +72,7 @@ public class ReportSiteTask : RecurringHostedServiceBase
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/
                 // Fire & Forget, do not need to know if its a 200, 500 etc
-                using (await s_httpClient.SendAsync(request))
+                using (await _httpClient.SendAsync(request))
                 {
                 }
             }

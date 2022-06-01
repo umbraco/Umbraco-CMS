@@ -21,7 +21,7 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
     INotificationHandler<ContentTypeCacheRefresherNotification>,
     INotificationHandler<DataTypeCacheRefresherNotification>
 {
-    private static int req;
+    private static int _req;
     private readonly ModelsBuilderSettings _config;
     private readonly ILogger<AutoModelsNotificationHandler> _logger;
     private readonly IMainDom _mainDom;
@@ -90,12 +90,12 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
 
         _logger.LogDebug("Requested to generate models.");
 
-        Interlocked.Exchange(ref req, 1);
+        Interlocked.Exchange(ref _req, 1);
     }
 
     private void GenerateModelsIfRequested()
     {
-        if (Interlocked.Exchange(ref req, 0) == 0)
+        if (Interlocked.Exchange(ref _req, 0) == 0)
         {
             return;
         }

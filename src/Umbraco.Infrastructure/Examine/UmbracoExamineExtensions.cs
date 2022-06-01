@@ -13,7 +13,7 @@ public static class UmbracoExamineExtensions
     /// <remarks>
     ///     myFieldName_en-us will match the "en-us"
     /// </remarks>
-    internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new(
+    internal static readonly Regex _cultureIsoCodeFieldNameMatchExpression = new(
         "^(?<FieldName>[_\\w]+)_(?<CultureName>[a-z]{2,3}(-[a-z0-9]{2,4})?)$",
         RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
@@ -32,7 +32,7 @@ public static class UmbracoExamineExtensions
         var results = new List<string>();
         foreach (var field in allFields)
         {
-            Match match = CultureIsoCodeFieldNameMatchExpression.Match(field);
+            Match match = _cultureIsoCodeFieldNameMatchExpression.Match(field);
             if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
             {
                 results.Add(field);
@@ -54,7 +54,7 @@ public static class UmbracoExamineExtensions
 
         foreach (var field in allFields)
         {
-            Match match = CultureIsoCodeFieldNameMatchExpression.Match(field);
+            Match match = _cultureIsoCodeFieldNameMatchExpression.Match(field);
             if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
             {
                 yield return field; // matches this culture field

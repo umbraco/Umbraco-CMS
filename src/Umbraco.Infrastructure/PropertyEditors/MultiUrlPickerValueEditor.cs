@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
-    private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new()
+    private static readonly JsonSerializerSettings _linkDisplayJsonSerializerSettings = new()
     {
         Formatting = Formatting.None,
         NullValueHandling = NullValueHandling.Ignore,
@@ -204,7 +204,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
                     Udi = link.Udi,
                     Url = link.Udi == null ? link.Url : null, // only save the URL for external links
                 },
-                LinkDisplayJsonSerializerSettings);
+                _linkDisplayJsonSerializerSettings);
         }
         catch (Exception ex)
         {

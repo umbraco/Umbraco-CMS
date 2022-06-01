@@ -373,8 +373,8 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .From<User2UserGroupDto>()
             .WhereIn<User2UserGroupDto>(x => x.UserId, userIds);
 
-        List<User2UserGroupDto>? users2groups = Database.Fetch<User2UserGroupDto>(sql);
-        var groupIds = users2groups.Select(x => x.UserGroupId).ToList();
+        List<User2UserGroupDto>? user2Groups = Database.Fetch<User2UserGroupDto>(sql);
+        var groupIds = user2Groups.Select(x => x.UserGroupId).ToList();
 
         // get groups
 
@@ -393,7 +393,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .From<UserGroup2AppDto>()
             .WhereIn<UserGroup2AppDto>(x => x.UserGroupId, groupIds);
 
-        var groups2apps = Database.Fetch<UserGroup2AppDto>(sql)
+        var groups2Apps = Database.Fetch<UserGroup2AppDto>(sql)
             .GroupBy(x => x.UserGroupId)
             .ToDictionary(x => x.Key, x => x);
 
@@ -408,11 +408,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         // map groups
 
-        foreach (User2UserGroupDto? user2group in users2groups)
+        foreach (User2UserGroupDto? user2Group in user2Groups)
         {
-            if (groups.TryGetValue(user2group.UserGroupId, out UserGroupDto? group))
+            if (groups.TryGetValue(user2Group.UserGroupId, out UserGroupDto? group))
             {
-                UserDto dto = xUsers == null ? dtos[0] : xUsers[user2group.UserId];
+                UserDto dto = xUsers == null ? dtos[0] : xUsers[user2Group.UserId];
                 dto.UserGroupDtos.Add(group); // user2group is distinct
             }
         }
@@ -429,7 +429,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         foreach (UserGroupDto? group in groups.Values)
         {
-            if (groups2apps.TryGetValue(group.Id, out IGrouping<int, UserGroup2AppDto>? list))
+            if (groups2Apps.TryGetValue(group.Id, out IGrouping<int, UserGroup2AppDto>? list))
             {
                 group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
             }

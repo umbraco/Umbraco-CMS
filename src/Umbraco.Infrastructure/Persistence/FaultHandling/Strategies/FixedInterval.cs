@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 /// </summary>
 public class FixedInterval : RetryStrategy
 {
-    private readonly int retryCount;
-    private readonly TimeSpan retryInterval;
+    private readonly int _retryCount;
+    private readonly TimeSpan _retryInterval;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="FixedInterval" /> class.
@@ -61,8 +61,8 @@ public class FixedInterval : RetryStrategy
     {
         // Guard.ArgumentNotNegativeValue(retryCount, "retryCount");
         // Guard.ArgumentNotNegativeValue(retryInterval.Ticks, "retryInterval");
-        this.retryCount = retryCount;
-        this.retryInterval = retryInterval;
+        this._retryCount = retryCount;
+        this._retryInterval = retryInterval;
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class FixedInterval : RetryStrategy
     /// <returns>The ShouldRetry delegate.</returns>
     public override ShouldRetry GetShouldRetry()
     {
-        if (retryCount == 0)
+        if (_retryCount == 0)
         {
             return delegate(int currentRetryCount, Exception lastException, out TimeSpan interval)
             {
@@ -82,9 +82,9 @@ public class FixedInterval : RetryStrategy
 
         return delegate(int currentRetryCount, Exception lastException, out TimeSpan interval)
         {
-            if (currentRetryCount < retryCount)
+            if (currentRetryCount < _retryCount)
             {
-                interval = retryInterval;
+                interval = _retryInterval;
                 return true;
             }
 

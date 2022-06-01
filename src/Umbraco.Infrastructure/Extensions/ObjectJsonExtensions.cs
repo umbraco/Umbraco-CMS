@@ -10,7 +10,7 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class ObjectJsonExtensions
 {
-    private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> ToObjectTypes = new();
+    private static readonly ConcurrentDictionary<Type, Dictionary<string, object>> _toObjectTypes = new();
 
     /// <summary>
     ///     Converts an object's properties into a dictionary.
@@ -38,7 +38,7 @@ public static class ObjectJsonExtensions
             namer = DefaultNamer;
         }
 
-        if (!ToObjectTypes.TryGetValue(t, out Dictionary<string, object>? properties))
+        if (!_toObjectTypes.TryGetValue(t, out Dictionary<string, object>? properties))
         {
             properties = new Dictionary<string, object>();
 
@@ -48,7 +48,7 @@ public static class ObjectJsonExtensions
                 properties[namer(p)] = ReflectionUtilities.EmitPropertyGetter<T, object>(p);
             }
 
-            ToObjectTypes[t] = properties;
+            _toObjectTypes[t] = properties;
         }
 
         return properties.ToDictionary(x => x.Key, x => ((Func<T, object>)x.Value)(obj));

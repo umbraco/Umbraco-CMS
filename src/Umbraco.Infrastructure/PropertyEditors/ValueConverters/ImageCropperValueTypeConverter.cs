@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 /// </summary>
 public class ImageCropperValueTypeConverter : TypeConverter
 {
-    private static readonly Type[] ConvertableTypes = { typeof(JObject) };
+    private static readonly Type[] _convertableTypes = { typeof(JObject) };
 
     public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType)
     {
@@ -22,7 +22,7 @@ public class ImageCropperValueTypeConverter : TypeConverter
             return false;
         }
 
-        return ConvertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
+        return _convertableTypes.Any(x => TypeHelper.IsTypeAssignableFrom(x, destinationType))
                || CanConvertFrom(context, destinationType);
     }
 

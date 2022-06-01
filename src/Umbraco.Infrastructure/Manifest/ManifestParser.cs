@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Manifest;
 /// </summary>
 public class ManifestParser : IManifestParser
 {
-    private static readonly string SUtf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+    private static readonly string _utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
     private readonly IAppPolicyCache _cache;
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
@@ -234,9 +234,9 @@ public class ManifestParser : IManifestParser
     private static string TrimPreamble(string text)
     {
         // strangely StartsWith(preamble) would always return true
-        if (text[..1] == SUtf8Preamble)
+        if (text[..1] == _utf8Preamble)
         {
-            text = text.Remove(0, SUtf8Preamble.Length);
+            text = text.Remove(0, _utf8Preamble.Length);
         }
 
         return text;

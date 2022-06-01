@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install;
 public class DatabaseSchemaCreator
 {
     // all tables, in order
-    internal static readonly List<Type> OrderedTables = new()
+    internal static readonly List<Type> _orderedTables = new()
     {
         typeof(UserDto),
         typeof(NodeDto),
@@ -134,7 +134,7 @@ public class DatabaseSchemaCreator
     {
         _logger.LogInformation("Start UninstallDatabaseSchema");
 
-        foreach (Type table in OrderedTables.AsEnumerable().Reverse())
+        foreach (Type table in _orderedTables.AsEnumerable().Reverse())
         {
             TableNameAttribute? tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
             var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
@@ -178,7 +178,7 @@ public class DatabaseSchemaCreator
                 _database, _loggerFactory.CreateLogger<DatabaseDataCreator>(),
                 _umbracoVersion,
                 _defaultDataCreationSettings);
-            foreach (Type table in OrderedTables)
+            foreach (Type table in _orderedTables)
             {
                 CreateTable(false, table, dataCreation);
             }
@@ -192,7 +192,7 @@ public class DatabaseSchemaCreator
     /// <summary>
     ///     Validates the schema of the current database.
     /// </summary>
-    internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(OrderedTables);
+    internal DatabaseSchemaResult ValidateSchema() => ValidateSchema(_orderedTables);
 
     internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
     {

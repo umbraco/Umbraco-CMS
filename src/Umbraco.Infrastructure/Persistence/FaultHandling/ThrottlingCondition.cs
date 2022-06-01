@@ -136,7 +136,7 @@ public class ThrottlingCondition
     /// <summary>
     ///     Provides a compiled regular expression used for extracting the reason code from the error message.
     /// </summary>
-    private static readonly Regex SqlErrorCodeRegEx =
+    private static readonly Regex _sqlErrorCodeRegEx =
         new(@"Code:\s*(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     /// <summary>
@@ -256,7 +256,7 @@ public class ThrottlingCondition
     {
         if (error != null)
         {
-            Match match = SqlErrorCodeRegEx.Match(error.Message);
+            Match match = _sqlErrorCodeRegEx.Match(error.Message);
 
             if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int reasonCode))
             {

@@ -16,13 +16,13 @@ public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
 
     private string ApplyHtmlHighlighting(string html)
     {
-        const string SuccessHexColor = "5cb85c";
-        const string WarningHexColor = "f0ad4e";
-        const string ErrorHexColor = "d9534f";
+        const string successHexColor = "5cb85c";
+        const string warningHexColor = "f0ad4e";
+        const string errorHexColor = "d9534f";
 
-        html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, SuccessHexColor);
-        html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, WarningHexColor);
-        return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, ErrorHexColor);
+        html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Success, successHexColor);
+        html = ApplyHtmlHighlightingForStatus(html, StatusResultType.Warning, warningHexColor);
+        return ApplyHtmlHighlightingForStatus(html, StatusResultType.Error, errorHexColor);
     }
 
     private string ApplyHtmlHighlightingForStatus(string html, StatusResultType status, string color) =>

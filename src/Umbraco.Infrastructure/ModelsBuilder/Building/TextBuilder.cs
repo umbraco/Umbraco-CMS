@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 /// </summary>
 public class TextBuilder : Builder
 {
-    private static readonly IDictionary<string, string> TypesMap =
+    private static readonly IDictionary<string, string> _typesMap =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "System.Int16", "short" },
@@ -612,7 +612,7 @@ public class TextBuilder : Builder
         s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
         // takes care eg of "System.Int32" vs. "int"
-        if (TypesMap.TryGetValue(s, out var typeName))
+        if (_typesMap.TryGetValue(s, out var typeName))
         {
             sb.Append(typeName);
             return;

@@ -282,7 +282,7 @@ dotnet_naming_style.internal_error_style.required_suffix = ____INTERNAL_ERROR___
 
 # All public/protected/protected_internal constant fields must be PascalCase
 # https://docs.microsoft.com/dotnet/standard/design-guidelines/field
-dotnet_naming_symbols.public_protected_constant_fields_group.applicable_accessibilities = public, protected, protected_internal, private
+dotnet_naming_symbols.public_protected_constant_fields_group.applicable_accessibilities = public, protected, protected_internal, internal, private
 dotnet_naming_symbols.public_protected_constant_fields_group.required_modifiers         = const
 dotnet_naming_symbols.public_protected_constant_fields_group.applicable_kinds           = field
 dotnet_naming_rule.public_protected_constant_fields_must_be_pascal_case_rule.symbols    = public_protected_constant_fields_group

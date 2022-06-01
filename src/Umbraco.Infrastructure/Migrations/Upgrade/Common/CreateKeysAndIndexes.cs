@@ -17,7 +17,7 @@ public class CreateKeysAndIndexes : MigrationBase
         Delete.KeysAndIndexes(Constants.DatabaseSchema.Tables.PropertyData).Do();
 
         // re-create *all* keys and indexes
-        foreach (Type x in DatabaseSchemaCreator.OrderedTables)
+        foreach (Type x in DatabaseSchemaCreator._orderedTables)
         {
             Create.KeysAndIndexes(x).Do();
         }

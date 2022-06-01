@@ -13,12 +13,12 @@ public class MessageTemplates : IMessageTemplates
     // means we cannot get rid of Serilog entirely. We may want to revisit this at some point.
 
     // TODO: Do we still need this, is there a non-pre release package shipped?
-    private static readonly Lazy<ILogger> MinimalLogger = new(() => new LoggerConfiguration().CreateLogger());
+    private static readonly Lazy<ILogger> _minimalLogger = new(() => new LoggerConfiguration().CreateLogger());
 
     public string Render(string messageTemplate, params object[] args)
     {
         // resolve a minimal logger instance which is used to bind message templates
-        ILogger logger = MinimalLogger.Value;
+        ILogger logger = _minimalLogger.Value;
 
         var bound = logger.BindMessageTemplate(messageTemplate, args, out MessageTemplate? parsedTemplate, out IEnumerable<LogEventProperty>? boundProperties);
 

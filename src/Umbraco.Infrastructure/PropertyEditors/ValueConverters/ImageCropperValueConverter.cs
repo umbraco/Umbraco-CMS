@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
 public class ImageCropperValueConverter : PropertyValueConverterBase
 {
-    private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new()
+    private static readonly JsonSerializerSettings _imageCropperValueJsonSerializerSettings = new()
     {
         Culture = CultureInfo.InvariantCulture,
         FloatParseHandling = FloatParseHandling.Decimal,
@@ -52,7 +52,7 @@ public class ImageCropperValueConverter : PropertyValueConverterBase
         {
             value = JsonConvert.DeserializeObject<ImageCropperValue>(
                 sourceString,
-                ImageCropperValueJsonSerializerSettings);
+                _imageCropperValueJsonSerializerSettings);
         }
         catch (Exception ex)
         {

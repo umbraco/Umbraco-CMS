@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class GenericIndexDiagnostics : IIndexDiagnostics
 {
-    private static readonly string[] SIgnoreProperties = { "Description" };
+    private static readonly string[] _ignoreProperties = { "Description" };
 
     private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
     private readonly IIndex _index;
@@ -31,7 +31,7 @@ public class GenericIndexDiagnostics : IIndexDiagnostics
 
             IOrderedEnumerable<PropertyInfo> props = TypeHelper
                 .CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
-                .Where(x => SIgnoreProperties.InvariantContains(x.Name) == false)
+                .Where(x => _ignoreProperties.InvariantContains(x.Name) == false)
                 .OrderBy(x => x.Name);
 
             foreach (PropertyInfo p in props)

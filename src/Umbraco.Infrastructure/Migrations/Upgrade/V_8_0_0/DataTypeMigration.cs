@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 
 public class DataTypeMigration : MigrationBase
 {
-    private static readonly ISet<string> LegacyAliases = new HashSet<string>
+    private static readonly ISet<string> _legacyAliases = new HashSet<string>
     {
         Constants.PropertyEditors.Legacy.Aliases.Date,
         Constants.PropertyEditors.Legacy.Aliases.Textbox,
@@ -100,7 +100,7 @@ public class DataTypeMigration : MigrationBase
             var newAlias = migrator.GetNewAlias(dataType.EditorAlias);
             if (newAlias == null)
             {
-                if (!LegacyAliases.Contains(dataType.EditorAlias))
+                if (!_legacyAliases.Contains(dataType.EditorAlias))
                 {
                     _logger.LogWarning(
                         "Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
@@ -110,7 +110,7 @@ public class DataTypeMigration : MigrationBase
             }
             else if (!_propertyEditors.TryGet(newAlias, out IDataEditor? propertyEditor))
             {
-                if (!LegacyAliases.Contains(newAlias))
+                if (!_legacyAliases.Contains(newAlias))
                 {
                     _logger.LogWarning(
                         "Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"

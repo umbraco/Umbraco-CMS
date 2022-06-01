@@ -2232,7 +2232,7 @@ internal class DatabaseDataCreator
 
     private void CreateLogViewerQueryData()
     {
-        LogViewerQueryDto[] defaultData = MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries.ToArray();
+        LogViewerQueryDto[] defaultData = MigrateLogViewerQueriesFromFileToDb._defaultLogQueries.ToArray();
 
         for (var i = 0; i < defaultData.Length; i++)
         {

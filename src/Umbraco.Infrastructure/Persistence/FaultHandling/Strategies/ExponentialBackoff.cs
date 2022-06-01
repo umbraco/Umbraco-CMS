@@ -5,10 +5,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 /// </summary>
 public class ExponentialBackoff : RetryStrategy
 {
-    private readonly TimeSpan deltaBackoff;
-    private readonly TimeSpan maxBackoff;
-    private readonly TimeSpan minBackoff;
-    private readonly int retryCount;
+    private readonly TimeSpan _deltaBackoff;
+    private readonly TimeSpan _maxBackoff;
+    private readonly TimeSpan _minBackoff;
+    private readonly int _retryCount;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ExponentialBackoff" /> class.
@@ -72,10 +72,10 @@ public class ExponentialBackoff : RetryStrategy
         // Guard.ArgumentNotNegativeValue(maxBackoff.Ticks, "maxBackoff");
         // Guard.ArgumentNotNegativeValue(deltaBackoff.Ticks, "deltaBackoff");
         // Guard.ArgumentNotGreaterThan(minBackoff.TotalMilliseconds, maxBackoff.TotalMilliseconds, "minBackoff");
-        this.retryCount = retryCount;
-        this.minBackoff = minBackoff;
-        this.maxBackoff = maxBackoff;
-        this.deltaBackoff = deltaBackoff;
+        this._retryCount = retryCount;
+        this._minBackoff = minBackoff;
+        this._maxBackoff = maxBackoff;
+        this._deltaBackoff = deltaBackoff;
     }
 
     /// <summary>
@@ -85,13 +85,13 @@ public class ExponentialBackoff : RetryStrategy
     public override ShouldRetry GetShouldRetry() =>
         delegate(int currentRetryCount, Exception lastException, out TimeSpan retryInterval)
         {
-            if (currentRetryCount < retryCount)
+            if (currentRetryCount < _retryCount)
             {
                 var random = new Random();
 
                 var delta = (int)((Math.Pow(2.0, currentRetryCount) - 1.0) * random.Next(
-                    (int)(deltaBackoff.TotalMilliseconds * 0.8), (int)(deltaBackoff.TotalMilliseconds * 1.2)));
-                var interval = (int)Math.Min(minBackoff.TotalMilliseconds + delta, maxBackoff.TotalMilliseconds);
+                    (int)(_deltaBackoff.TotalMilliseconds * 0.8), (int)(_deltaBackoff.TotalMilliseconds * 1.2)));
+                var interval = (int)Math.Min(_minBackoff.TotalMilliseconds + delta, _maxBackoff.TotalMilliseconds);
 
                 retryInterval = TimeSpan.FromMilliseconds(interval);
 

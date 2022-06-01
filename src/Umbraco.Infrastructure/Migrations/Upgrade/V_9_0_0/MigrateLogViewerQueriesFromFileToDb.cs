@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 
 public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
 {
-    internal static readonly IEnumerable<LogViewerQueryDto> DefaultLogQueries = new LogViewerQueryDto[]
+    internal static readonly IEnumerable<LogViewerQueryDto> _defaultLogQueries = new LogViewerQueryDto[]
     {
         new()
         {
@@ -90,7 +90,7 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
 
         IEnumerable<LogViewerQueryDto>? logQueriesInFile = File.Exists(logViewerQueryFile)
             ? JsonConvert.DeserializeObject<LogViewerQueryDto[]>(File.ReadAllText(logViewerQueryFile))
-            : DefaultLogQueries;
+            : _defaultLogQueries;
 
         LogViewerQueryDto[]? logQueriesInDb = Database.Query<LogViewerQueryDto>().ToArray();
 

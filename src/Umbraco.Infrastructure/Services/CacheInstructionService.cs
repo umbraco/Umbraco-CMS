@@ -261,7 +261,7 @@ namespace Umbraco.Cms
                 // Even though MaxProcessingInstructionCount is by default 1000 we still don't want to process that many
                 // rows in one request thread since each row can contain a ton of instructions (until 7.5.5 in which case
                 // a row can only contain MaxProcessingInstructionCount).
-                const int MaxInstructionsToRetrieve = 100;
+                const int maxInstructionsToRetrieve = 100;
 
                 // Only process instructions coming from a remote server, and ignore instructions coming from
                 // the local server as they've already been processed. We should NOT assume that the sequence of
@@ -275,7 +275,7 @@ namespace Umbraco.Cms
                 // some memory however we cannot do that because inside of this loop the cache refreshers are also
                 // performing some lookups which cannot be done with an active reader open.
                 IEnumerable<CacheInstruction> pendingInstructions =
-                    _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve);
+                    _cacheInstructionRepository.GetPendingInstructions(lastId, maxInstructionsToRetrieve);
                 lastId = 0;
                 foreach (CacheInstruction instruction in pendingInstructions)
                 {

@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Infrastructure.Macros;
 /// </summary>
 public class MacroTagParser
 {
-    private static readonly Regex MacroRteContent = new(
+    private static readonly Regex _macroRteContent = new(
         @"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
-    private static readonly Regex MacroPersistedFormat =
+    private static readonly Regex _macroPersistedFormat =
         new(
             @"(<\?UMBRACO_MACRO (?:.+?)??macroAlias=[""']([^""\'\n\r]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
@@ -36,7 +36,7 @@ public class MacroTagParser
     public static string FormatRichTextPersistedDataForEditor(
         string persistedContent,
         IDictionary<string, string> htmlAttributes) =>
-        MacroPersistedFormat.Replace(persistedContent, match =>
+        _macroPersistedFormat.Replace(persistedContent, match =>
         {
             if (match.Groups.Count >= 3)
             {
@@ -120,7 +120,7 @@ public class MacroTagParser
         var parsed = html.DocumentNode.OuterHtml;
 
         // now replace all the <!-- and --> with nothing
-        return MacroRteContent.Replace(parsed, match =>
+        return _macroRteContent.Replace(parsed, match =>
         {
             if (match.Groups.Count >= 3)
             {

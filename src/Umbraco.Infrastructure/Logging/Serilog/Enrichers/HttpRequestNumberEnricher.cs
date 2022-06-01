@@ -16,7 +16,7 @@ public class HttpRequestNumberEnricher : ILogEventEnricher
     /// <summary>
     ///     The property name added to enriched log events.
     /// </summary>
-    private const string _httpRequestNumberPropertyName = "HttpRequestNumber";
+    private const string HttpRequestNumberPropertyName = "HttpRequestNumber";
     private static readonly string _requestNumberItemName = typeof(HttpRequestNumberEnricher).Name + "+RequestNumber";
 
     private static int _lastRequestNumber;
@@ -42,7 +42,7 @@ public class HttpRequestNumberEnricher : ILogEventEnricher
             () => Interlocked.Increment(ref _lastRequestNumber));
 
         var requestNumberProperty =
-            new LogEventProperty(_httpRequestNumberPropertyName, new ScalarValue(requestNumber));
+            new LogEventProperty(HttpRequestNumberPropertyName, new ScalarValue(requestNumber));
         logEvent.AddPropertyIfAbsent(requestNumberProperty);
     }
 }
