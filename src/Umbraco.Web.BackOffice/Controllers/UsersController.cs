@@ -742,8 +742,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostDisableUsers([FromQuery]int[] userIds)
         {
-            var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int?>.Fail();
-            if (tryGetCurrentUserId.Success && userIds.Contains(tryGetCurrentUserId.Result!.Value))
+            var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
+            if (tryGetCurrentUserId.Success && userIds.Contains(tryGetCurrentUserId.Result))
             {
                 return ValidationProblem("The current user cannot disable itself");
             }
