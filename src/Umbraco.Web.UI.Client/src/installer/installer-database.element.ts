@@ -1,13 +1,10 @@
-import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { UUIBooleanInputEvent, UUISelectElement } from '@umbraco-ui/uui';
-import {
-  PostInstallRequest,
-  UmbracoInstallerDatabaseModel,
-  UmbracoPerformInstallDatabaseConfiguration,
-} from '../core/models';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, property, query, state } from 'lit/decorators.js';
+import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbInstallerContext } from './installer-context';
+import { Subscription } from 'rxjs';
+import { UUIButtonElement } from '@umbraco-ui/uui';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
@@ -41,68 +38,59 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     `,
   ];
 
-  @property({ attribute: false })
-  public get databases(): UmbracoInstallerDatabaseModel[] | undefined {
-    return this._databases;
-  }
-  public set databases(value: UmbracoInstallerDatabaseModel[] | undefined) {
-    const oldValue = value;
-    this._databases = value;
-    this._options = value?.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
-    this._selectedDatabase = value?.find((x) => x.id === this.data?.databaseType) ?? value?.[0];
-    this.requestUpdate('databases', oldValue);
-  }
+  @query('#button-install')
+  private _installButton!: UUIButtonElement;
 
   @property({ attribute: false })
-  public data?: PostInstallRequest['database'];
+  public databaseFormData!: UmbracoPerformInstallDatabaseConfiguration;
 
   @state()
-  private _options?: { name: string; value: string }[];
+  private _options: { name: string; value: string; selected?: boolean }[] = [];
 
   @state()
-  private _databases?: UmbracoInstallerDatabaseModel[] = [];
-
-  @state()
-  private _selectedDatabase?: UmbracoInstallerDatabaseModel;
-
-  @state()
-  private _useIntegratedAuthentication = false; // Used to hide credentials when integrated authentication is selected
+  private _databases: UmbracoInstallerDatabaseModel[] = [];
 
   @state()
   private _installerStore!: UmbInstallerContext;
+
+  private storeDataSubscription?: Subscription;
+  private storeSettingsSubscription?: Subscription;
 
   constructor() {
     super();
 
     this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
       this._installerStore = installerStore;
+
+      this.storeSettingsSubscription?.unsubscribe();
+      this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
+        this._databases = settings.databases;
+        this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+      });
+
+      this.storeDataSubscription?.unsubscribe();
+      this.storeDataSubscription = installerStore.data.subscribe((data) => {
+        this.databaseFormData = data.database;
+        this._options.forEach((x, i) => (x.selected = data.database.databaseType === x.value || i === 0));
+      });
     });
   }
 
-  protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    super.firstUpdated(_changedProperties);
-
-    if (_changedProperties.has('data') && this.data) {
-      this._useIntegratedAuthentication = this.data.database.useIntegratedAuthentication ?? false;
-      this._selectedDatabase = this.databases?.find((x) => x.id === this.data?.database?.databaseType);
-    }
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.storeSettingsSubscription?.unsubscribe();
+    this.storeDataSubscription?.unsubscribe();
   }
 
-  protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    super.updated(_changedProperties);
+  private _handleChange(e: InputEvent) {
+    const target = e.target as HTMLInputElement;
 
-    if (_changedProperties.has('data') && this.data) {
-      this._useIntegratedAuthentication =
-        this.data.database.useIntegratedAuthentication ?? this._useIntegratedAuthentication;
-      this._selectedDatabase =
-        this.databases?.find((x) => x.id === this.data?.database?.databaseType) ?? this._selectedDatabase;
+    const value: { [key: string]: string | boolean } = {};
+    value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
-      this._options = this.databases?.map((x, i) => ({
-        name: x.displayName,
-        value: x.id,
-        selected: this._selectedDatabase ? this._selectedDatabase.id === x.id : i === 0,
-      }));
-    }
+    const database = { ...this._installerStore.getData().database, ...value };
+
+    this._installerStore.appendData({ database });
   }
 
   private _handleSubmit = (e: SubmitEvent) => {
@@ -114,54 +102,61 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
-    this.shadowRoot?.getElementById('button-install')?.setAttribute('state', 'waiting');
-
     const formData = new FormData(form);
+    const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const server = formData.get('server') as string;
-    const username = formData.get('username') as string;
     const databaseName = formData.get('databaseName') as string;
     const databaseType = formData.get('databaseType') as string;
     const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
-    this.dispatchEvent(
-      new CustomEvent('submit', {
-        detail: {
-          database: {
-            password,
-            server,
-            username,
-            databaseName,
-            databaseType,
-            useIntegratedAuthentication,
-          },
-        },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    const database = {
+      ...this._installerStore.getData().database,
+      username,
+      password,
+      server,
+      databaseName,
+      databaseType,
+      useIntegratedAuthentication,
+    };
+
+    this._installerStore.appendData({ database });
+    this._installerStore.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
+    this._installButton.state = 'waiting';
   };
+  private _handleFulfilled() {
+    this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
+  }
+  private _handleRejected(error: Error) {
+    this._installButton.state = 'failed';
+    console.log('ERROR hallo', error);
+  }
 
   private _onBack() {
     this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
   }
 
-  private _renderSettings() {
-    if (!this._selectedDatabase) return;
+  private get selectedDatabase() {
+    const id = this._installerStore.getData().database.databaseType;
+    return this._databases.find((x) => x.id === id) ?? this._databases[0];
+  }
 
-    if (this._selectedDatabase.displayName.toLowerCase() === 'custom') {
+  private _renderSettings() {
+    if (!this.selectedDatabase) return;
+
+    if (this.selectedDatabase.displayName.toLowerCase() === 'custom') {
       return this._renderCustom();
     }
 
     const result = [];
 
-    if (this._selectedDatabase.requiresServer) {
+    if (this.selectedDatabase.requiresServer) {
       result.push(this._renderServer());
     }
 
     result.push(this._renderDatabaseName());
 
-    if (this._selectedDatabase.requiresCredentials) {
+    if (this.selectedDatabase.requiresCredentials) {
       result.push(this._renderCredentials());
     }
 
@@ -177,8 +172,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
         type="text"
         id="server"
         name="server"
-        .value=${this.data?.database?.server ?? ''}
-        .placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
+        @input=${this._handleChange}
+        .value=${this.databaseFormData.server ?? ''}
+        .placeholder=${this.selectedDatabase?.serverPlaceholder ?? ''}
         required
         required-message="Server is required"></uui-input>
     </uui-form-layout-item>
@@ -188,9 +184,10 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     <uui-label for="database-name" slot="label" required>Database Name</uui-label>
     <uui-input
       type="text"
-      .value=${this.data?.database?.databaseName ?? ''}
+      .value=${this.databaseFormData.databaseName ?? ''}
       id="database-name"
       name="databaseName"
+      @input=${this._handleChange}
       placeholder="umbraco-cms"
       required
       required-message="Database name is required"></uui-input>
@@ -203,20 +200,21 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
       <uui-checkbox
         name="useIntegratedAuthentication"
         label="use-integrated-authentication"
-        @change=${(e: UUIBooleanInputEvent) => (this._useIntegratedAuthentication = e.target.checked)}
-        .checked=${this._useIntegratedAuthentication}
+        @change=${this._handleChange}
+        .checked=${this.databaseFormData.useIntegratedAuthentication || false}
         >Use integrated authentication</uui-checkbox
       >
     </uui-form-layout-item>
 
-    ${!this._useIntegratedAuthentication
+    ${!this.databaseFormData.useIntegratedAuthentication
       ? html` <uui-form-layout-item>
             <uui-label for="username" slot="label" required>Username</uui-label>
             <uui-input
               type="text"
-              .value=${this.data?.database?.username ?? ''}
+              .value=${this.databaseFormData.username ?? ''}
               id="username"
               name="username"
+              @input=${this._handleChange}
               required
               required-message="Username is required"></uui-input>
           </uui-form-layout-item>
@@ -225,9 +223,10 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
             <uui-label for="password" slot="label" required>Password</uui-label>
             <uui-input
               type="text"
-              .value=${this.data?.database?.password ?? ''}
+              .value=${this.databaseFormData.password ?? ''}
               id="password"
               name="password"
+              @input=${this._handleChange}
               autocomplete="new-password"
               required
               required-message="Password is required"></uui-input>
@@ -240,17 +239,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
       <uui-label for="connection-string" slot="label" required>Connection string</uui-label>
       <uui-textarea
         type="text"
-        .value=${this.data?.database?.connectionString ?? ''}
+        .value=${this.databaseFormData.connectionString ?? ''}
         id="connection-string"
         name="connectionString"
+        label="connection-string"
+        @input=${this._handleChange}
         required
         required-message="Connection string is required"></uui-textarea>
     </uui-form-layout-item>
   `;
-
-  private _handleDatabaseTypeChange = (e: CustomEvent) => {
-    this._selectedDatabase = this.databases?.find((db) => db.id === (e.target as UUISelectElement).value);
-  };
 
   render() {
     return html` <div class="uui-text">
@@ -264,7 +261,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
               name="databaseType"
               label="database-type"
               .options=${this._options || []}
-              @change=${this._handleDatabaseTypeChange}></uui-select>
+              @change=${this._handleChange}></uui-select>
           </uui-form-layout-item>
 
           ${this._renderSettings()}

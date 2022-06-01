@@ -1,9 +1,9 @@
-import { UUISliderEvent } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../core/context';
-import { PostInstallRequest, TelemetryModel } from '../core/models';
+import { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-consent')
@@ -27,23 +27,40 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
     `,
   ];
 
-  @property({ attribute: false })
+  @state()
   private _telemetryLevels: TelemetryModel[] = [];
 
-  @property({ attribute: false })
-  public _telemetryFormData!: TelemetryModel['level'];
+  @state()
+  private _telemetryFormData!: TelemetryModel['level'];
 
   @state()
   private _installerStore!: UmbInstallerContext;
+
+  private storeDataSubscription?: Subscription;
+  private storeSettingsSubscription?: Subscription;
 
   constructor() {
     super();
 
     this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
       this._installerStore = installerStore;
-      this._telemetryFormData = installerStore.getData().telemetryLevel;
-      this._telemetryLevels = installerStore.getInstallerSettings().user.consentLevels;
+
+      this.storeSettingsSubscription?.unsubscribe();
+      this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
+        this._telemetryLevels = settings.user.consentLevels;
+      });
+
+      this.storeDataSubscription?.unsubscribe();
+      this.storeDataSubscription = installerStore.data.subscribe((data) => {
+        this._telemetryFormData = data.telemetryLevel;
+      });
     });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.storeSettingsSubscription?.unsubscribe();
+    this.storeDataSubscription?.unsubscribe();
   }
 
   private _handleChange(e: InputEvent) {
@@ -62,11 +79,11 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
     this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
   }
 
-  get _selectedTelemetryIndex() {
+  private get _selectedTelemetryIndex() {
     return this._telemetryLevels?.findIndex((x) => x.level === this._telemetryFormData) ?? 0;
   }
 
-  get _selectedTelemetry() {
+  private get _selectedTelemetry() {
     return this._telemetryLevels?.find((x) => x.level === this._telemetryFormData) ?? this._telemetryLevels[0];
   }
 

@@ -1,7 +1,7 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../core/context';
-import { PostInstallRequest, UmbracoInstallerUserModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-user')
@@ -34,27 +34,34 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
     `,
   ];
 
-  @property({ attribute: false })
-  public userModel?: UmbracoInstallerUserModel; //TODO: Use this to validate the form
-
   @state()
-  public _userFormData!: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
+  private _userFormData!: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
   @state()
   private _installerStore!: UmbInstallerContext;
+
+  private installerStoreSubscription?: Subscription;
 
   constructor() {
     super();
 
     this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
       this._installerStore = installerStore;
-      this._userFormData = (({ name, password, email, subscribeToNewsletter }) => ({
-        name,
-        password,
-        email,
-        subscribeToNewsletter,
-      }))(installerStore.getData()); // Only get the properties that we need
+      this.installerStoreSubscription?.unsubscribe();
+      this.installerStoreSubscription = installerStore.data.subscribe((data) => {
+        this._userFormData = {
+          name: data.name,
+          password: data.password,
+          email: data.email,
+          subscribeToNewsletter: data.subscribeToNewsletter,
+        };
+      });
     });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.installerStoreSubscription?.unsubscribe();
   }
 
   private _handleChange(e: InputEvent) {

@@ -1,48 +1,47 @@
-import { getInstall } from '../core/api/fetcher';
-import { PostInstallRequest, UmbracoInstaller, UmbracoPerformInstallRequest } from '../core/models';
+import { getInstall, postInstall } from '../core/api/fetcher';
+import { PostInstallRequest, UmbracoInstaller } from '../core/models';
 import { ApiResponse } from 'openapi-typescript-fetch';
+import { BehaviorSubject, Observable, ReplaySubject, Subject, timeout } from 'rxjs';
 
 export class UmbInstallerContext {
-  private _data: PostInstallRequest = {
+  private _data: BehaviorSubject<PostInstallRequest> = new BehaviorSubject<PostInstallRequest>({
     name: 'Test Name',
     email: 'emails@test',
     password: 'yyoyoy',
     subscribeToNewsletter: true,
     telemetryLevel: 'Basic',
     database: {},
-  };
+  });
+  public readonly data: Observable<PostInstallRequest> = this._data.asObservable();
 
-  private _installerSettings!: UmbracoInstaller;
+  private _settings: Subject<UmbracoInstaller> = new ReplaySubject<UmbracoInstaller>();
+  public readonly settings: Observable<UmbracoInstaller> = this._settings.asObservable();
 
   constructor() {
     this.loadIntallerSettings();
   }
 
-  public loadIntallerSettings() {
-    getInstall({}).then(({ data }) => {
-      this._installerSettings = data;
-    });
-  }
-
-  public getInstallerSettings() {
-    return this._installerSettings;
-  }
-
-  public appendData(data: object) {
-    this._data = { ...this._data, ...data };
+  public appendData(data: any) {
+    this._data.next({ ...this._data.getValue(), ...data });
   }
 
   public getData() {
-    return this._data;
+    return this._data.getValue();
   }
 
   public requestInstall() {
-    return new Promise((r) => setTimeout(r, 2000)); // wait for 2 seconds
-    // try {
-    //     await new Promise((r) => setTimeout(r, 2000)); // wait for 2 seconds
-    //     postInstall(data).then(this._onInstallRequestFulfilled.bind(this), this._onInstallRequestRejected.bind(this));
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // simulate 2 sec delay
+        postInstall(this._data.getValue()).then(resolve, reject);
+      }, 2000);
+    });
+  }
+
+  private loadIntallerSettings() {
+    getInstall({}).then(({ data }) => {
+      this._settings.next(data);
+      console.log('INSTALLER SETTINGS', data);
+    });
   }
 }
