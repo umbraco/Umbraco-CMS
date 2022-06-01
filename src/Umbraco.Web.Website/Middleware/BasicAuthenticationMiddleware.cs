@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -55,7 +56,6 @@ public class BasicAuthenticationMiddleware : IMiddleware
         if (_runtimeState.Level < RuntimeLevel.Run
             || !_basicAuthService.IsBasicAuthEnabled()
             || context.Request.IsBackOfficeRequest()
-            || context.Request.IsClientSideRequest()
             || AllowedClientRequest(context)
             || _basicAuthService.HasCorrectSharedSecret(context.Request.Headers))
         {
@@ -117,7 +117,7 @@ public class BasicAuthenticationMiddleware : IMiddleware
     {
         if (_basicAuthService.IsRedirectToLoginPageEnabled())
         {
-            context.Response.Redirect($"{_backOfficePath}#/login/false?returnPath=%252F" , false);
+            context.Response.Redirect($"{_backOfficePath}#/login/false?returnPath={WebUtility.UrlEncode(context.Request.GetEncodedPathAndQuery())}" , false);
         }
         else
         {
