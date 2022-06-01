@@ -3,10 +3,6 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 // TODO: how do we want to type extensions?
 export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'dashboard';
 
-export type UmbExtensionManifestJSModel = {
-  elementName?: string;
-}
-
 export type UmbExtensionManifestBase = {
   //type: string;
   alias: string;

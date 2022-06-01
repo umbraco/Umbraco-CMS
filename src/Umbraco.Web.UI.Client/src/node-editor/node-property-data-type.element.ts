@@ -3,10 +3,10 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../core/context';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
-import { mergeMap, Subscription, map, switchMap } from 'rxjs';
+import { Subscription, map, switchMap } from 'rxjs';
 import { DataTypeEntity } from '../mocks/data/content.data';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
-import { loadExtension } from '../core/extension/load-extension.function';
+import { createExtensionElement } from '../core/extension/create-extension-element.function';
 
 @customElement('umb-node-property-data-type')
 class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
@@ -27,7 +27,7 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
     return this._dataTypeKey;
   }
   public set dataTypeKey(key: string | undefined) {
-    const oldValue = this._dataTypeKey
+    //const oldValue = this._dataTypeKey;
     this._dataTypeKey = key;
     this._useDataType();
   }
@@ -35,7 +35,7 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
 
   // TODO: make interface for UMBPropertyEditorElement
   @state()
-  private _element?:any;
+  private _element?: {value?:string} & HTMLElement;// TODO: invent interface for propertyEditorUI.
 
   @property()
   value?:string;
@@ -95,27 +95,22 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
       return;
     }
 
-    const oldValue = this._element;
 
-    loadExtension(_propertyEditorUI)?.then(js => {
+    createExtensionElement(_propertyEditorUI).then(el => {
 
-      // TODO: something with JS
-      console.log('ext js', js);
-      // IF we got a JS file loaded, we can use its elementName prop.
-      const elementName = _propertyEditorUI.elementName || js?.elementName;
-
-      if (elementName) {
-        this._element = document.createElement(elementName);
-      }
+      const oldValue = this._element;
+      this._element = el;
   
       // TODO: Set/Parse Data-Type-UI-configuration
   
       if(oldValue) {
-        oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange);
+        oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
       }
-      this._element.addEventListener('property-editor-change', this._onPropertyEditorChange);
-  
-      this._element.value = this.value;// Be aware its duplicated code
+
+      if(this._element) {
+        this._element.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+        this._element.value = this.value;// Be aware its duplicated code
+      }
       this.requestUpdate('element', oldValue);
     }).catch(() => {
       // TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)

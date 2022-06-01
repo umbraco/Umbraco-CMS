@@ -19,6 +19,12 @@ export class UmbDataTypeStore {
         key: 'dt-2',
         name: 'Textarea (DataType)',
         propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea'
+      },
+      {
+        id: 1246,
+        key: 'dt-3',
+        name: 'External Test (DataType)',
+        propertyEditorUIAlias: 'External.PropertyEditorUI.Test'
       }
     ])
   }

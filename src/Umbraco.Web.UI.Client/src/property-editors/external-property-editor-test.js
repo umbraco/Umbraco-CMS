@@ -1,4 +1,4 @@
-class ExternalPropertyEditorTest extends HTMLElement {
+export default class ExternalPropertyEditorTest extends HTMLElement {
   
     constructor() {
         super();
