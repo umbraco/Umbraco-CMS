@@ -31,6 +31,11 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
       this._extensionsSubscription = this._extensionRegistry.extensions.subscribe(extensions => {
         this._extensions = [...extensions];// TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
       });
+
+      this._extensionsSubscription = this._extensionRegistry.extensionsOfType('section').subscribe(sections => {
+        // In this callback sections are typed. Example meta.weight...
+        console.log(sections[0].meta.weight);
+      });
     });
   }
 

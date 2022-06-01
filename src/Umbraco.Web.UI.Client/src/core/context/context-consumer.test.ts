@@ -3,7 +3,7 @@ import { UmbContextProvider } from './context-provider';
 import { UmbContextConsumer } from './context-consumer';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
 
-const testContextKey = 'my-test-context';
+const testContextAlias = 'my-test-context';
 
 class MyClass {
   prop = 'value from provider';
@@ -14,7 +14,7 @@ describe('UmbContextConsumer', () => {
 
   beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    consumer = new UmbContextConsumer(document.body, testContextKey, () => {});
+    consumer = new UmbContextConsumer(document.body, testContextAlias, () => {});
   });
 
   describe('Public API', () => {
@@ -33,19 +33,19 @@ describe('UmbContextConsumer', () => {
         const event = await listener as unknown as UmbContextRequestEventImplementation;
         expect(event).to.exist;
         expect(event.type).to.eq(umbContextRequestEventType);
-        expect(event.contextAlias).to.eq(testContextKey);
+        expect(event.contextAlias).to.eq(testContextAlias);
       });
     });
   });
 
   it('works with UmbContextProvider', (done: any) => {
-    const provider = new UmbContextProvider(document.body, testContextKey, new MyClass());
+    const provider = new UmbContextProvider(document.body, testContextAlias, new MyClass());
     provider.attach();
 
     const element = document.createElement('div');
     document.body.appendChild(element);
 
-    const localConsumer = new UmbContextConsumer(element, testContextKey, (_instance) => {
+    const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
     })

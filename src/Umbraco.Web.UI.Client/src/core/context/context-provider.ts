@@ -7,19 +7,19 @@ import { UmbContextProvideEventImplementation } from './context-provide.event';
  */
 export class UmbContextProvider {
   protected host: EventTarget;
-  private _contextKey: string;
+  private _contextAlias: string;
   private _instance: unknown;
 
   /**
    * Creates an instance of UmbContextProvider.
    * @param {EventTarget} host
-   * @param {string} contextKey
+   * @param {string} contextAlias
    * @param {*} instance
    * @memberof UmbContextProvider
    */
-  constructor (host: EventTarget, contextKey: string, instance: unknown) {
+  constructor (host: EventTarget, contextAlias: string, instance: unknown) {
     this.host = host;
-    this._contextKey = contextKey;
+    this._contextAlias = contextAlias;
     this._instance = instance;
   }
 
@@ -28,7 +28,7 @@ export class UmbContextProvider {
    */
   public attach () {
     this.host.addEventListener(umbContextRequestEventType, this._handleContextRequest);
-    this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextKey));
+    this.host.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
   }
 
   /**
@@ -47,7 +47,7 @@ export class UmbContextProvider {
   private _handleContextRequest = (event: Event) => {
     
     if (!isUmbContextRequestEvent(event)) return;
-    if (event.contextAlias !== this._contextKey) return;
+    if (event.contextAlias !== this._contextAlias) return;
 
     event.stopPropagation();
     event.callback(this._instance);

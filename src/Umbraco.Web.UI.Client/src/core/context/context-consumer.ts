@@ -10,13 +10,13 @@ export class UmbContextConsumer {
   /**
    * Creates an instance of UmbContextConsumer.
    * @param {EventTarget} target
-   * @param {string} _contextKey
+   * @param {string} _contextAlias
    * @param {UmbContextCallback} _callback
    * @memberof UmbContextConsumer
    */
   constructor (
     protected target: EventTarget,
-    private _contextKey: string,
+    private _contextAlias: string,
     private _callback: UmbContextCallback
   ) {
     
@@ -26,7 +26,7 @@ export class UmbContextConsumer {
    * @memberof UmbContextConsumer
    */
    public request() {
-    const event = new UmbContextRequestEventImplementation(this._contextKey, this._callback);
+    const event = new UmbContextRequestEventImplementation(this._contextAlias, this._callback);
     this.target.dispatchEvent(event);
   }
 
@@ -42,7 +42,7 @@ export class UmbContextConsumer {
   private _handleNewProvider = (event: Event) => {
     if (!isUmbContextProvideEvent(event)) return;
 
-    if (this._contextKey === event.contextAlias) {
+    if (this._contextAlias === event.contextAlias) {
       this.request();
     }
   }
