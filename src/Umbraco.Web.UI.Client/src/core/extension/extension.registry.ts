@@ -69,8 +69,8 @@ export type UmbExtensionManifest = UmbExtensionManifestCore | UmbExtensionManife
 type UmbExtensionManifestCoreTypes = Pick<UmbExtensionManifestCore, 'type'>['type'];
 
 export class UmbExtensionRegistry {
-  private _extensions = new BehaviorSubject(<Array<UmbExtensionManifest>>[]);
-  public readonly extensions: Observable<Array<UmbExtensionManifest>> = this._extensions.asObservable();
+  private _extensions = new BehaviorSubject<Array<UmbExtensionManifest>>([]);
+  public readonly extensions = this._extensions.asObservable();
 
   register<T extends UmbExtensionManifest = UmbExtensionManifestCore>(manifest: T): void {
     const extensionsValues = this._extensions.getValue();
@@ -86,12 +86,7 @@ export class UmbExtensionRegistry {
 
   getByAlias(alias: string): Observable<UmbExtensionManifest | null> {
     // TODO: make pipes prettier/simpler/reuseable
-    return this.extensions.pipe(
-      map(
-        (dataTypes: Array<UmbExtensionManifest>) =>
-          dataTypes.find((extension: UmbExtensionManifest) => extension.alias === alias) || null
-      )
-    );
+    return this.extensions.pipe(map((dataTypes) => dataTypes.find((extension) => extension.alias === alias) || null));
   }
 
   // TODO: implement unregister of extension
