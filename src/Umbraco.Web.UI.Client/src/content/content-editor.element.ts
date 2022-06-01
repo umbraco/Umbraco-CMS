@@ -54,7 +54,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   private _nodeStore?: UmbNodeStore;
   private _nodeSubscription?: Subscription;
 
-  constructor () {
+  constructor() {
     super();
 
     this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
@@ -64,11 +64,11 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _onPropertyValueChange(e: CustomEvent) {
-    const target = (e.target as any);
+    const target = e.target as any;
 
     // TODO: Set value.
-    const property = this._node?.properties.find(x => x.alias === target.property.alias);
-    if(property) {
+    const property = this._node?.properties.find((x) => x.alias === target.property.alias);
+    if (property) {
       property.tempValue = target.value;
     } else {
       console.error('property was not found', target.property.alias);
@@ -78,7 +78,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   private _useNode() {
     this._nodeSubscription?.unsubscribe();
 
-    this._nodeSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe(node => {
+    this._nodeSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe((node) => {
       if (!node) return; // TODO: Handle nicely if there is no node.
       this._node = node;
     });
@@ -90,7 +90,7 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
 
   private _onSave() {
     // TODO: What if store is not present, what if node is not loaded....
-    if(this._node) {
+    if (this._node) {
       this._nodeStore?.save([this._node]);
     }
   }
@@ -118,20 +118,25 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
         <uui-box slot="content">
           <!-- TODO: Make sure map get data from data object?, parse on property object. -->
           ${this._node?.properties.map(
-            property => html`
-            <umb-node-property 
-              .property=${property}
-              .value=${property.tempValue} 
-              @property-value-change=${this._onPropertyValueChange}>
-            </umb-node-property>
-            <hr />
-          `)}
+            (property) => html`
+              <umb-node-property
+                .property=${property}
+                .value=${property.tempValue}
+                @property-value-change=${this._onPropertyValueChange}>
+              </umb-node-property>
+              <hr />
+            `
+          )}
         </uui-box>
 
         <div slot="actions">
           <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
           <uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>
-          <uui-button @click=${this._onSaveAndPublish} look="primary" color="positive" label="Save and publish"></uui-button>
+          <uui-button
+            @click=${this._onSaveAndPublish}
+            look="primary"
+            color="positive"
+            label="Save and publish"></uui-button>
         </div>
       </umb-node-editor-layout>
     `;

@@ -54,7 +54,7 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
 
     // TODO: How do we handle dynamic imports of our files?
     if (typeof section.js === 'string') {
-      await import(/* @vite-ignore */section.js);
+      await import(/* @vite-ignore */ section.js);
     }
 
     if (typeof section.js === 'function') {

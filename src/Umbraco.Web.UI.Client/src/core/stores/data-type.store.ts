@@ -2,7 +2,6 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 import { DataTypeEntity } from '../../mocks/data/content.data';
 
 export class UmbDataTypeStore {
-
   private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
   public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
 
@@ -12,7 +11,7 @@ export class UmbDataTypeStore {
         id: 1245,
         key: 'dt-1',
         name: 'TextString (DataType)',
-        propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text'
+        propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
       },
       {
         id: 1244,
@@ -29,19 +28,21 @@ export class UmbDataTypeStore {
     ])
   }
 
-  getById (id: number): Observable<DataTypeEntity | null> {
-    
+  getById(id: number): Observable<DataTypeEntity | null> {
     // no fetch..
 
     // TODO: make pipes prettier/simpler/reuseable
-    return this.dataTypes.pipe(map(((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)));
+    return this.dataTypes.pipe(
+      map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)
+    );
   }
 
-  getByKey (key: string): Observable<DataTypeEntity | null> {
-    
+  getByKey(key: string): Observable<DataTypeEntity | null> {
     // no fetch..
 
     // TODO: make pipes prettier/simpler/reuseable
-    return this.dataTypes.pipe(map(((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)));
+    return this.dataTypes.pipe(
+      map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
+    );
   }
 }

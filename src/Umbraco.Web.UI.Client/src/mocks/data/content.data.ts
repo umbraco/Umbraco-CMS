@@ -18,7 +18,6 @@ export interface DataTypeEntity {
   propertyEditorUIAlias: string;
 }
 
-
 export interface NodeProperty {
   alias: string;
   label: string;
@@ -26,7 +25,6 @@ export interface NodeProperty {
   dataTypeKey: string;
   tempValue: string; // TODO: remove this - only used for testing
 }
-
 
 export const data: Array<DocumentNode> = [
   {
@@ -41,14 +39,14 @@ export const data: Array<DocumentNode> = [
         label: 'Textarea label 1',
         description: 'this is a textarea property',
         dataTypeKey: 'dt-1',
-        tempValue: 'hello world 1'
+        tempValue: 'hello world 1',
       },
       {
         alias: 'myDescription',
         label: 'Text string label 1',
         description: 'This is the a text string property',
         dataTypeKey: 'dt-2',
-        tempValue: 'Tex areaaaa 1'
+        tempValue: 'Tex areaaaa 1',
       },
       {
         alias: 'myExternalEditor',
@@ -102,35 +100,35 @@ export const data: Array<DocumentNode> = [
         label: 'Textarea label 2',
         description: 'this is a textarea property',
         dataTypeKey: 'dt-1',
-        tempValue: 'hello world 2'
+        tempValue: 'hello world 2',
       },
       {
         alias: 'myDescription',
         label: 'Text string label 2',
         description: 'This is the a text string property',
         dataTypeKey: 'dt-2',
-        tempValue: 'Tex areaaaa 2'
+        tempValue: 'Tex areaaaa 2',
       },
     ],
-  }
+  },
 ];
 
 // Temp mocked database
 class UmbContentData {
   private _data: Array<DocumentNode> = [];
 
-  constructor () {
+  constructor() {
     this._data = data;
   }
 
-  getById (id: number) {
-    return this._data.find(item => item.id === id);
+  getById(id: number) {
+    return this._data.find((item) => item.id === id);
   }
 
   save(nodes: DocumentNode[]) {
-    nodes.forEach( node => {
-      const foundIndex = this._data.findIndex(item => item.id === node.id);
-      if(foundIndex !== -1) {
+    nodes.forEach((node) => {
+      const foundIndex = this._data.findIndex((item) => item.id === node.id);
+      if (foundIndex !== -1) {
         // replace
         this._data[foundIndex] = node;
       } else {
