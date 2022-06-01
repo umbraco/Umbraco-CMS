@@ -184,7 +184,7 @@ public class MacroTagParser
                 // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
                 if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ", StringComparison.InvariantCulture) > -1)
                 {
-                    var closingTag = "</" + tag[1..tag.IndexOf(" ", StringComparison.InvariantCulture)] + ">";
+                    var closingTag = "</" + (tag.Substring(1, tag.IndexOf(" ", StringComparison.InvariantCulture) - 1)) + ">";
 
                     // Tag with children are only used when a macro is inserted by the umbraco-editor, in the
                     // following format: "<?UMBRACO_MACRO ...><IMG SRC="..."..></?UMBRACO_MACRO>", so we
