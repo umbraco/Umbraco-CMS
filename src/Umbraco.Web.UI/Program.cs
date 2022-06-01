@@ -1,4 +1,3 @@
-using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.UI;
 
 IHost host = Host.CreateDefaultBuilder(args)
