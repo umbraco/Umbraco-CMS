@@ -68,8 +68,7 @@ public class ContentIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
         if (indexes.Count == 0)
         {
-            _logger.LogDebug(
-                $"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+            _logger.LogDebug($"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
             return;
         }
 
