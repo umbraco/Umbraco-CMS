@@ -634,7 +634,7 @@ public class TextBuilder : Builder
             }
             else if (x == ModelsNamespace) // that one is used by default
             {
-                typeName = typeName[(p + 1)..];
+                typeName = typeName.Substring(p + 1);
                 typeUsing = ModelsNamespace;
             }
         }
