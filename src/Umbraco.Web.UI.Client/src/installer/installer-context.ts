@@ -30,12 +30,7 @@ export class UmbInstallerContext {
   }
 
   public requestInstall() {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // simulate 2 sec delay
-        postInstall(this._data.getValue()).then(resolve, reject);
-      }, 2000);
-    });
+    return postInstall(this._data.getValue());
   }
 
   private loadIntallerSettings() {
