@@ -5,11 +5,11 @@ import { BehaviorSubject, Observable, ReplaySubject, Subject, timeout } from 'rx
 
 export class UmbInstallerContext {
   private _data: BehaviorSubject<PostInstallRequest> = new BehaviorSubject<PostInstallRequest>({
-    name: 'Test Name',
-    email: 'emails@test',
-    password: 'yyoyoy',
-    subscribeToNewsletter: true,
-    telemetryLevel: 'Basic',
+    name: '',
+    email: '',
+    password: '',
+    subscribeToNewsletter: false,
+    telemetryLevel: 'Minimal',
     database: {},
   });
   public readonly data: Observable<PostInstallRequest> = this._data.asObservable();
