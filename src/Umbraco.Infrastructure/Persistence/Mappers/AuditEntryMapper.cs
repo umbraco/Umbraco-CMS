@@ -18,12 +18,8 @@ public sealed class AuditEntryMapper : BaseMapper
     protected override void DefineMaps()
     {
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.Id), nameof(AuditEntryDto.Id));
-        DefineMap<AuditEntry, AuditEntryDto>(
-            nameof(AuditEntry.PerformingUserId),
-            nameof(AuditEntryDto.PerformingUserId));
-        DefineMap<AuditEntry, AuditEntryDto>(
-            nameof(AuditEntry.PerformingDetails),
-            nameof(AuditEntryDto.PerformingDetails));
+        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingUserId), nameof(AuditEntryDto.PerformingUserId));
+        DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingDetails), nameof(AuditEntryDto.PerformingDetails));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.PerformingIp), nameof(AuditEntryDto.PerformingIp));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.EventDateUtc), nameof(AuditEntryDto.EventDateUtc));
         DefineMap<AuditEntry, AuditEntryDto>(nameof(AuditEntry.AffectedUserId), nameof(AuditEntryDto.AffectedUserId));
