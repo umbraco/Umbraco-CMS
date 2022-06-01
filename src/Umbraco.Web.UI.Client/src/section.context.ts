@@ -13,14 +13,9 @@ export class UmbSectionContext {
   }
 
   getSections() {
-    return this._extensionRegistry.extensions.pipe(
-      map((extensions) =>
-        extensions
-          .filter((extension) => extension.type === 'section')
-          .map((extension) => extension as UmbExtensionManifestSection)
-          .sort((a, b) => b.meta.weight - a.meta.weight)
-      )
-    );
+    return this._extensionRegistry
+      .extensionsOfType('section')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)));
   }
 
   getCurrent() {

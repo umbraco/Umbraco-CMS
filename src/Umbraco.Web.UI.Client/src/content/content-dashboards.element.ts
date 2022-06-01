@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import { UmbExtensionManifest, UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../core/extension';
+import { UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../core/extension';
 import { UmbRouteLocation, UmbRouter } from '../core/router';
 
 @customElement('umb-content-dashboards')
@@ -59,15 +59,9 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   private _useDashboards() {
     this._dashboardsSubscription?.unsubscribe();
 
-    this._dashboardsSubscription = this._extensionRegistry?.extensions
-      .pipe(
-        map((extensions) =>
-          extensions
-            .filter((extension) => extension.type === 'dashboard')
-            .map((x) => x as UmbExtensionManifestDashboard)
-            .sort((a, b) => b.meta.weight - a.meta.weight)
-        )
-      )
+    this._dashboardsSubscription = this._extensionRegistry
+      ?.extensionsOfType('dashboard')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
       .subscribe((dashboards) => {
         // TODO: What do we want to use as path?
         this._dashboards = dashboards;
@@ -101,7 +95,7 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   }
 
   // TODO: Temp outlet solution
-  private async _setCurrent(dashboard: UmbExtensionManifest) {
+  private async _setCurrent(dashboard: UmbExtensionManifestDashboard) {
     if (typeof dashboard.js === 'function') {
       await dashboard.js();
     }
