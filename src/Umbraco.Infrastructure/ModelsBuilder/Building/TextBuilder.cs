@@ -629,7 +629,7 @@ public class TextBuilder : Builder
             var x = typeName.Substring(0, p);
             if (Using.Contains(x))
             {
-                typeName = typeName[(p + 1)..];
+                typeName = typeName.Substring(p + 1);
                 typeUsing = x;
             }
             else if (x == ModelsNamespace) // that one is used by default
