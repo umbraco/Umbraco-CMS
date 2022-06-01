@@ -143,9 +143,8 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
                     if (publishField.Value.Count <= 0 || !publishField.Value[0].Equals("y"))
                     {
                         // this culture is not published, so remove all of these culture values
-                        var cultureSuffix = publishField.Key[publishField.Key.LastIndexOf('_')..];
-                        foreach (KeyValuePair<string, IReadOnlyList<object>> cultureField in valueSet.Values
-                                     .Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
+                        var cultureSuffix = publishField.Key.Substring(publishField.Key.LastIndexOf('_'));
+                        foreach (KeyValuePair<string, IReadOnlyList<object>> cultureField in valueSet.Values.Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
                         {
                             filteredValues.Remove(cultureField.Key);
                             isFiltered = true;
