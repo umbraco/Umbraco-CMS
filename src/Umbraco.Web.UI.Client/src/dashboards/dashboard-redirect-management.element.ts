@@ -4,10 +4,7 @@ import { css, html, LitElement } from 'lit';
 
 @defineElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagement extends LitElement {
-  static styles = [
-    UUITextStyles,
-    css``,
-  ];
+  static styles = [UUITextStyles, css``];
 
   render() {
     return html`<div>Redirect Management</div>`;

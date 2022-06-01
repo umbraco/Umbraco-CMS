@@ -21,7 +21,6 @@ class MyTestProviderElement extends UmbContextProviderMixin(HTMLElement) {
 customElements.define('my-test-provider-element', MyTestProviderElement);
 
 describe('UmbContextProviderMixin', async () => {
-
   let element: MyTestProviderElement;
   let _providers: Map<string, UmbContextProvider>;
 

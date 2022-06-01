@@ -34,7 +34,9 @@ export class UmbRouter {
 
     // Anchor Hijacker
     this._host.addEventListener('click', async (event: MouseEvent) => {
-      const anchor = ('composedPath' in event as any) ? event.composedPath().find(element => element instanceof HTMLAnchorElement) : event.target;
+      const anchor = (('composedPath' in event) as any)
+        ? event.composedPath().find((element) => element instanceof HTMLAnchorElement)
+        : event.target;
       if (anchor == null || !(anchor instanceof HTMLAnchorElement)) {
         return;
       }

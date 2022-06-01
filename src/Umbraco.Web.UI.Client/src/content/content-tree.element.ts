@@ -9,7 +9,6 @@ import { UUIMenuItemElement } from '@umbraco-ui/uui';
 
 @customElement('umb-content-tree')
 class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
-
   static styles = [
     UUITextStyles,
     css`
@@ -33,7 +32,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
   private _location?: UmbRouteLocation;
   private _locationSubscription?: Subscription;
 
-  constructor () {
+  constructor() {
     super();
 
     // TODO: implement correct tree data
@@ -48,7 +47,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
   private _useLocation() {
     this._locationSubscription?.unsubscribe();
 
-    this._locationSubscription = this._router?.location.subscribe(location => {
+    this._locationSubscription = this._router?.location.subscribe((location) => {
       this._location = location;
       this._section = location.params.section;
       this._currentNodeId = parseInt(location.params.nodeId);
@@ -65,7 +64,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
     It might make sense to make it possible to use your own anchor tag or button inside a label slot instead.
     This is a temp solution to get the href from the menu item and overwrite the router hijacking.
   */
-  private _handleMenuItemClick (e: PointerEvent) {
+  private _handleMenuItemClick(e: PointerEvent) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -78,7 +77,7 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
     this._router?.push(href);
   }
 
-  render () {
+  render() {
     return html`
       <a href="${`/section/${this._section}`}">
         <h3>Content</h3>
@@ -86,16 +85,18 @@ class UmbContentTree extends UmbContextConsumerMixin(LitElement) {
 
       <div class="nav-list">
         <!-- TODO: make menu item events bubble so we don't have to attach event listeners on every item -->
-        ${ this._tree.map(item => html`
-          <uui-menu-item
-            @click="${this._handleMenuItemClick}"
-            ?active="${item.id === this._currentNodeId}"
-            data-id="${item.id}"
-            label="${item.name}"
-            href="/section/${this._section}/node/${item.id}">
-            <uui-icon slot="icon" name="${item.icon}"></uui-icon>
-          </uui-menu-item>
-        `)}
+        ${this._tree.map(
+          (item) => html`
+            <uui-menu-item
+              @click="${this._handleMenuItemClick}"
+              ?active="${item.id === this._currentNodeId}"
+              data-id="${item.id}"
+              label="${item.name}"
+              href="/section/${this._section}/node/${item.id}">
+              <uui-icon slot="icon" name="${item.icon}"></uui-icon>
+            </uui-menu-item>
+          `
+        )}
       </div>
     `;
   }
