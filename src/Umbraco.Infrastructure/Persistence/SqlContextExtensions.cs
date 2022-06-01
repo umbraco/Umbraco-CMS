@@ -105,6 +105,6 @@ public static class SqlContextExtensions
         // going to return "<field> = @0"
         // take the first part only
         var pos = sql.IndexOf(' ');
-        return sql[..pos];
+        return sql.Substring(0, pos);
     }
 }

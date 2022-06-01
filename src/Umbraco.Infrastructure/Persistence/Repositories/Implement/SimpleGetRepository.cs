@@ -61,7 +61,6 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
         {
             sql.Where(GetWhereInClauseForGetAll(), new
             {
-                /*ids =*/
                 ids,
             });
         }
@@ -77,8 +76,6 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
         return Database.Fetch<TDto>(sql).Select(ConvertToEntity);
     }
 
-    #region Not implemented and not required
-
     protected sealed override IEnumerable<string> GetDeleteClauses() =>
         throw new InvalidOperationException("This method won't be implemented.");
 
@@ -87,6 +84,4 @@ internal abstract class SimpleGetRepository<TId, TEntity, TDto> : EntityReposito
 
     protected sealed override void PersistUpdatedItem(TEntity entity) =>
         throw new InvalidOperationException("This method won't be implemented.");
-
-    #endregion
 }

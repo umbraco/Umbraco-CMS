@@ -10,8 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Serialization;
 /// <remarks>
 ///     borrowed from https://stackoverflow.com/a/36116462/694494
 /// </remarks>
-public class
-    AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : CaseInsensitiveDictionaryConverter<TValue>
+public class AutoInterningStringKeyCaseInsensitiveDictionaryConverter<TValue> : CaseInsensitiveDictionaryConverter<TValue>
 {
     public AutoInterningStringKeyCaseInsensitiveDictionaryConverter()
     {

@@ -234,7 +234,7 @@ public class ManifestParser : IManifestParser
     private static string TrimPreamble(string text)
     {
         // strangely StartsWith(preamble) would always return true
-        if (text[..1] == _utf8Preamble)
+        if (text.Substring(0, 1) == _utf8Preamble)
         {
             text = text.Remove(0, _utf8Preamble.Length);
         }

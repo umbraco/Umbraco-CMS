@@ -76,7 +76,7 @@ public class ContentFinderByConfigured404 : IContentLastChanceFinder
             IPublishedContent? node = null;
             while (pos > 1)
             {
-                route = route[..pos];
+                route = route.Substring(0, pos);
                 node = umbracoContext.Content?.GetByRoute(route, culture: frequest?.Culture);
                 if (node != null)
                 {

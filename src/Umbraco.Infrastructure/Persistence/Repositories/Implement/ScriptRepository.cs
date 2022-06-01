@@ -15,8 +15,6 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
     {
     }
 
-    #region Implementation of IRepository<string,Script>
-
     public override IScript? Get(string? id)
     {
         if (id is null || FileSystem is null)
@@ -37,7 +35,6 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
         DateTime created = FileSystem.GetCreated(path).UtcDateTime;
         DateTime updated = FileSystem.GetLastModified(path).UtcDateTime;
 
-        // var content = GetFileContent(path);
         var script = new Script(path, file => GetFileContent(file.OriginalPath))
         {
             // id can be the hash
@@ -99,6 +96,4 @@ internal class ScriptRepository : FileRepository<string, IScript>, IScriptReposi
             }
         }
     }
-
-    #endregion
 }
