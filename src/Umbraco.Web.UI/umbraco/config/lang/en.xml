@@ -1041,7 +1041,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="login">
     <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
+    <key alias="greeting1">Happy marvelous Monday</key>
     <key alias="greeting2">Happy tubular Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
     <key alias="greeting4">Happy thunderous Thursday</key>
