@@ -121,9 +121,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         // check for published content
         if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
         {
-            if (!valueSet.Values.TryGetValue(
-                UmbracoExamineFieldNames.PublishedFieldName,
-                out IReadOnlyList<object>? published))
+            if (!valueSet.Values.TryGetValue(UmbracoExamineFieldNames.PublishedFieldName, out IReadOnlyList<object>? published))
             {
                 return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
             }
