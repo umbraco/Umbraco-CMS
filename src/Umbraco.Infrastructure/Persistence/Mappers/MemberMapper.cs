@@ -49,9 +49,7 @@ public sealed class MemberMapper : BaseMapper
         DefineMap<Member, PropertyDataDto>(nameof(Member.IntegerPropertyValue), nameof(PropertyDataDto.IntegerValue));
         DefineMap<Member, PropertyDataDto>(nameof(Member.BoolPropertyValue), nameof(PropertyDataDto.IntegerValue));
         DefineMap<Member, PropertyDataDto>(nameof(Member.LongStringPropertyValue), nameof(PropertyDataDto.TextValue));
-        DefineMap<Member, PropertyDataDto>(
-            nameof(Member.ShortStringPropertyValue),
-            nameof(PropertyDataDto.VarcharValue));
+        DefineMap<Member, PropertyDataDto>(nameof(Member.ShortStringPropertyValue), nameof(PropertyDataDto.VarcharValue));
         DefineMap<Member, PropertyTypeDto>(nameof(Member.PropertyTypeAlias), nameof(PropertyTypeDto.Alias));
     }
 }
