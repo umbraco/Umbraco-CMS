@@ -284,11 +284,8 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                 var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                 {
-                    [true] =
-                        new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder
-                            .GetValueSets(content).ToList()),
-                    [false] = new(() =>
-                        examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
+                    [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
                 };
 
                 // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
