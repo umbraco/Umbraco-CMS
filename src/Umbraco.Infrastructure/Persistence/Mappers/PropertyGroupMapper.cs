@@ -22,8 +22,6 @@ public sealed class PropertyGroupMapper : BaseMapper
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Type), nameof(PropertyTypeGroupDto.Type));
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Name), nameof(PropertyTypeGroupDto.Text));
         DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Alias), nameof(PropertyTypeGroupDto.Alias));
-        DefineMap<PropertyGroup, PropertyTypeGroupDto>(
-            nameof(PropertyGroup.SortOrder),
-            nameof(PropertyTypeGroupDto.SortOrder));
+        DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.SortOrder), nameof(PropertyTypeGroupDto.SortOrder));
     }
 }
