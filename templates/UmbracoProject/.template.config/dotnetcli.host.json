@@ -25,6 +25,10 @@
       "longName": "minimal-gitignore",
       "shortName": ""
     },
+    "UseProgramMain": {
+      "longName": "use-program-main",
+      "shortName": ""
+    },
     "ConnectionString": {
       "longName": "connection-string",
       "shortName": ""

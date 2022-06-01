@@ -26,6 +26,21 @@
           "exclude": [
             ".gitignore"
           ]
+        },
+        {
+          "condition": "(!UseProgramMain)",
+          "exclude": [
+            "Program.Main.cs"
+          ]
+        },
+        {
+          "condition": "(UseProgramMain)",
+          "exclude": [
+            "Program.cs"
+          ],
+          "rename": {
+            "Program.Main.cs": "Program.cs"
+          }
         }
       ]
     }
@@ -78,6 +93,13 @@
     "MinimalGitignore": {
       "displayName": "Minimal .gitignore",
       "description": "Whether to only include minimal (Umbraco specific) rules in the .gitignore.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "UseProgramMain": {
+      "displayName": "Do not use top-level statements",
+      "description": "Whether to generate an explicit Program class and Main method instead of top-level statements.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"

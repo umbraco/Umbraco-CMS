@@ -1,21 +1,13 @@
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Web.UI;
 
-namespace Umbraco.Cms.Web.UI
-{
-    public class Program
+IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureUmbracoDefaults()
+    .ConfigureWebHostDefaults(webBuilder =>
     {
-        public static void Main(string[] args)
-            => CreateHostBuilder(args)
-                .Build()
-                .Run();
+        webBuilder.UseStaticWebAssets();
+        webBuilder.UseStartup<Startup>();
+    })
+    .Build();
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureUmbracoDefaults()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStaticWebAssets();
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+host.Run();

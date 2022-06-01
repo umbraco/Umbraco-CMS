@@ -28,6 +28,10 @@
       "isVisible": true
     },
     {
+      "id": "UseProgramMain",
+      "isVisible": true
+    },
+    {
       "id": "ConnectionString",
       "isVisible": true
     },
