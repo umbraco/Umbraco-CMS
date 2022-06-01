@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
 {
     private const string PathKey = "path";
-    private static readonly IEnumerable<string> _validCategories = new[] { IndexTypes.Content, IndexTypes.Media };
+    private static readonly IEnumerable<string> ValidCategories = new[] {IndexTypes.Content, IndexTypes.Media};
     private readonly IPublicAccessService? _publicAccessService;
     private readonly IScopeProvider? _scopeProvider;
 
@@ -40,17 +40,15 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         _scopeProvider = scopeProvider;
     }
 
+    protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
+
     public bool PublishedValuesOnly { get; }
-
-    protected override IEnumerable<string> ValidIndexCategories => _validCategories;
-
     public bool SupportProtectedContent { get; }
-
     public int? ParentId { get; }
 
     public bool ValidatePath(string path, string category)
     {
-        // check if this document is a descendent of the parent
+        //check if this document is a descendent of the parent
         if (ParentId.HasValue && ParentId.Value > 0)
         {
             // we cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
@@ -70,7 +68,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             ? Constants.System.RecycleBinContentString
             : Constants.System.RecycleBinMediaString;
 
-        // check for recycle bin
+        //check for recycle bin
         if (PublishedValuesOnly)
         {
             if (path.Contains(string.Concat(",", recycleBinId, ",")))
@@ -86,7 +84,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     {
         if (category == IndexTypes.Content && !SupportProtectedContent)
         {
-            // if the service is null we can't look this up so we'll return false
+            //if the service is null we can't look this up so we'll return false
             if (_publicAccessService == null || _scopeProvider == null)
             {
                 return false;
@@ -117,8 +115,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         var isFiltered = baseValidate.Status == ValueSetValidationStatus.Filtered;
 
         var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
-
-        // check for published content
+        //check for published content
         if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
         {
             if (!valueSet.Values.TryGetValue(UmbracoExamineFieldNames.PublishedFieldName, out IReadOnlyList<object>? published))
@@ -131,20 +128,20 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
                 return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
             }
 
-            // deal with variants, if there are unpublished variants than we need to remove them from the value set
+            //deal with variants, if there are unpublished variants than we need to remove them from the value set
             if (valueSet.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out IReadOnlyList<object>? variesByCulture)
                 && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
-                && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
             {
-                // so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
+                //so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
                 foreach (KeyValuePair<string, IReadOnlyList<object>> publishField in valueSet.Values
                              .Where(x => x.Key.StartsWith($"{UmbracoExamineFieldNames.PublishedFieldName}_")).ToList())
                 {
                     if (publishField.Value.Count <= 0 || !publishField.Value[0].Equals("y"))
                     {
-                        // this culture is not published, so remove all of these culture values
+                        //this culture is not published, so remove all of these culture values
                         var cultureSuffix = publishField.Key.Substring(publishField.Key.LastIndexOf('_'));
-                        foreach (KeyValuePair<string, IReadOnlyList<object>> cultureField in valueSet.Values.Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
+                        foreach (KeyValuePair<string, IReadOnlyList<object>> cultureField in valueSet.Values
+                                     .Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
                         {
                             filteredValues.Remove(cultureField.Key);
                             isFiltered = true;
@@ -154,7 +151,7 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             }
         }
 
-        // must have a 'path'
+        //must have a 'path'
         if (!valueSet.Values.TryGetValue(PathKey, out IReadOnlyList<object>? pathValues))
         {
             return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
@@ -178,7 +175,6 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         var path = pathValues[0].ToString();
 
         var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x => x.Key, x => (IEnumerable<object>)x.Value));
-
         // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
         // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
         // because we need to remove anything that doesn't pass by protected content in the cases that umbraco data is moved to an illegal parent.
