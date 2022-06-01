@@ -174,7 +174,7 @@ public class MacroTagParser
                 var tempElementContent = string.Empty;
 
                 // text block found, call the call back method
-                textFoundCallback(fieldResult.ToString()[..tagIndex]);
+                textFoundCallback(fieldResult.ToString().Substring(0, tagIndex));
 
                 fieldResult.Remove(0, tagIndex);
 
