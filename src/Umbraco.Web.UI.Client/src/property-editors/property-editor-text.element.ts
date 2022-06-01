@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-property-editor-text')
-class UmbPropertyEditorText extends LitElement {
+export default class UmbPropertyEditorText extends LitElement {
   static styles = [
     UUITextStyles,
     css`
@@ -25,8 +25,6 @@ class UmbPropertyEditorText extends LitElement {
     return html`<uui-input .value=${this.value} type="text" @input=${this.onInput}></uui-input>`;
   }
 }
-
-export const elementName = 'umb-property-editor-text';
 
 declare global {
   interface HTMLElementTagNameMap {

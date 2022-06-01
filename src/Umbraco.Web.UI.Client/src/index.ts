@@ -87,7 +87,7 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
-      elementName: 'umb-property-editor-text',
+      //elementName: 'umb-property-editor-text',
       js: () => import('./property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
@@ -98,13 +98,26 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
-      elementName: 'external-property-editor-test', //Gets the element name from JS file.
+      //elementName: 'external-property-editor-test', //Gets the element name from JS file.
       js: '/src/property-editors/external-property-editor-test.js',
       meta: {
         icon: 'document',
         group: 'common',
       },
     },
+   /*
+    {
+      type: 'propertyEditorUI',
+      alias: 'External.PropertyEditorUI.Test',
+      name: 'Text',
+      elementName: 'external-property-editor-test', //Gets the element name from JS file.
+      js: () => Promise.resolve(document.createElement('hr')),
+      meta: {
+        icon: 'document',
+        group: 'common',
+      }
+    },
+    */
     {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Textarea',
