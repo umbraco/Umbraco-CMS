@@ -1,10 +1,16 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UUIBooleanInputEvent, UUISelectElement } from '@umbraco-ui/uui';
-import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
+import {
+  PostInstallRequest,
+  UmbracoInstallerDatabaseModel,
+  UmbracoPerformInstallDatabaseConfiguration,
+} from '../core/models';
+import { UmbContextConsumerMixin } from '../core/context';
+import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
-export class UmbInstallerDatabase extends LitElement {
+export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
       uui-input,
@@ -43,9 +49,12 @@ export class UmbInstallerDatabase extends LitElement {
     const oldValue = value;
     this._databases = value;
     this._options = value?.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
-    this._selectedDatabase = value?.[0];
+    this._selectedDatabase = value?.find((x) => x.id === this.data?.databaseType) ?? value?.[0];
     this.requestUpdate('databases', oldValue);
   }
+
+  @property({ attribute: false })
+  public data?: PostInstallRequest['database'];
 
   @state()
   private _options?: { name: string; value: string }[];
@@ -59,6 +68,43 @@ export class UmbInstallerDatabase extends LitElement {
   @state()
   private _useIntegratedAuthentication = false; // Used to hide credentials when integrated authentication is selected
 
+  @state()
+  private _installerStore!: UmbInstallerContext;
+
+  constructor() {
+    super();
+
+    this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
+      this._installerStore = installerStore;
+    });
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    super.firstUpdated(_changedProperties);
+
+    if (_changedProperties.has('data') && this.data) {
+      this._useIntegratedAuthentication = this.data.database.useIntegratedAuthentication ?? false;
+      this._selectedDatabase = this.databases?.find((x) => x.id === this.data?.database?.databaseType);
+    }
+  }
+
+  protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    super.updated(_changedProperties);
+
+    if (_changedProperties.has('data') && this.data) {
+      this._useIntegratedAuthentication =
+        this.data.database.useIntegratedAuthentication ?? this._useIntegratedAuthentication;
+      this._selectedDatabase =
+        this.databases?.find((x) => x.id === this.data?.database?.databaseType) ?? this._selectedDatabase;
+
+      this._options = this.databases?.map((x, i) => ({
+        name: x.displayName,
+        value: x.id,
+        selected: this._selectedDatabase ? this._selectedDatabase.id === x.id : i === 0,
+      }));
+    }
+  }
+
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -68,6 +114,8 @@ export class UmbInstallerDatabase extends LitElement {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
+    this.shadowRoot?.getElementById('button-install')?.setAttribute('state', 'waiting');
+
     const formData = new FormData(form);
     const password = formData.get('password') as string;
     const server = formData.get('server') as string;
@@ -76,16 +124,22 @@ export class UmbInstallerDatabase extends LitElement {
     const databaseType = formData.get('databaseType') as string;
     const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
-    const databaseConfig: UmbracoPerformInstallDatabaseConfiguration = {
-      password,
-      server,
-      username,
-      databaseName,
-      databaseType,
-      useIntegratedAuthentication,
-    };
-
-    this.dispatchEvent(new CustomEvent('submit', { detail: { database: databaseConfig } }));
+    this.dispatchEvent(
+      new CustomEvent('submit', {
+        detail: {
+          database: {
+            password,
+            server,
+            username,
+            databaseName,
+            databaseType,
+            useIntegratedAuthentication,
+          },
+        },
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 
   private _onBack() {
@@ -123,7 +177,8 @@ export class UmbInstallerDatabase extends LitElement {
         type="text"
         id="server"
         name="server"
-        .placeholder=${this._selectedDatabase?.serverPlaceholder || ''}
+        .value=${this.data?.database?.server ?? ''}
+        .placeholder=${this._selectedDatabase?.serverPlaceholder ?? ''}
         required
         required-message="Server is required"></uui-input>
     </uui-form-layout-item>
@@ -133,6 +188,7 @@ export class UmbInstallerDatabase extends LitElement {
     <uui-label for="database-name" slot="label" required>Database Name</uui-label>
     <uui-input
       type="text"
+      .value=${this.data?.database?.databaseName ?? ''}
       id="database-name"
       name="databaseName"
       placeholder="umbraco-cms"
@@ -158,6 +214,7 @@ export class UmbInstallerDatabase extends LitElement {
             <uui-label for="username" slot="label" required>Username</uui-label>
             <uui-input
               type="text"
+              .value=${this.data?.database?.username ?? ''}
               id="username"
               name="username"
               required
@@ -167,9 +224,10 @@ export class UmbInstallerDatabase extends LitElement {
           <uui-form-layout-item>
             <uui-label for="password" slot="label" required>Password</uui-label>
             <uui-input
+              type="text"
+              .value=${this.data?.database?.password ?? ''}
               id="password"
               name="password"
-              type="text"
               autocomplete="new-password"
               required
               required-message="Password is required"></uui-input>
@@ -182,6 +240,7 @@ export class UmbInstallerDatabase extends LitElement {
       <uui-label for="connection-string" slot="label" required>Connection string</uui-label>
       <uui-textarea
         type="text"
+        .value=${this.data?.database?.connectionString ?? ''}
         id="connection-string"
         name="connectionString"
         required
