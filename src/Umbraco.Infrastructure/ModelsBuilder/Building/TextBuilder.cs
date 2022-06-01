@@ -113,7 +113,7 @@ public class TextBuilder : Builder
         if (type.IsGenericType)
         {
             var p = s.IndexOf('`');
-            WriteNonGenericClrType(sb, s[..p]);
+            WriteNonGenericClrType(sb, s.Substring(0, p));
             sb.Append("<");
             Type[] args = type.GetGenericArguments();
             for (var i = 0; i < args.Length; i++)
