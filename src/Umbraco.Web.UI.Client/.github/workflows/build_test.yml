@@ -29,5 +29,5 @@ jobs:
     - run: npm ci --no-audit --no-fund --prefer-offline
     - run: npm run lint
     - run: npm run build
-    # - run: sudo npx playwright install-deps
-    # - run: npm test
+    - run: sudo npx playwright install-deps
+    - run: npm test
