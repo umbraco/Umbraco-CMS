@@ -1,5 +1,3 @@
-using Umbraco.Cms.Web.Common.Hosting;
-
 namespace Umbraco.Cms.Web.UI
 {
     public class Program
