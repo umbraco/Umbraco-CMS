@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -78,6 +80,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             if (_expressions == null)
                 return;
+
+            // HACK: We're handling all the constraints higher up the stack for SQLite.
+            if (Context.Database.DatabaseType.IsSqlite())
+            {
+                _expressions = _expressions
+                    .Where(x => x is not CreateConstraintExpression)
+                    .Where(x => x is not CreateForeignKeyExpression)
+                    .ToList();
+            }
 
             foreach (var expression in _expressions)
                 expression.Execute();
