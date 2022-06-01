@@ -132,9 +132,8 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
             }
 
             // deal with variants, if there are unpublished variants than we need to remove them from the value set
-            if (valueSet.Values.TryGetValue(
-                UmbracoExamineFieldNames.VariesByCultureFieldName,
-                out IReadOnlyList<object>? variesByCulture)
+            if (valueSet.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out IReadOnlyList<object>? variesByCulture)
+                && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
                 && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
             {
                 // so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
