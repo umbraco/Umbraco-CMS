@@ -23,9 +23,7 @@ public sealed class PropertyTypeMapper : BaseMapper
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.DataTypeId), nameof(PropertyTypeDto.DataTypeId));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Description), nameof(PropertyTypeDto.Description));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Mandatory), nameof(PropertyTypeDto.Mandatory));
-        DefineMap<PropertyType, PropertyTypeDto>(
-            nameof(PropertyType.MandatoryMessage),
-            nameof(PropertyTypeDto.MandatoryMessage));
+        DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.MandatoryMessage), nameof(PropertyTypeDto.MandatoryMessage));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.Name), nameof(PropertyTypeDto.Name));
         DefineMap<PropertyType, PropertyTypeDto>(nameof(PropertyType.SortOrder), nameof(PropertyTypeDto.SortOrder));
         DefineMap<PropertyType, PropertyTypeDto>(
