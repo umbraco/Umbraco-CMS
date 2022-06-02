@@ -1,51 +1,50 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
+
+internal static class LanguageFactory
 {
-    internal static class LanguageFactory
+    public static ILanguage BuildEntity(LanguageDto dto)
     {
-        public static ILanguage BuildEntity(LanguageDto dto)
+        ArgumentNullException.ThrowIfNull(dto);
+        if (dto.IsoCode == null || dto.CultureName == null)
         {
-            ArgumentNullException.ThrowIfNull(dto);
-            if (dto.IsoCode == null || dto.CultureName == null)
-            {
-                throw new InvalidOperationException("Language ISO code and/or culture name can't be null.");
-            }
-
-            var lang = new Language(dto.IsoCode, dto.CultureName)
-            {
-                Id = dto.Id,
-                IsDefault = dto.IsDefault,
-                IsMandatory = dto.IsMandatory,
-                FallbackLanguageId = dto.FallbackLanguageId
-            };
-
-            // Reset dirty initial properties
-            lang.ResetDirtyProperties(false);
-
-            return lang;
+            throw new InvalidOperationException("Language ISO code and/or culture name can't be null.");
         }
 
-        public static LanguageDto BuildDto(ILanguage entity)
+        var lang = new Language(dto.IsoCode, dto.CultureName)
         {
-            ArgumentNullException.ThrowIfNull(entity);
+            Id = dto.Id,
+            IsDefault = dto.IsDefault,
+            IsMandatory = dto.IsMandatory,
+            FallbackLanguageId = dto.FallbackLanguageId,
+        };
 
-            var dto = new LanguageDto
-            {
-                IsoCode = entity.IsoCode,
-                CultureName = entity.CultureName,
-                IsDefault = entity.IsDefault,
-                IsMandatory = entity.IsMandatory,
-                FallbackLanguageId = entity.FallbackLanguageId
-            };
+        // Reset dirty initial properties
+        lang.ResetDirtyProperties(false);
 
-            if (entity.HasIdentity)
-            {
-                dto.Id = (short)entity.Id;
-            }
+        return lang;
+    }
 
-            return dto;
+    public static LanguageDto BuildDto(ILanguage entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        var dto = new LanguageDto
+        {
+            IsoCode = entity.IsoCode,
+            CultureName = entity.CultureName,
+            IsDefault = entity.IsDefault,
+            IsMandatory = entity.IsMandatory,
+            FallbackLanguageId = entity.FallbackLanguageId,
+        };
+
+        if (entity.HasIdentity)
+        {
+            dto.Id = (short)entity.Id;
         }
+
+        return dto;
     }
 }

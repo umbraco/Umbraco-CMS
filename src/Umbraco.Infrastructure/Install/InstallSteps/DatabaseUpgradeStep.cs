@@ -38,8 +38,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
+            InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
+            InstallTrackingItem previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
-                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
                 if (result?.Success == false)
                 {
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
 
             // This step relies on the previous one completed - because it has stored some information we need
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
             if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
             {
                 return false;
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             {
                 // A connection string was present, determine whether this is an install/upgrade
                 // Return true (upgrade) if there is an installed version, else false (install)
-                var result = _databaseBuilder.ValidateSchema();
+                DatabaseSchemaResult? result = _databaseBuilder.ValidateSchema();
                 return result?.DetermineHasInstalledVersion() ?? false;
             }
 
