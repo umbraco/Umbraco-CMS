@@ -48,13 +48,6 @@ export const data: Array<DocumentNode> = [
         dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 1',
       },
-      {
-        alias: 'myExternalEditor',
-        label: 'External label 1',
-        description: 'This is the a external property',
-        dataTypeKey: 'dt-3',
-        tempValue: 'Tex lkasdfkljdfsa 1',
-      },
     ],
     /*
     // Concept for stored values, better approach for variants, separating data from structure/configuration
@@ -108,6 +101,20 @@ export const data: Array<DocumentNode> = [
         description: 'This is the a text string property',
         dataTypeKey: 'dt-2',
         tempValue: 'Tex areaaaa 2',
+      },
+      {
+        alias: 'myExternalEditor',
+        label: 'External label 1',
+        description: 'This is the a external property',
+        dataTypeKey: 'dt-3',
+        tempValue: 'Tex lkasdfkljdfsa 1',
+      },
+      {
+        alias: 'myContextExampleEditor',
+        label: 'Context example label 1',
+        description: 'This is the a example property',
+        dataTypeKey: 'dt-4',
+        tempValue: '',
       },
     ],
   },

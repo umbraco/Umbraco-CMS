@@ -128,6 +128,16 @@ const registerInternalManifests = async () => {
         group: 'common',
       },
     },
+    {
+      type: 'propertyEditorUI',
+      alias: 'Umb.PropertyEditorUI.ContextExample',
+      name: 'Context Example',
+      js: () => import('./extensions/property-editors/property-editor-context-example.element'),
+      meta: {
+        icon: 'document',
+        group: 'common',
+      },
+    },
   ];
 
   manifests.forEach((manifest: UmbExtensionManifestCore) =>
