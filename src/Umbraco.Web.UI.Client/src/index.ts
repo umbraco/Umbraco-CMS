@@ -1,3 +1,4 @@
+import 'element-internals-polyfill';
 import { worker } from './mocks/browser';
 import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestCore } from './core/extension';
 
