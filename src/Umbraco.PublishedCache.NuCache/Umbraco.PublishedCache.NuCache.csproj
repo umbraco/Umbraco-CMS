@@ -24,6 +24,9 @@
     <PackageReference Include="Umbraco.Code" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Update="Nerdbank.GitVersioning">
+      <Version>3.5.107</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

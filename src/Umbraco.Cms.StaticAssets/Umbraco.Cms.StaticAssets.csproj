@@ -24,6 +24,12 @@
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning">
+      <Version>3.5.107</Version>
+    </PackageReference>
+  </ItemGroup>
+
   <PropertyGroup>
     <BellePath>$(ProjectDir)wwwroot/umbraco</BellePath>
   </PropertyGroup>
