@@ -1,9 +1,11 @@
 import { css, CSSResultGroup, html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { PostInstallRequest, UmbracoInstallerUserModel } from '../core/models';
+import { customElement, state } from 'lit/decorators.js';
+import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../core/context';
+import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-user')
-export class UmbInstallerUser extends LitElement {
+export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
       uui-input,
@@ -32,11 +34,43 @@ export class UmbInstallerUser extends LitElement {
     `,
   ];
 
-  @property({ attribute: false })
-  public userModel?: UmbracoInstallerUserModel; //TODO: Use this to validate the form
+  @state()
+  private _userFormData!: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
-  @property({ attribute: false })
-  public data?: PostInstallRequest;
+  @state()
+  private _installerStore!: UmbInstallerContext;
+
+  private installerStoreSubscription?: Subscription;
+
+  constructor() {
+    super();
+
+    this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
+      this._installerStore = installerStore;
+      this.installerStoreSubscription?.unsubscribe();
+      this.installerStoreSubscription = installerStore.data.subscribe((data) => {
+        this._userFormData = {
+          name: data.name,
+          password: data.password,
+          email: data.email,
+          subscribeToNewsletter: data.subscribeToNewsletter,
+        };
+      });
+    });
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.installerStoreSubscription?.unsubscribe();
+  }
+
+  private _handleChange(e: InputEvent) {
+    const target = e.target as HTMLInputElement;
+
+    const value: { [key: string]: string | boolean } = {};
+    value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
+    this._installerStore.appendData(value);
+  }
 
   private _handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
@@ -47,14 +81,14 @@ export class UmbInstallerUser extends LitElement {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
-    const user: Record<string, FormDataEntryValue> = {};
-
     const formData = new FormData(form);
-    for (const pair of formData.entries()) {
-      user[pair[0]] = pair[1];
-    }
+    const name = formData.get('name');
+    const password = formData.get('password');
+    const email = formData.get('email');
+    const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
-    this.dispatchEvent(new CustomEvent('submit', { detail: user }));
+    this._installerStore.appendData({ name, password, email, subscribeToNewsletter });
+    this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
   };
 
   render() {
@@ -67,7 +101,8 @@ export class UmbInstallerUser extends LitElement {
             <uui-input
               type="text"
               id="name"
-              .value=${this.data?.name || ''}
+              .value=${this._userFormData.name}
+              @input=${this._handleChange}
               name="name"
               required
               required-message="Name is required"></uui-input>
@@ -78,7 +113,8 @@ export class UmbInstallerUser extends LitElement {
             <uui-input
               type="email"
               id="email"
-              .value=${this.data?.email || ''}
+              .value=${this._userFormData.email}
+              @input=${this._handleChange}
               name="email"
               required
               required-message="Email is required"></uui-input>
@@ -89,7 +125,8 @@ export class UmbInstallerUser extends LitElement {
             <uui-input-password
               id="password"
               name="password"
-              .value=${this.data?.password || ''}
+              .value=${this._userFormData.password}
+              @input=${this._handleChange}
               required
               required-message="Password is required"></uui-input-password>
           </uui-form-layout-item>
@@ -98,7 +135,8 @@ export class UmbInstallerUser extends LitElement {
             <uui-checkbox
               name="subscribeToNewsletter"
               label="Remember me"
-              .checked=${this.data?.subscribeToNewsletter || false}>
+              @input=${this._handleChange}
+              .checked=${this._userFormData.subscribeToNewsletter}>
               Keep me updated on Umbraco Versions, Security Bulletins and Community News
             </uui-checkbox>
           </uui-form-layout-item>
