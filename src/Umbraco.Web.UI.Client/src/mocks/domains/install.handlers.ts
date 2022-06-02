@@ -71,7 +71,9 @@ export const handlers = [
     );
   }),
 
-  rest.post<UmbracoPerformInstallRequest>('/umbraco/backoffice/install', (req, res, ctx) => {
+  rest.post<UmbracoPerformInstallRequest>('/umbraco/backoffice/install', async (req, res, ctx) => {
+    await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
+
     if (req.body.database.databaseName === 'fail') {
       return res(
         // Respond with a 200 status code

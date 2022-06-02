@@ -1,11 +1,13 @@
-import { UUISliderEvent } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { PostInstallRequest, TelemetryModel } from '../core/models';
+import { Subscription } from 'rxjs';
+import { UmbContextConsumerMixin } from '../core/context';
+import { TelemetryModel } from '../core/models';
+import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-consent')
-export class UmbInstallerConsent extends LitElement {
+export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
       h1 {
@@ -25,82 +27,93 @@ export class UmbInstallerConsent extends LitElement {
     `,
   ];
 
-  @property({ attribute: false })
-  private telemetryLevels?: TelemetryModel[];
-
-  @property({ attribute: false })
-  public data?: PostInstallRequest;
+  @state()
+  private _telemetryLevels: TelemetryModel[] = [];
 
   @state()
-  private _selectedTelemetryIndex = 0;
+  private _telemetryFormData!: TelemetryModel['level'];
 
-  private _handleSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
+  @state()
+  private _installerStore!: UmbInstallerContext;
 
-    const form = e.target as HTMLFormElement;
-    if (!form) return;
+  private storeDataSubscription?: Subscription;
+  private storeSettingsSubscription?: Subscription;
 
-    const isValid = form.checkValidity();
-    if (!isValid) return;
+  constructor() {
+    super();
 
-    const formData = new FormData(form);
+    this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
+      this._installerStore = installerStore;
 
-    const telemetry = formData.get('telemetryLevel')?.toString();
-    if (!telemetry) return;
+      this.storeSettingsSubscription?.unsubscribe();
+      this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
+        this._telemetryLevels = settings.user.consentLevels;
+      });
 
-    const telemetryLevel = this.telemetryLevels?.[parseInt(telemetry) - 1].level;
+      this.storeDataSubscription?.unsubscribe();
+      this.storeDataSubscription = installerStore.data.subscribe((data) => {
+        this._telemetryFormData = data.telemetryLevel;
+      });
+    });
+  }
 
-    this.dispatchEvent(new CustomEvent('submit', { detail: { telemetryLevel } }));
-  };
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.storeSettingsSubscription?.unsubscribe();
+    this.storeDataSubscription?.unsubscribe();
+  }
+
+  private _handleChange(e: InputEvent) {
+    const target = e.target as HTMLInputElement;
+
+    const value: { [key: string]: string } = {};
+    value[target.name] = this._telemetryLevels[parseInt(target.value) - 1].level;
+    this._installerStore.appendData(value);
+  }
+
+  private _onNext() {
+    this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
+  }
 
   private _onBack() {
     this.dispatchEvent(new CustomEvent('previous', { bubbles: true, composed: true }));
   }
 
-  private _updateTelemetryIndex = (e: UUISliderEvent) => {
-    this._selectedTelemetryIndex = parseInt(e.target.value.toString()) - 1;
-  };
+  private get _selectedTelemetryIndex() {
+    return this._telemetryLevels?.findIndex((x) => x.level === this._telemetryFormData) ?? 0;
+  }
+
+  private get _selectedTelemetry() {
+    return this._telemetryLevels?.find((x) => x.level === this._telemetryFormData) ?? this._telemetryLevels[0];
+  }
 
   private _renderSlider() {
-    if (!this.telemetryLevels) return;
-
-    const currentTelemetryLevel = this.telemetryLevels[this._selectedTelemetryIndex];
+    if (!this._telemetryLevels) return;
 
     return html`
       <uui-slider
-        @input=${this._updateTelemetryIndex}
+        @input=${this._handleChange}
         name="telemetryLevel"
         label="telemetry-level"
         value=${this._selectedTelemetryIndex + 1}
         hide-step-values
         min="1"
-        max=${this.telemetryLevels.length}></uui-slider>
-      <h2>${currentTelemetryLevel.level}</h2>
+        max=${this._telemetryLevels.length}></uui-slider>
+      <h2>${this._selectedTelemetry.level}</h2>
       <!-- TODO: Is this safe to do? -->
-      <p>${unsafeHTML(currentTelemetryLevel.description)}</p>
+      <p>${unsafeHTML(this._selectedTelemetry.description)}</p>
     `;
-  }
-
-  protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    super.firstUpdated(_changedProperties);
-
-    this._selectedTelemetryIndex = this.telemetryLevels?.findIndex((x) => x.level === this.data?.telemetryLevel) ?? 0;
-    this._selectedTelemetryIndex = this._selectedTelemetryIndex === -1 ? 0 : this._selectedTelemetryIndex; // If not found, default to first
   }
 
   render() {
     return html`
       <div class="uui-text">
         <h1>Consent Level</h1>
-        <uui-form>
-          <form id="LoginForm" name="login" @submit="${this._handleSubmit}">
-            ${this._renderSlider()}
-            <div id="buttons">
-              <uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
-              <uui-button id="button-install" type="submit" label="Next" look="primary"></uui-button>
-            </div>
-          </form>
-        </uui-form>
+        ${this._renderSlider()}
+        <div id="buttons">
+          <uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
+          <uui-button id="button-install" @click=${this._onNext} label="Next" look="primary"></uui-button>
+        </div>
       </div>
     `;
   }
