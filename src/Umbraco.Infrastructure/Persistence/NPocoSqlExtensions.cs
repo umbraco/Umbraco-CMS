@@ -263,7 +263,7 @@ namespace Umbraco.Extensions
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ")");
         }
 
-        public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field, string alias)
         {
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field, alias) + ")");
         }

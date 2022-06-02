@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Core.Routing
                     var route = contentCache?.GetRouteById(publishedContent.Id, culture);
                     if (!IsNotRoute(route))
                     {
-                        oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route);
+                        oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
                     }
                     else if (string.IsNullOrEmpty(culture))
                     {
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Routing
                         var languages = _localizationService.GetAllLanguages();
                         foreach (var language in languages)
                         {
-                            route = contentCache.GetRouteById(publishedContent.Id, language.IsoCode);
+                            route = contentCache?.GetRouteById(publishedContent.Id, language.IsoCode);
                             if (!IsNotRoute(route))
                             {
                                 oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);

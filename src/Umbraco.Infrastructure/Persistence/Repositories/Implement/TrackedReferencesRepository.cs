@@ -69,6 +69,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private Sql<ISqlContext> GetInnerUnionSql()
         {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                throw new InvalidOperationException("No Ambient Scope available");
+            }
+
             var innerUnionSqlChild = _scopeAccessor.AmbientScope.Database.SqlContext.Sql().Select(
                     "[cr].childId as id", "[cr].parentId as otherId", "[rt].[alias]", "[rt].[name]", "[rt].[isDependency]", "[rt].[dual]")
                 .From<RelationDto>("cr").InnerJoin<RelationTypeDto>("rt")
@@ -134,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                                                                             aliasRight: "ct")
                                                                         .LeftJoin<NodeDto>("ctn").On<ContentTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId,
                                                                             aliasLeft: "ct", aliasRight: "ctn");
-            sql = sql.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
+            sql = sql?.WhereIn((System.Linq.Expressions.Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
             {
@@ -205,10 +210,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             public int OtherId { get; set; }
 
             [Column("alias")]
-            public string Alias { get; set; }
+            public string? Alias { get; set; }
 
             [Column("name")]
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
             [Column("isDependency")]
             public bool IsDependency { get; set; }
