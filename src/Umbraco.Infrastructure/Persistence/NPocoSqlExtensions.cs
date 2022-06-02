@@ -88,6 +88,17 @@ namespace Umbraco.Extensions
             return sql;
         }
 
+        public static Sql<ISqlContext> Union(this Sql<ISqlContext> sql, Sql<ISqlContext> sql2)
+        {
+            return sql.Append( " UNION ").Append(sql2);
+        }
+
+        public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> InnerJoinNested(this Sql<ISqlContext> sql, Sql<ISqlContext> nestedQuery, string alias)
+        {
+            return new Sql<ISqlContext>.SqlJoinClause<ISqlContext>(sql.Append("INNER JOIN (").Append(nestedQuery)
+                .Append($") [{alias}]"));
+        }
+
         public static Sql<ISqlContext> WhereLike<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> fieldSelector, string likeValue)
         {
             var fieldName = sql.SqlContext.SqlSyntax.GetFieldName(fieldSelector);
@@ -250,6 +261,11 @@ namespace Umbraco.Extensions
         public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object?>> field)
         {
             return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field) + ")");
+        }
+
+        public static Sql<ISqlContext> OrderBy<TDto>(this Sql<ISqlContext> sql, Expression<Func<TDto, object>> field, string alias)
+        {
+            return sql.OrderBy("(" + sql.SqlContext.SqlSyntax.GetFieldName(field, alias) + ")");
         }
 
         /// <summary>
