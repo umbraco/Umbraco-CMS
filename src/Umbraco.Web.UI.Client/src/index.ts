@@ -128,6 +128,30 @@ const registerInternalManifests = async () => {
         group: 'common',
       },
     },
+    {
+      type: 'editorView',
+      alias: 'Umb.EditorView.ContentEdit',
+      name: 'Content',
+      elementName: 'umb-content-edit-editor-view',
+      js: () => import('./extensions/sections/content/editor-views/content-edit-editor-view.element'),
+      meta: {
+        pathname: 'content',
+        weight: 100,
+        icon: 'document',
+      },
+    },
+    {
+      type: 'editorView',
+      alias: 'Umb.EditorView.ContentInfo',
+      name: 'Info',
+      elementName: 'umb-content-info-editor-view',
+      js: () => import('./extensions/sections/content/editor-views/content-info-editor-view.element'),
+      meta: {
+        pathname: 'info',
+        weight: 90,
+        icon: 'info',
+      },
+    },
   ];
 
   manifests.forEach((manifest: UmbExtensionManifestCore) =>

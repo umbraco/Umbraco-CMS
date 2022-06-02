@@ -3,9 +3,15 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
-import { Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../../mocks/data/content.data';
 import { UmbNotificationService } from '../../../core/service/notifications.store';
+import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../core/extension';
+import { IRoutingInfo } from 'router-slot';
+
+// Lazy load
+import './editor-views/content-edit-editor-view.element';
+import './editor-views/content-info-editor-view.element';
 
 @customElement('umb-content-editor')
 export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
@@ -52,10 +58,24 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   @state()
   _node?: DocumentNode;
 
+  @state()
+  private _routes: Array<any> = [];
+
+  @state()
+  private _editorViews: Array<any> = [];
+
+  @state()
+  private _currentView = '';
+
   private _nodeStore?: UmbNodeStore;
   private _nodeSubscription?: Subscription;
 
   private _notificationService?: UmbNotificationService;
+  
+  private _extensionRegistry?: UmbExtensionRegistry;
+  private _editorViewsSubscription?: Subscription;
+
+  private _routerFolder = '';
 
   constructor() {
     super();
@@ -68,11 +88,24 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
       this._notificationService = service;
     });
+    
+    this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
+      this._extensionRegistry = extensionRegistry;
+      this._useEditorViews();
+    });
+
+    this.addEventListener('property-value-change', this._onPropertyValueChange);
   }
 
-  // FLYT
-  private _onPropertyValueChange(e: CustomEvent) {
-    const target = e.target as any;
+  connectedCallback(): void {
+    super.connectedCallback();
+    /* TODO: find a way to construct absolute urls */
+    this._routerFolder = window.location.pathname.split('/view')[0];
+  }
+
+  // TODO: Move
+  private _onPropertyValueChange = (e: Event) => {
+    const target = e.composedPath()[0] as any;
 
     // TODO: Set value.
     const property = this._node?.properties.find((x) => x.alias === target.property.alias);
@@ -89,7 +122,28 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this._nodeSubscription = this._nodeStore?.getById(parseInt(this.id)).subscribe((node) => {
       if (!node) return; // TODO: Handle nicely if there is no node.
       this._node = node;
+      // TODO: merge observables
+      this._createRoutes();
     });
+  }
+
+  private _useEditorViews() {
+    this._editorViewsSubscription?.unsubscribe();
+
+    // TODO: how do we know which editor to show the views for?
+    this._editorViewsSubscription = this._extensionRegistry?.extensions
+      .pipe(
+        map((extensions: Array<UmbExtensionManifest>) =>
+          extensions
+            .filter((extension) => extension.type === 'editorView')
+            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
+        )
+      )
+      .subscribe((dashboards: Array<UmbExtensionManifest>) => {
+        this._editorViews = dashboards as Array<UmbExtensionManifestEditorView>;
+        // TODO: merge observables
+        this._createRoutes();
+      });
   }
 
   private _onSaveAndPublish() {
@@ -109,6 +163,35 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this._onSave();
   }
 
+  private _createRoutes () {
+
+    if (this._node && this._editorViews.length > 0) {
+
+      this._routes = [];
+
+      this._routes = this._editorViews.map(view => {
+        return {
+          path: `view/${view.meta.pathname}`,
+          component: () => document.createElement(view.elementName),
+          setup: (element: HTMLElement, info: IRoutingInfo) => {
+            // TODO: make interface for EditorViews
+            const editorView = element as any;
+            // TODO: how do we pass data to views? Maybe we should use a context?
+            editorView.node = this._node;
+            this._currentView = info.match.route.path;
+          },
+        };
+      });
+
+      this._routes.push({
+        path: '**',
+        redirectTo: `view/${this._editorViews?.[0].meta.pathname}`,
+      });
+      
+      this.requestUpdate();
+    }
+  }
+
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this._nodeSubscription?.unsubscribe();
@@ -120,25 +203,24 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
       <umb-editor-layout>
         <uui-input slot="name" .value="${this._node?.name}"></uui-input>
         <uui-tab-group slot="apps">
-          <uui-tab label="Content" active></uui-tab>
-          <uui-tab label="Info"></uui-tab>
-          <uui-tab label="Actions" disabled></uui-tab>
+          ${this._editorViews.map((view: UmbExtensionManifestEditorView) => html`
+            <uui-tab 
+              .label="${view.name}" 
+              href="${this._routerFolder}/view/${view.meta.pathname}"
+              ?active="${this._currentView.includes(view.meta.pathname)}">
+              <uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+              ${view.name}
+            </uui-tab>
+          `)}
         </uui-tab-group>
 
-        <uui-box slot="content">
-          <!-- TODO: Make sure map get data from data object?, parse on property object. -->
-          ${this._node?.properties.map(
-            (property) => html`
-              <umb-node-property
-                .property=${property}
-                .value=${property.tempValue}
-                @property-value-change=${this._onPropertyValueChange}>
-              </umb-node-property>
-              <hr />
-            `
-          )}
-        </uui-box>
+        <router-slot slot="content" .routes="${this._routes}"></router-slot>
 
+        <div slot="content">
+          ROUTES
+          ${this._routes.map((route) => html`<div>${route.path}</div>`)}
+        </div>
+        
         <div slot="actions">
           <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
           <uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>

@@ -52,10 +52,22 @@ export type UmbExtensionManifestDashboard = {
   meta: UmbManifestDashboardMeta;
 } & UmbExtensionManifestBase;
 
+// Editor View:
+export type UmbManifestEditorViewMeta = {
+  pathname: string; // TODO: how to we want to support pretty urls?
+  icon: string;
+  weight: number;
+};
+export type UmbExtensionManifestEditorView = {
+  type: 'editorView';
+  meta: UmbManifestEditorViewMeta;
+} & UmbExtensionManifestBase;
+
 export type UmbExtensionManifestCore =
   | UmbExtensionManifestSection
   | UmbExtensionManifestDashboard
-  | UmbExtensionManifestPropertyEditor;
+  | UmbExtensionManifestPropertyEditor
+  | UmbExtensionManifestEditorView;
 
 // the 'Other' manifest type:
 
