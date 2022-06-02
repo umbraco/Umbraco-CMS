@@ -20,11 +20,13 @@ export class UmbInstallerInstalling extends LitElement {
   }
 
   private async _updateProgress() {
-    this._installProgress = Math.min(this._installProgress, (Math.random() + 1) * 10, 100);
+    this._installProgress = Math.min(this._installProgress + (Math.random() + 1) * 10, 100);
     await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000));
+    console.log('progress', this._installProgress);
 
     if (this._installProgress >= 100) {
       // Redirect to backoffice
+      history.pushState(null, '', '/backoffice/backoffice');
       return;
     }
 
