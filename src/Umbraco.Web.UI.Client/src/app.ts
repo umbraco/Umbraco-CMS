@@ -11,9 +11,9 @@ import { UmbNodeStore } from './core/stores/node.store';
 import { UmbDataTypeStore } from './core/stores/data-type.store';
 
 // Load these in the correct components
-import './node-editor/node-editor-layout.element';
-import './node-editor/node-property-data-type.element';
-import './node-editor/node-property.element';
+import './editors/node-editor/node-editor-layout.element';
+import './editors/node-editor/node-property-data-type.element';
+import './editors/node-editor/node-property.element';
 
 const routes = [
   {

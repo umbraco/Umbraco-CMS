@@ -32,7 +32,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Content',
       name: 'Content',
       elementName: 'umb-content-section',
-      js: () => import('./content/content-section.element'),
+      js: () => import('./extensions/content/content-section.element'),
       meta: {
         pathname: 'content', // TODO: how to we want to support pretty urls?
         weight: 50,
@@ -53,7 +53,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Settings',
       name: 'Settings',
       elementName: 'umb-settings-section',
-      js: () => import('./settings/settings-section.element'),
+      js: () => import('./extensions/settings/settings-section.element'),
       meta: {
         pathname: 'settings', // TODO: how to we want to support pretty urls?
         weight: 20,
@@ -64,7 +64,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Dashboard.Welcome',
       name: 'Welcome',
       elementName: 'umb-dashboard-welcome',
-      js: () => import('./dashboards/dashboard-welcome.element'),
+      js: () => import('./extensions/dashboards/dashboard-welcome.element'),
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'welcome', // TODO: how to we want to support pretty urls?
@@ -76,7 +76,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Dashboard.RedirectManagement',
       name: 'Redirect Management',
       elementName: 'umb-dashboard-redirect-management',
-      js: () => import('./dashboards/dashboard-redirect-management.element'),
+      js: () => import('./extensions/dashboards/dashboard-redirect-management.element'),
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
@@ -88,7 +88,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
       //elementName: 'umb-property-editor-text',
-      js: () => import('./property-editors/property-editor-text.element'),
+      js: () => import('./extensions/property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
         group: 'common',
@@ -123,7 +123,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.PropertyEditorUI.Textarea',
       name: 'Textarea',
       elementName: 'umb-property-editor-textarea',
-      js: () => import('./property-editors/property-editor-textarea.element'),
+      js: () => import('./extensions/property-editors/property-editor-textarea.element'),
       meta: {
         icon: 'document',
         group: 'common',

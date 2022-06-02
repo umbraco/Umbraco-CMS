@@ -1,12 +1,12 @@
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../core/context';
-import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { Subscription, map, switchMap } from 'rxjs';
-import { DataTypeEntity } from '../mocks/data/content.data';
-import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
-import { createExtensionElement } from '../core/extension/create-extension-element.function';
+import { DataTypeEntity } from '../../mocks/data/content.data';
+import { UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
+import { createExtensionElement } from '../../core/extension/create-extension-element.function';
 
 @customElement('umb-node-property-data-type')
 class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {

@@ -1,10 +1,10 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../core/context';
-import { UmbNodeStore } from '../core/stores/node.store';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbNodeStore } from '../../core/stores/node.store';
 import { Subscription } from 'rxjs';
-import { DocumentNode } from '../mocks/data/content.data';
+import { DocumentNode } from '../../mocks/data/content.data';
 
 @customElement('umb-content-editor')
 export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
@@ -63,6 +63,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     });
   }
 
+  // FLYT
   private _onPropertyValueChange(e: CustomEvent) {
     const target = e.target as any;
 

@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, state, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { data } from '../mocks/data/content.data';
+import { data } from '../../mocks/data/content.data';
 
 @customElement('umb-content-tree')
 class UmbContentTree extends LitElement {

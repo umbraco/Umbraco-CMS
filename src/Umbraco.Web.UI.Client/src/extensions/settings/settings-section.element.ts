@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../core/context';
-import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
 
 @customElement('umb-settings-section')
 export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
