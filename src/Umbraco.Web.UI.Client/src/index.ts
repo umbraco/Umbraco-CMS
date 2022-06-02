@@ -110,7 +110,6 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
-      elementName: 'external-property-editor-test', //Gets the element name from JS file.
       js: () => Promise.resolve(document.createElement('hr')),
       meta: {
         icon: 'document',

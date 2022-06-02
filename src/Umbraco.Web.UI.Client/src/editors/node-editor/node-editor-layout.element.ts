@@ -55,10 +55,6 @@ class UmbNodeEditorLayout extends LitElement {
     `,
   ];
 
-  private _onSaveAndPublish() {
-    console.log('Save and publish');
-  }
-
   render() {
     return html`
       <div id="node-editor">
@@ -70,6 +66,7 @@ class UmbNodeEditorLayout extends LitElement {
           <slot name="content"></slot>
         </uui-scroll-container>
         <div id="footer">
+          <!-- only show footer if slot has elements -->
           <slot name="actions"></slot>
         </div>
       </div>
