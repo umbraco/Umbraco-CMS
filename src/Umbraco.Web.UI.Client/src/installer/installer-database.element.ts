@@ -273,7 +273,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
           ${this._renderSettings()}
 
-          <!-- Maybe move this error message to the installer.element -->
+          <!-- TODO: Apply error message to the fields that has errors -->
           <p id="error-message"></p>
 
           <div id="buttons">
