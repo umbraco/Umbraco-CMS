@@ -55,6 +55,9 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
   }
 }
 
+
+export default UmbInstaller;
+
 declare global {
   interface HTMLElementTagNameMap {
     'umb-installer': UmbInstaller;
