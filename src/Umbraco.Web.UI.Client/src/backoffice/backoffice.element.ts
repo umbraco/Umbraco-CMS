@@ -7,7 +7,7 @@ import './backoffice-sidebar.element';
 import './backoffice-main.element';
 
 @defineElement('umb-backoffice')
-export class UmbBackoffice extends LitElement {
+export default class UmbBackoffice extends LitElement {
   static styles = [
     UUITextStyles,
     css`

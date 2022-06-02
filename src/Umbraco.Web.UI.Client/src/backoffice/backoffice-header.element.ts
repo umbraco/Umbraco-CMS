@@ -1,10 +1,10 @@
-
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
 import './backoffice-header-sections.element';
 import './backoffice-header-tools.element';
+
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeader extends LitElement {
   static styles: CSSResultGroup = [
@@ -15,7 +15,7 @@ export class UmbBackofficeHeader extends LitElement {
       }
 
       #appHeader {
-        background-color: var(--uui-look-primary-surface);
+        background-color: var(--uui-color-header-surface);
         display: flex;
         align-items: center;
         justify-content: space-between;

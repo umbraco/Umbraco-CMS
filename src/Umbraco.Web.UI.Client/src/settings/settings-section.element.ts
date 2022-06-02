@@ -1,4 +1,5 @@
-import { html, LitElement } from 'lit';
+import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../core/context';
@@ -6,13 +7,23 @@ import { UmbExtensionManifest, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-settings-section')
 export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
+  static styles = [
+    UUITextStyles,
+    css`
+      :host {
+        display: block;
+        padding: var(--uui-size-space-5);
+      }
+    `,
+  ];
+
   @state()
   private _extensions: Array<UmbExtensionManifest> = [];
 
   private _extensionRegistry?: UmbExtensionRegistry;
   private _extensionsSubscription?: Subscription;
 
-  constructor () {
+  constructor() {
     super();
 
     this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
@@ -28,11 +39,11 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
       // OurUmbracoSubscribeMethod(this, this._extensionRegistry.extensions, (extensions) => {}); // uses `this` to append the subscription to the controller array.
       // Or:
       // this.attachSubscription(this._extensionRegistry.extensions, (extensions) => {});
-      this._extensionsSubscription = this._extensionRegistry.extensions.subscribe(extensions => {
-        this._extensions = [...extensions];// TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
+      this._extensionsSubscription = this._extensionRegistry.extensions.subscribe((extensions) => {
+        this._extensions = [...extensions]; // TODO: Though, this is a shallow clone, wouldn't we either do a deep clone or no clone at all?
       });
 
-      this._extensionsSubscription = this._extensionRegistry.extensionsOfType('section').subscribe(sections => {
+      this._extensionsSubscription = this._extensionRegistry.extensionsOfType('section').subscribe((sections) => {
         // In this callback sections are typed. Example meta.weight...
         console.log(sections[0].meta.weight);
       });
@@ -54,15 +65,17 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
             <uui-table-head-cell>Alias</uui-table-head-cell>
           </uui-table-head>
 
-          ${ this._extensions.map(extension => html`
-            <uui-table-row>
-              <uui-table-cell>${ extension.type }</uui-table-cell>
-              <uui-table-cell>${ extension.name }</uui-table-cell>
-              <uui-table-cell>${ extension.alias }</uui-table-cell>
-            </uui-table-row>
-          `)}
+          ${this._extensions.map(
+            (extension) => html`
+              <uui-table-row>
+                <uui-table-cell>${extension.type}</uui-table-cell>
+                <uui-table-cell>${extension.name}</uui-table-cell>
+                <uui-table-cell>${extension.alias}</uui-table-cell>
+              </uui-table-row>
+            `
+          )}
         </uui-table>
       </uui-box>
-    `
+    `;
   }
 }

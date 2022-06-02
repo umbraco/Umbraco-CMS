@@ -20,7 +20,6 @@ describe('UmbContextProvider', () => {
   });
 
   describe('Public API', () => {
-
     describe('properties', () => {
       it('has a host property', () => {
         expect(provider).to.have.property('host');

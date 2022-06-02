@@ -14,7 +14,7 @@ declare global {
 }
 
 window.Umbraco = {
-  extensionRegistry
+  extensionRegistry,
 };
 
 const registerExtensionManifestsFromServer = async () => {
@@ -22,7 +22,7 @@ const registerExtensionManifestsFromServer = async () => {
   const res = await fetch('/umbraco/backoffice/manifests');
   const { manifests } = await res.json();
   manifests.forEach((manifest: UmbExtensionManifest) => extensionRegistry.register(manifest));
-}
+};
 
 const registerInternalManifests = async () => {
   // TODO: where do we get these from?
@@ -35,8 +35,8 @@ const registerInternalManifests = async () => {
       js: () => import('./content/content-section.element'),
       meta: {
         pathname: 'content', // TODO: how to we want to support pretty urls?
-        weight: 50
-      }
+        weight: 50,
+      },
     },
     {
       type: 'section',
@@ -45,8 +45,8 @@ const registerInternalManifests = async () => {
       elementName: 'umb-members-section',
       meta: {
         pathname: 'members',
-        weight: 30
-      }
+        weight: 30,
+      },
     },
     {
       type: 'section',
@@ -56,8 +56,8 @@ const registerInternalManifests = async () => {
       js: () => import('./settings/settings-section.element'),
       meta: {
         pathname: 'settings', // TODO: how to we want to support pretty urls?
-        weight: 20
-      }
+        weight: 20,
+      },
     },
     {
       type: 'dashboard',
@@ -68,8 +68,8 @@ const registerInternalManifests = async () => {
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'welcome', // TODO: how to we want to support pretty urls?
-        weight: 20
-      }
+        weight: 20,
+      },
     },
     {
       type: 'dashboard',
@@ -80,31 +80,44 @@ const registerInternalManifests = async () => {
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
-        weight: 10
-      }
+        weight: 10,
+      },
     },
     {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
-      elementName: 'umb-property-editor-text',
+      //elementName: 'umb-property-editor-text',
       js: () => import('./property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
         group: 'common',
-      }
+      },
     },
     {
       type: 'propertyEditorUI',
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
-      elementName: 'external-property-editor-test', //Gets the element name from JS file.
+      //elementName: 'external-property-editor-test', //Gets the element name from JS file.
       js: '/src/property-editors/external-property-editor-test.js',
+      meta: {
+        icon: 'document',
+        group: 'common',
+      },
+    },
+    /*
+    {
+      type: 'propertyEditorUI',
+      alias: 'External.PropertyEditorUI.Test',
+      name: 'Text',
+      elementName: 'external-property-editor-test', //Gets the element name from JS file.
+      js: () => Promise.resolve(document.createElement('hr')),
       meta: {
         icon: 'document',
         group: 'common',
       }
     },
+    */
     {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Textarea',
@@ -114,19 +127,21 @@ const registerInternalManifests = async () => {
       meta: {
         icon: 'document',
         group: 'common',
-      }
+      },
     },
   ];
-  
-  manifests.forEach((manifest: UmbExtensionManifestCore) => extensionRegistry.register<UmbExtensionManifestCore>(manifest));
-}
+
+  manifests.forEach((manifest: UmbExtensionManifestCore) =>
+    extensionRegistry.register<UmbExtensionManifestCore>(manifest)
+  );
+};
 
 const setup = async () => {
   await registerExtensionManifestsFromServer();
   await registerInternalManifests();
   // TODO: implement loading of "startUp" extensions
   await import('./app');
-}
+};
 
 worker.start({
   onUnhandledRequest: (req) => {
@@ -134,12 +149,8 @@ worker.start({
     if (req.url.pathname.startsWith('/src/')) return;
     if (req.destination === 'image') return;
 
-    console.warn(
-      'Found an unhandled %s request to %s',
-      req.method,
-      req.url.href,
-    )
-  }
+    console.warn('Found an unhandled %s request to %s', req.method, req.url.href);
+  },
 });
 
 setup();

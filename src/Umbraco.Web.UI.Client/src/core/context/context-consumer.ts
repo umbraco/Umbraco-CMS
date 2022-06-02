@@ -6,7 +6,6 @@ import { isUmbContextProvideEvent, umbContextProvideEventType } from './context-
  * @class UmbContextConsumer
  */
 export class UmbContextConsumer {
-
   /**
    * Creates an instance of UmbContextConsumer.
    * @param {EventTarget} target
@@ -14,18 +13,12 @@ export class UmbContextConsumer {
    * @param {UmbContextCallback} _callback
    * @memberof UmbContextConsumer
    */
-  constructor (
-    protected target: EventTarget,
-    private _contextAlias: string,
-    private _callback: UmbContextCallback
-  ) {
-    
-  }
+  constructor(protected target: EventTarget, private _contextAlias: string, private _callback: UmbContextCallback) {}
 
   /**
    * @memberof UmbContextConsumer
    */
-   public request() {
+  public request() {
     const event = new UmbContextRequestEventImplementation(this._contextAlias, this._callback);
     this.target.dispatchEvent(event);
   }
@@ -37,7 +30,7 @@ export class UmbContextConsumer {
 
   public detach() {
     window.removeEventListener(umbContextProvideEventType, this._handleNewProvider);
-  } 
+  }
 
   private _handleNewProvider = (event: Event) => {
     if (!isUmbContextProvideEvent(event)) return;
@@ -45,5 +38,5 @@ export class UmbContextConsumer {
     if (this._contextAlias === event.contextAlias) {
       this.request();
     }
-  }
+  };
 }

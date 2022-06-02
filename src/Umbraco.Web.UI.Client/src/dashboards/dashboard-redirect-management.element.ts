@@ -1,16 +1,17 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
-@defineElement('umb-dashboard-redirect-management')
+@customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagement extends LitElement {
-  static styles = [
-    UUITextStyles,
-    css``,
-  ];
+  static styles = [UUITextStyles, css``];
 
   render() {
-    return html`<div>Redirect Management</div>`;
+    return html`
+      <uui-box>
+        <h1>Redirect Management</h1>
+      </uui-box>
+    `;
   }
 }
 

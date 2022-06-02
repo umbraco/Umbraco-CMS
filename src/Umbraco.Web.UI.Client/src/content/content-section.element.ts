@@ -1,20 +1,17 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../core/context';
-import { UmbRouteLocation, UmbRouter } from '../core/router';
-import { Subscription } from 'rxjs';
+import { customElement, state } from 'lit/decorators.js';
+import { IRoute, IRoutingInfo } from 'router-slot';
 
 import './content-tree.element';
-import './content-dashboards.element';
-import './content-editor.element';
 
 @customElement('umb-content-section')
-export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
+export class UmbContentSection extends LitElement {
   static styles = [
     UUITextStyles,
     css`
-      :host {
+      :host,
+      #router-slot {
         display: flex;
         width: 100%;
         height: 100%;
@@ -22,55 +19,36 @@ export class UmbContentSection extends UmbContextProviderMixin(UmbContextConsume
     `,
   ];
 
-  private _router?: UmbRouter;
-  private _locationSubscription?: Subscription;
-  private _outlet?: HTMLElement;
+  @state()
+  private _routes: Array<IRoute> = [
+    {
+      path: 'dashboard',
+      component: () => import('./content-dashboards.element'),
+    },
+    {
+      path: 'node/:nodeId',
+      component: () => import('./content-editor.element'),
+      setup: (component: HTMLElement, info: IRoutingInfo) => {
+        this._currentNodeId = info.match.params.nodeId;
+        component.id = this._currentNodeId;
+      },
+    },
+    {
+      path: '**',
+      redirectTo: 'dashboard',
+    },
+  ];
 
-  constructor () {
-    super();
-
-    this.consumeContext('umbRouter', (_instance: UmbRouter) => {
-      this._router = _instance;
-      this._useLocation();
-    });
-  }
-
-  private _useLocation () {
-    this._locationSubscription?.unsubscribe();
-
-    this._locationSubscription = this._router?.location
-    .subscribe((location: UmbRouteLocation) => {
-      // TODO: temp outlet solution
-      const nodeId = location.params.nodeId;
-
-      this._outlet?.parentNode?.removeChild(this._outlet);
-
-      if (nodeId !== undefined) {
-        const contentEditor = document.createElement('umb-content-editor');
-        contentEditor.id = nodeId;
-        this._outlet = contentEditor;
-        this.requestUpdate();
-        return;
-      }
-
-      const dashboards = document.createElement('umb-content-dashboards');
-      this._outlet = dashboards;
-      this.requestUpdate();      
-    });
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._locationSubscription?.unsubscribe();
-  }
+  @state()
+  private _currentNodeId!: string;
 
   render() {
     return html`
       <!-- TODO: Figure out how we name layout components -->
       <umb-backoffice-sidebar>
-        <umb-content-tree></umb-content-tree>
+        <umb-content-tree .id="${this._currentNodeId}"></umb-content-tree>
       </umb-backoffice-sidebar>
-      ${this._outlet}
+      <router-slot id="router-slot" .routes="${this._routes}"></router-slot>
     `;
   }
 }

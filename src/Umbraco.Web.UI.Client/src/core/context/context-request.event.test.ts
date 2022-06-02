@@ -6,7 +6,10 @@ describe('UmbContextRequestEvent', () => {
     console.log('hello from callback');
   };
 
-  const event: UmbContextRequestEvent =  new UmbContextRequestEventImplementation('my-test-context-alias', contextRequestCallback);
+  const event: UmbContextRequestEvent = new UmbContextRequestEventImplementation(
+    'my-test-context-alias',
+    contextRequestCallback
+  );
 
   it('has context', () => {
     expect(event.contextAlias).to.eq('my-test-context-alias');

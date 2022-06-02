@@ -30,7 +30,7 @@ describe('UmbContextConsumer', () => {
 
         consumer.attach();
 
-        const event = await listener as unknown as UmbContextRequestEventImplementation;
+        const event = (await listener) as unknown as UmbContextRequestEventImplementation;
         expect(event).to.exist;
         expect(event.type).to.eq(umbContextRequestEventType);
         expect(event.contextAlias).to.eq(testContextAlias);
@@ -48,10 +48,9 @@ describe('UmbContextConsumer', () => {
     const localConsumer = new UmbContextConsumer(element, testContextAlias, (_instance) => {
       expect(_instance.prop).to.eq('value from provider');
       done();
-    })
+    });
     localConsumer.attach();
 
     provider.detach();
   });
-
 });

@@ -2,8 +2,7 @@ import { expect } from '@open-wc/testing';
 import { UmbContextProvideEventImplementation, UmbContextProvideEvent } from './context-provide.event';
 
 describe('UmbContextProvideEvent', () => {
-
-  const event: UmbContextProvideEvent =  new UmbContextProvideEventImplementation('my-test-context-alias');
+  const event: UmbContextProvideEvent = new UmbContextProvideEventImplementation('my-test-context-alias');
 
   it('has context', () => {
     expect(event.contextAlias).to.eq('my-test-context-alias');

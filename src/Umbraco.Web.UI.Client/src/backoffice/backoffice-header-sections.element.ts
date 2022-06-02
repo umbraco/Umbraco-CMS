@@ -1,14 +1,13 @@
+import { Subscription, map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { Subscription } from 'rxjs';
+import { isPathActive, path } from 'router-slot';
 
 import { getUserSections } from '../core/api/fetcher';
+import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestSection } from '../core/extension';
 import { UmbContextConsumerMixin } from '../core/context';
-import { UmbExtensionManifestSection } from '../core/extension';
-import { UmbRouteLocation, UmbRouter } from '../core/router';
-import { UmbSectionContext } from '../section.context';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
@@ -16,13 +15,13 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     UUITextStyles,
     css`
       #tabs {
-        color: var(--uui-look-primary-contrast);
+        color: var(--uui-color-header-contrast);
         height: 60px;
         font-size: 16px;
-        --uui-tab-text: var(--uui-look-primary-contrast);
-        --uui-tab-text-hover: var(--uui-look-primary-contrast-hover);
-        --uui-tab-text-active: var(--uui-interface-active);
-        --uui-tab-background: var(--uui-look-primary-surface);
+        --uui-tab-text: var(--uui-color-header-contrast);
+        --uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
+        --uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
+        --uui-tab-background: var(--uui-color-header-background);
       }
 
       #dropdown {
@@ -56,24 +55,15 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
   @state()
   private _currentSectionAlias = '';
 
-  private _router?: UmbRouter;
-  private _sectionContext?: UmbSectionContext;
+  private _extensionRegistry?: UmbExtensionRegistry;
+
   private _sectionSubscription?: Subscription;
-  private _currentSectionSubscription?: Subscription;
-  private _locationSubscription?: Subscription;
-  private _location?: UmbRouteLocation;
 
   constructor() {
     super();
 
-    this.consumeContext('umbRouter', (_instance: UmbRouter) => {
-      this._router = _instance;
-      this._useLocation();
-    });
-
-    this.consumeContext('umbSectionContext', (_instance: UmbSectionContext) => {
-      this._sectionContext = _instance;
-      this._useCurrentSection();
+    this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
+      this._extensionRegistry = extensionRegistry;
       this._useSections();
     });
   }
@@ -92,36 +82,14 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     }
 
     // TODO: this could maybe be handled by an anchor tag
-    this._router?.push(`/section/${section.meta.pathname}`);
-    this._sectionContext?.setCurrent(section.alias);
+    history.pushState(null, '', `/section/${section.meta.pathname}`);
   }
 
-  private _handleLabelClick(e: PointerEvent) {
-    const label = (e.target as any).label;
-
-    // TODO: set current section
-    //this._sectionContext?.setCurrent(section.alias);
-
+  private _handleLabelClick() {
     const moreTab = this.shadowRoot?.getElementById('moreTab');
     moreTab?.setAttribute('active', 'true');
 
     this._open = false;
-  }
-
-  private _useLocation() {
-    this._locationSubscription?.unsubscribe();
-
-    this._locationSubscription = this._router?.location.subscribe((location: UmbRouteLocation) => {
-      this._location = location;
-    });
-  }
-
-  private _useCurrentSection() {
-    this._currentSectionSubscription?.unsubscribe();
-
-    this._currentSectionSubscription = this._sectionContext?.getCurrent().subscribe((section) => {
-      this._currentSectionAlias = section.alias;
-    });
   }
 
   private async _useSections() {
@@ -130,31 +98,32 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     const { data } = await getUserSections({});
     this._allowedSection = data.sections;
 
-    this._sectionSubscription = this._sectionContext?.getSections().subscribe((sectionExtensions) => {
-      this._sections = sectionExtensions.filter((section) => this._allowedSection.includes(section.alias));
-      this._visibleSections = this._sections;
-      const currentSectionAlias = this._sections.find(
-        (section) => section.meta.pathname === this._location?.params?.section
-      )?.alias;
-      if (!currentSectionAlias) return;
-      this._sectionContext?.setCurrent(currentSectionAlias);
-    });
+    this._sectionSubscription = this._extensionRegistry?.extensions
+      .pipe(
+        map((extensions: Array<UmbExtensionManifest>) =>
+          extensions
+            .filter((extension) => extension.type === 'section')
+            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
+        )
+      )
+      .subscribe((sections: Array<any>) => {
+        this._sections = sections.filter((section: any) => this._allowedSection.includes(section.alias));
+        this._visibleSections = this._sections;
+      });
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
-    this._locationSubscription?.unsubscribe();
     this._sectionSubscription?.unsubscribe();
-    this._currentSectionSubscription?.unsubscribe();
   }
 
   render() {
     return html`
       <uui-tab-group id="tabs">
         ${this._visibleSections.map(
-          (section) => html`
+          (section: any) => html`
             <uui-tab
-              ?active="${this._currentSectionAlias === section.alias}"
+              ?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
               label="${section.name}"
               @click="${(e: PointerEvent) => this._handleTabClick(e, section)}"></uui-tab>
           `
