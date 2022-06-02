@@ -20,7 +20,7 @@ export default class UmbPropertyEditorContextExample extends UmbContextConsumerM
   }
 
   render() {
-    return html`<uui-button look='secondary' label="Click to fire notification" @click=${this._onClick}></uui-button>`;
+    return html`<uui-button look='secondary' label="Click to notify" @click=${this._onClick}></uui-button>`;
   }
 }
 
