@@ -7,7 +7,11 @@ export class UmbDashboardRedirectManagement extends LitElement {
   static styles = [UUITextStyles, css``];
 
   render() {
-    return html`<div>Redirect Management</div>`;
+    return html`
+      <uui-box>
+        <h1>Redirect Management</h1>
+      </uui-box>
+    `;
   }
 }
 

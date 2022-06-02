@@ -15,7 +15,7 @@ export class UmbBackofficeHeader extends LitElement {
       }
 
       #appHeader {
-        background-color: var(--uui-look-primary-surface);
+        background-color: var(--uui-color-header-surface);
         display: flex;
         align-items: center;
         justify-content: space-between;

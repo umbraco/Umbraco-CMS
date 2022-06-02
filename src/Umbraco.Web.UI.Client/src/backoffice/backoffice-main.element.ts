@@ -18,6 +18,7 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
     UUITextStyles,
     css`
       :host {
+        background-color: var(--uui-color-background);
         display: block;
         width: 100%;
         height: 100%;

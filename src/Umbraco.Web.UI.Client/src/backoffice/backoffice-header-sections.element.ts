@@ -15,13 +15,13 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     UUITextStyles,
     css`
       #tabs {
-        color: var(--uui-look-primary-contrast);
+        color: var(--uui-color-header-contrast);
         height: 60px;
         font-size: 16px;
-        --uui-tab-text: var(--uui-look-primary-contrast);
-        --uui-tab-text-hover: var(--uui-look-primary-contrast-hover);
-        --uui-tab-text-active: var(--uui-interface-active);
-        --uui-tab-background: var(--uui-look-primary-surface);
+        --uui-tab-text: var(--uui-color-header-contrast);
+        --uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
+        --uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
+        --uui-tab-background: var(--uui-color-header-background);
       }
 
       #dropdown {

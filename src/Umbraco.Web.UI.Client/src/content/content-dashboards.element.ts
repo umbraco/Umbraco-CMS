@@ -17,8 +17,21 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
+      :host {
+        display: block;
+        width: 100%;
+      }
+
       #tabs {
+        background-color: var(--uui-color-surface);
         height: 70px;
+      }
+
+      #router-slot {
+        width: 100%;
+        box-sizing: border-box;
+        padding: var(--uui-size-space-5);
+        display: block;
       }
     `,
   ];
@@ -98,7 +111,7 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
           `
         )}
       </uui-tab-group>
-      <router-slot .routes="${this._routes}"></router-slot>
+      <router-slot id="router-slot" .routes="${this._routes}"></router-slot>
     `;
   }
 }
