@@ -99,7 +99,7 @@ const registerInternalManifests = async () => {
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
       //elementName: 'external-property-editor-test', //Gets the element name from JS file.
-      js: '/src/property-editors/external-property-editor-test.js',
+      js: '/src/extensions/property-editors/external-property-editor-test.js',
       meta: {
         icon: 'document',
         group: 'common',
