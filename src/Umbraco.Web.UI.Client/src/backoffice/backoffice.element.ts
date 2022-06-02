@@ -35,14 +35,14 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
         top:0;
         left:0;
         right:0;
-        height: 100vh;
+        bottom: 70px;
+        height:auto;
         padding: var(--uui-size-layout-1);
       }
     `,
   ];
 
   private _notificationService: UmbNotificationService = new UmbNotificationService();
-  private _notificationContainer: UUIToastNotificationContainerElement;
   private _notificationSubscribtion: Subscription;
 
   @state()
@@ -62,8 +62,6 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
     _changedProperties: Map<string | number | symbol, unknown>
   ): void {
     super.firstUpdated(_changedProperties);
-
-    this._notificationContainer = this.shadowRoot?.querySelector('uui-toast-notification-container') as UUIToastNotificationContainerElement;
 
     this._notificationSubscribtion = this._notificationService.notifications
     .subscribe((notifications: Array<any>) => {
