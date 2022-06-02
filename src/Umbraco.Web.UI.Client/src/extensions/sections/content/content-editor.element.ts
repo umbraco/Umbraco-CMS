@@ -5,6 +5,7 @@ import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import { Subscription } from 'rxjs';
 import { DocumentNode } from '../../../mocks/data/content.data';
+import { UmbNotificationService } from '../../../core/service/notifications.store';
 
 @customElement('umb-content-editor')
 export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
@@ -54,12 +55,18 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   private _nodeStore?: UmbNodeStore;
   private _nodeSubscription?: Subscription;
 
+  private _notificationService?: UmbNotificationService;
+
   constructor() {
     super();
 
-    this.consumeContext('umbNodeStore', (nodeStore: UmbNodeStore) => {
-      this._nodeStore = nodeStore;
+    this.consumeContext('umbNodeStore', (store: UmbNodeStore) => {
+      this._nodeStore = store;
       this._useNode();
+    });
+
+    this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
+      this._notificationService = service;
     });
   }
 
@@ -86,18 +93,20 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _onSaveAndPublish() {
-    console.log('Save and publish');
+    this._onSave();
   }
 
   private _onSave() {
     // TODO: What if store is not present, what if node is not loaded....
     if (this._node) {
-      this._nodeStore?.save([this._node]);
+      this._nodeStore?.save([this._node]).then(() => {
+        this._notificationService?.peek('Document saved');
+      });
     }
   }
 
   private _onSaveAndPreview() {
-    console.log('Save and preview');
+    this._onSave();
   }
 
   disconnectedCallback(): void {

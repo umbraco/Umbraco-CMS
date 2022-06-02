@@ -9,8 +9,6 @@ export function createExtensionElement(manifest: UmbExtensionManifest): Promise<
       return document.createElement(manifest.elementName as any);
     }
 
-    console.log(js);
-
     if (js) {
       if (js instanceof HTMLElement) {
         console.log('-- created by manifest method providing HTMLElement', js);

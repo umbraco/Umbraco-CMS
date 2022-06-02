@@ -7,13 +7,11 @@ import { customElement } from 'lit/decorators.js';
 
 import { getInitStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
-import { UmbNodeStore } from './core/stores/node.store';
-import { UmbDataTypeStore } from './core/stores/data-type.store';
 
 // Load these in the correct components
-import './editors/editor-layout.element';
-import './editors/editor-property-layout.element';
-import './editors/node-editor/node-property.element';
+import './editor/editor-layout.element';
+import './editor/editor-property-layout.element';
+import './editor/node-editor/node-property.element';
 
 const routes = [
   {
@@ -50,10 +48,6 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
     const { extensionRegistry } = window.Umbraco;
     this.provideContext('umbExtensionRegistry', extensionRegistry);
-
-    // TODO: consider providing somethings for install/login and some only for 'backoffice'.
-    this.provideContext('umbNodeStore', new UmbNodeStore());
-    this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
   }
 
   private _isAuthorized(): boolean {

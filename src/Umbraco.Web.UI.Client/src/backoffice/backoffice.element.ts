@@ -6,8 +6,17 @@ import './backoffice-header.element';
 import '../section/section-sidebar.element';
 import './backoffice-main.element';
 
+import { UUIToastNotificationContainerElement } from '@umbraco-ui/uui';
+import { UmbContextProviderMixin } from '../core/context';
+import { UmbNodeStore } from '../core/stores/node.store';
+import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbNotificationService } from '../core/service/notifications.store';
+import { Subscription } from 'rxjs';
+import { state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
+
 @defineElement('umb-backoffice')
-export default class UmbBackoffice extends LitElement {
+export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -20,13 +29,69 @@ export default class UmbBackoffice extends LitElement {
         font-size: 14px;
         box-sizing: border-box;
       }
+
+      #notifications {
+        position: absolute;
+        top:0;
+        left:0;
+        right:0;
+        height: 100vh;
+        padding: var(--uui-size-layout-1);
+      }
     `,
   ];
+
+  private _notificationService: UmbNotificationService = new UmbNotificationService();
+  private _notificationContainer: UUIToastNotificationContainerElement;
+  private _notificationSubscribtion: Subscription;
+
+  @state()
+  private _notifications:any[] = [];
+
+  constructor() {
+    super();
+
+    this.provideContext('umbNodeStore', new UmbNodeStore());
+    this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
+
+    this._notificationService = new UmbNotificationService();
+    this.provideContext('umbNotificationService', this._notificationService);
+  }
+
+  protected firstUpdated(
+    _changedProperties: Map<string | number | symbol, unknown>
+  ): void {
+    super.firstUpdated(_changedProperties);
+
+    this._notificationContainer = this.shadowRoot?.querySelector('uui-toast-notification-container') as UUIToastNotificationContainerElement;
+
+    this._notificationSubscribtion = this._notificationService.notifications
+    .subscribe((notifications: Array<any>) => {
+      this._notifications = notifications;
+    });
+
+    // TODO: listen to close event and remove notification from store.
+  }
 
   render() {
     return html`
       <umb-backoffice-header></umb-backoffice-header>
       <umb-backoffice-main></umb-backoffice-main>
+      <uui-toast-notification-container
+        auto-close="7000"
+        bottom-up
+        id="notifications">
+        ${
+          repeat(
+            this._notifications,
+            (notification: any) => notification.key,
+            notification => html`<uui-toast-notification color='positive'>
+            <uui-toast-notification-layout .headline=${notification.headline}>
+            </uui-toast-notification-layout>
+          </uui-toast-notification>`
+          )
+        }
+      </uui-toast-notification-container>
     `;
   }
 }
