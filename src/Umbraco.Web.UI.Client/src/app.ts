@@ -13,7 +13,6 @@ import { UmbDataTypeStore } from './core/stores/data-type.store';
 // Load these in the correct components
 import './editors/editor-layout.element';
 import './editors/editor-property-layout.element';
-import './editors/node-editor/node-property-data-type.element';
 import './editors/node-editor/node-property.element';
 
 const routes = [
