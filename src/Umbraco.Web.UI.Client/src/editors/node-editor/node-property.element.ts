@@ -10,17 +10,9 @@ class UmbNodeProperty extends LitElement {
       :host {
         display: block;
       }
-      .property {
-        display: grid;
-        grid-template-columns: 200px 600px;
-        gap: 32px;
-      }
-      .property > .property-label > p {
+
+      p {
         color: var(--uui-color-text-alt);
-      }
-      .property uui-input,
-      .property uui-textarea {
-        width: 100%;
       }
     `,
   ];
@@ -41,18 +33,18 @@ class UmbNodeProperty extends LitElement {
 
   render() {
     return html`
-      <div class="property">
-        <div class="header">
+      <umb-editor-property-layout>
+        <div slot="header">
           <uui-label>${this.property.label}</uui-label>
           <p>${this.property.description}</p>
         </div>
-        <div class="editor">
+        <div slot="editor">
           <umb-node-property-data-type
             .dataTypeKey=${this.property.dataTypeKey}
             .value=${this.value}
             @property-data-type-value-change=${this._onPropertyDataTypeChange}></umb-node-property-data-type>
         </div>
-      </div>
+      </umb-editor-property-layout>
     `;
   }
 }

@@ -11,7 +11,8 @@ import { UmbNodeStore } from './core/stores/node.store';
 import { UmbDataTypeStore } from './core/stores/data-type.store';
 
 // Load these in the correct components
-import './editors/node-editor/node-editor-layout.element';
+import './editors/editor-layout.element';
+import './editors/editor-property-layout.element';
 import './editors/node-editor/node-property-data-type.element';
 import './editors/node-editor/node-property.element';
 

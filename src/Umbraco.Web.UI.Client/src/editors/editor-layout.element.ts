@@ -2,8 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-node-editor-layout')
-class UmbNodeEditorLayout extends LitElement {
+@customElement('umb-editor-layout')
+class UmbEditorLayout extends LitElement {
   static styles = [
     UUITextStyles,
     css`
@@ -13,7 +13,7 @@ class UmbNodeEditorLayout extends LitElement {
         height: 100%;
       }
 
-      #node-editor {
+      #editor-frame {
         background-color: var(--uui-color-background);
         width: 100%;
         height: 100%;
@@ -57,7 +57,7 @@ class UmbNodeEditorLayout extends LitElement {
 
   render() {
     return html`
-      <div id="node-editor">
+      <div id="editor-frame">
         <div id="header">
           <slot name="name"></slot>
           <slot name="apps"></slot>
@@ -76,6 +76,6 @@ class UmbNodeEditorLayout extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-node-editor-layout': UmbNodeEditorLayout;
+    'umb-editor-layout': UmbEditorLayout;
   }
 }

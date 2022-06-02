@@ -108,7 +108,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
 
   render() {
     return html`
-      <umb-node-editor-layout>
+      <umb-editor-layout>
         <uui-input slot="name" .value="${this._node?.name}"></uui-input>
         <uui-tab-group slot="apps">
           <uui-tab label="Content" active></uui-tab>
@@ -139,7 +139,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
             color="positive"
             label="Save and publish"></uui-button>
         </div>
-      </umb-node-editor-layout>
+      </umb-editor-layout>
     `;
   }
 }
