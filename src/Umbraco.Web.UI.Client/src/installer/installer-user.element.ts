@@ -8,6 +8,23 @@ import { UmbInstallerContext } from './installer-context';
 export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
+      :host,
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      uui-form {
+        height: 100%;
+      }
+
+      form {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
       uui-input,
       uui-input-password {
         width: 100%;
@@ -24,7 +41,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 
       #buttons {
         display: flex;
-        margin-top: var(--uui-size-layout-3);
+        margin-top: auto;
       }
 
       #button-install {
@@ -92,7 +109,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
   };
 
   render() {
-    return html` <div class="uui-text">
+    return html` <div id="container" class="uui-text">
       <h1>Install Umbraco</h1>
       <uui-form>
         <form id="LoginForm" name="login" @submit="${this._handleSubmit}">

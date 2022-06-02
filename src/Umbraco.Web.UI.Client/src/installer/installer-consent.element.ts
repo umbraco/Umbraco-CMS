@@ -10,6 +10,23 @@ import { UmbInstallerContext } from './installer-context';
 export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
+      :host,
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      uui-form {
+        height: 100%;
+      }
+
+      form {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
       h1 {
         text-align: center;
         margin-bottom: var(--uui-size-layout-3);
@@ -17,7 +34,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
       #buttons {
         display: flex;
-        margin-top: var(--uui-size-layout-3);
+        margin-top: auto;
       }
 
       #button-install {
@@ -107,7 +124,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 
   render() {
     return html`
-      <div class="uui-text">
+      <div id="container" class="uui-text">
         <h1>Consent Level</h1>
         ${this._renderSlider()}
         <div id="buttons">

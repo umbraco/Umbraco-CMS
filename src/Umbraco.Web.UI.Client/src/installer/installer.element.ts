@@ -15,7 +15,7 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
   static styles: CSSResultGroup = [css``];
 
   @state()
-  step = 1;
+  step = 3;
 
   constructor() {
     super();
@@ -54,7 +54,6 @@ export class UmbInstaller extends UmbContextProviderMixin(LitElement) {
     return html`<umb-installer-layout>${this._renderSection()}</umb-installer-layout> `;
   }
 }
-
 
 export default UmbInstaller;
 
