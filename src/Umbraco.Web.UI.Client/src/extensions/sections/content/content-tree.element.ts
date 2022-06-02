@@ -15,7 +15,7 @@ class UmbContentTree extends LitElement {
   ];
 
   @property()
-  public id!: string;
+  public currentNodeId?: string;
 
   // simplified tree data for testing
   @state()
@@ -34,8 +34,7 @@ class UmbContentTree extends LitElement {
         ${this._tree.map(
           (item) => html`
             <uui-menu-item
-              ?active="${parseInt(this.id) === item.id}"
-              data-id="${item.id}"
+              ?active="${parseInt(this.currentNodeId || '-1') === item.id}"
               label="${item.name}"
               href="/section/content/node/${item.id}">
               <uui-icon slot="icon" name="${item.icon}"></uui-icon>
