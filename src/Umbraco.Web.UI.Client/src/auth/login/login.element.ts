@@ -101,7 +101,8 @@ export default class UmbLogin extends LitElement {
               <uui-button
                 type="submit"
                 label="Login"
-                look="positive"
+                look="primary"
+                color="positive"
                 state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
               <uui-button type="button" label="Forgot Password?"></uui-button>
             </form>
