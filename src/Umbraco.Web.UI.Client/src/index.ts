@@ -32,7 +32,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Content',
       name: 'Content',
       elementName: 'umb-content-section',
-      js: () => import('./extensions/content/content-section.element'),
+      js: () => import('./extensions/sections/content/content-section.element'),
       meta: {
         pathname: 'content', // TODO: how to we want to support pretty urls?
         weight: 50,
@@ -53,7 +53,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Settings',
       name: 'Settings',
       elementName: 'umb-settings-section',
-      js: () => import('./extensions/settings/settings-section.element'),
+      js: () => import('./extensions/sections/settings/settings-section.element'),
       meta: {
         pathname: 'settings', // TODO: how to we want to support pretty urls?
         weight: 20,

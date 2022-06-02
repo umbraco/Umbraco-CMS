@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 
 import './backoffice-header.element';
-import './backoffice-sidebar.element';
+import '../section/section-sidebar.element';
 import './backoffice-main.element';
 
 @defineElement('umb-backoffice')

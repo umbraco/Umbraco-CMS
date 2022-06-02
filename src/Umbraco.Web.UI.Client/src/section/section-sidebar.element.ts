@@ -2,8 +2,8 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('umb-backoffice-sidebar')
-export class UmbBackofficeSidebar extends LitElement {
+@customElement('umb-section-sidebar')
+export class UmbSectionSidebar extends LitElement {
   static styles = [
     UUITextStyles,
     css`
@@ -26,6 +26,6 @@ export class UmbBackofficeSidebar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-backoffice-sidebar': UmbBackofficeSidebar;
+    'umb-section-sidebar': UmbSectionSidebar;
   }
 }

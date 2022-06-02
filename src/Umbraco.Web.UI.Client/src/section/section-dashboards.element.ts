@@ -12,8 +12,8 @@ import {
   createExtensionElement,
 } from '../core/extension';
 
-@customElement('umb-content-dashboards')
-export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-section-dashboards')
+export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -90,6 +90,7 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _handleTabClick(e: PointerEvent, dashboard: UmbExtensionManifestDashboard) {
+    // TODO: generate URL from context/location. Or use Router-link concept?
     history.pushState(null, '', `/section/content/dashboard/${dashboard.meta.pathname}`);
     this._current = dashboard.name;
   }
@@ -116,10 +117,10 @@ export class UmbContentDashboards extends UmbContextConsumerMixin(LitElement) {
   }
 }
 
-export default UmbContentDashboards;
+export default UmbSectionDashboards;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-content-dashboards': UmbContentDashboards;
+    'umb-section-dashboards': UmbSectionDashboards;
   }
 }
