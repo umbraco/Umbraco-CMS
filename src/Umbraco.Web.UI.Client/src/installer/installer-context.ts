@@ -8,7 +8,7 @@ export class UmbInstallerContext {
     email: '',
     password: '',
     subscribeToNewsletter: false,
-    telemetryLevel: 'Minimal',
+    telemetryLevel: 'Basic',
     database: {},
   });
   public readonly data: Observable<PostInstallRequest> = this._data.asObservable();
@@ -39,7 +39,6 @@ export class UmbInstallerContext {
   private loadIntallerSettings() {
     getInstall({}).then(({ data }) => {
       this._settings.next(data);
-      console.log('INSTALLER SETTINGS', data);
     });
   }
 }
