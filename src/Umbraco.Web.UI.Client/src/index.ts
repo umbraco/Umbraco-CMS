@@ -105,7 +105,7 @@ const registerInternalManifests = async () => {
         group: 'common',
       },
     },
-   /*
+    /*
     {
       type: 'propertyEditorUI',
       alias: 'External.PropertyEditorUI.Test',

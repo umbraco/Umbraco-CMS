@@ -53,7 +53,7 @@ export const data: Array<DocumentNode> = [
         label: 'External label 1',
         description: 'This is the a external property',
         dataTypeKey: 'dt-3',
-        tempValue: 'Tex lkasdfkljdfsa 1'
+        tempValue: 'Tex lkasdfkljdfsa 1',
       },
     ],
     /*

@@ -34,7 +34,7 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
 
   // TODO: make interface for UMBPropertyEditorElement
   @state()
-  private _element?: {value?:string} & HTMLElement;// TODO: invent interface for propertyEditorUI.
+  private _element?: { value?: string } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
   @property()
   value?: string;
@@ -93,34 +93,36 @@ class UmbNodePropertyDataType extends UmbContextConsumerMixin(LitElement) {
       return;
     }
 
+    createExtensionElement(_propertyEditorUI)
+      .then((el) => {
+        const oldValue = this._element;
+        this._element = el;
 
-    createExtensionElement(_propertyEditorUI).then(el => {
+        // TODO: Set/Parse Data-Type-UI-configuration
 
-      const oldValue = this._element;
-      this._element = el;
-  
-      // TODO: Set/Parse Data-Type-UI-configuration
-  
-      if(oldValue) {
-        oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-      }
+        if (oldValue) {
+          oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+        }
 
-      if(this._element) {
-        this._element.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-        this._element.value = this.value;// Be aware its duplicated code
-      }
-      this.requestUpdate('element', oldValue);
-    }).catch(() => {
-      // TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
-    });
-
+        if (this._element) {
+          this._element.addEventListener(
+            'property-editor-change',
+            this._onPropertyEditorChange as any as EventListener
+          );
+          this._element.value = this.value; // Be aware its duplicated code
+        }
+        this.requestUpdate('element', oldValue);
+      })
+      .catch(() => {
+        // TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
+      });
   }
 
   private _onPropertyEditorChange = (e: CustomEvent) => {
     if (e.currentTarget === this._element) {
       this.value = this._element.value;
       //
-      this.dispatchEvent(new CustomEvent('property-data-type-change', { bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent('property-data-type-value-change', { bubbles: true, composed: true }));
     }
     // make sure no event leave this scope.
     e.stopPropagation();

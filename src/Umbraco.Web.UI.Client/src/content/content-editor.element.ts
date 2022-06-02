@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { DocumentNode } from '../mocks/data/content.data';
 
 @customElement('umb-content-editor')
-class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
+export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -142,6 +142,8 @@ class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     `;
   }
 }
+
+export default UmbContentEditor;
 
 declare global {
   interface HTMLElementTagNameMap {

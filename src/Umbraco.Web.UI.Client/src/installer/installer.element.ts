@@ -11,7 +11,7 @@ import { getInstall, postInstall } from '../core/api/fetcher';
 import { PostInstallRequest, UmbracoInstaller, UmbracoPerformInstallRequest } from '../core/models';
 
 @customElement('umb-installer')
-export class UmbInstaller extends LitElement {
+export default class UmbInstaller extends LitElement {
   static styles: CSSResultGroup = [css``];
 
   @state()

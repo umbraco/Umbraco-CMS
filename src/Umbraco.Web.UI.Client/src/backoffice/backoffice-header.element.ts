@@ -4,6 +4,7 @@ import { customElement } from 'lit/decorators.js';
 
 import './backoffice-header-sections.element';
 import './backoffice-header-tools.element';
+
 @customElement('umb-backoffice-header')
 export class UmbBackofficeHeader extends LitElement {
   static styles: CSSResultGroup = [

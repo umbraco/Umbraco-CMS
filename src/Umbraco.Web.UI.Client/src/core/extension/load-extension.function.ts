@@ -1,14 +1,13 @@
 import { UmbExtensionManifest } from './extension.registry';
 
-export function loadExtension(manifest: UmbExtensionManifest): Promise<object|HTMLElement> | Promise<null> {
-
+export function loadExtension(manifest: UmbExtensionManifest): Promise<object | HTMLElement> | Promise<null> {
   if (typeof manifest.js === 'function') {
-      return manifest.js() as Promise<object|HTMLElement>;
+    return manifest.js() as Promise<object | HTMLElement>;
   }
 
   // TODO: verify if this is acceptable solution.
   if (typeof manifest.js === 'string') {
-    return import(/* @vite-ignore */manifest.js);
+    return import(/* @vite-ignore */ manifest.js);
     /*
       return new Promise((resolve, reject) => {
           const script  = document.createElement('script');
@@ -27,6 +26,6 @@ export function loadExtension(manifest: UmbExtensionManifest): Promise<object|HT
       */
   }
 
-  console.log('-- Extension does not have any referenced JS')
+  console.log('-- Extension does not have any referenced JS');
   return Promise.resolve(null);
 }

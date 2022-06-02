@@ -1,8 +1,8 @@
-import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
-@defineElement('umb-dashboard-welcome')
+@customElement('umb-dashboard-welcome')
 export class UmbDashboardWelcome extends LitElement {
   static styles = [UUITextStyles, css``];
 
