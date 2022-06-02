@@ -33,9 +33,6 @@
     </PackageReference>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Update="Nerdbank.GitVersioning">
-      <Version>3.5.107</Version>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -19,9 +19,6 @@
     <PackageReference Include="Moq" Version="4.18.1" />
     <PackageReference Include="AutoFixture.NUnit3" Version="4.17.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Update="Nerdbank.GitVersioning">
-      <Version>3.5.107</Version>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

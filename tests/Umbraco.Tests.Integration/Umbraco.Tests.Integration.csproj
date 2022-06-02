@@ -13,9 +13,6 @@
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
-    <PackageReference Update="Nerdbank.GitVersioning">
-      <Version>3.5.107</Version>
-    </PackageReference>
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">

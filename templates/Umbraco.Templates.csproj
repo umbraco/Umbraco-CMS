@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Enable multi-level merging with src -->
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../src/'))" />
-    
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <PackageType>Template</PackageType>
@@ -14,7 +14,7 @@
     <NoDefaultExcludes>true</NoDefaultExcludes>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Content Include="icon.png" Visible="false" />
     <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
@@ -43,11 +43,5 @@
       <Link>UmbracoProject\wwwroot\favicon.ico</Link>
       <PackagePath>UmbracoProject\wwwroot</PackagePath>
     </Content>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning">
-      <Version>3.5.107</Version>
-    </PackageReference>
   </ItemGroup>
 </Project>

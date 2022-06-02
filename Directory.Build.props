@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Condition="!Exists('packages.config')">
       <PrivateAssets>all</PrivateAssets>
-      <Version>3.5.103</Version>
+      <Version>3.5.107</Version>
     </PackageReference>
 
     <PackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.1.1">

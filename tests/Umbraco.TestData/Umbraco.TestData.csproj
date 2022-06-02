@@ -8,9 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Update="Nerdbank.GitVersioning">
-      <Version>3.5.107</Version>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
