@@ -278,7 +278,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
           <div id="buttons">
             <uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>
-            <uui-button id="button-install" type="submit" label="Install" look="positive"></uui-button>
+            <uui-button id="button-install" type="submit" label="Install" look="primary" color="positive"></uui-button>
           </div>
         </form>
       </uui-form>
