@@ -25,6 +25,12 @@ export class UmbDataTypeStore {
         name: 'External Test (DataType)',
         propertyEditorUIAlias: 'External.PropertyEditorUI.Test',
       },
+      {
+        id: 1247,
+        key: 'dt-4',
+        name: 'Context Example (DataType)',
+        propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
+      },
     ]);
   }
 

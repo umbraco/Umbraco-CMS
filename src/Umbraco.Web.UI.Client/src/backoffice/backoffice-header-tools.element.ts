@@ -29,7 +29,7 @@ export class UmbBackofficeHeaderTools extends LitElement {
           <uui-icon name="favorite"></uui-icon>
         </uui-button>
         <uui-button look="primary" style="font-size: 14px;" label="User" compact>
-          <uui-avatar name="Mads Rasmussen"></uui-avatar>
+          <uui-avatar name="Mr Rabbit"></uui-avatar>
         </uui-button>
       </div>
     `;

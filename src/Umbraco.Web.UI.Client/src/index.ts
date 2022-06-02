@@ -1,3 +1,4 @@
+import 'element-internals-polyfill';
 import { worker } from './mocks/browser';
 import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestCore } from './core/extension';
 
@@ -99,7 +100,7 @@ const registerInternalManifests = async () => {
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
       //elementName: 'external-property-editor-test', //Gets the element name from JS file.
-      js: '/src/property-editors/external-property-editor-test.js',
+      js: '/src/extensions/property-editors/external-property-editor-test.js',
       meta: {
         icon: 'document',
         group: 'common',
@@ -129,6 +130,16 @@ const registerInternalManifests = async () => {
       },
     },
     {
+      type: 'propertyEditorUI',
+      alias: 'Umb.PropertyEditorUI.ContextExample',
+      name: 'Context Example',
+      js: () => import('./extensions/property-editors/property-editor-context-example.element'),
+      meta: {
+        icon: 'document',
+        group: 'common',
+      },
+    },
+    {
       type: 'editorView',
       alias: 'Umb.EditorView.ContentEdit',
       name: 'Content',
@@ -150,8 +161,8 @@ const registerInternalManifests = async () => {
         pathname: 'info',
         weight: 90,
         icon: 'info',
-      },
-    },
+      }
+    }
   ];
 
   manifests.forEach((manifest: UmbExtensionManifestCore) =>
