@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
@@ -31,6 +32,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         public bool IsBasicAuthEnabled() => _basicAuthSettings.Enabled;
+        public bool IsRedirectToLoginPageEnabled() => _basicAuthSettings.RedirectToLoginPage;
 
         public bool IsIpAllowListed(IPAddress clientIpAddress)
         {
@@ -43,6 +45,19 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             return false;
+        }
+
+        public bool HasCorrectSharedSecret(IDictionary<string, StringValues> headers)
+        {
+            var headerName = _basicAuthSettings.SharedSecret.HeaderName;
+            var sharedSecret = _basicAuthSettings.SharedSecret.Value;
+
+            if (string.IsNullOrWhiteSpace(headerName) || string.IsNullOrWhiteSpace(sharedSecret))
+            {
+                return false;
+            }
+
+            return headers.TryGetValue(headerName, out var value) && value.Equals(sharedSecret);
         }
     }
 }
