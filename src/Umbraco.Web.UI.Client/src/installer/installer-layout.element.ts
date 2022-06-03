@@ -30,16 +30,20 @@ export class UmbInstallerLayout extends LitElement {
       #container {
         position: relative;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
         width: 100vw;
         height: 100vh;
       }
 
       #box {
-        width: 450px;
+        max-width: 500px;
+        width: 100%;
         box-sizing: border-box;
-        padding: var(--uui-size-layout-1) var(--uui-size-layout-2) var(--uui-size-layout-2) var(--uui-size-layout-2);
+        border-radius: 30px 0 0 30px;
+        background-color: var(--uui-color-surface);
+        display: flex;
+        flex-direction: column;
+        padding: var(--uui-size-layout-4) var(--uui-size-layout-4) var(--uui-size-layout-2) var(--uui-size-layout-4);
       }
     `,
   ];
@@ -53,9 +57,9 @@ export class UmbInstallerLayout extends LitElement {
       </div>
 
       <div id="container">
-        <uui-box id="box">
+        <div id="box">
           <slot></slot>
-        </uui-box>
+        </div>
       </div>
     </div>`;
   }

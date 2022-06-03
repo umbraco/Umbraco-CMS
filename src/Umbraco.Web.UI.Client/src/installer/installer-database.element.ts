@@ -10,10 +10,44 @@ import { UUIButtonElement } from '@umbraco-ui/uui';
 export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   static styles: CSSResultGroup = [
     css`
+      :host,
+      #container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      uui-form {
+        height: 100%;
+      }
+
+      form {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      form > uui-form-layout-item {
+        /* margin-bottom: var(--uui-size-layout-2); */
+      }
+
+      uui-form-layout-item {
+        margin-top: 0;
+        margin-bottom: var(--uui-size-space-6);
+      }
+
       uui-input,
       uui-input-password,
       uui-combobox {
         width: 100%;
+      }
+
+      hr {
+        width: 100%;
+        margin-top: var(--uui-size-space-2);
+        margin-bottom: var(--uui-size-space-6);
+        border: none;
+        border-bottom: 1px solid var(--uui-color-border);
       }
 
       h1 {
@@ -22,13 +56,12 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
       }
 
       h4 {
-        margin-bottom: 0;
-        margin-top: var(--uui-size-layout-2);
+        margin: 0;
       }
 
       #buttons {
         display: flex;
-        margin-top: var(--uui-size-layout-3);
+        margin-top: auto;
       }
 
       #button-install {
@@ -257,7 +290,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   `;
 
   render() {
-    return html` <div class="uui-text">
+    return html` <div id="container" class="uui-text">
       <h1 class="uui-h3">Database Configuration</h1>
       <uui-form>
         <form id="database-form" name="database" @submit="${this._handleSubmit}">
