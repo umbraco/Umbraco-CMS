@@ -27,6 +27,15 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
         flex-direction: column;
       }
 
+      form > uui-form-layout-item {
+        /* margin-bottom: var(--uui-size-layout-2); */
+      }
+
+      uui-form-layout-item {
+        margin-top: 0;
+        margin-bottom: var(--uui-size-space-6);
+      }
+
       uui-input,
       uui-input-password,
       uui-combobox {
@@ -35,7 +44,10 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
       hr {
         width: 100%;
-        border-bottom: 1px solid var(--uui-color-divider);
+        margin-top: var(--uui-size-space-2);
+        margin-bottom: var(--uui-size-space-6);
+        border: none;
+        border-bottom: 1px solid var(--uui-color-border);
       }
 
       h1 {
@@ -44,8 +56,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
       }
 
       h4 {
-        margin-bottom: 0;
-        margin-top: var(--uui-size-layout-2);
+        margin: 0;
       }
 
       #buttons {

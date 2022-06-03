@@ -15,6 +15,11 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
         height: 100%;
       }
 
+      uui-form-layout-item {
+        margin-top: 0;
+        margin-bottom: var(--uui-size-space-6);
+      }
+
       uui-form {
         height: 100%;
       }
