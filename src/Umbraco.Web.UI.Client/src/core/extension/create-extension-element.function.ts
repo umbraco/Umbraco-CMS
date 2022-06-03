@@ -5,21 +5,21 @@ export function createExtensionElement(manifest: UmbExtensionManifest): Promise<
   //TODO: Write tests for these extension options:
   return loadExtension(manifest).then((js) => {
     if (manifest.elementName) {
-      console.log('-- created by elementName', manifest.elementName);
+      // created by manifest elementName
       return document.createElement(manifest.elementName as any);
     }
 
     if (js) {
       if (js instanceof HTMLElement) {
-        console.log('-- created by manifest method providing HTMLElement', js);
+        // created by manifest method providing HTMLElement
         return js;
       }
       if ((js as any).elementName) {
-        console.log('-- created by export elementName', (js as any).elementName);
+        // created by js export elementName
         return document.createElement((js as any).elementName);
       }
       if ((js as any).default) {
-        console.log('-- created by default class', (js as any).default);
+        // created by default class
         return new (js as any).default() as HTMLElement;
       }
     }
