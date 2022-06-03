@@ -43,7 +43,7 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
   ];
 
   private _notificationService: UmbNotificationService = new UmbNotificationService();
-  private _notificationSubscribtion: Subscription;
+  private _notificationSubscribtion?: Subscription;
 
   @state()
   private _notifications:any[] = [];
