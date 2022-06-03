@@ -163,7 +163,27 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (!isTrialRun)
             {
+                // File configuration providers use a delay before reloading and triggering changes, so wait
+                using var isChanged = new ManualResetEvent(false);
+                using IDisposable? onChange = _connectionStrings.OnChange((options, name) =>
+                {
+                    // Only watch default named option (CurrentValue)
+                    if (name != Options.DefaultName)
+                    {
+                        return;
+                    }
+
+                    // Signal change
+                    isChanged.Set();
+                });
+
+                // Update configuration and wait for change
                 _configManipulator.SaveConnectionString(connectionString, providerName);
+                if (!isChanged.WaitOne(10_000))
+                {
+                    throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
+                }
+
                 Configure(_globalSettings.CurrentValue.InstallMissingDatabase || providerMeta.ForceCreateDatabase);
             }
 
