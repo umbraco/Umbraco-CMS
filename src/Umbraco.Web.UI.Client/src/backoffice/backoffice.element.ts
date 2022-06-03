@@ -1,6 +1,6 @@
-import '../section/section-sidebar.element';
-import './backoffice-header.element';
-import './backoffice-main.element';
+import './components/section-sidebar.element';
+import './components/backoffice-header.element';
+import './components/backoffice-main.element';
 
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';

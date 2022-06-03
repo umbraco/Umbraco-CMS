@@ -4,8 +4,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { IRoutingInfo } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../core/context';
-import { createExtensionElement, UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../core/extension';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { createExtensionElement, UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../../core/extension';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {

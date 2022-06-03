@@ -23,7 +23,7 @@ export class UmbContentSection extends LitElement {
   private _routes: Array<IRoute> = [
     {
       path: 'dashboard',
-      component: () => import('../../../section/section-dashboards.element'),
+      component: () => import('../../components/section-dashboards.element'),
       setup: () => {
         this._currentNodeId = undefined;
       },

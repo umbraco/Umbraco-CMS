@@ -9,9 +9,9 @@ import { getInitStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 
 // Load these in the correct components
-import './editors/editor-layout.element';
-import './editors/editor-property-layout.element';
-import './editors/node-editor/node-property.element';
+import './backoffice/components/editor-layout.element';
+import './backoffice/components/editor-property-layout.element';
+import './backoffice/components/node-editor/node-property.element';
 
 const routes = [
   {

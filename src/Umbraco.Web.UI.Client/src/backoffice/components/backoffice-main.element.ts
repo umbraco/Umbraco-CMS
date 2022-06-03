@@ -4,8 +4,8 @@ import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { map, Subscription } from 'rxjs';
 
-import { UmbContextConsumerMixin } from '../core/context';
-import { createExtensionElement, UmbExtensionManifestSection, UmbExtensionRegistry } from '../core/extension';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { createExtensionElement, UmbExtensionManifestSection, UmbExtensionRegistry } from '../../core/extension';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {

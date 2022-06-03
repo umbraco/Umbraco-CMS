@@ -5,9 +5,9 @@ import { when } from 'lit/directives/when.js';
 import { isPathActive, path } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 
-import { getUserSections } from '../core/api/fetcher';
-import { UmbContextConsumerMixin } from '../core/context';
-import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../core/extension';
+import { getUserSections } from '../../core/api/fetcher';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../../core/extension';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {

@@ -33,7 +33,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Content',
       name: 'Content',
       elementName: 'umb-content-section',
-      js: () => import('./extensions/sections/content/content-section.element'),
+      js: () => import('./backoffice/sections/content/content-section.element'),
       meta: {
         pathname: 'content', // TODO: how to we want to support pretty urls?
         weight: 50,
@@ -54,7 +54,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Section.Settings',
       name: 'Settings',
       elementName: 'umb-settings-section',
-      js: () => import('./extensions/sections/settings/settings-section.element'),
+      js: () => import('./backoffice/sections/settings/settings-section.element'),
       meta: {
         pathname: 'settings', // TODO: how to we want to support pretty urls?
         weight: 20,
@@ -65,7 +65,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Dashboard.Welcome',
       name: 'Welcome',
       elementName: 'umb-dashboard-welcome',
-      js: () => import('./extensions/dashboards/dashboard-welcome.element'),
+      js: () => import('./backoffice/dashboards/dashboard-welcome.element'),
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'welcome', // TODO: how to we want to support pretty urls?
@@ -77,7 +77,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.Dashboard.RedirectManagement',
       name: 'Redirect Management',
       elementName: 'umb-dashboard-redirect-management',
-      js: () => import('./extensions/dashboards/dashboard-redirect-management.element'),
+      js: () => import('./backoffice/dashboards/dashboard-redirect-management.element'),
       meta: {
         sections: ['Umb.Section.Content'],
         pathname: 'redirect-management', // TODO: how to we want to support pretty urls?
@@ -89,7 +89,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
       //elementName: 'umb-property-editor-text',
-      js: () => import('./extensions/property-editors/property-editor-text.element'),
+      js: () => import('./backoffice/property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
         group: 'common',
@@ -100,7 +100,7 @@ const registerInternalManifests = async () => {
       alias: 'External.PropertyEditorUI.Test',
       name: 'Text',
       //elementName: 'external-property-editor-test', //Gets the element name from JS file.
-      js: '/src/extensions/property-editors/external-property-editor-test.js',
+      js: '/src/backoffice/property-editors/external-property-editor-test.js',
       meta: {
         icon: 'document',
         group: 'common',
@@ -123,7 +123,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.PropertyEditorUI.Textarea',
       name: 'Textarea',
       elementName: 'umb-property-editor-textarea',
-      js: () => import('./extensions/property-editors/property-editor-textarea.element'),
+      js: () => import('./backoffice/property-editors/property-editor-textarea.element'),
       meta: {
         icon: 'document',
         group: 'common',
@@ -133,7 +133,7 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.ContextExample',
       name: 'Context Example',
-      js: () => import('./extensions/property-editors/property-editor-context-example.element'),
+      js: () => import('./backoffice/property-editors/property-editor-context-example.element'),
       meta: {
         icon: 'document',
         group: 'common',
@@ -144,7 +144,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.EditorView.ContentEdit',
       name: 'Content',
       elementName: 'umb-content-edit-editor-view',
-      js: () => import('./extensions/sections/content/editor-views/content-edit-editor-view.element'),
+      js: () => import('./backoffice/sections/content/editor-views/content-edit-editor-view.element'),
       meta: {
         pathname: 'content',
         weight: 100,
@@ -156,7 +156,7 @@ const registerInternalManifests = async () => {
       alias: 'Umb.EditorView.ContentInfo',
       name: 'Info',
       elementName: 'umb-content-info-editor-view',
-      js: () => import('./extensions/sections/content/editor-views/content-info-editor-view.element'),
+      js: () => import('./backoffice/sections/content/editor-views/content-info-editor-view.element'),
       meta: {
         pathname: 'info',
         weight: 90,
