@@ -1,11 +1,13 @@
-import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
-import { Subscription, map, switchMap } from 'rxjs';
+import { EMPTY, of, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
 import { UmbContextConsumerMixin } from '../../core/context';
-import { DataTypeEntity } from '../../mocks/data/content.data';
+import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
+import { DataTypeEntity } from '../../mocks/data/content.data';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
@@ -63,26 +65,27 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
   private _useDataType() {
     this._dataTypeSubscription?.unsubscribe();
     if (this._property.dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
-
       this._dataTypeSubscription = this._dataTypeStore
         .getByKey(this._property.dataTypeKey)
         .pipe(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          map((dataTypeEntity: DataTypeEntity) => {
+          switchMap((dataTypeEntity) => {
+            if (!dataTypeEntity) {
+              return EMPTY;
+            }
             this._dataType = dataTypeEntity;
-            return dataTypeEntity.propertyEditorUIAlias;
-          }),
-          switchMap((alias: string) => this._extensionRegistry?.getByAlias(alias) as any)
+
+            return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
+          })
         )
-        .subscribe((propertyEditorUI: any) => {
-          this._gotData(propertyEditorUI);
+        .subscribe((propertyEditorUI) => {
+          if (propertyEditorUI) {
+            this._gotData(propertyEditorUI);
+          }
         });
     }
   }
 
   private _gotData(_propertyEditorUI?: UmbExtensionManifest) {
-
     if (!this._dataType || !_propertyEditorUI) {
       // TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
       return;
@@ -145,9 +148,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
           <uui-label>${this.property.label}</uui-label>
           <p>${this.property.description}</p>
         </div>
-        <div slot="editor">
-          ${this._element}
-        </div>
+        <div slot="editor">${this._element}</div>
       </umb-editor-property-layout>
     `;
   }

@@ -1,6 +1,5 @@
+import { HTMLElementConstructor } from '../models';
 import { UmbContextConsumer } from './context-consumer';
-
-type Constructor<T = HTMLElement> = new (...args: any[]) => T;
 
 export declare class UmbContextConsumerInterface {
   consumeContext(alias: string, callback?: (_instance: any) => void): void;
@@ -14,7 +13,7 @@ export declare class UmbContextConsumerInterface {
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbContextConsumerMixin = <T extends Constructor<HTMLElement>>(superClass: T) => {
+export const UmbContextConsumerMixin = <T extends HTMLElementConstructor>(superClass: T) => {
   class UmbContextConsumerClass extends superClass {
     // all context requesters in the element
     _consumers: Map<string, UmbContextConsumer> = new Map();
@@ -75,7 +74,7 @@ export const UmbContextConsumerMixin = <T extends Constructor<HTMLElement>>(supe
     }
   }
 
-  return UmbContextConsumerClass as unknown as Constructor<UmbContextConsumerInterface> & T;
+  return UmbContextConsumerClass as unknown as HTMLElementConstructor<UmbContextConsumerInterface> & T;
 };
 
 declare global {

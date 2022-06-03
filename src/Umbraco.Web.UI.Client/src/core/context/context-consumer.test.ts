@@ -1,6 +1,7 @@
 import { expect, oneEvent } from '@open-wc/testing';
-import { UmbContextProvider } from './context-provider';
+
 import { UmbContextConsumer } from './context-consumer';
+import { UmbContextProvider } from './context-provider';
 import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event';
 
 const testContextAlias = 'my-test-context';
@@ -38,7 +39,7 @@ describe('UmbContextConsumer', () => {
     });
   });
 
-  it('works with UmbContextProvider', (done: any) => {
+  it('works with UmbContextProvider', (done) => {
     const provider = new UmbContextProvider(document.body, testContextAlias, new MyClass());
     provider.attach();
 

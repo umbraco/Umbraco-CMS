@@ -17,3 +17,6 @@ export type UmbracoPerformInstallDatabaseConfiguration =
 export type UmbracoInstallerDatabaseModel = components['schemas']['UmbracoInstallerDatabaseModel'];
 export type UmbracoInstallerUserModel = components['schemas']['UmbracoInstallerUserModel'];
 export type TelemetryModel = components['schemas']['TelemetryModel'];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;

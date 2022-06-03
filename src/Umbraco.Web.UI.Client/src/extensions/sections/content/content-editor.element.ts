@@ -1,5 +1,5 @@
-import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
@@ -7,7 +7,7 @@ import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../../mocks/data/content.data';
 import { UmbNotificationService } from '../../../core/service/notifications.store';
 import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../core/extension';
-import { IRoutingInfo, queryParentRouterSlot, RouterSlot } from 'router-slot';
+import { IRoutingInfo, RouterSlot } from 'router-slot';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
