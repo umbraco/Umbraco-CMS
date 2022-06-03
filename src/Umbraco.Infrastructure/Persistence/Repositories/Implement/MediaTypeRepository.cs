@@ -44,6 +44,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IMediaType? PerformGet(Guid id)
             => GetMany()?.FirstOrDefault(x => x.Key == id);
 
+        protected override async Task<IMediaType?> PerformGetAsync(Guid id)
+           => (await GetManyAsync())?.FirstOrDefault(x => x.Key == id);
+
         protected override bool PerformExists(Guid id)
             => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
 
@@ -56,6 +59,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IEnumerable<IMediaType>? GetAllWithFullCachePolicy()
         {
             return CommonRepository.GetAllTypes()?.OfType<IMediaType>();
+        }
+        protected override async Task<IEnumerable<IMediaType>?> GetAllWithFullCachePolicyAsync()
+        {
+            return (await CommonRepository.GetAllTypesAsync())?.OfType<IMediaType>();
         }
 
         protected override IEnumerable<IMediaType>? PerformGetAll(params Guid[]? ids)

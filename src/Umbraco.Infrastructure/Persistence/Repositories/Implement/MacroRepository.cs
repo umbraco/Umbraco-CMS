@@ -42,6 +42,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sql = GetBaseQuery().Where<MacroDto>(x => x.UniqueId == id);
             return GetBySql(sql);
         }
+        public async Task<IMacro?> GetAsync(Guid id)
+        {
+            var sql = GetBaseQuery().Where<MacroDto>(x => x.UniqueId == id);
+            return await GetBySqlAsync(sql);
+        }
 
         private IMacro? GetBySql(Sql sql)
         {
@@ -49,6 +54,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
                 .FirstOrDefault();
 
+            return MapToMacro(macroDto);
+        }
+        private Task<IMacro?> GetBySqlAsync(Sql sql)
+        {
+            var macroDto = Database
+                .FetchOneToMany<MacroDto>(x => x.MacroPropertyDtos, sql)
+                .FirstOrDefault();
+
+            return Task.FromResult(MapToMacro(macroDto));
+        }
+
+        private IMacro? MapToMacro(MacroDto? macroDto)
+        {
             if (macroDto == null)
                 return null;
 
@@ -109,6 +127,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IEnumerable<IMacro> PerformGetAll(params int[]? ids)
         {
             return ids?.Length > 0 ? ids.Select(Get).WhereNotNull() : GetAllNoIds();
+        }
+        protected override async Task<IEnumerable<IMacro>> PerformGetAllAsync(params int[]? ids)
+        {
+            if(ids?.Length > 0)
+            {
+                var macros = new List<IMacro>();
+                foreach (var id in ids)
+                {
+                    IMacro? macro = await GetAsync(id);
+
+                    if(macro != null)
+                    {
+                        macros.Add(macro);
+                    }
+                }
+                return macros;
+            }
+            return GetAllNoIds();
         }
 
         private IEnumerable<IMacro> GetAllNoIds()

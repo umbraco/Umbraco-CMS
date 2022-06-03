@@ -249,6 +249,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
 
 
         public ILogViewerQuery Get(int id) => Store.FirstOrDefault(x => x.Id == id);
+        public Task<ILogViewerQuery> GetAsync(int id) => Task.FromResult(Store.FirstOrDefault(x => x.Id == id));
 
         public IEnumerable<ILogViewerQuery> GetMany(params int[] ids) =>
             ids.Any() ? Store.Where(x => ids.Contains(x.Id)) : Store;

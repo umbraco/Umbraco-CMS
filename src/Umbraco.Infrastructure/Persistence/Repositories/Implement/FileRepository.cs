@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public virtual void Delete(TEntity entity) => PersistDeletedItem(entity);
 
         public abstract TEntity? Get(TId? id);
+        public abstract Task<TEntity?> GetAsync(TId? id);
 
         public abstract IEnumerable<TEntity> GetMany(params TId[]? ids);
 
@@ -238,5 +239,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return -1; // deal with race conds
             }
         }
+
     }
 }
