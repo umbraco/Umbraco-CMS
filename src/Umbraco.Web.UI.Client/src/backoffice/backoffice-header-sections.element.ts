@@ -1,13 +1,13 @@
-import { Subscription, map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { isPathActive, path } from 'router-slot';
+import { map, Subscription } from 'rxjs';
 
 import { getUserSections } from '../core/api/fetcher';
-import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestSection } from '../core/extension';
 import { UmbContextConsumerMixin } from '../core/context';
+import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
@@ -73,16 +73,13 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     this._open = !this._open;
   }
 
-  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifestSection) {
+  private _handleTabClick(e: PointerEvent) {
     const tab = e.currentTarget as HTMLElement;
 
     // TODO: we need to be able to prevent the tab from setting the active state
     if (tab.id === 'moreTab') {
       return;
     }
-
-    // TODO: this could maybe be handled by an anchor tag
-    history.pushState(null, '', `/section/${section.meta.pathname}`);
   }
 
   private _handleLabelClick() {
@@ -98,16 +95,11 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     const { data } = await getUserSections({});
     this._allowedSection = data.sections;
 
-    this._sectionSubscription = this._extensionRegistry?.extensions
-      .pipe(
-        map((extensions: Array<UmbExtensionManifest>) =>
-          extensions
-            .filter((extension) => extension.type === 'section')
-            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
-        )
-      )
-      .subscribe((sections: Array<any>) => {
-        this._sections = sections.filter((section: any) => this._allowedSection.includes(section.alias));
+    this._sectionSubscription = this._extensionRegistry
+      ?.extensionsOfType('section')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
+      .subscribe((sections) => {
+        this._sections = sections.filter((section) => this._allowedSection.includes(section.alias));
         this._visibleSections = this._sections;
       });
   }
@@ -121,11 +113,11 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     return html`
       <uui-tab-group id="tabs">
         ${this._visibleSections.map(
-          (section: any) => html`
+          (section: UmbExtensionManifestSection) => html`
             <uui-tab
               ?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
-              label="${section.name}"
-              @click="${(e: PointerEvent) => this._handleTabClick(e, section)}"></uui-tab>
+              href="${`/section/${section.meta.pathname}`}"
+              label="${section.name}"></uui-tab>
           `
         )}
         ${this._renderExtraSections()}

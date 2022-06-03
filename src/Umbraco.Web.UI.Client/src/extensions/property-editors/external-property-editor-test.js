@@ -4,7 +4,7 @@ export default class ExternalPropertyEditorTest extends HTMLElement {
         super();
         this.attachShadow({mode: 'open'}); // sets and returns 'this.shadowRoot'
         const wrapper = document.createElement('span');
-        wrapper.textContent = 'hello world';
+        wrapper.textContent = 'Example of a pure JS Property Editor';
         this.shadowRoot.append(wrapper);
     }
 }

@@ -20,7 +20,7 @@ export class UmbNodeStore {
 
   // TODO: Use Node type, to not be specific about Document.
   // TODO: make sure UI somehow can follow the status of this action.
-  save(data: DocumentNode[]) {
+  save(data: DocumentNode[]): Promise<void> {
     // fetch from server and update store
     // TODO: use Fetcher API.
     let body: string;
@@ -29,21 +29,21 @@ export class UmbNodeStore {
       body = JSON.stringify(data);
     } catch (error) {
       console.error(error);
-      return;
+      return Promise.reject();
     }
 
     // TODO: Use node type to hit the right API, or have a general Node API?
-    fetch('/umbraco/backoffice/content/save', {
+    return fetch('/umbraco/backoffice/content/save', {
       method: 'POST',
       body: body,
       headers: {
         'Content-Type': 'application/json',
       },
     })
-      .then((res) => res.json())
-      .then((data) => {
-        this._updateStore(data);
-      });
+    .then((res) => res.json())
+    .then((data) => {
+      this._updateStore(data);
+    });
   }
 
   private _updateStore(fetchedNodes: Array<any>) {

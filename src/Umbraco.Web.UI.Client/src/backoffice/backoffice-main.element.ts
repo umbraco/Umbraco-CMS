@@ -2,15 +2,10 @@ import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
-import { Subscription, map } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import {
-  UmbExtensionRegistry,
-  createExtensionElement,
-  UmbExtensionManifest,
-  UmbExtensionManifestSection,
-} from '../core/extension';
+import { createExtensionElement, UmbExtensionManifestSection, UmbExtensionRegistry } from '../core/extension';
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
@@ -47,14 +42,9 @@ export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
   private _useSections() {
     this._sectionSubscription?.unsubscribe();
 
-    this._sectionSubscription = this._extensionRegistry?.extensions
-      .pipe(
-        map((extensions: Array<UmbExtensionManifest>) =>
-          extensions
-            .filter((extension) => extension.type === 'section')
-            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
-        )
-      )
+    this._sectionSubscription = this._extensionRegistry
+      ?.extensionsOfType('section')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
       .subscribe((sections) => {
         this._routes = [];
         this._sections = sections as Array<UmbExtensionManifestSection>;

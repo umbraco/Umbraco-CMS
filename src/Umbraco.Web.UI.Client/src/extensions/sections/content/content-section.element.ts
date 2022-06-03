@@ -23,7 +23,10 @@ export class UmbContentSection extends LitElement {
   private _routes: Array<IRoute> = [
     {
       path: 'dashboard',
-      component: () => import('./content-dashboards.element'),
+      component: () => import('../../../section/section-dashboards.element'),
+      setup: () => {
+        this._currentNodeId = undefined;
+      },
     },
     {
       path: 'node/:nodeId',
@@ -40,14 +43,13 @@ export class UmbContentSection extends LitElement {
   ];
 
   @state()
-  private _currentNodeId!: string;
+  private _currentNodeId?: string;
 
   render() {
     return html`
-      <!-- TODO: Figure out how we name layout components -->
-      <umb-backoffice-sidebar>
-        <umb-content-tree .id="${this._currentNodeId}"></umb-content-tree>
-      </umb-backoffice-sidebar>
+      <umb-section-sidebar>
+        <umb-content-tree .currentNodeId="${this._currentNodeId}"></umb-content-tree>
+      </umb-section-sidebar>
       <router-slot id="router-slot" .routes="${this._routes}"></router-slot>
     `;
   }
