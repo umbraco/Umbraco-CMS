@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../../core/context';
@@ -7,7 +7,7 @@ import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../../mocks/data/content.data';
 import { UmbNotificationService } from '../../../core/service/notifications.store';
 import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../core/extension';
-import { IRoutingInfo } from 'router-slot';
+import { IRoutingInfo, queryParentRouterSlot, RouterSlot } from 'router-slot';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -98,13 +98,13 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this._routerFolder = window.location.pathname.split('/view')[0];
   }
 
-  // TODO: Move
   private _onPropertyValueChange = (e: Event) => {
     const target = e.composedPath()[0] as any;
 
     // TODO: Set value.
     const property = this._node?.properties.find((x) => x.alias === target.property.alias);
     if (property) {
+      // TODO: Dont set the temp value, but set it on the data part of our model.
       property.tempValue = target.value;
     } else {
       console.error('property was not found', target.property.alias);
@@ -158,7 +158,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
     this._onSave();
   }
 
-  private _createRoutes () {
+  private async _createRoutes () {
 
     if (this._node && this._editorViews.length > 0) {
 
@@ -177,13 +177,23 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
           },
         };
       });
-
       this._routes.push({
         path: '**',
         redirectTo: `view/${this._editorViews?.[0].meta.pathname}`,
       });
       
       this.requestUpdate();
+      await this.updateComplete;
+
+      this._forceRouteRender()
+    }
+  }
+
+  // TODO: Fgure out why this has been necessary for this case. Come up with another case
+  private _forceRouteRender() {
+    const routerSlotEl = this.shadowRoot?.querySelector('router-slot') as RouterSlot;
+    if(routerSlotEl) {
+      routerSlotEl.render();
     }
   }
 
@@ -209,12 +219,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
           `)}
         </uui-tab-group>
 
-        <router-slot slot="content" .routes="${this._routes}"></router-slot>
-
-        <div slot="content">
-          ROUTES
-          ${this._routes.map((route) => html`<div>${route.path}</div>`)}
-        </div>
+        <router-slot .routes="${this._routes}"></router-slot>
         
         <div slot="actions">
           <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
@@ -226,6 +231,7 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
             label="Save and publish"></uui-button>
         </div>
       </umb-editor-layout>
+      
     `;
   }
 }
