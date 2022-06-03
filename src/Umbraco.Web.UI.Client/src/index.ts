@@ -143,8 +143,8 @@ const registerInternalManifests = async () => {
       type: 'editorView',
       alias: 'Umb.EditorView.ContentEdit',
       name: 'Content',
-      elementName: 'umb-content-edit-editor-view',
-      js: () => import('./backoffice/sections/content/editor-views/content-edit-editor-view.element'),
+      elementName: 'umb-editor-view-node-edit',
+      js: () => import('./backoffice/editor-views/editor-view-node-edit.element'),
       meta: {
         pathname: 'content',
         weight: 100,
@@ -155,8 +155,8 @@ const registerInternalManifests = async () => {
       type: 'editorView',
       alias: 'Umb.EditorView.ContentInfo',
       name: 'Info',
-      elementName: 'umb-content-info-editor-view',
-      js: () => import('./backoffice/sections/content/editor-views/content-info-editor-view.element'),
+      elementName: 'umb-editor-view-node-info',
+      js: () => import('./backoffice/editor-views/editor-view-node-info.element'),
       meta: {
         pathname: 'info',
         weight: 90,

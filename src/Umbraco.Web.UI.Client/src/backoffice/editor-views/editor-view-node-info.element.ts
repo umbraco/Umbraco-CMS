@@ -2,8 +2,8 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('umb-content-info-editor-view')
-export class UmbContentInfoEditorView extends LitElement {
+@customElement('umb-editor-view-node-info')
+export class UmbEditorViewNodeInfo extends LitElement {
   static styles = [
     UUITextStyles,
     css``,
@@ -17,10 +17,10 @@ export class UmbContentInfoEditorView extends LitElement {
   }
 }
 
-export default UmbContentInfoEditorView;
+export default UmbEditorViewNodeInfo;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-content-info-editor-view': UmbContentInfoEditorView;
+    'umb-editor-view-node-info': UmbEditorViewNodeInfo;
   }
 }

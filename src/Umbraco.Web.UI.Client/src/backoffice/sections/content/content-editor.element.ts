@@ -11,8 +11,8 @@ import { IRoutingInfo, RouterSlot } from 'router-slot';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import './editor-views/content-edit-editor-view.element';
-import './editor-views/content-info-editor-view.element';
+import '../../editor-views/editor-view-node-edit.element';
+import '../../editor-views/editor-view-node-info.element';
 
 @customElement('umb-content-editor')
 export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
