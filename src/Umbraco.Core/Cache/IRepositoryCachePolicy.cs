@@ -18,6 +18,16 @@ namespace Umbraco.Cms.Core.Cache
         TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
 
         /// <summary>
+        /// Gets an entity from the cache, else from the repository.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="performGet">The repository PerformGet method.</param>
+        /// <param name="performGetAllAsync">The repository PerformGetAll method.</param>
+        /// <returns>The entity with the specified identifier, if it exits, else null.</returns>
+        /// <remarks>First considers the cache then the repository.</remarks>
+        Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGetAsync, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync);
+
+        /// <summary>
         /// Gets an entity from the cache.
         /// </summary>
         /// <param name="id">The identifier.</param>
@@ -77,6 +87,15 @@ namespace Umbraco.Cms.Core.Cache
         /// <returns>If <paramref name="ids"/> is empty, all entities, else the entities with the specified identifiers.</returns>
         /// <remarks>Get all the entities. Either from the cache or the repository depending on the implementation.</remarks>
         TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>> performGetAll);
+
+        /// <summary>
+        /// Gets entities.
+        /// </summary>
+        /// <param name="ids">The identifiers.</param>
+        /// <param name="performGetAll">The repository PerformGetAll method.</param>
+        /// <returns>If <paramref name="ids"/> is empty, all entities, else the entities with the specified identifiers.</returns>
+        /// <remarks>Get all the entities. Either from the cache or the repository depending on the implementation.</remarks>
+        Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync);
 
         /// <summary>
         /// Clears the entire cache.

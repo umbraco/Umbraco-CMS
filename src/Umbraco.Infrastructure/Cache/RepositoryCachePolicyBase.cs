@@ -47,6 +47,8 @@ namespace Umbraco.Cms.Core.Cache
 
         /// <inheritdoc />
         public abstract TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
+        /// <inheritdoc />
+        public abstract Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGetAsync, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync);
 
         /// <inheritdoc />
         public abstract TEntity? GetCached(TId id);
@@ -67,6 +69,9 @@ namespace Umbraco.Cms.Core.Cache
 
         /// <inheritdoc />
         public abstract TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
+
+        /// <inheritdoc />
+        public abstract Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync);
 
         /// <inheritdoc />
         public abstract void ClearAll();

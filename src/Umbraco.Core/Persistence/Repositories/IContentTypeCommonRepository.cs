@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
@@ -16,6 +16,11 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// Gets and cache all types.
         /// </summary>
         IEnumerable<IContentTypeComposition>? GetAllTypes();
+
+        /// <summary>
+        /// Gets and cache all types.
+        /// </summary>
+        Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync();
 
         /// <summary>
         /// Clears the cache.

@@ -131,6 +131,18 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGet, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync)
+        {
+            // get all from the cache, then look for the entity
+            var all = await GetAllCachedAsync(performGetAllAsync);
+            var entity = all.FirstOrDefault(x => _entityGetId(x)?.Equals(id) ?? false);
+
+            // see note in InsertEntities - what we get here is the original
+            // cached entity, not a clone, so we need to manually ensure it is deep-cloned.
+            return (TEntity?)entity?.DeepClone();
+        }
+
+        /// <inheritdoc />
         public override TEntity? GetCached(TId id)
         {
             // get all from the cache -- and only the cache, then look for the entity
@@ -182,6 +194,19 @@ namespace Umbraco.Cms.Core.Cache
 
             // else get from repo and cache
             var entities = performGetAll(EmptyIds)?.WhereNotNull().ToArray();
+            InsertEntities(entities); // may be an empty array...
+            return entities ?? Enumerable.Empty<TEntity>();
+        }
+        // does NOT clone anything, so be nice with the returned values
+        internal async Task<IEnumerable<TEntity>> GetAllCachedAsync(Func<TId[], Task<IEnumerable<TEntity>?>> performGetAllAsync)
+        {
+            // try the cache first
+            var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());
+            if (all != null)
+                return all.ToArray();
+
+            // else get from repo and cache
+            var entities = (await performGetAllAsync(EmptyIds))?.WhereNotNull().ToArray();
             InsertEntities(entities); // may be an empty array...
             return entities ?? Enumerable.Empty<TEntity>();
         }

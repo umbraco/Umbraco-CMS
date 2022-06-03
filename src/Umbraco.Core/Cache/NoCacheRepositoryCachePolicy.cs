@@ -16,6 +16,10 @@ namespace Umbraco.Cms.Core.Cache
         {
             return performGet(id);
         }
+        public async Task<TEntity?> GetAsync(TId? id, Func<TId?, Task<TEntity?>> performGetAsync, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync)
+        {
+            return await performGetAsync(id);
+        }
 
         public TEntity? GetCached(TId id)
         {
@@ -51,7 +55,14 @@ namespace Umbraco.Cms.Core.Cache
             return performGetAll(ids)?.ToArray() ?? Array.Empty<TEntity>();
         }
 
+        public async Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[]?, Task<IEnumerable<TEntity>?>> performGetAllAsync)
+        {
+            var result = await performGetAllAsync(ids);
+            return result?.ToArray() ?? Array.Empty<TEntity>();
+        }
+
         public void ClearAll()
         { }
+
     }
 }

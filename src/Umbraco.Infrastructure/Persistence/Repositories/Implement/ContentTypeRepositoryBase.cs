@@ -120,7 +120,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return result ?? Enumerable.Empty<TEntity>();;
         }
 
+        protected override async Task<IEnumerable<TEntity>> PerformGetAllAsync(params int[]? ids)
+        {
+            var result = GetAllWithFullCachePolicy();
+
+            // By default the cache policy will always want everything
+            // even GetMany(ids) gets everything and filters afterwards,
+            // however if we are using No Cache, we must still be able to support
+            // collections of Ids, so this is to work around that:
+            if (ids?.Any() ?? false)
+            {
+                return result?.Where(x => ids.Contains(x.Id)) ?? Enumerable.Empty<TEntity>();
+            }
+
+            return result ?? Enumerable.Empty<TEntity>();
+            ;
+        }
+
         protected abstract IEnumerable<TEntity>? GetAllWithFullCachePolicy();
+        protected abstract Task<IEnumerable<TEntity>?> GetAllWithFullCachePolicyAsync();
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
             string propertyTypeAlias)
@@ -1376,6 +1394,7 @@ AND umbracoNode.id <> @id",
         }
 
         protected abstract TEntity? PerformGet(Guid id);
+        protected abstract Task<TEntity?> PerformGetAsync(Guid id);
         protected abstract TEntity? PerformGet(string alias);
         protected abstract IEnumerable<TEntity>? PerformGetAll(params Guid[]? ids);
         protected abstract bool PerformExists(Guid id);
@@ -1399,6 +1418,16 @@ AND umbracoNode.id <> @id",
         public TEntity? Get(Guid id)
         {
             return PerformGet(id);
+        }
+
+        /// <summary>
+        /// Gets an Entity by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<TEntity?> GetAsync(Guid id)
+        {
+            return await PerformGetAsync(id);
         }
 
         /// <summary>

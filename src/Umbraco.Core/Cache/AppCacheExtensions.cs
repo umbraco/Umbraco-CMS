@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Cache;
@@ -18,6 +18,16 @@ namespace Umbraco.Extensions
             string[]? dependentFiles = null)
         {
             var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
+            return result == null ? default(T) : result.TryConvertTo<T>().Result;
+        }
+        public static async Task<T?> GetCacheItemAsync<T>(this IAppPolicyCache provider,
+            string cacheKey,
+            Func<Task<T?>> getCacheItemAsync,
+            TimeSpan? timeout,
+            bool isSliding = false,
+            string[]? dependentFiles = null)
+        {
+            var result = await provider.GetAsync(cacheKey, async () => await getCacheItemAsync(), timeout, isSliding, dependentFiles);
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
         }
 

@@ -13,6 +13,11 @@ namespace Umbraco.Cms.Core.Persistence
         TEntity? Get(TId? id);
 
         /// <summary>
+        /// Gets an entity.
+        /// </summary>
+        Task<TEntity?> GetAsync(TId? id);
+
+        /// <summary>
         /// Gets entities.
         /// </summary>
         IEnumerable<TEntity> GetMany(params TId[]? ids);

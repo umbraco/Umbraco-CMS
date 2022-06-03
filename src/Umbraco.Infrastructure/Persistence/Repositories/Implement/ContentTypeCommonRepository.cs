@@ -58,6 +58,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _appCaches.RuntimeCache.GetCacheItem(CacheKey, GetAllTypesInternal, TimeSpan.FromMinutes(5), true);
 
         /// <inheritdoc />
+        public async Task<IEnumerable<IContentTypeComposition>?> GetAllTypesAsync() =>
+            // use a 5 minutes sliding cache - same as FullDataSet cache policy
+            await _appCaches.RuntimeCache.GetCacheItemAsync(CacheKey, GetAllTypesInternalAsync, TimeSpan.FromMinutes(5), true);
+
+        /// <inheritdoc />
         public void ClearCache() => _appCaches.RuntimeCache.Clear(CacheKey);
 
         private Sql<ISqlContext>? Sql() => SqlContext?.Sql();
@@ -65,23 +70,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private IEnumerable<IContentTypeComposition> GetAllTypesInternal()
         {
             var contentTypes = new Dictionary<int, IContentTypeComposition>();
-
             // get content types
-            Sql<ISqlContext>? sql1 = Sql()?
-                .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
-                .From<ContentTypeDto>()
-                .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
-                .OrderBy<ContentTypeDto>(x => x.NodeId);
+            Sql<ISqlContext>? allContentTypesSql = GetContentTypesSql();
 
-            List<ContentTypeDto>? contentTypeDtos = Database?.Fetch<ContentTypeDto>(sql1);
-
+            List<ContentTypeDto>? contentTypeDtos = Database?.Fetch<ContentTypeDto>(allContentTypesSql);
             // get allowed content types
-            Sql<ISqlContext>? sql2 = Sql()?
-                .Select<ContentTypeAllowedContentTypeDto>()
-                .From<ContentTypeAllowedContentTypeDto>()
-                .OrderBy<ContentTypeAllowedContentTypeDto>(x => x.Id);
+            Sql<ISqlContext>? allowedContentTypesSql = GetAllowedContentTypesSql();
 
-            List<ContentTypeAllowedContentTypeDto>? allowedDtos = Database?.Fetch<ContentTypeAllowedContentTypeDto>(sql2);
+            List<ContentTypeAllowedContentTypeDto>? allowedDtos = Database?.Fetch<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql);
 
             if (contentTypeDtos is null)
             {
@@ -97,42 +93,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 // create content type
                 IContentTypeComposition contentType;
-                if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
-                {
-                    contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, contentTypeDto);
-                }
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
-                {
-                    contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, contentTypeDto);
-                }
-                else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
-                {
-                    contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, contentTypeDto);
-                }
-                else
-                {
-                    throw new PanicException(
-                        $"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
-                }
-
-                contentTypes.Add(contentType.Id, contentType);
+                contentType = MapNodeTypeToContentType(contentTypeDto);
 
                 // map allowed content types
-                var allowedContentTypes = new List<ContentTypeSort>();
-                while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
-                {
-                    ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
-                    if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
-                    {
-                        continue;
-                    }
-
-                    allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
-                        allowedDto.SortOrder, alias!));
-                    allowedDtoIx++;
-                }
+                var allowedDtoIxLocal = allowedDtoIx; // Seems odd
+                List<ContentTypeSort> allowedContentTypes = MapAllowedContentTypes(allowedDtos, aliases, contentTypeDto, ref allowedDtoIxLocal);
+                allowedDtoIx += allowedDtoIxLocal;
 
                 contentType.AllowedContentTypes = allowedContentTypes;
+
+                contentTypes.Add(contentType.Id, contentType);
             }
 
             MapTemplates(contentTypes);
@@ -148,6 +118,113 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return contentTypes.Values;
         }
+
+        private async Task<IEnumerable<IContentTypeComposition>?> GetAllTypesInternalAsync()
+        {
+            var contentTypes = new Dictionary<int, IContentTypeComposition>();
+            // get content types
+            Sql<ISqlContext>? allContentTypesSql = GetContentTypesSql();
+
+            List<ContentTypeDto>? contentTypeDtos = Database != null ? await Database.FetchAsync<ContentTypeDto>(allContentTypesSql) : null;
+            // get allowed content types
+            Sql<ISqlContext>? allowedContentTypesSql = GetAllowedContentTypesSql();
+
+            List<ContentTypeAllowedContentTypeDto>? allowedDtos = Database != null ? await Database.FetchAsync<ContentTypeAllowedContentTypeDto>(allowedContentTypesSql) : null;
+
+            if (contentTypeDtos is null)
+            {
+                return contentTypes.Values;
+            }
+            // prepare
+            // note: same alias could be used for media, content... but always different ids = ok
+            var aliases = Enumerable.ToDictionary(contentTypeDtos, x => x.NodeId, x => x.Alias);
+
+            // create
+            var allowedDtoIx = 0;
+            foreach (ContentTypeDto contentTypeDto in contentTypeDtos)
+            {
+                // create content type
+                IContentTypeComposition contentType;
+                contentType = MapNodeTypeToContentType(contentTypeDto);
+
+                // map allowed content types
+                var allowedDtoIxLocal = allowedDtoIx; // Seems odd
+                List<ContentTypeSort> allowedContentTypes = MapAllowedContentTypes(allowedDtos, aliases, contentTypeDto, ref allowedDtoIxLocal);
+                allowedDtoIx += allowedDtoIxLocal;
+
+                contentType.AllowedContentTypes = allowedContentTypes;
+
+                contentTypes.Add(contentType.Id, contentType);
+            }
+
+            MapTemplates(contentTypes);
+            MapComposition(contentTypes);
+            MapGroupsAndProperties(contentTypes);
+            MapHistoryCleanup(contentTypes);
+
+            // finalize
+            foreach (IContentTypeComposition contentType in contentTypes.Values)
+            {
+                contentType.ResetDirtyProperties(false);
+            }
+
+            return contentTypes.Values;
+        }
+
+        private IContentTypeComposition MapNodeTypeToContentType(ContentTypeDto contentTypeDto)
+        {
+            IContentTypeComposition contentType;
+            if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MediaType)
+            {
+                contentType = ContentTypeFactory.BuildMediaTypeEntity(_shortStringHelper, contentTypeDto);
+            }
+            else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.DocumentType)
+            {
+                contentType = ContentTypeFactory.BuildContentTypeEntity(_shortStringHelper, contentTypeDto);
+            }
+            else if (contentTypeDto.NodeDto.NodeObjectType == Constants.ObjectTypes.MemberType)
+            {
+                contentType = ContentTypeFactory.BuildMemberTypeEntity(_shortStringHelper, contentTypeDto);
+            }
+            else
+            {
+                throw new PanicException(
+                    $"The node object type {contentTypeDto.NodeDto.NodeObjectType} is not supported");
+            }
+
+            return contentType;
+        }
+
+        private static List<ContentTypeSort> MapAllowedContentTypes(List<ContentTypeAllowedContentTypeDto>? allowedDtos, Dictionary<int, string?> aliases, ContentTypeDto contentTypeDto, ref int allowedDtoIxLocal)
+        {
+            var allowedContentTypes = new List<ContentTypeSort>();
+            while (allowedDtoIxLocal < allowedDtos?.Count && allowedDtos[allowedDtoIxLocal].Id == contentTypeDto.NodeId)
+            {
+                ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIxLocal];
+                if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
+                {
+                    continue;
+                }
+
+                allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
+                    allowedDto.SortOrder, alias!));
+                allowedDtoIxLocal++;
+            }
+
+            return allowedContentTypes;
+        }
+
+        private Sql<ISqlContext>? GetAllowedContentTypesSql() =>
+                    Sql()?
+                        .Select<ContentTypeAllowedContentTypeDto>()
+                        .From<ContentTypeAllowedContentTypeDto>()
+                        .OrderBy<ContentTypeAllowedContentTypeDto>(x => x.Id);
+        private Sql<ISqlContext>? GetContentTypesSql() =>
+                    Sql()?
+                        .Select<ContentTypeDto>(r => r.Select(x => x.NodeDto))
+                        .From<ContentTypeDto>()
+                        .InnerJoin<NodeDto>().On<ContentTypeDto, NodeDto>((ct, n) => ct.NodeId == n.NodeId)
+                        .OrderBy<ContentTypeDto>(x => x.NodeId);
 
         private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
         {

@@ -50,6 +50,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IContentType? PerformGet(Guid id)
             => GetMany()?.FirstOrDefault(x => x.Key == id);
 
+        protected override async Task<IContentType?> PerformGetAsync(Guid id)
+           => GetMany()?.FirstOrDefault(x => x.Key == id);
+
         protected override IContentType? PerformGet(string alias)
             => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
@@ -60,6 +63,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         => Task.FromResult(GetMany()?.FirstOrDefault(x => x.Key == id) != null);
 
         protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy()
+        {
+            return CommonRepository.GetAllTypes()?.OfType<IContentType>();
+        }
+        protected override async Task<IEnumerable<IContentType>?> GetAllWithFullCachePolicyAsync()
         {
             return CommonRepository.GetAllTypes()?.OfType<IContentType>();
         }

@@ -140,9 +140,48 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             => CachePolicy.Get(id, PerformGet, PerformGetAll);
 
         /// <summary>
+        ///     Gets an entity by the passed in Id utilizing the repository's cache policy
+        /// </summary>
+        public async Task<TEntity?> GetAsync(TId? id)
+            => CachePolicy.Get(id, PerformGet, PerformGetAll);
+
+        /// <summary>
         ///     Gets all entities of type TEntity or a list according to the passed in Ids
         /// </summary>
         public IEnumerable<TEntity> GetMany(params TId[]? ids)
+        {
+            // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
+            ids = ids?.Distinct()
+
+                // don't query by anything that is a default of T (like a zero)
+                // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
+                // .Where(x => Equals(x, default(TId)) == false)
+                .ToArray();
+
+            // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
+            // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
+            if (ids?.Length <= Constants.Sql.MaxParameterCount)
+            {
+                return CachePolicy.GetAll(ids, PerformGetAll) ?? Enumerable.Empty<TEntity>();
+            }
+
+            var entities = new List<TEntity>();
+            foreach (IEnumerable<TId> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                var groups = CachePolicy.GetAll(group.ToArray(), PerformGetAll);
+                if (groups is not null)
+                {
+                    entities.AddRange(groups);
+                }
+            }
+
+            return entities;
+        }
+
+        /// <summary>
+        ///     Gets all entities of type TEntity or a list according to the passed in Ids
+        /// </summary>
+        public async Task<IEnumerable<TEntity>> GetManyAsync(params TId[]? ids)
         {
             // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
             ids = ids?.Distinct()
@@ -216,6 +255,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected abstract TEntity? PerformGet(TId? id);
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[]? ids);
+        protected abstract Task<IEnumerable<TEntity>> PerformGetAllAsync(params TId[]? ids);
 
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
 
