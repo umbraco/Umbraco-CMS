@@ -1,3 +1,5 @@
+﻿using System.Collections.Generic;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
@@ -16,7 +18,12 @@ public class CreateTableExpression : MigrationExpressionBase
 
     protected override string GetSql()
     {
-        var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns };
+        var foreignKeys = Expressions
+                .OfType<CreateForeignKeyExpression>()
+                .Select(x => x.ForeignKey)
+                .ToList();
+
+            var table = new TableDefinition { Name = TableName, SchemaName = SchemaName, Columns = Columns, ForeignKeys = foreignKeys };
 
         return string.Format(SqlSyntax.Format(table));
     }
