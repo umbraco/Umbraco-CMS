@@ -95,14 +95,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 IContentTypeComposition contentType;
                 contentType = MapNodeTypeToContentType(contentTypeDto);
 
+                contentTypes.Add(contentType.Id, contentType);
                 // map allowed content types
-                var allowedDtoIxLocal = allowedDtoIx; // Seems odd
-                List<ContentTypeSort> allowedContentTypes = MapAllowedContentTypes(allowedDtos, aliases, contentTypeDto, ref allowedDtoIxLocal);
-                allowedDtoIx += allowedDtoIxLocal;
+                var allowedContentTypes = new List<ContentTypeSort>();
+                while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
+                {
+                    ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
+                    if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
+                    {
+                        continue;
+                    }
+
+                    allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
+                        allowedDto.SortOrder, alias!));
+                    allowedDtoIx++;
+                }
 
                 contentType.AllowedContentTypes = allowedContentTypes;
 
-                contentTypes.Add(contentType.Id, contentType);
             }
 
             MapTemplates(contentTypes);
@@ -147,14 +157,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 IContentTypeComposition contentType;
                 contentType = MapNodeTypeToContentType(contentTypeDto);
 
+                contentTypes.Add(contentType.Id, contentType);
                 // map allowed content types
-                var allowedDtoIxLocal = allowedDtoIx; // Seems odd
-                List<ContentTypeSort> allowedContentTypes = MapAllowedContentTypes(allowedDtos, aliases, contentTypeDto, ref allowedDtoIxLocal);
-                allowedDtoIx += allowedDtoIxLocal;
+                var allowedContentTypes = new List<ContentTypeSort>();
+                while (allowedDtoIx < allowedDtos?.Count && allowedDtos[allowedDtoIx].Id == contentTypeDto.NodeId)
+                {
+                    ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIx];
+                    if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
+                    {
+                        continue;
+                    }
+
+                    allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
+                        allowedDto.SortOrder, alias!));
+                    allowedDtoIx++;
+                }
 
                 contentType.AllowedContentTypes = allowedContentTypes;
 
-                contentTypes.Add(contentType.Id, contentType);
             }
 
             MapTemplates(contentTypes);
@@ -195,24 +215,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return contentType;
         }
 
-        private static List<ContentTypeSort> MapAllowedContentTypes(List<ContentTypeAllowedContentTypeDto>? allowedDtos, Dictionary<int, string?> aliases, ContentTypeDto contentTypeDto, ref int allowedDtoIxLocal)
-        {
-            var allowedContentTypes = new List<ContentTypeSort>();
-            while (allowedDtoIxLocal < allowedDtos?.Count && allowedDtos[allowedDtoIxLocal].Id == contentTypeDto.NodeId)
-            {
-                ContentTypeAllowedContentTypeDto allowedDto = allowedDtos[allowedDtoIxLocal];
-                if (!aliases.TryGetValue(allowedDto.AllowedId, out var alias))
-                {
-                    continue;
-                }
-
-                allowedContentTypes.Add(new ContentTypeSort(new Lazy<int>(() => allowedDto.AllowedId),
-                    allowedDto.SortOrder, alias!));
-                allowedDtoIxLocal++;
-            }
-
-            return allowedContentTypes;
-        }
 
         private Sql<ISqlContext>? GetAllowedContentTypesSql() =>
                     Sql()?
