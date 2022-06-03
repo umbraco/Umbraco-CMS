@@ -1,13 +1,13 @@
-import { Subscription, map } from 'rxjs';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { isPathActive, path } from 'router-slot';
+import { map, Subscription } from 'rxjs';
 
 import { getUserSections } from '../core/api/fetcher';
-import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestSection } from '../core/extension';
 import { UmbContextConsumerMixin } from '../core/context';
+import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
@@ -95,16 +95,11 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     const { data } = await getUserSections({});
     this._allowedSection = data.sections;
 
-    this._sectionSubscription = this._extensionRegistry?.extensions
-      .pipe(
-        map((extensions: Array<UmbExtensionManifest>) =>
-          extensions
-            .filter((extension) => extension.type === 'section')
-            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
-        )
-      )
-      .subscribe((sections: Array<any>) => {
-        this._sections = sections.filter((section: any) => this._allowedSection.includes(section.alias));
+    this._sectionSubscription = this._extensionRegistry
+      ?.extensionsOfType('section')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
+      .subscribe((sections) => {
+        this._sections = sections.filter((section) => this._allowedSection.includes(section.alias));
         this._visibleSections = this._sections;
       });
   }

@@ -1,11 +1,12 @@
-import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
+import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbNodeStore } from '../../../core/stores/node.store';
 import { Subscription } from 'rxjs';
-import { DocumentNode } from '../../../mocks/data/content.data';
+
+import { UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/service/notifications.store';
+import { UmbNodeStore } from '../../../core/stores/node.store';
+import { DocumentNode } from '../../../mocks/data/content.data';
 
 @customElement('umb-content-editor')
 export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {

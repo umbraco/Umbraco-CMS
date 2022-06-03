@@ -1,19 +1,18 @@
+import '../section/section-sidebar.element';
+import './backoffice-header.element';
+import './backoffice-main.element';
+
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
-
-import './backoffice-header.element';
-import '../section/section-sidebar.element';
-import './backoffice-main.element';
-
-import { UUIToastNotificationContainerElement } from '@umbraco-ui/uui';
-import { UmbContextProviderMixin } from '../core/context';
-import { UmbNodeStore } from '../core/stores/node.store';
-import { UmbDataTypeStore } from '../core/stores/data-type.store';
-import { UmbNotificationService } from '../core/service/notifications.store';
-import { Subscription } from 'rxjs';
 import { state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+import { Subscription } from 'rxjs';
+
+import { UmbContextProviderMixin } from '../core/context';
+import { UmbNotificationService } from '../core/service/notifications.store';
+import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbNodeStore } from '../core/stores/node.store';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
@@ -32,11 +31,11 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
 
       #notifications {
         position: absolute;
-        top:0;
-        left:0;
-        right:0;
+        top: 0;
+        left: 0;
+        right: 0;
         bottom: 70px;
-        height:auto;
+        height: auto;
         padding: var(--uui-size-layout-1);
       }
     `,
@@ -46,7 +45,7 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
   private _notificationSubscribtion?: Subscription;
 
   @state()
-  private _notifications:any[] = [];
+  private _notifications: any[] = [];
 
   constructor() {
     super();
@@ -58,37 +57,34 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
     this.provideContext('umbNotificationService', this._notificationService);
   }
 
-  protected firstUpdated(
-    _changedProperties: Map<string | number | symbol, unknown>
-  ): void {
+  protected firstUpdated(_changedProperties: Map<string | number | symbol, unknown>): void {
     super.firstUpdated(_changedProperties);
 
-    this._notificationSubscribtion = this._notificationService.notifications
-    .subscribe((notifications: Array<any>) => {
+    this._notificationSubscribtion = this._notificationService.notifications.subscribe((notifications: Array<any>) => {
       this._notifications = notifications;
     });
 
     // TODO: listen to close event and remove notification from store.
   }
 
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+
+    this._notificationSubscribtion?.unsubscribe();
+  }
+
   render() {
     return html`
       <umb-backoffice-header></umb-backoffice-header>
       <umb-backoffice-main></umb-backoffice-main>
-      <uui-toast-notification-container
-        auto-close="7000"
-        bottom-up
-        id="notifications">
-        ${
-          repeat(
-            this._notifications,
-            (notification: any) => notification.key,
-            notification => html`<uui-toast-notification color='positive'>
-            <uui-toast-notification-layout .headline=${notification.headline}>
-            </uui-toast-notification-layout>
+      <uui-toast-notification-container auto-close="7000" bottom-up id="notifications">
+        ${repeat(
+          this._notifications,
+          (notification) => notification.key,
+          (notification) => html`<uui-toast-notification color="positive">
+            <uui-toast-notification-layout .headline=${notification.headline}> </uui-toast-notification-layout>
           </uui-toast-notification>`
-          )
-        }
+        )}
       </uui-toast-notification-container>
     `;
   }

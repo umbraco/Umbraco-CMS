@@ -5,12 +5,7 @@ import { IRoutingInfo } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../core/context';
-import {
-  UmbExtensionManifestDashboard,
-  UmbExtensionManifest,
-  UmbExtensionRegistry,
-  createExtensionElement,
-} from '../core/extension';
+import { createExtensionElement, UmbExtensionManifestDashboard, UmbExtensionRegistry } from '../core/extension';
 
 @customElement('umb-section-dashboards')
 export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
@@ -60,23 +55,18 @@ export class UmbSectionDashboards extends UmbContextConsumerMixin(LitElement) {
   private _useDashboards() {
     this._dashboardsSubscription?.unsubscribe();
 
-    this._dashboardsSubscription = this._extensionRegistry?.extensions
-      .pipe(
-        map((extensions: Array<UmbExtensionManifest>) =>
-          extensions
-            .filter((extension) => extension.type === 'dashboard')
-            .sort((a: any, b: any) => b.meta.weight - a.meta.weight)
-        )
-      )
-      .subscribe((dashboards: Array<UmbExtensionManifest>) => {
-        this._dashboards = dashboards as Array<UmbExtensionManifestDashboard>;
+    this._dashboardsSubscription = this._extensionRegistry
+      ?.extensionsOfType('dashboard')
+      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
+      .subscribe((dashboards) => {
+        this._dashboards = dashboards;
         this._routes = [];
 
         this._routes = this._dashboards.map((dashboard) => {
           return {
             path: `${dashboard.meta.pathname}`,
             component: () => createExtensionElement(dashboard),
-            setup: (element: UmbExtensionManifestDashboard, info: IRoutingInfo) => {
+            setup: (_element: UmbExtensionManifestDashboard, info: IRoutingInfo) => {
               this._current = info.match.route.path;
             },
           };

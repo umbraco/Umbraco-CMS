@@ -1,12 +1,11 @@
+import { HTMLElementConstructor } from '../models';
 import { UmbContextProvider } from './context-provider';
-
-type Constructor<T = HTMLElement> = new (...args: any[]) => T;
 
 export declare class UmbContextProviderMixinInterface {
   provideContext(alias: string, instance: unknown): void;
 }
 
-export const UmbContextProviderMixin = <T extends Constructor>(superClass: T) => {
+export const UmbContextProviderMixin = <T extends HTMLElementConstructor>(superClass: T) => {
   class UmbContextProviderClass extends superClass {
     _providers: Map<string, UmbContextProvider> = new Map();
 
@@ -39,7 +38,7 @@ export const UmbContextProviderMixin = <T extends Constructor>(superClass: T) =>
     }
   }
 
-  return UmbContextProviderClass as unknown as Constructor<UmbContextProviderMixinInterface> & T;
+  return UmbContextProviderClass as unknown as HTMLElementConstructor<UmbContextProviderMixinInterface> & T;
 };
 
 declare global {
