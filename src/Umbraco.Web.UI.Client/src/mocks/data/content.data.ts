@@ -104,7 +104,7 @@ export const data: Array<DocumentNode> = [
       },
       {
         alias: 'myExternalEditor',
-        label: 'External label',
+        label: 'My JS Property Editor',
         description: 'This is the a external property',
         dataTypeKey: 'dt-3',
         tempValue: 'Tex lkasdfkljdfsa 1',

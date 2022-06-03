@@ -11,11 +11,21 @@ export const handlers = [
           {
             type: 'section',
             alias: 'My.Section.Custom',
-            name: 'Custom',
-            elementName: 'umb-custom-section',
+            name: 'Custom Section',
+            js: '/APP_PLUGINS/section.js',
             meta: {
               pathname: 'my-custom',
               weight: 1,
+            },
+          },
+          {
+            type: 'propertyEditorUI',
+            alias: 'My.PropertyEditorUI.Custom',
+            name: 'My Custom Property Editor UI',
+            js: '/APP_PLUGINS/property-editor.js',
+            meta: {
+              icon: 'document',
+              group: 'common',
             },
           },
         ],

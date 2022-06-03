@@ -22,8 +22,8 @@ export class UmbDataTypeStore {
       {
         id: 1246,
         key: 'dt-3',
-        name: 'External Test (DataType)',
-        propertyEditorUIAlias: 'External.PropertyEditorUI.Test',
+        name: 'My JS Property Editor (DataType)',
+        propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
       },
       {
         id: 1247,
