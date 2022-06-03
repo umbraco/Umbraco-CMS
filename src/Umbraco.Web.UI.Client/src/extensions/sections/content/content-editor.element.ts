@@ -10,6 +10,7 @@ import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegis
 import { IRoutingInfo } from 'router-slot';
 
 // Lazy load
+// TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import './editor-views/content-edit-editor-view.element';
 import './editor-views/content-info-editor-view.element';
 
