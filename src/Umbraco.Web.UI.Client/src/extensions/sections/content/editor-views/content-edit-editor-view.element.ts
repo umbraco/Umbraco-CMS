@@ -6,7 +6,13 @@ import { customElement, property } from 'lit/decorators.js';
 export class UmbContentEditEditorView extends LitElement {
   static styles = [
     UUITextStyles,
-    css``,
+    css`
+      hr {
+        border: 0;
+        /* TODO: Use correct color property */
+        border-top: 1px solid #e7e7e7;
+      }
+    `,
   ];
 
   @property()

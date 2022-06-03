@@ -43,12 +43,6 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
       uui-box hr {
         margin-bottom: var(--uui-size-6);
       }
-
-      hr {
-        border: 0;
-        /* TODO: Use correct color property */
-        border-top: 1px solid #e7e7e7;
-      }
     `,
   ];
 
