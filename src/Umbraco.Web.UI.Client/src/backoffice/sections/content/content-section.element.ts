@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo } from 'router-slot';
 
-import './content-tree.element';
+import './content-section-tree.element';
 
 @customElement('umb-content-section')
 export class UmbContentSection extends LitElement {
@@ -48,7 +48,7 @@ export class UmbContentSection extends LitElement {
   render() {
     return html`
       <umb-section-sidebar>
-        <umb-content-tree .currentNodeId="${this._currentNodeId}"></umb-content-tree>
+        <umb-content-section-tree .currentNodeId="${this._currentNodeId}"></umb-content-section-tree>
       </umb-section-sidebar>
       <router-slot id="router-slot" .routes="${this._routes}"></router-slot>
     `;

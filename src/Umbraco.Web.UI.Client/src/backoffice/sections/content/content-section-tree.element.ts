@@ -3,8 +3,8 @@ import { customElement, state, property } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { data } from '../../../mocks/data/content.data';
 
-@customElement('umb-content-tree')
-class UmbContentTree extends LitElement {
+@customElement('umb-content-section-tree')
+class UmbContentSectionTree extends LitElement {
   static styles = [
     UUITextStyles,
     css`
@@ -48,6 +48,6 @@ class UmbContentTree extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-content-tree': UmbContentTree;
+    'umb-content-section-tree': UmbContentSectionTree;
   }
 }
