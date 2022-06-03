@@ -73,16 +73,13 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     this._open = !this._open;
   }
 
-  private _handleTabClick(e: PointerEvent, section: UmbExtensionManifestSection) {
+  private _handleTabClick(e: PointerEvent) {
     const tab = e.currentTarget as HTMLElement;
 
     // TODO: we need to be able to prevent the tab from setting the active state
     if (tab.id === 'moreTab') {
       return;
     }
-
-    // TODO: this could maybe be handled by an anchor tag
-    history.pushState(null, '', `/section/${section.meta.pathname}`);
   }
 
   private _handleLabelClick() {
@@ -121,11 +118,11 @@ export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElem
     return html`
       <uui-tab-group id="tabs">
         ${this._visibleSections.map(
-          (section: any) => html`
+          (section: UmbExtensionManifestSection) => html`
             <uui-tab
               ?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
-              label="${section.name}"
-              @click="${(e: PointerEvent) => this._handleTabClick(e, section)}"></uui-tab>
+              href="${`/section/${section.meta.pathname}`}"
+              label="${section.name}"></uui-tab>
           `
         )}
         ${this._renderExtraSections()}
