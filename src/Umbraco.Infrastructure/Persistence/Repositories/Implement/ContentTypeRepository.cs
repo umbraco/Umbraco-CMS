@@ -56,6 +56,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override bool PerformExists(Guid id)
         => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
 
+        protected override Task<bool> PerformExistsAsync(Guid id)
+        => Task.FromResult(GetMany()?.FirstOrDefault(x => x.Key == id) != null);
+
         protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy()
         {
             return CommonRepository.GetAllTypes()?.OfType<IContentType>();

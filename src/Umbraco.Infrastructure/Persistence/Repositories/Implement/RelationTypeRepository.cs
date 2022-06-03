@@ -49,6 +49,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             return Get(id) != null;
         }
+        public Task<bool> ExistsAsync(Guid id)
+        {
+            return Task.FromResult(Get(id) != null);
+        }
 
         protected override IEnumerable<IRelationType> PerformGetAll(params int[]? ids)
         {

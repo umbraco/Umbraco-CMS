@@ -53,6 +53,8 @@ namespace Umbraco.Cms.Core.Cache
 
         /// <inheritdoc />
         public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll);
+        /// <inheritdoc />
+        public abstract Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExistsAsync, Func<TId[], IEnumerable<TEntity>?> performGetAll);
 
         /// <inheritdoc />
         public abstract void Create(TEntity entity, Action<TEntity> persistNew);

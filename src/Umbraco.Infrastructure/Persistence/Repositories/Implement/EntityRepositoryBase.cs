@@ -190,6 +190,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             => CachePolicy.Exists(id, PerformExists, PerformGetAll);
 
         /// <summary>
+        ///     Returns a boolean indicating whether an entity with the passed Id exists
+        /// </summary>
+        public async Task<bool> ExistsAsync(TId id)
+            => await CachePolicy.ExistsAsync(id, PerformExistsAsync, PerformGetAll);
+
+        /// <summary>
         ///     Returns an integer with the count of entities found with the passed in query
         /// </summary>
         public int Count(IQuery<TEntity> query)
@@ -226,9 +232,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected virtual bool PerformExists(TId id)
         {
+            Sql<ISqlContext> sql = ExistsSql(id);
+            var count = Database.ExecuteScalar<int>(sql);
+            return count == 1;
+        }
+
+        private Sql<ISqlContext> ExistsSql(TId id)
+        {
             Sql<ISqlContext> sql = GetBaseQuery(true);
             sql.Where(GetBaseWhereClause(), new { id });
-            var count = Database.ExecuteScalar<int>(sql);
+            return sql;
+        }
+
+        protected virtual async Task<bool> PerformExistsAsync(TId id)
+        {
+            Sql<ISqlContext> sql = ExistsSql(id);
+            var count = await Database.ExecuteScalarAsync<int>(sql);
             return count == 1;
         }
 

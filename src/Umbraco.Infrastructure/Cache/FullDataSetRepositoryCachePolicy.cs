@@ -151,6 +151,14 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExistsAsync, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+        {
+            // get all as one set, then look for the entity
+            var all = GetAllCached(performGetAll);
+            return Task.FromResult(all.Any(x => _entityGetId(x)?.Equals(id) ?? false));
+        }
+
+        /// <inheritdoc />
         public override TEntity[] GetAll(TId[]? ids, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             // get all as one set, from cache if possible, else repo

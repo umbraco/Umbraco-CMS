@@ -1009,6 +1009,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             return _contentByGuidReadRepository.Exists(id);
         }
+        public async Task<bool> ExistsAsync(Guid id)
+        {
+            return await _contentByGuidReadRepository.ExistsAsync(id);
+        }
 
         // reading repository purely for looking up by GUID
         // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!

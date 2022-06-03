@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -253,6 +254,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
             ids.Any() ? Store.Where(x => ids.Contains(x.Id)) : Store;
 
         public bool Exists(int id) => Get(id) is not null;
+        public Task<bool> ExistsAsync(int id) => Task.FromResult(Get(id) is not null);
 
         public void Save(ILogViewerQuery entity)
         {

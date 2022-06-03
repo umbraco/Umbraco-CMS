@@ -18,6 +18,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 
 using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+using System.Threading.Tasks;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -404,6 +405,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 bool exists = DataTypeRepository.Exists(1046); // Content picker
                 bool doesntExist = DataTypeRepository.Exists(-80);
+
+                // Assert
+                Assert.That(exists, Is.True);
+                Assert.That(doesntExist, Is.False);
+            }
+        }
+
+        [Test]
+        public async Task Can_Perform_Async_Exists_On_DataTypeDefinitionRepository()
+        {
+            using (ScopeProvider.CreateScope())
+            {
+                // Act
+                bool exists = await DataTypeRepository.ExistsAsync(1046); // Content picker
+                bool doesntExist = await DataTypeRepository.ExistsAsync(-80);
 
                 // Assert
                 Assert.That(exists, Is.True);

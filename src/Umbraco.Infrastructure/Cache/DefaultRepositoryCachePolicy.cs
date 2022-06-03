@@ -203,6 +203,15 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExistsAsync, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+        {
+            // if found in cache the return else check
+            var cacheKey = GetEntityCacheKey(id);
+            var fromCache = Cache.GetCacheItem<TEntity>(cacheKey);
+            return fromCache != null || await performExistsAsync(id);
+        }
+
+        /// <inheritdoc />
         public override TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll)
         {
             if (ids?.Length > 0)

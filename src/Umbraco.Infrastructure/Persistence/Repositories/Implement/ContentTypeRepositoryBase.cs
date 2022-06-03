@@ -1379,6 +1379,7 @@ AND umbracoNode.id <> @id",
         protected abstract TEntity? PerformGet(string alias);
         protected abstract IEnumerable<TEntity>? PerformGetAll(params Guid[]? ids);
         protected abstract bool PerformExists(Guid id);
+        protected abstract Task<bool> PerformExistsAsync(Guid id);
 
         /// <summary>
         /// Gets an Entity by alias
@@ -1421,6 +1422,15 @@ AND umbracoNode.id <> @id",
         public bool Exists(Guid id)
         {
             return PerformExists(id);
+        }
+        /// <summary>
+        /// Boolean indicating whether an Entity with the specified Id exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> ExistsAsync(Guid id)
+        {
+            return await PerformExistsAsync(id);
         }
 
         public string GetUniqueAlias(string alias)

@@ -36,6 +36,16 @@ namespace Umbraco.Cms.Core.Cache
         bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll);
 
         /// <summary>
+        /// Gets a value indicating whether an entity with a specified identifier exists.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="performExists">The repository PerformExists method.</param>
+        /// <param name="performGetAll">The repository PerformGetAll method.</param>
+        /// <returns>A value indicating whether an entity with the specified identifier exists.</returns>
+        /// <remarks>First considers the cache then the repository.</remarks>
+        Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExistsAsync, Func<TId[], IEnumerable<TEntity>?> performGetAll);
+
+        /// <summary>
         /// Creates an entity.
         /// </summary>
         /// <param name="entity">The entity.</param>

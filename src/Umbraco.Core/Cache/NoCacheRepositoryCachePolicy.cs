@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.Entities;
@@ -25,6 +25,10 @@ namespace Umbraco.Cms.Core.Cache
         public bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll)
         {
             return performExists(id);
+        }
+        public async Task<bool> ExistsAsync(TId id, Func<TId, Task<bool>> performExistsAsync, Func<TId[], IEnumerable<TEntity>?> performGetAll)
+        {
+            return await performExistsAsync(id);
         }
 
         public void Create(TEntity entity, Action<TEntity> persistNew)

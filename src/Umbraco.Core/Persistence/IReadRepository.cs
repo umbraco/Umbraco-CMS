@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Persistence
 {
     /// <summary>
     /// Defines the base implementation of a reading repository.
     /// </summary>
-    public interface IReadRepository<in TId, out TEntity> : IRepository
+    public interface IReadRepository<in TId, TEntity> : IRepository
     {
         /// <summary>
         /// Gets an entity.
@@ -21,5 +21,10 @@ namespace Umbraco.Cms.Core.Persistence
         /// Gets a value indicating whether an entity exists.
         /// </summary>
         bool Exists(TId id);
+
+        /// <summary>
+        /// Gets a value indicating whether an entity exists.
+        /// </summary>
+        Task<bool> ExistsAsync(TId id);
     }
 }

@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public abstract IEnumerable<TEntity> GetMany(params TId[]? ids);
 
         public virtual bool Exists(TId id) => FileSystem?.FileExists(id!.ToString()!) ?? false;
+        public virtual Task<bool> ExistsAsync(TId id) => Task.FromResult(FileSystem?.FileExists(id!.ToString()!) ?? false);
 
         #endregion
 

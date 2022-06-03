@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         public bool Exists(int id) => false;
+        public Task<bool> ExistsAsync(int id) => Task.FromResult(false);
 
         public EntityContainer? Get(Guid id) => null;
 
