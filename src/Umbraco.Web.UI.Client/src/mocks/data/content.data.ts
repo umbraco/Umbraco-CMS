@@ -26,6 +26,13 @@ export interface NodeProperty {
   tempValue: string; // TODO: remove this - only used for testing
 }
 
+/* TODO:
+Consider splitting data into smaller thunks that matches our different stores.
+example: we need an entity store for things in the tree, so we dont load the full nodes for everything in the tree.
+We would like the tree items to stay up to date, without requesting the server again.
+
+If we split entityData into its own object, then that could go in the entityStore and be merged with the nodeStore (we would have a subscription on both).
+*/
 export const data: Array<DocumentNode> = [
   {
     id: 1,
@@ -50,7 +57,7 @@ export const data: Array<DocumentNode> = [
       },
     ],
     /*
-    // Concept for stored values, better approach for variants, separating data from structure/configuration
+    // Concept for stored values, better approach for variants, separating data from structure/configuration, still needs structure for variants. (We could actually split it up so we have each variants data through a separate end-point?)
     data: [
       {
         alias: 'myHeadline',
