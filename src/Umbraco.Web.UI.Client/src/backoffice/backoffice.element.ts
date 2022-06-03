@@ -1,7 +1,3 @@
-import './components/section-sidebar.element';
-import './components/backoffice-header.element';
-import './components/backoffice-main.element';
-
 import { defineElement } from '@umbraco-ui/uui-base/lib/registration';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
@@ -13,6 +9,13 @@ import { UmbContextProviderMixin } from '../core/context';
 import { UmbNotificationService } from '../core/service/notifications.store';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
+
+import './components/editor-layout.element';
+import './components/editor-property-layout.element';
+import './components/node-property.element';
+import './components/section-sidebar.element';
+import './components/backoffice-header.element';
+import './components/backoffice-main.element';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
