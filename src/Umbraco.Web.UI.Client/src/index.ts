@@ -1,5 +1,5 @@
 import 'element-internals-polyfill';
-import { worker } from './mocks/browser';
+import { startMockServiceWorker } from './mocks/browser';
 import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestCore } from './core/extension';
 
 const extensionRegistry = new UmbExtensionRegistry();
@@ -153,14 +153,5 @@ const setup = async () => {
   await import('./app');
 };
 
-worker.start({
-  onUnhandledRequest: (req) => {
-    if (req.url.pathname.startsWith('/node_modules/')) return;
-    if (req.url.pathname.startsWith('/src/')) return;
-    if (req.destination === 'image') return;
-
-    console.warn('Found an unhandled %s request to %s', req.method, req.url.href);
-  },
-});
-
+startMockServiceWorker();
 setup();
