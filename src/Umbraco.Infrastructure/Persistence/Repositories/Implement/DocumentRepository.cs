@@ -112,12 +112,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IContent> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+        }
+        protected override async Task<IEnumerable<IContent>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(await Database.FetchAsync<DocumentDto>(sql));
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(QueryType.Many);
 
             if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
-
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            return sql;
         }
 
         protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
@@ -999,6 +1011,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             return _contentByGuidReadRepository.Get(id);
         }
+        public async Task<IContent?> GetAsync(Guid id)
+        {
+            return await _contentByGuidReadRepository.GetAsync(id);
+        }
 
         IEnumerable<IContent> IReadRepository<Guid, IContent>.GetMany(params Guid[]? ids)
         {
@@ -1044,11 +1060,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             protected override IEnumerable<IContent> PerformGetAll(params Guid[]? ids)
             {
+                Sql<ISqlContext> sql = GetAllSql(ids);
+
+                return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+            }
+            protected override async Task<IEnumerable<IContent>> PerformGetAllAsync(params Guid[]? ids)
+            {
+                Sql<ISqlContext> sql = GetAllSql(ids);
+
+                return _outerRepo.MapDtosToContent(await Database.FetchAsync<DocumentDto>(sql));
+            }
+
+            private Sql<ISqlContext> GetAllSql(Guid[]? ids)
+            {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Many);
                 if (ids?.Length > 0)
                     sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
-
-                return _outerRepo.MapDtosToContent(Database.Fetch<DocumentDto>(sql));
+                return sql;
             }
 
             protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
