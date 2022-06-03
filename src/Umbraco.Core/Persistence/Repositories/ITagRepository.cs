@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
+    public interface ITagRepository : IAsyncReadWriteQueryRepository<int, ITag>
     {
         #region Assign and Remove Tags
 

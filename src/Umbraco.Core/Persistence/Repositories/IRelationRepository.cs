@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
+    public interface IRelationRepository : IAsyncReadWriteQueryRepository<int, IRelation>
     {
         IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering);
 

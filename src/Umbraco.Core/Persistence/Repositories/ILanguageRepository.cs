@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
+    public interface ILanguageRepository : IAsyncReadWriteQueryRepository<int, ILanguage>
     {
         ILanguage? GetByIsoCode(string isoCode);
 

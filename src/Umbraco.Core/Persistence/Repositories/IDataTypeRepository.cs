@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IDataTypeRepository : IReadWriteQueryRepository<int, IDataType>
+    public interface IDataTypeRepository : IAsyncReadWriteQueryRepository<int, IDataType>
     {
         IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container);
 

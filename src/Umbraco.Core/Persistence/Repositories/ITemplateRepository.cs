@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository
+    public interface ITemplateRepository : IAsyncReadWriteQueryRepository<int, ITemplate>, IFileRepository
     {
         ITemplate? Get(string? alias);
 

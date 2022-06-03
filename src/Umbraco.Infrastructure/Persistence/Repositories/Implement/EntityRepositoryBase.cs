@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     /// <typeparam name="TId">The type of the entity's unique identifier.</typeparam>
     /// <typeparam name="TEntity">The type of the entity managed by this repository.</typeparam>
-    public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteQueryRepository<TId, TEntity>
+    public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IAsyncReadWriteQueryRepository<TId, TEntity>
         where TEntity : class, IEntity
     {
         private static RepositoryCachePolicyOptions? s_defaultOptions;

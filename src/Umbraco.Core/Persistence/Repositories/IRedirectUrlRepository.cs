@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     /// <summary>
     /// Defines the <see cref="IRedirectUrl"/> repository.
     /// </summary>
-    public interface IRedirectUrlRepository : IReadWriteQueryRepository<Guid, IRedirectUrl>
+    public interface IRedirectUrlRepository : IAsyncReadWriteQueryRepository<Guid, IRedirectUrl>
     {
         /// <summary>
         /// Gets a redirect URL.

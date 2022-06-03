@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface ILogViewerQueryRepository : IReadWriteQueryRepository<int, ILogViewerQuery>
+    public interface ILogViewerQueryRepository : IAsyncReadWriteQueryRepository<int, ILogViewerQuery>
     {
         ILogViewerQuery? GetByName(string name);
     }

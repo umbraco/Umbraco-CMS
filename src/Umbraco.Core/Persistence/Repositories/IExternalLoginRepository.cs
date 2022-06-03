@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Security;
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
 
-    public interface IExternalLoginRepository : IReadWriteQueryRepository<int, IIdentityUserLogin>, IQueryRepository<IIdentityUserToken>
+    public interface IExternalLoginRepository : IAsyncReadWriteQueryRepository<int, IIdentityUserLogin>, IQueryRepository<IIdentityUserToken>
     {
 
         /// <summary>

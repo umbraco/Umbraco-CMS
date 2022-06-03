@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IDictionaryRepository : IReadWriteQueryRepository<int, IDictionaryItem>
+    public interface IDictionaryRepository : IAsyncReadWriteQueryRepository<int, IDictionaryItem>
     {
         IDictionaryItem? Get(Guid uniqueId);
         IDictionaryItem? Get(string key);

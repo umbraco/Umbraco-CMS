@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for <see cref="IAuditEntry"/> entities.
     /// </summary>
-    public interface IAuditEntryRepository : IReadWriteQueryRepository<int, IAuditEntry>
+    public interface IAuditEntryRepository : IAsyncReadWriteQueryRepository<int, IAuditEntry>
     {
         /// <summary>
         /// Gets a page of entries.

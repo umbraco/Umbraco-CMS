@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<int, TItem>, IReadRepository<Guid, TItem>
+    public interface IContentTypeRepositoryBase<TItem> : IAsyncReadWriteQueryRepository<int, TItem>, IReadRepository<Guid, TItem>
         where TItem : IContentTypeComposition
     {
         TItem? Get(string alias);

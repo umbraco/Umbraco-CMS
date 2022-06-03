@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IDomainRepository : IReadWriteQueryRepository<int, IDomain>
+    public interface IDomainRepository : IAsyncReadWriteQueryRepository<int, IDomain>
     {
         IDomain? GetByName(string domainName);
         bool Exists(string domainName);

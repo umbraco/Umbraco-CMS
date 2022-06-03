@@ -1,25 +1,18 @@
-using System.Collections.Generic;
-
 namespace Umbraco.Cms.Core.Persistence
 {
     /// <summary>
     /// Defines the base implementation of a reading repository.
     /// </summary>
-    public interface IReadRepository<in TId, out TEntity> : IRepository
+    public interface IAsyncReadRepository<in TId, TEntity> : IReadRepository<TId, TEntity>
     {
         /// <summary>
         /// Gets an entity.
         /// </summary>
-        TEntity? Get(TId? id);
-
-        /// <summary>
-        /// Gets entities.
-        /// </summary>
-        IEnumerable<TEntity> GetMany(params TId[]? ids);
+        Task<TEntity?> GetAsync(TId? id);
 
         /// <summary>
         /// Gets a value indicating whether an entity exists.
         /// </summary>
-        bool Exists(TId id);
+        Task<bool> ExistsAsync(TId id);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.Membership;
@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IUserRepository : IReadWriteQueryRepository<int, IUser>
+    public interface IUserRepository : IAsyncReadWriteQueryRepository<int, IUser>
     {
         /// <summary>
         /// Gets the count of items based on a complex query

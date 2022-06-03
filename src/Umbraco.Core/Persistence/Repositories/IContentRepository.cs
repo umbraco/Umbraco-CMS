@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     /// <summary>
     /// Defines the base implementation of a repository for content items.
     /// </summary>
-    public interface IContentRepository<in TId, TEntity> : IReadWriteQueryRepository<TId, TEntity>
+    public interface IContentRepository<in TId, TEntity> : IAsyncReadWriteQueryRepository<TId, TEntity>
         where TEntity : IUmbracoEntity
     {
         /// <summary>
