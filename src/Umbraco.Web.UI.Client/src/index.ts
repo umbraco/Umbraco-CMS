@@ -88,25 +88,12 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
-      //elementName: 'umb-property-editor-text',
       js: () => import('./backoffice/property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
         group: 'common',
       },
     },
-    /*
-    {
-      type: 'propertyEditorUI',
-      alias: 'External.PropertyEditorUI.Test',
-      name: 'Text',
-      js: () => Promise.resolve(document.createElement('hr')),
-      meta: {
-        icon: 'document',
-        group: 'common',
-      }
-    },
-    */
     {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Textarea',
