@@ -54,6 +54,11 @@ namespace Umbraco.Cms.Core.Cache
         {
             return Get(key, factory, null);
         }
+        /// <inheritdoc />
+        public async Task<object?> GetAsync(string key, Func<object?> factory)
+        {
+            return await GetAsync(key, factory, null);
+        }
 
         /// <inheritdoc />
         public IEnumerable<object> SearchByKey(string keyStartsWith)
@@ -102,6 +107,50 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public async Task<object?> GetAsync(string key, Func<Task<object?>> factoryAsync, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            // see notes in HttpRuntimeAppCache
+
+            AsyncLazy<object?>? result;
+
+            try
+            {
+                _locker.EnterUpgradeableReadLock();
+
+                result = MemoryCache.Get(key) as AsyncLazy<object?>;
+                if (result == null || AsyncSafeLazy.GetAsyncSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
+                    result = AsyncSafeLazy.GetAsyncSafeLazy(factoryAsync);
+                    var policy = GetPolicy(timeout, isSliding, dependentFiles);
+
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
+                }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
+            }
+
+            //return result.Value;
+
+            var value = await result; // will not throw (safe lazy)
+            if (value is AsyncSafeLazy.ExceptionHolder eh)
+                eh.Exception.Throw(); // throw once!
+            return value;
+        }
+
+        /// <inheritdoc />
         public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
         {
             // see notes in HttpRuntimeAppCache
@@ -143,6 +192,49 @@ namespace Umbraco.Cms.Core.Cache
             if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
         }
+        /// <inheritdoc />
+        public Task<object?> GetAsync(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            // see notes in HttpRuntimeAppCache
+
+            Lazy<object?>? result;
+
+            try
+            {
+                _locker.EnterUpgradeableReadLock();
+
+                result = MemoryCache.Get(key) as Lazy<object?>;
+                if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                {
+                    result = SafeLazy.GetSafeLazy(factory);
+                    var policy = GetPolicy(timeout, isSliding, dependentFiles);
+
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
+                }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
+            }
+
+            //return result.Value;
+
+            var value = result.Value; // will not throw (safe lazy)
+            if (value is SafeLazy.ExceptionHolder eh)
+                eh.Exception.Throw(); // throw once!
+            return Task.FromResult(value);
+        }
 
         /// <inheritdoc />
         public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
@@ -153,6 +245,21 @@ namespace Umbraco.Cms.Core.Cache
             var result = SafeLazy.GetSafeLazy(factory);
             var value = result.Value; // force evaluation now
             if (value == null) return; // do not store null values (backward compat)
+
+            var policy = GetPolicy(timeout, isSliding, dependentFiles);
+            //NOTE: This does an add or update
+            MemoryCache.Set(key, result, policy);
+        }
+        /// <inheritdoc />
+        public async Task InsertAsync(string key, Func<Task<object?>> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
+            // and make sure we don't store a null value.
+
+            var result = AsyncSafeLazy.GetAsyncSafeLazy(factory);
+            var value = await result; // force evaluation now
+            if (value == null)
+                return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, dependentFiles);
             //NOTE: This does an add or update

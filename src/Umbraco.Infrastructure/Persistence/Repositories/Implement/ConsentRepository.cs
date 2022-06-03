@@ -37,6 +37,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             throw new NotSupportedException();
         }
+        /// <inheritdoc />
+        protected override Task<IEnumerable<IConsent>> PerformGetAllAsync(params int[]? ids)
+        {
+            throw new NotSupportedException();
+        }
 
         /// <inheritdoc />
         protected override IEnumerable<IConsent> PerformGetByQuery(IQuery<IConsent> query)

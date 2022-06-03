@@ -111,12 +111,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 return PerformGetAllOnIds(ids);
             }
-
-            var sql = GetBaseQuery(false).OrderByDescending<ExternalLoginDto>(x => x.CreateDate);
+            Sql<ISqlContext> sql = GetAllSql();
 
             return ConvertFromDtos(Database.Fetch<ExternalLoginDto>(sql))
                 .ToArray();// we don't want to re-iterate again!
         }
+        protected override async Task<IEnumerable<IIdentityUserLogin>> PerformGetAllAsync(params int[]? ids)
+        {
+            if (ids?.Any() ?? false)
+            {
+                return PerformGetAllOnIds(ids);
+            }
+            Sql<ISqlContext> sql = GetAllSql();
+
+            return ConvertFromDtos(await Database.FetchAsync<ExternalLoginDto>(sql))
+                .ToArray();// we don't want to re-iterate again!
+        }
+
+        private Sql<ISqlContext> GetAllSql() =>
+                    GetBaseQuery(false).OrderByDescending<ExternalLoginDto>(x => x.CreateDate);
 
         private IEnumerable<IIdentityUserLogin> PerformGetAllOnIds(params int[] ids)
         {

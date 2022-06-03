@@ -51,10 +51,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ITwoFactorLogin> PerformGetAll(params int[]? ids)
         {
-            var sql = GetBaseQuery(false).WhereIn<TwoFactorLoginDto>(x => x.Id, ids);
+            Sql<ISqlContext> sql = GetAllSql(ids);
             var dtos = Database.Fetch<TwoFactorLoginDto>(sql);
             return dtos.WhereNotNull().Select(Map).WhereNotNull();
         }
+        protected override async Task<IEnumerable<ITwoFactorLogin>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+            var dtos = await Database.FetchAsync<TwoFactorLoginDto>(sql);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids) => GetBaseQuery(false).WhereIn<TwoFactorLoginDto>(x => x.Id, ids);
 
         protected override IEnumerable<ITwoFactorLogin> PerformGetByQuery(IQuery<ITwoFactorLogin> query)
         {

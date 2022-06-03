@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public IEnumerable<EntityContainer> Get(string name, int level) => Enumerable.Empty<EntityContainer>();
 
         public EntityContainer? Get(int id) => null;
-
+        public Task<EntityContainer?> GetAsync(int id) => Task.FromResult<EntityContainer?>(null);
         public IEnumerable<EntityContainer> GetMany(params int[]? ids) => Enumerable.Empty<EntityContainer>();
 
         public void Save(EntityContainer entity)

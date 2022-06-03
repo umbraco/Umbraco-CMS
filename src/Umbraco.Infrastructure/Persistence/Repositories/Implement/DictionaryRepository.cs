@@ -66,15 +66,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertFromDto);
+        }
+        protected override Task<IEnumerable<IDictionaryItem>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Task.FromResult(Database
+                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
+                .Select(ConvertFromDto));
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
             if (ids?.Any() ?? false)
             {
                 sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
             }
 
-            return Database
-                .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
-                .Select(ConvertFromDto);
+            return sql;
         }
 
         protected override IEnumerable<IDictionaryItem> PerformGetByQuery(IQuery<IDictionaryItem> query)

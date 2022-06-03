@@ -180,12 +180,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 throw new NotSupportedException(
                     $"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
             }
-
-            Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
+            Sql<ISqlContext> sql = GetAllSql(ids);
             List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
             return dtos.WhereNotNull().Select(Map).WhereNotNull();
         }
-
+        protected override async Task<IEnumerable<IRedirectUrl>> PerformGetAllAsync(params Guid[]? ids)
+        {
+            if (ids?.Length > Constants.Sql.MaxParameterCount)
+            {
+                throw new NotSupportedException(
+                    $"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
+            }
+            Sql<ISqlContext> sql = GetAllSql(ids);
+            List<RedirectUrlDto> dtos = await Database.FetchAsync<RedirectUrlDto>(sql);
+            return dtos.WhereNotNull().Select(Map).WhereNotNull();
+        }
+        private Sql<ISqlContext> GetAllSql(Guid[]? ids) =>
+                    GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
         protected override IEnumerable<IRedirectUrl> PerformGetByQuery(IQuery<IRedirectUrl> query) =>
             throw new NotSupportedException("This repository does not support this method.");
 

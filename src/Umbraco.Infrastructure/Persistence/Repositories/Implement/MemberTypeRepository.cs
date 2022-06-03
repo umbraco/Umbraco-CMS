@@ -49,6 +49,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IMemberType? PerformGet(Guid id)
             => GetMany()?.FirstOrDefault(x => x.Key == id);
 
+        protected override async Task<IMemberType?> PerformGetAsync(Guid id)
+            => (await GetManyAsync())?.FirstOrDefault(x => x.Key == id);
+
         protected override IEnumerable<IMemberType>? PerformGetAll(params Guid[]? ids)
         {
             var all = GetMany();
@@ -67,6 +70,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IEnumerable<IMemberType>? GetAllWithFullCachePolicy()
         {
             return CommonRepository.GetAllTypes()?.OfType<IMemberType>();
+        }
+        protected override async Task<IEnumerable<IMemberType>?> GetAllWithFullCachePolicyAsync()
+        {
+            return (await CommonRepository.GetAllTypesAsync())?.OfType<IMemberType>();
         }
 
         protected override IEnumerable<IMemberType> PerformGetByQuery(IQuery<IMemberType> query)

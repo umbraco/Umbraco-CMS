@@ -57,6 +57,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return view;
         }
+        public override Task<IPartialView?> GetAsync(string? id)
+        {
+            return Task.FromResult(Get(id));
+        }
 
         public override void Save(IPartialView entity)
         {
@@ -137,5 +141,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var withBom = Encoding.UTF8.GetPreamble().Concat(data).ToArray();
             return new MemoryStream(withBom);
         }
+
     }
 }

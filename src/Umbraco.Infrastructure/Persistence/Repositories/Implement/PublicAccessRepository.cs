@@ -35,6 +35,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
+            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
+        }
+        protected override Task<IEnumerable<PublicAccessEntry>> PerformGetAllAsync(params Guid[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
+            return Task.FromResult(dtos.Select(PublicAccessEntryFactory.BuildEntity));
+        }
+
+        private Sql<ISqlContext> GetAllSql(Guid[]? ids)
+        {
             var sql = GetBaseQuery(false);
 
             if (ids?.Any() ?? false)
@@ -43,9 +58,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             sql.OrderBy<AccessDto>(x => x.NodeId);
-
-            var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
-            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
+            return sql;
         }
 
         protected override IEnumerable<PublicAccessEntry> PerformGetByQuery(IQuery<PublicAccessEntry> query)

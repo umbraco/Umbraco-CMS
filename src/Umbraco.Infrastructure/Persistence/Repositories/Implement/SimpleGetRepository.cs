@@ -56,6 +56,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<TEntity> PerformGetAll(params TId[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Database.Fetch<TDto>(sql).Select(ConvertToEntity);
+        }
+        protected override async Task<IEnumerable<TEntity>> PerformGetAllAsync(params TId[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return (await Database.FetchAsync<TDto>(sql)).Select(ConvertToEntity);
+        }
+
+        private Sql<ISqlContext> GetAllSql(TId[]? ids)
+        {
             var sql = Sql().From<TEntity>();
 
             if (ids?.Any() ?? false)
@@ -63,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 sql.Where(GetWhereInClauseForGetAll(), new { /*ids =*/ ids });
             }
 
-            return Database.Fetch<TDto>(sql).Select(ConvertToEntity);
+            return sql;
         }
 
         protected sealed override IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)

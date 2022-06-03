@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -84,6 +84,22 @@ namespace Umbraco.Cms.Core.Cache
             // clone / reset to go into the cache
             return CheckCloneableAndTracksChanges(cached);
         }
+        /// <inheritdoc />
+        public async Task<object?> GetAsync(string key, Func<Task<object?>> factoryAsync, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            var cached = await InnerCache.GetAsync(key, async () =>
+            {
+                var result = AsyncSafeLazy.GetAsyncSafeLazy(factoryAsync);
+                var value = await result; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+                // do not store null values (backward compat), clone / reset to go into the cache
+                return value == null ? null : CheckCloneableAndTracksChanges(value);
+
+                // clone / reset to go into the cache
+            }, timeout, isSliding, dependentFiles);
+
+            // clone / reset to go into the cache
+            return CheckCloneableAndTracksChanges(cached);
+        }
 
         /// <inheritdoc />
         public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
@@ -92,6 +108,17 @@ namespace Umbraco.Cms.Core.Cache
             {
                 var result = SafeLazy.GetSafeLazy(factory);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+                // do not store null values (backward compat), clone / reset to go into the cache
+                return value == null ? null : CheckCloneableAndTracksChanges(value);
+            }, timeout, isSliding, dependentFiles);
+        }
+        /// <inheritdoc />
+        public async Task InsertAsync(string key, Func<Task<object?>> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            await InnerCache.InsertAsync(key, async () =>
+            {
+                var result = AsyncSafeLazy.GetAsyncSafeLazy(factory);
+                var value = await result; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 // do not store null values (backward compat), clone / reset to go into the cache
                 return value == null ? null : CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, dependentFiles);

@@ -56,12 +56,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IRelation> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+            var dtos = Database.Fetch<RelationDto>(sql);
+            return DtosToEntities(dtos);
+        }
+        protected override async Task<IEnumerable<IRelation>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+            var dtos = await Database.FetchAsync<RelationDto>(sql);
+            return DtosToEntities(dtos);
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(false);
             if (ids?.Length > 0)
                 sql.WhereIn<RelationDto>(x => x.Id, ids);
             sql.OrderBy<RelationDto>(x => x.RelationType);
-            var dtos = Database.Fetch<RelationDto>(sql);
-            return DtosToEntities(dtos);
+            return sql;
         }
 
         protected override IEnumerable<IRelation> PerformGetByQuery(IQuery<IRelation> query)

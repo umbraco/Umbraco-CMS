@@ -65,6 +65,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             throw new NotImplementedException();
         }
+        protected override Task<IEnumerable<IAuditItem>> PerformGetAllAsync(params int[]? ids)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override IEnumerable<IAuditItem> PerformGetByQuery(IQuery<IAuditItem> query)
         {

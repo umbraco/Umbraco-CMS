@@ -71,22 +71,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (ids?.Any() ?? false)
             {
-                return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
-                        GetBaseQuery(false)
-                            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                            .WhereIn<NodeDto>(x => x.NodeId, batch))
+                return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch => GetAllSql(batch))
                     .Select(CreateEntity);
             }
-
-            // else
-
-            Sql<ISqlContext> sql = GetBaseQuery(false)
-                .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
-                .OrderBy<NodeDto>(x => x.Level);
+            Sql<ISqlContext> sql = GetAllSql();
 
             return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
+        protected override async Task<IEnumerable<EntityContainer>> PerformGetAllAsync(params int[]? ids)
+        {
+            if (ids?.Any() ?? false)
+            {
+                return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch => GetAllSql(batch))
+                    .Select(CreateEntity);
+            }
+            Sql<ISqlContext> sql = GetAllSql();
 
+            return (await Database.FetchAsync<NodeDto>(sql)).Select(CreateEntity);
+        }
+
+        private Sql<ISqlContext> GetAllSql(IEnumerable<int> batch) => GetBaseQuery(false)
+                                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                                    .WhereIn<NodeDto>(x => x.NodeId, batch);
+        private Sql<ISqlContext> GetAllSql() =>
+                    // else
+
+                    GetBaseQuery(false)
+                        .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
+                        .OrderBy<NodeDto>(x => x.Level);
         protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query) =>
             throw new NotImplementedException();
 

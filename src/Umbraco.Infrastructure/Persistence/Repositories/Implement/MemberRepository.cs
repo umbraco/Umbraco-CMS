@@ -403,6 +403,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IMember> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
+        }
+        protected override async Task<IEnumerable<IMember>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(await Database.FetchAsync<MemberDto>(sql));
+        }
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many);
 
             if (ids?.Any() ?? false)
@@ -410,7 +422,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
             }
 
-            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
+            return sql;
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)

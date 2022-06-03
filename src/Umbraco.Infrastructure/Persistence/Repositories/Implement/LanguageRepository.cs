@@ -46,20 +46,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
         {
-            var sql = GetBaseQuery(false).Where<LanguageDto>(x => x.Id > 0);
-            if (ids?.Any() ?? false)
-            {
-                sql.WhereIn<LanguageDto>(x => x.Id, ids);
-            }
-
-            //this needs to be sorted since that is the way legacy worked - default language is the first one!!
-            //even though legacy didn't sort, it should be by id
-            sql.OrderBy<LanguageDto>(x => x.Id);
+            Sql<ISqlContext> sql = GetAllSql(ids);
 
             // get languages
             var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
 
             // initialize the code-id map
+            InitializeCodeIdMap(languages);
+
+            return languages;
+        }
+        protected override async Task<IEnumerable<ILanguage>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            // get languages
+            var languages = (await Database.FetchAsync<LanguageDto>(sql)).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+
+            // initialize the code-id map
+            InitializeCodeIdMap(languages);
+
+            return languages;
+        }
+
+        private void InitializeCodeIdMap(List<ILanguage> languages)
+        {
             lock (_codeIdMap)
             {
                 _codeIdMap.Clear();
@@ -70,8 +81,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     _idCodeMap[language.Id] = language.IsoCode.ToLowerInvariant();
                 }
             }
+        }
 
-            return languages;
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
+            var sql = GetBaseQuery(false).Where<LanguageDto>(x => x.Id > 0);
+            if (ids?.Any() ?? false)
+            {
+                sql.WhereIn<LanguageDto>(x => x.Id, ids);
+            }
+
+            //this needs to be sorted since that is the way legacy worked - default language is the first one!!
+            //even though legacy didn't sort, it should be by id
+            sql.OrderBy<LanguageDto>(x => x.Id);
+            return sql;
         }
 
         protected override IEnumerable<ILanguage> PerformGetByQuery(IQuery<ILanguage> query)

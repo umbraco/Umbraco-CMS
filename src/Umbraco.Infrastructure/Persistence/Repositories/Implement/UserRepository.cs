@@ -300,7 +300,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                 users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
             return users;
         }
+        protected override async Task<IEnumerable<IUser>> PerformGetAllAsync(params int[]? ids)
+        {
+            var dtos = ids?.Length == 0
+                ? await GetDtosWithAsync(null, true)
+                : await GetDtosWithAsync(sql => sql.WhereIn<UserDto>(x => x.Id, ids), true);
 
+            var users = new IUser[dtos.Count];
+            var i = 0;
+            foreach (var dto in dtos)
+                users[i++] = UserFactory.BuildEntity(_globalSettings, dto);
+            return users;
+        }
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
         {
             var dtos = GetDtosWith(sql => new SqlTranslator<IUser>(sql, query).Translate(), true)
@@ -335,6 +346,21 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             with?.Invoke(sql);
 
             var dtos = Database.Fetch<UserDto>(sql);
+
+            if (includeReferences)
+                PerformGetReferencedDtos(dtos);
+
+            return dtos;
+        }
+        private async Task<List<UserDto>> GetDtosWithAsync(Action<Sql<ISqlContext>>? with, bool includeReferences)
+        {
+            var sql = SqlContext.Sql()
+                .Select<UserDto>()
+                .From<UserDto>();
+
+            with?.Invoke(sql);
+
+            var dtos = await Database.FetchAsync<UserDto>(sql);
 
             if (includeReferences)
                 PerformGetReferencedDtos(dtos);

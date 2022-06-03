@@ -27,13 +27,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ILogViewerQuery> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Database.Fetch<LogViewerQueryDto>(sql).Select(ConvertFromDto);
+        }
+        protected override async Task<IEnumerable<ILogViewerQuery>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return (await Database.FetchAsync<LogViewerQueryDto>(sql)).Select(ConvertFromDto);
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(false).Where($"{Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery}.id > 0");
             if (ids?.Any() ?? false)
             {
                 sql.Where($"{Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery}.id in (@ids)", new { ids = ids });
             }
 
-            return Database.Fetch<LogViewerQueryDto>(sql).Select(ConvertFromDto);
+            return sql;
         }
 
         protected override IEnumerable<ILogViewerQuery> PerformGetByQuery(IQuery<ILogViewerQuery> query)

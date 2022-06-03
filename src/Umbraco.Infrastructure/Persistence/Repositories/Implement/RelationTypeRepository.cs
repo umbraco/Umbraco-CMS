@@ -44,6 +44,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // use the underlying GetAll which will force cache all content types
             return GetMany()?.FirstOrDefault(x => x.Key == id);
         }
+        public async Task<IRelationType?> GetAsync(Guid id)
+        {
+            // use the underlying GetAll which will force cache all content types
+            return (await GetManyAsync())?.FirstOrDefault(x => x.Key == id);
+        }
 
         public bool Exists(Guid id)
         {
@@ -59,6 +64,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sql = GetBaseQuery(false);
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
+
+            return dtos.Select(x => DtoToEntity(x));
+        }
+        protected override async Task<IEnumerable<IRelationType>> PerformGetAllAsync(params int[]? ids)
+        {
+            var sql = GetBaseQuery(false);
+
+            var dtos = await Database.FetchAsync<RelationTypeDto>(sql);
 
             return dtos.Select(x => DtoToEntity(x));
         }

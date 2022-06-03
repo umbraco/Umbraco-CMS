@@ -203,6 +203,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return null;
         }
+        protected async Task<string?> GetFileContentAsync(string? filename)
+        {
+            if (filename is null || FileSystem?.FileExists(filename) == false)
+            {
+                return null;
+            }
+
+            try
+            {
+                using Stream? stream = FileSystem?.OpenFile(filename!);
+                if (stream is not null)
+                {
+                    using var reader = new StreamReader(stream, Encoding.UTF8, true);
+                    return await reader.ReadToEndAsync();
+                }
+            }
+            catch
+            {
+                return null; // deal with race conds
+            }
+
+            return null;
+        }
 
         public Stream GetFileContentStream(string filepath)
         {

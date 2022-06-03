@@ -342,6 +342,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[]? ids) =>
             throw new InvalidOperationException("This method won't be implemented.");
+        protected override Task<IEnumerable<ContentPermissionSet>> PerformGetAllAsync(params int[]? ids) =>
+            throw new InvalidOperationException("This method won't be implemented.");
 
         protected override IEnumerable<ContentPermissionSet> PerformGetByQuery(IQuery<ContentPermissionSet> query) =>
             throw new InvalidOperationException("This method won't be implemented.");

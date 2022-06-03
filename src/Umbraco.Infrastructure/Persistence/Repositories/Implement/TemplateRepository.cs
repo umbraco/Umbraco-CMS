@@ -51,6 +51,47 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
+
+            if (dtos.Count == 0)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
+            IUmbracoEntity[] childIds = MapSimpleTemplateEntities(ids, dtos);
+
+            return dtos.Select(d => MapFromDto(d, childIds));
+        }
+        protected override async Task<IEnumerable<ITemplate>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            List<TemplateDto> dtos = await Database.FetchAsync<TemplateDto>(sql);
+
+            if (dtos.Count == 0)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
+            IUmbracoEntity[] childIds = MapSimpleTemplateEntities(ids, dtos);
+
+            return dtos.Select(d => MapFromDto(d, childIds));
+        }
+
+        private IUmbracoEntity[] MapSimpleTemplateEntities(int[]? ids, List<TemplateDto> dtos) =>
+                    //look up the simple template definitions that have a master template assigned, this is used
+                    // later to populate the template item's properties
+                    (ids?.Any() ?? false
+                        ? GetAxisDefinitions(dtos.ToArray())
+                        : dtos.Select(x => new EntitySlim
+                        {
+                            Id = x.NodeId,
+                            ParentId = x.NodeDto.ParentId,
+                            Name = x.Alias
+                        })).ToArray();
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             Sql<ISqlContext> sql = GetBaseQuery(false);
 
             if (ids?.Any() ?? false)
@@ -62,25 +103,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
-
-            if (dtos.Count == 0)
-            {
-                return Enumerable.Empty<ITemplate>();
-            }
-
-            //look up the simple template definitions that have a master template assigned, this is used
-            // later to populate the template item's properties
-            IUmbracoEntity[] childIds = (ids?.Any() ?? false
-                ? GetAxisDefinitions(dtos.ToArray())
-                : dtos.Select(x => new EntitySlim
-                {
-                    Id = x.NodeId,
-                    ParentId = x.NodeDto.ParentId,
-                    Name = x.Alias
-                })).ToArray();
-
-            return dtos.Select(d => MapFromDto(d, childIds));
+            return sql;
         }
 
         protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)

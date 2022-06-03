@@ -58,9 +58,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IServerRegistration> PerformGetAll(params int[]? ids)
         {
-            return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
+            return Database.Fetch<ServerRegistrationDto>(GetAllSql())
                 .Select(x => ServerRegistrationFactory.BuildEntity(x));
         }
+        protected override async Task<IEnumerable<IServerRegistration>> PerformGetAllAsync(params int[]? ids)
+        {
+            return (await Database.FetchAsync<ServerRegistrationDto>(GetAllSql()))
+                .Select(x => ServerRegistrationFactory.BuildEntity(x));
+        }
+
+        private static string GetAllSql() => "WHERE id > 0";
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
@@ -39,12 +40,25 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IEnumerable<ITag> PerformGetAll(params int[]? ids)
         {
             IEnumerable<TagDto> dtos = ids?.Length == 0
-                ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
+                ? Database.Fetch<TagDto>(GetAllSql())
                 : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
-                    batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
+                    batch => GetAllSql(batch));
 
             return dtos.Select(TagFactory.BuildEntity).ToList();
         }
+        /// <inheritdoc />
+        protected override async Task<IEnumerable<ITag>> PerformGetAllAsync(params int[]? ids)
+        {
+            IEnumerable<TagDto> dtos = ids?.Length == 0
+                ? await Database.FetchAsync<TagDto>(GetAllSql())
+                : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
+                    batch => GetAllSql(batch));
+
+            return dtos.Select(TagFactory.BuildEntity).ToList();
+        }
+
+        private Sql<ISqlContext> GetAllSql(IEnumerable<int> batch) => Sql().Select<TagDto>().From<TagDto>().WhereIn((Expression<Func<TagDto, object?>>)(x => x.Id), batch);
+        private Sql<ISqlContext> GetAllSql() => Sql().Select<TagDto>().From<TagDto>();
 
         /// <inheritdoc />
         protected override IEnumerable<ITag> PerformGetByQuery(IQuery<ITag> query)

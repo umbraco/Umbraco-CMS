@@ -37,6 +37,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IMemberGroup> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
+        }
+        protected override async Task<IEnumerable<IMemberGroup>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return (await Database.FetchAsync<NodeDto>(sql)).Select(x => MemberGroupFactory.BuildEntity(x));
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = Sql()
                 .SelectAll()
                 .From<NodeDto>()
@@ -44,8 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
-
-            return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
+            return sql;
         }
 
         protected override IEnumerable<IMemberGroup> PerformGetByQuery(IQuery<IMemberGroup> query)

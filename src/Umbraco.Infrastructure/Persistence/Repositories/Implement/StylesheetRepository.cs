@@ -64,6 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return stylesheet;
 
         }
+        public override Task<IStylesheet?> GetAsync(string? id) => Task.FromResult(Get(id));
 
         public override void Save(IStylesheet entity)
         {
@@ -109,6 +110,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             }
         }
+
+       
 
         #endregion
     }

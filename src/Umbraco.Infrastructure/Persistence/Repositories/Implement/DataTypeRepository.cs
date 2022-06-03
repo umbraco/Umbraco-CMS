@@ -57,6 +57,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDataType> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> dataTypeSql = GetAllSql(ids);
+
+            var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        }
+        protected override async Task<IEnumerable<IDataType>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> dataTypeSql = GetAllSql(ids);
+
+            var dtos = await Database.FetchAsync<DataTypeDto>(dataTypeSql);
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var dataTypeSql = GetBaseQuery(false);
 
             if (ids?.Any() ?? false)
@@ -68,8 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 dataTypeSql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
+            return dataTypeSql;
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)

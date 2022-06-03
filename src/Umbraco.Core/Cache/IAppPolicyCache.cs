@@ -55,5 +55,20 @@ namespace Umbraco.Cms.Core.Cache
             TimeSpan? timeout = null,
             bool isSliding = false,
             string[]? dependentFiles = null);
+
+        /// <summary>
+        /// Inserts an item.
+        /// </summary>
+        /// <param name="key">The key of the item.</param>
+        /// <param name="factory">A factory function that can create the item.</param>
+        /// <param name="timeout">An optional cache timeout.</param>
+        /// <param name="isSliding">An optional value indicating whether the cache timeout is sliding (default is false).</param>
+        /// <param name="dependentFiles">Files the cache entry depends on.</param>
+        Task InsertAsync(
+            string key,
+            Func<Task<object?>> factoryAsync,
+            TimeSpan? timeout = null,
+            bool isSliding = false,
+            string[]? dependentFiles = null);
     }
 }

@@ -469,11 +469,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             protected override IEnumerable<IMedia> PerformGetAll(params Guid[]? ids)
             {
+                Sql<ISqlContext> sql = GetAllSql(ids);
+
+                return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+            }
+            protected override async Task<IEnumerable<IMedia>> PerformGetAllAsync(params Guid[]? ids)
+            {
+                Sql<ISqlContext> sql = GetAllSql(ids);
+
+                return _outerRepo.MapDtosToContent(await Database.FetchAsync<ContentDto>(sql));
+            }
+
+            private Sql<ISqlContext> GetAllSql(Guid[]? ids)
+            {
                 var sql = _outerRepo.GetBaseQuery(QueryType.Many);
                 if (ids?.Length > 0)
                     sql.WhereIn<NodeDto>(x => x.UniqueId, ids);
-
-                return _outerRepo.MapDtosToContent(Database.Fetch<ContentDto>(sql));
+                return sql;
             }
 
             protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)

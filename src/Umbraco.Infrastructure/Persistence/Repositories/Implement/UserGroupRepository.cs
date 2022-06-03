@@ -191,6 +191,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IUserGroup> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+            return dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
+        }
+        protected override Task<IEnumerable<IUserGroup>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
+            return Task.FromResult(dtos.Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x)));
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(QueryType.Many);
 
             if (ids?.Any() ?? false)
@@ -200,9 +215,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             AppendGroupBy(sql);
             sql.OrderBy<UserGroupDto>(x => x.Id); // required for references
-
-            var dtos = Database.FetchOneToMany<UserGroupDto>(x => x.UserGroup2AppDtos, sql);
-            return dtos.Select(x=>UserGroupFactory.BuildEntity(_shortStringHelper, x));
+            return sql;
         }
 
         protected override IEnumerable<IUserGroup> PerformGetByQuery(IQuery<IUserGroup> query)
@@ -379,6 +392,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[]? ids)
+            {
+                throw new InvalidOperationException("This method won't be implemented.");
+            }
+            protected override Task<IEnumerable<UserGroupWithUsers>> PerformGetAllAsync(params int[]? ids)
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }

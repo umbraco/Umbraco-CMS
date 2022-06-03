@@ -67,9 +67,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             if (ids?.Length == 0)
             {
-                Sql<ISqlContext> sql = Sql()
-                    .Select<AuditEntryDto>()
-                    .From<AuditEntryDto>();
+                Sql<ISqlContext> sql = GetAllAuditSql();
 
                 return Database.Fetch<AuditEntryDto>(sql).Select(AuditEntryFactory.BuildEntity);
             }
@@ -78,17 +76,42 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                Sql<ISqlContext> sql = Sql()
-                    .Select<AuditEntryDto>()
-                    .From<AuditEntryDto>()
-                    .WhereIn<AuditEntryDto>(x => x.Id, group);
+                Sql<ISqlContext> sql = GetAuditsSql(group);
 
                 entries.AddRange(Database.Fetch<AuditEntryDto>(sql).Select(AuditEntryFactory.BuildEntity));
             }
 
             return entries;
         }
+        /// <inheritdoc />
+        protected override async Task<IEnumerable<IAuditEntry>> PerformGetAllAsync(params int[]? ids)
+        {
+            if (ids?.Length == 0)
+            {
+                Sql<ISqlContext> sql = GetAllAuditSql();
 
+                return (await Database.FetchAsync<AuditEntryDto>(sql)).Select(AuditEntryFactory.BuildEntity);
+            }
+
+            var entries = new List<IAuditEntry>();
+
+            foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Sql<ISqlContext> sql = GetAuditsSql(group);
+
+                entries.AddRange((await Database.FetchAsync<AuditEntryDto>(sql)).Select(AuditEntryFactory.BuildEntity));
+            }
+
+            return entries;
+        }
+
+        private Sql<ISqlContext> GetAuditsSql(IEnumerable<int> group) => Sql()
+                            .Select<AuditEntryDto>()
+                            .From<AuditEntryDto>()
+                            .WhereIn<AuditEntryDto>(x => x.Id, group);
+        private Sql<ISqlContext> GetAllAuditSql() => Sql()
+                            .Select<AuditEntryDto>()
+                            .From<AuditEntryDto>();
         /// <inheritdoc />
         protected override IEnumerable<IAuditEntry> PerformGetByQuery(IQuery<IAuditEntry> query)
         {

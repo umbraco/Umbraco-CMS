@@ -37,13 +37,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDomain> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
+        }
+        protected override async Task<IEnumerable<IDomain>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return (await Database.FetchAsync<DomainDto>(sql)).Select(ConvertFromDto);
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(false).Where<DomainDto>(x => x.Id > 0);
             if (ids?.Any() ?? false)
             {
                 sql.WhereIn<DomainDto>(x => x.Id, ids);
             }
 
-            return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
+            return sql;
         }
 
         protected override IEnumerable<IDomain> PerformGetByQuery(IQuery<IDomain> query)

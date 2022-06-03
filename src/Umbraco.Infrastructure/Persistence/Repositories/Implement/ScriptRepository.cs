@@ -54,6 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return script;
         }
+        public override Task<IScript?> GetAsync(string? id) => Task.FromResult(Get(id));
 
         public override void Save(IScript entity)
         {
@@ -96,6 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             }
         }
+
 
         #endregion
     }

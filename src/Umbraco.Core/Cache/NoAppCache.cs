@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +53,11 @@ namespace Umbraco.Cms.Core.Cache
         {
             return factory();
         }
+        /// <inheritdoc />
+        public async Task<object?> GetAsync(string key, Func<Task<object?>> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+        {
+            return factory();
+        }
 
         /// <inheritdoc />
         public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
@@ -89,5 +94,7 @@ namespace Umbraco.Cms.Core.Cache
         public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => new Dictionary<string, object?>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        /// <inheritdoc />
+        public Task InsertAsync(string key, Func<Task<object?>> factoryAsync, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null) => Task.CompletedTask;
     }
 }

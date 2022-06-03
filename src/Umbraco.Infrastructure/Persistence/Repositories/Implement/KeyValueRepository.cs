@@ -66,10 +66,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IKeyValue> PerformGetAll(params string[]? ids)
         {
-            var sql = GetBaseQuery(false).WhereIn<KeyValueDto>(x => x.Key, ids);
+            Sql<ISqlContext> sql = GetAllSql(ids);
             var dtos = Database.Fetch<KeyValueDto>(sql);
             return dtos?.WhereNotNull().Select(Map)!;
         }
+        protected override async Task<IEnumerable<IKeyValue>> PerformGetAllAsync(params string[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+            var dtos = await Database.FetchAsync<KeyValueDto>(sql);
+            return dtos?.WhereNotNull().Select(Map)!;
+        }
+
+        private Sql<ISqlContext> GetAllSql(string[]? ids) => GetBaseQuery(false).WhereIn<KeyValueDto>(x => x.Key, ids);
 
         protected override IEnumerable<IKeyValue> PerformGetByQuery(IQuery<IKeyValue> query)
         {

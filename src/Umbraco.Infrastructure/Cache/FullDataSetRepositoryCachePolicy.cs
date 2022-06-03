@@ -184,6 +184,21 @@ namespace Umbraco.Cms.Core.Cache
             // cached entities, not clones, so we need to manually ensure they are deep-cloned.
             return all.Select(x => (TEntity) x.DeepClone()).ToArray();
         }
+        /// <inheritdoc />
+        public override async Task<TEntity[]> GetAllAsync(TId[]? ids, Func<TId[], Task<IEnumerable<TEntity>?>> performGetAllAsync)
+        {
+            // get all as one set, from cache if possible, else repo
+            var all = await GetAllCachedAsync(performGetAllAsync);
+
+            // if ids have been specified, filter
+            if (ids?.Length > 0)
+                all = all.Where(x => ids.Contains(_entityGetId(x)));
+
+            // and return
+            // see note in SetCacheActionToInsertEntities - what we get here is the original
+            // cached entities, not clones, so we need to manually ensure they are deep-cloned.
+            return all.Select(x => (TEntity)x.DeepClone()).ToArray();
+        }
 
         // does NOT clone anything, so be nice with the returned values
         internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>?> performGetAll)
