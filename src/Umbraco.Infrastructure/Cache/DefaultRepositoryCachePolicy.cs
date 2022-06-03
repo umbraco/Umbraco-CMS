@@ -114,6 +114,39 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override async Task CreateAsync(TEntity entity, Func<TEntity,Task> persistNewAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistNewAsync(entity);
+
+                // just to be safe, we cannot cache an item without an identity
+                if (entity.HasIdentity)
+                {
+                    Cache.Insert(GetEntityCacheKey(entity.Id), () => entity, TimeSpan.FromMinutes(5), true);
+                }
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.Clear(EntityTypeCacheKey);
+            }
+            catch
+            {
+                // if an exception is thrown we need to remove the entry from cache,
+                // this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                Cache.Clear(GetEntityCacheKey(entity.Id));
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.Clear(EntityTypeCacheKey);
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
@@ -146,6 +179,39 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override async Task UpdateAsync(TEntity entity, Func<TEntity,Task> persistUpdatedAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistUpdatedAsync(entity);
+
+                // just to be safe, we cannot cache an item without an identity
+                if (entity.HasIdentity)
+                {
+                    await Cache.InsertAsync(GetEntityCacheKey(entity.Id), async () => entity, TimeSpan.FromMinutes(5), true);
+                }
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.Clear(EntityTypeCacheKey);
+            }
+            catch
+            {
+                // if an exception is thrown we need to remove the entry from cache,
+                // this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                Cache.Clear(GetEntityCacheKey(entity.Id));
+
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.Clear(EntityTypeCacheKey);
+
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
         public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
@@ -153,6 +219,26 @@ namespace Umbraco.Cms.Core.Cache
             try
             {
                 persistDeleted(entity);
+            }
+            finally
+            {
+                // whatever happens, clear the cache
+                var cacheKey = GetEntityCacheKey(entity.Id);
+                Cache.Clear(cacheKey);
+                // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.Clear(EntityTypeCacheKey);
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task DeleteAsync(TEntity entity, Func<TEntity,Task> persistDeletedAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistDeletedAsync(entity);
             }
             finally
             {
@@ -351,6 +437,13 @@ namespace Umbraco.Cms.Core.Cache
         public override void ClearAll()
         {
             Cache.ClearByKey(EntityTypeCacheKey);
+        }
+
+        /// <inheritdoc />
+        public override Task ClearAllAsync()
+        {
+            Cache.ClearByKey(EntityTypeCacheKey);
+            return Task.CompletedTask;
         }
     }
 }

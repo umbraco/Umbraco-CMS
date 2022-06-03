@@ -88,6 +88,23 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
+
+        /// <inheritdoc />
+        public override async Task CreateAsync(TEntity entity, Func<TEntity,Task> persistNewAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistNewAsync(entity);
+            }
+            finally
+            {
+                await ClearAllAsync();
+            }
+        }
+
         /// <inheritdoc />
         public override void Update(TEntity entity, Action<TEntity> persistUpdated)
         {
@@ -104,6 +121,22 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
+        public override async Task UpdateAsync(TEntity entity, Func<TEntity,Task> persistUpdatedAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistUpdatedAsync(entity);
+            }
+            finally
+            {
+                await ClearAllAsync();
+            }
+        }
+
+        /// <inheritdoc />
         public override void Delete(TEntity entity, Action<TEntity> persistDeleted)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
@@ -115,6 +148,22 @@ namespace Umbraco.Cms.Core.Cache
             finally
             {
                 ClearAll();
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task DeleteAsync(TEntity entity, Func<TEntity,Task> persistDeletedAsync)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            try
+            {
+                await persistDeletedAsync(entity);
+            }
+            finally
+            {
+                await ClearAllAsync();
             }
         }
 
@@ -230,6 +279,13 @@ namespace Umbraco.Cms.Core.Cache
         public override void ClearAll()
         {
             Cache.Clear(GetEntityTypeCacheKey());
+        }
+
+        /// <inheritdoc />
+        public override Task ClearAllAsync()
+        {
+            Cache.Clear(GetEntityTypeCacheKey());
+            return Task.CompletedTask;
         }
     }
 }

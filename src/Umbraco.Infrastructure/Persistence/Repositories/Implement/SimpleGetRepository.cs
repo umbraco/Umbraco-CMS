@@ -98,8 +98,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             throw new InvalidOperationException("This method won't be implemented.");
         }
-
+        protected sealed override Task PersistNewItemAsync(TEntity entity)
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
         protected sealed override void PersistUpdatedItem(TEntity entity)
+        {
+            throw new InvalidOperationException("This method won't be implemented.");
+        }
+        protected sealed override Task PersistUpdatedItemAsync(TEntity entity)
         {
             throw new InvalidOperationException("This method won't be implemented.");
         }

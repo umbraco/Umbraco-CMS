@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IAuditRepository : IReadRepository<int, IAuditItem>, IWriteRepository<IAuditItem>, IQueryRepository<IAuditItem>
+    public interface IAuditRepository : IAsyncReadRepository<int, IAuditItem>, IAsyncWriteRepository<IAuditItem>, IAsyncQueryRepository<IAuditItem>
     {
         void CleanLogs(int maximumAgeOfLogsInMinutes);
 

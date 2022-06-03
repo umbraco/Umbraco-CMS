@@ -78,12 +78,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.Insert(dto);
         }
 
+        protected override async Task PersistNewItemAsync(ITwoFactorLogin entity)
+        {
+            var dto = Map(entity);
+            await Database.InsertAsync(dto);
+        }
+
         protected override void PersistUpdatedItem(ITwoFactorLogin entity)
         {
             var dto = Map(entity);
             if (dto is not null)
             {
                 Database.Update(dto);
+            }
+        }
+
+        protected override async Task PersistUpdatedItemAsync(ITwoFactorLogin entity)
+        {
+            var dto = Map(entity);
+            if (dto is not null)
+            {
+               await Database.UpdateAsync(dto);
             }
         }
 

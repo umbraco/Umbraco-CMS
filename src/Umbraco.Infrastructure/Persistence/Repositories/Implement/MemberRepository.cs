@@ -686,7 +686,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
-
+        protected override Task PersistNewItemAsync(IMember entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(IMember entity)
         {
             // update
@@ -830,6 +834,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
+        }
+
+        protected override Task PersistUpdatedItemAsync(IMember entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         #endregion

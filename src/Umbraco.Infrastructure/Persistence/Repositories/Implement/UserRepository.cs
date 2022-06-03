@@ -550,7 +550,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
             entity.ResetDirtyProperties();
         }
-
+        protected override Task PersistNewItemAsync(IUser entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(IUser entity)
         {
             // updates Modified date
@@ -674,6 +678,11 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             }
 
             entity.ResetDirtyProperties();
+        }
+        protected override Task PersistUpdatedItemAsync(IUser entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         private void AddingOrUpdateStartNodes(IEntity entity, IEnumerable<UserStartNodeDto> current, UserStartNodeDto.StartNodeTypeValue startNodeType, int[]? entityStartIds)

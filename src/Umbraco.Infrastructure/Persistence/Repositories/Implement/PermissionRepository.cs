@@ -302,6 +302,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         ///     Used to add or update entity permissions during a content item being updated
         /// </summary>
         /// <param name="entity"></param>
+        protected override Task PersistNewItemAsync(ContentPermissionSet entity)
+        {
+            //does the same thing as update
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Used to add or update entity permissions during a content item being updated
+        /// </summary>
+        /// <param name="entity"></param>
         protected override void PersistUpdatedItem(ContentPermissionSet entity)
         {
             var asIEntity = (IEntity)entity;
@@ -311,6 +322,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             ReplaceEntityPermissions(entity);
+        }
+        /// <summary>
+        ///     Used to add or update entity permissions during a content item being updated
+        /// </summary>
+        /// <param name="entity"></param>
+        protected override Task PersistUpdatedItemAsync(ContentPermissionSet entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         private static EntityPermissionCollection ConvertToPermissionList(

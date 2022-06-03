@@ -62,10 +62,19 @@ namespace Umbraco.Cms.Core.Cache
         public abstract void Create(TEntity entity, Action<TEntity> persistNew);
 
         /// <inheritdoc />
+        public abstract Task CreateAsync(TEntity entity, Func<TEntity,Task> persistNewAsync);
+
+        /// <inheritdoc />
         public abstract void Update(TEntity entity, Action<TEntity> persistUpdated);
 
         /// <inheritdoc />
+        public abstract Task UpdateAsync(TEntity entity, Func<TEntity,Task> persistUpdatedAsync);
+
+        /// <inheritdoc />
         public abstract void Delete(TEntity entity, Action<TEntity> persistDeleted);
+
+        /// <inheritdoc />
+        public abstract Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeletedAsync);
 
         /// <inheritdoc />
         public abstract TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
@@ -75,5 +84,8 @@ namespace Umbraco.Cms.Core.Cache
 
         /// <inheritdoc />
         public abstract void ClearAll();
+
+        /// <inheritdoc />
+        public abstract Task ClearAllAsync();
     }
 }

@@ -229,5 +229,7 @@ namespace Umbraco.Cms.Core.IO
 
         /// <inheritdoc />
         public IFileProvider? Create() => _innerFileSystem.TryCreateFileProvider(out IFileProvider? fileProvider) ? fileProvider : null;
+        public Task AddFileAsync(string path, Stream stream) => FileSystem.AddFileAsync(path, stream);
+        public Task AddFileAsync(string path, Stream stream, bool overrideIfExists) => FileSystem.AddFileAsync(path, stream, overrideIfExists);
     }
 }

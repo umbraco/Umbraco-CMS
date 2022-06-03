@@ -163,6 +163,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             dictionaryItem.ResetDirtyProperties();
         }
+        protected override async Task PersistNewItemAsync(IDictionaryItem entity)
+        {
+            var dictionaryItem = ((DictionaryItem)entity);
+
+            dictionaryItem.AddingEntity();
+
+            foreach (var translation in dictionaryItem.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
+
+            var dto = DictionaryItemFactory.BuildDto(dictionaryItem);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            dictionaryItem.Id = id;
+
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                var textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key);
+                translation.Id = Convert.ToInt32(await Database.InsertAsync(textDto));
+                translation.Key = dictionaryItem.Key;
+            }
+
+            dictionaryItem.ResetDirtyProperties();
+        }
 
         protected override void PersistUpdatedItem(IDictionaryItem entity)
         {
@@ -185,6 +208,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 else
                 {
                     translation.Id = Convert.ToInt32(Database.Insert(textDto));
+                    translation.Key = entity.Key;
+                }
+            }
+
+            entity.ResetDirtyProperties();
+
+            //Clear the cache entries that exist by uniqueid/item key
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IDictionaryItem entity)
+        {
+            entity.UpdatingEntity();
+
+            foreach (var translation in entity.Translations)
+                translation.Value = translation.Value.ToValidXmlString();
+
+            var dto = DictionaryItemFactory.BuildDto(entity);
+
+            Database.Update(dto);
+
+            foreach (var translation in entity.Translations)
+            {
+                var textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key);
+                if (translation.HasIdentity)
+                {
+                    await Database.UpdateAsync(textDto);
+                }
+                else
+                {
+                    translation.Id = Convert.ToInt32(await Database.InsertAsync(textDto));
                     translation.Key = entity.Key;
                 }
             }

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface IEntityContainerRepository : IReadRepository<int, EntityContainer>, IWriteRepository<EntityContainer>
+    public interface IEntityContainerRepository : IAsyncReadRepository<int, EntityContainer>, IAsyncWriteRepository<EntityContainer>
     {
         EntityContainer? Get(Guid id);
 

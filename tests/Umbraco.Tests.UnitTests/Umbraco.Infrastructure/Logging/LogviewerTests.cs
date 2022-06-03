@@ -272,6 +272,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
             }
         }
 
+        public Task SaveAsync(ILogViewerQuery entity)
+        {
+            var item = Get(entity.Id);
+
+            if (item is null)
+            {
+                Store.Add(entity);
+            }
+            else
+            {
+                item.Name = entity.Name;
+                item.Query = entity.Query;
+            }
+            return Task.CompletedTask;
+        }
+
         public void Delete(ILogViewerQuery entity)
         {
             var item = Get(entity.Id);

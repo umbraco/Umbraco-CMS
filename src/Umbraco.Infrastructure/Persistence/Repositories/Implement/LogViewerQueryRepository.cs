@@ -91,6 +91,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Id = id;
         }
 
+        protected override async Task PersistNewItemAsync(ILogViewerQuery entity)
+        {
+            var exists = await Database.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {Core.Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name",
+                new { name = entity.Name });
+            if (exists > 0)
+                throw new DuplicateNameException($"The log query name '{entity.Name}' is already used");
+
+            entity.AddingEntity();
+
+            var factory = new LogViewerQueryModelFactory();
+            var dto = factory.BuildDto(entity);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            entity.Id = id;
+        }
+
         protected override void PersistUpdatedItem(ILogViewerQuery entity)
         {
             entity.UpdatingEntity();
@@ -105,6 +121,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
+        }
+
+        protected override async Task PersistUpdatedItemAsync(ILogViewerQuery entity)
+        {
+            entity.UpdatingEntity();
+
+            var exists = await Database.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM {Core.Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name AND id <> @id",
+                new { name = entity.Name, id = entity.Id });
+            //ensure there is no other log query with the same name on another entity
+            if (exists > 0)
+                throw new DuplicateNameException($"The log query name '{entity.Name}' is already used");
+
+
+            var factory = new LogViewerQueryModelFactory();
+            var dto = factory.BuildDto(entity);
+
+            await Database.UpdateAsync(dto);
         }
 
         private ILogViewerQuery ConvertFromDto(LogViewerQueryDto dto)

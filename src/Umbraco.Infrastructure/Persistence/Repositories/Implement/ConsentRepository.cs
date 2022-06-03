@@ -82,12 +82,35 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
+        protected override async Task PersistNewItemAsync(IConsent entity)
+        {
+            entity.AddingEntity();
+
+            var dto = ConsentFactory.BuildDto(entity);
+            await Database.InsertAsync(dto);
+            entity.Id = dto.Id;
+            entity.ResetDirtyProperties();
+        }
+
+        /// <inheritdoc />
         protected override void PersistUpdatedItem(IConsent entity)
         {
             entity.UpdatingEntity();
 
             var dto = ConsentFactory.BuildDto(entity);
             Database.Update(dto);
+            entity.ResetDirtyProperties();
+
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent, int>(entity.Id));
+        }
+
+        /// <inheritdoc />
+        protected override async Task PersistUpdatedItemAsync(IConsent entity)
+        {
+            entity.UpdatingEntity();
+
+            var dto = ConsentFactory.BuildDto(entity);
+            await Database.UpdateAsync(dto);
             entity.ResetDirtyProperties();
 
             IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent, int>(entity.Id));

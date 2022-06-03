@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-    internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEntity>, IWriteRepository<TEntity>
+    internal abstract class FileRepository<TId, TEntity> : IAsyncReadRepository<TId, TEntity>, IAsyncWriteRepository<TEntity>
         where TEntity : IFile
     {
         protected FileRepository(IFileSystem? fileSystem) => FileSystem = fileSystem;
@@ -31,6 +31,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             else
             {
                 PersistUpdatedItem(entity);
+            }
+        }
+        public virtual async Task SaveAsync(TEntity entity)
+        {
+            if (FileSystem?.FileExists(entity.OriginalPath) == false)
+            {
+                await PersistNewItemAsync(entity);
+            }
+            else
+            {
+                await PersistUpdatedItemAsync(entity);
             }
         }
 
@@ -101,6 +112,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 entity.VirtualPath = FileSystem?.GetUrl(entity.Path);
             }
         }
+        protected virtual async Task PersistNewItemAsync(TEntity entity)
+        {
+            if (entity.Content is null || FileSystem is null)
+            {
+                return;
+            }
+            using (Stream stream = GetContentStream(entity.Content))
+            {
+                await FileSystem.AddFileAsync(entity.Path, stream, true);
+                entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
+                entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
+                //the id can be the hash
+                entity.Id = entity.Path.GetHashCode();
+                entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem?.GetUrl(entity.Path);
+            }
+        }
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
@@ -111,6 +139,32 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             using (Stream stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
+                entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
+                entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
+                //the id can be the hash
+                entity.Id = entity.Path.GetHashCode();
+                entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
+            }
+
+            //now that the file has been written, we need to check if the path had been changed
+            if (entity.Path.InvariantEquals(entity.OriginalPath) == false)
+            {
+                //delete the original file
+                FileSystem?.DeleteFile(entity.OriginalPath);
+                //reset the original path on the file
+                entity.ResetOriginalPath();
+            }
+        }
+        protected virtual async Task PersistUpdatedItemAsync(TEntity entity)
+        {
+            if (entity.Content is null || FileSystem is null)
+            {
+                return;
+            }
+            using (Stream stream = GetContentStream(entity.Content))
+            {
+                await FileSystem.AddFileAsync(entity.Path, stream, true);
                 entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
                 entity.UpdateDate = FileSystem.GetLastModified(entity.Path).UtcDateTime;
                 //the id can be the hash

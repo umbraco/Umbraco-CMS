@@ -238,12 +238,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContentType entity)
         {
-            if (string.IsNullOrWhiteSpace(entity.Alias))
-            {
-                var ex = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
-                Logger.LogError("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
-                throw ex;
-            }
+            GuardContentTypeAlias(entity);
 
             entity.AddingEntity();
 
@@ -252,6 +247,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
+        }
+
+        protected override Task PersistNewItemAsync(IContentType entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
+
+        private void GuardContentTypeAlias(IContentType entity)
+        {
+            if (string.IsNullOrWhiteSpace(entity.Alias))
+            {
+                var ex = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
+                Logger.LogError("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
+                throw ex;
+            }
         }
 
         protected void PersistTemplates(IContentType entity, bool clearAll)
@@ -296,6 +307,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 entity.Level = parent.Level + 1;
                 var maxSortOrder =
                     Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
+            }
+
+            PersistUpdatedBaseContentType(entity);
+            PersistTemplates(entity, true);
+            PersistHistoryCleanup(entity);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IContentType entity)
+        {
+            ValidateAlias(entity);
+
+            //Updates Modified date
+            entity.UpdatingEntity();
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (entity.IsPropertyDirty("ParentId"))
+            {
+                var parent = await Database.FirstAsync<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder =
+                    await Database.ExecuteScalarAsync<int>(
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
                         new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;

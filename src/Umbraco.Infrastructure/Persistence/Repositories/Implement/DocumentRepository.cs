@@ -562,7 +562,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //    throw new Exception("oops");
             //}
         }
-
+        protected override Task PersistNewItemAsync(IContent entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(IContent entity)
         {
             var isEntityDirty = entity.IsDirty();
@@ -807,6 +811,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //    Debugger.Break();
             //    throw new Exception("oops");
             //}
+        }
+
+        protected override Task PersistUpdatedItemAsync(IContent entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -1093,8 +1103,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }
+            protected override Task PersistNewItemAsync(IContent entity)
+            {
+                throw new InvalidOperationException("This method won't be implemented.");
+            }
 
             protected override void PersistUpdatedItem(IContent entity)
+            {
+                throw new InvalidOperationException("This method won't be implemented.");
+            }
+
+            protected override Task PersistUpdatedItemAsync(IContent entity)
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }

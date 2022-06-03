@@ -113,6 +113,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+        protected override async Task PersistNewItemAsync(IServerRegistration entity)
+        {
+            entity.AddingEntity();
+
+            var dto = ServerRegistrationFactory.BuildDto(entity);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            entity.Id = id;
+
+            entity.ResetDirtyProperties();
+        }
 
         protected override void PersistUpdatedItem(IServerRegistration entity)
         {
@@ -121,6 +132,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var dto = ServerRegistrationFactory.BuildDto(entity);
 
             Database.Update(dto);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IServerRegistration entity)
+        {
+            entity.UpdatingEntity();
+
+            var dto = ServerRegistrationFactory.BuildDto(entity);
+
+            await Database.UpdateAsync(dto);
 
             entity.ResetDirtyProperties();
         }

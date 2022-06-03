@@ -120,6 +120,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+        protected override Task PersistNewItemAsync(IMediaType entity)
+        {
+            entity.AddingEntity();
+
+            PersistNewBaseContentType(entity);
+
+            entity.ResetDirtyProperties();
+
+            return Task.CompletedTask;
+        }
 
         protected override void PersistUpdatedItem(IMediaType entity)
         {
@@ -136,6 +146,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 entity.Level = parent.Level + 1;
                 var maxSortOrder =
                     Database.ExecuteScalar<int>(
+                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
+            }
+
+            PersistUpdatedBaseContentType(entity);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IMediaType entity)
+        {
+            ValidateAlias(entity);
+
+            //Updates Modified date
+            entity.UpdatingEntity();
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (entity.IsPropertyDirty("ParentId"))
+            {
+                var parent = await Database.FirstAsync<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder =
+                    await Database.ExecuteScalarAsync<int>(
                         "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
                         new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;

@@ -124,11 +124,37 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             group.ResetDirtyProperties();
         }
 
+        protected override async Task PersistNewItemAsync(IMemberGroup entity)
+        {
+            //Save to db
+            entity.AddingEntity();
+            var group = (MemberGroup)entity;
+            var dto = MemberGroupFactory.BuildDto(group);
+            var o = Database.IsNew(dto) ? Convert.ToInt32(await Database.InsertAsync(dto)) : await Database.UpdateAsync(dto);
+            group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
+
+            //Update with new correct path and id
+            dto.Path = string.Concat("-1,", dto.NodeId);
+            await Database.UpdateAsync(dto);
+            //assign to entity
+            group.Id = o;
+            group.ResetDirtyProperties();
+        }
+
         protected override void PersistUpdatedItem(IMemberGroup entity)
         {
             var dto = MemberGroupFactory.BuildDto(entity);
 
             Database.Update(dto);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IMemberGroup entity)
+        {
+            var dto = MemberGroupFactory.BuildDto(entity);
+
+            await Database.UpdateAsync(dto);
 
             entity.ResetDirtyProperties();
         }

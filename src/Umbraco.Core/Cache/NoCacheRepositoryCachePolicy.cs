@@ -64,5 +64,21 @@ namespace Umbraco.Cms.Core.Cache
         public void ClearAll()
         { }
 
+        public async Task CreateAsync(TEntity entity, Func<TEntity, Task> persistNewAsync)
+        {
+            await persistNewAsync(entity);
+        }
+        public async Task UpdateAsync(TEntity entity, Func<TEntity, Task> persistUpdatedAsync)
+        {
+            await persistUpdatedAsync(entity);
+        }
+        public async Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeletedAsync)
+        {
+            await persistDeletedAsync(entity);
+        }
+        public Task ClearAllAsync()
+        {
+            return Task.CompletedTask;
+        }
     }
 }

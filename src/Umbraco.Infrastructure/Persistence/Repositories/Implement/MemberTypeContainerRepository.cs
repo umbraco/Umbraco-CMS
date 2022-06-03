@@ -29,5 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public void Save(EntityContainer entity)
         {
         }
+
+        public Task SaveAsync(EntityContainer entity) => Task.CompletedTask;
     }
 }

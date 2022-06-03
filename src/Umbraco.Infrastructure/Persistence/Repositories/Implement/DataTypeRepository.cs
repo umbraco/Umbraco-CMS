@@ -184,18 +184,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+        protected override Task PersistNewItemAsync(IDataType entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
 
         protected override void PersistUpdatedItem(IDataType entity)
         {
 
             entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id)!;
-
-            //Cannot change to a duplicate alias
-            var existsSql = Sql()
-                .SelectCount()
-                .From<DataTypeDto>()
-                .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
-                .Where<NodeDto>(x => x.Text == entity.Name && x.NodeId != entity.Id);
+            Sql<ISqlContext> existsSql = ExistsSql(entity);
             var exists = Database.ExecuteScalar<int>(existsSql) > 0;
             if (exists)
             {
@@ -208,12 +207,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
+                var parent = Database.First<NodeDto>(ParentSql(), new { ParentId = entity.ParentId });
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
                 var maxSortOrder =
                     Database.ExecuteScalar<int>(
-                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                        MaxSortOrderSql(),
                         new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;
             }
@@ -227,6 +226,54 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+
+        private static string MaxSortOrderSql() => "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType";
+
+        protected override async Task PersistUpdatedItemAsync(IDataType entity)
+        {
+
+            entity.Name = await EnsureUniqueNodeNameAsync(entity.Name, entity.Id)!;
+            Sql<ISqlContext> existsSql = ExistsSql(entity);
+            var exists = await Database.ExecuteScalarAsync<int>(existsSql) > 0;
+            if (exists)
+            {
+                throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
+            }
+
+            //Updates Modified date
+            entity.UpdatingEntity();
+
+            //Look up parent to get and set the correct Path if ParentId has changed
+            if (entity.IsPropertyDirty("ParentId"))
+            {
+                var parent = await Database.FirstAsync<NodeDto>(ParentSql(), new { ParentId = entity.ParentId });
+                entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                entity.Level = parent.Level + 1;
+                var maxSortOrder =
+                    await Database.ExecuteScalarAsync<int>(
+                       MaxSortOrderSql(),
+                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                entity.SortOrder = maxSortOrder + 1;
+            }
+
+            var dto = DataTypeFactory.BuildDto(entity, _serializer);
+
+            //Updates the (base) node data - umbracoNode
+            var nodeDto = dto.NodeDto;
+            await Database.UpdateAsync(nodeDto);
+            await Database.UpdateAsync(dto);
+
+            entity.ResetDirtyProperties();
+        }
+
+        private static string ParentSql() => "WHERE id = @ParentId";
+        private Sql<ISqlContext> ExistsSql(IDataType entity) =>
+                    //Cannot change to a duplicate alias
+                    Sql()
+                        .SelectCount()
+                        .From<DataTypeDto>()
+                        .InnerJoin<NodeDto>().On<DataTypeDto, NodeDto>((left, right) => left.NodeId == right.NodeId)
+                        .Where<NodeDto>(x => x.Text == entity.Name && x.NodeId != entity.Id);
 
         protected override void PersistDeletedItem(IDataType entity)
         {
@@ -334,17 +381,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
-                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
-
-            var sql = template.Sql(NodeObjectTypeId);
+            Sql<ISqlContext> sql = EnsureUniqueNodeNameSql();
             var names = Database.Fetch<SimilarNodeName>(sql);
 
             return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
+        private async Task<string?> EnsureUniqueNodeNameAsync(string? nodeName, int id = 0)
+        {
+            Sql<ISqlContext> sql = EnsureUniqueNodeNameSql();
+            var names = await Database.FetchAsync<SimilarNodeName>(sql);
 
+            return SimilarNodeName.GetUniqueName(names, id, nodeName);
+        }
+
+        private Sql<ISqlContext> EnsureUniqueNodeNameSql()
+        {
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
+                            .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
+                            .From<NodeDto>()
+                            .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
+
+            var sql = template.Sql(NodeObjectTypeId);
+            return sql;
+        }
 
         [TableName(Cms.Core.Constants.DatabaseSchema.Tables.ContentType)]
         private class ContentTypeReferenceDto : ContentTypeDto

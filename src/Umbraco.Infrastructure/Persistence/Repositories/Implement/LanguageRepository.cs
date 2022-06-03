@@ -176,6 +176,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        protected override async Task PersistNewItemAsync(ILanguage entity)
+        {
+            // validate iso code and culture name
+            if (entity.IsoCode.IsNullOrWhiteSpace() || entity.CultureName.IsNullOrWhiteSpace())
+                throw new InvalidOperationException("Cannot save a language without an ISO code and a culture name.");
+
+            entity.AddingEntity();
+
+            // deal with entity becoming the new default entity
+            if (entity.IsDefault)
+            {
+                // set all other entities to non-default
+                // safe (no race cond) because the service locks languages
+                var setAllDefaultToFalse = Sql()
+                    .Update<LanguageDto>(u => u.Set(x => x.IsDefault, false));
+                await Database.ExecuteAsync(setAllDefaultToFalse);
+            }
+
+            // fallback cycles are detected at service level
+
+            // insert
+            var dto = LanguageFactory.BuildDto(entity);
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            entity.Id = id;
+            entity.ResetDirtyProperties();
+        }
+
         protected override void PersistUpdatedItem(ILanguage entity)
         {
             // validate iso code and culture name
@@ -229,6 +256,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        protected override Task PersistUpdatedItemAsync(ILanguage entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistDeletedItem(ILanguage entity)
         {
             // validate that the entity is not the default language.

@@ -234,6 +234,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        protected override async Task PersistNewItemAsync(IMacro entity)
+        {
+            entity.AddingEntity();
+
+            var dto = MacroFactory.BuildDto(entity);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            entity.Id = id;
+
+            if (dto.MacroPropertyDtos is not null)
+            {
+                foreach (var propDto in dto.MacroPropertyDtos)
+                {
+                    //need to set the id explicitly here
+                    propDto.Macro = id;
+                    var propId = Convert.ToInt32(await Database.InsertAsync(propDto));
+                    entity.Properties[propDto.Alias].Id = propId;
+                }
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
         protected override void PersistUpdatedItem(IMacro entity)
         {
             entity.UpdatingEntity();
@@ -300,6 +323,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             entity.ResetDirtyProperties();
+        }
+        protected override Task PersistUpdatedItemAsync(IMacro entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
     }
 }

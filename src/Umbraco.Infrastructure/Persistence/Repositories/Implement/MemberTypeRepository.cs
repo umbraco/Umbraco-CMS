@@ -174,7 +174,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
-
+        protected override Task PersistNewItemAsync(IMemberType entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(IMemberType entity)
         {
             ValidateAlias(entity);
@@ -207,6 +211,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             entity.ResetDirtyProperties();
+        }
+        protected override Task PersistUpdatedItemAsync(IMemberType entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -326,7 +326,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
-
+        protected override Task PersistNewItemAsync(IMedia entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(IMedia entity)
         {
             // update
@@ -388,6 +392,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
+        }
+
+        protected override Task PersistUpdatedItemAsync(IMedia entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         protected override void PersistDeletedItem(IMedia entity)
@@ -503,7 +513,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 throw new InvalidOperationException("This method won't be implemented.");
             }
 
+            protected override Task PersistNewItemAsync(IMedia entity)
+            {
+                throw new InvalidOperationException("This method won't be implemented.");
+            }
+
             protected override void PersistUpdatedItem(IMedia entity)
+            {
+                throw new InvalidOperationException("This method won't be implemented.");
+            }
+
+            protected override Task PersistUpdatedItemAsync(IMedia entity)
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }

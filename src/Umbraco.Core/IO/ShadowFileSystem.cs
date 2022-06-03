@@ -176,8 +176,26 @@ namespace Umbraco.Cms.Core.IO
         {
             AddFile(path, stream, true);
         }
+        public async Task AddFileAsync(string path, Stream stream)
+        {
+            await AddFileAsync(path, stream, true);
+        }
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
+        {
+            string normPath = NormalizeShadowPath(path, overrideIfExists);
+
+            _sfs.AddFile(path, stream, overrideIfExists);
+            Nodes[normPath] = new ShadowNode(false, false);
+        }
+        public async Task AddFileAsync(string path, Stream stream, bool overrideIfExists)
+        {
+            string normPath = NormalizeShadowPath(path, overrideIfExists);
+
+            await _sfs.AddFileAsync(path, stream, overrideIfExists);
+            Nodes[normPath] = new ShadowNode(false, false);
+        }
+        private string NormalizeShadowPath(string path, bool overrideIfExists)
         {
             ShadowNode? sf;
             var normPath = NormPath(path);
@@ -191,19 +209,22 @@ namespace Umbraco.Cms.Core.IO
                 ShadowNode? sd;
                 if (Nodes.TryGetValue(dirPath, out sd))
                 {
-                    if (sd.IsFile) throw new InvalidOperationException("Invalid path.");
-                    if (sd.IsDelete) Nodes[dirPath] = new ShadowNode(false, true);
+                    if (sd.IsFile)
+                        throw new InvalidOperationException("Invalid path.");
+                    if (sd.IsDelete)
+                        Nodes[dirPath] = new ShadowNode(false, true);
                 }
                 else
                 {
-                    if (_fs.DirectoryExists(dirPath)) continue;
-                    if (_fs.FileExists(dirPath)) throw new InvalidOperationException("Invalid path.");
+                    if (_fs.DirectoryExists(dirPath))
+                        continue;
+                    if (_fs.FileExists(dirPath))
+                        throw new InvalidOperationException("Invalid path.");
                     Nodes[dirPath] = new ShadowNode(false, true);
                 }
             }
 
-            _sfs.AddFile(path, stream, overrideIfExists);
-            Nodes[normPath] = new ShadowNode(false, false);
+            return normPath;
         }
 
         public IEnumerable<string> GetFiles(string path)

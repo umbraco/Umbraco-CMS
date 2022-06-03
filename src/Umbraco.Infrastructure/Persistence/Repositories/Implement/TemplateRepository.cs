@@ -213,6 +213,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
+        protected override Task PersistNewItemAsync(ITemplate entity)
+        {
+            PersistNewItem(entity);
+            return Task.CompletedTask;
+        }
         protected override void PersistUpdatedItem(ITemplate entity)
         {
             EnsureValidAlias(entity);
@@ -266,6 +271,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 template.GetFileContent = file => GetFileContent((Template) file, false);
             }
+        }
+
+        protected override Task PersistUpdatedItemAsync(ITemplate entity)
+        {
+            PersistUpdatedItem(entity);
+            return Task.CompletedTask;
         }
 
         private void SaveFile(Template template, string? originalAlias = null)

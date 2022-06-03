@@ -119,6 +119,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             entity.ResetDirtyProperties();
         }
+        protected override async Task PersistNewItemAsync(PublicAccessEntry entity)
+        {
+            entity.AddingEntity();
+            foreach (var rule in entity.Rules)
+                rule.AddingEntity();
+
+            var dto = PublicAccessEntryFactory.BuildDto(entity);
+
+            await Database.InsertAsync(dto);
+            //update the id so HasEntity is correct
+            entity.Id = entity.Key.GetHashCode();
+
+            foreach (var rule in dto.Rules)
+            {
+                rule.AccessId = entity.Key;
+                await Database.InsertAsync(rule);
+            }
+
+            //update the id so HasEntity is correct
+            foreach (var rule in entity.Rules)
+                rule.Id = rule.Key.GetHashCode();
+
+            entity.ResetDirtyProperties();
+        }
 
         protected override void PersistUpdatedItem(PublicAccessEntry entity)
         {
@@ -153,6 +177,55 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 else
                 {
                     Database.Insert(new AccessRuleDto
+                    {
+                        Id = rule.Key,
+                        AccessId = dto.Id,
+                        RuleValue = rule.RuleValue,
+                        RuleType = rule.RuleType,
+                        CreateDate = rule.CreateDate,
+                        UpdateDate = rule.UpdateDate
+                    });
+                    //update the id so HasEntity is correct
+                    rule.Id = rule.Key.GetHashCode();
+                }
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(PublicAccessEntry entity)
+        {
+            entity.UpdatingEntity();
+            foreach (var rule in entity.Rules)
+            {
+                if (rule.HasIdentity)
+                    rule.UpdatingEntity();
+                else
+                    rule.AddingEntity();
+            }
+
+            var dto = PublicAccessEntryFactory.BuildDto(entity);
+
+            await Database.UpdateAsync(dto);
+
+            foreach (var removedRule in entity.RemovedRules)
+            {
+                Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
+            }
+
+            foreach (var rule in entity.Rules)
+            {
+                if (rule.HasIdentity)
+                {
+                    var count = await Database.UpdateAsync(dto.Rules.Single(x => x.Id == rule.Key));
+                    if (count == 0)
+                    {
+                        throw new InvalidOperationException("No rows were updated for the access rule");
+                    }
+                }
+                else
+                {
+                    await Database.InsertAsync(new AccessRuleDto
                     {
                         Id = rule.Key,
                         AccessId = dto.Id,

@@ -53,8 +53,23 @@ namespace Umbraco.Cms.Core.IO
         /// </summary>
         /// <param name="path">The path to the given file.</param>
         /// <param name="stream">The <see cref="Stream"/> containing the file contents.</param>
+        Task AddFileAsync(string path, Stream stream);
+
+        /// <summary>
+        /// Adds a file to the file system.
+        /// </summary>
+        /// <param name="path">The path to the given file.</param>
+        /// <param name="stream">The <see cref="Stream"/> containing the file contents.</param>
         /// <param name="overrideIfExists">Whether to override the file if it already exists.</param>
         void AddFile(string path, Stream stream, bool overrideIfExists);
+
+        /// <summary>
+        /// Adds a file to the file system.
+        /// </summary>
+        /// <param name="path">The path to the given file.</param>
+        /// <param name="stream">The <see cref="Stream"/> containing the file contents.</param>
+        /// <param name="overrideIfExists">Whether to override the file if it already exists.</param>
+        Task AddFileAsync(string path, Stream stream, bool overrideIfExists);
 
         /// <summary>
         /// Gets all files matching the given path.

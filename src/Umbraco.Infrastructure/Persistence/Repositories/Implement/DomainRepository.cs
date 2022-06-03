@@ -98,19 +98,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IDomain entity)
         {
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName", new { domainName = entity.DomainName });
-            if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
+            var exists = Database.ExecuteScalar<int>(NewDomainNameExistsSql(), new { domainName = entity.DomainName });
+            if (exists > 0)
+                throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
 
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
-                if (contentExists == 0) throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
+                var contentExists = Database.ExecuteScalar<int>(NewContentExistsSql(), new { id = entity.RootContentId.Value });
+                if (contentExists == 0)
+                    throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
             }
 
             if (entity.LanguageId.HasValue)
             {
-                var languageExists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoLanguage WHERE id = @id", new { id = entity.LanguageId.Value });
-                if (languageExists == 0) throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
+                var languageExists = Database.ExecuteScalar<int>(NewLanguageExistsSql(), new { id = entity.LanguageId.Value });
+                if (languageExists == 0)
+                    throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
             }
 
             entity.AddingEntity();
@@ -124,31 +127,76 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //if the language changed, we need to resolve the ISO code!
             if (entity.LanguageId.HasValue)
             {
-                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new { langId = entity.LanguageId });
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(NewLanguageIsoCodeSql(), new { langId = entity.LanguageId });
             }
 
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(IDomain entity)
+        protected override async Task PersistNewItemAsync(IDomain entity)
         {
-            entity.UpdatingEntity();
-
-            var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id",
-                new { domainName = entity.DomainName, id = entity.Id });
-            //ensure there is no other domain with the same name on another entity
-            if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
+            var exists = await Database.ExecuteScalarAsync<int>(NewDomainNameExistsSql(), new { domainName = entity.DomainName });
+            if (exists > 0)
+                throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
 
             if (entity.RootContentId.HasValue)
             {
-                var contentExists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id", new { id = entity.RootContentId.Value });
-                if (contentExists == 0) throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
+                var contentExists = await Database.ExecuteScalarAsync<int>(NewContentExistsSql(), new { id = entity.RootContentId.Value });
+                if (contentExists == 0)
+                    throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
             }
 
             if (entity.LanguageId.HasValue)
             {
-                var languageExists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoLanguage WHERE id = @id", new { id = entity.LanguageId.Value });
-                if (languageExists == 0) throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
+                var languageExists = await Database.ExecuteScalarAsync<int>(NewLanguageExistsSql(), new { id = entity.LanguageId.Value });
+                if (languageExists == 0)
+                    throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
+            }
+
+            entity.AddingEntity();
+
+            var factory = new DomainModelFactory();
+            var dto = factory.BuildDto(entity);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(dto));
+            entity.Id = id;
+
+            //if the language changed, we need to resolve the ISO code!
+            if (entity.LanguageId.HasValue)
+            {
+                ((UmbracoDomain)entity).LanguageIsoCode = await Database.ExecuteScalarAsync<string>(NewLanguageIsoCodeSql(), new { langId = entity.LanguageId });
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
+        private static string NewLanguageIsoCodeSql() => "SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId";
+        private static string NewLanguageExistsSql() => "SELECT COUNT(*) FROM umbracoLanguage WHERE id = @id";
+        private static string NewContentExistsSql() => $"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id";
+        private static string NewDomainNameExistsSql() => "SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName";
+
+        protected override void PersistUpdatedItem(IDomain entity)
+        {
+            entity.UpdatingEntity();
+
+            var exists = Database.ExecuteScalar<int>(DomainExistsSql(),
+                new { domainName = entity.DomainName, id = entity.Id });
+            //ensure there is no other domain with the same name on another entity
+            if (exists > 0)
+                throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
+
+            if (entity.RootContentId.HasValue)
+            {
+                var contentExists = Database.ExecuteScalar<int>(ContentExistsSql(), new { id = entity.RootContentId.Value });
+                if (contentExists == 0)
+                    throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
+            }
+
+            if (entity.LanguageId.HasValue)
+            {
+                var languageExists = Database.ExecuteScalar<int>(LanguageExistsSql(), new { id = entity.LanguageId.Value });
+                if (languageExists == 0)
+                    throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
             }
 
             var factory = new DomainModelFactory();
@@ -159,11 +207,54 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //if the language changed, we need to resolve the ISO code!
             if (entity.WasPropertyDirty("LanguageId"))
             {
-                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new {langId = entity.LanguageId});
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>(LanguageIsoCodeExists(), new { langId = entity.LanguageId });
             }
 
             entity.ResetDirtyProperties();
         }
+
+        protected override async Task PersistUpdatedItemAsync(IDomain entity)
+        {
+            entity.UpdatingEntity();
+
+            var exists = await Database.ExecuteScalarAsync<int>(DomainExistsSql(),
+                new { domainName = entity.DomainName, id = entity.Id });
+            //ensure there is no other domain with the same name on another entity
+            if (exists > 0)
+                throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
+
+            if (entity.RootContentId.HasValue)
+            {
+                var contentExists = await Database.ExecuteScalarAsync<int>(ContentExistsSql(), new { id = entity.RootContentId.Value });
+                if (contentExists == 0)
+                    throw new NullReferenceException("No content exists with id " + entity.RootContentId.Value);
+            }
+
+            if (entity.LanguageId.HasValue)
+            {
+                var languageExists = await Database.ExecuteScalarAsync<int>(LanguageExistsSql(), new { id = entity.LanguageId.Value });
+                if (languageExists == 0)
+                    throw new NullReferenceException("No language exists with id " + entity.LanguageId.Value);
+            }
+
+            var factory = new DomainModelFactory();
+            var dto = factory.BuildDto(entity);
+
+            await Database.UpdateAsync(dto);
+
+            //if the language changed, we need to resolve the ISO code!
+            if (entity.WasPropertyDirty("LanguageId"))
+            {
+                ((UmbracoDomain)entity).LanguageIsoCode = await Database.ExecuteScalarAsync<string>(LanguageIsoCodeExists(), new { langId = entity.LanguageId });
+            }
+
+            entity.ResetDirtyProperties();
+        }
+
+        private static string LanguageIsoCodeExists() => "SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId";
+        private static string LanguageExistsSql() => "SELECT COUNT(*) FROM umbracoLanguage WHERE id = @id";
+        private static string ContentExistsSql() => $"SELECT COUNT(*) FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE nodeId = @id";
+        private static string DomainExistsSql() => "SELECT COUNT(*) FROM umbracoDomain WHERE domainName = @domainName AND umbracoDomain.id <> @id";
 
         public IDomain? GetByName(string domainName)
         {

@@ -320,6 +320,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        protected override async Task PersistNewItemAsync(IUserGroup entity)
+        {
+            entity.AddingEntity();
+
+            var userGroupDto = UserGroupFactory.BuildDto(entity);
+
+            var id = Convert.ToInt32(await Database.InsertAsync(userGroupDto));
+            entity.Id = id;
+
+            PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
+        }
+
         protected override void PersistUpdatedItem(IUserGroup entity)
         {
             entity.UpdatingEntity();
@@ -327,6 +341,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var userGroupDto = UserGroupFactory.BuildDto(entity);
 
             Database.Update(userGroupDto);
+
+            PersistAllowedSections(entity);
+
+            entity.ResetDirtyProperties();
+        }
+
+        protected override async Task PersistUpdatedItemAsync(IUserGroup entity)
+        {
+            entity.UpdatingEntity();
+
+            var userGroupDto = UserGroupFactory.BuildDto(entity);
+
+            await Database.UpdateAsync(userGroupDto);
 
             PersistAllowedSections(entity);
 
@@ -434,10 +461,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
             }
 
+            protected override async Task PersistNewItemAsync(UserGroupWithUsers entity)
+            {
+                //save the user group
+                await _userGroupRepo.PersistNewItemAsync(entity.UserGroup);
+
+                if (entity.UserIds == null)
+                    return;
+
+                //now the user association
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
+            }
+
             protected override void PersistUpdatedItem(UserGroupWithUsers entity)
             {
                 //save the user group
                 _userGroupRepo.PersistUpdatedItem(entity.UserGroup);
+
+                if (entity.UserIds == null)
+                    return;
+
+                //now the user association
+                RefreshUsersInGroup(entity.UserGroup.Id, entity.UserIds);
+            }
+
+            protected override async Task PersistUpdatedItemAsync(UserGroupWithUsers entity)
+            {
+                //save the user group
+                await _userGroupRepo.PersistUpdatedItemAsync(entity.UserGroup);
 
                 if (entity.UserIds == null)
                     return;

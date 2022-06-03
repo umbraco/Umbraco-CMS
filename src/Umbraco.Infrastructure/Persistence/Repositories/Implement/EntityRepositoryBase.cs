@@ -128,6 +128,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <summary>
+        ///     Adds or Updates an entity of type TEntity
+        /// </summary>
+        /// <remarks>This method is backed by an <see cref="IAppPolicyCache" /> cache</remarks>
+        public virtual async Task SaveAsync(TEntity entity)
+        {
+            if (entity.HasIdentity == false)
+            {
+                await CachePolicy.CreateAsync(entity, PersistNewItemAsync);
+            }
+            else
+            {
+                await CachePolicy.UpdateAsync(entity, PersistUpdatedItemAsync);
+            }
+        }
+
+        /// <summary>
         ///     Deletes the passed in entity
         /// </summary>
         public virtual void Delete(TEntity entity)
@@ -260,8 +276,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
 
         protected abstract void PersistNewItem(TEntity item);
+        protected abstract Task PersistNewItemAsync(TEntity item);
 
         protected abstract void PersistUpdatedItem(TEntity item);
+        protected abstract Task PersistUpdatedItemAsync(TEntity item);
 
         // TODO: obsolete, use QueryType instead everywhere like GetBaseQuery(QueryType queryType);
         protected abstract Sql<ISqlContext> GetBaseQuery(bool isCount);

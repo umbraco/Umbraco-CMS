@@ -142,6 +142,17 @@ namespace Umbraco.Cms.Core.IO
         /// </summary>
         /// <param name="path">The filesystem-relative path of the file.</param>
         /// <param name="stream">A stream containing the file data.</param>
+        /// <remarks>Overrides the existing file, if any.</remarks>
+        public async Task AddFileAsync(string path, Stream stream)
+        {
+            await AddFileAsync(path, stream, true);
+        }
+
+        /// <summary>
+        /// Saves a file.
+        /// </summary>
+        /// <param name="path">The filesystem-relative path of the file.</param>
+        /// <param name="stream">A stream containing the file data.</param>
         /// <param name="overrideExisting">A value indicating whether to override the existing file, if any.</param>
         /// <remarks>If a file exists and <paramref name="overrideExisting"/> is false, an exception is thrown.</remarks>
         public void AddFile(string path, Stream stream, bool overrideExisting)
@@ -164,6 +175,36 @@ namespace Umbraco.Cms.Core.IO
 
             using var destination = (Stream)File.Create(fullPath);
             stream.CopyTo(destination);
+        }
+
+        /// <summary>
+        /// Saves a file.
+        /// </summary>
+        /// <param name="path">The filesystem-relative path of the file.</param>
+        /// <param name="stream">A stream containing the file data.</param>
+        /// <param name="overrideExisting">A value indicating whether to override the existing file, if any.</param>
+        /// <remarks>If a file exists and <paramref name="overrideExisting"/> is false, an exception is thrown.</remarks>
+        public async Task AddFileAsync(string path, Stream stream, bool overrideExisting)
+        {
+            var fullPath = GetFullPath(path);
+            var exists = File.Exists(fullPath);
+            if (exists && overrideExisting == false)
+            {
+                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            }
+
+            var directory = Path.GetDirectoryName(fullPath);
+            if (directory == null)
+                throw new InvalidOperationException("Could not get directory.");
+            Directory.CreateDirectory(directory); // ensure it exists
+
+            if (stream.CanSeek)
+            {
+                stream.Seek(0, 0);
+            }
+
+            using var destination = (Stream)File.Create(fullPath);
+            await stream.CopyToAsync(destination);
         }
 
         /// <summary>

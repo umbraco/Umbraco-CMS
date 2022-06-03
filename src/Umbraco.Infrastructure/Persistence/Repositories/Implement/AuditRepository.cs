@@ -23,32 +23,46 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IAuditItem entity)
         {
-            Database.Insert(new LogDto
-            {
-                Comment = entity.Comment,
-                Datestamp = DateTime.Now,
-                Header = entity.AuditType.ToString(),
-                NodeId = entity.Id,
-                UserId = entity.UserId,
-                EntityType = entity.EntityType,
-                Parameters = entity.Parameters
-            });
+            Database.Insert(MapToNewLogDto(entity));
         }
+        protected override async Task PersistNewItemAsync(IAuditItem entity)
+        {
+            await Database.InsertAsync(MapToNewLogDto(entity));
+        }
+
+        private static LogDto MapToNewLogDto(IAuditItem entity) => new LogDto
+        {
+            Comment = entity.Comment,
+            Datestamp = DateTime.Now,
+            Header = entity.AuditType.ToString(),
+            NodeId = entity.Id,
+            UserId = entity.UserId,
+            EntityType = entity.EntityType,
+            Parameters = entity.Parameters
+        };
 
         protected override void PersistUpdatedItem(IAuditItem entity)
         {
             // inserting when updating because we never update a log entry, perhaps this should throw?
-            Database.Insert(new LogDto
-            {
-                Comment = entity.Comment,
-                Datestamp = DateTime.Now,
-                Header = entity.AuditType.ToString(),
-                NodeId = entity.Id,
-                UserId = entity.UserId,
-                EntityType = entity.EntityType,
-                Parameters = entity.Parameters
-            });
+            Database.Insert(MapToUpdatedLogDto(entity));
         }
+
+        protected override async Task PersistUpdatedItemAsync(IAuditItem entity)
+        {
+            // inserting when updating because we never update a log entry, perhaps this should throw?
+            await Database.InsertAsync(MapToUpdatedLogDto(entity));
+        }
+
+        private static LogDto MapToUpdatedLogDto(IAuditItem entity) => new LogDto
+        {
+            Comment = entity.Comment,
+            Datestamp = DateTime.Now,
+            Header = entity.AuditType.ToString(),
+            NodeId = entity.Id,
+            UserId = entity.UserId,
+            EntityType = entity.EntityType,
+            Parameters = entity.Parameters
+        };
 
         protected override IAuditItem? PerformGet(int id)
         {

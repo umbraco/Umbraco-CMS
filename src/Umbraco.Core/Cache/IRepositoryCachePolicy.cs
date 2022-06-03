@@ -64,6 +64,14 @@ namespace Umbraco.Cms.Core.Cache
         void Create(TEntity entity, Action<TEntity> persistNew);
 
         /// <summary>
+        /// Creates an entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="persistNew">The repository PersistNewItem method.</param>
+        /// <remarks>Creates the entity in the repository, and updates the cache accordingly.</remarks>
+        Task CreateAsync(TEntity entity, Func<TEntity,Task> persistNewAsync);
+
+        /// <summary>
         /// Updates an entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
@@ -72,12 +80,28 @@ namespace Umbraco.Cms.Core.Cache
         void Update(TEntity entity, Action<TEntity> persistUpdated);
 
         /// <summary>
+        /// Updates an entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="persistUpdated">The repository PersistUpdatedItem method.</param>
+        /// <remarks>Updates the entity in the repository, and updates the cache accordingly.</remarks>
+        Task UpdateAsync(TEntity entity, Func<TEntity, Task> persistUpdatedAsync);
+
+        /// <summary>
         /// Removes an entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <param name="persistDeleted">The repository PersistDeletedItem method.</param>
         /// <remarks>Removes the entity from the repository and clears the cache.</remarks>
         void Delete(TEntity entity, Action<TEntity> persistDeleted);
+
+        // <summary>
+        /// Removes an entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="persistDeleted">The repository PersistDeletedItem method.</param>
+        /// <remarks>Removes the entity from the repository and clears the cache.</remarks>
+        Task DeleteAsync(TEntity entity, Func<TEntity, Task> persistDeleted);
 
         /// <summary>
         /// Gets entities.
@@ -101,5 +125,10 @@ namespace Umbraco.Cms.Core.Cache
         /// Clears the entire cache.
         /// </summary>
         void ClearAll();
+
+        /// <summary>
+        /// Clears the entire cache.
+        /// </summary>
+        Task ClearAllAsync();
     }
 }

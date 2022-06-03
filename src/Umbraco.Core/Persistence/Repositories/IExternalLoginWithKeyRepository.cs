@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     /// <summary>
     /// Repository for external logins with Guid as key, so it can be shared for members and users
     /// </summary>
-    public interface IExternalLoginWithKeyRepository : IAsyncReadWriteQueryRepository<int, IIdentityUserLogin>, IQueryRepository<IIdentityUserToken>
+    public interface IExternalLoginWithKeyRepository : IAsyncReadWriteQueryRepository<int, IIdentityUserLogin>, IAsyncQueryRepository<IIdentityUserToken>
     {
         /// <summary>
         /// Replaces all external login providers for the user/member key
