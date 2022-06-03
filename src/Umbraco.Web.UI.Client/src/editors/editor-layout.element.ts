@@ -31,7 +31,7 @@ class UmbEditorLayout extends LitElement {
         border-bottom: 1px solid var(--uui-color-border);
       }
 
-      #content {
+      #main {
         padding: var(--uui-size-6);
         display: flex;
         flex: 1;
@@ -62,8 +62,8 @@ class UmbEditorLayout extends LitElement {
           <slot name="name"></slot>
           <slot name="apps"></slot>
         </div>
-        <uui-scroll-container id="content">
-          <slot name="content"></slot>
+        <uui-scroll-container id="main">
+          <slot></slot>
         </uui-scroll-container>
         <div id="footer">
           <!-- only show footer if slot has elements -->
