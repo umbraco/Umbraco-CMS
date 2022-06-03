@@ -41,7 +41,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
       }
 
       #news-checkbox {
-        margin-top: var(--uui-size-layout-2);
+        margin-top: var(--uui-size-space-4);
       }
 
       #buttons {
