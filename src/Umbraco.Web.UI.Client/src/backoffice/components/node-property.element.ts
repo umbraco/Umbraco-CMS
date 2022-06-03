@@ -4,10 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { EMPTY, of, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../../core/extension';
-import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
-import { DataTypeEntity } from '../../../mocks/data/content.data';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
+import { UmbDataTypeStore } from '../../core/stores/data-type.store';
+import { DataTypeEntity } from '../../mocks/data/content.data';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {

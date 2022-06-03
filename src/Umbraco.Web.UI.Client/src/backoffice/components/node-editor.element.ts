@@ -1,21 +1,21 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { UmbContextConsumerMixin } from '../../../core/context';
-import { UmbNodeStore } from '../../../core/stores/node.store';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbNodeStore } from '../../core/stores/node.store';
 import { map, Subscription } from 'rxjs';
-import { DocumentNode } from '../../../mocks/data/content.data';
-import { UmbNotificationService } from '../../../core/service/notifications.store';
-import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../../core/extension';
+import { DocumentNode } from '../../mocks/data/content.data';
+import { UmbNotificationService } from '../../core/service/notifications.store';
+import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import '../../editor-views/editor-view-node-edit.element';
-import '../../editor-views/editor-view-node-info.element';
+import '../editor-views/editor-view-node-edit.element';
+import '../editor-views/editor-view-node-info.element';
 
-@customElement('umb-content-editor')
-export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-node-editor')
+export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
   static styles = [
     UUITextStyles,
     css`
@@ -236,10 +236,10 @@ export class UmbContentEditor extends UmbContextConsumerMixin(LitElement) {
   }
 }
 
-export default UmbContentEditor;
+export default UmbNodeEditor;
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-content-editor': UmbContentEditor;
+    'umb-node-editor': UmbNodeEditor;
   }
 }
