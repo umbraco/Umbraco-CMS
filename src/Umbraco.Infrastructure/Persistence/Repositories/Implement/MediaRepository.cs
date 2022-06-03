@@ -82,12 +82,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IMedia> PerformGetAll(params int[]? ids)
         {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(Database.Fetch<ContentDto>(sql));
+        }
+        protected override async Task<IEnumerable<IMedia>> PerformGetAllAsync(params int[]? ids)
+        {
+            Sql<ISqlContext> sql = GetAllSql(ids);
+
+            return MapDtosToContent(await Database.FetchAsync<ContentDto>(sql));
+        }
+
+        private Sql<ISqlContext> GetAllSql(int[]? ids)
+        {
             var sql = GetBaseQuery(QueryType.Many);
 
             if (ids?.Any() ?? false)
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
-
-            return MapDtosToContent(Database.Fetch<ContentDto>(sql));
+            return sql;
         }
 
         protected override IEnumerable<IMedia> PerformGetByQuery(IQuery<IMedia> query)
@@ -407,6 +419,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public IMedia? Get(Guid id)
         {
             return _mediaByGuidReadRepository.Get(id);
+        }
+        public async Task<IMedia?> GetAsync(Guid id)
+        {
+            return await _mediaByGuidReadRepository.GetAsync(id);
         }
 
         IEnumerable<IMedia> IReadRepository<Guid, IMedia>.GetMany(params Guid[]? ids)
