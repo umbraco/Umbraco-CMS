@@ -48,13 +48,16 @@ namespace Umbraco.Web.Telemetry
 
             try
             {
-                // Send data to LIVE telemetry
-                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+                if (_httpClient.BaseAddress == null)
+                {
+                    // Send data to LIVE telemetry
+                    _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
-                // Send data to DEBUG telemetry service
-                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                    // Send data to DEBUG telemetry service
+                    _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
+                }
 
                 _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
