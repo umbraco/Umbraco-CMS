@@ -47,9 +47,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         DateTimeColumnDefinition = "TEXT";
         DateTimeOffsetColumnDefinition = "TEXT";
         TimeColumnDefinition = "TEXT";
+        DecimalColumnDefinition = "TEXT"; // REAL would be lossy. - https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/types
 
         RealColumnDefinition = "REAL";
-        DecimalColumnDefinition = "REAL";
 
         BlobColumnDefinition = "BLOB";
     }
