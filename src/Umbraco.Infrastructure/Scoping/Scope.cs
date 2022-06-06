@@ -40,7 +40,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private readonly bool? _scopeFileSystem;
 
         private readonly ScopeProvider _scopeProvider;
-        private bool _callContext;
         private bool? _completed;
         private IUmbracoDatabase? _database;
 
@@ -93,7 +92,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _eventDispatcher = eventDispatcher;
             _notificationPublisher = notificationPublisher;
             _scopeFileSystem = scopeFileSystems;
-            _callContext = callContext;
             _autoComplete = autoComplete;
             Detachable = detachable;
             _dictionaryLocker = new object();
@@ -259,24 +257,15 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
         }
 
+        [Obsolete("Scopes are never stored on HttpContext.Items anymore, so CallContext is always true.")]
         // a value indicating whether to force call-context
         public bool CallContext
         {
-            get
+            get => true;
+            set
             {
-                if (_callContext)
-                {
-                    return true;
-                }
-
-                if (ParentScope != null)
-                {
-                    return ParentScope.CallContext;
-                }
-
-                return false;
+                // NOOP - always true.
             }
-            set => _callContext = value;
         }
 
         public bool ScopedFileSystems
@@ -551,7 +540,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 }
             }
 
-            _scopeProvider.PopAmbientScope(this); // might be null = this is how scopes are removed from context objects
+            _scopeProvider.PopAmbientScope(); // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
@@ -903,7 +892,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     // by Deploy which I don't fully understand since there is limited tests on this in the CMS
                     if (OrigScope != _scopeProvider.AmbientScope)
                     {
-                        _scopeProvider.PopAmbientScope(_scopeProvider.AmbientScope);
+                        _scopeProvider.PopAmbientScope();
                     }
 
                     if (OrigContext != _scopeProvider.AmbientContext)
