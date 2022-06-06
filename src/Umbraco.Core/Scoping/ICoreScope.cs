@@ -1,4 +1,3 @@
-using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 
@@ -9,6 +8,14 @@ namespace Umbraco.Cms.Core.Scoping;
 /// </summary>
 public interface ICoreScope : IDisposable, IInstanceIdentifiable
 {
+    /// <summary>
+    /// Gets the distance from the root scope.
+    /// </summary>
+    /// <remarks>
+    /// A zero represents a root scope, any value greater than zero represents a child scope.
+    /// </remarks>
+    public int Depth => -1;
+
     /// <summary>
     /// Gets the scope notification publisher
     /// </summary>
