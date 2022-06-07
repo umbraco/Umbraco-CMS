@@ -7,8 +7,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing;
 ///     Represents the variant info for a content item
 /// </summary>
 [DataContract(Name = "contentVariant", Namespace = "")]
-public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, IContentProperties<ContentPropertyDisplay>,
-    INotificationModel
+public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, IContentProperties<ContentPropertyDisplay>, INotificationModel
 {
     public ContentVariantDisplay()
     {
