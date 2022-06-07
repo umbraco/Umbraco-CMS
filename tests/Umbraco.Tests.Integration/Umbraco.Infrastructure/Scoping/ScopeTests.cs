@@ -227,56 +227,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void NestedMigrateScope()
-        {
-            // Get the request cache mock and re-configure it to be available and used
-            var requestCacheDictionary = new Dictionary<string, object>();            
-            IRequestCache requestCache = AppCaches.RequestCache;
-            var requestCacheMock = Mock.Get(requestCache);
-            requestCacheMock
-                .Setup(x => x.IsAvailable)
-                .Returns(true);
-            requestCacheMock
-                .Setup(x => x.Set(It.IsAny<string>(), It.IsAny<object>()))
-                .Returns((string key, object val) =>
-                {
-                    requestCacheDictionary.Add(key, val);
-                    return true;
-                });
-            requestCacheMock
-                .Setup(x => x.Get(It.IsAny<string>()))
-                .Returns((string key) => requestCacheDictionary.TryGetValue(key, out var val) ? val : null);
-
-            ScopeProvider scopeProvider = ScopeProvider;
-            Assert.IsNull(scopeProvider.AmbientScope);
-
-            using (IScope scope = scopeProvider.CreateScope())
-            {
-                Assert.IsInstanceOf<Scope>(scope);
-                Assert.IsNotNull(scopeProvider.AmbientScope);
-                Assert.AreSame(scope, scopeProvider.AmbientScope);
-
-                using (IScope nested = scopeProvider.CreateScope(callContext: true))
-                {
-                    Assert.IsInstanceOf<Scope>(nested);
-                    Assert.IsNotNull(scopeProvider.AmbientScope);
-                    Assert.AreSame(nested, scopeProvider.AmbientScope);
-                    Assert.AreSame(scope, ((Scope)nested).ParentScope);
-
-                    // it's moved over to call context
-                    ConcurrentStack<IScope> callContextScope = scopeProvider.GetCallContextScopeValue();
-
-                    Assert.IsNotNull(callContextScope);
-                    Assert.AreEqual(2, callContextScope.Count);
-                }
-
-                // it's naturally back in http context
-            }
-
-            Assert.IsNull(scopeProvider.AmbientScope);
-        }
-
-        [Test]
         public void NestedCreateScopeContext()
         {
             ScopeProvider scopeProvider = ScopeProvider;
