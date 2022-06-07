@@ -14,9 +14,7 @@ public class RelationTypeDeletingNotification : DeletingNotification<IRelationTy
     }
 
     public RelationTypeDeletingNotification(IEnumerable<IRelationType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
