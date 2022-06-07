@@ -86,7 +86,7 @@ public static class StringExtensions
         var lastIndex = fileName.LastIndexOf('.');
         if (lastIndex > 0)
         {
-            var ext = fileName[lastIndex..];
+            var ext = fileName.Substring(lastIndex);
 
             // file extensions cannot contain whitespace
             if (ext.Contains(" "))
