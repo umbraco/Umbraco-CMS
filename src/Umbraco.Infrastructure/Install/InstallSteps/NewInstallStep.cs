@@ -1,11 +1,14 @@
 using System.Collections.Specialized;
+using System.Data.Common;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -14,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
@@ -100,18 +104,18 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override async Task<InstallSetupResult?> ExecuteAsync(UserModel user)
         {
-            var admin = _userService.GetUserById(Constants.Security.SuperUserId);
+            IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
             admin.Email = user.Email.Trim();
-            admin.Name = user.Name!.Trim();
+            admin.Name = user.Name.Trim();
             admin.Username = user.Email.Trim();
 
             _userService.Save(admin);
 
-            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+            BackOfficeIdentityUser? membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
             if (membershipUser == null)
             {
                 throw new InvalidOperationException(
@@ -121,11 +125,15 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             //To change the password here we actually need to reset it since we don't have an old one to use to change
             var resetToken = await _userManager.GeneratePasswordResetTokenAsync(membershipUser);
             if (string.IsNullOrWhiteSpace(resetToken))
+            {
                 throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
+            }
 
-            var resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
+            IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
+            {
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
+            }
 
             _metricsConsentService.SetConsentLevel(user.TelemetryLevel);
 
@@ -138,7 +146,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
                 try
                 {
-                    var response = httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
+                    HttpResponseMessage response = httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
                 }
                 catch { /* fail in silence */ }
             }
@@ -176,17 +184,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }
         }
 
-        public override string View
-        {
-            get
-            {
-                return ShowView()
-                    // the user UI
-                    ? "user"
-                    // continue install UI
-                    : "continueinstall";
-            }
-        }
+        public override string View => ShowView()
+            // the user UI
+            ? "user"
+            // continue install UI
+            : "continueinstall";
 
         private string GetTelemetryLevelDescription(TelemetryLevel telemetryLevel) => telemetryLevel switch
         {
@@ -198,42 +200,36 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         private InstallState GetInstallState()
         {
-            var installState = InstallState.Unknown;
+            InstallState installState = InstallState.Unknown;
 
-
-            // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
-            // exception in the installer.
-
-            var databaseSettings = _connectionStrings.Get(Constants.System.UmbracoConnectionName);
-
-            var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
-            if (hasConnString)
+            if (_databaseBuilder.IsDatabaseConfigured)
             {
                 installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
             }
 
-            var connStringConfigured = databaseSettings?.IsConnectionStringConfigured() ?? false;
-            if (connStringConfigured)
+            ConnectionStrings? umbracoConnectionString = _connectionStrings.CurrentValue;
+
+            var isConnectionStringConfigured = umbracoConnectionString.IsConnectionStringConfigured();
+            if (isConnectionStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
             }
 
-
-            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
-            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings?.ConnectionString, factory);
-            if (canConnect)
+            DbProviderFactory? factory = _dbProviderFactoryCreator.CreateFactory(umbracoConnectionString.ProviderName);
+            var isConnectionAvailable = isConnectionStringConfigured && DbConnectionExtensions.IsConnectionAvailable(umbracoConnectionString.ConnectionString, factory);
+            if (isConnectionAvailable)
             {
                 installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
             }
 
-            var umbracoInstalled = canConnect ? _databaseBuilder.IsUmbracoInstalled() : false;
-            if (umbracoInstalled)
+            var isUmbracoInstalled = isConnectionAvailable && _databaseBuilder.IsUmbracoInstalled();
+            if (isUmbracoInstalled)
             {
                 installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
             }
 
-            var hasNonDefaultUser = umbracoInstalled ? _databaseBuilder.HasSomeNonDefaultUser() : false;
-            if (hasNonDefaultUser)
+            var hasSomeNonDefaultUser = isUmbracoInstalled && _databaseBuilder.HasSomeNonDefaultUser();
+            if (hasSomeNonDefaultUser)
             {
                 installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
             }
@@ -243,16 +239,14 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         private bool ShowView()
         {
-            var installState = GetInstallState();
+            InstallState installState = GetInstallState();
 
-            return installState.HasFlag(InstallState.Unknown)
-                || !installState.HasFlag(InstallState.UmbracoInstalled);
+            return installState.HasFlag(InstallState.Unknown) || !installState.HasFlag(InstallState.UmbracoInstalled);
         }
 
         public override bool RequiresExecution(UserModel model)
         {
-            var installState = GetInstallState();
-
+            InstallState installState = GetInstallState();
             if (installState.HasFlag(InstallState.Unknown))
             {
                 // In this one case when it's a brand new install and nothing has been configured, make sure the
@@ -260,8 +254,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 _cookieManager.ExpireCookie(_securitySettings.AuthCookieName);
             }
 
-            return installState.HasFlag(InstallState.Unknown)
-                || !installState.HasFlag(InstallState.HasNonDefaultUser);
+            return installState.HasFlag(InstallState.Unknown) || !installState.HasFlag(InstallState.HasNonDefaultUser);
         }
 
         [Flags]

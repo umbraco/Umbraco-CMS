@@ -1,5 +1,3 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using NPoco;
 using Umbraco.Cms.Core;
@@ -28,7 +26,9 @@ public class AddMemberPropertiesAsColumns : MigrationBase
         AddColumnIfNotExists<MemberDto>(columns, "lastPasswordChangeDate");
 
         Sql<ISqlContext> newestContentVersionQuery = Database.SqlContext.Sql()
-            .Select($"MAX({GetQuotedSelector("cv", "id")}) as {SqlSyntax.GetQuotedColumnName("id")}", GetQuotedSelector("cv", "nodeId"))
+            .Select(
+                $"MAX({GetQuotedSelector("cv", "id")}) as {SqlSyntax.GetQuotedColumnName("id")}",
+                GetQuotedSelector("cv", "nodeId"))
             .From<ContentVersionDto>("cv")
             .GroupBy(GetQuotedSelector("cv", "nodeId"));
 
@@ -62,15 +62,21 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .From<PropertyTypeDto>("pt")
             .Where($"{GetQuotedSelector("pt", "Alias")} = 'umbracoMemberLastPasswordChangeDate'");
 
-        StringBuilder queryBuilder = new StringBuilder();
+        var queryBuilder = new StringBuilder();
         queryBuilder.AppendLine($"UPDATE {Constants.DatabaseSchema.Tables.Member}");
         queryBuilder.AppendLine("SET");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.FailedPasswordAttempts)} = {GetQuotedSelector("umbracoPropertyData", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsApproved)} = {GetQuotedSelector("pdmp", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsLockedOut)} = {GetQuotedSelector("pdlo", "intValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLockoutDate)} = {GetQuotedSelector("pdlout", "dateValue")},");
-        queryBuilder.AppendLine($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLoginDate)} = {GetQuotedSelector("pdlin", "dateValue")},");
-        queryBuilder.Append($"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastPasswordChangeDate)} = {GetQuotedSelector("pdlpc", "dateValue")}");
+        queryBuilder.AppendLine(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.FailedPasswordAttempts)} = {GetQuotedSelector("umbracoPropertyData", "intValue")},");
+        queryBuilder.AppendLine(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsApproved)} = {GetQuotedSelector("pdmp", "intValue")},");
+        queryBuilder.AppendLine(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.IsLockedOut)} = {GetQuotedSelector("pdlo", "intValue")},");
+        queryBuilder.AppendLine(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLockoutDate)} = {GetQuotedSelector("pdlout", "dateValue")},");
+        queryBuilder.AppendLine(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastLoginDate)} = {GetQuotedSelector("pdlin", "dateValue")},");
+        queryBuilder.Append(
+            $"\t{Database.SqlContext.SqlSyntax.GetFieldNameForUpdate<MemberDto>(x => x.LastPasswordChangeDate)} = {GetQuotedSelector("pdlpc", "dateValue")}");
 
         Sql<ISqlContext> updateMemberColumnsQuery = Database.SqlContext.Sql(queryBuilder.ToString())
             .From<NodeDto>()
@@ -87,37 +93,43 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             .LeftJoin<DataTypeDto>()
             .On<FailedAttempts, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
             .LeftJoin<PropertyDataDto>()
-            .On<PropertyDataDto, FailedAttempts, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id)
+            .On<PropertyDataDto, FailedAttempts, ContentVersionDto>((left, middle, right) =>
+                left.PropertyTypeId == middle.Id && left.VersionId == right.Id)
             .LeftJoin(memberApprovedQuery, "memberApprovedType")
             .On<ContentDto, MemberApproved>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>("dtmp")
             .On<MemberApproved, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId, null, "dtmp")
             .LeftJoin<PropertyDataDto>("pdmp")
-            .On<PropertyDataDto, MemberApproved, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdmp")
+            .On<PropertyDataDto, MemberApproved, ContentVersionDto>(
+                (left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdmp")
             .LeftJoin(memberLockedOutQuery, "memberLockedOutType")
             .On<ContentDto, MemberLockedOut>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>("dtlo")
             .On<MemberLockedOut, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId, null, "dtlo")
             .LeftJoin<PropertyDataDto>("pdlo")
-            .On<PropertyDataDto, MemberLockedOut, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlo")
+            .On<PropertyDataDto, MemberLockedOut, ContentVersionDto>(
+                (left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlo")
             .LeftJoin(memberLastLockoutDateQuery, "lastLockOutDateType")
             .On<ContentDto, LastLockoutDate>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>("dtlout")
             .On<LastLockoutDate, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId, null, "dtlout")
             .LeftJoin<PropertyDataDto>("pdlout")
-            .On<PropertyDataDto, LastLockoutDate, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlout")
+            .On<PropertyDataDto, LastLockoutDate, ContentVersionDto>(
+                (left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlout")
             .LeftJoin(memberLastLoginDateQuery, "lastLoginDateType")
             .On<ContentDto, LastLoginDate>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>("dtlin")
             .On<LastLoginDate, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId, null, "dtlin")
             .LeftJoin<PropertyDataDto>("pdlin")
-            .On<PropertyDataDto, LastLoginDate, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlin")
+            .On<PropertyDataDto, LastLoginDate, ContentVersionDto>(
+                (left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlin")
             .LeftJoin(memberLastPasswordChangeDateQuery, "lastPasswordChangeType")
             .On<ContentDto, LastPasswordChange>((left, right) => left.ContentTypeId == right.ContentTypeId)
             .LeftJoin<DataTypeDto>("dtlpc")
             .On<LastPasswordChange, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId, null, "dtlpc")
             .LeftJoin<PropertyDataDto>("pdlpc")
-            .On<PropertyDataDto, LastPasswordChange, ContentVersionDto>((left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlpc")
+            .On<PropertyDataDto, LastPasswordChange, ContentVersionDto>(
+                (left, middle, right) => left.PropertyTypeId == middle.Id && left.VersionId == right.Id, "pdlpc")
             .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Member);
 
         Database.Execute(updateMemberColumnsQuery);
@@ -131,7 +143,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
             "umbracoMemberLockedOut",
             "umbracoMemberLastLockoutDate",
             "umbracoMemberLastLogin",
-            "umbracoMemberLastPasswordChangeDate"
+            "umbracoMemberLastPasswordChangeDate",
         };
 
         Sql<ISqlContext> idQuery = Database.SqlContext.Sql().Select<PropertyTypeDto>(x => x.Id)
@@ -157,8 +169,7 @@ public class AddMemberPropertiesAsColumns : MigrationBase
 
     private object[] GetSubQueryColumns() => new object[]
     {
-        SqlSyntax.GetQuotedColumnName("contentTypeId"),
-        SqlSyntax.GetQuotedColumnName("dataTypeId"),
+        SqlSyntax.GetQuotedColumnName("contentTypeId"), SqlSyntax.GetQuotedColumnName("dataTypeId"),
         SqlSyntax.GetQuotedColumnName("id"),
     };
 

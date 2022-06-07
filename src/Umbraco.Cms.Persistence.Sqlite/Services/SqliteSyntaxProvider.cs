@@ -73,6 +73,32 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
+    public override string Format(TableDefinition table)
+    {
+        var columns = Format(table.Columns);
+        var primaryKey = FormatPrimaryKey(table);
+        List<string> foreignKeys = Format(table.ForeignKeys);
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"CREATE TABLE {table.Name}");
+        sb.AppendLine("(");
+        sb.Append(columns);
+
+        if (!string.IsNullOrEmpty(primaryKey))
+        {
+            sb.AppendLine($", {primaryKey}");
+        }
+
+        foreach (var foreignKey in foreignKeys)
+        {
+            sb.AppendLine($", {foreignKey}");
+        }
+
+        sb.AppendLine(")");
+
+        return sb.ToString();
+    }
+
     public override List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys)
     {
         return foreignKeys.Select(Format).ToList();
@@ -180,8 +206,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return string.Join(" || ", args.AsEnumerable());
     }
 
-    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias,
-        string? referenceName = null, bool forInsert = false)
+    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {

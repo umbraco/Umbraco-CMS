@@ -1,65 +1,76 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+
+[DefaultPropertyValueConverter]
+public class ColorPickerValueConverter : PropertyValueConverterBase
 {
-    [DefaultPropertyValueConverter]
-    public class ColorPickerValueConverter : PropertyValueConverterBase
+    public override bool IsConverter(IPublishedPropertyType propertyType)
+        => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ColorPicker);
+
+    public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+        => UseLabel(propertyType) ? typeof(PickedColor) : typeof(string);
+
+    public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Element;
+
+    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        public override bool IsConverter(IPublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Cms.Core.Constants.PropertyEditors.Aliases.ColorPicker);
+        var useLabel = UseLabel(propertyType);
 
-        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => UseLabel(propertyType) ? typeof(PickedColor) : typeof(string);
-
-        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-            => PropertyCacheLevel.Element;
-
-        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+        if (source == null)
         {
-            var useLabel = UseLabel(propertyType);
+            return useLabel ? null : string.Empty;
+        }
 
-            if (source == null) return useLabel ? null : string.Empty;
-
-            var ssource = source.ToString()!;
-            if (ssource.DetectIsJson())
+        var ssource = source.ToString()!;
+        if (ssource.DetectIsJson())
+        {
+            try
             {
-                try
+                JObject? jo = JsonConvert.DeserializeObject<JObject>(ssource);
+                if (useLabel)
                 {
-                    var jo = JsonConvert.DeserializeObject<JObject>(ssource);
-                    if (useLabel) return new PickedColor(jo!["value"]!.ToString(), jo["label"]!.ToString());
-                    return jo!["value"]!.ToString();
+                    return new PickedColor(jo!["value"]!.ToString(), jo["label"]!.ToString());
                 }
-                catch { /* not json finally */ }
+
+                return jo!["value"]!.ToString();
             }
-
-            if (useLabel) return new PickedColor(ssource, ssource);
-            return ssource;
-        }
-
-        private bool UseLabel(IPublishedPropertyType propertyType)
-        {
-            return ConfigurationEditor.ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration)?.UseLabel ?? false;
-        }
-
-        public class PickedColor
-        {
-            public PickedColor(string color, string label)
+            catch
             {
-                Color = color;
-                Label = label;
+                /* not json finally */
             }
-
-            public string Color { get; }
-            public string Label { get; }
-
-            public override string ToString() => Color;
         }
+
+        if (useLabel)
+        {
+            return new PickedColor(ssource, ssource);
+        }
+
+        return ssource;
+    }
+
+    private bool UseLabel(IPublishedPropertyType propertyType) => ConfigurationEditor
+        .ConfigurationAs<ColorPickerConfiguration>(propertyType.DataType.Configuration)?.UseLabel ?? false;
+
+    public class PickedColor
+    {
+        public PickedColor(string color, string label)
+        {
+            Color = color;
+            Label = label;
+        }
+
+        public string Color { get; }
+
+        public string Label { get; }
+
+        public override string ToString() => Color;
     }
 }

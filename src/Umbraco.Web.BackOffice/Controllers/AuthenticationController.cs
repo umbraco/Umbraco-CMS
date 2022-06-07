@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)] // Needed to enforce the principle set on the request, if one exists.
         public IDictionary<string, object> GetPasswordConfig(int userId)
         {
-            Attempt<int?> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int?>.Fail();
+            Attempt<int> currentUserId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId() ?? Attempt<int>.Fail();
             return _passwordConfiguration.GetConfiguration(
                 currentUserId.Success
                     ? currentUserId.Result != userId

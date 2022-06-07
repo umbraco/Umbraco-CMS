@@ -1,23 +1,23 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table;
+
+public class RenameTableBuilder : ExpressionBuilderBase<RenameTableExpression>,
+    IRenameTableBuilder, IExecutableBuilder
 {
-    public class RenameTableBuilder : ExpressionBuilderBase<RenameTableExpression>,
-        IRenameTableBuilder, IExecutableBuilder
+    public RenameTableBuilder(RenameTableExpression expression)
+        : base(expression)
     {
-        public RenameTableBuilder(RenameTableExpression expression)
-            : base(expression)
-        { }
+    }
 
-        /// <inheritdoc />
-        public void Do() => Expression.Execute();
+    /// <inheritdoc />
+    public void Do() => Expression.Execute();
 
-        /// <inheritdoc />
-        public IExecutableBuilder To(string name)
-        {
-            Expression.NewName = name;
-            return this;
-        }
+    /// <inheritdoc />
+    public IExecutableBuilder To(string name)
+    {
+        Expression.NewName = name;
+        return this;
     }
 }

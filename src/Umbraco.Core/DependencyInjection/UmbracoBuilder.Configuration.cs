@@ -82,9 +82,12 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
-            .AddUmbracoOptions<HelpPageSettings>();
+            .AddUmbracoOptions<HelpPageSettings>()
+            .AddUmbracoOptions<DataTypesSettings>();
 
+        // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();
+        builder.Services.AddSingleton<IOptionsChangeTokenSource<ConnectionStrings>, ConfigurationChangeTokenSource<ConnectionStrings>>();
 
         builder.Services.Configure<InstallDefaultDataSettings>(
             Constants.Configuration.NamedOptions.InstallDefaultData.Languages,

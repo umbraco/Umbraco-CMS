@@ -17,7 +17,8 @@ public class ActionAssignDomain : IAction
     public char Letter => ActionLetter;
 
     /// <inheritdoc />
-    public string Alias => "assignDomain";
+    // This is all lower-case because of case sensitive filesystems, see issue: https://github.com/umbraco/Umbraco-CMS/issues/11670
+    public string Alias => "assigndomain";
 
     /// <inheritdoc />
     public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;

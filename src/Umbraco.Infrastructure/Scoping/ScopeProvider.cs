@@ -1,18 +1,15 @@
-using System;
+using System.Collections.Concurrent;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Infrastructure.Persistence;
-using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
-using Umbraco.Extensions;
-using System.Collections.Concurrent;
-using System.Threading;
-using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Scoping;
-
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
 #if DEBUG_SCOPES
 using System.Linq;
 using System.Text;
@@ -21,7 +18,7 @@ using System.Text;
 namespace Umbraco.Cms.Infrastructure.Scoping
 {
     /// <summary>
-    /// Implements <see cref="IScopeProvider"/>.
+    ///     Implements <see cref="IScopeProvider" />.
     /// </summary>
     internal class ScopeProvider :
         ICoreScopeProvider,
@@ -35,10 +32,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private readonly FileSystems _fileSystems;
         private CoreDebugSettings _coreDebugSettings;
         private readonly MediaFileManager _mediaFileManager;
-        private static readonly AsyncLocal<ConcurrentStack<IScope>> s_scopeStack = new AsyncLocal<ConcurrentStack<IScope>>();
-        private static readonly AsyncLocal<ConcurrentStack<IScopeContext>> s_scopeContextStack = new AsyncLocal<ConcurrentStack<IScopeContext>>();
-        private static readonly string s_scopeItemKey = typeof(Scope).FullName!;
-        private static readonly string s_contextItemKey = typeof(ScopeProvider).FullName!;
+        private static readonly AsyncLocal<ConcurrentStack<IScope>> _scopeStack = new();
+        private static readonly AsyncLocal<ConcurrentStack<IScopeContext>> _scopeContextStack = new();
+        private static readonly string _scopeItemKey = typeof(Scope).FullName!;
+        private static readonly string _contextItemKey = typeof(ScopeProvider).FullName!;
         private readonly IEventAggregator _eventAggregator;
 
         public ScopeProvider(
@@ -60,6 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _loggerFactory = loggerFactory;
             _requestCache = requestCache;
             _eventAggregator = eventAggregator;
+
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
@@ -76,30 +74,30 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         private void MoveHttpContextScopeToCallContext()
         {
-            var source = (ConcurrentStack<IScope>?)_requestCache.Get(s_scopeItemKey);
-            ConcurrentStack<IScope>? stack = s_scopeStack.Value;
-            MoveContexts(s_scopeItemKey, source, stack, (_, v) => s_scopeStack.Value = v);
+            var source = (ConcurrentStack<IScope>?)_requestCache.Get(_scopeItemKey);
+            ConcurrentStack<IScope>? stack = _scopeStack.Value;
+            MoveContexts(_scopeItemKey, source, stack, (_, v) => _scopeStack.Value = v);
         }
 
         private void MoveHttpContextScopeContextToCallContext()
         {
-            var source = (ConcurrentStack<IScopeContext>?)_requestCache.Get(s_contextItemKey);
-            ConcurrentStack<IScopeContext>? stack = s_scopeContextStack.Value;
-            MoveContexts(s_contextItemKey, source, stack, (_, v) => s_scopeContextStack.Value = v);
+            var source = (ConcurrentStack<IScopeContext>?)_requestCache.Get(_contextItemKey);
+            ConcurrentStack<IScopeContext>? stack = _scopeContextStack.Value;
+            MoveContexts(_contextItemKey, source, stack, (_, v) => _scopeContextStack.Value = v);
         }
 
         private void MoveCallContextScopeToHttpContext()
         {
-            ConcurrentStack<IScope>? source = s_scopeStack.Value;
-            var stack = (ConcurrentStack<IScope>?)_requestCache.Get(s_scopeItemKey);
-            MoveContexts(s_scopeItemKey, source, stack, (k, v) => _requestCache.Set(k, v));
+            ConcurrentStack<IScope>? source = _scopeStack.Value;
+            var stack = (ConcurrentStack<IScope>?)_requestCache.Get(_scopeItemKey);
+            MoveContexts(_scopeItemKey, source, stack, (k, v) => _requestCache.Set(k, v));
         }
 
         private void MoveCallContextScopeContextToHttpContext()
         {
-            ConcurrentStack<IScopeContext>? source = s_scopeContextStack.Value;
-            var stack = (ConcurrentStack<IScopeContext>?)_requestCache.Get(s_contextItemKey);
-            MoveContexts(s_contextItemKey, source, stack, (k, v) => _requestCache.Set(k, v));
+            ConcurrentStack<IScopeContext>? source = _scopeContextStack.Value;
+            var stack = (ConcurrentStack<IScopeContext>?)_requestCache.Get(_contextItemKey);
+            MoveContexts(_contextItemKey, source, stack, (k, v) => _requestCache.Set(k, v));
         }
 
         private void MoveContexts<T>(string key, ConcurrentStack<T>? source, ConcurrentStack<T>? stack, Action<string, ConcurrentStack<T>> setter)
@@ -134,7 +132,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 
         private void SetCallContextScope(IScope? value)
         {
-            ConcurrentStack<IScope>? stack = s_scopeStack.Value;
+            ConcurrentStack<IScope>? stack = _scopeStack.Value;
 
 #if DEBUG_SCOPES
             // first, null-register the existing value
@@ -159,7 +157,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
             else
             {
-
 #if DEBUG_SCOPES
                 _logger.LogDebug("AddObject " + value.InstanceId.ToString("N").Substring(0, 8));
 #endif
@@ -167,14 +164,15 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     stack = new ConcurrentStack<IScope>();
                 }
+
                 stack.Push(value);
-                s_scopeStack.Value = stack;
+                _scopeStack.Value = stack;
             }
         }
 
         private void SetCallContextScopeContext(IScopeContext? value)
         {
-            ConcurrentStack<IScopeContext>? stack = s_scopeContextStack.Value;
+            ConcurrentStack<IScopeContext>? stack = _scopeContextStack.Value;
 
             if (value == null)
             {
@@ -189,11 +187,11 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     stack = new ConcurrentStack<IScopeContext>();
                 }
+
                 stack.Push(value);
-                s_scopeContextStack.Value = stack;
+                _scopeContextStack.Value = stack;
             }
         }
-
 
         private T? GetHttpContextObject<T>(string key, bool required = true)
             where T : class
@@ -253,6 +251,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     stack = new ConcurrentStack<T>();
                 }
+
                 stack.Push(value);
                 _requestCache.Set(key, stack);
             }
@@ -265,23 +264,23 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         #region Ambient Context
 
         /// <summary>
-        /// Get the Ambient (Current) <see cref="IScopeContext"/> for the current execution context.
+        ///     Get the Ambient (Current) <see cref="IScopeContext" /> for the current execution context.
         /// </summary>
         /// <remarks>
-        /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
+        ///     The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
         /// </remarks>
         public IScopeContext? AmbientContext
         {
             get
             {
                 // try http context, fallback onto call context
-                IScopeContext? value = GetHttpContextObject<IScopeContext>(s_contextItemKey, false);
+                IScopeContext? value = GetHttpContextObject<IScopeContext>(_contextItemKey, false);
                 if (value != null)
                 {
                     return value;
                 }
 
-                ConcurrentStack<IScopeContext>? stack = s_scopeContextStack.Value;
+                ConcurrentStack<IScopeContext>? stack = _scopeContextStack.Value;
                 if (stack == null || !stack.TryPeek(out IScopeContext? peek))
                 {
                     return null;
@@ -298,23 +297,23 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         IScope? IScopeAccessor.AmbientScope => AmbientScope;
 
         /// <summary>
-        /// Gets or set the Ambient (Current) <see cref="Scope"/> for the current execution context.
+        ///     Gets or set the Ambient (Current) <see cref="Scope" /> for the current execution context.
         /// </summary>
         /// <remarks>
-        /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
+        ///     The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
         /// </remarks>
         public Scope? AmbientScope
         {
             get
             {
                 // try http context, fallback onto call context
-                IScope? value = GetHttpContextObject<IScope>(s_scopeItemKey, false);
+                IScope? value = GetHttpContextObject<IScope>(_scopeItemKey, false);
                 if (value != null)
                 {
                     return (Scope)value;
                 }
 
-                ConcurrentStack<IScope>? stack = s_scopeStack.Value;
+                ConcurrentStack<IScope>? stack = _scopeStack.Value;
                 if (stack == null || !stack.TryPeek(out IScope? peek))
                 {
                     return null;
@@ -327,7 +326,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         public void PopAmbientScope(Scope? scope)
         {
             // pop the stack from all contexts
-            SetHttpContextObject<IScope>(s_scopeItemKey, null, false);
+            SetHttpContextObject<IScope>(_scopeItemKey, null, false);
             SetCallContextScope(null);
 
             // We need to move the stack to a different context if the parent scope
@@ -335,7 +334,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             // if creating a child scope with callContext: true (thus forcing CallContext)
             // when there is actually a current HttpContext available.
             // It's weird but is required for Deploy somehow.
-            bool parentScopeCallContext = (scope?.ParentScope?.CallContext ?? false);
+            var parentScopeCallContext = scope?.ParentScope?.CallContext ?? false;
             if ((scope?.CallContext ?? false) && !parentScopeCallContext)
             {
                 MoveCallContextScopeToHttpContext();
@@ -357,14 +356,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 throw new ArgumentNullException(nameof(scope));
             }
 
-            if (scope.CallContext != false || !SetHttpContextObject<IScope>(s_scopeItemKey, scope, false))
+            if (scope.CallContext || !SetHttpContextObject<IScope>(_scopeItemKey, scope, false))
             {
                 // In this case, always ensure that the HttpContext items
                 // is transfered to CallContext and then cleared since we
                 // may be migrating context with the callContext = true flag.
                 // This is a weird case when forcing callContext when HttpContext
                 // is available. Required by Deploy.
-
                 if (_requestCache.IsAvailable)
                 {
                     MoveHttpContextScopeToCallContext();
@@ -382,14 +380,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 throw new ArgumentNullException(nameof(scopeContext));
             }
 
-            SetHttpContextObject<IScopeContext>(s_contextItemKey, scopeContext, false);
+            SetHttpContextObject(_contextItemKey, scopeContext, false);
             SetCallContextScopeContext(scopeContext);
         }
 
         public void PopAmbientScopeContext()
         {
             // pop stack from all contexts
-            SetHttpContextObject<IScopeContext>(s_contextItemKey, null, false);
+            SetHttpContextObject<IScopeContext>(_contextItemKey, null, false);
             SetCallContextScopeContext(null);
         }
 
@@ -400,7 +398,21 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             IEventDispatcher? eventDispatcher = null,
             IScopedNotificationPublisher? scopedNotificationPublisher = null,
             bool? scopeFileSystems = null)
-            => new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems);
+            =>
+                new Scope(
+                    this,
+                    _coreDebugSettings,
+                    _mediaFileManager,
+                    _eventAggregator,
+                    _loggerFactory.CreateLogger<Scope>(),
+                    _fileSystems,
+                    true,
+                    null,
+                    isolationLevel,
+                    repositoryCacheMode,
+                    eventDispatcher,
+                    scopedNotificationPublisher,
+                    scopeFileSystems);
 
         /// <inheritdoc />
         public void AttachScope(IScope other, bool callContext = false)
@@ -451,12 +463,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             Scope? originalScope = AmbientScope;
             if (originalScope != ambientScope.OrigScope)
             {
-                throw new InvalidOperationException($"The detatched scope ({ambientScope.GetDebugInfo()}) does not match the original ({originalScope?.GetDebugInfo()})");
+                throw new InvalidOperationException(
+                    $"The detatched scope ({ambientScope.GetDebugInfo()}) does not match the original ({originalScope?.GetDebugInfo()})");
             }
+
             IScopeContext? originalScopeContext = AmbientContext;
             if (originalScopeContext != ambientScope.OrigContext)
             {
-                throw new InvalidOperationException($"The detatched scope context does not match the original");
+                throw new InvalidOperationException("The detatched scope context does not match the original");
             }
 
             ambientScope.OrigScope = null;
@@ -480,7 +494,22 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             {
                 IScopeContext? ambientContext = AmbientContext;
                 ScopeContext? newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(
+                    this,
+                    _coreDebugSettings,
+                    _mediaFileManager,
+                    _eventAggregator,
+                    _loggerFactory.CreateLogger<Scope>(),
+                    _fileSystems,
+                    false,
+                    newContext,
+                    isolationLevel,
+                    repositoryCacheMode,
+                    eventDispatcher,
+                    notificationPublisher,
+                    scopeFileSystems,
+                    callContext,
+                    autoComplete);
 
                 // assign only if scope creation did not throw!
                 PushAmbientScope(scope);
@@ -488,19 +517,33 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 {
                     PushAmbientScopeContext(newContext);
                 }
+
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(
+                this,
+                _coreDebugSettings,
+                _mediaFileManager,
+                _eventAggregator,
+                _loggerFactory.CreateLogger<Scope>(),
+                _fileSystems,
+                ambientScope,
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                notificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete);
             PushAmbientScope(nested);
             return nested;
         }
 
-        /// <inheritdoc />
         public IScopeContext? Context => AmbientContext;
 
         // for testing
-        internal ConcurrentStack<IScope>? GetCallContextScopeValue() => s_scopeStack.Value;
+        internal ConcurrentStack<IScope>? GetCallContextScopeValue() => _scopeStack.Value;
 
 #if DEBUG_SCOPES
         // this code needs TLC
@@ -658,6 +701,42 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 #endif
+        /// <inheritdoc />
+        Cms.Core.Scoping.IScope Cms.Core.Scoping.IScopeProvider.CreateScope(
+            IsolationLevel isolationLevel = IsolationLevel.Unspecified,
+            RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
+            IEventDispatcher? eventDispatcher = null,
+            IScopedNotificationPublisher? notificationPublisher = null,
+            bool? scopeFileSystems = null,
+            bool callContext = false,
+            bool autoComplete = false) =>
+            (Cms.Core.Scoping.IScope) CreateScope(
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                notificationPublisher,
+                scopeFileSystems,
+                callContext,
+                autoComplete);
+
+        /// <inheritdoc />
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.CreateDetachedScope(IsolationLevel isolationLevel,
+            RepositoryCacheMode repositoryCacheMode, IEventDispatcher? eventDispatcher,
+            IScopedNotificationPublisher? scopedNotificationPublisher, bool? scopeFileSystems) =>
+            (Core.Scoping.IScope)CreateDetachedScope(
+                isolationLevel,
+                repositoryCacheMode,
+                eventDispatcher,
+                scopedNotificationPublisher,
+                scopeFileSystems);
+
+        /// <inheritdoc />
+        void Core.Scoping.IScopeProvider.AttachScope(Core.Scoping.IScope scope, bool callContext) =>
+            AttachScope(scope, callContext);
+
+        /// <inheritdoc />
+        Core.Scoping.IScope Core.Scoping.IScopeProvider.DetachScope() =>
+            (Core.Scoping.IScope)DetachScope();
     }
 
 #if DEBUG_SCOPES
