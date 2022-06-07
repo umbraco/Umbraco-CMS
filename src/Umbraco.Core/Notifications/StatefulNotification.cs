@@ -8,8 +8,7 @@ public abstract class StatefulNotification : IStatefulNotification
 
     /// <summary>
     ///     This can be used by event subscribers to store state in the notification so they easily deal with custom state data
-    ///     between
-    ///     a starting ("ing") and an ending ("ed") notification
+    ///     between a starting ("ing") and an ending ("ed") notification
     /// </summary>
     public IDictionary<string, object?> State
     {
