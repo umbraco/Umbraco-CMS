@@ -11,8 +11,7 @@ public class MediaTypeMovedNotification : MovedNotification<IMediaType>
     }
 
     public MediaTypeMovedNotification(IEnumerable<MoveEventInfo<IMediaType>> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
