@@ -13,8 +13,7 @@ public abstract class MovingToRecycleBinNotification<T> : CancelableObjectNotifi
     }
 
     protected MovingToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 
