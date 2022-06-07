@@ -1046,7 +1046,7 @@ public static class StringExtensions
             return text;
         }
 
-        return text[..pos] + replace + text[(pos + search.Length)..];
+        text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
     }
 
     /// <summary>
