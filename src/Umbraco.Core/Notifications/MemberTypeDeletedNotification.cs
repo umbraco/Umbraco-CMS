@@ -11,9 +11,7 @@ public class MemberTypeDeletedNotification : DeletedNotification<IMemberType>
     }
 
     public MemberTypeDeletedNotification(IEnumerable<IMemberType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
