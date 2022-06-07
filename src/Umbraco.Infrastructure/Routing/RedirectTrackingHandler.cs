@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
@@ -35,6 +37,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly ILocalizationService _localizationService;
 
         private const string NotificationStateKey = "Umbraco.Cms.Core.Routing.RedirectTrackingHandler";
 
@@ -43,14 +46,35 @@ namespace Umbraco.Cms.Core.Routing
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IRedirectUrlService redirectUrlService,
-            IVariationContextAccessor variationContextAccessor)
+            IVariationContextAccessor variationContextAccessor,
+            ILocalizationService localizationService)
         {
             _logger = logger;
             _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;
+            _localizationService = localizationService;
         }
+
+        [Obsolete("Use ctor with all params")]
+        public RedirectTrackingHandler(
+            ILogger<RedirectTrackingHandler> logger,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IRedirectUrlService redirectUrlService,
+            IVariationContextAccessor variationContextAccessor)
+        :this(
+            logger,
+            webRoutingSettings,
+            publishedSnapshotAccessor,
+            redirectUrlService,
+            variationContextAccessor,
+            StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
+        {
+
+        }
+
 
         public void Handle(ContentPublishingNotification notification) => StoreOldRoutes(notification.PublishedEntities, notification);
 
@@ -119,12 +143,23 @@ namespace Umbraco.Cms.Core.Routing
                 foreach (var culture in cultures)
                 {
                     var route = contentCache?.GetRouteById(publishedContent.Id, culture);
-                    if (IsNotRoute(route))
+                    if (!IsNotRoute(route))
                     {
-                        continue;
+                        oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
                     }
-
-                    oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
+                    else if (string.IsNullOrEmpty(culture))
+                    {
+                        // Retry using all languages, if this is invariant but has a variant ancestor
+                        var languages = _localizationService.GetAllLanguages();
+                        foreach (var language in languages)
+                        {
+                            route = contentCache?.GetRouteById(publishedContent.Id, language.IsoCode);
+                            if (!IsNotRoute(route))
+                            {
+                                oldRoutes[new ContentIdAndCulture(publishedContent.Id, language.IsoCode)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
+                            }
+                        }
+                    }
                 }
             }
         }

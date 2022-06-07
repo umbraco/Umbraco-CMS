@@ -1,6 +1,3 @@
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Extensions;
-
 namespace Umbraco.Cms.Web.UI
 {
     public class Startup

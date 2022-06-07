@@ -746,7 +746,7 @@ namespace Umbraco.Cms.Core.Services
 
         public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            var eventMessages = EventMessagesFactory.Get();
 
             TItem copy;
             using (var scope = ScopeProvider.CreateCoreScope())
@@ -781,16 +781,34 @@ namespace Umbraco.Cms.Core.Services
                     }
 
                     copy.ParentId = containerId;
+
+                    SavingNotification<TItem> savingNotification = GetSavingNotification(copy, eventMessages);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
+                    {
+                        scope.Complete();
+                        return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages, copy);
+                    }
+
                     Repository.Save(copy);
+
+                    ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(copy).ToArray();
+
+                    _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
+                    scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
+
+                    SavedNotification<TItem> savedNotification = GetSavedNotification(copy, eventMessages);
+                    savedNotification.WithStateFrom(savingNotification);
+                    scope.Notifications.Publish(savedNotification);
+
                     scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return OperationResult.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, evtMsgs); // causes rollback
+                    return OperationResult.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, eventMessages); // causes rollback
                 }
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs, copy);
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
         }
 
         #endregion
