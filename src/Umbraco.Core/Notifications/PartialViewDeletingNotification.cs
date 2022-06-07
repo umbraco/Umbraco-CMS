@@ -14,9 +14,7 @@ public class PartialViewDeletingNotification : DeletingNotification<IPartialView
     }
 
     public PartialViewDeletingNotification(IEnumerable<IPartialView> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
