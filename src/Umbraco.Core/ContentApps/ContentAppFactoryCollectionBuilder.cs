@@ -8,8 +8,7 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.ContentApps;
 
-public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<ContentAppFactoryCollectionBuilder,
-    ContentAppFactoryCollection, IContentAppFactory>
+public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<ContentAppFactoryCollectionBuilder, ContentAppFactoryCollection, IContentAppFactory>
 {
     protected override ContentAppFactoryCollectionBuilder This => this;
 
