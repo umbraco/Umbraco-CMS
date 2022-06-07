@@ -43,7 +43,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterReadLock();
             entries = GetDictionaryEntries()
-                .Where(x => ((string)x.Key)[plen..].InvariantStartsWith(keyStartsWith))
+                .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
                 .ToArray(); // evaluate while locked
         }
         finally
