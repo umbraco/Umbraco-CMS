@@ -63,8 +63,7 @@ public static class DeepCloneHelper
                             && (propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                                 || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)
                                 || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
-                                || propertyInfo.PropertyType.GetGenericTypeDefinition() ==
-                                typeof(IReadOnlyCollection<>)))
+                                || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)))
                         {
                             // if it is a IEnumerable<>, IReadOnlyCollection<T>, IList<T> or ICollection<> we'll use a List<> since it implements them all
                             Type genericType =
