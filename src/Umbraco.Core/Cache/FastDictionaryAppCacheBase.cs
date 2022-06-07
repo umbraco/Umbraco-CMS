@@ -207,7 +207,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
                              return (isInterface ? value is T : value.GetType() == typeOfT)
 
                                     // run predicate on the 'public key' part only, ie without prefix
-                                    && predicate(((string)x.Key)[plen..], (T)value);
+                                    && predicate(((string) x.Key).Substring(plen), (T) value);
                          }))
             {
                 RemoveEntry((string)entry.Key);
