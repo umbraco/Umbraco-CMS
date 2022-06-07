@@ -32,7 +32,7 @@ public static class PropertyGroupExtensions
             return null;
         }
 
-        return alias?[..lastIndex];
+        return alias?.Substring(0, lastIndex);
     }
 
     /// <summary>
