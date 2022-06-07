@@ -67,7 +67,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterReadLock();
             entries = GetDictionaryEntries()
-                .Where(x => compiled.IsMatch(((string)x.Key)[plen..]))
+                .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
                 .ToArray(); // evaluate while locked
         }
         finally
