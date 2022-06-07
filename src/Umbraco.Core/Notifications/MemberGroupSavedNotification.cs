@@ -11,9 +11,7 @@ public class MemberGroupSavedNotification : SavedNotification<IMemberGroup>
     }
 
     public MemberGroupSavedNotification(IEnumerable<IMemberGroup> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
