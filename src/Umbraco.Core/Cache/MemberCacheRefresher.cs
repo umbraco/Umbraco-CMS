@@ -10,8 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class
-    MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
+public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
     #region Define
 
