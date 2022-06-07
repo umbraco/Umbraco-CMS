@@ -7,9 +7,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class MemberTypeChangedNotification : ContentTypeChangeNotification<IMemberType>
 {
     public MemberTypeChangedNotification(ContentTypeChange<IMemberType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
