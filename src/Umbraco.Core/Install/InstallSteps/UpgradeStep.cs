@@ -33,7 +33,7 @@ public class UpgradeStep : InstallSetupStep<object>
                 }
                 else if (Guid.TryParse(value, out Guid currentStateGuid))
                 {
-                    value = currentStateGuid.ToString("N")[..8];
+                    value = currentStateGuid.ToString("N").Substring(0, 8);
                 }
 
                 return value;
