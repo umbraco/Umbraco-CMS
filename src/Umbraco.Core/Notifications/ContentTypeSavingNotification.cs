@@ -11,9 +11,7 @@ public class ContentTypeSavingNotification : SavingNotification<IContentType>
     }
 
     public ContentTypeSavingNotification(IEnumerable<IContentType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
