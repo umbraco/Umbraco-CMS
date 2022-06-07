@@ -7,9 +7,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class MediaTypeChangedNotification : ContentTypeChangeNotification<IMediaType>
 {
     public MediaTypeChangedNotification(ContentTypeChange<IMediaType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
