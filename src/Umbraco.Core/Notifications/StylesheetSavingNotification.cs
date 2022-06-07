@@ -14,9 +14,7 @@ public class StylesheetSavingNotification : SavingNotification<IStylesheet>
     }
 
     public StylesheetSavingNotification(IEnumerable<IStylesheet> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
