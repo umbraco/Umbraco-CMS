@@ -94,7 +94,7 @@ public static class StringExtensions
                 return fileName;
             }
 
-            return string.Format("{0}", fileName[..fileName.IndexOf(ext, StringComparison.Ordinal)]);
+            return string.Format("{0}", fileName.Substring(0, fileName.IndexOf(ext, StringComparison.Ordinal)));
         }
 
         return fileName;
