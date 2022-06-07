@@ -5,8 +5,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresherNotification,
-    MemberGroupCacheRefresher.JsonPayload>
+public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresherNotification, MemberGroupCacheRefresher.JsonPayload>
 {
     public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         : base(appCaches, jsonSerializer, eventAggregator, factory)
