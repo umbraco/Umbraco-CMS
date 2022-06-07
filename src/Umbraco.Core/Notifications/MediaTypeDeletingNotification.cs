@@ -11,9 +11,7 @@ public class MediaTypeDeletingNotification : DeletingNotification<IMediaType>
     }
 
     public MediaTypeDeletingNotification(IEnumerable<IMediaType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
