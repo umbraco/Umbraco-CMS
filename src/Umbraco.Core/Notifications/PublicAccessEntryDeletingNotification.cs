@@ -14,8 +14,7 @@ public sealed class PublicAccessEntryDeletingNotification : DeletingNotification
     }
 
     public PublicAccessEntryDeletingNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
