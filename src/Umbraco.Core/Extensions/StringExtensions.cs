@@ -1358,7 +1358,7 @@ public static class StringExtensions
             return a;
         }
 
-        return char.ToLowerInvariant(a[0]) + a[1..];
+        return char.ToLowerInvariant(a[0]) + a.Substring(1);
     }
 
     /// <summary>
