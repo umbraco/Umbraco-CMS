@@ -14,8 +14,7 @@ public sealed class PublicAccessEntrySavedNotification : SavedNotification<Publi
     }
 
     public PublicAccessEntrySavedNotification(IEnumerable<PublicAccessEntry> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
