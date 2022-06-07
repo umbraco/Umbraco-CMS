@@ -870,7 +870,7 @@ public static class StringExtensions
             return truncatedString;
         }
 
-        truncatedString = text[..strLength];
+        truncatedString = text.Substring(0, strLength);
         truncatedString = truncatedString.TrimEnd();
         truncatedString += suffix;
 
