@@ -13,9 +13,7 @@ public abstract class MovedToRecycleBinNotification<T> : ObjectNotification<IEnu
     }
 
     protected MovedToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
