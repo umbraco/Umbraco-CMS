@@ -14,9 +14,7 @@ public class DictionaryItemSavedNotification : SavedNotification<IDictionaryItem
     }
 
     public DictionaryItemSavedNotification(IEnumerable<IDictionaryItem> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
