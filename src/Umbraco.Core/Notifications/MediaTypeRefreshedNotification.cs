@@ -10,9 +10,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class MediaTypeRefreshedNotification : ContentTypeRefreshNotification<IMediaType>
 {
     public MediaTypeRefreshedNotification(ContentTypeChange<IMediaType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
