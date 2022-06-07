@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <para>Limited to objects that have a corresponding node (in umbracoNode table).</para>
     /// <para>Returns <see cref="IEntitySlim"/> objects, i.e. lightweight representation of entities.</para>
     /// </remarks>
-    internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
+    internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended, IAsyncEntityRepository
     {
         public EntityRepository(IScopeAccessor scopeAccessor, AppCaches appCaches)
             : base(scopeAccessor, appCaches)
@@ -39,10 +39,53 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             return GetPagedResultsByQuery(query, new[] { objectType }, pageIndex, pageSize, out totalRecords, filter, ordering);
         }
+        public async Task<(IEnumerable<IEntitySlim> Entities, long TotalRecords)> GetPagedResultsByQueryAsync(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize,
+           IQuery<IUmbracoEntity>? filter, Ordering? ordering)
+        {
+            return await GetPagedResultsByQueryAsync(query, new[] { objectType }, pageIndex, pageSize, filter, ordering);
+        }
 
         // get a page of entities
         public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity>? filter, Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization = null)
+        {
+            Sql<ISqlContext> sql = GetPagedResultsByQuerySql(query, objectTypes, filter, ref ordering, sqlCustomization);
+
+            // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
+            var pageIndexToFetch = pageIndex + 1;
+            IEnumerable<BaseDto> dtos;
+            var page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
+            dtos = page.Items;
+            totalRecords = page.TotalItems;
+
+            var entities = dtos.Select(BuildEntity).ToArray();
+
+            BuildVariants(entities.OfType<DocumentEntitySlim>());
+
+            return entities;
+        }
+
+        // get a page of entities
+        public async Task<(IEnumerable<IEntitySlim> Entities, long TotalRecords)> GetPagedResultsByQueryAsync(IQuery<IUmbracoEntity> query, Guid[] objectTypes, long pageIndex, int pageSize,
+            IQuery<IUmbracoEntity>? filter, Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization = null)
+        {
+            Sql<ISqlContext> sql = GetPagedResultsByQuerySql(query, objectTypes, filter, ref ordering, sqlCustomization);
+
+            // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
+            var pageIndexToFetch = pageIndex + 1;
+            IEnumerable<BaseDto> dtos;
+            var page = await Database.PageAsync<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
+            dtos = page.Items;
+            var totalRecords = page.TotalItems;
+
+            var entities = dtos.Select(BuildEntity).ToArray();
+
+            BuildVariants(entities.OfType<DocumentEntitySlim>());
+
+            return (entities,totalRecords);
+        }
+
+        private Sql<ISqlContext> GetPagedResultsByQuerySql(IQuery<IUmbracoEntity> query, Guid[] objectTypes, IQuery<IUmbracoEntity>? filter, ref Ordering? ordering, Action<Sql<ISqlContext>>? sqlCustomization)
         {
             var isContent = objectTypes.Any(objectType => objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint);
             var isMedia = objectTypes.Any(objectType => objectType == Cms.Core.Constants.ObjectTypes.Media);
@@ -76,19 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // TODO: we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
             // no matter what we always must have node id ordered at the end
             sql = ordering.Direction == Direction.Ascending ? sql.OrderBy("NodeId") : sql.OrderByDescending("NodeId");
-
-            // for content we must query for ContentEntityDto entities to produce the correct culture variant entity names
-            var pageIndexToFetch = pageIndex + 1;
-            IEnumerable<BaseDto> dtos;
-            var page = Database.Page<GenericContentEntityDto>(pageIndexToFetch, pageSize, sql);
-            dtos = page.Items;
-            totalRecords = page.TotalItems;
-
-            var entities = dtos.Select(BuildEntity).ToArray();
-
-            BuildVariants(entities.OfType<DocumentEntitySlim>());
-
-            return entities;
+            return sql;
         }
 
         public IEntitySlim? Get(Guid key)
@@ -97,7 +128,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var dto = Database.FirstOrDefault<BaseDto>(sql);
             return dto == null ? null : BuildEntity(dto);
         }
-
+        public async Task<IEntitySlim?> GetAsync(Guid key)
+        {
+            var sql = GetBaseWhere(false, false, false, false, key);
+            var dto = await Database.FirstOrDefaultAsync<BaseDto>(sql);
+            return dto == null ? null : BuildEntity(dto);
+        }
 
         private IEntitySlim? GetEntity(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
         {
@@ -120,6 +156,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return entity;
         }
 
+        private async Task<IEntitySlim?> GetEntityAsync(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
+        {
+            // isContent is going to return a 1:M result now with the variants so we need to do different things
+            if (isContent)
+            {
+                var cdtos = await Database.FetchAsync<DocumentEntityDto>(sql);
+
+                return cdtos.Count == 0 ? null : BuildVariants(BuildDocumentEntity(cdtos[0]));
+            }
+
+            var dto = isMedia
+                    ? await Database.FirstOrDefaultAsync<MediaEntityDto>(sql)
+                    : await Database.FirstOrDefaultAsync<BaseDto>(sql);
+
+            if (dto == null)
+                return null;
+
+            var entity = BuildEntity(dto);
+
+            return entity;
+        }
+
         public IEntitySlim? Get(Guid key, Guid objectTypeId)
         {
             var isContent = objectTypeId == Cms.Core.Constants.ObjectTypes.Document || objectTypeId == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
@@ -129,11 +187,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, key);
             return GetEntity(sql, isContent, isMedia, isMember);
         }
+        public async Task<IEntitySlim?> GetAsync(Guid key, Guid objectTypeId)
+        {
+            var isContent = objectTypeId == Cms.Core.Constants.ObjectTypes.Document || objectTypeId == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Cms.Core.Constants.ObjectTypes.Member;
+
+            var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, key);
+            return await GetEntityAsync(sql, isContent, isMedia, isMember);
+        }
 
         public IEntitySlim? Get(int id)
         {
             var sql = GetBaseWhere(false, false, false, false, id);
             var dto = Database.FirstOrDefault<BaseDto>(sql);
+            return dto == null ? null : BuildEntity(dto);
+        }
+        public async Task<IEntitySlim?> GetAsync(int id)
+        {
+            var sql = GetBaseWhere(false, false, false, false, id);
+            var dto = await Database.FirstOrDefaultAsync<BaseDto>(sql);
             return dto == null ? null : BuildEntity(dto);
         }
 
@@ -147,6 +220,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return GetEntity(sql, isContent, isMedia, isMember);
         }
 
+        public async Task<IEntitySlim?> GetAsync(int id, Guid objectTypeId)
+        {
+            var isContent = objectTypeId == Cms.Core.Constants.ObjectTypes.Document || objectTypeId == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectTypeId == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectTypeId == Cms.Core.Constants.ObjectTypes.Member;
+
+            var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectTypeId, id);
+            return await GetEntityAsync(sql, isContent, isMedia, isMember);
+        }
+
         public IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
         {
             return ids.Length > 0
@@ -154,7 +237,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 : PerformGetAll(objectType);
         }
 
+        public async Task<IEnumerable<IEntitySlim>> GetAllAsync(Guid objectType, params int[] ids)
+        {
+            return ids.Length > 0
+                ? await PerformGetAllAsync(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+                : await PerformGetAllAsync(objectType);
+        }
+
         public IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
+        {
+            return keys.Length > 0
+                ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+                : PerformGetAll(objectType);
+        }
+
+        public async Task<IEnumerable<IEntitySlim>> GetAllAsync(Guid objectType, params Guid[] keys)
         {
             return keys.Length > 0
                 ? PerformGetAll(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
@@ -181,7 +278,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return entities;
         }
+        private async Task<IEnumerable<IEntitySlim>> GetEntitiesAsync(Sql<ISqlContext> sql, bool isContent, bool isMedia, bool isMember)
+        {
+            // isContent is going to return a 1:M result now with the variants so we need to do different things
+            if (isContent)
+            {
+                var cdtos = await Database.FetchAsync<DocumentEntityDto>(sql);
 
+                return cdtos.Count == 0
+                    ? Enumerable.Empty<IEntitySlim>()
+                    : BuildVariants(cdtos.Select(BuildDocumentEntity)).ToList();
+            }
+
+            var dtos = isMedia
+                    ? (IEnumerable<BaseDto>)Database.Fetch<MediaEntityDto>(sql)
+                    : await Database.FetchAsync<BaseDto>(sql);
+
+            var entities = dtos.Select(BuildEntity).ToArray();
+
+            return entities;
+        }
         private IEnumerable<IEntitySlim> PerformGetAll(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
         {
             var isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
@@ -192,11 +308,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return GetEntities(sql, isContent, isMedia, isMember);
         }
 
+        private async Task<IEnumerable<IEntitySlim>> PerformGetAllAsync(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
+        {
+            var isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            var isMedia = objectType == Cms.Core.Constants.ObjectTypes.Media;
+            var isMember = objectType == Cms.Core.Constants.ObjectTypes.Member;
+
+            var sql = GetFullSqlForEntityType(isContent, isMedia, isMember, objectType, filter);
+            return await GetEntitiesAsync(sql, isContent, isMedia, isMember);
+        }
+
         public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids)
         {
             return ids?.Any() ?? false
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
                 : PerformGetAllPaths(objectType);
+        }
+        public async Task<IEnumerable<TreeEntityPath>> GetAllPathsAsync(Guid objectType, params int[]? ids)
+        {
+            return ids?.Any() ?? false
+                ? await PerformGetAllPathsAsync(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+                : await PerformGetAllPathsAsync(objectType);
         }
 
         public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys)
@@ -205,38 +337,80 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
                 : PerformGetAllPaths(objectType);
         }
+        public async Task<IEnumerable<TreeEntityPath>> GetAllPathsAsync(Guid objectType, params Guid[] keys)
+        {
+            return keys.Any()
+                ? await PerformGetAllPathsAsync(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+                : await PerformGetAllPathsAsync(objectType);
+        }
 
         private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
+        {
+            Sql<ISqlContext> sql = GetAllPathsSql(objectType, filter);
+            return Database.Fetch<TreeEntityPath>(sql);
+        }
+        private async Task<IEnumerable<TreeEntityPath>> PerformGetAllPathsAsync(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
+        {
+            Sql<ISqlContext> sql = GetAllPathsSql(objectType, filter);
+            return await Database.FetchAsync<TreeEntityPath>(sql);
+        }
+
+        private Sql<ISqlContext> GetAllPathsSql(Guid objectType, Action<Sql<ISqlContext>>? filter)
         {
             // NodeId is named Id on TreeEntityPath = use an alias
             var sql = Sql().Select<NodeDto>(x => Alias(x.NodeId, nameof(TreeEntityPath.Id)), x => x.Path).From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
             filter?.Invoke(sql);
-            return Database.Fetch<TreeEntityPath>(sql);
+            return sql;
         }
 
         public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query)
+        {
+            Sql<ISqlContext> sql = GetByQuerySql(query);
+            var dtos = Database.Fetch<BaseDto>(sql);
+            return dtos.Select(BuildEntity).ToList();
+        }
+        public async Task<IEnumerable<IEntitySlim>> GetByQueryAsync(IQuery<IUmbracoEntity> query)
+        {
+            Sql<ISqlContext> sql = GetByQuerySql(query);
+            var dtos = await Database.FetchAsync<BaseDto>(sql);
+            return dtos.Select(BuildEntity).ToList();
+        }
+
+        private Sql<ISqlContext> GetByQuerySql(IQuery<IUmbracoEntity> query)
         {
             var sqlClause = GetBase(false, false, false, null);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate();
             sql = AddGroupBy(false, false, false, sql, true);
-            var dtos = Database.Fetch<BaseDto>(sql);
-            return dtos.Select(BuildEntity).ToList();
+            return sql;
         }
 
         public IEnumerable<IEntitySlim> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectType)
         {
-            var isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
-            var isMedia = objectType == Cms.Core.Constants.ObjectTypes.Media;
-            var isMember = objectType == Cms.Core.Constants.ObjectTypes.Member;
+            bool isContent, isMedia, isMember;
+            Sql<ISqlContext> sql;
+            GetByQuerySql(query, objectType, out isContent, out isMedia, out isMember, out sql);
 
-            var sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
+            return GetEntities(sql, isContent, isMedia, isMember);
+        }
+        public async Task<IEnumerable<IEntitySlim>> GetByQueryAsync(IQuery<IUmbracoEntity> query, Guid objectType)
+        {
+            bool isContent, isMedia, isMember;
+            Sql<ISqlContext> sql;
+            GetByQuerySql(query, objectType, out isContent, out isMedia, out isMember, out sql);
 
+            return await GetEntitiesAsync(sql, isContent, isMedia, isMember);
+        }
+
+        private void GetByQuerySql(IQuery<IUmbracoEntity> query, Guid objectType, out bool isContent, out bool isMedia, out bool isMember, out Sql<ISqlContext> sql)
+        {
+            isContent = objectType == Cms.Core.Constants.ObjectTypes.Document || objectType == Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
+            isMedia = objectType == Cms.Core.Constants.ObjectTypes.Media;
+            isMember = objectType == Cms.Core.Constants.ObjectTypes.Member;
+            sql = GetBaseWhere(isContent, isMedia, isMember, false, null, new[] { objectType });
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, isMember, sql, true);
-
-            return GetEntities(sql, isContent, isMedia, isMember);
         }
 
         public UmbracoObjectTypes GetObjectType(int id)
@@ -254,47 +428,77 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public int ReserveId(Guid key)
         {
             NodeDto node;
-
-            Sql<ISqlContext> sql = SqlContext.Sql()
-                .Select<NodeDto>()
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
+            Sql<ISqlContext> sql = ReservedIdExistsSql(key);
 
             node = Database.SingleOrDefault<NodeDto>(sql);
             if (node != null)
                 throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
 
-            node = new NodeDto
-            {
-                UniqueId = key,
-                Text = "RESERVED.ID",
-                NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
-
-                CreateDate = DateTime.Now,
-                UserId = null,
-                ParentId = -1,
-                Level = 1,
-                Path = "-1",
-                SortOrder = 0,
-                Trashed = false
-            };
+            node = MapToReservedNodeDto(key);
             Database.Insert(node);
 
             return node.NodeId;
         }
+        public async Task<int> ReserveIdAsync(Guid key)
+        {
+            NodeDto node;
+            Sql<ISqlContext> sql = ReservedIdExistsSql(key);
+
+            node = await Database.SingleOrDefaultAsync<NodeDto>(sql);
+            if (node != null)
+                throw new InvalidOperationException("An identifier has already been reserved for this Udi.");
+
+            node = MapToReservedNodeDto(key);
+            await Database.InsertAsync(node);
+
+            return node.NodeId;
+        }
+
+        private static NodeDto MapToReservedNodeDto(Guid key) => new NodeDto
+        {
+            UniqueId = key,
+            Text = "RESERVED.ID",
+            NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
+
+            CreateDate = DateTime.Now,
+            UserId = null,
+            ParentId = -1,
+            Level = 1,
+            Path = "-1",
+            SortOrder = 0,
+            Trashed = false
+        };
+        private Sql<ISqlContext> ReservedIdExistsSql(Guid key) =>
+                    SqlContext.Sql()
+                        .Select<NodeDto>()
+                        .From<NodeDto>()
+                        .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
 
         public bool Exists(Guid key)
         {
-            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
+            Sql<ISqlContext> sql = ExistsSql(key);
             return Database.ExecuteScalar<int>(sql) > 0;
         }
+        public async Task<bool> ExistsAsync(Guid key)
+        {
+            Sql<ISqlContext> sql = ExistsSql(key);
+            return await Database.ExecuteScalarAsync<int>(sql) > 0;
+        }
+
+        private Sql<ISqlContext> ExistsSql(Guid key) => Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
 
         public bool Exists(int id)
         {
-            var sql = Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+            Sql<ISqlContext> sql = ExistsSql(id);
             return Database.ExecuteScalar<int>(sql) > 0;
         }
+        public async Task<bool> ExistsAsync(int id)
+        {
+            Sql<ISqlContext> sql = ExistsSql(id);
+            return await Database.ExecuteScalarAsync<int>(sql) > 0;
+        }
 
+        private Sql<ISqlContext> ExistsSql(int id) => Sql().SelectCount().From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
         private DocumentEntitySlim BuildVariants(DocumentEntitySlim entity)
             => BuildVariants(new[] { entity }).First();
 
