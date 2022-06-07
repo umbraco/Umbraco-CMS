@@ -12,9 +12,7 @@ public class MediaTreeChangeNotification : TreeChangeNotification<IMedia>
     }
 
     public MediaTreeChangeNotification(IEnumerable<TreeChange<IMedia>> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
