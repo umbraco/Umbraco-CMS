@@ -14,8 +14,7 @@ public class DictionaryItemDeletingNotification : DeletingNotification<IDictiona
     }
 
     public DictionaryItemDeletingNotification(IEnumerable<IDictionaryItem> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
