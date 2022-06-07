@@ -478,6 +478,19 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
+        public int Depth
+        {
+            get
+            {
+                if (ParentScope == null)
+                {
+                    return 0;
+                }
+
+                return ParentScope.Depth + 1;
+            }
+        }
+
         public IScopedNotificationPublisher Notifications
         {
             get
