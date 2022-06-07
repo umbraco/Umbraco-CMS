@@ -969,7 +969,7 @@ public static class StringExtensions
     public static string ToFirstLowerInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input[..1].ToLowerInvariant() + input[1..];
+            : input.Substring(0, 1).ToLowerInvariant() + input.Substring(1);
 
     /// <summary>
     ///     Returns a new string in which all occurrences of specified strings are replaced by other specified strings.
