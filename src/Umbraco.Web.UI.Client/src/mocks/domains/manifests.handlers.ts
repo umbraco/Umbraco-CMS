@@ -12,7 +12,8 @@ export const handlers = [
             type: 'section',
             alias: 'My.Section.Custom',
             name: 'Custom Section',
-            js: '/APP_PLUGINS/section.js',
+            js: '/App_Plugins/section.js',
+            elementName: 'my-section-custom',
             meta: {
               pathname: 'my-custom',
               weight: 1,
@@ -22,7 +23,8 @@ export const handlers = [
             type: 'propertyEditorUI',
             alias: 'My.PropertyEditorUI.Custom',
             name: 'My Custom Property Editor UI',
-            js: '/APP_PLUGINS/property-editor.js',
+            js: '/App_Plugins/property-editor.js',
+            elementName: 'my-property-editor-ui-custom',
             meta: {
               icon: 'document',
               group: 'common',
