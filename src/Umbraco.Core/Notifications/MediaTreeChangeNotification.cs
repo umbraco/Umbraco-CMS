@@ -25,8 +25,7 @@ public class MediaTreeChangeNotification : TreeChangeNotification<IMedia>
     }
 
     public MediaTreeChangeNotification(IMedia target, TreeChangeTypes changeTypes, EventMessages messages)
-        : base(
-        new TreeChange<IMedia>(target, changeTypes), messages)
+        : base(new TreeChange<IMedia>(target, changeTypes), messages)
     {
     }
 }
