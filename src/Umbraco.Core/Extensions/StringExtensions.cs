@@ -923,7 +923,7 @@ public static class StringExtensions
     public static string ToFirstLower(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input[..1].ToLower() + input[1..];
+            : input.Substring(0, 1).ToLower() + input.Substring(1);
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to uppercase using the casing rules of the
