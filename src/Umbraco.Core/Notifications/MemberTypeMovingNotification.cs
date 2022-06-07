@@ -6,9 +6,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class MemberTypeMovingNotification : MovingNotification<IMemberType>
 {
     public MemberTypeMovingNotification(MoveEventInfo<IMemberType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
