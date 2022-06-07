@@ -53,7 +53,7 @@ public abstract class File : EntityBase, IFile
                 }
 
                 var lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
-                _alias = name[..lastIndexOf];
+                _alias = name.Substring(0, lastIndexOf);
             }
 
             return _alias;
