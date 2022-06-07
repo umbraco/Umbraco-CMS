@@ -1,17 +1,15 @@
-using System;
 using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards;
+
+[Weight(40)]
+public class ModelsBuilderDashboard : IDashboard
 {
-    [Weight(40)]
-    public class ModelsBuilderDashboard : IDashboard
-    {
-        public string Alias => "settingsModelsBuilder";
+    public string Alias => "settingsModelsBuilder";
 
-        public string[] Sections => new [] { "settings" };
+    public string[] Sections => new[] { "settings" };
 
-        public string View => "views/dashboard/settings/modelsbuildermanagement.html";
+    public string View => "views/dashboard/settings/modelsbuildermanagement.html";
 
-        public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
-    }
+    public IAccessRule[] AccessRules => Array.Empty<IAccessRule>();
 }

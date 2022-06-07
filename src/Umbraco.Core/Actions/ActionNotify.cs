@@ -1,29 +1,28 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Actions
+namespace Umbraco.Cms.Core.Actions;
+
+/// <summary>
+///     This action is invoked upon modifying the notification of a content
+/// </summary>
+public class ActionNotify : IAction
 {
-    /// <summary>
-    /// This action is invoked upon modifying the notification of a content
-    /// </summary>
-    public class ActionNotify : IAction
-    {
-        /// <inheritdoc/>
-        public char Letter => 'N';
+    /// <inheritdoc />
+    public char Letter => 'N';
 
-        /// <inheritdoc/>
-        public bool ShowInNotifier => false;
+    /// <inheritdoc />
+    public bool ShowInNotifier => false;
 
-        /// <inheritdoc/>
-        public bool CanBePermissionAssigned => true;
+    /// <inheritdoc />
+    public bool CanBePermissionAssigned => true;
 
-        /// <inheritdoc/>
-        public string Icon => "megaphone";
+    /// <inheritdoc />
+    public string Icon => "megaphone";
 
-        /// <inheritdoc/>
-        public string Alias => "notify";
+    /// <inheritdoc />
+    public string Alias => "notify";
 
-        /// <inheritdoc/>
-        public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-    }
+    /// <inheritdoc />
+    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 }

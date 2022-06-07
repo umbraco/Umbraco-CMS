@@ -1,16 +1,14 @@
-﻿namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+/// <summary>
+///     Defines a ContentType, which Media is based on
+/// </summary>
+public interface IMediaType : IContentTypeComposition
 {
     /// <summary>
-    /// Defines a ContentType, which Media is based on
+    ///     Creates a deep clone of the current entity with its identity/alias and it's property identities reset
     /// </summary>
-    public interface IMediaType : IContentTypeComposition
-    {
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <param name="newAlias"></param>
-        /// <returns></returns>
-        IMediaType DeepCloneWithResetIdentities(string newAlias);
-    }
+    /// <param name="newAlias"></param>
+    /// <returns></returns>
+    IMediaType DeepCloneWithResetIdentities(string newAlias);
 }

@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Events
+namespace Umbraco.Cms.Core.Events;
+
+public enum EventNameExtractorError
 {
-    public enum EventNameExtractorError
-    {
-        NoneFound,
-        Ambiguous
-    }
+    NoneFound,
+    Ambiguous,
 }

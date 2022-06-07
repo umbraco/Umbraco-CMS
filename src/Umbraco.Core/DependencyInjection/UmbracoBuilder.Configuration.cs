@@ -16,13 +16,13 @@ public static partial class UmbracoBuilderExtensions
     private static IUmbracoBuilder AddUmbracoOptions<TOptions>(this IUmbracoBuilder builder, Action<OptionsBuilder<TOptions>>? configure = null)
         where TOptions : class
     {
-        var umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
+        UmbracoOptionsAttribute? umbracoOptionsAttribute = typeof(TOptions).GetCustomAttribute<UmbracoOptionsAttribute>();
         if (umbracoOptionsAttribute is null)
         {
             throw new ArgumentException($"{typeof(TOptions)} do not have the UmbracoOptionsAttribute.");
         }
 
-        var optionsBuilder = builder.Services.AddOptions<TOptions>()
+        OptionsBuilder<TOptions>? optionsBuilder = builder.Services.AddOptions<TOptions>()
             .Bind(
                 builder.Config.GetSection(umbracoOptionsAttribute.ConfigurationKey),
                 o => o.BindNonPublicProperties = umbracoOptionsAttribute.BindNonPublicProperties)
