@@ -31,8 +31,8 @@ export class UmbInstallerLayout extends LitElement {
         position: relative;
         display: flex;
         justify-content: flex-end;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        min-height: 100vh;
       }
 
       #box {
