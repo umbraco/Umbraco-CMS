@@ -11,8 +11,7 @@ public class MemberTypeMovingNotification : MovingNotification<IMemberType>
     }
 
     public MemberTypeMovingNotification(IEnumerable<MoveEventInfo<IMemberType>> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
