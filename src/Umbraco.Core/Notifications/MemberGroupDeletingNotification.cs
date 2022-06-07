@@ -11,9 +11,7 @@ public class MemberGroupDeletingNotification : DeletingNotification<IMemberGroup
     }
 
     public MemberGroupDeletingNotification(IEnumerable<IMemberGroup> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
