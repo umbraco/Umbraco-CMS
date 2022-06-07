@@ -296,7 +296,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         // eg "/Media/1234/img.jpg" => "1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
         {
-            return path[_rootUrl.Length..].TrimStart(Constants.CharArrays.ForwardSlash);
+            return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         // unchanged - what else?
