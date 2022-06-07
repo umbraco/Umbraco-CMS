@@ -14,9 +14,7 @@ public class PartialViewSavingNotification : SavingNotification<IPartialView>
     }
 
     public PartialViewSavingNotification(IEnumerable<IPartialView> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
