@@ -7,8 +7,7 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class
-    DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresherNotification, DomainCacheRefresher.JsonPayload>
+public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresherNotification, DomainCacheRefresher.JsonPayload>
 {
     private readonly IPublishedSnapshotService _publishedSnapshotService;
 
