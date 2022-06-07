@@ -57,7 +57,7 @@ public static class LocalizedTextServiceExtensions
             return text;
         }
 
-        text = text[1..];
+        text = text.Substring(1);
         var value = cultureDictionary[text];
         if (value.IsNullOrWhiteSpace() == false)
         {

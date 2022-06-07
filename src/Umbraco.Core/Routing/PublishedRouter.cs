@@ -416,8 +416,8 @@ public class PublishedRouter : IPublishedRouter
         if (pos > 0)
         {
             // recurse
-            DirectoryInfo? subdir = directory.GetDirectories(alias[..pos]).FirstOrDefault();
-            alias = alias[(pos + 1)..];
+            DirectoryInfo? subdir = directory.GetDirectories(alias.Substring(0, pos)).FirstOrDefault();
+            alias = alias.Substring(pos + 1);
             return subdir != null && FindTemplateRenderingEngineInDirectory(subdir, alias, extensions);
         }
 

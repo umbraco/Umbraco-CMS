@@ -11,7 +11,7 @@ public class PackageDefinitionXmlParser
     private static readonly IList<string> EmptyStringList = new List<string>();
     private static readonly IList<GuidUdi> EmptyGuidUdiList = new List<GuidUdi>();
 
-    public PackageDefinition? ToPackageDefinition(XElement? xml)
+    public PackageDefinition? ToPackageDefinition(XElement xml)
     {
         if (xml == null)
         {

@@ -14,9 +14,7 @@ public sealed class UserGroupDeletingNotification : DeletingNotification<IUserGr
     }
 
     public UserGroupDeletingNotification(IEnumerable<IUserGroup> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }

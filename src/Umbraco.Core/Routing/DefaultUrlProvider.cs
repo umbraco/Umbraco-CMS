@@ -116,7 +116,7 @@ public class DefaultUrlProvider : IUrlProvider
 
             // need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
             var pos = route.IndexOf('/');
-            var path = pos == 0 ? route : route[pos..];
+            var path = pos == 0 ? route : route.Substring(pos);
 
             var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
             uri = _uriUtility.UriFromUmbraco(uri, _requestSettings);

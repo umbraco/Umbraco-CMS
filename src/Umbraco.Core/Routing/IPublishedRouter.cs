@@ -34,8 +34,7 @@ public interface IPublishedRouter
     ///     <para>
     ///         This method is used for 2 cases:
     ///         - When the rendering content needs to change due to Public Access rules.
-    ///         - When there is nothing to render due to circumstances such as no template files. In this case, NULL is used as
-    ///         the parameter.
+    ///         - When there is nothing to render due to circumstances such as no template files. In this case, NULL is used as the parameter.
     ///     </para>
     ///     <para>
     ///         This method is invoked when the pipeline decides it cannot render

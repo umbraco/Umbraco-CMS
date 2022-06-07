@@ -60,8 +60,7 @@ public interface IUmbracoContext : IDisposable
     bool IsDebug { get; }
 
     /// <summary>
-    ///     Gets a value indicating whether the current user is in a preview mode and browsing the site (ie. not in the admin
-    ///     UI)
+    ///     Gets a value indicating whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
     /// </summary>
     bool InPreviewMode { get; }
 

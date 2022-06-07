@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +21,7 @@ public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
     }
 
     public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
-        : base(
-        ioHelper, editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 

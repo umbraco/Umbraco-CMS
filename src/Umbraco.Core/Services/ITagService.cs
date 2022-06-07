@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 /// <remarks>
 ///     If there is unpublished content with tags, those tags will not be contained.
-///     This service does not contain methods to query for content, media or members based on tags, those methods will be
-///     added
+///     This service does not contain methods to query for content, media or members based on tags, those methods will be added
 ///     to the content, media and member services respectively.
 /// </remarks>
 public interface ITagService : IService

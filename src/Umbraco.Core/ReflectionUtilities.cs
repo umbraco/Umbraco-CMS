@@ -1063,8 +1063,7 @@ public static class ReflectionUtilities
             ilgen.Emit(OpCodes.Ldnull); // push null
 
             // stack: null ; inst|null ; value
-            ilgen.Emit(OpCodes
-                .Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
+            ilgen.Emit(OpCodes.Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
 
             // stack: 0|1 ; value
             ilgen.Emit(OpCodes.Brtrue_S, unbox); // pops value, branches to unbox if true, ie nonzero

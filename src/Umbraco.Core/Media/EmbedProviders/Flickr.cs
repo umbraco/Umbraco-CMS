@@ -20,8 +20,8 @@ public class Flickr : EmbedProviderBase
 
     public override string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
-        var requestUrl = this.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        XmlDocument xmlDocument = this.GetXmlResponse(requestUrl);
+        var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        XmlDocument xmlDocument = base.GetXmlResponse(requestUrl);
 
         var imageUrl = GetXmlProperty(xmlDocument, "/oembed/url");
         var imageWidth = GetXmlProperty(xmlDocument, "/oembed/width");

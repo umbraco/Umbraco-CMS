@@ -8,8 +8,6 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresherNotification>
 {
-    #region Define
-
     public static readonly Guid UniqueId = Guid.Parse("DD12B6A0-14B9-46e8-8800-C154F74047C8");
 
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
@@ -30,10 +28,6 @@ public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRef
     public override Guid RefresherUniqueId => UniqueId;
 
     public override string Name => "Template Cache Refresher";
-
-    #endregion
-
-    #region Refresher
 
     public override void Refresh(int id)
     {
@@ -64,6 +58,4 @@ public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRef
         // need to clear the runtime cache for templates
         ClearAllIsolatedCacheByEntityType<ITemplate>();
     }
-
-    #endregion
 }

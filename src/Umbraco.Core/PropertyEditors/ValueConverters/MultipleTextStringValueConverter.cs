@@ -1,4 +1,4 @@
-using System.Xml;
+﻿using System.Xml;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -46,7 +46,7 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
         {
             pos += "<value>".Length;
             var npos = sourceString.IndexOf("<", pos, StringComparison.Ordinal);
-            var value = sourceString[pos..npos];
+            var value = sourceString.Substring(pos, npos - pos);
             values.Add(value);
             pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
         }

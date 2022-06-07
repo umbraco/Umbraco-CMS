@@ -220,7 +220,7 @@ public class LocalizedTextServiceFileSources
         Dictionary<CultureInfo, Lazy<XDocument>> resolved = _xmlSources.Value;
 
         return _twoLetterCultureConverter.Values.Contains(culture)
-            ? Attempt.Succeed(culture.Name[..2])
+            ? Attempt.Succeed(culture.Name.Substring(0, 2))
             : Attempt<string?>.Fail();
     }
 

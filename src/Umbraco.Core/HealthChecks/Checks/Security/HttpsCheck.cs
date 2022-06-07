@@ -25,7 +25,7 @@ public class HttpsCheck : HealthCheck
     private const int NumberOfDaysForExpiryWarning = 14;
     private const string HttpPropertyKeyCertificateDaysToExpiry = "CertificateDaysToExpiry";
 
-    private static HttpClient? httpClient;
+    private static HttpClient? _httpClient;
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -47,7 +47,7 @@ public class HttpsCheck : HealthCheck
         _hostingEnvironment = hostingEnvironment;
     }
 
-    private static HttpClient HttpClient => httpClient ??= new HttpClient(new HttpClientHandler
+    private static HttpClient _httpClientEnsureInitialized => _httpClient ??= new HttpClient(new HttpClientHandler
     {
         ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation,
     });
@@ -92,7 +92,7 @@ public class HttpsCheck : HealthCheck
 
         try
         {
-            using HttpResponseMessage response = await HttpClient.SendAsync(request);
+            using HttpResponseMessage response = await _httpClientEnsureInitialized.SendAsync(request);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

@@ -18,8 +18,7 @@ public interface IPackagingService : IService
     /// </summary>
     /// <param name="packageFile"></param>
     /// <param name="userId"></param>
-    InstallationSummary
-        InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
+    InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
     InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId);
 

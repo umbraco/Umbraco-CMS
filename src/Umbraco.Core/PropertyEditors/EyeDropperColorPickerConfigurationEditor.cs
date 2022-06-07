@@ -14,9 +14,8 @@ internal class EyeDropperColorPickerConfigurationEditor : ConfigurationEditor<Ey
     }
 
     /// <inheritdoc />
-    public override Dictionary<string, object>
-        ToConfigurationEditor(EyeDropperColorPickerConfiguration? configuration) =>
-        new Dictionary<string, object>
+    public override Dictionary<string, object> ToConfigurationEditor(EyeDropperColorPickerConfiguration? configuration) =>
+        new()
         {
             { "showAlpha", configuration?.ShowAlpha ?? false }, { "showPalette", configuration?.ShowPalette ?? false },
         };

@@ -18,8 +18,8 @@ public class Hulu : EmbedProviderBase
 
     public override string? GetMarkup(string url, int maxWidth = 0, int maxHeight = 0)
     {
-        var requestUrl = this.GetEmbedProviderUrl(url, maxWidth, maxHeight);
-        OEmbedResponse? oembed = this.GetJsonResponse<OEmbedResponse>(requestUrl);
+        var requestUrl = base.GetEmbedProviderUrl(url, maxWidth, maxHeight);
+        OEmbedResponse? oembed = base.GetJsonResponse<OEmbedResponse>(requestUrl);
 
         return oembed?.GetHtml();
     }

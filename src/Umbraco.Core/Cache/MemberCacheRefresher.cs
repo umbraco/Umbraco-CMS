@@ -12,8 +12,6 @@ namespace Umbraco.Cms.Core.Cache;
 
 public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
 {
-    #region Define
-
     public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
     private readonly IIdKeyMap _idKeyMap;
@@ -49,10 +47,6 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
 
     public override string Name => "Member Cache Refresher";
 
-    #endregion
-
-    #region Refresher
-
     public override void Refresh(JsonPayload[] payloads)
     {
         ClearCache(payloads);
@@ -86,6 +80,4 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
             }
         }
     }
-
-    #endregion
 }

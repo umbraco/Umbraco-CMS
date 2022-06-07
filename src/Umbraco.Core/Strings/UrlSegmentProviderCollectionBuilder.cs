@@ -1,9 +1,8 @@
-using Umbraco.Cms.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Strings;
 
-public class UrlSegmentProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlSegmentProviderCollectionBuilder,
-    UrlSegmentProviderCollection, IUrlSegmentProvider>
+public class UrlSegmentProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>
 {
     protected override UrlSegmentProviderCollectionBuilder This => this;
 }

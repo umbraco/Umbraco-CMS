@@ -34,14 +34,8 @@ public abstract class PublishedContentWrapped : IPublishedContent
         _publishedValueFallback = publishedValueFallback;
     }
 
-    #region ContentType
-
     /// <inheritdoc />
     public virtual IPublishedContentType ContentType => _content.ContentType;
-
-    #endregion
-
-    #region PublishedElement
 
     /// <inheritdoc />
     public Guid Key => _content.Key;
@@ -95,10 +89,6 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// <inheritdoc />
     public virtual PublishedItemType ItemType => _content.ItemType;
 
-    #endregion
-
-    #region Tree
-
     /// <inheritdoc />
     public virtual IPublishedContent? Parent => _content.Parent;
 
@@ -114,15 +104,9 @@ public abstract class PublishedContentWrapped : IPublishedContent
     /// <inheritdoc />
     public virtual IEnumerable<IPublishedContent>? ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
-    #endregion
-
-    #region Properties
-
     /// <inheritdoc cref="IPublishedElement.Properties" />
     public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
     /// <inheritdoc cref="IPublishedElement.GetProperty(string)" />
     public virtual IPublishedProperty? GetProperty(string alias) => _content.GetProperty(alias);
-
-    #endregion
 }

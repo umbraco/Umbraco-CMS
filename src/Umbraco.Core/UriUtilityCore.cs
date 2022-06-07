@@ -1,4 +1,4 @@
-using Umbraco.Extensions;
+﻿using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core;
 
@@ -19,12 +19,12 @@ public static class UriUtilityCore
         var pos2 = Math.Max(0, uri.IndexOf('#'));
         var pos = Math.Min(pos1, pos2);
 
-        var path = pos > 0 ? uri[..pos] : uri;
+        var path = pos > 0 ? uri.Substring(0, pos) : uri;
         path = path.EnsureEndsWith('/');
 
         if (pos > 0)
         {
-            path += uri[pos..];
+            path += uri.Substring(pos);
         }
 
         return path;
@@ -41,7 +41,7 @@ public static class UriUtilityCore
 
         if (pos > 0)
         {
-            path += uri[pos..];
+            path += uri.Substring(pos);
         }
 
         return path;

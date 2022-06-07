@@ -1,4 +1,4 @@
-using System.Runtime.ConstrainedExecution;
+﻿using System.Runtime.ConstrainedExecution;
 
 namespace Umbraco.Cms.Core;
 
@@ -93,10 +93,8 @@ public class SystemLock
     {
         private readonly Semaphore? _semaphore;
 
-        #region IDisposable Support
-
         // This code added to correctly implement the disposable pattern.
-        private bool disposedValue; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         internal NamedSemaphoreReleaser(Semaphore? semaphore) => _semaphore = semaphore;
 
@@ -136,7 +134,7 @@ public class SystemLock
 
         private void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 try
                 {
@@ -153,11 +151,9 @@ public class SystemLock
                     }
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
-
-        #endregion
     }
 
     private class SemaphoreSlimReleaser : IDisposable

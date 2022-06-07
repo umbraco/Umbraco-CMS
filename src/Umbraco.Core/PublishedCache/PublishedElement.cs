@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Core.PublishedCache;
 //
 public class PublishedElement : IPublishedElement
 {
-    #region Properties
 
     private readonly IPublishedProperty[] _propertiesArray;
 
@@ -64,17 +63,9 @@ public class PublishedElement : IPublishedElement
     {
     }
 
-    #region ContentType
-
     public IPublishedContentType ContentType { get; }
 
-    #endregion
-
-    #region PublishedElement
-
     public Guid Key { get; }
-
-    #endregion
 
     private static Dictionary<string, object?> GetCaseInsensitiveValueDictionary(Dictionary<string, object?> values)
     {
@@ -94,6 +85,4 @@ public class PublishedElement : IPublishedElement
         IPublishedProperty? property = index < 0 ? null : _propertiesArray?[index];
         return property;
     }
-
-    #endregion
 }

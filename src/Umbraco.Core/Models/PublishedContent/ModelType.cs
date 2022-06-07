@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using Umbraco.Cms.Core.Exceptions;
 
@@ -372,6 +372,7 @@ public class ModelType : Type
         => new ModelTypeArrayType(this);
 }
 
+/// <inheritdoc />
 internal class ModelTypeArrayType : Type
 {
     private readonly Type _elementType;

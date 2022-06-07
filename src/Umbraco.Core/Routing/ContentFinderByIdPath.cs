@@ -64,7 +64,7 @@ public class ContentFinderByIdPath : IContentFinder
         // no id if "/"
         if (path != "/")
         {
-            var noSlashPath = path[1..];
+            var noSlashPath = path.Substring(1);
 
             if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out nodeId) == false)
             {

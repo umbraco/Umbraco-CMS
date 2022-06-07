@@ -9,8 +9,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </remarks>
 public interface IPublishedContent : IPublishedElement
 {
-    #region Content
-
     // TODO: IPublishedContent properties colliding with models
     // we need to find a way to remove as much clutter as possible from IPublishedContent,
     // since this is preventing someone from creating a property named 'Path' and have it
@@ -98,10 +96,6 @@ public interface IPublishedContent : IPublishedElement
     /// </summary>
     PublishedItemType ItemType { get; }
 
-    #endregion
-
-    #region Tree
-
     /// <summary>
     ///     Gets the parent of the content item.
     /// </summary>
@@ -153,6 +147,4 @@ public interface IPublishedContent : IPublishedElement
     ///     Gets all the children of the content item, regardless of whether they are available for the current culture.
     /// </summary>
     IEnumerable<IPublishedContent>? ChildrenForAllCultures { get; }
-
-    #endregion
 }

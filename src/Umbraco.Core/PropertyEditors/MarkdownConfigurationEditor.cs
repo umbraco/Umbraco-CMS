@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.IO;
@@ -12,8 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class MarkdownConfigurationEditor : ConfigurationEditor<MarkdownConfiguration>
 {
     public MarkdownConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
-        : base(
-        ioHelper, editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
     {
     }
 }

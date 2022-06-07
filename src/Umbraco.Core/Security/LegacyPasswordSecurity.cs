@@ -133,8 +133,8 @@ public class LegacyPasswordSecurity
         }
 
         var saltLen = GenerateSalt();
-        salt = storedString[..saltLen.Length];
-        return storedString[saltLen.Length..];
+        salt = storedString.Substring(0, saltLen.Length);
+        return storedString.Substring(saltLen.Length);
     }
 
     public bool SupportHashAlgorithm(string algorithm)

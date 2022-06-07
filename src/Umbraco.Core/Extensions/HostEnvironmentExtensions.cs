@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Extensions;
 /// </summary>
 public static class HostEnvironmentExtensions
 {
-    private static string? temporaryApplicationId;
+    private static string? _temporaryApplicationId;
 
     /// <summary>
     ///     Maps a virtual path to a physical path to the application's content root.
@@ -41,11 +41,11 @@ public static class HostEnvironmentExtensions
     /// </summary>
     public static string GetTemporaryApplicationId(this IHostEnvironment hostEnvironment)
     {
-        if (temporaryApplicationId != null)
+        if (_temporaryApplicationId != null)
         {
-            return temporaryApplicationId;
+            return _temporaryApplicationId;
         }
 
-        return temporaryApplicationId = hostEnvironment.ContentRootPath.GenerateHash();
+        return _temporaryApplicationId = hostEnvironment.ContentRootPath.GenerateHash();
     }
 }
