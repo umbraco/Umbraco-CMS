@@ -11,8 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification,
-    ContentTypeCacheRefresher.JsonPayload>
+public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
 {
     private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
     private readonly IIdKeyMap _idKeyMap;
