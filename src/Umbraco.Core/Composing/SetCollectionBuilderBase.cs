@@ -12,8 +12,7 @@ namespace Umbraco.Cms.Core.Composing;
 ///         where items are not ordered.
 ///     </para>
 /// </remarks>
-public abstract class
-    SetCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
+public abstract class SetCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
     where TBuilder : SetCollectionBuilderBase<TBuilder, TCollection, TItem>
     where TCollection : class, IBuilderCollection<TItem>
 {
