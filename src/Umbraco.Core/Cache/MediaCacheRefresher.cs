@@ -10,8 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class
-    MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
+public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
 {
     private readonly IIdKeyMap _idKeyMap;
     private readonly IPublishedSnapshotService _publishedSnapshotService;
