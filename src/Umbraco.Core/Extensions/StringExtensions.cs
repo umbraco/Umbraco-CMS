@@ -958,7 +958,7 @@ public static class StringExtensions
     public static string ToFirstUpperInvariant(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input[..1].ToUpperInvariant() + input[1..];
+            : input.Substring(0, 1).ToUpperInvariant() + input.Substring(1);
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase using the casing rules of the
