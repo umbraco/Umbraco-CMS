@@ -8,9 +8,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public abstract class MovedToRecycleBinNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
 {
     protected MovedToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages)
-        : base(
-        new[] { target },
-        messages)
+        : base(new[] { target }, messages)
     {
     }
 
