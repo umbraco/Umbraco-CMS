@@ -4,9 +4,7 @@ using Umbraco.Cms.Core.Manifest;
 
 namespace Umbraco.Cms.Core.Dashboards;
 
-public class
-    DashboardCollectionBuilder : WeightedCollectionBuilderBase<DashboardCollectionBuilder, DashboardCollection,
-        IDashboard>
+public class DashboardCollectionBuilder : WeightedCollectionBuilderBase<DashboardCollectionBuilder, DashboardCollection, IDashboard>
 {
     protected override DashboardCollectionBuilder This => this;
 
