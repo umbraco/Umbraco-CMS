@@ -6,8 +6,7 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Cache;
 
-public sealed class
-    MacroCacheRefresher : PayloadCacheRefresherBase<MacroCacheRefresherNotification, MacroCacheRefresher.JsonPayload>
+public sealed class MacroCacheRefresher : PayloadCacheRefresherBase<MacroCacheRefresherNotification, MacroCacheRefresher.JsonPayload>
 {
     public MacroCacheRefresher(
         AppCaches appCaches,
