@@ -81,7 +81,7 @@ public static class UriExtensions
         var posq = s.IndexOf("?", StringComparison.Ordinal);
         var posf = s.IndexOf("#", StringComparison.Ordinal);
         var pos = posq > 0 ? posq : posf > 0 ? posf : 0;
-        var path = pos > 0 ? s[..pos] : s;
+        var path = pos > 0 ? s.Substring(0, pos) : s;
         return path;
     }
 
