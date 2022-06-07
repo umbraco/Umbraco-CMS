@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Security
             ICoreScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IExternalLoginService externalLoginService)
+            IExternalLoginWithKeyService externalLoginService)
             : this(memberService, mapper, scopeProvider, describer, publishedSnapshotAccessor, StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(), StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
         {
 

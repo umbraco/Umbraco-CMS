@@ -309,7 +309,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 factory.GetRequiredService<IEventMessagesFactory>(),
                 factory.GetRequiredService<IExternalLoginWithKeyRepository>()
             ));
-            Services.AddUnique<IExternalLoginService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<IExternalLoginWithKeyService>(factory => factory.GetRequiredService<ExternalLoginService>());
             Services.AddUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetRequiredService<Lazy<LocalizedTextServiceFileSources>>(),

@@ -37,21 +37,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _memberTypeService = memberTypeService;
         }
 
-        [Obsolete("Use ctor injecting IMemberTypeService")]
-        protected MemberTypeAndGroupTreeControllerBase(
-            ILocalizedTextService localizedTextService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IMenuItemCollectionFactory menuItemCollectionFactory,
-            IEventAggregator eventAggregator)
-            : this(
-                localizedTextService,
-                umbracoApiControllerTypeCollection,
-                menuItemCollectionFactory,
-                eventAggregator,
-                StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
-        {
-        }
-
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();

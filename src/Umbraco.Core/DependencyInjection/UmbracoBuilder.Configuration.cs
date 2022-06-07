@@ -100,8 +100,6 @@ public static partial class UmbracoBuilderExtensions
             Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes,
             builder.Config.GetSection($"{Constants.Configuration.ConfigInstallDefaultData}:{Constants.Configuration.NamedOptions.InstallDefaultData.MemberTypes}"));
 
-        builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
-
         return builder;
     }
 }

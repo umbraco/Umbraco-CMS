@@ -20,14 +20,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        [Obsolete("This method will be removed in future versions.  Please use ExistsByUserName instead.")]
-        bool Exists(string username);
-
-        /// <summary>
-        /// Checks if a user with the username exists
-        /// </summary>
-        /// <param name="username"></param>
-        /// <returns></returns>
         bool ExistsByUserName(string username);
 
 

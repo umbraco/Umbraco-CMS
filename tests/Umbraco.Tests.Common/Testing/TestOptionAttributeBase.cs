@@ -13,9 +13,6 @@ namespace Umbraco.Cms.Tests.Common.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
-        [Obsolete("This is not used anymore - Test classes are found using nunit helpers")]
-        public static readonly List<Assembly> ScanAssemblies = new List<Assembly>();
-
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
             where TOptions : TestOptionAttributeBase, new()
         {

@@ -53,5 +53,12 @@ namespace Umbraco.Cms.Core.Services
         ///// <param name="alias">Alias to retrieve an <see cref="IMacroPropertyType"/> for</param>
         ///// <returns>An <see cref="IMacroPropertyType"/> object</returns>
         //IMacroPropertyType GetMacroPropertyTypeByAlias(string alias);
+
+        /// <summary>
+        /// Gets a list of available <see cref="IMacro"/> objects by alias.
+        /// </summary>
+        /// <param name="aliases">Optional array of aliases to limit the results</param>
+        /// <returns>An enumerable list of <see cref="IMacro"/> objects</returns>
+        IEnumerable<IMacro> GetAll(params string[] aliases);
     }
 }

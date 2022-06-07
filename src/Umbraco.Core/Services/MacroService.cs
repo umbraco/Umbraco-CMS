@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    internal class MacroService : RepositoryService, IMacroWithAliasService
+    internal class MacroService : RepositoryService, IMacroService
     {
         private readonly IMacroRepository _macroRepository;
         private readonly IAuditRepository _auditRepository;
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An <see cref="IMacro"/> object</returns>
         public IMacro? GetByAlias(string alias)
         {
-            if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+            if (_macroRepository is not IMacroRepository macroWithAliasRepository)
             {
                 return GetAll().FirstOrDefault(x => x.Alias == alias);
             }
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<IMacro> GetAll(params string[] aliases)
         {
-            if (_macroRepository is not IMacroWithAliasRepository macroWithAliasRepository)
+            if (_macroRepository is not IMacroRepository macroWithAliasRepository)
             {
                 var hashset = new HashSet<string>(aliases);
                 return GetAll().Where(x => hashset.Contains(x.Alias));

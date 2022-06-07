@@ -77,9 +77,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                 .From<PropertyTypeDto>()
                 .Where<PropertyTypeDto>(x => x.DataTypeId == Cms.Core.Constants.DataTypes.LabelString));
 
-            var intPropertyAliases = new[] { Cms.Core.Constants.Conventions.Media.Width, Cms.Core.Constants.Conventions.Media.Height, Cms.Core.Constants.Conventions.Member.FailedPasswordAttempts };
+            // member properties are no longer used in v10, so just added strings here instead of constants
+            // these migrations should be removed anyways for v11
+            var intPropertyAliases = new[] { Cms.Core.Constants.Conventions.Media.Width, Cms.Core.Constants.Conventions.Media.Height, "umbracoMemberFailedPasswordAttempts" };
             var bigintPropertyAliases = new[] { Cms.Core.Constants.Conventions.Media.Bytes };
-            var dtPropertyAliases = new[] { Cms.Core.Constants.Conventions.Member.LastLockoutDate, Cms.Core.Constants.Conventions.Member.LastLoginDate, Cms.Core.Constants.Conventions.Member.LastPasswordChangeDate };
+            var dtPropertyAliases = new[] { "umbracoMemberLastLockoutDate", "umbracoMemberLastLogin", "umbracoMemberLastPasswordChangeDate" };
 
             var intPropertyTypes = labelPropertyTypes.Where(pt => intPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id).ToArray();
             var bigintPropertyTypes = labelPropertyTypes.Where(pt => bigintPropertyAliases.Contains(pt.Alias)).Select(pt => pt.Id).ToArray();

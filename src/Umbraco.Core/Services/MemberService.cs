@@ -748,12 +748,6 @@ namespace Umbraco.Cms.Core.Services
         #region Save
 
         /// <inheritdoc />
-        [Obsolete("This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
-        public void SetLastLogin(string username, DateTime date)
-        {
-        }
-
-        /// <inheritdoc />
         public void Save(IMember member)
         {
             // trimming username and email to make sure we have no trailing space

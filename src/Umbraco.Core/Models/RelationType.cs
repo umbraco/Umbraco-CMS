@@ -23,13 +23,6 @@ namespace Umbraco.Cms.Core.Models
         {
         }
 
-        [Obsolete("Use ctor with isDependency parameter")]
-        public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
-        :this(name,alias,isBidrectional, parentObjectType, childObjectType, false)
-        {
-
-        }
-
         public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
