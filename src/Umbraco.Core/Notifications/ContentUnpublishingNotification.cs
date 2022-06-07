@@ -14,9 +14,7 @@ public sealed class ContentUnpublishingNotification : CancelableEnumerableObject
     }
 
     public ContentUnpublishingNotification(IEnumerable<IContent> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
