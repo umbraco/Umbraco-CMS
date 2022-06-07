@@ -164,7 +164,7 @@ internal class ShadowWrapper : IFileSystem, IFileProviderFactory
                 var pos = dir.LastIndexOf(Path.DirectorySeparatorChar);
                 while (pos > min)
                 {
-                    dir = dir[..pos];
+                    dir = dir.Substring(0, pos);
                     if (Directory.EnumerateFileSystemEntries(dir).Any() == false)
                     {
                         Directory.Delete(dir, true);
