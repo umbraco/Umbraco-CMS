@@ -10,9 +10,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class MemberTypeRefreshedNotification : ContentTypeRefreshNotification<IMemberType>
 {
     public MemberTypeRefreshedNotification(ContentTypeChange<IMemberType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 
