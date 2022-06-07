@@ -14,9 +14,7 @@ public class RelationTypeSavingNotification : SavingNotification<IRelationType>
     }
 
     public RelationTypeSavingNotification(IEnumerable<IRelationType> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
