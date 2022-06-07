@@ -14,8 +14,7 @@ public sealed class MediaMovedToRecycleBinNotification : MovedToRecycleBinNotifi
     }
 
     public MediaMovedToRecycleBinNotification(IEnumerable<MoveEventInfo<IMedia>> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 }
