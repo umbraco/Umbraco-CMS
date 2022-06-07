@@ -377,7 +377,7 @@ public static class StringExtensions
 
         while (value.StartsWith(forRemoving, StringComparison.InvariantCultureIgnoreCase))
         {
-            value = value[forRemoving.Length..];
+            value = value.Substring(forRemoving.Length);
         }
 
         return value;
