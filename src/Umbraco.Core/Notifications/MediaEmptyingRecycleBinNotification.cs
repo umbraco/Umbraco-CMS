@@ -9,8 +9,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public sealed class MediaEmptyingRecycleBinNotification : EmptyingRecycleBinNotification<IMedia>
 {
     public MediaEmptyingRecycleBinNotification(IEnumerable<IMedia> deletedEntities, EventMessages messages)
-        : base(
-        deletedEntities, messages)
+        : base(deletedEntities, messages)
     {
     }
 }
