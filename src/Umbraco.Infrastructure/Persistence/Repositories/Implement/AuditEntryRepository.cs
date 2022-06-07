@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <summary>
     ///     Represents the NPoco implementation of <see cref="IAuditEntryRepository" />.
     /// </summary>
-    internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
+    internal class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAsyncAuditEntryRepository
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="AuditEntryRepository" /> class.
@@ -33,16 +33,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
         {
-            Sql<ISqlContext> sql = Sql()
-                .Select<AuditEntryDto>()
-                .From<AuditEntryDto>()
-                .OrderByDescending<AuditEntryDto>(x => x.EventDateUtc);
+            Sql<ISqlContext> sql = GetPageSql();
 
             Page<AuditEntryDto> page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
             records = page.TotalItems;
             return page.Items.Select(AuditEntryFactory.BuildEntity);
         }
 
+        public async Task<(IEnumerable<IAuditEntry> Entries, long RecordCount)> GetPageAsync(long pageIndex, int pageCount)
+        {
+            Sql<ISqlContext> sql = GetPageSql();
+
+            Page<AuditEntryDto> page = await Database.PageAsync<AuditEntryDto>(pageIndex + 1, pageCount, sql);
+            var records = page.TotalItems;
+            return (page.Items.Select(AuditEntryFactory.BuildEntity),records);
+        }
+
+        private Sql<ISqlContext> GetPageSql() => Sql()
+                        .Select<AuditEntryDto>()
+                        .From<AuditEntryDto>()
+                        .OrderByDescending<AuditEntryDto>(x => x.EventDateUtc);
         /// <inheritdoc />
         public bool IsAvailable()
         {
