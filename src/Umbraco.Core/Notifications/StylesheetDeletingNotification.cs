@@ -14,9 +14,7 @@ public class StylesheetDeletingNotification : DeletingNotification<IStylesheet>
     }
 
     public StylesheetDeletingNotification(IEnumerable<IStylesheet> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
