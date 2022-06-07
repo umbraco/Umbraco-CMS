@@ -913,7 +913,7 @@ public static class StringExtensions
     public static string ToFirstUpper(this string input) =>
         string.IsNullOrWhiteSpace(input)
             ? input
-            : input[..1].ToUpper() + input[1..];
+            : input.Substring(0, 1).ToUpper() + input.Substring(1);
 
     /// <summary>
     ///     Returns a copy of the string with the first character converted to lowercase.
