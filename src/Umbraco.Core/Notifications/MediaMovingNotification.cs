@@ -14,9 +14,7 @@ public sealed class MediaMovingNotification : MovingNotification<IMedia>
     }
 
     public MediaMovingNotification(IEnumerable<MoveEventInfo<IMedia>> target, EventMessages messages)
-        : base(
-        target,
-        messages)
+        : base(target, messages)
     {
     }
 }
