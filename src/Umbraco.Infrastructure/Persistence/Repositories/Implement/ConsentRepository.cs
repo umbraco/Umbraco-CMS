@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// <summary>
     /// Represents the NPoco implementation of <see cref="IConsentRepository"/>.
     /// </summary>
-    internal class ConsentRepository : EntityRepositoryBase<int, IConsent>, IConsentRepository
+    internal class ConsentRepository : EntityRepositoryBase<int, IConsent>, IAsyncConsentRepository
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsentRepository"/> class.
@@ -119,10 +119,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public void ClearCurrent(string source, string context, string action)
         {
-            var sql = Sql()
-                .Update<ConsentDto>(u => u.Set(x => x.Current, false))
-                .Where<ConsentDto>(x => x.Source == source && x.Context == context && x.Action == action && x.Current);
+            Sql<ISqlContext> sql = ClearCurrentSql(source, context, action);
             Database.Execute(sql);
         }
+
+        /// <inheritdoc />
+        public async Task ClearCurrentAsync(string source, string context, string action)
+        {
+            Sql<ISqlContext> sql = ClearCurrentSql(source, context, action);
+            await Database.ExecuteAsync(sql);
+        }
+
+        private Sql<ISqlContext> ClearCurrentSql(string source, string context, string action) => Sql()
+                        .Update<ConsentDto>(u => u.Set(x => x.Current, false))
+                        .Where<ConsentDto>(x => x.Source == source && x.Context == context && x.Action == action && x.Current);
     }
 }
