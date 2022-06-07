@@ -191,7 +191,7 @@ public static class UriExtensions
         var s = uri.OriginalString;
         var posq = s.IndexOf("?", StringComparison.Ordinal);
         var posf = s.IndexOf("#", StringComparison.Ordinal);
-        var query = posq < 0 ? null : posf < 0 ? s[posq..] : s[posq..posf];
+        var query = posq < 0 ? null : (posf < 0 ? s.Substring(posq) : s.Substring(posq, posf - posq));
 
         return query;
     }
