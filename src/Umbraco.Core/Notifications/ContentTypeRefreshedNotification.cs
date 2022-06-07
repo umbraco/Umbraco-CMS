@@ -10,8 +10,7 @@ namespace Umbraco.Cms.Core.Notifications;
 public class ContentTypeRefreshedNotification : ContentTypeRefreshNotification<IContentType>
 {
     public ContentTypeRefreshedNotification(ContentTypeChange<IContentType> target, EventMessages messages)
-        : base(
-        target, messages)
+        : base(target, messages)
     {
     }
 
