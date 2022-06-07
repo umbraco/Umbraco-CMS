@@ -289,7 +289,7 @@ public class PhysicalFileSystem : IPhysicalFileSystem, IFileProviderFactory
         // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
         if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
         {
-            return path[_rootPathFwd.Length..].TrimStart(Constants.CharArrays.ForwardSlash);
+            return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         // if it starts with the root URL, strip it and trim the starting slash to make it relative
