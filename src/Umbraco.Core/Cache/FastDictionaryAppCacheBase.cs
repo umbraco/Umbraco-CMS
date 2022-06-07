@@ -248,7 +248,7 @@ public abstract class FastDictionaryAppCacheBase : IAppCache
         {
             EnterWriteLock();
             foreach (KeyValuePair<object, object> entry in GetDictionaryEntries()
-                         .Where(x => compiled.IsMatch(((string)x.Key)[plen..]))
+                         .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
                          .ToArray())
             {
                 RemoveEntry((string)entry.Key);
