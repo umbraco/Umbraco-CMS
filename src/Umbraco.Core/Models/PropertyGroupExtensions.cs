@@ -18,7 +18,7 @@ public static class PropertyGroupExtensions
         var lastIndex = alias?.LastIndexOf(AliasSeparator) ?? -1;
         if (lastIndex != -1)
         {
-            return alias?[(lastIndex + 1)..];
+            return alias?.Substring(lastIndex + 1);
         }
 
         return alias;
