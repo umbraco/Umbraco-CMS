@@ -1,8 +1,7 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { EMPTY, of, Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 
 import { UmbContextConsumerMixin } from '../../core/context';
 import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';

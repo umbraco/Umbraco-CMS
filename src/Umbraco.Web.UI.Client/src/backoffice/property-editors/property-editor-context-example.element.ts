@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationService } from '../../core/service/notifications.store';
+import { UmbNotificationService } from '../../core/services/notification.service';
 
 @customElement('umb-property-editor-context-example')
 export default class UmbPropertyEditorContextExample extends UmbContextConsumerMixin(LitElement) {

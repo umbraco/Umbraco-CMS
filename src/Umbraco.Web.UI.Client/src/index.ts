@@ -1,5 +1,5 @@
 import 'element-internals-polyfill';
-import { worker } from './mocks/browser';
+import { startMockServiceWorker } from './mocks/browser';
 import { UmbExtensionRegistry, UmbExtensionManifest, UmbExtensionManifestCore } from './core/extension';
 
 const extensionRegistry = new UmbExtensionRegistry();
@@ -88,36 +88,12 @@ const registerInternalManifests = async () => {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Text',
       name: 'Text',
-      //elementName: 'umb-property-editor-text',
       js: () => import('./backoffice/property-editors/property-editor-text.element'),
       meta: {
         icon: 'document',
         group: 'common',
       },
     },
-    {
-      type: 'propertyEditorUI',
-      alias: 'External.PropertyEditorUI.Test',
-      name: 'Text',
-      //elementName: 'external-property-editor-test', //Gets the element name from JS file.
-      js: '/src/backoffice/property-editors/external-property-editor-test.js',
-      meta: {
-        icon: 'document',
-        group: 'common',
-      },
-    },
-    /*
-    {
-      type: 'propertyEditorUI',
-      alias: 'External.PropertyEditorUI.Test',
-      name: 'Text',
-      js: () => Promise.resolve(document.createElement('hr')),
-      meta: {
-        icon: 'document',
-        group: 'common',
-      }
-    },
-    */
     {
       type: 'propertyEditorUI',
       alias: 'Umb.PropertyEditorUI.Textarea',
@@ -177,14 +153,5 @@ const setup = async () => {
   await import('./app');
 };
 
-worker.start({
-  onUnhandledRequest: (req) => {
-    if (req.url.pathname.startsWith('/node_modules/')) return;
-    if (req.url.pathname.startsWith('/src/')) return;
-    if (req.destination === 'image') return;
-
-    console.warn('Found an unhandled %s request to %s', req.method, req.url.href);
-  },
-});
-
+startMockServiceWorker();
 setup();

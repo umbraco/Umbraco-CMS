@@ -8,11 +8,6 @@ import { customElement } from 'lit/decorators.js';
 import { getInitStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 
-// Load these in the correct components
-import './backoffice/components/editor-layout.element';
-import './backoffice/components/editor-property-layout.element';
-import './backoffice/components/node-property.element';
-
 const routes = [
   {
     path: 'login',
@@ -34,7 +29,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     :host,
     #outlet {
       display: block;
-      width: 100vw;
+      width: 100%;
       height: 100vh;
     }
   `;

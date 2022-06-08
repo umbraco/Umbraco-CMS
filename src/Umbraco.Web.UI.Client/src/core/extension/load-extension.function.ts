@@ -7,13 +7,14 @@ export function loadExtension(manifest: UmbExtensionManifest): Promise<object | 
 
   // TODO: verify if this is acceptable solution.
   if (typeof manifest.js === 'string') {
-    return import(/* @vite-ignore */ manifest.js);
-    /*
+    // TODO: change this back to dynamic import after POC. Vite complains about the dynamic imports in the public folder but doesn't include the temp app_plugins folder in the final build.
+    // return import(/* @vite-ignore */ manifest.js);
       return new Promise((resolve, reject) => {
           const script  = document.createElement('script');
           script.type = 'text/javascript';
           //script.charset = 'utf-8';
           script.async = true;
+          script.type = 'module';
           script.src = manifest.js as string;
           script.onload = function () {
             resolve(null);
@@ -23,7 +24,6 @@ export function loadExtension(manifest: UmbExtensionManifest): Promise<object | 
           };
           document.body.appendChild(script);
       }) as Promise<null>;
-      */
   }
 
   console.log('-- Extension does not have any referenced JS');
