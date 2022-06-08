@@ -338,7 +338,7 @@ public class ContentService : RepositoryService, IContentService
     public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         // TODO: what about culture?
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -361,6 +361,8 @@ public class ContentService : RepositoryService, IContentService
 
             Save(content, userId);
 
+            scope.Complete();
+
             return content;
         }
     }
@@ -382,7 +384,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -396,6 +398,8 @@ public class ContentService : RepositoryService, IContentService
             var content = new Content(name, parent, contentType, userId);
 
             Save(content, userId);
+
+            scope.Complete();
 
             return content;
         }
@@ -474,10 +478,12 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentRepository.PersistContentSchedule(content, contentSchedule);
+
+            scope.Complete();
         }
     }
 

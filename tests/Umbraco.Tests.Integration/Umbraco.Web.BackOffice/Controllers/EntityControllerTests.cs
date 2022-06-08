@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var mediaItems = new List<Media>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IMediaType mediaType = mediaTypeService.Get("image");
                 mediaTypeService.Save(mediaType);
@@ -44,6 +44,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     mediaService.Save(media);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -115,7 +117,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var mediaItems = new List<Media>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IMediaType mediaType = mediaTypeService.Get("image");
                 mediaTypeService.Save(mediaType);
@@ -127,6 +129,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     mediaService.Save(media);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -168,7 +172,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var mediaItems = new List<Media>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IMediaType mediaType = mediaTypeService.Get("image");
                 mediaTypeService.Save(mediaType);
@@ -180,6 +184,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     mediaService.Save(media);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -251,7 +257,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var contentItems = new List<IContent>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
                 contentTypeService.Save(contentType);
@@ -269,6 +275,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     contentService.SaveAndPublish(content);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -310,7 +318,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var contentItems = new List<IContent>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
                 contentTypeService.Save(contentType);
@@ -328,6 +336,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     contentService.SaveAndPublish(content);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -369,7 +379,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var contentItems = new List<IContent>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
                 contentTypeService.Save(contentType);
@@ -387,6 +397,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     contentService.SaveAndPublish(content);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>
@@ -428,7 +440,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var contentItems = new List<IContent>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
                 contentTypeService.Save(contentType);
@@ -446,6 +458,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 {
                     contentService.SaveAndPublish(content);
                 }
+
+                scope.Complete();
             }
 
             var queryParameters = new Dictionary<string, object>

@@ -94,7 +94,7 @@ public class ScheduledPublishing : RecurringHostedServiceBase
             //    but then what should be its "scope"? could we attach it to scopes?
             // - and we should definitively *not* have to flush it here (should be auto)
             using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             /* We used to assume that there will never be two instances running concurrently where (IsMainDom && ServerRole == SchedulingPublisher)
              * However this is possible during an azure deployment slot swap for the SchedulingPublisher instance when trying to achieve zero downtime deployments.
@@ -122,6 +122,8 @@ public class ScheduledPublishing : RecurringHostedServiceBase
                     _serverMessenger.SendMessages();
                 }
             }
+
+            scope.Complete();
         }
         catch (Exception ex)
         {

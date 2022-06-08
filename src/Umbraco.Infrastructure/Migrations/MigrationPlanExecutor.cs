@@ -52,7 +52,7 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
             plan.ThrowOnUnknownInitialState(nextState);
         }
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             // We want to suppress scope (service, etc...) notifications during a migration plan
             // execution. This is because if a package that doesn't have their migration plan
@@ -100,6 +100,8 @@ public class MigrationPlanExecutor : IMigrationPlanExecutor
                     postMigration.Run();
                 }
             }
+
+            scope.Complete();
         }
 
         _logger.LogInformation("Done (pending scope completion).");
