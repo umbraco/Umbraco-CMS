@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbNodeStore } from '../../core/stores/node.store';
 import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../mocks/data/content.data';
-import { UmbNotificationService } from '../../core/service/notifications.store';
+import { UmbNotificationService } from '../../core/services/notification.service';
 import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 
