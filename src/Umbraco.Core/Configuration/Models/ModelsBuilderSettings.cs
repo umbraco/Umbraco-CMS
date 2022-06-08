@@ -42,18 +42,17 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </remarks>
         public bool FlagOutOfDateModels
         {
-            get => _flagOutOfDateModels;
-
-            set
+            get
             {
                 if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsAuto())
                 {
-                    _flagOutOfDateModels = false;
-                    return;
+                    return false;
                 }
 
-                _flagOutOfDateModels = value;
+                return _flagOutOfDateModels;
             }
+
+            set => _flagOutOfDateModels = value;
         }
 
         /// <summary>
