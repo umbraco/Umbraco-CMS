@@ -30,14 +30,14 @@ namespace Umbraco.Cms.Core.Logging
             if (!bound)
                 throw new FormatException($"Could not format message \"{messageTemplate}\" with {args.Length} args.");
 
-            var values = boundProperties.ToDictionary(x => x.Name, x => x.Value);
+            var values = boundProperties!.ToDictionary(x => x.Name, x => x.Value);
 
             // this ends up putting every string parameter between quotes
             //return parsedTemplate.Render(values);
 
             // this does not
             var tw = new StringWriter();
-            foreach (var t in parsedTemplate.Tokens)
+            foreach (var t in parsedTemplate!.Tokens)
             {
                 if (t is PropertyToken pt &&
                     values.TryGetValue(pt.PropertyName, out var propVal) &&
