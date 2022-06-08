@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         {
             get
             {
-                if (!ModelsMode.IsAuto())
+                if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsAuto())
                 {
                     return false;
                 }
