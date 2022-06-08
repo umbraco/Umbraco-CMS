@@ -81,6 +81,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
           if (propertyEditorUI) {
             this._gotData(propertyEditorUI);
           }
+          // TODO: If gone what then...
         });
     }
   }
