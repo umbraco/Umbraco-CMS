@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
             set
             {
-                if (!ModelsMode.IsAuto())
+                if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsAuto())
                 {
                     _flagOutOfDateModels = false;
                     return;
