@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models
         public string? NodeType { get; set; }
 
         [DataMember(Name = "udi")]
-        public Udi NodeUdi => Udi.Create(NodeType, NodeKey);
+        public Udi NodeUdi => NodeType == Constants.UdiEntityType.Unknown ? null : Udi.Create(NodeType, NodeKey);
 
         [DataMember(Name = "icon")]
         public string? ContentTypeIcon { get; set; }
