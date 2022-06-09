@@ -55,7 +55,7 @@ export default class UmbLogin extends LitElement {
 
   private _greetings: Array<string> = [
     'Happy super Sunday',
-    'Happy manic Monday',
+    'Happy marvelous Monday',
     'Happy tubular Tuesday',
     'Happy wonderful Wednesday',
     'Happy thunderous Thursday',
