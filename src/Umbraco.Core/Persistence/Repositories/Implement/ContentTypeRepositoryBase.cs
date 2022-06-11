@@ -1128,18 +1128,24 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            //Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
+            // Now bulk update the table DocumentCultureVariationDto, once for edited = true, another for edited = false
             foreach (var editValue in toUpdate.GroupBy(x => x.Edited))
             {
-                Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
-                    .WhereIn<DocumentCultureVariationDto>(x => x.Id, editValue.Select(x => x.Id)));
+                foreach (var ids in editValue.Select(x => x.Id).InGroupsOf(Constants.Sql.MaxParameterCount))
+                {
+                    Database.Execute(Sql().Update<DocumentCultureVariationDto>(u => u.Set(x => x.Edited, editValue.Key))
+                        .WhereIn<DocumentCultureVariationDto>(x => x.Id, ids));
+                }
             }
 
-            //Now bulk update the umbracoDocument table
+            // Now bulk update the umbracoDocument table
             foreach (var editValue in editedDocument.GroupBy(x => x.Value))
             {
-                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
-                    .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+                foreach (var ids in editValue.Select(x => x.Key).InGroupsOf(Constants.Sql.MaxParameterCount))
+                {
+                    Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
+                        .WhereIn<DocumentDto>(x => x.NodeId, ids));
+                }
             }
         }
 
