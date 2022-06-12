@@ -54,7 +54,7 @@
                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
                                <button type="button" ng-click="createBlank(entityType,contentType.alias)">
                                    <umb-icon icon="{{::contentType.icon}}"></umb-icon>
-                                   {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
+                                   <span style="padding-left:15px;">{{::contentType.name}}</span> <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </button>
 
                                <button type="button" ng-repeat="blueprint in contentType.blueprints track by blueprint.id | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)">
