@@ -44,7 +44,7 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "9.5.1",
+      "defaultValue": "9.5.2",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "UseHttpsRedirect": {
