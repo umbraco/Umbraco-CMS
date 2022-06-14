@@ -1,51 +1,50 @@
 using System.Globalization;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Routing
+namespace Umbraco.Cms.Core.Routing;
+
+/// <summary>
+///     This looks up a document by checking for the umbPageId of a request/query string
+/// </summary>
+/// <remarks>
+///     This is used by library.RenderTemplate and also some of the macro rendering functionality like in
+///     macroResultWrapper.aspx
+/// </remarks>
+public class ContentFinderByPageIdQuery : IContentFinder
 {
+    private readonly IRequestAccessor _requestAccessor;
+    private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
     /// <summary>
-    /// This looks up a document by checking for the umbPageId of a request/query string
+    ///     Initializes a new instance of the <see cref="ContentFinderByPageIdQuery" /> class.
     /// </summary>
-    /// <remarks>
-    /// This is used by library.RenderTemplate and also some of the macro rendering functionality like in
-    /// macroResultWrapper.aspx
-    /// </remarks>
-    public class ContentFinderByPageIdQuery : IContentFinder
+    public ContentFinderByPageIdQuery(IRequestAccessor requestAccessor, IUmbracoContextAccessor umbracoContextAccessor)
     {
-        private readonly IRequestAccessor _requestAccessor;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
+        _umbracoContextAccessor =
+            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContentFinderByPageIdQuery"/> class.
-        /// </summary>
-        public ContentFinderByPageIdQuery(IRequestAccessor requestAccessor, IUmbracoContextAccessor umbracoContextAccessor)
+    /// <inheritdoc />
+    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    {
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            _requestAccessor = requestAccessor ?? throw new System.ArgumentNullException(nameof(requestAccessor));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            return Task.FromResult(false);
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+        if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var pageId))
         {
-            if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                return false;
-            }
-            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"),  NumberStyles.Integer, CultureInfo.InvariantCulture, out int pageId))
-            {
-                IPublishedContent? doc = umbracoContext.Content?.GetById(pageId);
+            IPublishedContent? doc = umbracoContext.Content?.GetById(pageId);
 
-                if (doc != null)
-                {
-                    frequest.SetPublishedContent(doc);
-                    return true;
-                }
+            if (doc != null)
+            {
+                frequest.SetPublishedContent(doc);
+                return Task.FromResult(true);
             }
-
-            return false;
         }
+
+        return Task.FromResult(false);
     }
 }

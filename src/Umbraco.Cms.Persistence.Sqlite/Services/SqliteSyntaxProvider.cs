@@ -20,22 +20,23 @@ using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
 namespace Umbraco.Cms.Persistence.Sqlite.Services;
 
 /// <summary>
-///     Implements <see cref="ISqlSyntaxProvider" /> for SQLite.
+/// Implements <see cref="ISqlSyntaxProvider"/> for SQLite.
 /// </summary>
 public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ILogger<SqliteSyntaxProvider> _log;
+    private readonly IDictionary<Type, IScalarMapper> _scalarMappers;
 
     public SqliteSyntaxProvider(IOptions<GlobalSettings> globalSettings, ILogger<SqliteSyntaxProvider> log)
     {
         _globalSettings = globalSettings;
         _log = log;
 
-        ScalarMappers = new Dictionary<Type, IScalarMapper>
+        _scalarMappers = new Dictionary<Type, IScalarMapper>
         {
             [typeof(Guid)] = new SqliteGuidScalarMapper(),
-            [typeof(Guid?)] = new SqliteNullableGuidScalarMapper()
+            [typeof(Guid?)] = new SqliteNullableGuidScalarMapper(),
         };
     }
 
@@ -52,13 +53,6 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     /// <inheritdoc />
     public override string DbProvider => Constants.ProviderName;
-
-
-    public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
-    public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
-    public override string ConvertDateToOrderableString => "{0}";
-
-    public override IDictionary<Type, IScalarMapper> ScalarMappers { get; }
 
 
     /// <inheritdoc />
@@ -79,8 +73,36 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         }
     }
 
-    public override List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys) =>
-        foreignKeys.Select(Format).ToList();
+    public override string Format(TableDefinition table)
+    {
+        var columns = Format(table.Columns);
+        var primaryKey = FormatPrimaryKey(table);
+        List<string> foreignKeys = Format(table.ForeignKeys);
+
+        var sb = new StringBuilder();
+        sb.AppendLine($"CREATE TABLE {table.Name}");
+        sb.AppendLine("(");
+        sb.Append(columns);
+
+        if (!string.IsNullOrEmpty(primaryKey))
+        {
+            sb.AppendLine($", {primaryKey}");
+        }
+
+        foreach (var foreignKey in foreignKeys)
+        {
+            sb.AppendLine($", {foreignKey}");
+        }
+
+        sb.AppendLine(")");
+
+        return sb.ToString();
+    }
+
+    public override List<string> Format(IEnumerable<ForeignKeyDefinition> foreignKeys)
+    {
+        return foreignKeys.Select(Format).ToList();
+    }
 
     public virtual string Format(ForeignKeyDefinition foreignKey)
     {
@@ -119,6 +141,11 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             .ToList();
     }
 
+
+    public override string ConvertIntegerToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    public override string ConvertDecimalToOrderableString => "substr('0000000000'||'{0}', -10, 10)";
+    public override string ConvertDateToOrderableString => "{0}";
+
     /// <inheritdoc />
     public override string GetSpecialDbType(SpecialDbType dbType) => "TEXT COLLATE NOCASE";
 
@@ -126,14 +153,16 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override string GetSpecialDbType(SpecialDbType dbType, int customSize) => GetSpecialDbType(dbType);
 
     /// <inheritdoc />
-    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName, out string constraintName)
+    public override bool TryGetDefaultConstraint(IDatabase db, string? tableName, string columnName,
+        out string constraintName)
     {
         // TODO: SQLite
         constraintName = string.Empty;
         return false;
     }
 
-    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector, string? tableAlias = null)
+    public override string GetFieldNameForUpdate<TDto>(Expression<Func<TDto, object?>> fieldSelector,
+        string? tableAlias = null)
     {
         var field = ExpressionHelper.FindProperty(fieldSelector).Item1 as PropertyInfo;
         var fieldName = GetColumnName(field!);
@@ -163,16 +192,21 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
-    protected override string FormatIdentity(ColumnDefinition column) =>
+    protected override string FormatIdentity(ColumnDefinition column)
+    {
         /* NOTE: We need AUTOINCREMENT, adds overhead but makes magic ids not break everything.
          * e.g. Cms.Core.Constants.Security.SuperUserId is -1
          * without the sqlite_sequence table we end up with the next user id = 0
          * but 0 is considered to not exist by our c# code and things explode */
-        column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+        return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+    }
 
-    public override string GetConcat(params string[] args) => string.Join(" || ", args.AsEnumerable());
+    public override string GetConcat(params string[] args)
+    {
+        return string.Join(" || ", args.AsEnumerable());
+    }
 
-    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string columnAlias, string? referenceName = null, bool forInsert = false)
+    public override string GetColumn(DatabaseType dbType, string tableName, string columnName, string? columnAlias, string? referenceName = null, bool forInsert = false)
     {
         if (forInsert)
         {
@@ -197,7 +231,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         var columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
             ? GetQuotedColumnName(columnDefinition.Name)
             : string.Join(", ", columnDefinition.PrimaryKeyColumns
-                .Split(Core.Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
+                .Split(Cms.Core.Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                 .Select(GetQuotedColumnName));
 
         // We can't name the PK if it's set as a column constraint so add an alternate at table level.
@@ -210,11 +244,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
 
     /// <inheritdoc />
-    public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top) =>
+    public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
+    {
         // SQLite uses LIMIT as opposed to TOP
         // SELECT TOP 5 * FROM My_Table
         // SELECT * FROM My_Table LIMIT 5;
-        sql.Append($"LIMIT {top}");
+
+        return sql.Append($"LIMIT {top}");
+    }
 
     public virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
@@ -227,7 +264,8 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sb.ToString().TrimStart(',');
     }
 
-    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition, bool skipKeysAndIndexes = false)
+    public override void HandleCreateTable(IDatabase database, TableDefinition tableDefinition,
+        bool skipKeysAndIndexes = false)
     {
         var columns = Format(tableDefinition.Columns);
         var primaryKey = FormatPrimaryKey(tableDefinition);
@@ -300,13 +338,13 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
     {
-        IEnumerable<SqliteMaster> items = db.Fetch<SqliteMaster>("select * from sqlite_master where type = 'table'")
+        var items = db.Fetch<SqliteMaster>("select * from sqlite_master where type = 'table'")
             .Where(x => !x.Name.StartsWith("sqlite_"));
 
         List<Constraint> foundConstraints = new();
         foreach (SqliteMaster row in items)
         {
-            Match altPk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>PK_\w+)\s.*UNIQUE \(""(?<field>.+?)""\)");
+            var altPk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>PK_\w+)\s.*UNIQUE \(""(?<field>.+?)""\)");
             if (altPk.Success)
             {
                 var field = altPk.Groups["field"].Value;
@@ -315,14 +353,14 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             }
             else
             {
-                Match identity = Regex.Match(row.Sql, @"""(?<field>.+)"".*AUTOINCREMENT");
+                var identity = Regex.Match(row.Sql, @"""(?<field>.+)"".*AUTOINCREMENT");
                 if (identity.Success)
                 {
                     foundConstraints.Add(new Constraint(row.Name, identity.Groups["field"].Value, $"PK_{row.Name}"));
                 }
             }
 
-            Match pk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>\w+)\s.*PRIMARY KEY \(""(?<field>.+?)""\)");
+            var pk = Regex.Match(row.Sql, @"CONSTRAINT (?<constraint>\w+)\s.*PRIMARY KEY \(""(?<field>.+?)""\)");
             if (pk.Success)
             {
                 var field = pk.Groups["field"].Value;
@@ -331,9 +369,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             }
 
             var fkRegex = new Regex(@"CONSTRAINT (?<constraint>\w+) FOREIGN KEY \(""(?<field>.+?)""\) REFERENCES");
-            IEnumerable<Match> foreignKeys = fkRegex.Matches(row.Sql).Cast<Match>();
+            var foreignKeys = fkRegex.Matches(row.Sql).Cast<Match>();
             {
-                foreach (Match? fk in foreignKeys)
+                foreach (var fk in foreignKeys)
                 {
                     var field = fk.Groups["field"].Value;
                     var constraint = fk.Groups["constraint"].Value;
@@ -350,7 +388,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     public override Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoinWithNestedJoin<TDto>(
         Sql<ISqlContext> sql,
         Func<Sql<ISqlContext>,
-            Sql<ISqlContext>> nestedJoin,
+        Sql<ISqlContext>> nestedJoin,
         string? alias = null)
     {
         Type type = typeof(TDto);
@@ -374,8 +412,16 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sqlJoin;
     }
 
+    public override IDictionary<Type, IScalarMapper> ScalarMappers => _scalarMappers;
+
     private class Constraint
     {
+        public string TableName { get; }
+
+        public string ColumnName { get; }
+
+        public string ConstraintName { get; }
+
         public Constraint(string tableName, string columnName, string constraintName)
         {
             TableName = tableName;
@@ -383,27 +429,21 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             ConstraintName = constraintName;
         }
 
-        public string TableName { get; }
-
-        public string ColumnName { get; }
-
-        public string ConstraintName { get; }
-
         public override string ToString() => ConstraintName;
     }
 
     private class SqliteMaster
     {
         public string Type { get; set; } = null!;
-        public string Name { get; } = null!;
-        public string Sql { get; } = null!;
+        public string Name { get; set; } = null!;
+        public string Sql { get; set; } = null!;
     }
 
     private class IndexMeta
     {
-        public string TableName { get; } = null!;
-        public string IndexName { get; } = null!;
-        public string ColumnName { get; } = null!;
+        public string TableName { get; set; } = null!;
+        public string IndexName { get; set; } = null!;
+        public string ColumnName { get; set; } = null!;
         public bool IsUnique { get; set; }
     }
 }

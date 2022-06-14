@@ -1,49 +1,51 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Represents the configuration for the label value editor.
+/// </summary>
+public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
 {
-    /// <summary>
-    /// Represents the configuration for the label value editor.
-    /// </summary>
-    public class LabelConfigurationEditor : ConfigurationEditor<LabelConfiguration>
+    // Scheduled for removal in v12
+    [Obsolete("Please use constructor that takes and IEditorConfigurationParser instead")]
+    public LabelConfigurationEditor(IIOHelper ioHelper)
+        : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
     {
-        // Scheduled for removal in v12
-        [Obsolete("Please use constructor that takes and IEditorConfigurationParser instead")]
-        public LabelConfigurationEditor(IIOHelper ioHelper)
-            : this(ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+    }
+
+    public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser)
+        : base(ioHelper, editorConfigurationParser)
+    {
+    }
+
+    /// <inheritdoc />
+    public override LabelConfiguration FromConfigurationEditor(
+        IDictionary<string, object?>? editorValues,
+        LabelConfiguration? configuration)
+    {
+        var newConfiguration = new LabelConfiguration();
+
+        // get the value type
+        // not simply deserializing Json because we want to validate the valueType
+        if (editorValues is not null && editorValues.TryGetValue(
+                                         Constants.PropertyEditors.ConfigurationKeys.DataValueType,
+                                         out var valueTypeObj)
+                                     && valueTypeObj is string stringValue)
         {
-        }
-
-        public LabelConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
-        {
-        }
-
-        /// <inheritdoc />
-        public override LabelConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, LabelConfiguration? configuration)
-        {
-            var newConfiguration = new LabelConfiguration();
-
-            // get the value type
-            // not simply deserializing Json because we want to validate the valueType
-
-            if (editorValues is not null && editorValues.TryGetValue(Cms.Core.Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
-                && valueTypeObj is string stringValue)
+            // validate
+            if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue))
             {
-                if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate
-                    newConfiguration.ValueType = stringValue;
+                newConfiguration.ValueType = stringValue;
             }
-
-            return newConfiguration;
         }
 
-
+        return newConfiguration;
     }
 }

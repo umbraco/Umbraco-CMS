@@ -1,7 +1,5 @@
-﻿namespace Umbraco.Cms.Core.Serialization
-{
-    public interface IConfigurationEditorJsonSerializer : IJsonSerializer
-    {
+namespace Umbraco.Cms.Core.Serialization;
 
-    }
+public interface IConfigurationEditorJsonSerializer : IJsonSerializer
+{
 }

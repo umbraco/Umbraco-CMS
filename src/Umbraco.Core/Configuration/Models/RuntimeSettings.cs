@@ -1,22 +1,21 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+/// <summary>
+///     Typed configuration options for runtime settings.
+/// </summary>
+[UmbracoOptions(Constants.Configuration.ConfigRuntime)]
+public class RuntimeSettings
 {
     /// <summary>
-    /// Typed configuration options for runtime settings.
+    ///     Gets or sets a value for the maximum query string length.
     /// </summary>
-    [UmbracoOptions(Constants.Configuration.ConfigRuntime)]
-    public class RuntimeSettings
-    {
-        /// <summary>
-        /// Gets or sets a value for the maximum query string length.
-        /// </summary>
-        public int? MaxQueryStringLength { get; set; }
+    public int? MaxQueryStringLength { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value for the maximum request length in kb.
-        /// </summary>
-        public int? MaxRequestLength { get; set; }
-    }
+    /// <summary>
+    ///     Gets or sets a value for the maximum request length in kb.
+    /// </summary>
+    public int? MaxRequestLength { get; set; }
 }
