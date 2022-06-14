@@ -27,7 +27,7 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         Standard = 2,
         Enterprise = 3, // Also developer edition
         Express = 4,
-        Azure = 5
+        Azure = 5,
     }
 
     public enum VersionName
@@ -43,7 +43,7 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         V2016 = 7,
         V2017 = 8,
         V2019 = 9,
-        Other = 99
+        Other = 99,
     }
 
     private readonly IOptions<GlobalSettings> _globalSettings;
@@ -126,7 +126,7 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
 
     internal ServerVersionInfo GetSetVersion(string? connectionString, string? providerName, ILogger logger)
     {
-        //var factory = DbProviderFactories.GetFactory(providerName);
+        // var factory = DbProviderFactories.GetFactory(providerName);
         SqlClientFactory? factory = SqlClientFactory.Instance;
         DbConnection? connection = factory.CreateConnection();
 
@@ -219,14 +219,13 @@ public class SqlServerSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlServerS
         return
             items.Select(
                 item =>
-                    new ColumnInfo(item.TableName, item.ColumnName, item.OrdinalPosition, item.ColumnDefault,
-                        item.IsNullable, item.DataType)).ToList();
+                    new ColumnInfo(item.TableName, item.ColumnName, item.OrdinalPosition, item.ColumnDefault, item.IsNullable, item.DataType)).ToList();
     }
 
     /// <inheritdoc />
     public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
     {
-        List<ConstraintPerTableDto>? items =
+        List<ConstraintPerTableDto> items =
             db.Fetch<ConstraintPerTableDto>(
                 "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
         return items.Select(item => new Tuple<string, string>(item.TableName, item.ConstraintName)).ToList();
@@ -304,9 +303,10 @@ where tbl.[name]=@0 and col.[name]=@1;",
                 return "NEWID()";
             case SystemMethods.CurrentDateTime:
                 return "GETDATE()";
-                //case SystemMethods.NewSequentialId:
+
+                // case SystemMethods.NewSequentialId:
                 //    return "NEWSEQUENTIALID()";
-                //case SystemMethods.CurrentUTCDateTime:
+                // case SystemMethods.CurrentUTCDateTime:
                 //    return "GETUTCDATE()";
         }
 
@@ -406,12 +406,19 @@ where tbl.[name]=@0 and col.[name]=@1;",
         }
 
         public string? Edition { get; }
+
         public string? InstanceName { get; }
+
         public string? ProductVersion { get; }
+
         public VersionName ProductVersionName { get; }
+
         public EngineEdition EngineEdition { get; }
+
         public bool IsAzure => EngineEdition == EngineEdition.Azure;
+
         public string? MachineName { get; }
+
         public string? ProductLevel { get; }
     }
 

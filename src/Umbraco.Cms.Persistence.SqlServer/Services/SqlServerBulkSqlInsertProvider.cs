@@ -46,7 +46,7 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
         // which in theory should be more efficient than NPocos way of building up an in-memory DataTable.
 
         // create command against the original database.Connection
-        using (DbCommand? command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
+        using (DbCommand command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
         {
             // use typed connection and transaction or SqlBulkCopy
             SqlConnection tConnection = NPocoDatabaseExtensions.GetTypedConnection<SqlConnection>(database.Connection);
@@ -64,14 +64,15 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
                 BulkCopyTimeout =
                            0, // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
                 DestinationTableName = tableName,
+
                 // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
-                BatchSize = 4096
+                BatchSize = 4096,
             })
             using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
             {
-                //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared
-                //to the order in which they are declared in the model then this will not work, so instead we will add column mappings by name so that this explicitly uses
-                //the names instead of their ordering.
+                // we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared
+                // to the order in which they are declared in the model then this will not work, so instead we will add column mappings by name so that this explicitly uses
+                // the names instead of their ordering.
                 foreach (SqlBulkCopyColumnMapping col in bulkReader.ColumnMappings)
                 {
                     copy.ColumnMappings.Add(col.DestinationColumn, col.DestinationColumn);
