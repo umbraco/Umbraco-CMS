@@ -46,7 +46,7 @@
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.errorMsg = "";
         const tempUrl = new URL(Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl, window.location.origin);
-        tempUrl.searchParams.append("redirectUrl", $location.search().returnPath ?? "")
+        tempUrl.searchParams.append("redirectUrl", decodeURIComponent($location.search().returnPath ?? ""))
 
         vm.externalLoginFormAction = tempUrl.pathname + tempUrl.search;
         vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
