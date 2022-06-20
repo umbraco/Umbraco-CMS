@@ -197,7 +197,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
         {
-            var result = new ConcurrentDictionary<string, TreeSearchResult>();
+            var result = new Dictionary<string, TreeSearchResult>();
 
             if (string.IsNullOrEmpty(query))
             {
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
 
-            var searchTasks = new List<Task>();
+            var searchTasks = new List<Task<KeyValuePair<string, TreeSearchResult>>>();
             foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
                          .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
@@ -221,20 +221,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
                     if (rootNodeDisplayName is not null)
                     {
-                        searchTasks.Add(ExecuteSearchAsync(query, searchableTree, rootNodeDisplayName,result));
+                        searchTasks.Add(ExecuteSearchAsync(query, searchableTree, rootNodeDisplayName));
                     }
                 }
             }
 
-            await Task.WhenAll(searchTasks);
+            var taskResults = await Task.WhenAll(searchTasks);
+
+            foreach (var taskResult in taskResults)
+            {
+                result[taskResult.Key] = taskResult.Value;
+            }
+
             return result;
         }
 
-        private static async Task ExecuteSearchAsync(
+        private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
             string query,
             KeyValuePair<string, SearchableApplicationTree> searchableTree,
-            string rootNodeDisplayName,
-            ConcurrentDictionary<string, TreeSearchResult> result)
+            string rootNodeDisplayName)
         {
             var searchResult = new TreeSearchResult
             {
@@ -245,7 +250,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 JsFormatterMethod = searchableTree.Value.FormatterMethod
             };
 
-            result.AddOrUpdate(rootNodeDisplayName, _=> searchResult, (_,_) => searchResult);
+            return new KeyValuePair<string, TreeSearchResult>(rootNodeDisplayName, searchResult);
         }
         /// <summary>
         ///     Gets the path for a given node ID
