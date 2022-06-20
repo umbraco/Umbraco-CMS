@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -19,28 +17,29 @@ public class ContentVariantMapper
 {
     private readonly ILocalizationService _localizationService;
     private readonly ILocalizedTextService _localizedTextService;
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-        private readonly IContentService _contentService;
-        private readonly IUserService _userService;
-        private SecuritySettings _securitySettings;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IContentService _contentService;
+    private readonly IUserService _userService;
+    private SecuritySettings _securitySettings;
 
-        public ContentVariantMapper(
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IContentService contentService,
-            IUserService userService,
-            IOptionsMonitor<SecuritySettings> securitySettings)
+    public ContentVariantMapper(
+        ILocalizationService localizationService,
+        ILocalizedTextService localizedTextService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IContentService contentService,
+        IUserService userService,
+        IOptionsMonitor<SecuritySettings> securitySettings)
     {
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-            _contentService = contentService;
-            _userService = userService;
-            _securitySettings = securitySettings.CurrentValue;
-            securitySettings.OnChange(settings => _securitySettings = settings);
-        }
-        public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _contentService = contentService;
+        _userService = userService;
+        _securitySettings = securitySettings.CurrentValue;
+        securitySettings.OnChange(settings => _securitySettings = settings);
+    }
+
+    public ContentVariantMapper(ILocalizationService localizationService, ILocalizedTextService localizedTextService)
         : this(
             localizationService,
             localizedTextService,
@@ -48,7 +47,7 @@ public class ContentVariantMapper
             StaticServiceProvider.Instance.GetRequiredService<IContentService>(),
             StaticServiceProvider.Instance.GetRequiredService<IUserService>(),
             StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
-        {
+    {
     }
 
     public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context)
@@ -57,7 +56,7 @@ public class ContentVariantMapper
         var variesByCulture = source.ContentType.VariesByCulture();
         var variesBySegment = source.ContentType.VariesBySegment();
 
-        List<TVariant> variants = new ();
+        List<TVariant> variants = new();
 
         if (!variesByCulture && !variesBySegment)
         {
@@ -65,8 +64,8 @@ public class ContentVariantMapper
             TVariant? variantDisplay = context.Map<TVariant>(source);
             if (variantDisplay is not null)
             {
-                    // Map allowed actions per language
-                    variantDisplay.AllowedActions = GetLanguagePermissions(source, context, variantDisplay);
+                // Map allowed actions per language
+                variantDisplay.AllowedActions = GetLanguagePermissions(source, context, variantDisplay);
                 variants.Add(variantDisplay);
             }
         }
@@ -114,7 +113,7 @@ public class ContentVariantMapper
     private IList<TVariant> SortVariants<TVariant>(IList<TVariant> variants)
         where TVariant : ContentVariantDisplay
     {
-        if ( variants.Count <= 1)
+        if (variants.Count <= 1)
         {
             return variants;
         }
@@ -154,7 +153,7 @@ public class ContentVariantMapper
     {
         // The default segment (null) is always there,
         // even when there is no property data at all yet
-        var segments = new List<string?> { null };
+        var segments = new List<string?> {null};
 
         // Add actual segments based on the property values
         segments.AddRange(content.Properties.SelectMany(p => p.Values.Select(v => v.Segment)));
@@ -210,15 +209,16 @@ public class ContentVariantMapper
         }
 
         return string.Join(" — ", parts);
+    }
 
-        }
-// This is a bit ugly, but when languages get granular permissions this will be really useful
+    // This is a bit ugly, but when languages get granular permissions this will be really useful
     // For now we just return the exact same permissions as you had on the node, if you have access via language
     private IEnumerable<string> GetLanguagePermissions<TVariant>(IContent content, MapperContext context, TVariant variantDisplay)
         where TVariant : ContentVariantDisplay
     {
         // Map allowed actions
-        IEnumerable<IReadOnlyUserGroup>? userGroups = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+        IEnumerable<IReadOnlyUserGroup>? userGroups =
+            _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
         bool hasAccess = false;
         if (userGroups is not null)
         {
@@ -228,12 +228,14 @@ public class ContentVariantMapper
                 if (variantDisplay.Language is null)
                 {
                     int? defaultLanguageId = _localizationService.GetDefaultLanguageId();
-                    if (defaultLanguageId is not null && (group.AllowedLanguages.Contains(defaultLanguageId.Value) || _securitySettings.AllowEditInvariantFromNonDefault))
+                    if (defaultLanguageId is not null && (group.AllowedLanguages.Contains(defaultLanguageId.Value) ||
+                                                          _securitySettings.AllowEditInvariantFromNonDefault))
                     {
                         hasAccess = true;
                     }
                 }
-                if ((variantDisplay.Language is not null && group.AllowedLanguages.Contains(variantDisplay.Language.Id)) || group.AllowedLanguages.Any() is false)
+
+                if (group.HasAccessToLanguage(variantDisplay.Language))
                 {
                     hasAccess = true;
                     break;
@@ -243,11 +245,11 @@ public class ContentVariantMapper
             // If user does not have access, return only browse permission
             if (!hasAccess)
             {
-                return new[] { ActionBrowse.ActionLetter.ToString() };
+                return new[] {ActionBrowse.ActionLetter.ToString()};
             }
         }
 
-        var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
+        IBackOfficeSecurity? backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
 
         //cannot check permissions without a context
         if (backOfficeSecurity is null)
@@ -268,7 +270,9 @@ public class ContentVariantMapper
 
         string path;
         if (content.HasIdentity)
+        {
             path = content.Path;
+        }
         else
         {
             path = parent == null ? "-1" : parent.Path;
@@ -283,7 +287,7 @@ public class ContentVariantMapper
             // If we already have permissions for a given path,
             // and the current user is the same as was used to generate the permissions, return the stored permissions.
             if (backOfficeSecurity.CurrentUser?.Id == currentUser.Id &&
-                permissionsDict.TryGetValue(path, out var permissions))
+                permissionsDict.TryGetValue(path, out EntityPermissionSet? permissions))
             {
                 return permissions.GetAllPermissions();
             }
@@ -294,5 +298,5 @@ public class ContentVariantMapper
         // reference exception :(
 
         return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
-        }
+    }
 }
