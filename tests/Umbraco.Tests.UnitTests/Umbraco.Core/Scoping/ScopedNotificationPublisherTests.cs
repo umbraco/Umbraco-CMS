@@ -91,13 +91,14 @@ public class ScopedNotificationPublisherTests
         eventAggregatorMock = new Mock<IEventAggregator>();
 
         return new ScopeProvider(
-            Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeStack(),
+                new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
             Mock.Of<IUmbracoDatabaseFactory>(),
             fileSystems,
             new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
             mediaFileManager,
             loggerFactory,
-            Mock.Of<IRequestCache>(),
+            
             eventAggregatorMock.Object);
     }
 }

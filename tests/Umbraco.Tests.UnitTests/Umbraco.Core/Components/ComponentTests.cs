@@ -81,13 +81,13 @@ public class ComponentTests
             Options.Create(new ContentSettings()));
         var eventAggregator = Mock.Of<IEventAggregator>();
         var scopeProvider = new ScopeProvider(
-            Mock.Of<IDistributedLockingMechanismFactory>(),
+            new AmbientScopeStack(), new AmbientScopeContextStack(),Mock.Of<IDistributedLockingMechanismFactory>(),
             f,
             fs,
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
             mediaFileManager,
             loggerFactory,
-            NoAppCache.Instance,
+            
             eventAggregator);
 
         mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);

@@ -38,6 +38,20 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             [typeof(Guid)] = new SqliteGuidScalarMapper(),
             [typeof(Guid?)] = new SqliteNullableGuidScalarMapper(),
         };
+
+        IntColumnDefinition = "INTEGER";
+        LongColumnDefinition = "INTEGER";
+        BoolColumnDefinition = "INTEGER";
+
+        GuidColumnDefinition = "TEXT";
+        DateTimeColumnDefinition = "TEXT";
+        DateTimeOffsetColumnDefinition = "TEXT";
+        TimeColumnDefinition = "TEXT";
+        DecimalColumnDefinition = "TEXT"; // REAL would be lossy. - https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/types
+
+        RealColumnDefinition = "REAL";
+
+        BlobColumnDefinition = "BLOB";
     }
 
     /// <inheritdoc />

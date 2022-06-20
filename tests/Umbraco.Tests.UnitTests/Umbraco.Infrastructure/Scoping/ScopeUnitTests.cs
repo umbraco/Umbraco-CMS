@@ -65,13 +65,14 @@ public class ScopeUnitTests
         sqlContext.Setup(x => x.SqlSyntax).Returns(syntaxProviderMock.Object);
 
         return new ScopeProvider(
-            lockingMechanismFactory.Object,
+            new AmbientScopeStack(),
+                new AmbientScopeContextStack(),lockingMechanismFactory.Object,
             databaseFactory.Object,
             fileSystems,
             new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
             mediaFileManager,
             loggerFactory,
-            Mock.Of<IRequestCache>(),
+            
             Mock.Of<IEventAggregator>());
     }
 
@@ -708,6 +709,35 @@ public class ScopeUnitTests
         {
             var realScope = (Scope)scope;
             Assert.IsNull(realScope.GetReadLocks());
+        }
+
+        [Test]
+        public void Depth_WhenRootScope_ReturnsZero()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                Assert.AreEqual(0,scope.Depth);
+            }
+        }
+
+
+        [Test]
+        public void Depth_WhenChildScope_ReturnsDepth()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (scopeProvider.CreateScope())
+            {
+                using (scopeProvider.CreateScope())
+                {
+                    using (var c2 = scopeProvider.CreateScope())
+                    {
+                        Assert.AreEqual(2, c2.Depth);
+                    }
+                }
+            }
         }
     }
 }
