@@ -134,11 +134,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope>
-                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
-                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
-
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
                         // against an ambient context which cannot be done due to the rules of scope creation and completion.
@@ -234,11 +229,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        ConcurrentStack<IScope>
-                            currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
-                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}",
-                            Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
-
                         // NOTE: This is NULL because we have supressed the execution context flow.
                         // If we don't do that we will get various exceptions because we're trying to run concurrent threads
                         // against an ambient context which cannot be done due to the rules of scope creation and completion.

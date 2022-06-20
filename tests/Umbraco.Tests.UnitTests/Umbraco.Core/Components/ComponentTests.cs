@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 Mock.Of<IServiceProvider>(),
                 Options.Create(new ContentSettings()));
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
-            var scopeProvider = new ScopeProvider(Mock.Of<IDistributedLockingMechanismFactory>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), mediaFileManager, loggerFactory, NoAppCache.Instance, eventAggregator);
+            var scopeProvider = new ScopeProvider(new AmbientScopeStack(), new AmbientScopeContextStack(), Mock.Of<IDistributedLockingMechanismFactory>(),f , fs, new TestOptionsMonitor<CoreDebugSettings>(coreDebug), mediaFileManager, loggerFactory, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
