@@ -49,10 +49,4 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     ///     Specifies the number of users assigned to this group
     /// </summary>
     int UserCount { get; }
-
-    void RemoveAllowedSection(string sectionAlias);
-
-    void AddAllowedSection(string sectionAlias);
-
-    void ClearAllowedSections();
 }

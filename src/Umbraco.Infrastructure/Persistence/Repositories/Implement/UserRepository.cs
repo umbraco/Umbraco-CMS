@@ -406,16 +406,16 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
 
         List<UserStartNodeDto>? startNodes = Database.Fetch<UserStartNodeDto>(sql);
 
-            // get groups2languages
+        // get groups2languages
 
-            sql = SqlContext.Sql()
-                .Select<UserGroup2LanguageDto>()
-                .From<UserGroup2LanguageDto>()
-                .WhereIn<UserGroup2LanguageDto>(x => x.UserGroupId, groupIds);
+        sql = SqlContext.Sql()
+            .Select<UserGroup2LanguageDto>()
+            .From<UserGroup2LanguageDto>()
+            .WhereIn<UserGroup2LanguageDto>(x => x.UserGroupId, groupIds);
 
-            var groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
-                .GroupBy(x => x.UserGroupId)
-                .ToDictionary(x => x.Key, x => x);
+        var groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
+            .GroupBy(x => x.UserGroupId)
+            .ToDictionary(x => x.Key, x => x);
 
         // map groups
 
@@ -445,14 +445,15 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
                 group.UserGroup2AppDtos = list.ToList(); // groups2apps is distinct
             }
 
-            // map languages
+        }
 
-            foreach (var group in groups.Values)
+        // map languages
+
+        foreach (var group in groups.Values)
+        {
+            if (groups2languages.TryGetValue(group.Id, out var list))
             {
-                if (groups2languages.TryGetValue(group.Id, out var list))
-                {
-                    group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
-                }
+                group.UserGroup2LanguageDtos = list.ToList(); // groups2apps is distinct
             }
         }
     }

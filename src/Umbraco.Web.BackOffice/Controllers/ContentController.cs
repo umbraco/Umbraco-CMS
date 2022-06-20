@@ -57,12 +57,7 @@ public class ContentController : ContentControllerBase
     private readonly ILocalizationService _localizationService;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly INotificationService _notificationService;
-    private readonly ActionCollection _actionCollection;
-    private readonly ISqlContext _sqlContext;
-    private readonly IAuthorizationService _authorizationService;
-    private readonly IContentVersionService _contentVersionService;
     private readonly ICultureImpactService _cultureImpactService;
-    private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
     private readonly ILogger<ContentController> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IPublishedUrlProvider _publishedUrlProvider;

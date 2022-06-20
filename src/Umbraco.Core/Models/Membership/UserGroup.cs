@@ -28,12 +28,6 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private int? _startContentId;
     private int? _startMediaId;
 
-    //Custom comparer for enumerable
-    private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
-        new DelegateEqualityComparer<IEnumerable<string>>(
-            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-            enum1 => enum1.GetHashCode());
-
     /// <summary>
     ///     Constructor to create a new user group
     /// </summary>
