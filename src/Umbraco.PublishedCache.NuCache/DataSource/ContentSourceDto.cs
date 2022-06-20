@@ -1,66 +1,67 @@
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
-
-// read-only dto
-internal class ContentSourceDto : IReadOnlyContentBase
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
-    public bool Published { get; set; }
+    // read-only dto
+    internal class ContentSourceDto : IReadOnlyContentBase
+    {
+        public int Id { get; set; }
 
-    public bool Edited { get; set; }
+        public Guid Key { get; set; }
 
-    public string? EditName { get; set; }
+        public int ContentTypeId { get; set; }
 
-    public DateTime EditVersionDate { get; set; }
+        public int Level { get; set; }
 
-    public int EditWriterId { get; set; }
+        public string Path { get; set; } = string.Empty;
 
-    public int EditTemplateId { get; set; }
+        public int SortOrder { get; set; }
 
-    public string? EditData { get; set; }
+        public int ParentId { get; set; }
 
-    public byte[]? EditDataRaw { get; set; }
+        public bool Published { get; set; }
 
-    // published data
-    public int PublishedVersionId { get; set; }
+        public bool Edited { get; set; }
 
-    public string? PubName { get; set; }
+        public DateTime CreateDate { get; set; }
 
-    public DateTime PubVersionDate { get; set; }
+        public int CreatorId { get; set; }
 
-    public int PubWriterId { get; set; }
+        // edited data
+        public int VersionId { get; set; }
 
-    public int PubTemplateId { get; set; }
+        public string? EditName { get; set; }
 
-    public string? PubData { get; set; }
+        public DateTime EditVersionDate { get; set; }
 
-    public byte[]? PubDataRaw { get; set; }
+        public int EditWriterId { get; set; }
 
-    public int Id { get; set; }
+        public int EditTemplateId { get; set; }
 
-    public Guid Key { get; set; }
+        public string? EditData { get; set; }
 
-    public int ContentTypeId { get; set; }
+        public byte[]? EditDataRaw { get; set; }
 
-    public int Level { get; set; }
+        // published data
+        public int PublishedVersionId { get; set; }
 
-    public string Path { get; set; } = string.Empty;
+        public string? PubName { get; set; }
 
-    public int SortOrder { get; set; }
+        public DateTime PubVersionDate { get; set; }
 
-    public int ParentId { get; set; }
+        public int PubWriterId { get; set; }
 
-    public DateTime CreateDate { get; set; }
+        public int PubTemplateId { get; set; }
 
-    public int CreatorId { get; set; }
+        public string? PubData { get; set; }
 
-    // edited data
-    public int VersionId { get; set; }
+        public byte[]? PubDataRaw { get; set; }
 
-    // Explicit implementation
-    DateTime IReadOnlyContentBase.UpdateDate => EditVersionDate;
+        // Explicit implementation
+        DateTime IReadOnlyContentBase.UpdateDate => EditVersionDate;
 
-    string? IReadOnlyContentBase.Name => EditName;
+        string? IReadOnlyContentBase.Name => EditName;
 
-    int IReadOnlyContentBase.WriterId => EditWriterId;
+        int IReadOnlyContentBase.WriterId => EditWriterId;
+    }
 }

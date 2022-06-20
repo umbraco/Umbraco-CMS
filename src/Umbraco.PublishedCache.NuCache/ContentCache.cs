@@ -22,13 +22,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
     private readonly IAppCache _snapshotCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
 
-    #region IDisposable
-
     public void Dispose() => _snapshot.Dispose();
-
-    #endregion
-
-    #region Constructor
 
     // TODO: figure this out
     // after the current snapshot has been resync-ed
@@ -53,10 +47,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
     }
 
     private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
-
-    #endregion
-
-    #region Routes
 
     // routes can be
     // "/"
@@ -257,10 +247,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         }
     }
 
-    #endregion
-
-    #region Get, Has
-
     public override IPublishedContent? GetById(bool preview, int contentId)
     {
         ContentNode? node = _snapshot.Get(contentId);
@@ -363,10 +349,6 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             ? _snapshot.IsEmpty == false
             : _snapshot.GetAtRoot().Any(x => x.PublishedModel != null);
 
-    #endregion
-
-    #region XPath
-
     public override IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars)
     {
         XPathNavigator navigator = CreateNavigator(preview);
@@ -437,15 +419,9 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         return navigator.CloneWithNewRoot(id, 0);
     }
 
-    #endregion
-
-    #region Content types
-
     public override IPublishedContentType? GetContentType(int id) => _snapshot.GetContentType(id);
 
     public override IPublishedContentType? GetContentType(string alias) => _snapshot.GetContentType(alias);
 
     public override IPublishedContentType? GetContentType(Guid key) => _snapshot.GetContentType(key);
-
-    #endregion
 }
