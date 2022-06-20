@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 
 public class TestProfiler : IProfiler
 {
-    private static bool s_enabled;
+    private static bool _enabled;
 
-    public IDisposable Step(string name) => s_enabled ? MiniProfiler.Current.Step(name) : null;
+    public IDisposable Step(string name) => _enabled ? MiniProfiler.Current.Step(name) : null;
 
     public void Start()
     {
-        if (s_enabled == false)
+        if (_enabled == false)
         {
             return;
         }
@@ -33,13 +33,13 @@ public class TestProfiler : IProfiler
 
     public void Stop(bool discardResults = false)
     {
-        if (s_enabled)
+        if (_enabled)
         {
             MiniProfiler.Current.Stop(discardResults);
         }
     }
 
-    public static void Enable() => s_enabled = true;
+    public static void Enable() => _enabled = true;
 
-    public static void Disable() => s_enabled = false;
+    public static void Disable() => _enabled = false;
 }

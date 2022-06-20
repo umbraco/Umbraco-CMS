@@ -28,14 +28,28 @@ public class TelemetryServiceTests : UmbracoIntegrationTest
     {
         var expectedData = new[]
         {
-            Constants.Telemetry.RootCount, Constants.Telemetry.DomainCount, Constants.Telemetry.ExamineIndexCount,
-            Constants.Telemetry.LanguageCount, Constants.Telemetry.MacroCount, Constants.Telemetry.MediaCount,
-            Constants.Telemetry.MediaCount, Constants.Telemetry.TemplateCount, Constants.Telemetry.ContentCount,
-            Constants.Telemetry.DocumentTypeCount, Constants.Telemetry.Properties, Constants.Telemetry.UserCount,
-            Constants.Telemetry.UserGroupCount, Constants.Telemetry.ServerOs, Constants.Telemetry.ServerFramework,
-            Constants.Telemetry.OsLanguage, Constants.Telemetry.WebServer, Constants.Telemetry.ModelsBuilderMode,
-            Constants.Telemetry.CustomUmbracoPath, Constants.Telemetry.AspEnvironment, Constants.Telemetry.IsDebug,
-            Constants.Telemetry.DatabaseProvider
+            Constants.Telemetry.RootCount,
+            Constants.Telemetry.DomainCount,
+            Constants.Telemetry.ExamineIndexCount,
+            Constants.Telemetry.LanguageCount,
+            Constants.Telemetry.MacroCount,
+            Constants.Telemetry.MediaCount,
+            Constants.Telemetry.MediaCount,
+            Constants.Telemetry.TemplateCount,
+            Constants.Telemetry.ContentCount,
+            Constants.Telemetry.DocumentTypeCount,
+            Constants.Telemetry.Properties,
+            Constants.Telemetry.UserCount,
+            Constants.Telemetry.UserGroupCount,
+            Constants.Telemetry.ServerOs,
+            Constants.Telemetry.ServerFramework,
+            Constants.Telemetry.OsLanguage,
+            Constants.Telemetry.WebServer,
+            Constants.Telemetry.ModelsBuilderMode,
+            Constants.Telemetry.CustomUmbracoPath,
+            Constants.Telemetry.AspEnvironment,
+            Constants.Telemetry.IsDebug,
+            Constants.Telemetry.DatabaseProvider,
         };
 
         MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
