@@ -11,7 +11,8 @@ public class HexStringBenchmarks
 {
     private byte[] _buffer;
 
-    [Params(8, 16, 32, 64, 128, 256)] public int Count { get; set; }
+    [Params(8, 16, 32, 64, 128, 256)]
+    public int Count { get; set; }
 
     [GlobalSetup]
     public void Setup()
