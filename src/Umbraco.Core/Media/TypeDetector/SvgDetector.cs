@@ -1,24 +1,22 @@
-﻿using System.IO;
 using System.Xml.Linq;
 
-namespace Umbraco.Cms.Core.Media.TypeDetector
+namespace Umbraco.Cms.Core.Media.TypeDetector;
+
+public class SvgDetector
 {
-    public class SvgDetector
+    public static bool IsOfType(Stream fileStream)
     {
-        public static bool IsOfType(Stream fileStream)
+        var document = new XDocument();
+
+        try
         {
-            var document = new XDocument();
-
-            try
-            {
-                document = XDocument.Load(fileStream);
-            }
-            catch (System.Exception)
-            {
-                return false;
-            }
-
-            return document.Root?.Name.LocalName == "svg";
+            document = XDocument.Load(fileStream);
         }
+        catch (Exception)
+        {
+            return false;
+        }
+
+        return document.Root?.Name.LocalName == "svg";
     }
 }

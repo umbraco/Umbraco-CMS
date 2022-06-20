@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             {
                 var schema = new DatabaseSchemaCreator(ScopeAccessor.AmbientScope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator, Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x => x.CurrentValue == new InstallDefaultDataSettings()));
                 schema.InitializeDatabaseSchema();
-                result = schema.ValidateSchema(DatabaseSchemaCreator.OrderedTables);
+                result = schema.ValidateSchema(DatabaseSchemaCreator._orderedTables);
             }
 
             // Assert

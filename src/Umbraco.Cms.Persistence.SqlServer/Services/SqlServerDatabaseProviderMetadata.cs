@@ -5,13 +5,13 @@ using Umbraco.Cms.Infrastructure.Persistence;
 namespace Umbraco.Cms.Persistence.SqlServer.Services;
 
 /// <summary>
-/// Provider metadata for SQL Server
+///     Provider metadata for SQL Server
 /// </summary>
 [DataContract]
 public class SqlServerDatabaseProviderMetadata : IDatabaseProviderMetadata
 {
     /// <inheritdoc />
-    public Guid Id => new ("5e1ad149-1951-4b74-90bf-2ac2aada9e73");
+    public Guid Id => new("5e1ad149-1951-4b74-90bf-2ac2aada9e73");
 
     /// <inheritdoc />
     public int SortOrder => 2;

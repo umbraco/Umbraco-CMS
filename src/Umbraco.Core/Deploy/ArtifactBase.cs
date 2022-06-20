@@ -21,8 +21,6 @@ namespace Umbraco.Cms.Core.Deploy
 
         protected abstract string GetChecksum();
 
-        #region Abstract implementation of IArtifactSignature
-
         Udi IArtifactSignature.Udi => Udi;
 
         public TUdi Udi { get; set; }
@@ -44,8 +42,6 @@ namespace Umbraco.Cms.Core.Deploy
             get => _dependencies;
             set => _dependencies = value.OrderBy(x => x.Udi);
         }
-
-        #endregion
 
         public string Name { get; set; }
 

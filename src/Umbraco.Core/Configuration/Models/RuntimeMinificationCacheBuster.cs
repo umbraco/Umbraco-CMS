@@ -1,9 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+public enum RuntimeMinificationCacheBuster
 {
-    public enum RuntimeMinificationCacheBuster
-    {
-        Version,
-        AppDomain,
-        Timestamp
-    }
+    Version,
+    AppDomain,
+    Timestamp,
 }

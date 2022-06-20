@@ -1,68 +1,69 @@
-﻿using System.Collections.Generic;
 using System.Text;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
+
+public class InsertDataExpression : MigrationExpressionBase
 {
-    public class InsertDataExpression : MigrationExpressionBase
+    public InsertDataExpression(IMigrationContext context)
+        : base(context)
     {
-        public InsertDataExpression(IMigrationContext context)
-            : base(context)
-        { }
+    }
 
-        public string? TableName { get; set; }
-        public bool EnabledIdentityInsert { get; set; }
+    public string? TableName { get; set; }
 
-        public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
+    public bool EnabledIdentityInsert { get; set; }
 
-        protected override string GetSql()
+    public List<InsertionDataDefinition> Rows { get; } = new();
+
+    protected override string GetSql()
+    {
+        var stmts = new StringBuilder();
+
+        if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
         {
-            var stmts = new StringBuilder();
+            stmts.AppendLine($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(TableName)} ON");
+            AppendStatementSeparator(stmts);
+        }
 
-            if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
+        try
+        {
+            foreach (InsertionDataDefinition item in Rows)
             {
-                stmts.AppendLine($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(TableName)} ON");
-                AppendStatementSeparator(stmts);
-            }
-
-            try
-            {
-                foreach (var item in Rows)
+                var cols = new StringBuilder();
+                var vals = new StringBuilder();
+                var first = true;
+                foreach (KeyValuePair<string, object?> keyVal in item)
                 {
-                    var cols = new StringBuilder();
-                    var vals = new StringBuilder();
-                    var first = true;
-                    foreach (var keyVal in item)
+                    if (first)
                     {
-                        if (first)
-                        {
-                            first = false;
-                        }
-                        else
-                        {
-                            cols.Append(",");
-                            vals.Append(",");
-                        }
-                        cols.Append(SqlSyntax.GetQuotedColumnName(keyVal.Key));
-                        vals.Append(GetQuotedValue(keyVal.Value));
+                        first = false;
+                    }
+                    else
+                    {
+                        cols.Append(",");
+                        vals.Append(",");
                     }
 
-                    var sql = string.Format(SqlSyntax.InsertData, SqlSyntax.GetQuotedTableName(TableName), cols, vals);
-
-                    stmts.Append(sql);
-                    AppendStatementSeparator(stmts);
+                    cols.Append(SqlSyntax.GetQuotedColumnName(keyVal.Key));
+                    vals.Append(GetQuotedValue(keyVal.Value));
                 }
-            }
-            finally
-            {
-                if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
-                {
-                    stmts.AppendLine($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(TableName)} OFF");
-                    AppendStatementSeparator(stmts);
-                }
-            }
 
-            return stmts.ToString();
+                var sql = string.Format(SqlSyntax.InsertData, SqlSyntax.GetQuotedTableName(TableName), cols, vals);
+
+                stmts.Append(sql);
+                AppendStatementSeparator(stmts);
+            }
         }
+        finally
+        {
+            if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
+            {
+                stmts.AppendLine($"SET IDENTITY_INSERT {SqlSyntax.GetQuotedTableName(TableName)} OFF");
+                AppendStatementSeparator(stmts);
+            }
+        }
+
+        return stmts.ToString();
     }
 }

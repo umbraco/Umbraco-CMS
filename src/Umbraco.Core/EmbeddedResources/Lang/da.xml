@@ -2183,18 +2183,19 @@ Mange hilsner fra Umbraco robotten
       være muligt. Indholdet vil blive vist som ikke understøttet indhold.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
+    <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer.</key>
     <key alias="thumbnail">Billede</key>
     <key alias="addThumbnail">Tilføj billede</key>
     <key alias="tabCreateEmpty">Opret ny</key>
     <key alias="tabClipboard">Udklipsholder</key>
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
-    <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
-    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
-    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="elementTypeDoesNotExistHeadline">Fejl!</key>
+    <key alias="elementTypeDoesNotExistDescription">Elementtypen for denne blok eksisterer ikke længere</key>
     <key alias="addBlock">Tilføj indhold</key>
     <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>

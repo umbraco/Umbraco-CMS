@@ -1,9 +1,6 @@
-﻿namespace Umbraco.Cms.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid;
+
+public interface IGridConfig
 {
-    public interface IGridConfig
-    {
-
-        IGridEditorsConfig EditorsConfig { get; }
-
-    }
+    IGridEditorsConfig EditorsConfig { get; }
 }

@@ -4,12 +4,12 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class DomainDeletedNotification : DeletedNotification<IDomain>
 {
-    public class DomainDeletedNotification : DeletedNotification<IDomain>
+    public DomainDeletedNotification(IDomain target, EventMessages messages)
+        : base(target, messages)
     {
-        public DomainDeletedNotification(IDomain target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }
