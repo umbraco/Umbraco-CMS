@@ -33,9 +33,8 @@ public class TestDbMeta
         return connectionString.Replace(";;", ";");
     }
 
-    public static TestDbMeta
-        CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
-        new(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Constants.ProviderName, null);
+        public static TestDbMeta CreateWithMasterConnectionString(string name, bool isEmpty, string masterConnectionString) =>
+            new TestDbMeta(name, isEmpty, ConstructConnectionString(masterConnectionString, name), Persistence.SqlServer.Constants.ProviderName, null);
 
     // LocalDb mdf funtimes
     public static TestDbMeta CreateWithoutConnectionString(string name, bool isEmpty) =>
