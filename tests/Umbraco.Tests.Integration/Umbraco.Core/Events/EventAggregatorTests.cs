@@ -16,9 +16,7 @@ public class EventAggregatorTests : UmbracoTestServerTestBase
     protected override void ConfigureTestServices(IServiceCollection services)
     {
         services.AddScoped<EventAggregatorTestScopedService>();
-        services
-            .AddTransient<INotificationHandler<EventAggregatorTestNotification>,
-                EventAggregatorTestNotificationHandler>();
+        services.AddTransient<INotificationHandler<EventAggregatorTestNotification>, EventAggregatorTestNotificationHandler>();
     }
 
     [Test]
