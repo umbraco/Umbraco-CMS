@@ -97,11 +97,14 @@ public static partial class UmbracoBuilderExtensions
         builder.Mappers()?.AddCoreMappers();
 
         // register the scope provider
-        builder.Services.AddSingleton<ScopeProvider>(); // implements IScopeProvider, IScopeAccessor
+        builder.Services.AddSingleton<ScopeProvider>(sp => ActivatorUtilities.CreateInstance<ScopeProvider>(sp, sp.GetRequiredService<IAmbientScopeStack>())); // implements IScopeProvider, IScopeAccessor
         builder.Services.AddSingleton<ICoreScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
         builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
         builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
-        builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+
+            builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
+        builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<IAmbientScopeStack>());
+            builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
 
         builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 

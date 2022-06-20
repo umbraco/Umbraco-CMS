@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
-    <Content Include="$(JsonSchemaPath)" PackagePath="."/>
+    <Content Include="$(JsonSchemaPath)" PackagePath="." />
   </ItemGroup>
 
   <Target Name="CheckPreConditions" BeforeTargets="Build">
