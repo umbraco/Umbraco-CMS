@@ -71,8 +71,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     [SetUp]
     public void Setup()
     {
-        InMemoryConfiguration[
-            Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
+        InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
         var hostBuilder = CreateHostBuilder();
 
         _host = hostBuilder.Build();
