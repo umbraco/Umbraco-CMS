@@ -1,23 +1,20 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
-namespace Umbraco.Cms.Core.WebAssets
+namespace Umbraco.Cms.Core.WebAssets;
+
+/// <summary>
+///     Represents a dependency file
+/// </summary>
+[DebuggerDisplay("Type: {DependencyType}, File: {FilePath}")]
+public class AssetFile : IAssetFile
 {
-    /// <summary>
-    /// Represents a dependency file
-    /// </summary>
-    [DebuggerDisplay("Type: {DependencyType}, File: {FilePath}")]
-    public class AssetFile : IAssetFile
-    {
-        #region IAssetFile Members
+    public AssetFile(AssetType type) => DependencyType = type;
 
-        public string? FilePath { get; set; }
-        public AssetType DependencyType { get; }
+    #region IAssetFile Members
 
-        #endregion
+    public string? FilePath { get; set; }
 
-        public AssetFile(AssetType type)
-        {
-            DependencyType = type;
-        }
-    }
+    public AssetType DependencyType { get; }
+
+    #endregion
 }

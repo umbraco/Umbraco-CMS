@@ -14,30 +14,37 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Persistence.Sqlite;
 
 /// <summary>
-/// SQLite support extensions for IUmbracoBuilder.
+///     SQLite support extensions for IUmbracoBuilder.
 /// </summary>
 public static class UmbracoBuilderExtensions
 {
     /// <summary>
-    /// Add required services for SQLite support.
+    ///     Add required services for SQLite support.
     /// </summary>
     public static IUmbracoBuilder AddUmbracoSqliteSupport(this IUmbracoBuilder builder)
     {
         // TryAddEnumerable takes both TService and TImplementation into consideration (unlike TryAddSingleton)
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ISqlSyntaxProvider, SqliteSyntaxProvider>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>());
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseCreator, SqliteDatabaseCreator>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificMapperFactory, SqliteSpecificMapperFactory>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDatabaseProviderMetadata, SqliteDatabaseProviderMetadata>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificMapperFactory, SqliteSpecificMapperFactory>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDatabaseProviderMetadata, SqliteDatabaseProviderMetadata>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDistributedLockingMechanism, SqliteDistributedLockingMechanism>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IDistributedLockingMechanism, SqliteDistributedLockingMechanism>());
 
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddPreferDeferredInterceptor>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddMiniProfilerInterceptor>());
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IProviderSpecificInterceptor, SqliteAddRetryPolicyInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificInterceptor, SqliteAddPreferDeferredInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificInterceptor, SqliteAddMiniProfilerInterceptor>());
+        builder.Services.TryAddEnumerable(ServiceDescriptor
+            .Singleton<IProviderSpecificInterceptor, SqliteAddRetryPolicyInterceptor>());
 
         DbProviderFactories.UnregisterFactory(Constants.ProviderName);
-        DbProviderFactories.RegisterFactory(Constants.ProviderName, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+        DbProviderFactories.RegisterFactory(Constants.ProviderName, SqliteFactory.Instance);
 
         // Prevent accidental creation of SQLite database files
         builder.Services.PostConfigureAll<ConnectionStrings>(options =>

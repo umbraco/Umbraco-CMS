@@ -1,7 +1,5 @@
-﻿namespace Umbraco.Cms.Core.Models
-{
-    public interface IScript : IFile
-    {
+namespace Umbraco.Cms.Core.Models;
 
-    }
+public interface IScript : IFile
+{
 }

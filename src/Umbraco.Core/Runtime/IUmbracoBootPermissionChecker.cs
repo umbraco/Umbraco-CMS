@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime;
+
+public interface IUmbracoBootPermissionChecker
 {
-    public interface IUmbracoBootPermissionChecker
-    {
-        void ThrowIfNotPermissions();
-    }
+    void ThrowIfNotPermissions();
 }

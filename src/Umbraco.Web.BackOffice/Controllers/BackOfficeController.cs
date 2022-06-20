@@ -311,7 +311,7 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
     {
-        if (redirectUrl == null)
+        if (redirectUrl == null || Uri.TryCreate(redirectUrl, UriKind.Absolute, out _))
         {
             redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
         }

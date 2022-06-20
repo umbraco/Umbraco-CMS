@@ -1,7 +1,6 @@
-﻿namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
+namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+
+public interface IMarkdownToHtmlConverter
 {
-    public interface IMarkdownToHtmlConverter
-    {
-        string ToHtml(HealthCheckResults results, HealthCheckNotificationVerbosity verbosity);
-    }
+    string ToHtml(HealthCheckResults results, HealthCheckNotificationVerbosity verbosity);
 }

@@ -1,132 +1,128 @@
-using System;
-using System.Collections.Generic;
 using MimeKit;
 using MimeKit.Text;
 using Umbraco.Cms.Core.Models.Email;
 
-namespace Umbraco.Cms.Infrastructure.Extensions
+namespace Umbraco.Cms.Infrastructure.Extensions;
+
+internal static class EmailMessageExtensions
 {
-    internal static class EmailMessageExtensions
+    public static MimeMessage ToMimeMessage(this EmailMessage mailMessage, string configuredFromAddress)
     {
-        public static MimeMessage ToMimeMessage(this EmailMessage mailMessage, string configuredFromAddress)
+        var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
+
+        if (!InternetAddress.TryParse(fromEmail, out InternetAddress fromAddress))
         {
-            var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
+            throw new ArgumentException(
+                $"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
+        }
 
-            if (!InternetAddress.TryParse(fromEmail, out InternetAddress fromAddress))
+        var messageToSend = new MimeMessage { From = { fromAddress }, Subject = mailMessage.Subject };
+
+        AddAddresses(messageToSend, mailMessage.To, x => x.To, true);
+        AddAddresses(messageToSend, mailMessage.Cc, x => x.Cc);
+        AddAddresses(messageToSend, mailMessage.Bcc, x => x.Bcc);
+        AddAddresses(messageToSend, mailMessage.ReplyTo, x => x.ReplyTo);
+
+        if (mailMessage.HasAttachments)
+        {
+            var builder = new BodyBuilder();
+            if (mailMessage.IsBodyHtml)
             {
-                throw new ArgumentException($"Email could not be sent.  Could not parse from address {fromEmail} as a valid email address.");
-            }
-
-            var messageToSend = new MimeMessage
-            {
-                From = { fromAddress },
-                Subject = mailMessage.Subject,
-            };
-
-            AddAddresses(messageToSend, mailMessage.To, x => x.To, throwIfNoneValid: true);
-            AddAddresses(messageToSend, mailMessage.Cc, x => x.Cc);
-            AddAddresses(messageToSend, mailMessage.Bcc, x => x.Bcc);
-            AddAddresses(messageToSend, mailMessage.ReplyTo, x => x.ReplyTo);
-
-            if (mailMessage.HasAttachments)
-            {
-                var builder = new BodyBuilder();
-                if (mailMessage.IsBodyHtml)
-                {
-                    builder.HtmlBody = mailMessage.Body;
-                }
-                else
-                {
-                    builder.TextBody = mailMessage.Body;
-                }
-
-                foreach (EmailMessageAttachment attachment in mailMessage.Attachments!)
-                {
-                    builder.Attachments.Add(attachment.FileName, attachment.Stream);
-                }
-
-                messageToSend.Body = builder.ToMessageBody();
+                builder.HtmlBody = mailMessage.Body;
             }
             else
             {
-                messageToSend.Body = new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body };
+                builder.TextBody = mailMessage.Body;
             }
 
-            return messageToSend;
+            foreach (EmailMessageAttachment attachment in mailMessage.Attachments!)
+            {
+                builder.Attachments.Add(attachment.FileName, attachment.Stream);
+            }
+
+            messageToSend.Body = builder.ToMessageBody();
+        }
+        else
+        {
+            messageToSend.Body =
+                new TextPart(mailMessage.IsBodyHtml ? TextFormat.Html : TextFormat.Plain) { Text = mailMessage.Body };
         }
 
-        private static void AddAddresses(MimeMessage message, string?[]? addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
+        return messageToSend;
+    }
+
+    public static NotificationEmailModel ToNotificationEmail(
+        this EmailMessage emailMessage,
+        string? configuredFromAddress)
+    {
+        var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
+
+        NotificationEmailAddress? from = ToNotificationAddress(fromEmail);
+
+        return new NotificationEmailModel(
+            from,
+            GetNotificationAddresses(emailMessage.To),
+            GetNotificationAddresses(emailMessage.Cc),
+            GetNotificationAddresses(emailMessage.Bcc),
+            GetNotificationAddresses(emailMessage.ReplyTo),
+            emailMessage.Subject,
+            emailMessage.Body,
+            emailMessage.Attachments,
+            emailMessage.IsBodyHtml);
+    }
+
+    private static void AddAddresses(MimeMessage message, string?[]? addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
+    {
+        var foundValid = false;
+        if (addresses != null)
         {
-            var foundValid = false;
-            if (addresses != null)
+            foreach (var address in addresses)
             {
-                foreach (var address in addresses)
+                if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
                 {
-                    if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
-                    {
-                        addressListGetter(message).Add(internetAddress);
-                        foundValid = true;
-                    }
+                    addressListGetter(message).Add(internetAddress);
+                    foundValid = true;
                 }
             }
+        }
 
-            if (throwIfNoneValid && foundValid == false)
+        if (throwIfNoneValid && foundValid == false)
+        {
+            throw new InvalidOperationException("Email could not be sent. Could not parse a valid recipient address.");
+        }
+    }
+
+    private static NotificationEmailAddress? ToNotificationAddress(string? address)
+    {
+        if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
+        {
+            if (internetAddress is MailboxAddress mailboxAddress)
             {
-                throw new InvalidOperationException($"Email could not be sent. Could not parse a valid recipient address.");
+                return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name);
             }
         }
 
-        public static NotificationEmailModel ToNotificationEmail(this EmailMessage emailMessage,
-            string? configuredFromAddress)
+        return null;
+    }
+
+    private static IEnumerable<NotificationEmailAddress>? GetNotificationAddresses(IEnumerable<string?>? addresses)
+    {
+        if (addresses is null)
         {
-            var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
-
-            NotificationEmailAddress? from = ToNotificationAddress(fromEmail);
-
-            return new NotificationEmailModel(
-                from,
-                GetNotificationAddresses(emailMessage.To),
-                GetNotificationAddresses(emailMessage.Cc),
-                GetNotificationAddresses(emailMessage.Bcc),
-                GetNotificationAddresses(emailMessage.ReplyTo),
-                emailMessage.Subject,
-                emailMessage.Body,
-                emailMessage.Attachments,
-                emailMessage.IsBodyHtml);
-        }
-
-        private static NotificationEmailAddress? ToNotificationAddress(string? address)
-        {
-            if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
-            {
-                if (internetAddress is MailboxAddress mailboxAddress)
-                {
-                    return new NotificationEmailAddress(mailboxAddress.Address, internetAddress.Name);
-                }
-            }
-
             return null;
         }
 
-        private static IEnumerable<NotificationEmailAddress>? GetNotificationAddresses(IEnumerable<string?>? addresses)
+        var notificationAddresses = new List<NotificationEmailAddress>();
+
+        foreach (var address in addresses)
         {
-            if (addresses is null)
+            NotificationEmailAddress? notificationAddress = ToNotificationAddress(address);
+            if (notificationAddress is not null)
             {
-                return null;
+                notificationAddresses.Add(notificationAddress);
             }
-
-            var notificationAddresses = new List<NotificationEmailAddress>();
-
-            foreach (var address in addresses)
-            {
-                NotificationEmailAddress? notificationAddress = ToNotificationAddress(address);
-                if (notificationAddress is not null)
-                {
-                    notificationAddresses.Add(notificationAddress);
-                }
-            }
-
-            return notificationAddresses;
         }
+
+        return notificationAddresses;
     }
 }
