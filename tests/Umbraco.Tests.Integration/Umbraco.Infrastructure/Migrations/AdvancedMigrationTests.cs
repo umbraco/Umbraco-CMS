@@ -279,7 +279,7 @@ public class AdvancedMigrationTests : UmbracoIntegrationTest
         protected override void Migrate()
         {
             // Creates *all* tables keys and indexes
-            foreach (var x in DatabaseSchemaCreator.OrderedTables)
+            foreach (var x in DatabaseSchemaCreator._orderedTables)
             {
                 // ok - for tests, restrict to Node
                 if (x != typeof(UserDto))

@@ -35,7 +35,7 @@ public class SchemaValidationTest : UmbracoIntegrationTest
                 Mock.Of<IOptionsMonitor<InstallDefaultDataSettings>>(x =>
                     x.CurrentValue == new InstallDefaultDataSettings()));
             schema.InitializeDatabaseSchema();
-            result = schema.ValidateSchema(DatabaseSchemaCreator.OrderedTables);
+            result = schema.ValidateSchema(DatabaseSchemaCreator._orderedTables);
         }
 
         // Assert

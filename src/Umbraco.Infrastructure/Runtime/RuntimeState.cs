@@ -254,16 +254,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 }
 
                 // no scope, no service - just directly accessing the database
-                using (var database = databaseFactory.CreateDatabase())
+                using (IUmbracoDatabase database = databaseFactory.CreateDatabase())
                 {
-                    if (!database!.IsUmbracoInstalled())
+                    if (!database.IsUmbracoInstalled())
                     {
                         return UmbracoDatabaseState.NotInstalled;
                     }
 
                     // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
                     // All will be prefixed with the same key.
-                    IReadOnlyDictionary<string, string?>? keyValues = database!.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
+                    IReadOnlyDictionary<string, string?>? keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
                     // This could need both an upgrade AND package migrations to execute but
                     // we will process them one at a time, first the upgrade, then the package migrations.
@@ -322,7 +322,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 canConnect = databaseFactory.CanConnect;
                 if (canConnect || ++i == tries)
+                {
                     break;
+                }
+
                 _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }

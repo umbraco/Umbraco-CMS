@@ -1,17 +1,16 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+[DataContract(Name = "propertyType")]
+public class MemberPropertyTypeDisplay : PropertyTypeDisplay
 {
-    [DataContract(Name = "propertyType")]
-    public class MemberPropertyTypeDisplay : PropertyTypeDisplay
-    {
-        [DataMember(Name = "showOnMemberProfile")]
-        public bool MemberCanViewProperty { get; set; }
+    [DataMember(Name = "showOnMemberProfile")]
+    public bool MemberCanViewProperty { get; set; }
 
-        [DataMember(Name = "memberCanEdit")]
-        public bool MemberCanEditProperty { get; set; }
+    [DataMember(Name = "memberCanEdit")]
+    public bool MemberCanEditProperty { get; set; }
 
-        [DataMember(Name = "isSensitiveData")]
-        public bool IsSensitiveData { get; set; }
-    }
+    [DataMember(Name = "isSensitiveData")]
+    public bool IsSensitiveData { get; set; }
 }

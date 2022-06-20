@@ -1,9 +1,8 @@
-namespace Umbraco.Cms.Infrastructure.Persistence
-{
-    public interface IDatabaseCreator
-    {
-        string ProviderName { get; }
+namespace Umbraco.Cms.Infrastructure.Persistence;
 
-        void Create(string connectionString);
-    }
+public interface IDatabaseCreator
+{
+    string ProviderName { get; }
+
+    void Create(string connectionString);
 }

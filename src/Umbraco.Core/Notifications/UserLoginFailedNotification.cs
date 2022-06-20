@@ -1,9 +1,10 @@
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class UserLoginFailedNotification : UserNotification
 {
-    public class UserLoginFailedNotification : UserNotification
+    public UserLoginFailedNotification(string ipAddress, string affectedUserId, string performingUserId)
+        : base(
+        ipAddress, affectedUserId, performingUserId)
     {
-        public UserLoginFailedNotification(string ipAddress, string affectedUserId, string performingUserId) : base(ipAddress, affectedUserId, performingUserId)
-        {
-        }
     }
 }

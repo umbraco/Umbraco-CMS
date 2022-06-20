@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -99,10 +98,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         private void Initialize()
         {
-            if (_initialized) return;
+            if (_initialized)
+            {
+                return;
+            }
+
             lock (_locker)
             {
-                if (_initialized) return;
+                if (_initialized)
+                {
+                    return;
+                }
+
                 InitializeLocked();
                 _initialized = true;
             }
@@ -113,10 +120,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             _converter = null;
             var isdefault = false;
 
-            foreach (var converter in _propertyValueConverters)
+            foreach (IPropertyValueConverter converter in _propertyValueConverters)
             {
                 if (!converter.IsConverter(this))
+                {
                     continue;
+                }
 
                 if (_converter == null)
                 {
@@ -142,11 +151,14 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                         else
                         {
                             // no shadow - bad
-                            throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
-                                                                              + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
-                                                                              + " for that property, and only one converter can exist for a property.",
-                                ContentType?.Alias, Alias,
-                                converter.GetType().FullName, _converter.GetType().FullName));
+                            throw new InvalidOperationException(string.Format(
+                                "Type '{2}' cannot be an IPropertyValueConverter"
+                              + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                              + " for that property, and only one converter can exist for a property.",
+                                ContentType?.Alias,
+                                Alias,
+                                converter.GetType().FullName,
+                                _converter.GetType().FullName));
                         }
                     }
                     else
@@ -165,11 +177,14 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                     else
                     {
                         // previous was non-default, and got another non-default - bad
-                        throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
-                                                                          + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
-                                                                          + " for that property, and only one converter can exist for a property.",
-                            ContentType?.Alias, Alias,
-                            converter.GetType().FullName, _converter.GetType().FullName));
+                        throw new InvalidOperationException(string.Format(
+                            "Type '{2}' cannot be an IPropertyValueConverter"
+                          + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                          + " for that property, and only one converter can exist for a property.",
+                            ContentType?.Alias,
+                            Alias,
+                            converter.GetType().FullName,
+                            _converter.GetType().FullName));
                     }
                 }
             }
@@ -181,11 +196,16 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public bool? IsValue(object? value, PropertyValueLevel level)
         {
-            if (!_initialized) Initialize();
+            if (!_initialized)
+            {
+                Initialize();
+            }
 
             // if we have a converter, use the converter
             if (_converter != null)
+            {
                 return _converter.IsValue(value, level);
+            }
 
             // otherwise use the old magic null & string comparisons
             return value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
@@ -196,7 +216,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         {
             get
             {
-                if (!_initialized) Initialize();
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
                 return _cacheLevel;
             }
         }
@@ -204,7 +228,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public object? ConvertSourceToInter(IPublishedElement owner, object? source, bool preview)
         {
-            if (!_initialized) Initialize();
+            if (!_initialized)
+            {
+                Initialize();
+            }
 
             // use the converter if any, else just return the source value
             return _converter != null
@@ -215,7 +242,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
-            if (!_initialized) Initialize();
+            if (!_initialized)
+            {
+                Initialize();
+            }
 
             // use the converter if any, else just return the inter value
             return _converter != null
@@ -226,16 +256,28 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
-            if (!_initialized) Initialize();
+            if (!_initialized)
+            {
+                Initialize();
+            }
 
             // use the converter if any
             if (_converter != null)
+            {
                 return _converter.ConvertIntermediateToXPath(owner, this, referenceCacheLevel, inter, preview);
+            }
 
             // else just return the inter value as a string or an XPathNavigator
-            if (inter == null) return null;
+            if (inter == null)
+            {
+                return null;
+            }
+
             if (inter is XElement xElement)
+            {
                 return xElement.CreateNavigator();
+            }
+
             return inter.ToString()?.Trim();
         }
 
@@ -244,7 +286,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         {
             get
             {
-                if (!_initialized) Initialize();
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
                 return _modelClrType!;
             }
         }
@@ -254,7 +300,11 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         {
             get
             {
-                if (!_initialized) Initialize();
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
                 return _clrType ?? (_modelClrType is not null ? _clrType = _publishedModelFactory.MapModelType(_modelClrType) : null);
             }
         }

@@ -234,7 +234,7 @@ public class LogviewerTests
 internal class TestLogViewerQueryRepository : ILogViewerQueryRepository
 {
     public TestLogViewerQueryRepository() =>
-        Store = new List<ILogViewerQuery>(MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries
+        Store = new List<ILogViewerQuery>(MigrateLogViewerQueriesFromFileToDb._defaultLogQueries
             .Select(LogViewerQueryModelFactory.BuildEntity));
 
     private IList<ILogViewerQuery> Store { get; }
