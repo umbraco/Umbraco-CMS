@@ -45,6 +45,7 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
             _mapper = mapper;
         }
 
+        [Obsolete("Please use constructor that takes an IUmbracoMapper, scheduled for removal in V12")]
         public OutgoingEditorModelEventFilter(
             IUmbracoContextAccessor umbracoContextAccessor,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
