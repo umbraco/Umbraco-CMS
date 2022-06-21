@@ -6,9 +6,9 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
     var evtOn = eventsService.on("app.ready", function(evt, data){
         $scope.avatar = "assets/img/application/logo.png";
 
-        var path = "/";
+        var path = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath;
 
-        //check if there's a returnPath query string, if so redirect to it
+      //check if there's a returnPath query string, if so redirect to it
         var locationObj = $location.search();
         if (locationObj.returnPath) {
             path = decodeURIComponent(locationObj.returnPath);
