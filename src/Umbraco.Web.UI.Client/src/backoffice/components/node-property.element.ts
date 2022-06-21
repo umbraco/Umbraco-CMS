@@ -8,6 +8,8 @@ import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } fr
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/content.data';
 
+import './node-property-actions.element';
+
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
   static styles = [
@@ -141,11 +143,16 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
     this._dataTypeSubscription?.unsubscribe();
   }
 
+  private _renderPropertyActions () {
+    return html`${ this._dataType ? html`<umb-node-property-actions .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}"></umb-node-property-actions>`: '' }`;
+  }
+
   render() {
     return html`
       <umb-editor-property-layout>
         <div slot="header">
           <uui-label>${this.property.label}</uui-label>
+          ${ this._renderPropertyActions() }
           <p>${this.property.description}</p>
         </div>
         <div slot="editor">${this._element}</div>

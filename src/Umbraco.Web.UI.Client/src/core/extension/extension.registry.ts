@@ -1,7 +1,7 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
 // TODO: how do we want to type extensions?
-export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'dashboard';
+export type UmbExtensionType = 'startUp' | 'section' | 'propertyEditorUI' | 'propertyAction' | 'dashboard';
 
 export type UmbExtensionManifestJSModel = {
   elementName?: string;
@@ -41,6 +41,16 @@ export type UmbExtensionManifestPropertyEditor = {
   meta: UmbManifestPropertyEditorMeta;
 } & UmbExtensionManifestBase;
 
+// Property Actions
+export type UmbExtensionManifestPropertyAction = {
+  type: 'propertyAction';
+  meta: UmbManifestPropertyActionMeta;
+} & UmbExtensionManifestBase;
+
+export type UmbManifestPropertyActionMeta = {
+  propertyEditors: Array<string>;
+};
+
 // Dashboard:
 export type UmbManifestDashboardMeta = {
   sections: Array<string>;
@@ -67,6 +77,7 @@ export type UmbExtensionManifestCore =
   | UmbExtensionManifestSection
   | UmbExtensionManifestDashboard
   | UmbExtensionManifestPropertyEditor
+  | UmbExtensionManifestPropertyAction
   | UmbExtensionManifestEditorView;
 
 // the 'Other' manifest type:
@@ -107,6 +118,7 @@ export class UmbExtensionRegistry {
   extensionsOfType(type: 'section'): Observable<Array<UmbExtensionManifestSection>>;
   extensionsOfType(type: 'dashboard'): Observable<Array<UmbExtensionManifestDashboard>>;
   extensionsOfType(type: 'propertyEditor'): Observable<Array<UmbExtensionManifestPropertyEditor>>;
+  extensionsOfType(type: 'propertyAction'): Observable<Array<UmbExtensionManifestPropertyAction>>;
   extensionsOfType(type: UmbExtensionManifestCoreTypes): Observable<Array<UmbExtensionManifestCore>>;
   extensionsOfType(type: string): Observable<Array<UmbExtensionManifestOther>>;
   extensionsOfType<T extends UmbExtensionManifestBase>(type: string): Observable<Array<T>>;

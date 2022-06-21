@@ -111,5 +111,15 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
       weight: 90,
       icon: 'info',
     }
+  },
+  {
+    type: 'propertyAction',
+    alias: 'Umb.PropertyAction.Copy',
+    name: 'Copy',
+    elementName: 'umb-property-action-copy',
+    js: () => import('./backoffice/property-actions/property-action-copy.element'),
+    meta: {
+      propertyEditors: ['Umb.PropertyEditorUI.Text'],
+    }
   }
 ];
