@@ -8,8 +8,8 @@ interface UmbPropertyActionElement {
   value: string;
 }
 
-@customElement('umb-property-action-copy')
-export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitElement) implements UmbPropertyActionElement {
+@customElement('umb-property-action-clear')
+export default class UmbPropertyActionClear extends UmbContextConsumerMixin(LitElement) implements UmbPropertyActionElement {
   
   @property()
   value = '';
@@ -29,19 +29,19 @@ export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitEl
   }
 
   private _handleLabelClick () {
-    this._notificationService?.peek('Copied to clipboard');
+    this._notificationService?.peek('Clear value');
   }
 
   render() {
     return html`
-      <uui-menu-item label="Copy" @click-label="${this._handleLabelClick}">
-        <uui-icon slot="icon" name="copy"></uui-icon>
+      <uui-menu-item label="Clear" @click-label="${this._handleLabelClick}">
+        <uui-icon slot="icon" name="delete"></uui-icon>
       </uui-menu-item>`;
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-property-action-copy': UmbPropertyActionCopy;
+    'umb-property-action-clear': UmbPropertyActionClear;
   }
 }

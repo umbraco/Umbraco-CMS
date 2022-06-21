@@ -119,7 +119,17 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
     elementName: 'umb-property-action-copy',
     js: () => import('./backoffice/property-actions/property-action-copy.element'),
     meta: {
-      propertyEditors: ['Umb.PropertyEditorUI.Text'],
+      propertyEditors: ['Umb.PropertyEditorUI.Text']
+    }
+  },
+  {
+    type: 'propertyAction',
+    alias: 'Umb.PropertyAction.Clear',
+    name: 'Clear',
+    elementName: 'umb-property-action-clear',
+    js: () => import('./backoffice/property-actions/property-action-clear.element'),
+    meta: {
+      propertyEditors: ['Umb.PropertyEditorUI.Text']
     }
   }
 ];
