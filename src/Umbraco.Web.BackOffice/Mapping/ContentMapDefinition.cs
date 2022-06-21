@@ -107,7 +107,130 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
             mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
             mapper.Define<IContent, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(), Map);
+    mapper.Define<ContentItemDisplayWithSchedule, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
+        mapper.Define<ContentItemDisplay, ContentItemDisplayWithSchedule>((source, context) => new ContentItemDisplayWithSchedule(), Map);
+
+        mapper.Define<ContentVariantDisplay, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(), Map);
+        mapper.Define<ContentVariantScheduleDisplay, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ContentVariantScheduleDisplay source, ContentVariantDisplay target, MapperContext context)
+    {
+        target.CreateDate = source.CreateDate;
+        target.DisplayName = source.DisplayName;
+        target.Language = source.Language;
+        target.Name = source.Name;
+        target.PublishDate = source.PublishDate;
+        target.Segment = source.Segment;
+        target.State = source.State;
+        target.Tabs = source.Tabs;
+        target.UpdateDate = source.UpdateDate;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ContentItemDisplay source, ContentItemDisplayWithSchedule target, MapperContext context)
+    {
+        target.AllowedActions = source.AllowedActions;
+        target.AllowedTemplates = source.AllowedTemplates;
+        target.AllowPreview = source.AllowPreview;
+        target.ContentApps = source.ContentApps;
+        target.ContentDto = source.ContentDto;
+        target.ContentTypeAlias = source.ContentTypeAlias;
+        target.ContentTypeId = source.ContentTypeId;
+        target.ContentTypeKey = source.ContentTypeKey;
+        target.ContentTypeName = source.ContentTypeName;
+        target.DocumentType = source.DocumentType;
+        target.Errors = source.Errors;
+        target.Icon = source.Icon;
+        target.Id = source.Id;
+        target.IsBlueprint = source.IsBlueprint;
+        target.IsChildOfListView = source.IsChildOfListView;
+        target.IsContainer = source.IsContainer;
+        target.IsElement = source.IsElement;
+        target.Key = source.Key;
+        target.Owner = source.Owner;
+        target.ParentId = source.ParentId;
+        target.Path = source.Path;
+        target.PersistedContent = source.PersistedContent;
+        target.SortOrder = source.SortOrder;
+        target.TemplateAlias = source.TemplateAlias;
+        target.TemplateId = source.TemplateId;
+        target.Trashed = source.Trashed;
+        target.TreeNodeUrl = source.TreeNodeUrl;
+        target.Udi = source.Udi;
+        target.UpdateDate = source.UpdateDate;
+        target.Updater = source.Updater;
+        target.Urls = source.Urls;
+        target.Variants = context.MapEnumerable<ContentVariantDisplay, ContentVariantScheduleDisplay>(source.Variants);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ContentVariantDisplay source, ContentVariantScheduleDisplay target, MapperContext context)
+    {
+        target.CreateDate = source.CreateDate;
+        target.DisplayName = source.DisplayName;
+        target.Language = source.Language;
+        target.Name = source.Name;
+        target.PublishDate = source.PublishDate;
+        target.Segment = source.Segment;
+        target.State = source.State;
+        target.Tabs = source.Tabs;
+        target.UpdateDate = source.UpdateDate;
+
+        // We'll only try and map the ReleaseDate/ExpireDate if the "old" ContentVariantScheduleDisplay is in the context, otherwise we'll just skip it quietly.
+        _ = context.Items.TryGetValue(nameof(ContentItemDisplayWithSchedule.Variants), out var variants);
+        if (variants is IEnumerable<ContentVariantScheduleDisplay> scheduleDisplays)
+        {
+            ContentVariantScheduleDisplay? item = scheduleDisplays.FirstOrDefault(x => x.Language?.Id == source.Language?.Id && x.Segment == source.Segment);
+
+            if (item is null)
+            {
+                // If we can't find the old variants display, we'll just not try and map it.
+                return;
+            }
+
+            target.ReleaseDate = item.ReleaseDate;
+            target.ExpireDate = item.ExpireDate;
         }
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(ContentItemDisplayWithSchedule source, ContentItemDisplay target, MapperContext context)
+    {
+        target.AllowedActions = source.AllowedActions;
+        target.AllowedTemplates = source.AllowedTemplates;
+        target.AllowPreview = source.AllowPreview;
+        target.ContentApps = source.ContentApps;
+        target.ContentDto = source.ContentDto;
+        target.ContentTypeAlias = source.ContentTypeAlias;
+        target.ContentTypeId = source.ContentTypeId;
+        target.ContentTypeKey = source.ContentTypeKey;
+        target.ContentTypeName = source.ContentTypeName;
+        target.DocumentType = source.DocumentType;
+        target.Errors = source.Errors;
+        target.Icon = source.Icon;
+        target.Id = source.Id;
+        target.IsBlueprint = source.IsBlueprint;
+        target.IsChildOfListView = source.IsChildOfListView;
+        target.IsContainer = source.IsContainer;
+        target.IsElement = source.IsElement;
+        target.Key = source.Key;
+        target.Owner = source.Owner;
+        target.ParentId = source.ParentId;
+        target.Path = source.Path;
+        target.PersistedContent = source.PersistedContent;
+        target.SortOrder = source.SortOrder;
+        target.TemplateAlias = source.TemplateAlias;
+        target.TemplateId = source.TemplateId;
+        target.Trashed = source.Trashed;
+        target.TreeNodeUrl = source.TreeNodeUrl;
+        target.Udi = source.Udi;
+        target.UpdateDate = source.UpdateDate;
+        target.Updater = source.Updater;
+        target.Urls = source.Urls;
+        target.Variants = source.Variants;
+    }
 
         // Umbraco.Code.MapAll
         private static void Map(IContent source, ContentPropertyCollectionDto target, MapperContext context)

@@ -3,12 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters
@@ -29,20 +32,34 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
             private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-
+        private readonly IUmbracoMapper _mapper;
             private readonly IEventAggregator _eventAggregator;
 
-            public OutgoingEditorModelEventFilter(
+            [ActivatorUtilitiesConstructor]public OutgoingEditorModelEventFilter(
                 IUmbracoContextAccessor umbracoContextAccessor,
-                IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEventAggregator eventAggregator)
-            {
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEventAggregator eventAggregator,
+            IUmbracoMapper mapper){
                 _umbracoContextAccessor = umbracoContextAccessor
                                           ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor
                                               ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
                 _eventAggregator = eventAggregator
                                    ?? throw new ArgumentNullException(nameof(eventAggregator));
-            }
+            _mapper = mapper;
+        }
+
+        [Obsolete("Please use constructor that takes an IUmbracoMapper, scheduled for removal in V12")]
+        public OutgoingEditorModelEventFilter(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IEventAggregator eventAggregator)
+        : this(
+            umbracoContextAccessor,
+            backOfficeSecurityAccessor,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUmbracoMapper>())
+        {
+        }
 
             public void OnActionExecuted(ActionExecutedContext context)
             {
@@ -72,7 +89,26 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             case ContentItemDisplay content:
                                 _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
                                 break;
-                            case MediaItemDisplay media:
+                            case ContentItemDisplayWithSchedule contentWithSchedule:
+                            // This is a bit weird, since ContentItemDisplayWithSchedule was introduced later,
+                            // the SendingContentNotification only accepts ContentItemDisplay,
+                            // which means we have to map it to this before sending the notification.
+                            ContentItemDisplay? display = _mapper.Map<ContentItemDisplayWithSchedule, ContentItemDisplay>(contentWithSchedule);
+                            if (display is null)
+                            {
+                                // This will never happen.
+                                break;
+                            }
+
+                            // Now that the display is mapped to the non-schedule one we can publish the notification.
+                            _eventAggregator.Publish(new SendingContentNotification(display, umbracoContext));
+
+                            // We want the changes the handler makes to take effect.
+                            // So we have to map these changes back to the existing ContentItemWithSchedule.
+                            // To avoid losing the schedule information we add the old variants to context.
+                            _mapper.Map(display, contentWithSchedule, mapperContext => mapperContext.Items[nameof(contentWithSchedule.Variants)] = contentWithSchedule.Variants);
+                            break;
+                        case MediaItemDisplay media:
                                 _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
                                 break;
                             case MemberDisplay member:

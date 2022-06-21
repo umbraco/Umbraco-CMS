@@ -42,6 +42,16 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
+        /// <summary>
+        ///  Hook for altering UmbracoBuilder setup
+        /// </summary>
+        /// <remarks>
+        /// Can also be used for registering test doubles.
+        /// </remarks>
+        protected virtual void CustomTestSetup(IUmbracoBuilder builder)
+        {
+        }
+
         [SetUp]
         public void Setup()
         {
@@ -233,8 +243,9 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddWebsite()
                 .AddUmbracoSqlServerSupport()
                 .AddUmbracoSqliteSupport()
-                .AddTestServices(TestHelper) // This is the important one!
-                .Build();
+                .AddTestServices(TestHelper); // This is the important one!
+                CustomTestSetup(builder);
+            builder.Build();
         }
 
         /// <summary>
