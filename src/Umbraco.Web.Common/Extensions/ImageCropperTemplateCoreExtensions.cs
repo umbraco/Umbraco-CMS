@@ -92,6 +92,7 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
         mediaItem.GetCropUrl(
             imageUrlGenerator,
@@ -101,6 +102,7 @@ public static class ImageCropperTemplateCoreExtensions
             true,
             cropAlias: cropAlias,
             useCropDimensions: true,
+            fileType: fileType,
             urlMode: urlMode);
 
     /// <summary>
@@ -124,6 +126,7 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
         mediaItem.GetCropUrl(
             imageUrlGenerator,
@@ -132,6 +135,7 @@ public static class ImageCropperTemplateCoreExtensions
             propertyAlias: propertyAlias,
             cropAlias: cropAlias,
             useCropDimensions: true,
+            fileType: fileType,
             urlMode: urlMode);
 
     /// <summary>

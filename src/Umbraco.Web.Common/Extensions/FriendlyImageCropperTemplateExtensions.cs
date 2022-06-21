@@ -59,6 +59,7 @@ public static class FriendlyImageCropperTemplateExtensions
     /// <param name="mediaItem">The IPublishedContent item.</param>
     /// <param name="propertyAlias">The property alias of the property containing the JSON data e.g. umbracoFile.</param>
     /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="urlMode">The url mode.</param>
     /// <returns>
     ///     The URL of the cropped image.
@@ -67,8 +68,9 @@ public static class FriendlyImageCropperTemplateExtensions
         this IPublishedContent mediaItem,
         string propertyAlias,
         string cropAlias,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
-        mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
+        mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, fileType, urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL by the crop alias using the specified property containing the
@@ -77,12 +79,13 @@ public static class FriendlyImageCropperTemplateExtensions
     /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
     /// <param name="propertyAlias">The property alias of the property containing the JSON data e.g. umbracoFile.</param>
     /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="urlMode">The url mode.</param>
     /// <returns>
     ///     The URL of the cropped image.
     /// </returns>
-    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, UrlMode urlMode = UrlMode.Default)
-        => mediaWithCrops.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
+    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default, UrlMode urlMode = UrlMode.Default)
+        => mediaWithCrops.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, fileType, urlMode);
 
     /// <summary>
     ///     Gets the underlying image processing service URL from the IPublishedContent item.
@@ -114,6 +117,7 @@ public static class FriendlyImageCropperTemplateExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="urlMode">The url mode.</param>
     /// <returns>
     ///     The URL of the cropped image.
@@ -181,6 +185,7 @@ public static class FriendlyImageCropperTemplateExtensions
     /// furtherOptions: "bgcolor=fff"
     /// ]]></example>
     /// </param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="urlMode">The url mode.</param>
     /// <returns>
     ///     The URL of the cropped image.
@@ -241,6 +246,7 @@ public static class FriendlyImageCropperTemplateExtensions
     ///     Add a serialized date of the last edit of the item to ensure client cache refresh when
     ///     updated.
     /// </param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="furtherOptions">
     ///     These are any query string parameters (formatted as query strings) that the underlying image processing service
     ///     supports. For example:
@@ -303,6 +309,7 @@ public static class FriendlyImageCropperTemplateExtensions
     ///     Add a serialized date of the last edit of the item to ensure client cache refresh when
     ///     updated.
     /// </param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="furtherOptions">
     ///     These are any query string parameters (formatted as query strings) that the underlying image processing service
     ///     supports. For example:
