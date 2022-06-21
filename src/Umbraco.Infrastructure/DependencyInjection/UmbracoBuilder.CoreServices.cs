@@ -52,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -196,6 +197,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddSingleton<PackageDataInstallation>();
 
+            builder.Services.AddTransient<INodeCountService, NodeCountService>();
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)

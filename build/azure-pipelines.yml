@@ -210,7 +210,7 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
+                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj /Umbraco:CMS:Global:Id=0000000-0000-0000-0000-000000000042"
                   displayName: dotnet run
 #                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
 #                  displayName: dotnet run
@@ -313,7 +313,7 @@ stages:
                   displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ /Umbraco:CMS:Global:Id=0000000-0000-0000-0000-000000000042 > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
@@ -396,42 +396,27 @@ stages:
 
                         $ubuild = build/build.ps1 -get -continue
 
-
                         $version = $ubuild.GetUmbracoVersion()
 
                         $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
-                        if ($isRelease.Count -gt 0){
+                        if ($isRelease.Count -gt 0) {
                           $continuous = $version.Semver
-
-                        }
-                        else
-                        {
+                        } else {
                             $date = (Get-Date).ToString("yyyyMMdd")
                             $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
-                            #Update the version in templates also
-
-                            $templatePath =
-                            'templates/UmbracoProject/.template.config/template.json'
-
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                            $a.symbols.version.defaultValue = $continuous
-
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
-
-
-                            $templatePath =
-                            'templates/UmbracoPackage/.template.config/template.json'
-
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                            $a.symbols.version.defaultValue = $continuous
-
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
-                          }
+                            # Update the default Umbraco version in templates
+                            $templatePaths = Get-ChildItem 'templates/**/.template.config/template.json'
+                            foreach ($templatePath in $templatePaths) {
+                              $a = Get-Content $templatePath -Raw | ConvertFrom-Json
+                              if ($a.symbols -and $a.symbols.UmbracoVersion) {
+                                $a.symbols.UmbracoVersion.defaultValue = $continuous
+                                $a | ConvertTo-Json -Depth 32 | Set-Content $templatePath
+                              }
+                            }
+                        }
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
 

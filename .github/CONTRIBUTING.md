@@ -10,7 +10,7 @@ Remember, we're a friendly bunch and are happy with whatever contribution you mi
 
 **Code of conduct**
 
-This project and everyone participating in it, is governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
+This project and everyone participating in it, is governed by the [our Code of Conduct](https://github.com/umbraco/.github/blob/main/.github/CODE_OF_CONDUCT.md).
 
 **Table of contents**
 

@@ -236,6 +236,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.PostLogin(null))
                         },
                         {
+                            "twoFactorLoginApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TwoFactorLoginController>(
+                                controller => controller.SetupInfo(null))
+                        },
+                        {
                             "currentUserApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
                                 controller => controller.PostChangePassword(null))
                         },
@@ -381,7 +385,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "trackedReferencesApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<TrackedReferencesController>(
                                 controller => controller.GetPagedReferences(0,  1, 1, false))
-                        }
+                        },
+                        {
+                            "analyticsApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AnalyticsController>(
+                                controller => controller.GetConsentLevel())
+                        },
                     }
                 },
                 {

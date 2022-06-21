@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Models
             }
             else
             {
-                var tuple = new MemberTypePropertyProfileAccess(false, false, true);
+                var tuple = new MemberTypePropertyProfileAccess(false, false, value);
                 _memberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
         }

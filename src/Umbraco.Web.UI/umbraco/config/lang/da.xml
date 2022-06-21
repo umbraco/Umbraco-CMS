@@ -565,11 +565,11 @@
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
       Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder.<br />Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
-      ]]></key>
+      ]]>    </key>
     <key alias="displayName">Kulturnavn</key>
     <key alias="changeKeyError"><![CDATA[
       Navnet '%0%' eksisterer allerede.
-   ]]></key>
+   ]]>    </key>
     <key alias="overviewTitle">Ordbogsoversigt</key>
   </area>
   <area alias="examineManagement">
@@ -902,7 +902,7 @@
     <key alias="databaseHeader">Database konfiguration</key>
     <key alias="databaseInstall"><![CDATA[
       Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen
-    ]]></key>
+    ]]>    </key>
     <key alias="databaseInstallDone">
       <![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
@@ -981,7 +981,7 @@
     <key alias="theEndInstallFailed">
       <![CDATA[For at afslutte installationen er du nødt til manuelt at rette <strong>/web.config filen</strong> og opdatére 'AppSetting' feltet <strong>UmbracoConfigurationStatus</strong> i bunden til <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>komme igang med det samme</strong> ved at klikke på "Start Umbraco" knappen nedenfor.<br/>Hvis du er <strong>ny med Umbraco</strong>, kan du finde masser af ressourcer på vores 'getting started' sider.
-]]></key>
+]]>    </key>
     <key alias="theEndOpenUmbraco">
       <![CDATA[<h3>Start Umbraco</h3>For at administrere dit website skal du blot åbne Umbraco administrationen og begynde at tilføje indhold, opdatere skabelonerne og stylesheets'ene eller tilføje ny funktionalitet.]]></key>
     <key alias="Unavailable">Forbindelse til databasen fejlede.</key>
@@ -1028,6 +1028,12 @@
     <key alias="resetPasswordEmailCopySubject">Umbraco: Nulstil adgangskode</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>Dit brugernavn til at logge på Umbraco backoffice er: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>her</strong></a> for at nulstille din adgangskode eller kopier/indsæt denne URL i din browser:</p><p><em>%1%</em></p>]]></key>
+    <key alias="2faTitle">Sidste skridt</key>
+    <key alias="2faText">Det er påkrævet at du verificerer din identitet.</key>
+    <key alias="2faMultipleText">Vælg venligst en autentificeringsmetode</key>
+    <key alias="2faCodeInput">Kode</key>
+    <key alias="2faCodeInputHelp">Indtast venligst koden fra dit device</key>
+    <key alias="2faInvalidCode">Koden kunne ikke genkendes</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -1065,7 +1071,7 @@ Gå til http://%4%/#/content/content/edit/%5% for at redigere.
 Ha' en dejlig dag!
 
 Mange hilsner fra Umbraco robotten
-		]]></key>
+		]]>    </key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hej %0%</p>
     <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong>
     er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p>
@@ -1166,14 +1172,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedAwaitingRelease">Udgivelsen kunne ikke udgives da publiceringsdato er sat</key>
     <key alias="contentPublishedFailedIsTrashed"><![CDATA[
       %0% kunne ikke publiceres da elementet er i skraldespanden.
-      ]]></key>
+      ]]>    </key>
     <key alias="contentPublishedFailedExpired">
       <![CDATA[
       %0% Udgivelsen kunne ikke blive publiceret da publiceringsdatoen er overskredet
-     ]]></key>
+     ]]>    </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
-    ]]></key>
+    ]]>    </key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen
     </key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
@@ -1453,24 +1459,24 @@ Mange hilsner fra Umbraco robotten
     <key alias="renderBodyDesc"><![CDATA[
       Henter indholdet af en underliggende skabelon ind, ved at
       indsætte et <code>@RenderBody()</code> element.
-      ]]></key>
+      ]]>    </key>
     <key alias="defineSection">Definer en sektion</key>
     <key alias="defineSectionDesc"><![CDATA[
          Definerer en del af din skabelon som en navngivet sektion, ved at
          omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i
          overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
-      ]]></key>
+      ]]>    </key>
     <key alias="renderSection">Indsæt en sektion</key>
     <key alias="renderSectionDesc"><![CDATA[
       Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et
       <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have
       defineret en sektion via et <code>@section [name]{ ... }</code> element.
-      ]]></key>
+      ]]>    </key>
     <key alias="sectionName">Sektionsnavn</key>
     <key alias="sectionMandatory">Sektionen er obligatorisk</key>
     <key alias="sectionMandatoryDesc"><![CDATA[
       Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
-    ]]></key>
+    ]]>    </key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">sider returneret, på</key>
     <key alias="iWant">Returner</key>
@@ -1918,6 +1924,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortCreateDateDescending">Ældste</key>
     <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
+    <key alias="2faDisableText">Hvis du ønsker at slå denne autentificeringsmetode fra, så skal du nu indtaste koden fra dit device:</key>
+    <key alias="2faProviderIsEnabled">Denne autentificeringsmetode er slået til</key>
+    <key alias="2faProviderIsDisabledMsg">Den valgte autentificeringsmetode er nu slået fra</key>
+    <key alias="2faProviderIsNotDisabledMsg">Der skete en ukendt fejl da denne autentificeringsmetode skulles slåes fra</key>
+    <key alias="2faDisableForUser">Er du sikker på, at du vil fjerne denne autentificeringsmetode for denne bruger?</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validering</key>

@@ -15,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-1
 	ProjectSection(SolutionItems) = preProject
 		.github\BUILD.md = .github\BUILD.md
 		.github\CLEAR.md = .github\CLEAR.md
-		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\CONTRIBUTING_DETAILED.md = .github\CONTRIBUTING_DETAILED.md
 		.github\CONTRIBUTION_GUIDELINES.md = .github\CONTRIBUTION_GUIDELINES.md
