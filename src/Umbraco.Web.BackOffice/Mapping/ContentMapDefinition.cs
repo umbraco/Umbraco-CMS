@@ -179,7 +179,6 @@ internal class ContentMapDefinition : IMapDefinition
         _ = context.Items.TryGetValue(nameof(ContentItemDisplayWithSchedule.Variants), out var variants);
         if (variants is IEnumerable<ContentVariantScheduleDisplay> scheduleDisplays)
         {
-            // Find something better to select on
             ContentVariantScheduleDisplay? item = scheduleDisplays.FirstOrDefault(x => x.Language?.Id == source.Language?.Id && x.Segment == source.Segment);
 
             if (item is null)
