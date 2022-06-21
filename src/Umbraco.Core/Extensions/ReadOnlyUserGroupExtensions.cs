@@ -9,10 +9,10 @@ public static class ReadOnlyUserGroupExtensions
     /// Checks if a readonly user group has access to a given language
     /// </summary>
     /// <remarks> If allowed languages on the user group is empty, it means that we have access to all languages, and thus have access to the language</remarks>
-    public static bool HasAccessToLanguage(this IReadOnlyUserGroup readOnlyUserGroup, Language? language)
+    public static bool HasAccessToLanguage(this IReadOnlyUserGroup readOnlyUserGroup, int languageId)
     {
 
-        if (readOnlyUserGroup.AllowedLanguages.Any() is false || (language is not null && readOnlyUserGroup.AllowedLanguages.Contains(language.Id)))
+        if (readOnlyUserGroup.AllowedLanguages.Any() is false || readOnlyUserGroup.AllowedLanguages.Contains(languageId))
         {
             return true;
         }

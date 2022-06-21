@@ -235,7 +235,7 @@ public class ContentVariantMapper
                     }
                 }
 
-                if (group.HasAccessToLanguage(variantDisplay.Language))
+                if (variantDisplay.Language is not null && group.HasAccessToLanguage(variantDisplay.Language.Id))
                 {
                     hasAccess = true;
                     break;
