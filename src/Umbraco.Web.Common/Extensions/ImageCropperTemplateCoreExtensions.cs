@@ -20,6 +20,7 @@ public static class ImageCropperTemplateCoreExtensions
     /// <param name="imageUrlGenerator">The image URL generator.</param>
     /// <param name="publishedValueFallback">The published value fallback.</param>
     /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="fileType">The fileType to return.</param>
     /// <param name="urlMode">The url mode.</param>
     /// <returns>
     ///     The URL of the cropped image.
@@ -30,12 +31,14 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
         mediaItem.GetCropUrl(
             imageUrlGenerator,
             publishedValueFallback,
             publishedUrlProvider,
             cropAlias: cropAlias,
+            furtherOptions: fileType == ImageCropperForcedFileTypes.Default ? string.Empty : "&format=" + fileType.ToString().ToLower(),
             useCropDimensions: true,
             urlMode: urlMode);
 
@@ -58,43 +61,14 @@ public static class ImageCropperTemplateCoreExtensions
         IImageUrlGenerator imageUrlGenerator,
         IPublishedValueFallback publishedValueFallback,
         IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
         mediaWithCrops.GetCropUrl(
             imageUrlGenerator,
             publishedValueFallback,
             publishedUrlProvider,
             cropAlias: cropAlias,
-            useCropDimensions: true,
-            urlMode: urlMode);
-
-    /// <summary>
-    ///     Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias in the
-    ///     MediaWithCrops content item) on the MediaWithCrops item forced to a certain file type.
-    /// </summary>
-    /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
-    /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
-    /// <param name="imageUrlGenerator">The image URL generator.</param>
-    /// <param name="publishedValueFallback">The published value fallback.</param>
-    /// <param name="publishedUrlProvider">The published URL provider.</param>
-    /// <param name="fileType">The file type that should be returned.</param>
-    /// <param name="urlMode">The url mode.</param>
-    /// <returns>
-    ///     The URL of the cropped image.
-    /// </returns>
-    public static string? GetCropUrl(
-        this MediaWithCrops mediaWithCrops,
-        string cropAlias,
-        IImageUrlGenerator imageUrlGenerator,
-        IPublishedValueFallback publishedValueFallback,
-        IPublishedUrlProvider publishedUrlProvider,
-        ImageCropperForcedFileTypes fileType,
-        UrlMode urlMode = UrlMode.Default) =>
-        mediaWithCrops.GetCropUrl(
-            imageUrlGenerator,
-            publishedValueFallback,
-            publishedUrlProvider,
-            cropAlias: cropAlias,
-            furtherOptions: "&format=" + fileType.ToString().ToLower(),
+            furtherOptions: fileType == ImageCropperForcedFileTypes.Default ? string.Empty : "&format=" + fileType.ToString().ToLower(),
             useCropDimensions: true,
             urlMode: urlMode);
 
@@ -243,6 +217,7 @@ public static class ImageCropperTemplateCoreExtensions
         bool useCropDimensions = false,
         bool cacheBuster = true,
         string? furtherOptions = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default) =>
         mediaItem.GetCropUrl(
             imageUrlGenerator,
@@ -261,6 +236,7 @@ public static class ImageCropperTemplateCoreExtensions
             useCropDimensions,
             cacheBuster,
             furtherOptions,
+            fileType,
             urlMode);
 
     /// <summary>
@@ -315,6 +291,7 @@ public static class ImageCropperTemplateCoreExtensions
         bool useCropDimensions = false,
         bool cacheBuster = true,
         string? furtherOptions = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default)
     {
         if (mediaWithCrops == null)
@@ -339,6 +316,7 @@ public static class ImageCropperTemplateCoreExtensions
             useCropDimensions,
             cacheBuster,
             furtherOptions,
+            fileType,
             urlMode);
     }
 
@@ -389,6 +367,7 @@ public static class ImageCropperTemplateCoreExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         string? furtherOptions = null)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
@@ -416,6 +395,7 @@ public static class ImageCropperTemplateCoreExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
+            fileType,
             furtherOptions);
     }
 
@@ -469,6 +449,7 @@ public static class ImageCropperTemplateCoreExtensions
         bool preferFocalPoint = false,
         bool useCropDimensions = false,
         string? cacheBusterValue = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         string? furtherOptions = null)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
@@ -521,6 +502,11 @@ public static class ImageCropperTemplateCoreExtensions
         options.Width = width;
         options.Height = height;
         options.FurtherOptions = furtherOptions;
+        if (fileType != ImageCropperForcedFileTypes.Default)
+        {
+            options.FurtherOptions = (furtherOptions != null && furtherOptions.Contains("&format")) ? furtherOptions : "&format=" + fileType.ToString().ToLower();
+        }
+
         options.CacheBusterValue = cacheBusterValue;
 
         return imageUrlGenerator.GetImageUrl(options);
@@ -544,6 +530,7 @@ public static class ImageCropperTemplateCoreExtensions
         bool useCropDimensions = false,
         bool cacheBuster = true,
         string? furtherOptions = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
@@ -604,6 +591,7 @@ public static class ImageCropperTemplateCoreExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
+            fileType,
             furtherOptions);
     }
 }

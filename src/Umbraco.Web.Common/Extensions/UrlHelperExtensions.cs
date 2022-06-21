@@ -265,25 +265,25 @@ public static class UrlHelperExtensions
         return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
+    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string cropAlias, bool htmlEncode = true, ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default, UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
         {
             return HtmlString.Empty;
         }
 
-        var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+        var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true, fileType: fileType, urlMode: urlMode);
         return CreateHtmlString(url, htmlEncode);
     }
 
-    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
+    public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent? mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true, ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default, UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
         {
             return HtmlString.Empty;
         }
 
-        var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+        var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, fileType: fileType, urlMode: urlMode);
         return CreateHtmlString(url, htmlEncode);
     }
 
@@ -302,6 +302,7 @@ public static class UrlHelperExtensions
         bool cacheBuster = true,
         string? furtherOptions = null,
         bool htmlEncode = true,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         UrlMode urlMode = UrlMode.Default)
     {
         if (mediaItem == null)
@@ -321,6 +322,7 @@ public static class UrlHelperExtensions
             useCropDimensions,
             cacheBuster,
             furtherOptions,
+            fileType,
             urlMode);
 
         return CreateHtmlString(url, htmlEncode);
@@ -339,6 +341,7 @@ public static class UrlHelperExtensions
         bool useCropDimensions = true,
         string? cacheBusterValue = null,
         string? furtherOptions = null,
+        ImageCropperForcedFileTypes fileType = ImageCropperForcedFileTypes.Default,
         bool htmlEncode = true)
     {
         if (imageCropperValue == null)
@@ -358,6 +361,7 @@ public static class UrlHelperExtensions
             preferFocalPoint,
             useCropDimensions,
             cacheBusterValue,
+            fileType,
             furtherOptions);
 
         return CreateHtmlString(url, htmlEncode);
