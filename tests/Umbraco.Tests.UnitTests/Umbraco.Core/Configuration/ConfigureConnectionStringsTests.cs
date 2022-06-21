@@ -83,7 +83,8 @@ public class ConfigureConnectionStringsTests
         AppDomain.CurrentDomain.SetData("DataDirectory", aDataDirectory);
         var config = new Dictionary<string, string>
         {
-            [$"ConnectionStrings:{UmbracoDbDsn}"] = $"{ConnectionStrings.DataDirectoryPlaceholder}/{aConnectionString}",
+            [$"ConnectionStrings:{UmbracoDbDsn}"] =
+                $"{ConnectionStrings.DataDirectoryPlaceholder}/{aConnectionString}",
             [$"ConnectionStrings:{UmbracoDbDsn}_ProviderName"] = aProviderName,
         };
 
