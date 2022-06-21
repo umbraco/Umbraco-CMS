@@ -68,6 +68,37 @@ public static class ImageCropperTemplateCoreExtensions
             urlMode: urlMode);
 
     /// <summary>
+    ///     Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias in the
+    ///     MediaWithCrops content item) on the MediaWithCrops item forced to a certain file type.
+    /// </summary>
+    /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
+    /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+    /// <param name="imageUrlGenerator">The image URL generator.</param>
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    /// <param name="publishedUrlProvider">The published URL provider.</param>
+    /// <param name="fileType">The file type that should be returned.</param>
+    /// <param name="urlMode">The url mode.</param>
+    /// <returns>
+    ///     The URL of the cropped image.
+    /// </returns>
+    public static string? GetCropUrl(
+        this MediaWithCrops mediaWithCrops,
+        string cropAlias,
+        IImageUrlGenerator imageUrlGenerator,
+        IPublishedValueFallback publishedValueFallback,
+        IPublishedUrlProvider publishedUrlProvider,
+        ImageCropperForcedFileTypes fileType,
+        UrlMode urlMode = UrlMode.Default) =>
+        mediaWithCrops.GetCropUrl(
+            imageUrlGenerator,
+            publishedValueFallback,
+            publishedUrlProvider,
+            cropAlias: cropAlias,
+            furtherOptions: "&format=" + fileType.ToString().ToLower(),
+            useCropDimensions: true,
+            urlMode: urlMode);
+
+    /// <summary>
     ///     Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
     /// </summary>
     /// <param name="mediaItem">The media item.</param>

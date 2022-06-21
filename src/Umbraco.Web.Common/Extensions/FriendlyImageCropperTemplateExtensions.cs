@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Extensions;
 
@@ -48,6 +49,20 @@ public static class FriendlyImageCropperTemplateExtensions
     /// </returns>
     public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, UrlMode urlMode = UrlMode.Default)
         => mediaWithCrops.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
+
+    /// <summary>
+    ///     Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias in the
+    ///     MediaWithCrops content item) on the MediaWithCrops item and returns a specific fileType.
+    /// </summary>
+    /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
+    /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+    /// <param name="fileType">The type it should return.</param>
+    /// <param name="urlMode">The url mode.</param>
+    /// <returns>
+    ///     The URL of the cropped image.
+    /// </returns>
+    public static string? GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, ImageCropperForcedFileTypes fileType, UrlMode urlMode = UrlMode.Default)
+        => mediaWithCrops.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, fileType, urlMode);
 
     /// <summary>
     ///     Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
