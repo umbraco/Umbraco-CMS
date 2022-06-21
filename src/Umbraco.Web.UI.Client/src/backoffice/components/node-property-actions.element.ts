@@ -58,6 +58,10 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
     });
   }
 
+  private _toggleMenu () {
+    this._open = !this._open;
+  }
+
   disconnectedCallback () {
     super.disconnectedCallback();
     this._subscription?.unsubscribe();
@@ -74,7 +78,7 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
             slot="trigger"
             look="secondary"
             label="More"
-            @click="${() => this._open = true}"
+            @click="${this._toggleMenu}"
             compact>
             <uui-symbol-more></uui-symbol-more>
           </uui-button>
