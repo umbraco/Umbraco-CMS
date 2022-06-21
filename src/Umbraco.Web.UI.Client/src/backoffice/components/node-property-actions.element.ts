@@ -42,6 +42,10 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
   @property()
   public propertyEditorUIAlias = '';
 
+  // TODO: we need to investigate context api vs values props and events
+  @property()
+  public value?: string;
+
   @state()
   private _actions: Array<UmbExtensionManifestPropertyAction> = [];
 
@@ -106,7 +110,7 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
           <div slot="popover" id="dropdown">
             ${this._actions.map(
               action => html`
-                <umb-node-property-action .propertyAction=${action}></umb-node-property-action>
+                <umb-node-property-action .propertyAction=${action} .value="${this.value}"></umb-node-property-action>
               `
             )}
           </div>

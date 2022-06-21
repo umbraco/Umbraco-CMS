@@ -58,8 +58,12 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
       this._extensionRegistry = _instance;
       this._useDataType();
     });
-
     // TODO: solution to know when both contexts are available
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
   }
 
   // TODO: use subscribtion, rename to _useDataType:
@@ -99,17 +103,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
         this._element = el;
 
         // TODO: Set/Parse Data-Type-UI-configuration
-
-        if (oldValue) {
-          oldValue.removeEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-        }
-
-        /* NYT lav callback: */
         if (this._element) {
-          this._element.addEventListener(
-            'property-editor-change',
-            this._onPropertyEditorChange as any as EventListener
-          );
           this._element.value = this.value; // Be aware its duplicated code
         }
         this.requestUpdate('element', oldValue);
@@ -120,9 +114,9 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _onPropertyEditorChange = (e: CustomEvent) => {
-    this.value = (e.target as any).value;
+    const target = e.composedPath()[0] as any;
+    this.value = target.value;
     this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
-    // No need for this event to leave scope.
     e.stopPropagation();
   };
 
@@ -144,7 +138,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _renderPropertyActions () {
-    return html`${ this._dataType ? html`<umb-node-property-actions .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}"></umb-node-property-actions>`: '' }`;
+    return html`${ this._dataType ? html`<umb-node-property-actions .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-node-property-actions>`: '' }`;
   }
 
   render() {

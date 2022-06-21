@@ -2,11 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbNotificationService } from '../../core/services/notification.service';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface UmbPropertyActionElement {
-  value: string;
-}
+import type { UmbPropertyActionElement } from './property-action-element.model';
 
 @customElement('umb-property-action-copy')
 export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitElement) implements UmbPropertyActionElement {
@@ -19,6 +15,7 @@ export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitEl
   constructor () {
     super();
 
+    // TODO implement a property context
     this.consumeContext('umbProperty', (property) => {
       console.log('PROPERTY', property);
     });
