@@ -216,9 +216,16 @@ public class ContentVariantMapper
     private IEnumerable<string> GetLanguagePermissions<TVariant>(IContent content, MapperContext context, TVariant variantDisplay)
         where TVariant : ContentVariantDisplay
     {
+        context.Items.TryGetValue("CurrentUser", out var currentBackofficeUser);
+
+        IEnumerable<IReadOnlyUserGroup>? userGroups = null;
+        if (currentBackofficeUser is IUser currentIUserBackofficeUser)
+        {
+            userGroups = currentIUserBackofficeUser.Groups;
+        }
+
         // Map allowed actions
-        IEnumerable<IReadOnlyUserGroup>? userGroups =
-            _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
+        userGroups ??= _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
         bool hasAccess = false;
         if (userGroups is not null)
         {
