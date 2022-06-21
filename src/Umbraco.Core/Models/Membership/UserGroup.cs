@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Membership;
 public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
 {
     // Custom comparer for enumerable
-    private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
+    private static readonly DelegateEqualityComparer<IEnumerable<string>> _stringEnumerableComparer =
         new(
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
@@ -37,7 +37,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
         _name = string.Empty;
         _shortStringHelper = shortStringHelper;
         _sectionCollection = new List<string>();
-            _languageCollection = new List<int>();
+        _languageCollection = new List<int>();
     }
 
     /// <summary>
@@ -49,7 +49,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     /// <param name="permissions"></param>
     /// <param name="icon"></param>
     /// <param name="shortStringHelper"></param>
-    public UserGroup(IShortStringHelper shortStringHelper, int userCount, string? alias, string? name, IEnumerable<string> permissions, string? icon)
+    public UserGroup(
+        IShortStringHelper shortStringHelper,
+        int userCount,
+        string? alias,
+        string? name,
+        IEnumerable<string> permissions,
+        string? icon)
         : this(shortStringHelper)
     {
         UserCount = userCount;
@@ -85,7 +91,8 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _alias;
         set => SetPropertyValueAndDetectChanges(
-            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!, nameof(Alias));
+            value.ToCleanString(_shortStringHelper, CleanStringType.Alias | CleanStringType.UmbracoCase), ref _alias!,
+            nameof(Alias));
     }
 
     [DataMember]
@@ -106,7 +113,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     public IEnumerable<string>? Permissions
     {
         get => _permissions;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);
+        set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), _stringEnumerableComparer);
     }
 
     public IEnumerable<string> AllowedSections => _sectionCollection;
@@ -130,28 +137,29 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
     public IEnumerable<int> AllowedLanguages
-        {
-            get => _languageCollection;
-        }
+    {
+        get => _languageCollection;
+    }
 
-        public void RemoveAllowedLanguage(int languageId)
+    public void RemoveAllowedLanguage(int languageId)
+    {
+        if (_languageCollection.Contains(languageId))
         {
-            if (_languageCollection.Contains(languageId))
-                _languageCollection.Remove(languageId);
+            _languageCollection.Remove(languageId);
         }
+    }
 
-        public void AddAllowedLanguage(int languageId)
+    public void AddAllowedLanguage(int languageId)
+    {
+        if (_languageCollection.Contains(languageId) == false)
         {
-            if (_languageCollection.Contains(languageId) == false)
-                _languageCollection.Add(languageId);
+            _languageCollection.Add(languageId);
         }
+    }
 
-        public void ClearAllowedLanguages()
-        {
-            _languageCollection.Clear();
-        }
+    public void ClearAllowedLanguages() => _languageCollection.Clear();
 
-        public void ClearAllowedSections() => _sectionCollection.Clear();
+    public void ClearAllowedSections() => _sectionCollection.Clear();
 
     protected override void PerformDeepClone(object clone)
     {

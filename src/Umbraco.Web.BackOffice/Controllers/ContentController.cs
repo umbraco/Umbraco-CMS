@@ -757,7 +757,6 @@ public class ContentController : ContentControllerBase
 
         return pagedResult;
     }
-
     /// <summary>
     ///     Creates a blueprint from a content item
     /// </summary>

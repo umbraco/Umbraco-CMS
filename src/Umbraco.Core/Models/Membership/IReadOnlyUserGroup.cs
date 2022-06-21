@@ -31,5 +31,5 @@ public interface IReadOnlyUserGroup
 
     IEnumerable<string> AllowedSections { get; }
 
-        IEnumerable<int> AllowedLanguages { get; }
+    IEnumerable<int> AllowedLanguages { get; }
 }

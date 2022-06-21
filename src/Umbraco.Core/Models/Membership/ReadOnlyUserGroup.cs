@@ -2,22 +2,22 @@ namespace Umbraco.Cms.Core.Models.Membership;
 
 public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGroup>
 {
-        public ReadOnlyUserGroup(
-            int id,
-            string? name,
-            string? icon,
-            int? startContentId,
-            int? startMediaId,
-            string? alias,
-            IEnumerable<int> allowedLanguages,
-            IEnumerable<string> allowedSections,
-            IEnumerable<string>? permissions)
+    public ReadOnlyUserGroup(
+        int id,
+        string? name,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        string? alias,
+        IEnumerable<int> allowedLanguages,
+        IEnumerable<string> allowedSections,
+        IEnumerable<string>? permissions)
     {
         Name = name ?? string.Empty;
         Icon = icon;
         Id = id;
         Alias = alias ?? string.Empty;
-            AllowedLanguages = allowedLanguages.ToArray();
+        AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
         Permissions = permissions?.ToArray();
 
@@ -61,6 +61,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     ///     flexible permissions structure in the future.
     /// </remarks>
     public IEnumerable<string>? Permissions { get; set; }
+
     public IEnumerable<int> AllowedLanguages { get; private set; }
     public IEnumerable<string> AllowedSections { get; private set; }
 
