@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 
-namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
+
+public interface IWithDateBuilder
 {
-    public interface IWithDateBuilder
-    {
-        DateTime? Date { get; set; }
-    }
+    DateTime? Date { get; set; }
 }
