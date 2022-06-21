@@ -12,6 +12,19 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
+      #popover {
+        width: auto;
+      }
+
+      #more-symbol {
+        font-size: 0.6em;
+      }
+
+      #popover-trigger {
+        --uui-button-padding-top-factor: 0.5;
+        --uui-button-padding-bottom-factor: 0.1;
+      }
+
       #dropdown {
         background-color: white;
         border-radius: var(--uui-border-radius);
@@ -76,16 +89,18 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
     return html`
       ${ this._actions?.length > 0 ? html`
         <uui-popover
-          .open=${this._open}
+          id="popover"
           placement="bottom-start"
+          .open=${this._open}
           @close="${this._handleClose}">
           <uui-button
+            id="popover-trigger"
             slot="trigger"
             look="secondary"
             label="More"
             @click="${this._toggleMenu}"
             compact>
-            <uui-symbol-more></uui-symbol-more>
+            <uui-symbol-more id="more-symbol"></uui-symbol-more>
           </uui-button>
 
           <div slot="popover" id="dropdown">
