@@ -62,6 +62,11 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
     this._open = !this._open;
   }
 
+  private _handleClose (event: CustomEvent) {
+    this._open = false;
+    event.stopPropagation();
+  };
+
   disconnectedCallback () {
     super.disconnectedCallback();
     this._subscription?.unsubscribe();
@@ -73,7 +78,7 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
         <uui-popover
           .open=${this._open}
           placement="bottom-start"
-          @close="${() => this._open = false}">
+          @close="${this._handleClose}">
           <uui-button
             slot="trigger"
             look="secondary"

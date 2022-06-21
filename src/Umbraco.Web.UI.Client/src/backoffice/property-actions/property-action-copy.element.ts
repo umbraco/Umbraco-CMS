@@ -30,6 +30,8 @@ export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitEl
 
   private _handleLabelClick () {
     this._notificationService?.peek('Copied to clipboard');
+    // TODO: how do we want to close the menu? Testing an event based approach
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   render() {

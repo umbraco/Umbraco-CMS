@@ -30,6 +30,8 @@ export default class UmbPropertyActionClear extends UmbContextConsumerMixin(LitE
 
   private _handleLabelClick () {
     this._notificationService?.peek('Clear value');
+    // TODO: how do we want to close the menu? Testing an event based approach
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   render() {
