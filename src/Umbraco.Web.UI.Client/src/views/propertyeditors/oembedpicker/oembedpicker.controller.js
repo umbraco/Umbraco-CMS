@@ -4,23 +4,36 @@
   angular
     .module("umbraco")
     .controller("Umbraco.PropertyEditors.OEmbedPickerController",
-      function Controller($scope) {
+      function Controller($scope, $sce, editorService) {
 
         const vm = this;
+
+        vm.add = addEmbed;
+        vm.edit = editEmbed;
+        vm.remove = removeEmbed;
+        vm.trustHtml = trustHtml;
+        vm.validateMandatory = validateMandatory;
 
         vm.allowMultiple = $scope.model.config.allowmultiple;
 
         vm.items = Array.isArray($scope.model.value) ? $scope.model.value : [];
 
+        vm.sortableOptions = {
+          axis: 'y',
+          containment: 'parent',
+          cursor: 'move',
+          items: '> .umb-table-row',
+          handle: '.handle',
+          tolerance: 'pointer'
+        };
+
         function openEmbedDialog(embed, onSubmit) {
 
           // Pass in a clone of embed object to embed infinite editor.
-          // We set both "orignal" and "modify" properties as it changed in Umbraco v8.2
           const clone = Utilities.copy(embed);
 
           const embedDialog = {
             modify: clone,
-            original: clone,
             submit: model => {
               onSubmit(model.embed);
               editorService.close();
@@ -81,12 +94,13 @@
 
         function updateModelValue() {
           $scope.model.value = vm.items;
+
           if (vm.oembedform && vm.oembedform.itemCount) {
             vm.oembedform.itemCount.$setViewValue(vm.items.length);
           }
         }
 
-        function validate() {
+        function validateMandatory() {
           var isValid = true;
 
           if ($scope.model.validation.mandatory && (Array.isArray(vm.items) === false || vm.items.length === 0)) {
@@ -99,21 +113,6 @@
             errorKey: "required"
           };
         }
-
-        vm.add = addEmbed;
-        vm.edit = editEmbed;
-        vm.remove = removeEmbed;
-        vm.trustHtml = trustHtml;
-        vm.validateMandatory = validate;
-
-        vm.sortableOptions = {
-          axis: 'y',
-          containment: 'parent',
-          cursor: 'move',
-          items: '> .umb-table-row',
-          handle: '.handle',
-          tolerance: 'pointer'
-        };
 
       });
 

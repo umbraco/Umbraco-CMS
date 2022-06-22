@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class OEmbedPickerValueConverter : PropertyValueConverterBase
     {
+        /// <inheritdoc/>
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.OEmbedPicker);
 
@@ -15,8 +16,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => IsMultipleDataType(propertyType.DataType)
                 ? typeof(IEnumerable<OEmbedItem>)
                 : typeof(OEmbedItem);
+
+        /// <inheritdoc/>
         public override bool? IsValue(object? value, PropertyValueLevel level) => value?.ToString() != "[]";
 
+        /// <inheritdoc/>
         public override object? ConvertSourceToIntermediate(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,
@@ -24,6 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             bool preview) =>
             source?.ToString();
 
+        /// <inheritdoc/>
         public override object? ConvertIntermediateToObject(
             IPublishedElement owner,
             IPublishedPropertyType propertyType,
