@@ -117,8 +117,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 prop.IsSensitive = true;
                 // mark this property as readonly so that it does not post any data
                 prop.Readonly = true;
-                // this is readonly so support read-only mode
-                prop.SupportsReadOnly = true;
                 // replace this editor with a sensitive value
                 prop.View = "sensitivevalue";
                 // clear the value
@@ -235,7 +233,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 View = "boolean",
                 IsSensitive = true,
                 Readonly = false,
-                SupportsReadOnly = true,
             },
 
             new()
@@ -246,7 +243,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                 View = "boolean",
                 IsSensitive = true,
                 Readonly = !member.IsLockedOut, // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
-                SupportsReadOnly = true,
             },
 
             new()
@@ -287,7 +283,6 @@ public class MemberTabsAndPropertiesMapper : TabsAndPropertiesMapper<IMember>
                     property.Value = null;
                     property.View = "sensitivevalue";
                     property.Readonly = true;
-                    property.SupportsReadOnly = true;
                 }
             }
         }
