@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
-    /// The default converter for all property editors that expose a JSON value type
+    /// The default converter for all property editors that expose a JSON value type.
     /// </summary>
     /// <remarks>
     /// Since this is a default (umbraco) converter it will be ignored if another converter found conflicts with this one.
@@ -23,7 +23,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly ILogger<JsonValueConverter> _logger;
 
-        string[] ExcludedPropertyEditors = new string[] { Constants.PropertyEditors.Aliases.MediaPicker3 };
+        private readonly string[] _excludedPropertyEditors = new string[]
+        {
+            Constants.PropertyEditors.Aliases.MediaPicker3,
+            Constants.PropertyEditors.Aliases.OEmbedPicker
+        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonValueConverter"/> class.
@@ -45,7 +49,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             return _propertyEditors.TryGet(propertyType.EditorAlias, out var editor)
                    && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
-                   && ExcludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
+                   && _excludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
         }
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
