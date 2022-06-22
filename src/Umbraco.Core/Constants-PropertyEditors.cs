@@ -132,6 +132,11 @@ namespace Umbraco.Cms.Core
                 public const string MultipleTextstring = "Umbraco.MultipleTextstring";
 
                 /// <summary>
+                /// OEmbed Picker.
+                /// </summary>
+                public const string OEmbedPicker = "Umbraco.OEmbedPicker";
+
+                /// <summary>
                 /// Label.
                 /// </summary>
                 public const string Label = "Umbraco.Label";

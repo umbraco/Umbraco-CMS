@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return base.FromEditor(editorValue, currentValue);
             }
 
-            ///<remarks>
+            /// <remarks>
             /// Note: no FromEditor() and ToEditor() methods
             /// We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
             /// </remarks>

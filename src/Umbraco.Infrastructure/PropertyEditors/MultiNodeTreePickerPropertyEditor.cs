@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -68,8 +68,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 var udiPaths = asString!.Split(',');
                 foreach (var udiPath in udiPaths)
+                {
                     if (UdiParser.TryParse(udiPath, out var udi))
+                    {
                         yield return new UmbracoEntityReference(udi);
+                    }
+                }
             }
         }
     }
