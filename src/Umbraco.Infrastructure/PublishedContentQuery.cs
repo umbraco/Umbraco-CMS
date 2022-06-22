@@ -26,8 +26,8 @@ namespace Umbraco.Cms.Infrastructure
         private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
-        private static readonly HashSet<string> s_itemIdFieldNameHashSet =
-            new HashSet<string>() { ExamineFieldNames.ItemIdFieldName };
+        private static readonly HashSet<string> s_returnedQueryFields =
+            new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
@@ -272,8 +272,8 @@ namespace Umbraco.Cms.Infrastructure
                 ordering = query.ManagedQuery(term, fields);
             }
 
-            // Only select item ID field, because results are loaded from the published snapshot based on this single value
-            var queryExecutor = ordering.SelectFields(s_itemIdFieldNameHashSet);
+            // Filter selected fields because results are loaded from the published snapshot based on these
+            var queryExecutor = ordering.SelectFields(s_returnedQueryFields);
 
 
             var results = skip == 0 && take == 0
@@ -304,8 +304,8 @@ namespace Umbraco.Cms.Infrastructure
 
             if (query is IOrdering ordering)
             {
-                // Only select item ID field, because results are loaded from the published snapshot based on this single value
-                query = ordering.SelectFields(s_itemIdFieldNameHashSet);
+                // Filter selected fields because results are loaded from the published snapshot based on these
+                query = ordering.SelectFields(s_returnedQueryFields);
             }
 
             var results = skip == 0 && take == 0
