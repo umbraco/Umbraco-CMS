@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 
@@ -30,7 +31,17 @@ public sealed class HtmlStringUtilities
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
         var doc = new HtmlDocument();
-        doc.LoadHtml("<p>" + html + "</p>");
+
+        // If the html string already starts with a tag we don't want to add extra tags
+        // as this would cause doc.DocumentNode.FirstChild.SelectNodes(".//*") to return null
+        if (Regex.IsMatch(html, @"^<[^>^<.]*>"))
+        {
+            doc.LoadHtml(html);
+        }
+        else
+        {
+            doc.LoadHtml("<p>" + html + "</p>");
+        }
 
         var targets = new List<HtmlNode>();
 
