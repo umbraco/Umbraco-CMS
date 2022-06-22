@@ -4,12 +4,26 @@
 .umb-block-grid__layout-container {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)), minmax(0, 1fr));
     
     grid-gap: 0px;
     grid-auto-flow: row;
     grid-auto-rows: minmax(50px, auto);
 
+}
+
+.umb-block-grid__block-area-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
+    
+    grid-gap: 0px;
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(50px, auto);
+}
+.umb-block-grid__block-area {
+    grid-column: span var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1));
+    grid-row: span var(--umb-block-grid--area-row-span, 1);
 }
 
 .umb-block-grid__layout-item {
