@@ -12,10 +12,7 @@
                         <localize key="contentTypeEditor_inheritedFrom">Inherited from</localize> {{vm.inheritsFrom}}
                     </small>
 
-                    <label class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">{{vm.property.label}}<span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory">
-                            <strong class="umb-control-required">*</strong>
-                        </span>
-                    </label>
+                    <label class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">{{vm.property.label}}<span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory"><strong class="umb-control-required">*</strong></span></label>
 
                     <umb-property-actions ng-if="!vm.showInherit" actions="vm.propertyActions"></umb-property-actions>
 
