@@ -265,6 +265,14 @@
                     prop.culture = vm.umbProperty.property.culture;
                 });
             });
+
+            // set the scaffolded allowed actions to the allowed actions of the document
+            content.allowedActions = vm.umbVariantContent.content.allowedActions;
+
+            // set the scaffolded variants' allowed actions to the allowed actions of the current variant
+            content.variants.forEach(variant => {
+                variant.allowedActions = vm.umbVariantContent.editor.content.allowedActions;
+            });
         }
 
         function getBlockObject(entry) {
