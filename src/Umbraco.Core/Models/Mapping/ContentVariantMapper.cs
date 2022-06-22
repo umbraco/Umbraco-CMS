@@ -252,7 +252,7 @@ public class ContentVariantMapper
             // If user does not have access, return only browse permission
             if (!hasAccess)
             {
-                return new[] {ActionBrowse.ActionLetter.ToString()};
+                return new[] { ActionBrowse.ActionLetter.ToString() };
             }
         }
 

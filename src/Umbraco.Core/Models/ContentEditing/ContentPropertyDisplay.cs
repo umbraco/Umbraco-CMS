@@ -40,4 +40,7 @@ public class ContentPropertyDisplay : ContentPropertyBasic
 
     [DataMember(Name = "readonly")]
     public bool Readonly { get; set; }
+
+    [DataMember(Name = "supportsReadOnly")]
+    public bool SupportsReadOnly { get; set; }
 }
