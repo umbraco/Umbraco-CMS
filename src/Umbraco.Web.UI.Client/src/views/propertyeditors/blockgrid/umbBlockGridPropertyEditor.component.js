@@ -196,7 +196,7 @@
             // each layoutEntry should have a child array,
             layoutEntry.areas = layoutEntry.areas || [];
 
-            // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
+            // $block must have the data property to be a valid BlockObject, if not, its considered as a destroyed blockObject.
             if (layoutEntry.$block === undefined || layoutEntry.$block === null || layoutEntry.$block.data === undefined) {
                 var block = getBlockObject(layoutEntry);
 
@@ -215,7 +215,6 @@
                             key: areaConfig.key,
                             items: []
                         })
-                        console.log("using area config:", areaConfig);
                     } else {
                         // set $config as its not persisted:
                         layoutEntry.areas[areaIndex].$config = areaConfig;
