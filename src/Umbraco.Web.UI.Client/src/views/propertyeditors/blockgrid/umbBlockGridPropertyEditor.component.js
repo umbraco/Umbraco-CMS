@@ -211,10 +211,14 @@
                     const areaIndex = layoutEntry.areas.findIndex(x => x.key === areaConfig.key);
                     if(areaIndex === -1) {
                         layoutEntry.areas.push({
+                            $config: areaConfig,
                             key: areaConfig.key,
                             items: []
                         })
+                        console.log("using area config:", areaConfig);
                     } else {
+                        // set $config as its not persisted:
+                        layoutEntry.areas[areaIndex].$config = areaConfig;
                         initializeLayout(layoutEntry.areas[areaIndex].items);
                     }
                 });
@@ -408,26 +412,13 @@
                 return false;
             }
 
-            blockObject.config.areas.forEach(areaConfig => {
-                //if(layoutEntry.areas.findIndex(x => x.key === areaConfig.key) === -1) {
-                    layoutEntry.areas.push({
-                        $config: areaConfig, 
-                        key: areaConfig.key,
-                        items: []
-                    })
-                    //initializeLayout(area.items);
-                //}
-            });
-            /*
-            layoutEntry.areas.forEach(area => {
-                initializeLayout(area.items);
-            })
-            */
-
             // If we reach this line, we are good to add the layoutEntry and blockObject to our models.
 
             // Add the Block Object to our layout entry.
             layoutEntry.$block = blockObject;
+
+            // Development note: Notice this is runned before added to the data model.
+            initializeLayoutEntry(layoutEntry);
 
             // add layout entry at the decided location in layout.
             if(parentBlock != null) {
@@ -839,24 +830,10 @@
                 return false;
             }
 
-            // TODO: this should be using initializeLayoutEntry...
-            blockObject.config.areas.forEach(areaConfig => {
-                const areaIndex = entry.areas.findIndex(x => x.key === areaConfig.key)
-                if(areaIndex === -1) {
-                    entry.areas.push({
-                        // missing $config, but this should be using initializeLayoutEntry...
-                        key: areaConfig.key,
-                        items: []
-                    })
-                } else {
-                    // TODO: Figure how to handle block that contains sub blocks. Maybe they re not copy-able(not included in the copy)
-                    // TODO: move initialization till after pasting is done, so clipboardEntries containint multiple nested blocks can create the blocks before initilizing them..
-                    initializeLayout(entry.areas[areaIndex].items);
-                }
-            });
-
             // set the BlockObject on our layout entry.
             layoutEntry.$block = blockObject;
+
+            initializeLayoutEntry(layoutEntry);
 
             // insert layout entry at the decided location in layout.
             if(parentLayoutEntry != null) {
