@@ -6,31 +6,43 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices;
+
+public class ReportSiteTask : RecurringHostedServiceBase
 {
-    public class ReportSiteTask : RecurringHostedServiceBase
-    {
-        private readonly ILogger<ReportSiteTask> _logger;
-        private readonly ITelemetryService _telemetryService;
-        private static HttpClient s_httpClient = new();
+    private static HttpClient _httpClient = new();
+    private readonly ILogger<ReportSiteTask> _logger;
+    private readonly ITelemetryService _telemetryService;
+    private readonly IRuntimeState _runtimeState;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
-            ITelemetryService telemetryService)
-            : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            ITelemetryService telemetryService,
+            IRuntimeState runtimeState)
+        : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(5))
         {
             _logger = logger;
-            _telemetryService = telemetryService;
-            s_httpClient = new HttpClient();
+            _telemetryService = telemetryService;_runtimeState = runtimeState;
+            _httpClient = new HttpClient();
         }
 
-        [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
+        [Obsolete("Use the constructor that takes IRuntimeState, scheduled for removal in V12")]
+    public ReportSiteTask(
+        ILogger<ReportSiteTask> logger,
+        ITelemetryService telemetryService)
+        : this(logger, telemetryService, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
+    {
+    }
+
+    [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             IUmbracoVersion umbracoVersion,
@@ -45,7 +57,13 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         public override async Task PerformExecuteAsync(object? state)
         {
-            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
+            if (_runtimeState.Level is not RuntimeLevel.Run)
+        {
+            // We probably haven't installed yet, so we can't get telemetry.
+            return;
+        }
+
+        if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
             {
                 _logger.LogWarning("No telemetry marker found");
 
@@ -54,19 +72,19 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             try
             {
-                if (s_httpClient.BaseAddress is null)
+                if (_httpClient.BaseAddress is null)
                 {
                     // Send data to LIVE telemetry
-                    s_httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+                    _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
                     // Send data to DEBUG telemetry service
-                    s_httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                    _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
                 }
 
 
-                s_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
@@ -75,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                     // Make a HTTP Post to telemetry service
                     // https://telemetry.umbraco.com/installs/
                     // Fire & Forget, do not need to know if its a 200, 500 etc
-                    using (HttpResponseMessage response = await s_httpClient.SendAsync(request))
+                    using (HttpResponseMessage response = await _httpClient.SendAsync(request))
                     {
                     }
                 }
