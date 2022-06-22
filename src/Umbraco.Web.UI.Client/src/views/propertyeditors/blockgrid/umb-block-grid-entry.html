@@ -8,20 +8,22 @@
                               index="vm.index"
                               parent-form="vm.blockRowForm">
 
-            <umb-block-grid-entries
-                data-col-span="{{areaEntry.$config.columnSpan}}"
-                data-row-span="{{areaEntry.$config.rowSpan}}"
-                style="
-                --umb-block-grid--item-column-span: {{areaEntry.$config.columnSpan}};
-                --umb-block-grid--item-row-span: {{areaEntry.$config.rowSpan}};
-                "
-                ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
-                slot="areas"
-                block-editor-api="vm.blockEditorApi"
-                entries="areaEntry.items"
-                area-key="areaEntry.key"
-                parent-block="vm.layoutEntry.$block">
-            </umb-block-grid-entries>
+            <div class="umb-block-grid__block-area-container" slot="areas">
+                <umb-block-grid-entries
+                    class="umb-block-grid__block-area"
+                    data-area-col-span="{{areaEntry.$config.columnSpan}}"
+                    data-area-row-span="{{areaEntry.$config.rowSpan}}"
+                    style="
+                    --umb-block-grid--area-column-span: {{areaEntry.$config.columnSpan}};
+                    --umb-block-grid--area-row-span: {{areaEntry.$config.rowSpan}};
+                    "
+                    ng-repeat="areaEntry in vm.layoutEntry.areas track by areaEntry.key"
+                    block-editor-api="vm.blockEditorApi"
+                    entries="areaEntry.items"
+                    area-key="areaEntry.key"
+                    parent-block="vm.layoutEntry.$block">
+                </umb-block-grid-entries>
+            </div>
 
         </umb-block-grid-block>
 
