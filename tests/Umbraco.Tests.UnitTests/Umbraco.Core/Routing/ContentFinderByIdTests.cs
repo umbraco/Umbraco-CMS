@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                 Mock.Of<ILogger<ContentFinderByIdPath>>(), Mock.Of<IRequestAccessor>(), umbracoContextAccessor);
 
 
-            var result = await lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContentAsync(frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(frequest.PublishedContent.Id, nodeMatch);

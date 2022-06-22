@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContentAsync(IPublishedRequestBuilder frequest)
         {
             if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {

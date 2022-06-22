@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             if (urlString == "/home/sub1")
                 System.Diagnostics.Debugger.Break();
 
-            var result = await lookup.finder.TryFindContent(lookup.frequest);
+            var result = await lookup.finder.TryFindContentAsync(lookup.frequest);
 
             if (expectedId > 0)
             {
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             Assert.IsFalse(GlobalSettings.HideTopLevelNodeFromPath);
 
-            var result = await lookup.finder.TryFindContent(lookup.frequest);
+            var result = await lookup.finder.TryFindContentAsync(lookup.frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             var lookup = await GetContentFinder(urlString);
 
-            var result = await lookup.finder.TryFindContent(lookup.frequest);
+            var result = await lookup.finder.TryFindContentAsync(lookup.frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             lookup.frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite", -1, "en-US", false), new Uri("http://mysite/")));
 
-            var result = await lookup.finder.TryFindContent(lookup.frequest);
+            var result = await lookup.finder.TryFindContentAsync(lookup.frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);
@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             lookup.frequest.SetDomain(new DomainAndUri(new Domain(1, "mysite/æøå", -1, "en-US", false), new Uri("http://mysite/æøå")));
 
-            var result = await lookup.finder.TryFindContent(lookup.frequest);
+            var result = await lookup.finder.TryFindContentAsync(lookup.frequest);
 
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, lookup.frequest.PublishedContent.Id);

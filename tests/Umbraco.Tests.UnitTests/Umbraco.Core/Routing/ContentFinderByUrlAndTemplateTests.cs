@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                 umbracoContextAccessor,
                 Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x=>x.CurrentValue == webRoutingSettings));
 
-            var result = await lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContentAsync(frequest);
 
             IPublishedRequest request = frequest.Build();
 

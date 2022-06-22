@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             Mock.Get(variationContextAccessor).Setup(x => x.VariationContext).Returns(variationContext);
             var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
             //Act
-            var result = await sut.TryFindContent(publishedRequestBuilder);
+            var result = await sut.TryFindContentAsync(publishedRequestBuilder);
 
             Assert.IsTrue(result);
             Assert.AreEqual(publishedRequestBuilder.PublishedContent.Id, nodeMatch);

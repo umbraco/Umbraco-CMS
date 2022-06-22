@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContentAsync(IPublishedRequestBuilder frequest)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {

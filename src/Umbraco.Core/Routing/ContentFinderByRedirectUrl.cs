@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
-        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+        public async Task<bool> TryFindContentAsync(IPublishedRequestBuilder frequest)
         {
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {

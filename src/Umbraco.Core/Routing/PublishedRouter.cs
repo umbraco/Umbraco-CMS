@@ -436,7 +436,7 @@ namespace Umbraco.Cms.Core.Routing
                     {
                         _logger.LogDebug("Finder {ContentFinderType}", contentFinder.GetType().FullName);
                     }
-                    found = await contentFinder.TryFindContent(request);
+                    found = await contentFinder.TryFindContentAsync(request);
                     if (found)
                     {
                         break;
@@ -493,7 +493,7 @@ namespace Umbraco.Cms.Core.Routing
                     }
 
                     // if it fails then give up, there isn't much more that we can do
-                    if (await _contentLastChanceFinder.TryFindContent(request) == false)
+                    if (await _contentLastChanceFinder.TryFindContentAsync(request) == false)
                     {
                         if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
                         {

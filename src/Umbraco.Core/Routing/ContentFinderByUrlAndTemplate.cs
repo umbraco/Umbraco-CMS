@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>If successful, also assigns the template.</remarks>
-        public override async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+        public override async Task<bool> TryFindContentAsync(IPublishedRequestBuilder frequest)
         {
             var path = frequest.AbsolutePathDecoded;
 

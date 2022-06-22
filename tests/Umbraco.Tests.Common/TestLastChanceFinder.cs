@@ -8,6 +8,6 @@ namespace Umbraco.Cms.Tests.Common
 {
     public class TestLastChanceFinder : IContentLastChanceFinder
     {
-        public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest) => false;
+        public async Task<bool> TryFindContentAsync(IPublishedRequestBuilder frequest) => false;
     }
 }
