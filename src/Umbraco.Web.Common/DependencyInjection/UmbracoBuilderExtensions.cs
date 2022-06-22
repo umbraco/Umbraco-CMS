@@ -186,7 +186,8 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService(provider =>
                 new ReportSiteTask(
                     provider.GetRequiredService<ILogger<ReportSiteTask>>(),
-                    provider.GetRequiredService<ITelemetryService>()));
+                    provider.GetRequiredService<ITelemetryService>(),
+                    provider.GetRequiredService<IRuntimeState>()));
             return builder;
         }
 
