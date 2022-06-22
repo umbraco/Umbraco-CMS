@@ -75,6 +75,7 @@ public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         _contentService = contentService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     public bool TryGetMediaPath(string? propertyEditorAlias, object? value, [MaybeNullWhen(false)] out string mediaPath)

@@ -23,8 +23,11 @@ public class EmailAddressPropertyEditor : DataEditor
     public EmailAddressPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
-        : base(dataValueEditorFactory) =>
+        : base(dataValueEditorFactory)
+    {
         _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
 
     protected override IDataValueEditor CreateValueEditor()
     {
