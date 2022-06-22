@@ -236,7 +236,7 @@ public class ContentVariantMapper
                 {
                     int? defaultLanguageId = _localizationService.GetDefaultLanguageId();
                     if (defaultLanguageId is not null && (group.AllowedLanguages.Contains(defaultLanguageId.Value) ||
-                                                          _securitySettings.AllowEditInvariantFromNonDefault))
+                                                          _securitySettings.AllowEditInvariantFromNonDefault || group.HasAccessToLanguage(defaultLanguageId.Value)))
                     {
                         hasAccess = true;
                     }
