@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </summary>
         public static string GetTagName(ExifTag tag)
         {
-            string name = Enum.GetName(typeof(ExifTag), tag);
+            string? name = Enum.GetName(typeof(ExifTag), tag);
             if (name == null)
                 return "Unknown";
             else
@@ -56,8 +56,8 @@ namespace Umbraco.Cms.Core.Media.Exif
         /// </summary>
         public static string GetTagLongName(ExifTag tag)
         {
-            string ifdname = Enum.GetName(typeof(IFD), GetTagIFD(tag));
-            string name = Enum.GetName(typeof(ExifTag), tag);
+            string? ifdname = Enum.GetName(typeof(IFD), GetTagIFD(tag));
+            string? name = Enum.GetName(typeof(ExifTag), tag);
             if (name == null)
                 name = "Unknown";
             string tagidname = GetTagID(tag).ToString();

@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             Member = member;
         }
 
-        public static IPublishedContent Create(
+        public static IPublishedContent? Create(
             IMember member,
             IPublishedContentType contentType,
             bool previewing,
@@ -34,15 +34,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IVariationContextAccessor variationContextAccessor,
             IPublishedModelFactory publishedModelFactory)
         {
-            var d = new ContentData
-            {
-                Name = member.Name,
-                Published = previewing,
-                TemplateId = -1,
-                VersionDate = member.UpdateDate,
-                WriterId = member.CreatorId, // what else?
-                Properties = GetPropertyValues(contentType, member)
-            };
+            var d = new ContentData(member.Name, null, 0, member.UpdateDate, member.CreatorId, -1, previewing, GetPropertyValues(contentType, member), null);
+
             var n = new ContentNode(
                 member.Id,
                 member.Key,
@@ -95,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return properties;
         }
 
-        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object value)
+        private static void AddIf(IPublishedContentType contentType, IDictionary<string, PropertyData[]> properties, string alias, object? value)
         {
             var propertyType = contentType.GetPropertyType(alias);
             if (propertyType == null || propertyType.IsUserProperty) return;
@@ -110,19 +103,19 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public string UserName => Member.Username;
 
-        public string Comments => Member.Comments;
+        public string? Comments => Member.Comments;
 
         public bool IsApproved => Member.IsApproved;
 
         public bool IsLockedOut => Member.IsLockedOut;
 
-        public DateTime LastLockoutDate => Member.LastLockoutDate;
+        public DateTime? LastLockoutDate => Member.LastLockoutDate;
 
         public DateTime CreationDate => Member.CreateDate;
 
-        public DateTime LastLoginDate => Member.LastLoginDate;
+        public DateTime? LastLoginDate => Member.LastLoginDate;
 
-        public DateTime LastPasswordChangedDate => Member.LastPasswordChangeDate;
+        public DateTime? LastPasswordChangedDate => Member.LastPasswordChangeDate;
 
         #endregion
     }

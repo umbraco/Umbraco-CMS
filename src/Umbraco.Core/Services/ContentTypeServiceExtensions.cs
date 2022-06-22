@@ -45,10 +45,10 @@ namespace Umbraco.Extensions
         /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
-            IContentTypeComposition source,
+            IContentTypeComposition? source,
             IContentTypeComposition[] allContentTypes,
-            string[] filterContentTypes = null,
-            string[] filterPropertyTypes = null,
+            string[]? filterContentTypes = null,
+            string[]? filterPropertyTypes = null,
             bool isElement = false)
         {
             filterContentTypes = filterContentTypes == null
@@ -82,7 +82,7 @@ namespace Umbraco.Extensions
             // if it is not used then composition is possible
             // hashset guarantees uniqueness on Id
             var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-                (x, y) => x.Id == y.Id,
+                (x, y) => x?.Id == y?.Id,
                 x => x.Id));
 
             // usable types are those that are top-level
@@ -134,7 +134,7 @@ namespace Umbraco.Extensions
         }
 
 
-        private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
+        private static IContentTypeComposition[] GetAncestors(IContentTypeComposition? ctype, IContentTypeComposition[] allContentTypes)
         {
             if (ctype == null) return new IContentTypeComposition[] {};
             var ancestors = new List<IContentTypeComposition>();
@@ -160,13 +160,13 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="ctype"></param>
         /// <returns></returns>
-        private static IEnumerable<IContentTypeComposition> GetDirectOrIndirect(IContentTypeComposition ctype)
+        private static IEnumerable<IContentTypeComposition> GetDirectOrIndirect(IContentTypeComposition? ctype)
         {
             if (ctype == null) return Enumerable.Empty<IContentTypeComposition>();
 
             // hashset guarantees uniqueness on Id
             var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-                (x, y) => x.Id == y.Id,
+                (x, y) => x?.Id == y?.Id,
                 x => x.Id));
 
             var stack = new Stack<IContentTypeComposition>();

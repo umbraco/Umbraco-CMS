@@ -20,18 +20,18 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             throw new NotImplementedException($"{nameof(AutoInterningStringConverter)} should not be used globally");
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
                 return null;
             // Check is in case the value is a non-string literal such as an integer.
             var s = reader.TokenType == JsonToken.String
-                ? string.Intern((string)reader.Value)
-                : string.Intern((string)JToken.Load(reader));
+                ? string.Intern((string)reader.Value!)
+                : string.Intern((string)JToken.Load(reader)!);
             return s;
         }
 
         public override bool CanWrite => false;
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) => throw new NotImplementedException();
     }
 }

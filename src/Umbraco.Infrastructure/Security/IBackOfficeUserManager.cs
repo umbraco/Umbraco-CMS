@@ -10,6 +10,6 @@ namespace Umbraco.Cms.Core.Security
     {
         void NotifyForgotPasswordRequested(IPrincipal currentUser, string userId);
         void NotifyForgotPasswordChanged(IPrincipal currentUser, string userId);
-        SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string userId);
+        SignOutSuccessResult NotifyLogoutSuccess(IPrincipal currentUser, string? userId);
     }
 }

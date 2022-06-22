@@ -19,7 +19,7 @@
         /// <summary>
         /// Gets the tree group.
         /// </summary>
-        string TreeGroup { get; }
+        string? TreeGroup { get; }
 
         /// <summary>
         /// Gets the tree alias.
@@ -29,7 +29,7 @@
         /// <summary>
         /// Gets or sets the tree title (fallback if the tree alias isn't localized)
         /// </summary>
-        string TreeTitle { get; }
+        string? TreeTitle { get; }
 
         /// <summary>
         /// Gets the tree use.

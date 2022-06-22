@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         // internal for tests
-        internal string ReplaceBlockListUdis(string rawJson, Func<Guid> createGuid = null)
+        internal string ReplaceBlockListUdis(string rawJson, Func<Guid>? createGuid = null)
         {
             // used so we can test nicely
             if (createGuid == null)
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             UpdateBlockListRecursively(blockListValue, createGuid);
 
-            return JsonConvert.SerializeObject(blockListValue.BlockValue);
+            return JsonConvert.SerializeObject(blockListValue.BlockValue, Formatting.None);
         }
 
         private void UpdateBlockListRecursively(BlockEditorData blockListData, Func<Guid> createGuid)
@@ -65,23 +65,23 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 var reference = blockListData.References[i];
                 var hasContentMap = oldToNew.TryGetValue(reference.ContentUdi, out var contentMap);
-                Udi settingsMap = null;
-                var hasSettingsMap = reference.SettingsUdi != null && oldToNew.TryGetValue(reference.SettingsUdi, out settingsMap);
+                Udi? settingsMap = null;
+                var hasSettingsMap = reference.SettingsUdi is not null && oldToNew.TryGetValue(reference.SettingsUdi, out settingsMap);
 
                 if (hasContentMap)
                 {
                     // replace the reference
                     blockListData.References.RemoveAt(i);
-                    blockListData.References.Insert(i, new ContentAndSettingsReference(contentMap, hasSettingsMap ? settingsMap : null));
+                    blockListData.References.Insert(i, new ContentAndSettingsReference(contentMap!, hasSettingsMap ? settingsMap : null));
                 }
             }
 
             // build the layout with the new UDIs
-            var layout = (JArray)blockListData.Layout;
-            layout.Clear();
+            var layout = (JArray?)blockListData.Layout;
+            layout?.Clear();
             foreach (var reference in blockListData.References)
             {
-                layout.Add(JObject.FromObject(new BlockListLayoutItem
+                layout?.Add(JObject.FromObject(new BlockListLayoutItem
                 {
                     ContentUdi = reference.ContentUdi,
                     SettingsUdi = reference.SettingsUdi
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             foreach (var data in blockData)
             {
                 // check if we need to recurse (make a copy of the dictionary since it will be modified)
-                foreach (var propertyAliasToBlockItemData in new Dictionary<string, object>(data.RawPropertyValues))
+                foreach (var propertyAliasToBlockItemData in new Dictionary<string, object?>(data.RawPropertyValues))
                 {
                     if (propertyAliasToBlockItemData.Value is JToken jtoken)
                     {
@@ -117,12 +117,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             // this gets a little ugly because there could be some other complex editor that contains another block editor
                             // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
                             // of our type
-                            JToken json = null;
+                            JToken? json = null;
                             try
                             {
                                 json = JToken.Parse(asString);
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
                                 // We are detecting JSON data by seeing if a string is surrounded by [] or {}
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     // this is an arbitrary property that could contain a nested complex editor
                     var propVal = prop.Value?.ToString();
                     // check if this might contain a nested Block Editor
-                    if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
+                    if (!propVal.IsNullOrWhiteSpace() && (propVal?.DetectIsJson() ?? false) && propVal.InvariantContains(Constants.PropertyEditors.Aliases.BlockList))
                     {
                         if (_converter.TryDeserialize(propVal, out var nestedBlockData))
                         {
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             foreach (var data in blockData)
             {
                 // This should never happen since a FormatException will be thrown if one is empty but we'll keep this here
-                if (data.Udi == null)
+                if (data.Udi is null)
                     throw new InvalidOperationException("Block data cannot contain a null UDI");
 
                 // replace the UDIs

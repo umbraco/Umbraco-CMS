@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -6,6 +6,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes
 {
+    /// <remarks>
+    /// <para>
+    /// Assuming we stick with the current migrations setup this will need to be altered to
+    /// delegate to SQL syntax provider (we can drop indexes but not PK/FK).
+    /// </para>
+    /// <para>
+    /// 1. For SQLite, rename table.<br/>
+    /// 2. Create new table with expected keys.<br/>
+    /// 3. Insert into new from renamed<br/>
+    /// 4. Drop renamed.<br/>
+    /// </para>
+    /// <para>
+    /// Read more <a href="https://www.sqlite.org/omitted.html">SQL Features That SQLite Does Not Implement</a>
+    /// </para>
+    /// </remarks>
     public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
     {
         private readonly IMigrationContext _context;
@@ -17,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexe
             _supportedDatabaseTypes = supportedDatabaseTypes;
         }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
         public bool DeleteLocal { get; set; }
 

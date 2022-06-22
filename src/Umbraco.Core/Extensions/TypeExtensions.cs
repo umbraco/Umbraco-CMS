@@ -15,14 +15,14 @@ namespace Umbraco.Extensions
 {
     public static class TypeExtensions
     {
-        public static object GetDefaultValue(this Type t)
+        public static object? GetDefaultValue(this Type t)
         {
             return t.IsValueType
                        ? Activator.CreateInstance(t)
                        : null;
         }
 
-        internal static MethodInfo GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
+        internal static MethodInfo? GetGenericMethod(this Type type, string name, params Type[] parameterTypes)
         {
             var methods = type.GetMethods().Where(method => method.Name == name);
 
@@ -75,12 +75,12 @@ namespace Umbraco.Extensions
             return true;
         }
 
-        public static IEnumerable<Type> GetBaseTypes(this Type type, bool andSelf)
+        public static IEnumerable<Type?> GetBaseTypes(this Type? type, bool andSelf)
         {
             if (andSelf)
                 yield return type;
 
-            while ((type = type.BaseType) != null)
+            while ((type = type?.BaseType) != null)
                 yield return type;
         }
 
@@ -121,7 +121,7 @@ namespace Umbraco.Extensions
         /// </returns>
         public static bool IsOfGenericType(this Type type, Type genericType)
         {
-            Type[] args;
+            Type[]? args;
             return type.TryGetGenericArguments(genericType, out args);
         }
 
@@ -132,7 +132,7 @@ namespace Umbraco.Extensions
         /// <param name="genericType"></param>
         /// <param name="genericArgType"></param>
         /// <returns></returns>
-        public static bool TryGetGenericArguments(this Type type, Type genericType, out Type[] genericArgType)
+        public static bool TryGetGenericArguments(this Type type, Type genericType, out Type[]? genericArgType)
         {
             if (type == null)
             {
@@ -147,7 +147,7 @@ namespace Umbraco.Extensions
                 throw new ArgumentException("genericType must be a generic type");
             }
 
-            Func<Type, Type, Type[]> checkGenericType = (@int, t) =>
+            Func<Type, Type, Type[]?> checkGenericType = (@int, t) =>
             {
                 if (@int.IsGenericType)
                 {
@@ -313,34 +313,34 @@ namespace Umbraco.Extensions
             return typeof(TInterface).IsAssignableFrom(type);
         }
 
-        public static TAttribute FirstAttribute<TAttribute>(this Type type)
+        public static TAttribute? FirstAttribute<TAttribute>(this Type type)
         {
             return type.FirstAttribute<TAttribute>(true);
         }
 
-        public static TAttribute FirstAttribute<TAttribute>(this Type type, bool inherit)
+        public static TAttribute? FirstAttribute<TAttribute>(this Type type, bool inherit)
         {
             var attrs = type.GetCustomAttributes(typeof(TAttribute), inherit);
-            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+            return (TAttribute?)(attrs.Length > 0 ? attrs[0] : null);
         }
 
-        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        public static TAttribute? FirstAttribute<TAttribute>(this PropertyInfo propertyInfo)
         {
             return propertyInfo.FirstAttribute<TAttribute>(true);
         }
 
-        public static TAttribute FirstAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        public static TAttribute? FirstAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
         {
             var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
-            return (TAttribute)(attrs.Length > 0 ? attrs[0] : null);
+            return (TAttribute?)(attrs.Length > 0 ? attrs[0] : null);
         }
 
-        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo)
+        public static IEnumerable<TAttribute>? MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo)
         {
             return propertyInfo.MultipleAttribute<TAttribute>(true);
         }
 
-        public static IEnumerable<TAttribute> MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
+        public static IEnumerable<TAttribute>? MultipleAttribute<TAttribute>(this PropertyInfo propertyInfo, bool inherit)
         {
             var attrs = propertyInfo.GetCustomAttributes(typeof(TAttribute), inherit);
             return (attrs.Length > 0 ? attrs.ToList().ConvertAll(input => (TAttribute)input) : null);
@@ -389,8 +389,8 @@ namespace Umbraco.Extensions
                 var t = c;
                 while (t != typeof(object))
                 {
-                    if (t.IsGenericType && t.GetGenericTypeDefinition() == type) return true;
-                    t = t.BaseType;
+                    if (t is not null && t.IsGenericType && t.GetGenericTypeDefinition() == type) return true;
+                    t = t?.BaseType;
                 }
             }
 
@@ -403,7 +403,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="type">the source type</param>
         /// <returns></returns>
-        public static Type GetEnumeratedType(this Type type)
+        public static Type? GetEnumeratedType(this Type type)
         {
             if (typeof(IEnumerable).IsAssignableFrom(type) == false)
                 return null;
@@ -420,7 +420,7 @@ namespace Umbraco.Extensions
             return null;
         }
 
-        public static T GetCustomAttribute<T>(this Type type, bool inherit)
+        public static T? GetCustomAttribute<T>(this Type type, bool inherit)
             where T : Attribute
         {
             return type.GetCustomAttributes<T>(inherit).SingleOrDefault();
@@ -430,10 +430,16 @@ namespace Umbraco.Extensions
             where T : Attribute
         {
             if (type == null) return Enumerable.Empty<T>();
-            return type.GetCustomAttributes(typeof (T), inherited).OfType<T>();
+            return type.GetCustomAttributes(typeof(T), inherited).OfType<T>();
         }
 
-          /// <summary>
+        public static bool HasCustomAttribute<T>(this Type type, bool inherit)
+            where T : Attribute
+        {
+            return type.GetCustomAttribute<T>(inherit) != null;
+        }
+
+        /// <summary>
         /// Tries to return a value based on a property name for an object but ignores case sensitivity
         /// </summary>
         /// <param name="type"></param>

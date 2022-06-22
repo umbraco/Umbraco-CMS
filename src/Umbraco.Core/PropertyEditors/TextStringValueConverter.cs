@@ -31,25 +31,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Snapshot;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
         {
             if (source == null) return null;
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and URLs are resolved correctly
-            sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
+            sourceString = _linkParser.EnsureInternalLinks(sourceString!, preview);
             sourceString = _urlParser.EnsureUrls(sourceString);
 
             return sourceString;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return inter ?? string.Empty;
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             // source should come from ConvertSource and be a string (or null) already
             return inter;

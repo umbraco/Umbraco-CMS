@@ -18,23 +18,23 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "label", IsRequired = true)]
         [Required]
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataMember(Name = "view", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string View { get; set; }
+        public string? View { get; set; }
 
         [DataMember(Name = "config")]
-        public IDictionary<string, object> Config { get; set; }
+        public IDictionary<string, object>? Config { get; set; }
 
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
         [DataMember(Name = "labelOnTop")]
-        public bool LabelOnTop { get; set; }
+        public bool? LabelOnTop { get; set; }
 
         [DataMember(Name = "validation")]
         public PropertyTypeValidation Validation { get; set; }

@@ -1,0 +1,57 @@
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Media
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
+@inject IPublishedValueFallback PublishedValueFallback
+@inject IPublishedContentQuery PublishedContentQuery
+@inject IVariationContextAccessor VariationContextAccessor
+@inject IPublishedUrlProvider PublishedUrlProvider
+@inject IImageUrlGenerator ImageUrlGenerator
+
+@*
+    Macro to display a gallery of images from the Media section.
+    Works with either a 'Single Media Picker' or a 'Multiple Media Picker' macro parameter (see below).
+
+    How it works:
+        - Confirm the macro parameter has been passed in with a value
+        - Loop through all the media Ids passed in (might be a single item, might be many)
+        - Display any individual images, as well as any folders of images
+
+    Macro Parameters To Create, for this macro to work:
+    Alias:mediaIds     Name:Select folders and/or images    Type: Multiple Media Picker
+                                                            Type: (note: You can use a Single Media Picker if that's more appropriate to your needs)
+*@
+
+@{ var mediaIds = Model?.MacroParameters["mediaIds"] as string; }
+
+@if (mediaIds != null)
+{
+    <div class="row">
+        @foreach (var mediaId in mediaIds.Split(','))
+        {
+            var media = PublishedContentQuery.Media(mediaId);
+
+            @* a single image *@
+            if (media.IsDocumentType("Image"))
+            {
+                <div class="col-xs-6 col-md-3">
+                    <a href="@media.Url(PublishedUrlProvider)" class="thumbnail">
+                        <img src="@media.GetCropUrl(ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, width: 200, height: 200)" alt="@media.Name"/>
+                    </a>
+                </div>
+            }
+
+            @* a folder with images under it *@
+            foreach (var image in media.Children(VariationContextAccessor))
+            {
+                <div class="col-xs-6 col-md-3">
+                    <a href="@image.Url(PublishedUrlProvider)" class="thumbnail">
+                        <img src="@image.GetCropUrl(ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, width: 200, height: 200)" alt="@image.Name"/>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+}

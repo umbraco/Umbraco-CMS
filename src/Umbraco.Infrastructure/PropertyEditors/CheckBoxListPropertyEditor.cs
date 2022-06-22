@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -24,6 +23,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly ILocalizedTextService _textService;
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public CheckBoxListPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILocalizedTextService textService,
+            IIOHelper ioHelper)
+            : this(dataValueEditorFactory, textService, ioHelper, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
@@ -31,17 +41,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public CheckBoxListPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             ILocalizedTextService textService,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _textService = textService;
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper, _editorConfigurationParser);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleValueEditor>(Attribute!);
     }
 }

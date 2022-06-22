@@ -12,6 +12,7 @@ function iconPreValsController($scope, editorService) {
         var iconPicker = {
             icon: $scope.icon,
             color: $scope.color,
+            size: "medium",
             submit: function (model) {
                 if (model.icon) {
                     if (model.color) {

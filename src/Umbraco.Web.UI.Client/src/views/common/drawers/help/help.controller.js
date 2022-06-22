@@ -1,3 +1,4 @@
+
 (function () {
     "use strict";
 
@@ -13,6 +14,12 @@
         vm.customDashboard = null;
         vm.tours = [];
         vm.systemInfoDisplay = false;
+        vm.labels = {};
+        vm.labels.copiedSuccessInfo = "";
+        vm.labels.copySuccessStatus = "";
+        vm.labels.copiedErrorInfo = "";
+        vm.labels.copyErrorStatus = "";
+
 
         vm.closeDrawer = closeDrawer;
         vm.startTour = startTour;
@@ -36,6 +43,24 @@
             localizationService.localize("general_help").then(function(data){
                 vm.title = data;
             });
+            //Set help dashboard messages
+          var labelKeys = [
+            "general_help",
+            "speechBubbles_copySuccessMessage",
+            "general_success",
+            "speechBubbles_cannotCopyInformation",
+            "general_error"
+          ];
+          localizationService.localizeMany(labelKeys).then(function(resp){
+            [
+              vm.title,
+              vm.labels.copiedSuccessInfo,
+              vm.labels.copySuccessStatus,
+              vm.labels.copiedErrorInfo,
+              vm.labels.copyErrorStatus
+            ] = resp;
+          });
+
             currentUserResource.getUserData().then(function(systemInfo){
               vm.systemInfo = systemInfo;
               let browserInfo = platformService.getBrowserInfo();
@@ -43,7 +68,7 @@
                 vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
               }
               vm.systemInfo.push({name :"Browser OS", data: getPlatform()});
-            });
+            } );
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
                 getTourGroupCompletedPercentage();
@@ -208,22 +233,33 @@
             }
         }
         function copyInformation(){
-          let copyText = "<html>\n<body>\n<!--StartFragment-->\n\nCategory | Data\n-- | --\n";
+          //Write start and end text for table formatting in github issues
+          let copyStartText = "<html>\n<body>\n<!--StartFragment-->\n\nCategory | Data\n-- | --\n";
+          let copyEndText = "\n<!--EndFragment-->\n</body>\n</html>";
+
+          let copyText = copyStartText;
           vm.systemInfo.forEach(function (info){
             copyText += info.name + " | " + info.data + "\n";
           });
-          copyText += "\n<!--EndFragment-->\n</body>\n</html>"
-          navigator.clipboard.writeText(copyText);
-          if(copyText != null){
-            notificationsService.success("Copied!", "Your system information is now in your clipboard");
+
+          copyText += copyEndText;
+
+          // Check if copyText is only start + end text
+          // if it is something went wrong and we will not copy to clipboard
+          let emptyCopyText = copyStartText + copyEndText;
+          if(copyText !== emptyCopyText) {
+            notificationsService.success(vm.labels.copySuccessStatus, vm.labels.copiedSuccessInfo);
+            navigator.clipboard.writeText(copyText);
           }
-          else{
-            notificationsService.error("Error", "Could not copy system information");
+          else {
+            notificationsService.error(vm.labels.copyErrorStatus, vm.labels.copiedErrorInfo);
           }
         }
+
         function getPlatform() {
           return window.navigator.platform;
         }
+
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
@@ -239,8 +275,8 @@
         });
 
         oninit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Drawers.Help", HelpDrawerController);
+
 })();

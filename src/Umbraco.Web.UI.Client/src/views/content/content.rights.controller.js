@@ -11,7 +11,7 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-        
+        vm.initialState = {};
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
@@ -24,7 +24,7 @@
         function onInit() {
             vm.loading = true;
             contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
-                initData(userGroups);                
+                initData(userGroups);
                 vm.loading = false;
                 currentForm = angularHelper.getCurrentForm($scope);
             });
@@ -45,6 +45,21 @@
               assignGroupPermissions(group);
             }
           });
+          vm.initialState = angular.copy(userGroups);
+        }
+
+        function resetData() {
+            vm.selectedUserGroups = [];
+            vm.availableUserGroups = angular.copy(vm.initialState);
+            vm.availableUserGroups.forEach(function (group) {
+                if (group.permissions) {
+                    //if there's explicit permissions assigned than it's selected
+                    group.selected = false;
+                    assignGroupPermissions(group);
+                }
+            });
+            currentForm = angularHelper.getCurrentForm($scope);
+
         }
 
         function setViewSate(state) {
@@ -91,7 +106,7 @@
         }
 
         function setPermissions(group) {
-            assignGroupPermissions(group);  
+            assignGroupPermissions(group);
             setViewSate("manageGroups");
             $scope.dialog.confirmDiscardChanges = true;
         }
@@ -114,14 +129,18 @@
 
         function cancelManagePermissions() {
             setViewSate("manageGroups");
+            resetData();
         }
 
-        function formatSaveModel(permissionsSave, groupCollection) {
-          groupCollection.forEach(function (g) {
+        function formatSaveModel(permissionsSave, selectedUserGroups, removedUserGroups) {
+          selectedUserGroups.forEach(function (g) {
             permissionsSave[g.id] = [];
             g.allowedPermissions.forEach(function (p) {
               permissionsSave[g.id].push(p.permissionCode);
             });
+          });
+          removedUserGroups.forEach(function (g) {
+            permissionsSave[g.id] = null;
           });
         }
 
@@ -134,8 +153,7 @@
             //this is a dictionary that we need to populate
             var permissionsSave = {};
             //format the selectedUserGroups, then the removedUserGroups since we want to pass data from both collections up
-            formatSaveModel(permissionsSave, vm.selectedUserGroups);
-            formatSaveModel(permissionsSave, vm.removedUserGroups);
+            formatSaveModel(permissionsSave, vm.selectedUserGroups,  vm.removedUserGroups);
 
             var saveModel = {
                 contentId: $scope.currentNode.id,

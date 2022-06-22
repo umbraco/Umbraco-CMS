@@ -141,6 +141,9 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     });
                 }
             }
+            else if (vm.treeAlias === "templates") {
+                vm.entityType = "Template";
+            }
 
             // TODO: Seems odd this logic is here, i don't think it needs to be and should just exist on the property editor using this
             if ($scope.model.minNumber) {

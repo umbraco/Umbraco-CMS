@@ -79,7 +79,6 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
 }
 .umb-block-list__block--actions {
     position: absolute;
-    z-index:999999999;// We always want to be on top of custom view, but we need to make sure we still are behind relevant Umbraco CMS UI. ToDo: Needs further testing.
     top: 10px;
     right: 10px;
     font-size: 0;
@@ -202,7 +201,7 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         box-sizing: border-box;
         width: 28px;
         height: 28px;
-        margin-left: -16px - 8px;
+        margin-left: (-16px - 8px);
         margin-top: -16px;
         border-radius: 3em;
         font-size: 14px;

@@ -4,12 +4,14 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -20,25 +22,26 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
-    /// Represents a repository for doing CRUD operations for <see cref="IMember"/>
+    ///     Represents a repository for doing CRUD operations for <see cref="IMember" />
     /// </summary>
     public class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
     {
-        private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
-        private readonly IMemberTypeRepository _memberTypeRepository;
-        private readonly ITagRepository _tagRepository;
-        private readonly IPasswordHasher _passwordHasher;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
+        private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly IMemberTypeRepository _memberTypeRepository;
+        private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly ITagRepository _tagRepository;
         private bool _passwordConfigInitialized;
-        private string _passwordConfigJson;
+        private string? _passwordConfigJson;
 
         public MemberRepository(
             IScopeAccessor scopeAccessor,
@@ -57,21 +60,24 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IJsonSerializer serializer,
             IEventAggregator eventAggregator,
             IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository,
+                propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
-            _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
+            _memberTypeRepository =
+                memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _passwordHasher = passwordHasher;
             _jsonSerializer = serializer;
             _memberGroupRepository = memberGroupRepository;
             _passwordConfiguration = passwordConfiguration.Value;
-            _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+            _memberByUsernameCachePolicy =
+                new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         /// <summary>
-        /// Returns a serialized dictionary of the password configuration that is stored against the member in the database
+        ///     Returns a serialized dictionary of the password configuration that is stored against the member in the database
         /// </summary>
-        private string DefaultPasswordConfigJson
+        private string? DefaultPasswordConfigJson
         {
             get
             {
@@ -95,47 +101,333 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public override int RecycleBinId => throw new NotSupportedException();
 
+        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch,
+            StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            //get the group id
+            IQuery<IMemberGroup> grpQry = Query<IMemberGroup>().Where(group => group.Name!.Equals(roleName));
+            IMemberGroup? memberGroup = _memberGroupRepository.Get(grpQry)?.FirstOrDefault();
+            if (memberGroup == null)
+            {
+                return Enumerable.Empty<IMember>();
+            }
+
+            // get the members by username
+            IQuery<IMember> query = Query<IMember>();
+            switch (matchType)
+            {
+                case StringPropertyMatchType.Exact:
+                    query.Where(member => member.Username.Equals(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query.Where(member => member.Username.Contains(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query.Where(member => member.Username.StartsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query.Where(member => member.Username.EndsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query.Where(member => member.Username.SqlWildcard(usernameToMatch, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(matchType));
+            }
+
+            IMember[]? matchedMembers = Get(query)?.ToArray();
+
+            var membersInGroup = new List<IMember>();
+
+            if (matchedMembers is null)
+            {
+                return membersInGroup;
+            }
+            //then we need to filter the matched members that are in the role
+            foreach (IEnumerable<int> group in matchedMembers.Select(x => x.Id)
+                         .InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                Sql<ISqlContext> sql = Sql().SelectAll().From<Member2MemberGroupDto>()
+                    .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
+                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, group);
+
+                var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
+                    .Select(x => x.Member).ToArray();
+
+                membersInGroup.AddRange(matchedMembers.Where(x => memberIdsInGroup.Contains(x.Id)));
+            }
+
+            return membersInGroup;
+        }
+
+        /// <summary>
+        ///     Get all members in a specific group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetByMemberGroup(string groupName)
+        {
+            IQuery<IMemberGroup> grpQry = Query<IMemberGroup>().Where(group => group.Name!.Equals(groupName));
+            IMemberGroup? memberGroup = _memberGroupRepository.Get(grpQry)?.FirstOrDefault();
+            if (memberGroup == null)
+            {
+                return Enumerable.Empty<IMember>();
+            }
+
+            Sql<ISqlContext> subQuery = Sql().Select("Member").From<Member2MemberGroupDto>()
+                .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
+
+            Sql<ISqlContext> sql = GetBaseQuery(false)
+                // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
+                // subquery with an IN clause into an inner join anyways.
+                .Append("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                .OrderBy<NodeDto>(x => x.SortOrder);
+
+            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
+        }
+
+        public bool Exists(string username)
+        {
+            Sql<ISqlContext> sql = Sql()
+                .SelectCount()
+                .From<MemberDto>()
+                .Where<MemberDto>(x => x.LoginName == username);
+
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public int GetCountByQuery(IQuery<IMember>? query)
+        {
+            Sql<ISqlContext> sqlWithProps = GetNodeIdQueryWithPropertyData();
+            var translator = new SqlTranslator<IMember>(sqlWithProps, query);
+            Sql<ISqlContext> sql = translator.Translate();
+
+            //get the COUNT base query
+            Sql<ISqlContext> fullSql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
+
+            return Database.ExecuteScalar<int>(fullSql);
+        }
+
+        /// <inheritdoc />
+        [Obsolete(
+            "This is now a NoOp since last login date is no longer an umbraco property, set the date on the IMember directly and Save it instead, scheduled for removal in V11.")]
+        public void SetLastLogin(string username, DateTime date)
+        {
+
+        }
+
+        /// <summary>
+        ///     Gets paged member results.
+        /// </summary>
+        public override IEnumerable<IMember> GetPage(IQuery<IMember>? query,
+            long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMember>? filter,
+            Ordering? ordering)
+        {
+            Sql<ISqlContext>? filterSql = null;
+
+            if (filter != null)
+            {
+                filterSql = Sql();
+                foreach (Tuple<string, object[]> clause in filter.GetWhereClauses())
+                {
+                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
+                }
+            }
+
+            return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
+                x => MapDtosToContent(x),
+                filterSql,
+                ordering);
+        }
+
+        public IMember? GetByUsername(string? username) =>
+            _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+
+        public int[] GetMemberIds(string[] usernames)
+        {
+            Guid memberObjectType = Constants.ObjectTypes.Member;
+
+            Sql<ISqlContext> memberSql = Sql()
+                .Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                .Where("cmsMember.LoginName in (@usernames)", new
+                {
+                    /*usernames =*/
+                    usernames
+                });
+            return Database.Fetch<int>(memberSql).ToArray();
+        }
+
+        protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+        {
+            if (ordering.OrderBy.InvariantEquals("email"))
+            {
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.Email);
+            }
+
+            if (ordering.OrderBy.InvariantEquals("loginName"))
+            {
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
+            }
+
+            if (ordering.OrderBy.InvariantEquals("userName"))
+            {
+                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
+            }
+
+            if (ordering.OrderBy.InvariantEquals("updateDate"))
+            {
+                return SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate);
+            }
+
+            if (ordering.OrderBy.InvariantEquals("createDate"))
+            {
+                return SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate);
+            }
+
+            if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+            {
+                return SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias);
+            }
+
+            return base.ApplySystemOrdering(ref sql, ordering);
+        }
+
+        private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)
+        {
+            var temps = new List<TempContent<Member>>();
+            var contentTypes = new Dictionary<int, IMemberType?>();
+            var content = new Member[dtos.Count];
+
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                MemberDto dto = dtos[i];
+
+                if (withCache)
+                {
+                    // if the cache contains the (proper version of the) item, use it
+                    IMember? cached =
+                        IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember, int>(dto.NodeId));
+                    if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
+                    {
+                        content[i] = (Member)cached;
+                        continue;
+                    }
+                }
+
+                // else, need to build it
+
+                // get the content type - the repository is full cache *but* still deep-clones
+                // whatever comes out of it, so use our own local index here to avoid this
+                var contentTypeId = dto.ContentDto.ContentTypeId;
+                if (contentTypes.TryGetValue(contentTypeId, out IMemberType? contentType) == false)
+                {
+                    contentTypes[contentTypeId] = contentType = _memberTypeRepository.Get(contentTypeId);
+                }
+
+                Member c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
+
+                // need properties
+                var versionId = dto.ContentVersionDto.Id;
+                temps.Add(new TempContent<Member>(dto.NodeId, versionId, 0, contentType, c));
+            }
+
+            // load all properties for all documents from database in 1 query - indexed by version id
+            IDictionary<int, PropertyCollection> properties = GetPropertyCollections(temps);
+
+            // assign properties
+            foreach (TempContent<Member> temp in temps)
+            {
+                if (temp.Content is not null)
+                {
+                    temp.Content.Properties = properties[temp.VersionId];
+
+                    // reset dirty initial properties (U4-1946)
+                    temp.Content.ResetDirtyProperties(false);
+                }
+            }
+
+            return content;
+        }
+
+        private IMember MapDtoToContent(MemberDto dto)
+        {
+            IMemberType? memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            Member member = ContentBaseFactory.BuildEntity(dto, memberType);
+
+            // get properties - indexed by version id
+            var versionId = dto.ContentVersionDto.Id;
+            var temp = new TempContent<Member>(dto.ContentDto.NodeId, versionId, 0, memberType);
+            IDictionary<int, PropertyCollection> properties =
+                GetPropertyCollections(new List<TempContent<Member>> { temp });
+            member.Properties = properties[versionId];
+
+            // reset dirty initial properties (U4-1946)
+            member.ResetDirtyProperties(false);
+            return member;
+        }
+
+        private IMember? PerformGetByUsername(string? username)
+        {
+            IQuery<IMember> query = Query<IMember>().Where(x => x.Username.Equals(username));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+
+        private IEnumerable<IMember> PerformGetAllByUsername(params string[]? usernames)
+        {
+            IQuery<IMember> query = Query<IMember>().WhereIn(x => x.Username, usernames);
+            return PerformGetByQuery(query);
+        }
+
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Member;
+        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
 
-        protected override IMember PerformGet(int id)
+        protected override IMember? PerformGet(int id)
         {
-            var sql = GetBaseQuery(QueryType.Single)
+            Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
                 .Where<NodeDto>(x => x.NodeId == id)
                 .SelectTop(1);
 
-            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
+            MemberDto? dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
             return dto == null
                 ? null
                 : MapDtoToContent(dto);
         }
 
-        protected override IEnumerable<IMember> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IMember> PerformGetAll(params int[]? ids)
         {
-            var sql = GetBaseQuery(QueryType.Many);
+            Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
+            {
                 sql.WhereIn<NodeDto>(x => x.NodeId, ids);
+            }
 
             return MapDtosToContent(Database.Fetch<MemberDto>(sql));
         }
 
         protected override IEnumerable<IMember> PerformGetByQuery(IQuery<IMember> query)
         {
-            var baseQuery = GetBaseQuery(false);
+            Sql<ISqlContext> baseQuery = GetBaseQuery(false);
 
             // TODO: why is this different from content/media?!
             // check if the query is based on properties or not
 
-            var wheres = query.GetWhereClauses();
+            IEnumerable<Tuple<string, object[]>> wheres = query.GetWhereClauses();
             //this is a pretty rudimentary check but will work, we just need to know if this query requires property
             // level queries
             if (wheres.Any(x => x.Item1.Contains("cmsPropertyType")))
             {
-                var sqlWithProps = GetNodeIdQueryWithPropertyData();
+                Sql<ISqlContext> sqlWithProps = GetNodeIdQueryWithPropertyData();
                 var translator = new SqlTranslator<IMember>(sqlWithProps, query);
-                var sql = translator.Translate();
+                Sql<ISqlContext> sql = translator.Translate();
 
                 baseQuery.Append("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments)
                     .OrderBy<NodeDto>(x => x.SortOrder);
@@ -145,22 +437,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             else
             {
                 var translator = new SqlTranslator<IMember>(baseQuery, query);
-                var sql = translator.Translate()
+                Sql<ISqlContext> sql = translator.Translate()
                     .OrderBy<NodeDto>(x => x.SortOrder);
 
                 return MapDtosToContent(Database.Fetch<MemberDto>(sql));
             }
-
         }
 
-        protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType)
-        {
-            return GetBaseQuery(queryType, true);
-        }
+        protected override Sql<ISqlContext> GetBaseQuery(QueryType queryType) => GetBaseQuery(queryType, true);
 
         protected virtual Sql<ISqlContext> GetBaseQuery(QueryType queryType, bool current)
         {
-            var sql = SqlContext.Sql();
+            Sql<ISqlContext> sql = SqlContext.Sql();
 
             switch (queryType) // TODO: pretend we still need these queries for now
             {
@@ -187,67 +475,70 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .From<MemberDto>()
                 .InnerJoin<ContentDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentVersionDto>().On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>()
+                .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
 
                 // joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repos so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
 
             sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             if (current)
+            {
                 sql.Where<ContentVersionDto>(x => x.Current); // always get the current version
+            }
 
             return sql;
         }
 
         // TODO: move that one up to Versionable! or better: kill it!
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-        {
-            return GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
-        }
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
+            GetBaseQuery(isCount ? QueryType.Count : QueryType.Single);
 
         protected override string GetBaseWhereClause() // TODO: can we kill / refactor this?
-        {
-            return "umbracoNode.id = @id";
-        }
+            =>
+                "umbracoNode.id = @id";
 
         // TODO: document/understand that one
-        protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData()
-        {
-            return Sql()
+        protected Sql<ISqlContext> GetNodeIdQueryWithPropertyData() =>
+            Sql()
                 .Select("DISTINCT(umbracoNode.id)")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
-                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
-                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentDto, ContentTypeDto>((left, right) => left.ContentTypeId == right.NodeId)
+                .InnerJoin<ContentVersionDto>()
+                .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<MemberDto>().On<ContentDto, MemberDto>((left, right) => left.NodeId == right.NodeId)
-
-                .LeftJoin<PropertyTypeDto>().On<ContentDto, PropertyTypeDto>(left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
-
+                .LeftJoin<PropertyTypeDto>()
+                .On<ContentDto, PropertyTypeDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>()
+                .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId)
                 .LeftJoin<PropertyDataDto>().On(x => x
                     .Where<PropertyDataDto, PropertyTypeDto>((left, right) => left.PropertyTypeId == right.Id)
                     .Where<PropertyDataDto, ContentVersionDto>((left, right) => left.VersionId == right.Id))
-
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
-        }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
                 "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                 "DELETE FROM umbracoRelation WHERE parentId = @id",
                 "DELETE FROM umbracoRelation WHERE childId = @id",
                 "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData +
+                " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion +
+                " WHERE nodeId = @id)",
                 "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                 "DELETE FROM cmsMember WHERE nodeId = @id",
-                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                 "DELETE FROM umbracoNode WHERE id = @id"
             };
             return list;
@@ -259,7 +550,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public override IEnumerable<IMember> GetAllVersions(int nodeId)
         {
-            var sql = GetBaseQuery(QueryType.Many, false)
+            Sql<ISqlContext> sql = GetBaseQuery(QueryType.Many, false)
                 .Where<NodeDto>(x => x.NodeId == nodeId)
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
@@ -267,12 +558,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return MapDtosToContent(Database.Fetch<MemberDto>(sql), true);
         }
 
-        public override IMember GetVersion(int versionId)
+        public override IMember? GetVersion(int versionId)
         {
-            var sql = GetBaseQuery(QueryType.Single)
+            Sql<ISqlContext> sql = GetBaseQuery(QueryType.Single)
                 .Where<ContentVersionDto>(x => x.Id == versionId);
 
-            var dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
+            MemberDto? dto = Database.Fetch<MemberDto>(sql).FirstOrDefault();
             return dto == null ? null : MapDtoToContent(dto);
         }
 
@@ -346,13 +637,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Level = level;
 
             // persist the content dto
-            var contentDto = memberDto.ContentDto;
+            ContentDto contentDto = memberDto.ContentDto;
             contentDto.NodeId = nodeDto.NodeId;
             Database.Insert(contentDto);
 
             // persist the content version dto
             // assumes a new version id and version date (modified date) has been set
-            var contentVersionDto = memberDto.ContentVersionDto;
+            ContentVersionDto contentVersionDto = memberDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
@@ -365,8 +656,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // this will hash the guid with a salt so should be nicely random
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
             {
-
-                memberDto.Password = Cms.Core.Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                memberDto.Password = Constants.Security.EmptyPasswordPrefix +
+                                     _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
                 entity.RawPasswordValue = memberDto.Password;
             }
 
@@ -441,10 +732,44 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 changedCols.Add("LoginName");
             }
 
+            if (entity.IsPropertyDirty(nameof(entity.FailedPasswordAttempts)))
+            {
+                changedCols.Add(nameof(entity.FailedPasswordAttempts));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.IsApproved)))
+            {
+                changedCols.Add(nameof(entity.IsApproved));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.IsLockedOut)))
+            {
+                changedCols.Add(nameof(entity.IsLockedOut));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastLockoutDate)))
+            {
+                changedCols.Add(nameof(entity.LastLockoutDate));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastLoginDate)))
+            {
+                changedCols.Add(nameof(entity.LastLoginDate));
+            }
+
+            if (entity.IsPropertyDirty(nameof(entity.LastPasswordChangeDate)))
+            {
+                changedCols.Add(nameof(entity.LastPasswordChangeDate));
+            }
+
             // this can occur from an upgrade
             if (memberDto.PasswordConfig.IsNullOrWhiteSpace())
             {
                 memberDto.PasswordConfig = DefaultPasswordConfigJson;
+                changedCols.Add("passwordConfig");
+            }
+            else if (memberDto.PasswordConfig == Constants.Security.UnknownPasswordConfigJson)
+            {
                 changedCols.Add("passwordConfig");
             }
 
@@ -496,301 +821,5 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         #endregion
-
-        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
-        {
-            //get the group id
-            var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
-            var memberGroup = _memberGroupRepository.Get(grpQry).FirstOrDefault();
-            if (memberGroup == null)
-                return Enumerable.Empty<IMember>();
-
-            // get the members by username
-            var query = Query<IMember>();
-            switch (matchType)
-            {
-                case StringPropertyMatchType.Exact:
-                    query.Where(member => member.Username.Equals(usernameToMatch));
-                    break;
-                case StringPropertyMatchType.Contains:
-                    query.Where(member => member.Username.Contains(usernameToMatch));
-                    break;
-                case StringPropertyMatchType.StartsWith:
-                    query.Where(member => member.Username.StartsWith(usernameToMatch));
-                    break;
-                case StringPropertyMatchType.EndsWith:
-                    query.Where(member => member.Username.EndsWith(usernameToMatch));
-                    break;
-                case StringPropertyMatchType.Wildcard:
-                    query.Where(member => member.Username.SqlWildcard(usernameToMatch, TextColumnType.NVarchar));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(matchType));
-            }
-            var matchedMembers = Get(query).ToArray();
-
-            var membersInGroup = new List<IMember>();
-            //then we need to filter the matched members that are in the role
-            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
-            var inGroups = matchedMembers.InGroupsOf(1000);
-            foreach (var batch in inGroups)
-            {
-                var memberIdBatch = batch.Select(x => x.Id);
-
-                var sql = Sql().SelectAll().From<Member2MemberGroupDto>()
-                    .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
-                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, memberIdBatch);
-
-                var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
-                    .Select(x => x.Member).ToArray();
-
-                membersInGroup.AddRange(matchedMembers.Where(x => memberIdsInGroup.Contains(x.Id)));
-            }
-
-            return membersInGroup;
-
-        }
-
-        /// <summary>
-        /// Get all members in a specific group
-        /// </summary>
-        /// <param name="groupName"></param>
-        /// <returns></returns>
-        public IEnumerable<IMember> GetByMemberGroup(string groupName)
-        {
-            var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
-            var memberGroup = _memberGroupRepository.Get(grpQry).FirstOrDefault();
-            if (memberGroup == null)
-                return Enumerable.Empty<IMember>();
-
-            var subQuery = Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
-
-            var sql = GetBaseQuery(false)
-                // TODO: An inner join would be better, though I've read that the query optimizer will always turn a
-                // subquery with an IN clause into an inner join anyways.
-                .Append("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
-                .OrderBy<NodeDto>(x => x.SortOrder);
-
-            return MapDtosToContent(Database.Fetch<MemberDto>(sql));
-
-        }
-
-        public bool Exists(string username)
-        {
-            var sql = Sql()
-                .SelectCount()
-                .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == username);
-
-            return Database.ExecuteScalar<int>(sql) > 0;
-        }
-
-        public int GetCountByQuery(IQuery<IMember> query)
-        {
-            var sqlWithProps = GetNodeIdQueryWithPropertyData();
-            var translator = new SqlTranslator<IMember>(sqlWithProps, query);
-            var sql = translator.Translate();
-
-            //get the COUNT base query
-            var fullSql = GetBaseQuery(true)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments));
-
-            return Database.ExecuteScalar<int>(fullSql);
-        }
-
-        /// <inheritdoc />
-        public void SetLastLogin(string username, DateTime date)
-        {
-            // Important - these queries are designed to execute without an exclusive WriteLock taken in our distributed lock
-            // table. However due to the data that we are updating which relies on version data we cannot update this data
-            // without taking some locks, otherwise we'll end up with strange situations because when a member is updated, that operation
-            // deletes and re-inserts all property data. So if there are concurrent transactions, one deleting and re-inserting and another trying
-            // to update there can be problems. This is only an issue for cmsPropertyData, not umbracoContentVersion because that table just
-            // maintains a single row and it isn't deleted/re-inserted.
-            // So the important part here is the ForUpdate() call on the select to fetch the property data to update.
-
-            // Update the cms property value for the member
-
-            var sqlSelectTemplateProperty = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin1", s => s
-                .Select<PropertyDataDto>(x => x.Id)
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((l, r) => l.Id == r.PropertyTypeId)
-                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, PropertyDataDto>((l, r) => l.Id == r.VersionId)
-                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
-                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
-                .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
-                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
-                .ForUpdate());
-            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Cms.Core.Constants.ObjectTypes.Member, Cms.Core.Constants.Conventions.Member.LastLoginDate, username);
-
-            var update = Sql()
-                .Update<PropertyDataDto>(u => u
-                    .Set(x => x.DateValue, date))
-                .WhereIn<PropertyDataDto>(x => x.Id, sqlSelectProperty);
-
-            Database.Execute(update);
-
-            // Update the umbracoContentVersion value for the member
-
-            var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
-               .Select<ContentVersionDto>(x => x.Id)
-               .From<ContentVersionDto>()
-               .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
-               .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
-               .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
-               .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
-            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Cms.Core.Constants.ObjectTypes.Member, username);
-
-            Database.Execute(Sql()
-                .Update<ContentVersionDto>(u => u
-                    .Set(x => x.VersionDate, date))
-                .WhereIn<ContentVersionDto>(x => x.Id, sqlSelectVersion));
-        }
-
-        /// <summary>
-        /// Gets paged member results.
-        /// </summary>
-        public override IEnumerable<IMember> GetPage(IQuery<IMember> query,
-            long pageIndex, int pageSize, out long totalRecords,
-            IQuery<IMember> filter,
-            Ordering ordering)
-        {
-            Sql<ISqlContext> filterSql = null;
-
-            if (filter != null)
-            {
-                filterSql = Sql();
-                foreach (var clause in filter.GetWhereClauses())
-                    filterSql = filterSql.Append($"AND ({clause.Item1})", clause.Item2);
-            }
-
-            return GetPage<MemberDto>(query, pageIndex, pageSize, out totalRecords,
-                x => MapDtosToContent(x),
-                filterSql,
-                ordering);
-        }
-
-        protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
-        {
-            if (ordering.OrderBy.InvariantEquals("email"))
-                return SqlSyntax.GetFieldName<MemberDto>(x => x.Email);
-
-            if (ordering.OrderBy.InvariantEquals("loginName"))
-                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
-
-            if (ordering.OrderBy.InvariantEquals("userName"))
-                return SqlSyntax.GetFieldName<MemberDto>(x => x.LoginName);
-
-            if (ordering.OrderBy.InvariantEquals("updateDate"))
-                return SqlSyntax.GetFieldName<ContentVersionDto>(x => x.VersionDate);
-
-            if (ordering.OrderBy.InvariantEquals("createDate"))
-                return SqlSyntax.GetFieldName<NodeDto>(x => x.CreateDate);
-
-            if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
-                return SqlSyntax.GetFieldName<ContentTypeDto>(x => x.Alias);
-
-            return base.ApplySystemOrdering(ref sql, ordering);
-        }
-
-        private IEnumerable<IMember> MapDtosToContent(List<MemberDto> dtos, bool withCache = false)
-        {
-            var temps = new List<TempContent<Member>>();
-            var contentTypes = new Dictionary<int, IMemberType>();
-            var content = new Member[dtos.Count];
-
-            for (var i = 0; i < dtos.Count; i++)
-            {
-                var dto = dtos[i];
-
-                if (withCache)
-                {
-                    // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember, int>(dto.NodeId));
-                    if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
-                    {
-                        content[i] = (Member)cached;
-                        continue;
-                    }
-                }
-
-                // else, need to build it
-
-                // get the content type - the repository is full cache *but* still deep-clones
-                // whatever comes out of it, so use our own local index here to avoid this
-                var contentTypeId = dto.ContentDto.ContentTypeId;
-                if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
-                    contentTypes[contentTypeId] = contentType = _memberTypeRepository.Get(contentTypeId);
-
-                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
-
-                // need properties
-                var versionId = dto.ContentVersionDto.Id;
-                temps.Add(new TempContent<Member>(dto.NodeId, versionId, 0, contentType, c));
-            }
-
-            // load all properties for all documents from database in 1 query - indexed by version id
-            var properties = GetPropertyCollections(temps);
-
-            // assign properties
-            foreach (var temp in temps)
-            {
-                temp.Content.Properties = properties[temp.VersionId];
-
-                // reset dirty initial properties (U4-1946)
-                temp.Content.ResetDirtyProperties(false);
-            }
-
-            return content;
-        }
-
-        private IMember MapDtoToContent(MemberDto dto)
-        {
-            IMemberType memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            Member member = ContentBaseFactory.BuildEntity(dto, memberType);
-
-            // get properties - indexed by version id
-            var versionId = dto.ContentVersionDto.Id;
-            var temp = new TempContent<Member>(dto.ContentDto.NodeId, versionId, 0, memberType);
-            var properties = GetPropertyCollections(new List<TempContent<Member>> { temp });
-            member.Properties = properties[versionId];
-
-            // reset dirty initial properties (U4-1946)
-            member.ResetDirtyProperties(false);
-            return member;
-        }
-
-        public IMember GetByUsername(string username)
-        {
-            return _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
-        }
-
-        public int[] GetMemberIds(string[] usernames)
-        {
-            var memberObjectType = Cms.Core.Constants.ObjectTypes.Member;
-
-            var memberSql = Sql()
-                .Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
-            return Database.Fetch<int>(memberSql).ToArray();
-        }
-
-        private IMember PerformGetByUsername(string username)
-        {
-            var query = Query<IMember>().Where(x => x.Username.Equals(username));
-            return PerformGetByQuery(query).FirstOrDefault();
-        }
-
-        private IEnumerable<IMember> PerformGetAllByUsername(params string[] usernames)
-        {
-            var query = Query<IMember>().WhereIn(x => x.Username, usernames);
-            return PerformGetByQuery(query);
-        }
     }
 }

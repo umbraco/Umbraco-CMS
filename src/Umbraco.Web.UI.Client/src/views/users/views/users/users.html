@@ -181,7 +181,7 @@
         <umb-empty-state
             ng-if="!vm.loading && !vm.users.length && vm.usersOptions.filter.length > 0"
             position="center">
-            <localize key="general_searchNoResult"></localize>
+            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
         </umb-empty-state>
 
         <!-- Layout: Cards -->
@@ -305,7 +305,7 @@
                                     <localize key="user_inviteUser">Invite User</localize>
                                 </h3>
                                 <p style="line-height: 1.6em; margin-bottom: 15px;">
-                                    <localize key="user_inviteUserHelp"></localize>
+                                    <localize key="user_inviteUserHelp">Invite new users to give them access to Umbraco. An invite email will be sent to the user with information on how to log in to Umbraco. Invites last for 72 hours.</localize>
                                 </p>
                             </div>
                             <div ng-if="vm.usersViewState === 'createUser'">
@@ -313,7 +313,7 @@
                                     <localize key="user_createUser">Create user</localize>
                                 </h3>
                                 <p style="line-height: 1.6em; margin-bottom: 15px;">
-                                    <localize key="user_createUserHelp"></localize>
+                                    <localize key="user_createUserHelp">Create new users to give them access to Umbraco. When a new user is created a password will be generated that you can share with the user.</localize>
                                 </p>
                             </div>
                         </div>
@@ -437,7 +437,7 @@
                         </h3>
                     </div>
 
-                    <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp"></localize></p>
+                    <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userCreatedSuccessHelp">The new user has successfully been created. To log in to Umbraco use the password below.</localize></p>
 
                     <!-- New password -->
                     <div>
@@ -520,7 +520,7 @@
                     </h3>
                 </div>
 
-                <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userInvitedSuccessHelp"></localize></p>
+                <p style="line-height: 1.6em; margin-bottom: 20px;"><localize key="user_userInvitedSuccessHelp">An invitation has been sent to the new user with details about how to log in to Umbraco.</localize></p>
 
                 <!-- actions -->
                 <div>

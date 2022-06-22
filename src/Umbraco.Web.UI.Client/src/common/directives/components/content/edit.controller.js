@@ -200,6 +200,10 @@
                 }
             }));
 
+            evts.push(eventsService.on("rte.shortcut.saveAndPublish", function () {
+                $scope.saveAndPublish();
+            }));
+
             evts.push(eventsService.on("content.saved", function () {
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
@@ -598,8 +602,6 @@
                                 $scope.page.buttonGroupState = 'error';
                                 handleHttpException(err);
                             });
-
-
                     },
                     close: function () {
                         overlayService.close();
@@ -637,13 +639,14 @@
                                 overlayService.close();
                                 return $q.when(data);
                             },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-                                    model.submitButtonState = "error";
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    handleHttpException(err);
-                                });
+                            function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+
+                                handleHttpException(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -695,14 +698,18 @@
                                 clearNotifications($scope.content);
                                 overlayService.close();
                                 return $q.when(data);
-                            },
-                                function (err) {
-                                    clearDirtyState($scope.content.variants);
-                                    model.submitButtonState = "error";
-                                    //re-map the dialog model since we've re-bound the properties
-                                    dialog.variants = $scope.content.variants;
-                                    handleHttpException(err);
-                                });
+                            }, function (err) {
+                                clearDirtyState($scope.content.variants);
+                                model.submitButtonState = "error";
+                                //re-map the dialog model since we've re-bound the properties
+                                dialog.variants = $scope.content.variants;
+
+                                //ensure error messages are displayed
+                                formHelper.showNotifications(err.data);
+                                clearNotifications($scope.content);
+                                
+                                handleHttpException(err);
+                            });
                         },
                         close: function () {
                             overlayService.close();
@@ -756,20 +763,24 @@
                             clearNotifications($scope.content);
                             overlayService.close();
                             return $q.when(data);
-                        },
-                            function (err) {
-                                clearDirtyState($scope.content.variants);
-                                //model.submitButtonState = "error";
-                                // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
-                                if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
-                                    model.submitButtonState = "success";
-                                } else {
-                                    model.submitButtonState = "error";
-                                }
+                        }, function (err) {
+                            clearDirtyState($scope.content.variants);
+                            //model.submitButtonState = "error";
+                            // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
+                            if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
+                                model.submitButtonState = "success";
+                            } else {
+                                model.submitButtonState = "error";
                                 //re-map the dialog model since we've re-bound the properties
                                 dialog.variants = $scope.content.variants;
+
+                                //ensure error messages are displayed
+                                formHelper.showNotifications(err.data);
+                                clearNotifications($scope.content);
+
                                 handleHttpException(err);
-                            });
+                            }
+                        })
                     },
                     close: function (oldModel) {
                         overlayService.close();

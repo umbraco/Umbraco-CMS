@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Core.Security
         {
         }
 
-        public BackOfficeExternalLoginProviderErrors(string authenticationType, IEnumerable<string> errors)
+        public BackOfficeExternalLoginProviderErrors(string? authenticationType, IEnumerable<string> errors)
         {
             AuthenticationType = authenticationType;
             Errors = errors ?? Enumerable.Empty<string>();
         }
 
-        public string AuthenticationType { get; set; }
-        public IEnumerable<string> Errors { get; set; }
+        public string? AuthenticationType { get; set; }
+        public IEnumerable<string>? Errors { get; set; }
     }
 }

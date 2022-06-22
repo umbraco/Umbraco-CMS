@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
-        public static string GetClrName(IShortStringHelper shortStringHelper, string name, string alias)
+        public static string GetClrName(IShortStringHelper shortStringHelper, string? name, string alias)
         {
             // ModelsBuilder's legacy - but not ideal
             return alias.ToCleanString(shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);

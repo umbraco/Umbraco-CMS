@@ -11,7 +11,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang]";
+  var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
     var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
     // these languages are available for localization
     var availableLanguages = [
@@ -292,7 +292,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
     }
 
     function sizeImageInEditor(editor, imageDomElement, imgUrl) {
-
         var size = editor.dom.getSize(imageDomElement);
 
         if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
@@ -656,21 +655,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 stateSelector: 'img[data-udi]',
                 onclick: function () {
 
-
-                    var selectedElm = editor.selection.getNode(),
-                        currentTarget,
-                        imgDomElement;
+                  var selectedElm = editor.selection.getNode(),
+                    currentTarget;
 
                     if (selectedElm.nodeName === 'IMG') {
                         var img = $(selectedElm);
-                        imgDomElement = selectedElm;
 
                         var hasUdi = img.attr("data-udi") ? true : false;
                         var hasDataTmpImg = img.attr("data-tmpimg") ? true : false;
 
                         currentTarget = {
                             altText: img.attr("alt"),
-                            url: img.attr("src")
+                            url: img.attr("src"),
+                            caption: img.attr('data-caption')
                         };
 
                         if (hasUdi) {
@@ -687,85 +684,80 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     userService.getCurrentUser().then(function (userData) {
                         if (callback) {
                             angularHelper.safeApply($rootScope, function() {
-                                callback(currentTarget, userData, imgDomElement);
+                                callback(currentTarget, userData);
                             });
                         }
                     });
                 }
             });
         },
-
-        insertMediaInEditor: function (editor, img, imgDomElement) {
+        /**
+         * @ngdoc method
+         * @name umbraco.services.tinyMceService#insetMediaInEditor
+         * @methodOf umbraco.services.tinyMceService
+         *
+         * @description
+         * Inserts the image element in tinymce plugin
+         *
+         * @param {Object} editor the TinyMCE editor instance
+         */
+        insertMediaInEditor: function (editor, img) {
             if (img) {
-                // imgElement is only definied if updating an image
-                // if null/undefinied then its a BRAND new image
-                if(imgDomElement){
-                    // Check if the img src has changed
-                    // If it has we will need to do some resizing/recalc again
-                    var hasImageSrcChanged = false;
-
-                    if(img.url !==  editor.dom.getAttrib(imgDomElement, "src")){
-                        hasImageSrcChanged = true;
+                // We need to create a NEW DOM <img> element to insert
+                // setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
+                var data = {
+                    alt: img.altText || "",
+                    src: (img.url) ? img.url : "nothing.jpg",
+                    id: "__mcenew",
+                    "data-udi": img.udi,
+                    "data-caption": img.caption
+                };
+                var newImage = editor.dom.createHTML('img', data);
+                var parentElement = editor.selection.getNode().parentElement;
+                    
+                if (img.caption) {
+                    var figCaption = editor.dom.createHTML('figcaption', {}, img.caption);
+                    var combined = newImage + figCaption;
+                        
+                    if (parentElement.nodeName !== 'FIGURE') {
+                        var fragment = editor.dom.createHTML('figure', {}, combined);
+                        editor.selection.setContent(fragment);
                     }
-
-                    // If null/undefinied it will remove the attribute
-                    editor.dom.setAttrib(imgDomElement, "alt", img.altText);
-
-                    // It's possible to pick a NEW image - so need to ensure this gets updated
-                    if(img.udi){
-                        editor.dom.setAttrib(imgDomElement, "data-udi", img.udi);
+                    else {
+                        parentElement.innerHTML = combined;
                     }
-
-                    // It's possible to pick a NEW image - so need to ensure this gets updated
-                    if(img.url){
-                        editor.dom.setAttrib(imgDomElement, "src", img.url);
-                    }
-
-                    // Remove width & height attributes (ONLY if imgSrc changed)
-                    // So native image size is used as this needed to re-calc width & height
-                    // For the function sizeImageInEditor() & apply the image resizing querystrings etc..
-                    if(hasImageSrcChanged){
-                        editor.dom.setAttrib(imgDomElement, "width", null);
-                        editor.dom.setAttrib(imgDomElement, "height", null);
-
-                        //Re-calc the image dimensions
-                        sizeImageInEditor(editor, imgDomElement, img.url);
-                    }
-
-                } else{
-                    // We need to create a NEW DOM <img> element to insert
-                    // setting an attribute of ID to __mcenew, so we can gather a reference to the node, to be able to update its size accordingly to the size of the image.
-                    var data = {
-                        alt: img.altText || "",
-                        src: (img.url) ? img.url : "nothing.jpg",
-                        id: "__mcenew",
-                        "data-udi": img.udi
-                    };
-
-                    editor.selection.setContent(editor.dom.createHTML('img', data));
-
-                    // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
-                    $timeout(function () {
-
-                        var imgElm = editor.dom.get("__mcenew");
-                        editor.dom.setAttrib(imgElm, "id", null);
-
-                        // When image is loaded we are ready to call sizeImageInEditor.
-                        var onImageLoaded = function() {
-                            sizeImageInEditor(editor, imgElm, img.url);
-                            editor.fire("Change");
-                        }
-
-                        // Check if image already is loaded.
-                        if(imgElm.complete === true) {
-                            onImageLoaded();
-                        } else {
-                            imgElm.onload = onImageLoaded;
-                        }
-
-                    });
-
                 }
+                else {
+                    //if caption is removed, remove the figure element
+                    if (parentElement.nodeName === 'FIGURE') {
+                        parentElement.parentElement.innerHTML = newImage;
+                    }
+                    else {
+                        editor.selection.setContent(newImage);
+                    }
+                }
+                  
+                // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
+                $timeout(function () {
+
+                    var imgElm = editor.dom.get("__mcenew");
+                    editor.dom.setAttrib(imgElm, "id", null);
+
+                    // When image is loaded we are ready to call sizeImageInEditor.
+                    var onImageLoaded = function() {
+                        sizeImageInEditor(editor, imgElm, img.url);
+                        editor.fire("Change");
+                    }
+
+                    // Check if image already is loaded.
+                    if(imgElm.complete === true) {
+                        onImageLoaded();
+                    } else {
+                        imgElm.onload = onImageLoaded;
+                    }
+
+                });
+                
             }
         },
 
@@ -1226,6 +1218,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.saveAndPublish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1272,11 +1270,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             function insertLink() {
                 if (anchorElm) {
                     editor.dom.setAttribs(anchorElm, createElemAttributes());
-
                     editor.selection.select(anchorElm);
                     editor.execCommand('mceEndTyping');
                 } else {
-                    editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    var selectedContent = editor.selection.getContent();
+                    // If there is no selected content, we can't insert a link
+                    // as TinyMCE needs selected content for this, so instead we
+                    // create a new dom element and insert it, using the chosen
+                    // link name as the content.
+                    if (selectedContent !== "") {
+                        editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    } else {
+                        // Using the target url as a fallback, as href might be confusing with a local link
+                        var linkContent = typeof target.name !== "undefined" && target.name !== "" ? target.name : target.url
+                        var domElement = editor.dom.createHTML("a", createElemAttributes(), linkContent);
+                        editor.execCommand('mceInsertContent', false, domElement);
+                    }
                 }
             }
 
@@ -1496,6 +1505,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     });
 
                 }
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    /** prevent injecting arbitrary JavaScript execution in on-attributes. */
+                    const allNodes = Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    allNodes.forEach(node => {
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            if(node.attributes[i].name.indexOf("on") === 0) {
+                                node.removeAttribute(node.attributes[i].name)
+                            }
+                        }
+                    });
+                }
+
             });
 
             args.editor.on('init', function (e) {
@@ -1506,6 +1528,60 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);
+
+
+                /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+                 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
+                 * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+                 */
+                const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
+                const parseUri = function() {
+                    // Encapsulated JS logic.
+                    const safeSvgDataUrlElements = [ 'img', 'video' ];
+                    const scriptUriRegExp = /((java|vb)script|mhtml):/i;
+                    const trimRegExp = /[\s\u0000-\u001F]+/g;
+                    const isInvalidUri = (uri, tagName) => {
+                        if (/^data:image\//i.test(uri)) {
+                            return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+                        } else {
+                            return /^data:/i.test(uri);
+                        }
+                    };
+
+                    return function parseUri(uri, tagName) {
+                        uri = uri.replace(trimRegExp, '');
+                        try {
+                            // Might throw malformed URI sequence
+                            uri = decodeURIComponent(uri);
+                        } catch (ex) {
+                            // Fallback to non UTF-8 decoder
+                            uri = unescape(uri);
+                        }
+
+                        if (scriptUriRegExp.test(uri)) {
+                            return;
+                        }
+
+                        if (isInvalidUri(uri, tagName)) {
+                            return;
+                        }
+
+                        return uri;
+                    }
+                }();
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
+                        nodes.forEach(function(node) {
+                            node.attributes.forEach(function(attr) {
+                                const attrName = attr.name.toLowerCase();
+                                if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
+                                    attr.value = parseUri(attr.value, node.name);
+                                }
+                            });
+                        });
+                    });
+                }
 
                 //start watching the value
                 startWatch();
@@ -1522,6 +1598,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             args.editor.on('blur', function (e) {
                 syncContent();
             });
+
+            // When the element is removed from the DOM, we need to terminate
+            // any active watchers to ensure scopes are disposed and do not leak.
+            // No need to sync content as that has already happened.
+            args.editor.on('remove', () => stopWatch());
 
             args.editor.on('ObjectResized', function (e) {
                 var srcAttr = $(e.target).attr("src");

@@ -1,22 +1,48 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
+    /// <remarks>
+    /// <para>
+    /// This attribute is odd because it applies at class level where some methods may use it whilst others don't.
+    /// </para>
+    ///
+    /// <para>
+    /// What we should probably have (if we really even need something like this at all) is an attribute for method level.
+    ///
+    /// <example>
+    /// <code>
+    ///
+    /// [HasParameterFromUriOrBodyOfType("ids", typeof(Guid[]))]
+    /// public IActionResult GetByIds([FromJsonPath] Guid[] ids) { }
+    ///
+    /// [HasParameterFromUriOrBodyOfType("ids", typeof(int[]))]
+    /// public IActionResult GetByIds([FromJsonPath] int[] ids) { }
+    /// </code>
+    /// </example>
+    /// </para>
+    ///
+    /// <para>
+    /// That way we wouldn't need confusing things like Accept returning true when action name doesn't even match attribute metadata.
+    /// </para>
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     internal class ParameterSwapControllerActionSelectorAttribute : Attribute, IActionConstraint
     {
+
         private readonly string _actionName;
         private readonly string _parameterName;
         private readonly Type[] _supportedTypes;
-        private string _requestBody;
 
         public ParameterSwapControllerActionSelectorAttribute(string actionName, string parameterName, params Type[] supportedTypes)
         {
@@ -33,10 +59,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (!IsValidCandidate(context.CurrentCandidate))
             {
+                // See remarks on class, required because we apply at class level
+                // and some controllers have some actions with parameter swaps and others without.
                 return true;
             }
 
-            var chosenCandidate = SelectAction(context);
+            ActionSelectorCandidate? chosenCandidate = SelectAction(context);
 
             var found = context.CurrentCandidate.Equals(chosenCandidate);
             return found;
@@ -49,23 +77,45 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return candidate;
             }
 
+            HttpContext httpContext = context.RouteContext.HttpContext;
+
             // if it's a post we can try to read from the body and bind from the json value
-            if (context.RouteContext.HttpContext.Request.Method == HttpMethod.Post.ToString())
+            if (context.RouteContext.HttpContext.Request.Method.Equals(HttpMethod.Post.Method))
             {
-                // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
-                // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
-                // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
-                // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
-                var strJson = _requestBody ??= Task.Run(() => context.RouteContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
+                JObject? postBodyJson;
 
-                var json = JsonConvert.DeserializeObject<JObject>(strJson);
+                if (httpContext.Items.TryGetValue(Constants.HttpContext.Items.RequestBodyAsJObject, out var value) && value is JObject cached)
+                {
+                    postBodyJson = cached;
+                }
+                else
+                {
+                    // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
+                    // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
+                    // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
+                    // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
+                    //
+                    // To expand on the above, if KestrelServerOptions/IISServerOptions is AllowSynchronousIO=false
+                    // And you attempt to read stream sync an InvalidOperationException is thrown with message
+                    // "Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead."
+                    var rawBody = Task.Run(() => httpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
+                    try
+                    {
+                        postBodyJson = JsonConvert.DeserializeObject<JObject>(rawBody);
+                        httpContext.Items[Constants.HttpContext.Items.RequestBodyAsJObject] = postBodyJson;
+                    }
+                    catch (JsonException)
+                    {
+                        postBodyJson = null;
+                    }
+                }
 
-                if (json == null)
+                if (postBodyJson == null)
                 {
                     return null;
                 }
 
-                var requestParam = json[_parameterName];
+                var requestParam = postBodyJson[_parameterName];
 
                 if (requestParam != null)
                 {
@@ -85,11 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 }
                             }
                         }
-                        catch (JsonReaderException)
-                        {
-                            // can't convert
-                        }
-                        catch (JsonSerializationException)
+                        catch (JsonException)
                         {
                             // can't convert
                         }
@@ -103,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private bool TryBindFromUri(ActionConstraintContext context, out ActionSelectorCandidate? foundCandidate)
         {
 
-            string requestParam = null;
+            string? requestParam = null;
             if (context.RouteContext.HttpContext.Request.Query.TryGetValue(_parameterName, out var stringValues))
             {
                 requestParam = stringValues.ToString();
@@ -134,7 +180,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var enumType = paramType.GetEnumeratedType();
 
                     var converted = requestParam.TryConvertTo(enumType ?? paramType);
-                    if (converted)
+                    if (converted.Success)
                     {
                         foundCandidate = MatchByType(paramType, context);
                         if (foundCandidate.HasValue)

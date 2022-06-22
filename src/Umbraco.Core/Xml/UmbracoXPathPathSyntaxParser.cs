@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Xml
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Core.Xml
         public static string ParseXPathQuery(
             string xpathExpression,
             int? nodeContextId,
-            Func<int, IEnumerable<string>> getPath,
+            Func<int, IEnumerable<string>?> getPath,
             Func<int, bool> publishedContentExists)
         {
 
@@ -45,20 +46,24 @@ namespace Umbraco.Cms.Core.Xml
                 return xpathExpression;
 
             //get nearest published item
-            Func<IEnumerable<string>, int> getClosestPublishedAncestor = (path =>
+            Func<IEnumerable<string>?, int> getClosestPublishedAncestor = path =>
             {
-                foreach (var i in path)
+                if (path is not null)
                 {
-                    int idAsInt;
-                    if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out idAsInt))
+                    foreach (var i in path)
                     {
-                        var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
-                        if (exists)
-                            return idAsInt;
+                        int idAsInt;
+                        if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out idAsInt))
+                        {
+                            var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
+                            if (exists)
+                                return idAsInt;
+                        }
                     }
                 }
+
                 return -1;
-            });
+            };
 
             const string rootXpath = "id({0})";
 
@@ -78,10 +83,10 @@ namespace Umbraco.Cms.Core.Xml
                 {
                     //remove the first item in the array if its the current node
                     //this happens when current is published, but we are looking for its parent specifically
-                    var path = getPath(nodeContextId.Value).ToArray();
-                    if (path[0] == nodeContextId.ToString())
+                    var path = getPath(nodeContextId.Value)?.ToArray();
+                    if (path?[0] == nodeContextId.ToString())
                     {
-                        path = path.Skip(1).ToArray();
+                        path = path?.Skip(1).ToArray();
                     }
 
                     var closestPublishedAncestorId = getClosestPublishedAncestor(path);

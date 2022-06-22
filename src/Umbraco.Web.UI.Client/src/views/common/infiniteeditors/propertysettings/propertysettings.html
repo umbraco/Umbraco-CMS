@@ -55,9 +55,11 @@
                         <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component ng-if="!model.property.locked">
 
                             <button type="button" class="btn-reset editor-placeholder" data-element="editor-add" ng-if="!model.property.editor" hotkey="alt+shift+e" ng-click="vm.openDataTypePicker(model.property)">
-                                <localize key="defaultdialogs_selectEditor"></localize>
+                                <localize key="defaultdialogs_selectEditor">Select editor</localize>
                                 <div ng-messages="model.property.editor" show-validation-on-submit>
-                                    <span class="umb-validation-label" ng-message="required">Required editor</span>
+                                    <span class="umb-validation-label" ng-message="required">
+                                        <localize key="general_required">Required</localize>
+                                    </span>
                                 </div>
                             </button>
 
@@ -87,7 +89,7 @@
 
                         <div class="umb-control-group clearfix" ng-if="!model.property.locked">
 
-                            <h5><localize key="validation_validation"></localize></h5>
+                            <h5><localize key="validation_validation">Validation</localize></h5>
 
                             <umb-toggle data-element="validation_mandatory"
                                         checked="model.property.validation.mandatory"
@@ -109,7 +111,7 @@
                                    ng-keypress="vm.submitOnEnter($event)" />
 
                             <label class="mt3">
-                                <localize key="validation_customValidation"></localize>
+                                <localize key="validation_customValidation">Custom validation</localize>
                             </label>
 
                             <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
@@ -138,7 +140,7 @@
                         </div>
                         <div class="umb-control-group clearfix" ng-if="!model.property.locked">
 
-                            <h5><localize key="contentTypeEditor_displaySettingsHeadline"></localize></h5>
+                            <h5><localize key="contentTypeEditor_displaySettingsHeadline">Appearance</localize></h5>
 
                             <umb-toggle data-element="displaySettings_labelOnTop"
                                         checked="model.property.labelOnTop"
@@ -153,7 +155,7 @@
                         </div>
                         <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
 
-                            <h5><localize key="contentTypeEditor_cultureVariantHeading"></localize></h5>
+                            <h5><localize key="contentTypeEditor_cultureVariantHeading">Allow vary by culture</localize></h5>
                             <umb-toggle data-element="permissions-allow-culture-variant"
                                         checked="model.property.allowCultureVariant"
                                         on-click="vm.toggleAllowCultureVariants()">
@@ -162,7 +164,7 @@
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowSegmentVariant">
 
-                            <h5><localize key="contentTypeEditor_segmentVariantHeading"></localize></h5>
+                            <h5><localize key="contentTypeEditor_segmentVariantHeading">Allow segmentation</localize></h5>
 
                             <umb-toggle data-element="permissions-allow-segment-variant"
                                         checked="model.property.allowSegmentVariant"
@@ -173,11 +175,11 @@
 
                         <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'memberType'">
 
-                            <h5><localize key="general_options"></localize></h5>
+                            <h5><localize key="general_options">Options</localize></h5>
 
                             <label class="mt3">
-                                <localize key="contentTypeEditor_showOnMemberProfile"></localize>
-                                <small><localize key="contentTypeEditor_showOnMemberProfileDescription"></localize></small>
+                                <localize key="contentTypeEditor_showOnMemberProfile">Show on member profile</localize>
+                                <small><localize key="contentTypeEditor_showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</localize></small>
                             </label>
 
                             <umb-toggle data-element="settings_show_member_on_profile"
@@ -186,8 +188,8 @@
                             </umb-toggle>
 
                             <label class="mt3">
-                                <localize key="contentTypeEditor_memberCanEdit"></localize>
-                                <small><localize key="contentTypeEditor_memberCanEditDescription"></localize></small>
+                                <localize key="contentTypeEditor_memberCanEdit">Member can edit</localize>
+                                <small><localize key="contentTypeEditor_memberCanEditDescription">Allow this property value to be edited by the member on their profile page</localize></small>
                             </label>
 
                             <umb-toggle data-element="settings_member_can_edit"
@@ -196,8 +198,8 @@
                             </umb-toggle>
 
                             <label class="mt3" ng-if="vm.showSensitiveData">
-                                <localize key="contentTypeEditor_isSensitiveData"></localize>
-                                <small><localize key="contentTypeEditor_isSensitiveDataDescription"></localize></small>
+                                <localize key="contentTypeEditor_isSensitiveData">Is sensitive data</localize>
+                                <small><localize key="contentTypeEditor_isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</localize></small>
                             </label>
 
                             <umb-toggle ng-if="vm.showSensitiveData" data-element="settings_is_sensitive_data"

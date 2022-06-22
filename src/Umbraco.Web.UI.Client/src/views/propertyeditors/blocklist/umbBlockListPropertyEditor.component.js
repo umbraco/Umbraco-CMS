@@ -32,10 +32,10 @@
 
         var unsubscribe = [];
         var modelObject;
-
+        
         // Property actions:
-        var copyAllBlocksAction = null;
-        var deleteAllBlocksAction = null;
+        let copyAllBlocksAction = null;
+        let deleteAllBlocksAction = null;
 
         var inlineEditing = false;
         var liveEditing = true;
@@ -65,6 +65,9 @@
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
         vm.labels = {};
+        vm.options = {
+            createFlow: false
+        };
 
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
@@ -109,21 +112,23 @@
             } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
                 scopeOfExistence = vm.umbElementEditorContent.getScope();
             }
-
+            
             copyAllBlocksAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
-                icon: "documents",
+                icon: "icon-documents",
                 method: requestCopyAllBlocks,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             deleteAllBlocksAction = {
-                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelKey: "clipboard_labelForRemoveAllEntries",
                 labelTokens: [],
-                icon: 'trash',
+                icon: "icon-trash",
                 method: requestDeleteAllBlocks,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [
@@ -380,7 +385,7 @@
 
         function editBlock(blockObject, openSettings, blockIndex, parentForm, options) {
 
-            options = options || {};
+            options = options || vm.options;
 
             // this must be set
             if (blockIndex === undefined) {
@@ -560,7 +565,9 @@
                 if (inlineEditing === true) {
                     blockObject.activate();
                 } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                    vm.options.createFlow = true;
                     blockObject.edit();
+                    vm.options.createFlow = false;
                 }
             }
         }
@@ -571,7 +578,7 @@
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
@@ -591,7 +598,7 @@
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,

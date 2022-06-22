@@ -104,8 +104,13 @@
 
                             <umb-box>
                                 <umb-box-header title="Log level"></umb-box-header>
-                                <umb-box-content class="block-form" style="font-weight:900; text-align:center; color: {{ vm.logLevelColor }}">
-                                    {{ vm.logLevel }}
+                                <umb-box-content class="block-form">
+                                    <div ng-repeat="(sink, logTypeIndex) in vm.logLevels">
+                                        <p ng-if="vm.logLevelsCount == 1" style="font-weight: 900; text-align: center; color: {{ vm.logTypeColors[logTypeIndex] }} ">{{ vm.logTypeLabels[logTypeIndex] }}</p>
+                                        <p ng-if="vm.logLevelsCount > 1">
+                                             {{sink}}: <span style="font-weight: 900; color: {{ vm.logTypeColors[logTypeIndex] }} ">{{ vm.logTypeLabels[logTypeIndex] }}</span>
+                                        </p>
+                                    </div>
                                 </umb-box-content>
                             </umb-box>
                         </div>

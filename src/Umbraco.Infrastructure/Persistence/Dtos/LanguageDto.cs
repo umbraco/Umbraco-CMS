@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.UniqueNonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(14)]
-        public string IsoCode { get; set; }
+        public string? IsoCode { get; set; }
 
         /// <summary>
         /// Gets or sets the culture name of the language.
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("languageCultureName")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(100)]
-        public string CultureName { get; set; }
+        public string? CultureName { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the language is the default language.

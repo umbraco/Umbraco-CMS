@@ -5,10 +5,10 @@
         public override bool CanMigrate(string editorAlias)
             => editorAlias == Cms.Core.Constants.PropertyEditors.Legacy.Aliases.ContentPicker2;
 
-        public override string GetNewAlias(string editorAlias)
+        public override string? GetNewAlias(string editorAlias)
             => null;
 
-        protected override object GetPreValueValue(PreValueDto preValue)
+        protected override object? GetPreValueValue(PreValueDto preValue)
         {
             if (preValue.Alias == "showOpenButton" ||
                 preValue.Alias == "ignoreUserStartNodes")

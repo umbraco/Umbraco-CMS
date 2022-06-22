@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,19 +16,21 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
-        private readonly ConcurrentDictionary<string, Lazy<object>> _items = new ConcurrentDictionary<string, Lazy<object>>();
+        private readonly ConcurrentDictionary<string, Lazy<object?>> _items = new ConcurrentDictionary<string, Lazy<object?>>();
+
+        public IEnumerable<string> Keys => _items.Keys;
 
         public int Count => _items.Count;
 
         /// <inheritdoc />
-        public object Get(string cacheKey)
+        public object? Get(string cacheKey)
         {
             _items.TryGetValue(cacheKey, out var result); // else null
-            return result == null ? null : SafeLazy.GetSafeLazyValue(result); // return exceptions as null
+            return result == null ? null : SafeLazy.GetSafeLazyValue(result!); // return exceptions as null
         }
 
         /// <inheritdoc />
-        public object Get(string cacheKey, Func<object> getCacheItem)
+        public object? Get(string cacheKey, Func<object?> getCacheItem)
         {
             var result = _items.GetOrAdd(cacheKey, k => SafeLazy.GetSafeLazy(getCacheItem));
 
@@ -46,7 +48,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public IEnumerable<object> SearchByKey(string keyStartsWith)
+        public IEnumerable<object?> SearchByKey(string keyStartsWith)
         {
             return _items
                 .Where(kvp => kvp.Key.InvariantStartsWith(keyStartsWith))
@@ -55,7 +57,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public IEnumerable<object> SearchByRegex(string regex)
+        public IEnumerable<object?> SearchByRegex(string regex)
         {
             var compiled = new Regex(regex, RegexOptions.Compiled);
             return _items

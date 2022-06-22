@@ -19,8 +19,8 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public virtual UrlInfo GetMediaUrl(IPublishedContent content,
-            string propertyAlias, UrlMode mode, string culture, Uri current)
+        public virtual UrlInfo? GetMediaUrl(IPublishedContent content,
+            string propertyAlias, UrlMode mode, string? culture, Uri current)
         {
             var prop = content.GetProperty(propertyAlias);
 
@@ -31,11 +31,11 @@ namespace Umbraco.Cms.Core.Routing
                 return null;
             }
 
-            var propType = prop.PropertyType;
+            var propType = prop?.PropertyType;
 
-            if (_mediaPathGenerators.TryGetMediaPath(propType.EditorAlias, value, out var path))
+            if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
             {
-                var url = AssembleUrl(path, current, mode);
+                var url = AssembleUrl(path!, current, mode);
                 return UrlInfo.Url(url.ToString(), culture);
             }
 

@@ -21,18 +21,24 @@ namespace Umbraco.Cms.Core.Strings
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The URL segment.</returns>
-        public string GetUrlSegment(IContentBase content, string culture = null)
+        public string? GetUrlSegment(IContentBase content, string? culture = null)
         {
-            return GetUrlSegmentSource(content, culture).ToUrlSegment(_shortStringHelper, culture);
+            return GetUrlSegmentSource(content, culture)?.ToUrlSegment(_shortStringHelper, culture);
         }
 
-        private static string GetUrlSegmentSource(IContentBase content, string culture)
+        private static string? GetUrlSegmentSource(IContentBase content, string? culture)
         {
-            string source = null;
+            string? source = null;
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
                 source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
-                source = content.GetCultureName(culture);
+            {
+                // If the name of a node has been updated, but it has not been published, the url should use the published name, not the current node name
+                // If this node has never been published (GetPublishName is null), use the unpublished name
+                source = (content is IContent document) && document.Edited && document.GetPublishName(culture) != null
+                    ? document.GetPublishName(culture)
+                    : content.GetCultureName(culture);
+            }
             return source;
         }
     }

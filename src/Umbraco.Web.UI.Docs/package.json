@@ -1,4 +1,5 @@
 {
+  "name": "docs",
   "private": true,
   "scripts": {
     "docs": "gulp docs",

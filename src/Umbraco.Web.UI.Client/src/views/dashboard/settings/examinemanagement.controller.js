@@ -9,7 +9,9 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     vm.selectedIndex = null;
     vm.selectedSearcher = null;
     vm.searchResults = null;
+    vm.showSearchResultFields = [];
 
+    vm.showSelectFieldsDialog = showSelectFieldsDialog;
     vm.showSearchResultDialog = showSearchResultDialog;
     vm.showIndexInfo = showIndexInfo;
     vm.showSearcherInfo = showSearcherInfo;
@@ -23,6 +25,35 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
     vm.goToResult = goToResult;
 
     vm.infoOverlay = null;
+
+    function showSelectFieldsDialog() {
+        if (vm.searchResults) {
+
+            // build list of available fields
+            var availableFields = [];
+            vm.searchResults.results.map(r => Object.keys(r.values).map(key => {
+                if (availableFields.indexOf(key) == -1 && key != "__NodeId" && key != "nodeName") {
+                    availableFields.push(key);
+                }
+            }));
+
+            availableFields.sort();
+
+            editorService.open({
+                title: "Fields",
+                availableFields: availableFields,
+                fieldIsSelected: function(key) {
+                    return vm.showSearchResultFields.indexOf(key) > -1;
+                },
+                toggleField: vm.toggleField,
+                size: "small",
+                view: "views/dashboard/settings/examinemanagementfields.html",
+                close: function () {
+                    editorService.close();
+                }
+            });
+        }
+    }
 
     function showSearchResultDialog(values) {
         if (vm.searchResults) {
@@ -39,6 +70,17 @@ function ExamineManagementController($http, $q, $timeout, umbRequestHelper, loca
             });
         }
     }
+
+    vm.toggleField = function(key) {
+        if (vm.showSearchResultFields.indexOf(key) > -1) {
+            vm.showSearchResultFields = vm.showSearchResultFields.filter(field => field != key);
+        }
+        else {
+            vm.showSearchResultFields.push(key);
+        }
+
+        vm.showSearchResultFields.sort();
+    };
 
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);

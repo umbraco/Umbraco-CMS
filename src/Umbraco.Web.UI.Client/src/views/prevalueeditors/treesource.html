@@ -27,7 +27,7 @@
             </button>
             <div class="mt2" ng-show="model.value.type == 'content'">
                 <umb-icon icon="icon-search" class="icon"></umb-icon>
-                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with xpath</button>
+                <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with XPath</button>
             </div>
         </div>
 
@@ -36,32 +36,37 @@
             <input type="text"
                    ng-model="model.value.query"
                    class="umb-property-editor umb-textstring"
-                   placeholder="Enter xpath query">
+                   placeholder="Enter XPath query">
 
             <ul class="unstyled list-icons mt3">
                 <li style="max-width: 600px">
                     <umb-icon icon="icon-help-alt" class="icon"></umb-icon>
-                    <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} xpath query help</button>
+                    <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} XPath query help</button>
 
                     <div class="small" ng-show="showHelp">
                         <p>
-                            Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
+                            Use an XPath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
                         </p>
 
                         <p>
-                            Placeholders finds the nearest published ID and runs its query from there, so for instance:
-
-                            <pre>$parent/newsArticle</pre>
-
-                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
+                            A placeholder finds the nearest published ID and runs its query from there, so for instance:
+                        </p>
+                        
+                        <pre>$parent/newsArticle</pre>
+                        
+                        <p>
+                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
 
                         <p>
                             Available placeholders: <br/>
-                            <code>$current</code>: current page or closest found ancestor<br/>
-                            <code>$parent</code>: parent page or closest found ancestor<br/>
-                            <code>$root</code>: root of the content tree<br/>
-                            <code>$site</code>: Ancestor node at level 1 <br/>
+                            <code>$current</code>: Current page or closest found ancestor<br/>
+                            <code>$parent</code>: Parent page or closest found ancestor<br/>
+                            <code>$root</code>: Root of the content tree<br/>
+                            <code>$site</code>: Ancestor node at level 1<br/>
+                        </p>
+                        <p>
+                            Note: The placeholder can only be used at the beginning of the query.
                         </p>
                     </div>
                 </li>

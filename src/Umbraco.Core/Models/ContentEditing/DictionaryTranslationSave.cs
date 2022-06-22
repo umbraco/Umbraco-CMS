@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Gets or sets the ISO code.
         /// </summary>
         [DataMember(Name = "isoCode")]
-        public string IsoCode { get; set; }
+        public string? IsoCode { get; set; }
 
         /// <summary>
         /// Gets or sets the translation.
         /// </summary>
         [DataMember(Name = "translation")]
-        public string Translation { get; set; }
+        public string Translation { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the language id.

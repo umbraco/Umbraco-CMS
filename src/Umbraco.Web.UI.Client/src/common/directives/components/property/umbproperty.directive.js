@@ -75,7 +75,21 @@
                 // inheritance is (i.e.infinite editing)
                 var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "UmbPropertyController");
                 vm.parentUmbProperty = found ? found.vm : null;
+          }
+
+          if (vm.property.description) {
+            // split by lines containing only '--'
+            var descriptionParts = vm.property.description.split(/^--$/gim);
+            if (descriptionParts.length > 1) {
+              // if more than one part, we have an extended description,
+              // combine to one extended description, and remove leading linebreak
+              vm.property.extendedDescription = descriptionParts.splice(1).join("--").substring(1);
+              vm.property.extendedDescriptionVisible = false;
+
+              // set propertydescription to first part, and remove trailing linebreak
+              vm.property.description = descriptionParts[0].slice(0, -1);
             }
+          }
         }
 
     }

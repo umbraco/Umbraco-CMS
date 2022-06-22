@@ -33,15 +33,17 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         /// <summary>
         /// Initializes a new instance of the <see cref="AutoModelsNotificationHandler"/> class.
         /// </summary>
+        
         public AutoModelsNotificationHandler(
             ILogger<AutoModelsNotificationHandler> logger,
-            IOptions<ModelsBuilderSettings> config,
+            IOptionsMonitor<ModelsBuilderSettings> config,
             ModelsGenerator modelGenerator,
             ModelsGenerationError mbErrors,
             IMainDom mainDom)
         {
             _logger = logger;
-            _config = config.Value ?? throw new ArgumentNullException(nameof(config));
+            //We cant use IOptionsSnapshot here, cause this is used in the Core runtime, and that cannot use a scoped service as it has no scope
+            _config = config.CurrentValue ?? throw new ArgumentNullException(nameof(config));
             _modelGenerator = modelGenerator;
             _mbErrors = mbErrors;
             _mainDom = mainDom;

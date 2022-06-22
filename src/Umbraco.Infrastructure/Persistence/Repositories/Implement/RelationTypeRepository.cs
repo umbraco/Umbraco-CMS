@@ -9,10 +9,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -33,16 +33,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,RelationType>
 
-        protected override IRelationType PerformGet(int id)
+        protected override IRelationType? PerformGet(int id)
         {
             // use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Id == id);
+            return GetMany()?.FirstOrDefault(x => x.Id == id);
         }
 
-        public IRelationType Get(Guid id)
+        public IRelationType? Get(Guid id)
         {
             // use the underlying GetAll which will force cache all content types
-            return GetMany().FirstOrDefault(x => x.Key == id);
+            return GetMany()?.FirstOrDefault(x => x.Key == id);
         }
 
         public bool Exists(Guid id)
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Get(id) != null;
         }
 
-        protected override IEnumerable<IRelationType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IRelationType> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false);
 
@@ -59,10 +59,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return dtos.Select(x => DtoToEntity(x));
         }
 
-        public IEnumerable<IRelationType> GetMany(params Guid[] ids)
+        public IEnumerable<IRelationType> GetMany(params Guid[]? ids)
         {
             // should not happen due to the cache policy
-            if (ids.Any())
+            if (ids?.Any() ?? false)
                 throw new NotImplementedException();
 
             return GetMany(new int[0]);

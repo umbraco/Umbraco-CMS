@@ -6,6 +6,7 @@
                  class="umb-property-editor umb-textstring textstring flx-i"
                  ng-trim="false"
                  ng-keyup="addRemoveOnKeyDown($event, $index)"
+                 ng-paste="paste($event, $index)"
                  focus-when="{{item.hasFocus}}" />
 
           <div class="icon-wrapper">

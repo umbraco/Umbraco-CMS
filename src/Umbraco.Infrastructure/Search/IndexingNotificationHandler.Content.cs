@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             // Used to track permanent deletions so we can bulk delete from the index
             // when needed. For example, when emptying the recycle bin, else it will
             // individually update the index which will be much slower.
-            HashSet<int> deleteBatch = null;
+            HashSet<int>? deleteBatch = null;
 
             foreach (var payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
             {
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Infrastructure.Search
                         continue;
                     }
 
-                    IContent published = null;
+                    IContent? published = null;
                     if (content.Published && _contentService.IsPathPublished(content))
                     {
                         published = content;

@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core
         /// or
         /// Value type <typeparamref name="TValue" /> does not match property <typeparamref name="TDeclaring" />.<paramref name="propertyName" /> type.</exception>
         /// <exception cref="InvalidOperationException">Could not find property getter for <typeparamref name="TDeclaring" />.<paramref name="propertyName" />.</exception>
-        public static Func<TDeclaring, TValue> EmitPropertyGetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
+        public static Func<TDeclaring, TValue>? EmitPropertyGetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
             if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Core
         /// or
         /// Value type <typeparamref name="TValue" /> does not match property <typeparamref name="TDeclaring" />.<paramref name="propertyName" /> type.</exception>
         /// <exception cref="InvalidOperationException">Could not find property setter for <typeparamref name="TDeclaring" />.<paramref name="propertyName" />.</exception>
-        public static Action<TDeclaring, TValue> EmitPropertySetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
+        public static Action<TDeclaring, TValue>? EmitPropertySetter<TDeclaring, TValue>(string propertyName, bool mustExist = true)
         {
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
             if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyName));
@@ -334,7 +334,7 @@ namespace Umbraco.Cms.Core
         /// <exception cref="InvalidOperationException">Occurs when the constructor does not exist and <paramref name="mustExist"/> is <c>true</c>.</exception>
         /// <exception cref="ArgumentException">Occurs when <typeparamref name="TLambda"/> is not a Func or when <paramref name="declaring"/>
         /// is specified and does not match the function's returned type.</exception>
-        public static TLambda EmitConstructor<TLambda>(bool mustExist = true, Type declaring = null)
+        public static TLambda? EmitConstructor<TLambda>(bool mustExist = true, Type? declaring = null)
         {
             var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
@@ -416,7 +416,7 @@ namespace Umbraco.Cms.Core
             return EmitConstructor<TLambda>(lambdaReturned, lambdaParameters, ctor);
         }
 
-        private static TLambda EmitConstructor<TLambda>(Type declaring, Type[] lambdaParameters, ConstructorInfo ctor)
+        private static TLambda EmitConstructor<TLambda>(Type? declaring, Type[] lambdaParameters, ConstructorInfo ctor)
         {
             // gets the method argument types
             var ctorParameters = GetParameters(ctor);
@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Core
         /// <remarks>
         /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        public static TLambda EmitMethod<TDeclaring, TLambda>(string methodName, bool mustExist = true)
+        public static TLambda? EmitMethod<TDeclaring, TLambda>(string methodName, bool mustExist = true)
         {
             return EmitMethod<TLambda>(typeof(TDeclaring), methodName, mustExist);
         }
@@ -475,7 +475,7 @@ namespace Umbraco.Cms.Core
         /// <remarks>
         /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        public static TLambda EmitMethod<TLambda>(Type declaring, string methodName, bool mustExist = true)
+        public static TLambda? EmitMethod<TLambda>(Type declaring, string methodName, bool mustExist = true)
         {
             if (methodName == null) throw new ArgumentNullException(nameof(methodName));
             if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
@@ -569,7 +569,7 @@ namespace Umbraco.Cms.Core
         /// <remarks>
         /// The method arguments are determined by <typeparamref name="TLambda" /> generic arguments.
         /// </remarks>
-        public static TLambda EmitMethod<TLambda>(string methodName, bool mustExist = true)
+        public static TLambda? EmitMethod<TLambda>(string methodName, bool mustExist = true)
         {
             if (methodName == null) throw new ArgumentNullException(nameof(methodName));
             if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(methodName));
@@ -578,7 +578,7 @@ namespace Umbraco.Cms.Core
             var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);
 
             // get the method infos
-            var method = lambdaDeclaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
+            var method = lambdaDeclaring?.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
             if (method == null || isFunction && method.ReturnType != lambdaReturned)
             {
                 if (!mustExist) return default;
@@ -591,14 +591,14 @@ namespace Umbraco.Cms.Core
 
         // lambdaReturned = the lambda returned type (can be void)
         // lambdaArgTypes = the lambda argument types
-        private static TLambda EmitMethod<TLambda>(Type lambdaDeclaring, Type lambdaReturned, Type[] lambdaParameters, MethodInfo method)
+        private static TLambda EmitMethod<TLambda>(Type? lambdaDeclaring, Type lambdaReturned, Type[] lambdaParameters, MethodInfo method)
         {
             // non-static methods need the declaring type as first arg
             var parameters = lambdaParameters;
             if (!method.IsStatic)
             {
                 parameters = new Type[lambdaParameters.Length + 1];
-                parameters[0] = lambdaDeclaring ?? method.DeclaringType;
+                parameters[0] = lambdaDeclaring ?? method.DeclaringType!;
                 Array.Copy(lambdaParameters, 0, parameters, 1, lambdaParameters.Length);
             }
 
@@ -624,7 +624,7 @@ namespace Umbraco.Cms.Core
         //  hence, when !isStatic, the lambda cannot be a simple Action, as it requires at least one generic argument
         // when isFunction, the last generic argument of the lambda is the returned type
         // everything in between is parameters
-        private static (Type Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, bool isFunction)
+        private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, bool isFunction)
         {
             var typeLambda = typeof(TLambda);
 
@@ -648,7 +648,7 @@ namespace Umbraco.Cms.Core
         //  hence, when !isStatic, the lambda cannot be a simple Action, as it requires at least one generic argument
         // when isFunction, the last generic argument of the lambda is the returned type
         // everything in between is parameters
-        private static (Type Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, out bool isFunction)
+        private static (Type? Declaring, Type[] Parameters, Type Returned) AnalyzeLambda<TLambda>(bool isStatic, out bool isFunction)
         {
             isFunction = false;
 
@@ -695,7 +695,7 @@ namespace Umbraco.Cms.Core
             return (declaring, parameters, returned);
         }
 
-        private static (DynamicMethod, ILGenerator) CreateIlGenerator(Module module, Type[] arguments, Type returned)
+        private static (DynamicMethod, ILGenerator) CreateIlGenerator(Module? module, Type[] arguments, Type? returned)
         {
             if (module == null) throw new ArgumentNullException(nameof(module));
             var dm = new DynamicMethod(string.Empty, returned, arguments, module, true);
@@ -718,7 +718,7 @@ namespace Umbraco.Cms.Core
             var types = new Type[parameters.Length + (withDeclaring ? 1 : 0)];
             var i = 0;
             if (withDeclaring)
-                types[i++] = method.DeclaringType;
+                types[i++] = method.DeclaringType!;
             foreach (var parameter in parameters)
                 types[i++] = parameter.ParameterType;
             return types;
@@ -832,8 +832,8 @@ namespace Umbraco.Cms.Core
         //    return o is T t ? t : (T) System.Convert.ChangeType(o, typeof(T));
         //}
 
-        private static MethodInfo _convertMethod;
-        private static MethodInfo _getTypeFromHandle;
+        private static MethodInfo? _convertMethod;
+        private static MethodInfo? _getTypeFromHandle;
 
         private static void Convert(this ILGenerator ilgen, Type type)
         {
@@ -895,15 +895,18 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        private static void ThrowInvalidLambda<TLambda>(string methodName, Type returned, Type[] args)
+        private static void ThrowInvalidLambda<TLambda>(string methodName, Type? returned, Type[] args)
         {
             throw new ArgumentException($"Lambda {typeof(TLambda)} does not match {methodName}({string.Join(", ", (IEnumerable<Type>) args)}):{returned}.", nameof(TLambda));
         }
 
-        private static void CallMethod(this ILGenerator ilgen, MethodInfo method)
+        private static void CallMethod(this ILGenerator ilgen, MethodInfo? method)
         {
-            var virt = !method.IsStatic && (method.IsVirtual || !method.IsFinal);
-            ilgen.Emit(virt ? OpCodes.Callvirt : OpCodes.Call, method);
+            if (method is not null)
+            {
+                var virt = !method.IsStatic && (method.IsVirtual || !method.IsFinal);
+                ilgen.Emit(virt ? OpCodes.Callvirt : OpCodes.Call, method);
+            }
         }
 
         private static void Return(this ILGenerator ilgen)

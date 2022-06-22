@@ -22,6 +22,7 @@
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
         var isElement = $routeParams.iselement;
+        var icon = $routeParams.icon;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var documentTypeIcon = "";
@@ -72,6 +73,7 @@
                 if (create && !documentTypeId) documentTypeId = -1;
                 noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
+                icon = $scope.model.icon;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
@@ -385,14 +387,22 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
+
             // set isElement checkbox by default
             if (isElement) {
                 contentType.isElement = true;
             }
+
+            // set icon if one is provided
+            if (icon !== null && icon !== undefined) {
+                contentType.icon = icon;
+            }
+
             // set vary by culture checkbox by default
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;
             }
+
             // convert icons for content type
             convertLegacyIcons(contentType);
 

@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
@@ -21,24 +22,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     {
         public TagRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TagRepository> logger)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+        }
 
         #region Manage Tag Entities
 
         /// <inheritdoc />
-        protected override ITag PerformGet(int id)
+        protected override ITag? PerformGet(int id)
         {
-            var sql = Sql().Select<TagDto>().From<TagDto>().Where<TagDto>(x => x.Id == id);
-            var dto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            Sql<ISqlContext> sql = Sql().Select<TagDto>().From<TagDto>().Where<TagDto>(x => x.Id == id);
+            TagDto? dto = Database.Fetch<TagDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return dto == null ? null : TagFactory.BuildEntity(dto);
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<ITag> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ITag> PerformGetAll(params int[]? ids)
         {
-            var dtos = ids.Length == 0
+            IEnumerable<TagDto> dtos = ids?.Length == 0
                 ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
-                : Database.FetchByGroups<TagDto, int>(ids, 2000, batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
+                : Database.FetchByGroups<TagDto, int>(ids!, Constants.Sql.MaxParameterCount,
+                    batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
             return dtos.Select(TagFactory.BuildEntity).ToList();
         }
@@ -46,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override IEnumerable<ITag> PerformGetByQuery(IQuery<ITag> query)
         {
-            var sql = Sql().Select<TagDto>().From<TagDto>();
+            Sql<ISqlContext> sql = Sql().Select<TagDto>().From<TagDto>();
             var translator = new SqlTranslator<ITag>(sql, query);
             sql = translator.Translate();
 
@@ -54,30 +57,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-        {
-            return isCount ? Sql().SelectCount().From<TagDto>() : GetBaseQuery();
-        }
+        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
+            isCount ? Sql().SelectCount().From<TagDto>() : GetBaseQuery();
 
-        private Sql<ISqlContext> GetBaseQuery()
-        {
-            return Sql().Select<TagDto>().From<TagDto>();
-        }
+        private Sql<ISqlContext> GetBaseQuery() => Sql().Select<TagDto>().From<TagDto>();
 
         /// <inheritdoc />
-        protected override string GetBaseWhereClause()
-        {
-            return "id = @id";
-        }
+        protected override string GetBaseWhereClause() => "id = @id";
 
         /// <inheritdoc />
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
-                {
-                    "DELETE FROM cmsTagRelationship WHERE tagId = @id",
-                    "DELETE FROM cmsTags WHERE id = @id"
-                };
+            {
+                "DELETE FROM cmsTagRelationship WHERE tagId = @id", "DELETE FROM cmsTags WHERE id = @id"
+            };
             return list;
         }
 
@@ -86,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             entity.AddingEntity();
 
-            var dto = TagFactory.BuildDto(entity);
+            TagDto dto = TagFactory.BuildDto(entity);
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
@@ -98,7 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             entity.UpdatingEntity();
 
-            var dto = TagFactory.BuildDto(entity);
+            TagDto dto = TagFactory.BuildDto(entity);
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
@@ -113,18 +107,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public void Assign(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags = true)
         {
             // to no-duplicates array
-            var tagsA = tags.Distinct(new TagComparer()).ToArray();
+            ITag[] tagsA = tags.Distinct(new TagComparer()).ToArray();
 
             // replacing = clear all
             if (replaceTags)
             {
-                var sql0 = Sql().Delete<TagRelationshipDto>().Where<TagRelationshipDto>(x => x.NodeId == contentId && x.PropertyTypeId == propertyTypeId);
+                Sql<ISqlContext> sql0 = Sql().Delete<TagRelationshipDto>()
+                    .Where<TagRelationshipDto>(x => x.NodeId == contentId && x.PropertyTypeId == propertyTypeId);
                 Database.Execute(sql0);
             }
 
             // no tags? nothing else to do
             if (tagsA.Length == 0)
+            {
                 return;
+            }
 
             // tags
             // using some clever logic (?) to insert tags that don't exist in 1 query
@@ -163,7 +160,8 @@ WHERE r.tagId IS NULL";
             var tagSetSql = GetTagSet(tags);
             var group = SqlSyntax.GetQuotedColumnName("group");
 
-            var deleteSql = $@"DELETE FROM cmsTagRelationship WHERE nodeId = {contentId} AND propertyTypeId = {propertyTypeId} AND tagId IN (
+            var deleteSql =
+                $@"DELETE FROM cmsTagRelationship WHERE nodeId = {contentId} AND propertyTypeId = {propertyTypeId} AND tagId IN (
                             SELECT id FROM cmsTags INNER JOIN {tagSetSql} ON (
                                     tagSet.tag = cmsTags.tag AND tagSet.{group} = cmsTags.{group} AND COALESCE(tagSet.languageId, -1) = COALESCE(cmsTags.languageId, -1)
                                 )
@@ -173,18 +171,15 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public void RemoveAll(int contentId, int propertyTypeId)
-        {
-            Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
-                new { nodeId = contentId, propertyTypeId = propertyTypeId });
-        }
+        public void RemoveAll(int contentId, int propertyTypeId) =>
+            Database.Execute(
+                "DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId AND propertyTypeId = @propertyTypeId",
+                new { nodeId = contentId, propertyTypeId });
 
         /// <inheritdoc />
-        public void RemoveAll(int contentId)
-        {
+        public void RemoveAll(int contentId) =>
             Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
                 new { nodeId = contentId });
-        }
 
         // this is a clever way to produce an SQL statement like this:
         //
@@ -204,12 +199,27 @@ WHERE r.tagId IS NULL";
 
             sql.Append("(");
 
-            foreach (var tag in tags)
+            foreach (ITag tag in tags)
             {
-                if (first) first = false;
-                else sql.Append(" UNION ");
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    sql.Append(" UNION ");
+                }
 
-                sql.Append("SELECT N'");
+                // HACK: SQLite (or rather SQL server setup was a hack)
+                if (SqlContext.DatabaseType.IsSqlServer())
+                {
+                    sql.Append("SELECT N'");
+                }
+                else
+                {
+                    sql.Append("SELECT '");
+                }
+
                 sql.Append(SqlSyntax.EscapeString(tag.Text));
                 sql.Append("' AS tag, '");
                 sql.Append(SqlSyntax.EscapeString(tag.Group));
@@ -217,9 +227,14 @@ WHERE r.tagId IS NULL";
                 sql.Append(group);
                 sql.Append(" , ");
                 if (tag.LanguageId.HasValue)
+                {
                     sql.Append(tag.LanguageId);
+                }
                 else
+                {
                     sql.Append("NULL");
+                }
+
                 sql.Append(" AS languageId");
             }
 
@@ -231,19 +246,17 @@ WHERE r.tagId IS NULL";
         // used to run Distinct() on tags
         private class TagComparer : IEqualityComparer<ITag>
         {
-            public bool Equals(ITag x, ITag y)
-            {
-                return ReferenceEquals(x, y) // takes care of both being null
-                       || x != null && y != null && x.Text == y.Text && x.Group == y.Group && x.LanguageId == y.LanguageId;
-            }
+            public bool Equals(ITag? x, ITag? y) =>
+                ReferenceEquals(x, y) // takes care of both being null
+                || (x != null && y != null && x.Text == y.Text && x.Group == y.Group && x.LanguageId == y.LanguageId);
 
             public int GetHashCode(ITag obj)
             {
                 unchecked
                 {
-                    var h = obj.Text.GetHashCode();
-                    h = h * 397 ^ obj.Group.GetHashCode();
-                    h = h * 397 ^ (obj.LanguageId?.GetHashCode() ?? 0);
+                    var h = obj.Text?.GetHashCode() ?? 1;
+                    h = (h * 397) ^ obj.Group?.GetHashCode() ?? 0;
+                    h = (h * 397) ^ (obj.LanguageId?.GetHashCode() ?? 0);
                     return h;
                 }
             }
@@ -261,19 +274,19 @@ WHERE r.tagId IS NULL";
         private class TaggedEntityDto
         {
             public int NodeId { get; set; }
-            public string PropertyTypeAlias { get; set; }
+            public string? PropertyTypeAlias { get; set; }
             public int PropertyTypeId { get; set; }
             public int TagId { get; set; }
-            public string TagText { get; set; }
-            public string TagGroup { get; set; }
+            public string TagText { get; set; } = null!;
+            public string TagGroup { get; set; } = null!;
             public int? TagLanguage { get; set; }
         }
         // ReSharper restore UnusedAutoPropertyAccessor.Local
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityByKey(Guid key)
+        public TaggedEntity? GetTaggedEntityByKey(Guid key)
         {
-            var sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
+            Sql<ISqlContext> sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
 
             sql = sql
                 .Where<NodeDto>(dto => dto.UniqueId == key);
@@ -282,9 +295,9 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public TaggedEntity GetTaggedEntityById(int id)
+        public TaggedEntity? GetTaggedEntityById(int id)
         {
-            var sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
+            Sql<ISqlContext> sql = GetTaggedEntitiesSql(TaggableObjectTypes.All, "*");
 
             sql = sql
                 .Where<NodeDto>(dto => dto.NodeId == id);
@@ -293,9 +306,10 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string group,
+            string? culture = null)
         {
-            var sql = GetTaggedEntitiesSql(objectType, culture);
+            Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
             sql = sql
                 .Where<TagDto>(x => x.Group == group);
@@ -304,30 +318,37 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string group = null, string culture = null)
+        public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag,
+            string? group = null, string? culture = null)
         {
-            var sql = GetTaggedEntitiesSql(objectType, culture);
+            Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
             sql = sql
                 .Where<TagDto>(dto => dto.Text == tag);
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             return Map(Database.Fetch<TaggedEntityDto>(sql));
         }
 
-        private Sql<ISqlContext> GetTaggedEntitiesSql(TaggableObjectTypes objectType, string culture)
+        private Sql<ISqlContext> GetTaggedEntitiesSql(TaggableObjectTypes objectType, string? culture)
         {
-            var sql = Sql()
+            Sql<ISqlContext> sql = Sql()
                 .Select<TagRelationshipDto>(x => Alias(x.NodeId, "NodeId"))
-                .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyTypeAlias"), x => Alias(x.Id, "PropertyTypeId"))
-                .AndSelect<TagDto>(x => Alias(x.Id, "TagId"), x => Alias(x.Text, "TagText"), x => Alias(x.Group, "TagGroup"), x => Alias(x.LanguageId, "TagLanguage"))
+                .AndSelect<PropertyTypeDto>(x => Alias(x.Alias, "PropertyTypeAlias"),
+                    x => Alias(x.Id, "PropertyTypeId"))
+                .AndSelect<TagDto>(x => Alias(x.Id, "TagId"), x => Alias(x.Text, "TagText"),
+                    x => Alias(x.Group, "TagGroup"), x => Alias(x.LanguageId, "TagLanguage"))
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>().On<TagDto, TagRelationshipDto>((tag, rel) => tag.Id == rel.TagId)
-                .InnerJoin<ContentDto>().On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
-                .InnerJoin<PropertyTypeDto>().On<TagRelationshipDto, PropertyTypeDto>((rel, prop) => rel.PropertyTypeId == prop.Id)
+                .InnerJoin<ContentDto>()
+                .On<TagRelationshipDto, ContentDto>((rel, content) => rel.NodeId == content.NodeId)
+                .InnerJoin<PropertyTypeDto>()
+                .On<TagRelationshipDto, PropertyTypeDto>((rel, prop) => rel.PropertyTypeId == prop.Id)
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>((content, node) => content.NodeId == node.NodeId);
 
             if (culture == null)
@@ -344,20 +365,19 @@ WHERE r.tagId IS NULL";
 
             if (objectType != TaggableObjectTypes.All)
             {
-                var nodeObjectType = GetNodeObjectType(objectType);
+                Guid nodeObjectType = GetNodeObjectType(objectType);
                 sql = sql.Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
             }
 
             return sql;
         }
 
-        private static IEnumerable<TaggedEntity> Map(IEnumerable<TaggedEntityDto> dtos)
-        {
-            return dtos.GroupBy(x => x.NodeId).Select(dtosForNode =>
+        private static IEnumerable<TaggedEntity> Map(IEnumerable<TaggedEntityDto> dtos) =>
+            dtos.GroupBy(x => x.NodeId).Select(dtosForNode =>
             {
                 var taggedProperties = dtosForNode.GroupBy(x => x.PropertyTypeId).Select(dtosForProperty =>
                 {
-                    string propertyTypeAlias = null;
+                    string? propertyTypeAlias = null;
                     var tags = dtosForProperty.Select(dto =>
                     {
                         propertyTypeAlias = dto.PropertyTypeAlias;
@@ -368,25 +388,27 @@ WHERE r.tagId IS NULL";
 
                 return new TaggedEntity(dtosForNode.Key, taggedProperties);
             }).ToList();
-        }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string? group = null,
+            string? culture = null)
         {
-            var sql = GetTagsSql(culture, true);
+            Sql<ISqlContext> sql = GetTagsSql(culture, true);
 
             AddTagsSqlWhere(sql, culture);
 
             if (objectType != TaggableObjectTypes.All)
             {
-                var nodeObjectType = GetNodeObjectType(objectType);
+                Guid nodeObjectType = GetNodeObjectType(objectType);
                 sql = sql
                     .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
             }
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             sql = sql
                 .GroupBy<TagDto>(x => x.Id, x => x.Text, x => x.Group, x => x.LanguageId);
@@ -395,9 +417,9 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(int contentId, string? group = null, string? culture = null)
         {
-            var sql = GetTagsSql(culture);
+            Sql<ISqlContext> sql = GetTagsSql(culture);
 
             AddTagsSqlWhere(sql, culture);
 
@@ -405,16 +427,18 @@ WHERE r.tagId IS NULL";
                 .Where<NodeDto>(dto => dto.NodeId == contentId);
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             return ExecuteTagsQuery(sql);
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string? group = null, string? culture = null)
         {
-            var sql = GetTagsSql(culture);
+            Sql<ISqlContext> sql = GetTagsSql(culture);
 
             AddTagsSqlWhere(sql, culture);
 
@@ -422,63 +446,76 @@ WHERE r.tagId IS NULL";
                 .Where<NodeDto>(dto => dto.UniqueId == contentId);
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             return ExecuteTagsQuery(sql);
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string? group = null,
+            string? culture = null)
         {
-            var sql = GetTagsSql(culture);
+            Sql<ISqlContext> sql = GetTagsSql(culture);
 
             sql = sql
-                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, TagRelationshipDto>((prop, rel) => prop.Id == rel.PropertyTypeId)
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyTypeDto, TagRelationshipDto>((prop, rel) => prop.Id == rel.PropertyTypeId)
                 .Where<NodeDto>(x => x.NodeId == contentId)
                 .Where<PropertyTypeDto>(x => x.Alias == propertyTypeAlias);
 
             AddTagsSqlWhere(sql, culture);
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             return ExecuteTagsQuery(sql);
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string? group = null,
+            string? culture = null)
         {
-            var sql = GetTagsSql(culture);
+            Sql<ISqlContext> sql = GetTagsSql(culture);
 
             sql = sql
-                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, TagRelationshipDto>((prop, rel) => prop.Id == rel.PropertyTypeId)
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyTypeDto, TagRelationshipDto>((prop, rel) => prop.Id == rel.PropertyTypeId)
                 .Where<NodeDto>(dto => dto.UniqueId == contentId)
                 .Where<PropertyTypeDto>(dto => dto.Alias == propertyTypeAlias);
 
             AddTagsSqlWhere(sql, culture);
 
             if (group.IsNullOrWhiteSpace() == false)
+            {
                 sql = sql
                     .Where<TagDto>(dto => dto.Group == group);
+            }
 
             return ExecuteTagsQuery(sql);
         }
 
-        private Sql<ISqlContext> GetTagsSql(string culture, bool withGrouping = false)
+        private Sql<ISqlContext> GetTagsSql(string? culture, bool withGrouping = false)
         {
-            var sql = Sql()
+            Sql<ISqlContext> sql = Sql()
                 .Select<TagDto>();
 
             if (withGrouping)
+            {
                 sql = sql
                     .AndSelectCount("NodeCount");
+            }
 
             sql = sql
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>().On<TagRelationshipDto, TagDto>((rel, tag) => tag.Id == rel.TagId)
-                .InnerJoin<ContentDto>().On<ContentDto, TagRelationshipDto>((content, rel) => content.NodeId == rel.NodeId)
+                .InnerJoin<ContentDto>()
+                .On<ContentDto, TagRelationshipDto>((content, rel) => content.NodeId == rel.NodeId)
                 .InnerJoin<NodeDto>().On<NodeDto, ContentDto>((node, content) => node.NodeId == content.NodeId);
 
             if (culture != null && culture != "*")
@@ -490,7 +527,7 @@ WHERE r.tagId IS NULL";
             return sql;
         }
 
-        private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string culture)
+        private Sql<ISqlContext> AddTagsSqlWhere(Sql<ISqlContext> sql, string? culture)
         {
             if (culture == null)
             {
@@ -506,21 +543,19 @@ WHERE r.tagId IS NULL";
             return sql;
         }
 
-        private IEnumerable<ITag> ExecuteTagsQuery(Sql sql)
-        {
-            return Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity);
-        }
+        private IEnumerable<ITag> ExecuteTagsQuery(Sql sql) =>
+            Database.Fetch<TagDto>(sql).Select(TagFactory.BuildEntity);
 
         private Guid GetNodeObjectType(TaggableObjectTypes type)
         {
             switch (type)
             {
                 case TaggableObjectTypes.Content:
-                    return Cms.Core.Constants.ObjectTypes.Document;
+                    return Constants.ObjectTypes.Document;
                 case TaggableObjectTypes.Media:
-                    return Cms.Core.Constants.ObjectTypes.Media;
+                    return Constants.ObjectTypes.Media;
                 case TaggableObjectTypes.Member:
-                    return Cms.Core.Constants.ObjectTypes.Member;
+                    return Constants.ObjectTypes.Member;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }

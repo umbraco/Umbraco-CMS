@@ -36,6 +36,27 @@ function entityResource($q, $http, umbRequestHelper) {
     //the factory object returned
     return {
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#getSafeAlias
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Converts the given string to a safe alias
+         *
+         * ##usage
+         * <pre>
+         * entityResource.getSafeAlias(value, camelCase)
+         *    .then(function(safeAlias) {
+         *        Do stuff...
+         *    });
+         * </pre>
+         *
+         * @param {string} value the value to convert to a safe alias
+         * @param {boolean} camelCase if camel casing should be used
+         * @returns {Promise} resourcePromise object containing the safe alias.
+         *
+         */
         getSafeAlias: function (value, camelCase) {
 
             if (!value) {
@@ -125,6 +146,39 @@ function entityResource($q, $http, umbRequestHelper) {
                        "GetUrl",
                        [{ id: id }, {type: type }, {culture: culture }])),
                'Failed to retrieve url for id:' + id);
+        },
+
+        getUrlsByIds: function(ids, type, culture) {
+          var query = `type=${type}&culture=${culture || ""}`;
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByIds",
+                     query),
+                 {
+                     ids: ids
+                 }),
+             'Failed to retrieve url map for ids ' + ids);
+        },
+
+        /**
+         * @deprecated use getUrlsByIds instead.
+         */
+        getUrlsByUdis: function(udis, culture) {
+          var query = "culture=" + (culture || "");
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByIds",
+                     query),
+                 {
+                     ids: ids
+                 }),
+             'Failed to retrieve url map for ids ' + ids);
         },
 
         getUrlByUdi: function (udi, culture) {

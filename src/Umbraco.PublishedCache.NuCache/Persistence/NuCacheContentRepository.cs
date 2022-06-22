@@ -18,6 +18,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -116,9 +117,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         }
 
         public void Rebuild(
-            IReadOnlyCollection<int> contentTypeIds = null,
-            IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null)
+            IReadOnlyCollection<int>? contentTypeIds = null,
+            IReadOnlyCollection<int>? mediaTypeIds = null,
+            IReadOnlyCollection<int>? memberTypeIds = null)
         {
             IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
                 ContentCacheDataSerializerEntityType.Document
@@ -133,7 +134,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         }
 
         // assumes content tree lock
-        private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
         {
             Guid contentObjectType = Constants.ObjectTypes.Document;
 
@@ -199,7 +200,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes media tree lock
-        private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
         {
             var mediaObjectType = Constants.ObjectTypes.Media;
 
@@ -250,7 +251,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes member tree lock
-        private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
         {
             Guid memberObjectType = Constants.ObjectTypes.Member;
 
@@ -363,7 +364,7 @@ AND cmsContentNu.nodeId IS NULL
             foreach (IProperty prop in content.Properties)
             {
                 var pdatas = new List<PropertyData>();
-                foreach (IPropertyValue pvalue in prop.Values)
+                foreach (IPropertyValue pvalue in prop.Values.OrderBy(x => x.Culture))
                 {
                     // sanitize - properties should be ok but ... never knows
                     if (!prop.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment))
@@ -387,23 +388,26 @@ AND cmsContentNu.nodeId IS NULL
             // sanitize - names should be ok but ... never knows
             if (content.ContentType.VariesByCulture())
             {
-                ContentCultureInfosCollection infos = content is IContent document
+                ContentCultureInfosCollection? infos = content is IContent document
                     ? published
                         ? document.PublishCultureInfos
                         : document.CultureInfos
                     : content.CultureInfos;
 
                 // ReSharper disable once UseDeconstruction
-                foreach (ContentCultureInfos cultureInfo in infos)
+                if (infos is not null)
                 {
-                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
-                    cultureData[cultureInfo.Culture] = new CultureVariation
+                    foreach (ContentCultureInfos cultureInfo in infos)
                     {
-                        Name = cultureInfo.Name,
-                        UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
-                        Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
-                        IsDraft = cultureIsDraft
-                    };
+                        var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
+                        cultureData[cultureInfo.Culture] = new CultureVariation
+                        {
+                            Name = cultureInfo.Name,
+                            UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders, cultureInfo.Culture),
+                            Date = content.GetUpdateDate(cultureInfo.Culture) ?? DateTime.MinValue,
+                            IsDraft = cultureIsDraft
+                        };
+                    }
                 }
             }
 
@@ -429,7 +433,7 @@ AND cmsContentNu.nodeId IS NULL
         }
 
         // we want arrays, we want them all loaded, not an enumerable
-        private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
         {
             var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect, tsql =>
                 tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
@@ -537,7 +541,7 @@ AND cmsContentNu.nodeId IS NULL
         /// </summary>
         /// <param name="scope"></param>
         /// <returns></returns>
-        private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
         {
             var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesCount, tsql =>
                 tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"))
@@ -561,7 +565,7 @@ AND cmsContentNu.nodeId IS NULL
             return sql;
         }
 
-        private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
         {
             var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
                 tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
@@ -587,7 +591,7 @@ AND cmsContentNu.nodeId IS NULL
             return sql;
         }
 
-        private Sql<ISqlContext> SqlMediaSourcesCount(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlMediaSourcesCount(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
         {
             var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesCount, tsql =>
                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id")).From<NodeDto>());
@@ -667,9 +671,9 @@ AND cmsContentNu.nodeId IS NULL
             }
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids)
+        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids)
         {
-            if (!ids.Any())
+            if (!ids?.Any() ?? false)
                 yield break;
 
             var sql = SqlContentSourcesSelect()
@@ -694,7 +698,7 @@ AND cmsContentNu.nodeId IS NULL
             }
         }
 
-        public ContentNodeKit GetMediaSource(IScope scope, int id)
+        public ContentNodeKit GetMediaSource(Scoping.IScope scope, int id)
         {
             var sql = SqlMediaSourcesSelect()
                 .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
@@ -801,8 +805,8 @@ AND cmsContentNu.nodeId IS NULL
 
         private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
         {
-            ContentData d = null;
-            ContentData p = null;
+            ContentData? d = null;
+            ContentData? p = null;
 
             if (dto.Edited)
             {
@@ -820,18 +824,16 @@ AND cmsContentNu.nodeId IS NULL
                     bool published = false;
                     var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
-                    d = new ContentData
-                    {
-                        Name = dto.EditName,
-                        Published = published,
-                        TemplateId = dto.EditTemplateId,
-                        VersionId = dto.VersionId,
-                        VersionDate = dto.EditVersionDate,
-                        WriterId = dto.EditWriterId,
-                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = deserializedContent.CultureData,
-                        UrlSegment = deserializedContent.UrlSegment
-                    };
+                    d = new ContentData(
+                        dto.EditName,
+                        deserializedContent?.UrlSegment,
+                        dto.VersionId,
+                        dto.EditVersionDate,
+                        dto.EditWriterId,
+                        dto.EditTemplateId,
+                        published,
+                        deserializedContent?.PropertyData,
+                        deserializedContent?.CultureData);
                 }
             }
 
@@ -851,31 +853,23 @@ AND cmsContentNu.nodeId IS NULL
                     bool published = true;
                     var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, published);
 
-                    p = new ContentData
-                    {
-                        Name = dto.PubName,
-                        UrlSegment = deserializedContent.UrlSegment,
-                        Published = published,
-                        TemplateId = dto.PubTemplateId,
-                        VersionId = dto.VersionId,
-                        VersionDate = dto.PubVersionDate,
-                        WriterId = dto.PubWriterId,
-                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = deserializedContent.CultureData
-                    };
+                    p = new ContentData(
+                        dto.PubName,
+                        deserializedContent?.UrlSegment,
+                        dto.VersionId,
+                        dto.PubVersionDate,
+                        dto.PubWriterId,
+                        dto.PubTemplateId,
+                        published,
+                        deserializedContent?.PropertyData,
+                        deserializedContent?.CultureData);
                 }
             }
 
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                DraftData = d,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, d, p);
 
             return s;
         }
@@ -888,27 +882,21 @@ AND cmsContentNu.nodeId IS NULL
             bool published = true;
             var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
-            var p = new ContentData
-            {
-                Name = dto.EditName,
-                Published = published,
-                TemplateId = -1,
-                VersionId = dto.VersionId,
-                VersionDate = dto.EditVersionDate,
-                WriterId = dto.CreatorId, // what-else?
-                Properties = deserializedMedia.PropertyData, // TODO: We don't want to allocate empty arrays
-                CultureInfos = deserializedMedia.CultureData
-            };
+            var p = new ContentData(
+                dto.EditName,
+                null,
+                dto.VersionId,
+                dto.EditVersionDate,
+                dto.CreatorId,
+                -1,
+                published,
+                deserializedMedia?.PropertyData,
+                deserializedMedia?.CultureData);
 
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
 
             return s;
         }

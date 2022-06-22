@@ -12,7 +12,7 @@
             name: $scope.currentNode.name
         };
 
-        localizationService.localize("blueprints_createBlueprintFrom", ["<em>" + $scope.message.name + "</em>"]).then(function (localizedVal) {
+        localizationService.localize("blueprints_createBlueprintFrom", [$scope.message.name]).then(localizedVal => {
             $scope.title = localizedVal;
         });
 
@@ -33,14 +33,13 @@
 
                         navigationService.hideMenu();
                     },
-                        function (err) {
-                            formHelper.resetForm({ scope: $scope, hasErrors: true });
-                            contentEditingHelper.handleSaveError({
-                                err: err
-                            });
+                    function (err) {
+                        formHelper.resetForm({ scope: $scope, hasErrors: true });
+                        contentEditingHelper.handleSaveError({
+                            err: err
+                        });
 
-                        }
-                    );
+                    });
             }
         };
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Hosting;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         /// Initializes a new instance of the <see cref="ClickJackingCheck"/> class.
         /// </summary>
         public ClickJackingCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-            : base(hostingEnvironment, textService, "X-Frame-Options", "sameorigin", "clickJacking", true)
+            : base(hostingEnvironment, textService, "X-Frame-Options", "clickJacking", true)
         {
         }
 

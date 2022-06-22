@@ -165,12 +165,10 @@ When building a custom infinite editor view you can use the same components as a
 
     function editorService(eventsService, keyboardService, $timeout) {
 
-
         let editorsKeyboardShorcuts = [];
         var editors = [];
         var isEnabled = true;
         var lastElementInFocus = null;
-
 
         // events for backdrop
         eventsService.on("appState.backdrop", function (name, args) {
@@ -179,7 +177,7 @@ When building a custom infinite editor view you can use the same components as a
             } else {
                 focus();
             }
-        });      
+        });
 
         /**
          * @ngdoc method
@@ -214,17 +212,18 @@ When building a custom infinite editor view you can use the same components as a
          * Method to tell editors that they are begin blurred.
          */
         function blur() {
-
-            /* keyboard shortcuts will be overwritten by the new infinite editor
+            if (isEnabled === true) {
+                /* keyboard shortcuts will be overwritten by the new infinite editor
                 so we need to store the shortcuts for the current editor so they can be rebound
                 when the infinite editor closes
             */
-            unbindKeyboardShortcuts();
-            isEnabled = false;
+                unbindKeyboardShortcuts();
+                isEnabled = false;
+            }
         }
         /**
          * @ngdoc method
-         * @name umbraco.services.editorService#blur
+         * @name umbraco.services.editorService#focus
          * @methodOf umbraco.services.editorService
          *
          * @description
@@ -526,7 +525,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
-            if (!editor.size) editor.size = "medium";
+            if (!editor.size) editor.size = "";
             open(editor);
         }
 
@@ -972,6 +971,28 @@ When building a custom infinite editor view you can use the same components as a
         }
 
         /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#templatePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a template picker in infinite editing, the submit callback returns an array of selected items.
+        *
+        * @param {object} editor rendering options.
+        * @param {boolean} editor.multiPicker Pick one or multiple items.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function templatePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            if (!editor.size) editor.size = "small";
+            editor.section = "settings";
+            editor.treeAlias = "templates";
+            open(editor);
+        }
+
+        /**
          * @ngdoc method
          * @name umbraco.services.editorService#macroPicker
          * @methodOf umbraco.services.editorService
@@ -1133,6 +1154,7 @@ When building a custom infinite editor view you can use the same components as a
             templateSections: templateSections,
             userPicker: userPicker,
             itemPicker: itemPicker,
+            templatePicker: templatePicker,
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
             memberPicker: memberPicker,

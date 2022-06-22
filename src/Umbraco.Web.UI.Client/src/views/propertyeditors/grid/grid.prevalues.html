@@ -31,7 +31,7 @@
 
                     <div>
                         <p>{{template.name}}</p>
-                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
+                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate(template, $index, $event)">
                             <umb-icon icon="icon-delete" class="red"></umb-icon>
                             <localize key="general_delete">Delete</localize>
                         </button>

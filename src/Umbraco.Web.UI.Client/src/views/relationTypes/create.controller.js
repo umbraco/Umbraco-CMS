@@ -49,6 +49,10 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
             });
         }
     }
+
+    $scope.close = function () {
+        navigationService.hideDialog(true);
+    };
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.RelationTypes.CreateController", RelationTypeCreateController);

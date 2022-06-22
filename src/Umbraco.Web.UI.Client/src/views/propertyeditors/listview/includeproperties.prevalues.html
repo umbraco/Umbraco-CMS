@@ -18,8 +18,8 @@
             <thead>
                 <tr>
                     <td></td>
-                    <th>Alias</th>
-                    <th>Header</th>
+                    <th><localize key="general_alias">Alias</localize></th>
+                    <th><localize key="general_header">Header</localize></th>
                     <th><localize key="template_template">Template</localize></th>
                     <td></td>
                 </tr>
@@ -32,14 +32,16 @@
                     <td>
                        <div class="list-view-layout__name flex-column content-start">
                             <span class="list-view-layout__name-text" ng-bind="val.alias"></span>
-                            <span class="list-view-layout__system" ng-show="val.isSystem == 1">(system field)</span>
+                            <span class="list-view-layout__system" ng-show="val.isSystem == 1">(<localize key="general_systemField">systemField</localize>)</span>
                        </div>
                     </td>
                     <td>
                         <ng-form name="headerForm" ng-if="!val.isSystem">
                             <input type="text" name="header" ng-model="val.header" required />
                             <span ng-messages="headerForm.header.$error" show-validation-on-submit>
-                                <span class="help-inline" ng-message="required">Required</span>
+                                <span class="help-inline" ng-message="required">
+                                    <localize key="general_required">Required</localize>
+                                </span>
                             </span>
                         </ng-form>
 
@@ -53,8 +55,8 @@
                         </ng-form>
                     </td>
                     <td>
-                        <button type="button" class="btn-icon" ng-click="removeField(val)" aria-label="Remove">
-                            <umb-icon icon="icon-trash"></umb-icon>
+                        <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="removeField(val)">
+                            <localize key="general_remove">Remove</localize><span class="sr-only"> {{val.alias}}</span>
                         </button>
                     </td>
                 </tr>
@@ -62,6 +64,5 @@
 
         </table>
     </div>
-
 
 </div>

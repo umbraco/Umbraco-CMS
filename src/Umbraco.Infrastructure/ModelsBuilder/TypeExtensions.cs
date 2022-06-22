@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         /// <returns>A generic instance of the generic type with the proper type.</returns>
         /// <remarks>Usage... typeof (Something{}).CreateGenericInstance(object1, object2, object3) will return
         /// a Something{Type1} if object1.GetType() is Type1.</remarks>
-        public static object CreateGenericInstance(this Type genericType, object typeParmObj, params object[] ctorArgs)
+        public static object? CreateGenericInstance(this Type genericType, object typeParmObj, params object[] ctorArgs)
         {
             var type = genericType.MakeGenericType(typeParmObj.GetType());
             return Activator.CreateInstance(type, ctorArgs);

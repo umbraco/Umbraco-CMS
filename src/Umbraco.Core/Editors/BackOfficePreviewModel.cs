@@ -16,6 +16,6 @@ namespace Umbraco.Cms.Core.Editors
 
         public IEnumerable<ILanguage> Languages { get; }
         public bool DisableDevicePreview => _features.Disabled.DisableDevicePreview;
-        public string PreviewExtendedHeaderView => _features.Enabled.PreviewExtendedView;
+        public string? PreviewExtendedHeaderView => _features.Enabled.PreviewExtendedView;
     }
 }

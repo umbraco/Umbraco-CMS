@@ -273,7 +273,7 @@ angular.module('umbraco.services')
 		 */
 	    removeAll: function () {
 	        angularHelper.safeApply($rootScope, function() {
-	            nArray = [];
+	            nArray.length = 0;
 	        });
 		},
 

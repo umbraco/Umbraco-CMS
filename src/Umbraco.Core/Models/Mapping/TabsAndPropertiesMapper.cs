@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
     {
         protected ICultureDictionary CultureDictionary { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
-        protected IEnumerable<string> IgnoreProperties { get; set; }
+        protected IEnumerable<string?> IgnoreProperties { get; set; }
 
         protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)
             : this(cultureDictionary, localizedTextService, new List<string>())
@@ -52,47 +52,25 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var noGroupProperties = content.GetNonGroupedProperties()
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
-            var genericproperties = MapProperties(content, noGroupProperties, context);
+            var genericProperties = MapProperties(content, noGroupProperties, context);
 
-            tabs.Add(new Tab<ContentPropertyDisplay>
-            {
-                Id = 0,
-                Label = LocalizedTextService.Localize("general", "properties"),
-                Alias = "Generic properties",
-                Properties = genericproperties,
-                Type = PropertyGroupType.Group.ToString()
-            });
 
-            var genericProps = tabs.Single(x => x.Id == 0);
-
-            //store the current props to append to the newly inserted ones
-            var currProps = genericProps.Properties.ToArray();
-
-            var contentProps = new List<ContentPropertyDisplay>();
 
             var customProperties = GetCustomGenericProperties(content);
             if (customProperties != null)
             {
-                //add the custom ones
-                contentProps.AddRange(customProperties);
+                genericProperties.AddRange(customProperties);
             }
 
-            //now add the user props
-            contentProps.AddRange(currProps);
-
-            //re-assign
-            genericProps.Properties = contentProps;
-
-            //Show or hide properties tab based on whether it has or not any properties
-            if (genericProps.Properties.Any() == false)
+            if (genericProperties.Count > 0)
             {
-                //loop through the tabs, remove the one with the id of zero and exit the loop
-                for (var i = 0; i < tabs.Count; i++)
+                tabs.Add(new Tab<ContentPropertyDisplay>
                 {
-                    if (tabs[i].Id != 0) continue;
-                    tabs.RemoveAt(i);
-                    break;
-                }
+                    Id = 0,
+                    Label = LocalizedTextService.Localize("general", "properties"),
+                    Alias = "Generic properties",
+                    Properties = genericProperties
+                });
             }
         }
 
@@ -105,7 +83,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <returns></returns>
         protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<IProperty> properties, MapperContext context)
         {
-            return context.MapEnumerable<IProperty, ContentPropertyDisplay>(properties.OrderBy(x => x.PropertyType.SortOrder));
+            return context.MapEnumerable<IProperty, ContentPropertyDisplay>(properties.OrderBy(x => x.PropertyType?.SortOrder)).WhereNotNull().ToList();
         }
     }
 
@@ -131,39 +109,42 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
 
             // Merge the groups, as compositions can introduce duplicate aliases
-            var groups = contentType.CompositionPropertyGroups.OrderBy(x => x.SortOrder).ToArray();
-            var parentAliases = groups.Select(x => x.GetParentAlias()).Distinct().ToArray();
-            foreach (var groupsByAlias in groups.GroupBy(x => x.Alias))
+            var groups = contentType?.CompositionPropertyGroups.OrderBy(x => x.SortOrder).ToArray();
+            var parentAliases = groups?.Select(x => x.GetParentAlias()).Distinct().ToArray();
+            if (groups is not null)
             {
-                var properties = new List<IProperty>();
-
-                // Merge properties for groups with the same alias
-                foreach (var group in groupsByAlias)
+                foreach (var groupsByAlias in groups.GroupBy(x => x.Alias))
                 {
-                    var groupProperties = source.GetPropertiesForGroup(group)
-                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); // Skip ignored properties
+                    var properties = new List<IProperty>();
 
-                    properties.AddRange(groupProperties);
+                    // Merge properties for groups with the same alias
+                    foreach (var group in groupsByAlias)
+                    {
+                        var groupProperties = source.GetPropertiesForGroup(group)
+                            .Where(x => IgnoreProperties.Contains(x.Alias) == false); // Skip ignored properties
+
+                        properties.AddRange(groupProperties);
+                    }
+
+                    if (properties.Count == 0 && (!parentAliases?.Contains(groupsByAlias.Key) ?? false))
+                        continue;
+
+                    // Map the properties
+                    var mappedProperties = MapProperties(source, properties, context);
+
+                    // Add the tab (the first is closest to the content type, e.g. local, then direct composition)
+                    var g = groupsByAlias.First();
+
+                    tabs.Add(new Tab<ContentPropertyDisplay>
+                    {
+                        Id = g.Id,
+                        Key = g.Key,
+                        Type = g.Type.ToString(),
+                        Alias = g.Alias,
+                        Label = LocalizedTextService.UmbracoDictionaryTranslate(CultureDictionary, g.Name),
+                        Properties = mappedProperties
+                    });
                 }
-
-                if (properties.Count == 0 && !parentAliases.Contains(groupsByAlias.Key))
-                    continue;
-
-                // Map the properties
-                var mappedProperties = MapProperties(source, properties, context);
-
-                // Add the tab (the first is closest to the content type, e.g. local, then direct composition)
-                var g = groupsByAlias.First();
-
-                tabs.Add(new Tab<ContentPropertyDisplay>
-                {
-                    Id = g.Id,
-                    Key = g.Key,
-                    Type = g.Type.ToString(),
-                    Alias = g.Alias,
-                    Label = LocalizedTextService.UmbracoDictionaryTranslate(CultureDictionary, g.Name),
-                    Properties = mappedProperties
-                });
             }
 
             MapGenericProperties(source, tabs, context);

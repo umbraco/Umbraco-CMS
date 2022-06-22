@@ -1,6 +1,5 @@
 
 .umb-file-dropzone {
-
   // drop zone
   // tall and small version - animate height
   .dropzone {
@@ -21,17 +20,16 @@
 
     &.is-small {
       height: 100px;
+
       .illustration {
         width: 200px;
       }
     }
-    
+
     &.drag-over {
       border: 1px dashed @gray-1;
     }
   }
-
-
   // center the content of the drop zone
   .content {
     position: absolute;
@@ -41,8 +39,6 @@
     display: flex;
     flex-direction: column;
   }
-
-
   // file select link
   .file-select {
     background: transparent;
@@ -54,11 +50,10 @@
     margin-top: 10px;
 
     &:hover {
-        color: @ui-action-discreet-type-hover;
-        text-decoration: none;
+      color: @ui-action-discreet-type-hover;
+      text-decoration: none;
     }
   }
-
   // uploading / uploaded file list
   .file-list {
     list-style: none;
@@ -67,12 +62,10 @@
     padding: 10px 20px;
 
     .file {
-      //border-bottom: 1px dashed @orange;
-      display: block;
-      width: 100%;
       padding: 5px 0;
       position: relative;
       border-top: 1px solid @gray-8;
+
       &:first-child {
         border-top: none;
       }
@@ -80,13 +73,21 @@
       &.ng-enter {
         animation: fadeIn 0.5s;
       }
+
       &.ng-leave {
         animation: fadeOut 2s;
       }
+
       .file-description {
         color: @gray-3;
         font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
+      }
+
+      .file-messages, .file-messages span {
         display: block;
       }
 
@@ -95,25 +96,11 @@
         width: 100%;
       }
 
-      .file-icon {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-
-        .icon {
-          font-size: 20px;
-          &.ng-enter {
-            animation: fadeIn 0.5s;
-          }
-          &.ng-leave {
-            animation: fadeIn 0.5s;
-          }
-        }
+      .ok-all {
+          margin-left: auto;
       }
     }
   }
-
-
   // progress bars
   // could be moved to its own less file
   .file-progress {
@@ -131,5 +118,4 @@
       width: 0;
     }
   }
-
 }

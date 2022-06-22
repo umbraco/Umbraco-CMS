@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,12 +8,17 @@ namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>
-    /// Handles password hashing and formatting for legacy hashing algorithms
+    /// Handles password hashing and formatting for legacy hashing algorithms.
     /// </summary>
+    /// <remarks>
+    /// Should probably be internal.
+    /// </remarks>
     public class LegacyPasswordSecurity
     {
+        // TODO: Remove v11
         // Used for tests
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string HashPasswordForStorage(string algorithmType, string password)
         {
             if (string.IsNullOrWhiteSpace(password))
@@ -24,13 +29,15 @@ namespace Umbraco.Cms.Core.Security
             return FormatPasswordForStorage(algorithmType, hashed, salt);
         }
 
+        // TODO: Remove v11
         // Used for tests
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string FormatPasswordForStorage(string algorithmType, string hashedPassword, string salt)
         {
-            if (IsLegacySHA1Algorithm(algorithmType))
+            if (!SupportHashAlgorithm(algorithmType))
             {
-                return hashedPassword;
+                throw new InvalidOperationException($"{algorithmType} is not supported");
             }
 
             return salt + hashedPassword;
@@ -45,14 +52,43 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         public bool VerifyPassword(string algorithm, string password, string dbPassword)
         {
-            if (string.IsNullOrWhiteSpace(dbPassword)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(dbPassword));
+            if (string.IsNullOrWhiteSpace(dbPassword))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(dbPassword));
+            }
 
             if (dbPassword.StartsWith(Constants.Security.EmptyPasswordPrefix))
+            {
                 return false;
+            }
 
-            var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
-            var hashed = HashPassword(algorithm, password, salt);
-            return storedHashedPass == hashed;
+            try
+            {
+                var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
+                var hashed = HashPassword(algorithm, password, salt);
+                return storedHashedPass == hashed;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                //This can happen if the length of the password is wrong and a salt cannot be extracted.
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verify a legacy hashed password (HMACSHA1)
+        /// </summary>
+        public bool VerifyLegacyHashedPassword(string password, string dbPassword)
+        {
+            var hashAlgorithm = new HMACSHA1
+            {
+                //the legacy salt was actually the password :(
+                Key = Encoding.Unicode.GetBytes(password)
+            };
+
+            var hashed = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
+
+            return dbPassword == hashed;
         }
 
         /// <summary>
@@ -63,6 +99,8 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="salt"></param>
         /// <returns></returns>
         // TODO: Do we need this method? We shouldn't be using this class to create new password hashes for storage
+        // TODO: Remove v11
+        [Obsolete("We shouldn't be altering our public API to make test code easier, removing v11")]
         public string HashNewPassword(string algorithm, string newPassword, out string salt)
         {
             salt = GenerateSalt();
@@ -78,15 +116,15 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         public string ParseStoredHashPassword(string algorithm, string storedString, out string salt)
         {
-            if (string.IsNullOrWhiteSpace(storedString)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedString));
-
-            // This is for the <= v4 hashing algorithm for which there was no salt
-            if (IsLegacySHA1Algorithm(algorithm))
+            if (string.IsNullOrWhiteSpace(storedString))
             {
-                salt = string.Empty;
-                return storedString;
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(storedString));
             }
 
+            if (!SupportHashAlgorithm(algorithm))
+            {
+                throw new InvalidOperationException($"{algorithm} is not supported");
+            }
 
             var saltLen = GenerateSalt();
             salt = storedString.Substring(0, saltLen.Length);
@@ -109,18 +147,18 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         private string HashPassword(string algorithmType, string pass, string salt)
         {
-            if (IsLegacySHA1Algorithm(algorithmType))
+            if (!SupportHashAlgorithm(algorithmType))
             {
-                return HashLegacySHA1Password(pass);
+                throw new InvalidOperationException($"{algorithmType} is not supported");
             }
 
-            //This is the correct way to implement this (as per the sql membership provider)
+            // This is the correct way to implement this (as per the sql membership provider)
 
             var bytes = Encoding.Unicode.GetBytes(pass);
             var saltBytes = Convert.FromBase64String(salt);
             byte[] inArray;
 
-            var hashAlgorithm = GetHashAlgorithm(algorithmType);
+            using var hashAlgorithm = GetHashAlgorithm(algorithmType);
             var algorithm = hashAlgorithm as KeyedHashAlgorithm;
             if (algorithm != null)
             {
@@ -185,42 +223,17 @@ namespace Umbraco.Cms.Core.Security
         {
             // This is for the v6-v8 hashing algorithm
             if (algorithm.InvariantEquals(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName))
+            {
                 return true;
+            }
 
-            // This is for the <= v4 hashing algorithm
-            if (IsLegacySHA1Algorithm(algorithm))
+            // Default validation value for old machine keys (switched to HMACSHA256 aspnet 4 https://docs.microsoft.com/en-us/aspnet/whitepapers/aspnet4/breaking-changes)
+            if (algorithm.InvariantEquals("SHA1"))
+            {
                 return true;
+            }
 
             return false;
         }
-
-        private bool IsLegacySHA1Algorithm(string algorithm) => algorithm.InvariantEquals(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName);
-
-        /// <summary>
-        /// Hashes the password with the old v4 algorithm
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <returns>The encoded password.</returns>
-        private string HashLegacySHA1Password(string password)
-        {
-            var hashAlgorithm = GetLegacySHA1Algorithm(password);
-            var hash = Convert.ToBase64String(hashAlgorithm.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            return hash;
-        }
-
-        /// <summary>
-        /// Returns the old v4 algorithm and settings
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        private HashAlgorithm GetLegacySHA1Algorithm(string password)
-        {
-            return new HMACSHA1
-            {
-                //the legacy salt was actually the password :(
-                Key = Encoding.Unicode.GetBytes(password)
-            };
-        }
-
     }
 }

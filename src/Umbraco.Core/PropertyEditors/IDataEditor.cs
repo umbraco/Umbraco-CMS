@@ -52,12 +52,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Gets a configured value editor.
         /// </summary>
-        IDataValueEditor GetValueEditor(object configuration);
+        IDataValueEditor GetValueEditor(object? configuration);
 
         /// <summary>
         /// Gets the configuration for the value editor.
         /// </summary>
-        IDictionary<string, object> DefaultConfiguration { get; }
+        IDictionary<string, object>? DefaultConfiguration { get; }
 
         /// <summary>
         /// Gets an editor to edit the value editor configuration.

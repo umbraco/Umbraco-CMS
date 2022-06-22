@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
-    <LangVersion>8</LangVersion>
     <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
     <Title>Umbraco CMS Published Cache</Title>
     <Description>Contains the Published Cache assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
@@ -15,14 +14,14 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpTest.Net.Collections-NetStd2" Version="14.906.1403.1084" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MessagePack" Version="2.3.75" />
-    <PackageReference Include="K4os.Compression.LZ4" Version="1.2.12" />
+    <PackageReference Include="MessagePack" Version="2.3.85" />
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.2.16" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Umbraco.Code" Version="1.2.0">
+    <PackageReference Include="Umbraco.Code" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

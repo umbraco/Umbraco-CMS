@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Logging
         /// <param name="name">The name of the step.</param>
         /// <returns>A step.</returns>
         /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
-        internal static IDisposable Step<T>(this IProfiler profiler, string name)
+        internal static IDisposable? Step<T>(this IProfiler profiler, string name)
         {
             if (profiler == null) throw new ArgumentNullException(nameof(profiler));
             return profiler.Step(typeof (T), name);
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Logging
         /// <param name="name">The name of the step.</param>
         /// <returns>A step.</returns>
         /// <remarks>The returned <see cref="IDisposable"/> is meant to be used within a <c>using (...) {{ ... }}</c> block.</remarks>
-        internal static IDisposable Step(this IProfiler profiler, Type reporting, string name)
+        internal static IDisposable? Step(this IProfiler profiler, Type reporting, string name)
         {
             if (profiler == null) throw new ArgumentNullException(nameof(profiler));
             if (reporting == null) throw new ArgumentNullException(nameof(reporting));

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
@@ -10,28 +10,28 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
     public class OEmbedResponse
     {
         [DataMember(Name ="type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         [DataMember(Name ="version")]
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         [DataMember(Name ="title")]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         [DataMember(Name ="author_name")]
-        public string AuthorName { get; set; }
+        public string? AuthorName { get; set; }
 
         [DataMember(Name ="author_url")]
-        public string AuthorUrl { get; set; }
+        public string? AuthorUrl { get; set; }
 
         [DataMember(Name ="provider_name")]
-        public string ProviderName { get; set; }
+        public string? ProviderName { get; set; }
 
         [DataMember(Name ="provider_url")]
-        public string ProviderUrl { get; set; }
+        public string? ProviderUrl { get; set; }
 
         [DataMember(Name ="thumbnail_url")]
-        public string ThumbnailUrl { get; set; }
+        public string? ThumbnailUrl { get; set; }
 
         [DataMember(Name ="thumbnail_height")]
         public double? ThumbnailHeight { get; set; }
@@ -40,10 +40,10 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
         public double? ThumbnailWidth { get; set; }
 
         [DataMember(Name ="html")]
-        public string Html { get; set; }
+        public string? Html { get; set; }
 
         [DataMember(Name ="url")]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         [DataMember(Name ="height")]
         public double? Height { get; set; }

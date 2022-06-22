@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -8,11 +8,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -44,27 +44,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         // and ah, well, this all caching should be refactored + the cache refreshers
         // should to repository.Clear() not deal with magic caches by themselves
 
-        protected override IContentType PerformGet(int id)
-            => GetMany().FirstOrDefault(x => x.Id == id);
+        protected override IContentType? PerformGet(int id)
+            => GetMany()?.FirstOrDefault(x => x.Id == id);
 
-        protected override IContentType PerformGet(Guid id)
-            => GetMany().FirstOrDefault(x => x.Key == id);
+        protected override IContentType? PerformGet(Guid id)
+            => GetMany()?.FirstOrDefault(x => x.Key == id);
 
-        protected override IContentType PerformGet(string alias)
-            => GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+        protected override IContentType? PerformGet(string alias)
+            => GetMany()?.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
 
         protected override bool PerformExists(Guid id)
-        => GetMany().FirstOrDefault(x => x.Key == id) != null;
+        => GetMany()?.FirstOrDefault(x => x.Key == id) != null;
 
-        protected override IEnumerable<IContentType> GetAllWithFullCachePolicy()
+        protected override IEnumerable<IContentType>? GetAllWithFullCachePolicy()
         {
-            return CommonRepository.GetAllTypes().OfType<IContentType>();
+            return CommonRepository.GetAllTypes()?.OfType<IContentType>();
         }
 
-        protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
+        protected override IEnumerable<IContentType>? PerformGetAll(params Guid[]? ids)
         {
             var all = GetMany();
-            return ids.Any() ? all.Where(x => ids.Contains(x.Key)) : all;
+            return ids?.Any() ?? false ? all?.Where(x => ids.Contains(x.Key)) : all;
         }
 
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
@@ -74,14 +74,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var sql = translator.Translate();
             var ids = Database.Fetch<int>(sql).Distinct().ToArray();
 
-            return ids.Length > 0 ? GetMany(ids).OrderBy(x => x.Name) : Enumerable.Empty<IContentType>();
+            return ids.Length > 0 ? GetMany(ids)?.OrderBy(x => x.Name) ?? Enumerable.Empty<IContentType>() : Enumerable.Empty<IContentType>();
         }
 
         /// <inheritdoc />
         public IEnumerable<IContentType> GetByQuery(IQuery<PropertyType> query)
         {
             var ints = PerformGetByQuery(query).ToArray();
-            return ints.Length > 0 ? GetMany(ints) : Enumerable.Empty<IContentType>();
+            return ints.Length > 0 ? GetMany(ints) ?? Enumerable.Empty<IContentType>() : Enumerable.Empty<IContentType>();
         }
 
         protected IEnumerable<int> PerformGetByQuery(IQuery<PropertyType> query)
@@ -92,8 +92,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var sqlClause = Sql()
                 .SelectAll()
-                .From<PropertyTypeGroupDto>()
-                .RightJoin<PropertyTypeDto>()
+                .From<PropertyTypeDto>()
+                .LeftJoin<PropertyTypeGroupDto>()
                 .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
                 .InnerJoin<DataTypeDto>()
                 .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.NodeId);
@@ -198,9 +198,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var query = Query<IContentType>().Where(x => x.ParentId == entity.Id);
             var children = Get(query);
-            foreach (var child in children)
+            if (children is not null)
             {
-                PersistDeletedItem(child);
+                foreach (var child in children)
+                {
+                    PersistDeletedItem(child);
+                }
             }
 
             //Before we call the base class methods to run all delete clauses, we need to first
@@ -236,6 +239,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -256,7 +260,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     IsDefault = true
                 });
             }
-            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != defaultTemplateId))
+            foreach (var template in entity.AllowedTemplates?.Where(x => x != null && x.Id != defaultTemplateId) ?? Array.Empty<ITemplate>())
             {
                 Database.Insert(new ContentTypeTemplateDto
                 {
@@ -289,8 +293,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistUpdatedBaseContentType(entity);
             PersistTemplates(entity, true);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
+        }
+
+        private void PersistHistoryCleanup(IContentType entity)
+        {
+            // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
+            // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
+            if (entity is IContentTypeWithHistoryCleanup entityWithHistoryCleanup)
+            {
+                ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+                {
+                    ContentTypeId = entity.Id,
+                    Updated = DateTime.Now,
+                    PreventCleanup = entityWithHistoryCleanup.HistoryCleanup?.PreventCleanup ?? false,
+                    KeepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                    KeepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup?.KeepLatestVersionPerDayForDays
+                };
+                Database.InsertOrUpdate(dto);
+            }
+
         }
     }
 }

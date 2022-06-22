@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
@@ -23,13 +25,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
     public class RuntimeState : IRuntimeState
     {
         internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
-        private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IOptions<UnattendedSettings> _unattendedSettings;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly ILogger<RuntimeState> _logger;
-        private readonly PendingPackageMigrations _packageMigrationState;
+        private readonly IOptions<GlobalSettings> _globalSettings = null!;
+        private readonly IOptions<UnattendedSettings> _unattendedSettings = null!;
+        private readonly IUmbracoVersion _umbracoVersion = null!;
+        private readonly IUmbracoDatabaseFactory _databaseFactory = null!;
+        private readonly ILogger<RuntimeState> _logger = null!;
+        private readonly PendingPackageMigrations _packageMigrationState = null!;
         private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
+        private readonly IConflictingRouteService _conflictingRouteService = null!;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -41,16 +44,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
-        /// </summary>
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
             IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            PendingPackageMigrations packageMigrationState)
+            PendingPackageMigrations packageMigrationState,
+            IConflictingRouteService conflictingRouteService)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
@@ -58,8 +59,30 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _logger = logger;
             _packageMigrationState = packageMigrationState;
+            _conflictingRouteService = conflictingRouteService;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RuntimeState"/> class.
+        /// </summary>
+        [Obsolete("use ctor with all params")]
+        public RuntimeState(
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
+            IUmbracoVersion umbracoVersion,
+            IUmbracoDatabaseFactory databaseFactory,
+            ILogger<RuntimeState> logger,
+            PendingPackageMigrations packageMigrationState)
+            : this(
+                globalSettings,
+                unattendedSettings,
+                umbracoVersion,
+                databaseFactory,
+                logger,
+                packageMigrationState,
+                StaticServiceProvider.Instance.GetRequiredService<IConflictingRouteService>())
+        {
+        }
 
         /// <inheritdoc />
         public Version Version => _umbracoVersion.Version;
@@ -71,10 +94,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public SemVersion SemanticVersion => _umbracoVersion.SemanticVersion;
 
         /// <inheritdoc />
-        public string CurrentMigrationState { get; private set; }
+        public string? CurrentMigrationState { get; private set; }
 
         /// <inheritdoc />
-        public string FinalMigrationState { get; private set; }
+        public string? FinalMigrationState { get; private set; }
 
         /// <inheritdoc />
         public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
@@ -83,7 +106,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public RuntimeLevelReason Reason { get; internal set; } = RuntimeLevelReason.Unknown;
 
         /// <inheritdoc />
-        public BootFailedException BootFailedException { get; internal set; }
+        public BootFailedException? BootFailedException { get; internal set; }
 
         /// <inheritdoc />
         public IReadOnlyDictionary<string, object> StartupState => _startupState;
@@ -98,6 +121,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 _logger.LogDebug("Database is not configured, need to install Umbraco.");
                 Level = RuntimeLevel.Install;
                 Reason = RuntimeLevelReason.InstallNoDatabase;
+                return;
+            }
+
+            // Check if we have multiple controllers with the same name.
+            if (_conflictingRouteService.HasConflictingRoutes(out string controllerName))
+            {
+                Level = RuntimeLevel.BootFailed;
+                Reason = RuntimeLevelReason.BootFailedOnException;
+                BootFailedException = new BootFailedException($"Conflicting routes, you cannot have multiple controllers with the same name: {controllerName}");
+
                 return;
             }
 
@@ -173,7 +206,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
         }
 
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null)
         {
             Level = level;
             Reason = reason;
@@ -205,14 +238,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 // no scope, no service - just directly accessing the database
                 using (var database = databaseFactory.CreateDatabase())
                 {
-                    if (!database.IsUmbracoInstalled())
+                    if (!database!.IsUmbracoInstalled())
                     {
                         return UmbracoDatabaseState.NotInstalled;
                     }
 
                     // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
                     // All will be prefixed with the same key.
-                    IReadOnlyDictionary<string, string> keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
+                    IReadOnlyDictionary<string, string?>? keyValues = database!.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
 
                     // This could need both an upgrade AND package migrations to execute but
                     // we will process them one at a time, first the upgrade, then the package migrations.
@@ -244,14 +277,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
         }
 
-        private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string> keyValues)
+        private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
 
-            _ = keyValues.TryGetValue(stateValueKey, out var value);
+            if(keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
+            {
+                CurrentMigrationState = value;
+            }
 
-            CurrentMigrationState = value;
             FinalMigrationState = upgrader.Plan.FinalState;
 
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
@@ -278,7 +313,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         }
 
         private bool CanAutoInstallMissingDatabase(IUmbracoDatabaseFactory databaseFactory)
-            => databaseFactory.ProviderName == Constants.DatabaseProviders.SqlCe ||
-               databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
+            => databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
     }
 }

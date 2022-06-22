@@ -5,7 +5,7 @@ This project builds the documentation for the UI of the Umbraco backoffice, it i
 In order to build the documentation, please follow the following two steps:
 
 ```
-npm install
+npm ci
 npx gulp docs
 ```
 

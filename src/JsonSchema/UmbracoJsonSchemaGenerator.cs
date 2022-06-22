@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,28 +10,26 @@ using NJsonSchema.Generation;
 namespace JsonSchema
 {
     /// <summary>
-    /// Generator of the JsonSchema for AppSettings.json including A specific Umbraco version.
+    ///     Generator of the JsonSchema for AppSettings.json including A specific Umbraco version.
     /// </summary>
     public class UmbracoJsonSchemaGenerator
     {
+        private static readonly HttpClient s_client = new ();
         private readonly JsonSchemaGenerator _innerGenerator;
-        private static readonly HttpClient s_client = new HttpClient();
 
         /// <summary>
-        /// Creates a new instance of <see cref="UmbracoJsonSchemaGenerator"/>.
+        ///     Initializes a new instance of the <see cref="UmbracoJsonSchemaGenerator" /> class.
         /// </summary>
-        /// <param name="definitionPrefix">The prefix to use for definitions generated.</param>
         public UmbracoJsonSchemaGenerator()
             => _innerGenerator = new JsonSchemaGenerator(new UmbracoJsonSchemaGeneratorSettings());
 
-
         /// <summary>
-        /// Generates a json representing the JsonSchema for AppSettings.json including A specific Umbraco version..
+        ///     Generates a json representing the JsonSchema for AppSettings.json including A specific Umbraco version..
         /// </summary>
         public async Task<string> Generate()
         {
-            var umbracoSchema = GenerateUmbracoSchema();
-            var officialSchema = await GetOfficialAppSettingsSchema();
+            JObject umbracoSchema = GenerateUmbracoSchema();
+            JObject officialSchema = await GetOfficialAppSettingsSchema();
 
             officialSchema.Merge(umbracoSchema);
 
@@ -37,21 +38,19 @@ namespace JsonSchema
 
         private async Task<JObject> GetOfficialAppSettingsSchema()
         {
+            HttpResponseMessage response = await s_client.GetAsync("https://json.schemastore.org/appsettings.json")
+                .ConfigureAwait(false);
 
-            var response = await s_client.GetAsync("https://json.schemastore.org/appsettings.json");
+            var result = await response.Content.ReadAsStringAsync();
 
-
-            var result =  await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<JObject>(result);
-
+            return JsonConvert.DeserializeObject<JObject>(result)!;
         }
 
         private JObject GenerateUmbracoSchema()
         {
-            var schema = _innerGenerator.Generate(typeof(AppSettings));
+            NJsonSchema.JsonSchema schema = _innerGenerator.Generate(typeof(AppSettings));
 
-            return JsonConvert.DeserializeObject<JObject>(schema.ToJson());
+            return JsonConvert.DeserializeObject<JObject>(schema.ToJson())!;
         }
     }
 }

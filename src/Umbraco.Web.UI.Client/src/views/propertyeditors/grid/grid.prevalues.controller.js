@@ -125,8 +125,29 @@ angular.module("umbraco")
                 editorService.open(layoutConfigOverlay);
             }
 
-            function deleteTemplate(index) {
-                $scope.model.value.templates.splice(index, 1);
+            function deleteTemplate(template, index, event) {
+
+                const dialog = {
+                    view: "views/propertyEditors/grid/overlays/layoutdeleteconfirm.html",
+                    layout: template,
+                    submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                    submitButtonStyle: "danger",
+                    submit: function (model) {
+                        $scope.model.value.templates.splice(index, 1);
+                        overlayService.close();
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                localizationService.localize("general_delete").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
+                });
+
+                event.preventDefault();
+                event.stopPropagation();
             }
 
             /****************
@@ -167,7 +188,6 @@ angular.module("umbraco")
             }
 
             function deleteLayout(layout, index, event) {
-
                 const dialog = {
                     view: "views/propertyeditors/grid/overlays/rowdeleteconfirm.html",
                     layout: layout,

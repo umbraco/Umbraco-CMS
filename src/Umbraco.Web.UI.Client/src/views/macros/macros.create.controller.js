@@ -42,6 +42,10 @@ function MacrosCreateController($scope, $location, macroResource, navigationServ
         }
     }
 
+    $scope.close = function () {
+        navigationService.hideDialog(true);
+    };
+
     vm.createItem = createItem;
 }
 

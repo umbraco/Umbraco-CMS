@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
         /// <remarks>
         /// There can be nested results for complex editors that contain other editors
         /// </remarks>
-        public ComplexEditorValidationResult ComplexEditorResults { get; }
+        public ComplexEditorValidationResult? ComplexEditorResults { get; }
 
         /// <summary>
         /// Return the <see cref="ValidationResult.ErrorMessage"/> if <see cref="ComplexEditorResults"/> is null, else the serialized

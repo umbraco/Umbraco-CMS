@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -79,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .Select(dt =>
                     {
                         var dataType = dataTypes[dt.Id];
-                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor.Icon, false);
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, dataType.Editor?.Icon, false);
                         node.Path = dt.Path;
                         return node;
                     })
@@ -132,7 +133,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
@@ -140,21 +141,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DataTypeContainer);
             if (container != null)
             {
-                //set the default to create
+                // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
                 {
-                    Icon = "icon icon-edit"
+                    Icon = "icon-edit",
+                    UseLegacyIcon = false,
                 });
 
                 if (container.HasChildren == false)
                 {
-                    //can delete data type
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                    // can delete data type
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 }
+
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
             else
@@ -162,15 +165,20 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 var nonDeletableSystemDataTypeIds = GetNonDeletableSystemDataTypeIds();
 
                 if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id, CultureInfo.InvariantCulture)) == false)
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                {
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                }
 
-                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true);
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
             }
 
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.DataType, query, pageSize, pageIndex, out totalFound, searchFrom);
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.DataType, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
     }
 }

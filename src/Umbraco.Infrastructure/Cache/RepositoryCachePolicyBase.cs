@@ -1,10 +1,11 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Core.Cache
 {
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Core.Cache
             get
             {
                 var ambientScope = _scopeAccessor.AmbientScope;
-                switch (ambientScope.RepositoryCacheMode)
+                switch (ambientScope?.RepositoryCacheMode)
                 {
                     case RepositoryCacheMode.Default:
                         return _globalCache;
@@ -39,19 +40,19 @@ namespace Umbraco.Cms.Core.Cache
                     case RepositoryCacheMode.None:
                         return NoAppCache.Instance;
                     default:
-                        throw new NotSupportedException($"Repository cache mode {ambientScope.RepositoryCacheMode} is not supported.");
+                        throw new NotSupportedException($"Repository cache mode {ambientScope?.RepositoryCacheMode} is not supported.");
                 }
             }
         }
 
         /// <inheritdoc />
-        public abstract TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        public abstract TEntity? Get(TId? id, Func<TId?, TEntity?> performGet, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
 
         /// <inheritdoc />
-        public abstract TEntity GetCached(TId id);
+        public abstract TEntity? GetCached(TId id);
 
         /// <inheritdoc />
-        public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        public abstract bool Exists(TId id, Func<TId, bool> performExists, Func<TId[], IEnumerable<TEntity>?> performGetAll);
 
         /// <inheritdoc />
         public abstract void Create(TEntity entity, Action<TEntity> persistNew);
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Core.Cache
         public abstract void Delete(TEntity entity, Action<TEntity> persistDeleted);
 
         /// <inheritdoc />
-        public abstract TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        public abstract TEntity[] GetAll(TId[]? ids, Func<TId[]?, IEnumerable<TEntity>?> performGetAll);
 
         /// <inheritdoc />
         public abstract void ClearAll();

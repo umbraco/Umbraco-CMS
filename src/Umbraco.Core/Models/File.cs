@@ -18,10 +18,10 @@ namespace Umbraco.Cms.Core.Models
         // should use the lazyContent ctor to set it to null when loading existing.
         // cannot simply use HasIdentity as some classes (eg Script) override it
         // in a weird way.
-        private string _content;
-        public Func<File, string> GetFileContent { get; set; }
+        private string? _content;
+        public Func<File, string?>? GetFileContent { get; set; }
 
-        protected File(string path, Func<File, string> getFileContent = null)
+        protected File(string path, Func<File, string?>? getFileContent = null)
         {
             _path = SanitizePath(path);
             _originalPath = _path;
@@ -29,8 +29,8 @@ namespace Umbraco.Cms.Core.Models
             _content = getFileContent != null ? null : string.Empty;
         }
 
-        private string _alias;
-        private string _name;
+        private string? _alias;
+        private string? _name;
 
         private static string SanitizePath(string path)
         {
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models
                 _alias = null;
                 _name = null;
 
-                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, nameof(Path));
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path!, nameof(Path));
             }
         }
 
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Core.Models
         /// <remarks>Marked as DoNotClone, because it should be lazy-reloaded from disk.</remarks>
         [DataMember]
         [DoNotClone]
-        public virtual string Content
+        public virtual string? Content
         {
             get
             {
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
-        public string VirtualPath { get; set; }
+        public string? VirtualPath { get; set; }
 
         // this exists so that class that manage name and alias differently, eg Template,
         // can implement their own cloning - (though really, not sure it's even needed)

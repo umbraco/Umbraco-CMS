@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 if (context.Result == null) return;
 
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
                 if (currentUser == null) return;
 
                 if (context.Result is ObjectResult objectContent)
@@ -83,6 +83,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 break;
                             case IEnumerable<Tab<IDashboardSlim>> dashboards:
                                 _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
+                                break;
+                            case IEnumerable<ContentTypeBasic> allowedChildren:
+                                // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
+                                var notification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
+                                _eventAggregator.Publish(notification);
+                                context.Result = new ObjectResult(notification.Children);
                                 break;
                         }
                     }

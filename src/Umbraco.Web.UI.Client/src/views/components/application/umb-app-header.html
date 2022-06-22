@@ -1,34 +1,103 @@
-
 <div>
-
     <div class="umb-app-header">
-        <umb-sections
-            ng-if="authenticated"
-            sections="sections">
-        </umb-sections>
+        <div class="umb-app-header__logo" ng-if="hideBackofficeLogo !== true">
+            <button
+                type="button"
+                class="btn-reset"
+                ng-click="toggleLogoModal()"
+            >
+                <img
+                    src="assets/img/application/umbraco_logomark_white.svg"
+                    alt="Umbraco"
+                />
+            </button>
+            <div
+                tabindex="0"
+                on-outside-click="hideLogoModal()"
+                ng-click="stopClickEvent($event)"
+                ng-focus="keepLogoModal()"
+                ng-blur="hideLogoModal()"
+                class="umb-app-header__logo-modal"
+                ng-if="logoModal.show"
+            >
+                <img
+                    src="assets/img/application/umbraco_logo_large_blue.svg"
+                    alt="Umbraco — The Friendly CMS"
+                />
+                <small> {{logoModal.text}} </small>
+                <br /><br />
+                <a
+                    href="https://umbraco.com"
+                    title="Umbraco website"
+                    target="_blank"
+                    rel="noopener"
+                    ng-focus="keepLogoModal()"
+                    ng-blur="hideLogoModal()"
+                    >Umbraco.com</a
+                >
+            </div>
+        </div>
 
-        <div class="flex items-center">
+        <umb-sections ng-if="authenticated" sections="sections"> </umb-sections>
+
+        <div class="umb-app-header__right">
             <ul class="umb-app-header__actions">
                 <li data-element="global-search" class="umb-app-header__action">
-                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()">
+                    <button
+                        type="button"
+                        class="umb-app-header__button btn-reset"
+                        hotkey="ctrl+space"
+                        ng-click="searchClick()"
+                        ng-mousedown="rememberFocus()"
+                        localize="title"
+                        title="@general_search"
+                    >
                         <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_openBackofficeSearch">Open backoffice search</localize>...
+                            <localize
+                                key="visuallyHiddenTexts_openBackofficeSearch"
+                                >Open backoffice search</localize
+                            >...
                         </span>
-                        <umb-icon icon="icon-search" class="umb-app-header__action-icon"></umb-icon>
+                        <umb-icon
+                            icon="icon-search"
+                            class="umb-app-header__action-icon"
+                        ></umb-icon>
                     </button>
                 </li>
                 <li data-element="global-help" class="umb-app-header__action">
-                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()">
+                    <button
+                        type="button"
+                        class="umb-app-header__button btn-reset"
+                        hotkey="ctrl+shift+h"
+                        ng-click="helpClick()"
+                        localize="title"
+                        title="@general_help"
+                    >
                         <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_openCloseBackofficeHelp">Open/Close backoffice help</localize>...
+                            <localize
+                                key="visuallyHiddenTexts_openCloseBackofficeHelp"
+                                >Open/Close backoffice help</localize
+                            >...
                         </span>
-                        <umb-icon icon="icon-help-alt" class="umb-app-header__action-icon"></umb-icon>
+                        <umb-icon
+                            icon="icon-help-alt"
+                            class="umb-app-header__action-icon"
+                        ></umb-icon>
                     </button>
                 </li>
                 <li data-element="global-user" class="umb-app-header__action">
-                   <button type="button" class="umb-app-header__button btn-reset" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}">
+                    <button
+                        type="button"
+                        class="umb-app-header__button btn-reset"
+                        ng-click="avatarClick()"
+                        hotkey="ctrl+shift+u"
+                        title="{{user.name}}"
+                    >
                         <span class="sr-only">
-                            <localize key="visuallyHiddenTexts_openCloseBackofficeProfileOptions">Open/Close your profile options</localize>...
+                            <localize
+                                key="visuallyHiddenTexts_openCloseBackofficeProfileOptions"
+                                >Open/Close your profile options</localize
+                            >...
                         </span>
                         <umb-avatar
                             class="umb-app-header__action-icon"
@@ -36,13 +105,12 @@
                             color="secondary"
                             name="{{user.name}}"
                             img-src="{{avatar[0].value}}"
-                            img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x">
+                            img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x"
+                        >
                         </umb-avatar>
                     </button>
                 </li>
             </ul>
         </div>
-
     </div>
-
 </div>

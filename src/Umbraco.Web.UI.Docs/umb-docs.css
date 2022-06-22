@@ -34,7 +34,8 @@ a:hover {
     color: rgba(0, 0, 0, .8);
 }
 
-.content p code {
+.content p code,
+.content li code {
     font-size: 85%;
     font-family: inherit;
     background-color: #f7f7f9;
@@ -106,4 +107,24 @@ a:hover {
 
 .form-search > ul.nav > li.module > a:hover{
     color: #fff;
+}
+
+.close {
+    float: initial;
+    font-size: 14px;
+    font-weight: initial;
+    line-height: 20px;
+    color: #333333;
+    text-shadow: initial;
+    opacity: initial;
+    filter: initial;
+}
+
+.close:hover,
+.close:focus {
+    color: #333333;
+    text-decoration: initial;
+    cursor: initial;
+    opacity: initial;
+    filter: initial;
 }

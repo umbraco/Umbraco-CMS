@@ -29,6 +29,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<int> AllowedContentTypes { get; set; }
 
+        [DataMember(Name = "historyCleanup")]
+        public HistoryCleanupViewModel? HistoryCleanup { get; set; }
+
         /// <summary>
         /// Custom validation
         /// </summary>

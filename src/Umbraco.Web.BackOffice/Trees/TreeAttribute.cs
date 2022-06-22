@@ -31,12 +31,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets or sets the tree title.
         /// </summary>
-        public string TreeTitle { get; set; }
+        public string? TreeTitle { get; set; }
 
         /// <summary>
         /// Gets or sets the group of the tree.
         /// </summary>
-        public string TreeGroup { get; set; }
+        public string? TreeGroup { get; set; }
 
         /// <summary>
         /// Gets the usage of the tree.

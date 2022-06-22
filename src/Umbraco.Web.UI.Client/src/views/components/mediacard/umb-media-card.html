@@ -5,12 +5,12 @@
 
         <p ng-if="vm.media.trashed" class="__status --error">
             <umb-icon icon="icon-trash"></umb-icon>
-            <localize key="mediaPicker_trashed"></localize>
+            <localize key="mediaPicker_trashed">Trashed</localize>
         </p>
 
         <p ng-if="vm.notAllowed" class="__status --error">
             <umb-icon icon="icon-block"></umb-icon>
-            <localize key="mediaPicker_notAllowed"></localize>
+            <localize key="mediaPicker_notAllowed">Not allowed</localize>
         </p>
 
         <!-- IMAGE and SVG-->
@@ -30,7 +30,7 @@
         <umb-file-icon ng-if="vm.loading === false && !vm.thumbnail"
             ng-class="{'trashed': vm.media.trashed}"
             title="{{vm.media.name}}"
-            extension="{{vm.media.extension}}"
+            extension="{{vm.fileExtension}}"
             icon="{{vm.media.icon}}"
             size="s"
             text="{{vm.media.name}}">

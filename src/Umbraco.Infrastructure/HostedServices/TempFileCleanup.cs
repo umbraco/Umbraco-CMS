@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="mainDom">Representation of the main application domain.</param>
         /// <param name="logger">The typed logger.</param>
         public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger)
-            : base(TimeSpan.FromMinutes(60), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(60), DefaultDelay)
         {
             _ioHelper = ioHelper;
             _mainDom = mainDom;
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _tempFolders = _ioHelper.GetTempFolders();
         }
 
-        public override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object? state)
         {
             // Ensure we do not run if not main domain
             if (_mainDom.IsMainDom == false)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                     _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
                     break;
                 case CleanFolderResultStatus.FailedWithException:
-                    foreach (CleanFolderResult.Error error in result.Errors)
+                    foreach (CleanFolderResult.Error error in result.Errors!)
                     {
                         _logger.LogError(error.Exception, "Could not delete temp file {FileName}", error.ErroringFile.FullName);
                     }

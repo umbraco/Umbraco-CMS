@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -16,8 +18,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {
         private readonly IJsonSerializer _jsonSerializer;
-
-        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer) : base(ioHelper)
+        public ColorPickerConfigurationEditor(IIOHelper ioHelper, IJsonSerializer jsonSerializer, IEditorConfigurationParser editorConfigurationParser)
+            : base(ioHelper, editorConfigurationParser)
         {
             _jsonSerializer = jsonSerializer;
             var items = Fields.First(x => x.Key == "items");
@@ -29,7 +31,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             items.Validators.Add(new ColorListValidator());
         }
 
-        public override Dictionary<string, object> ToConfigurationEditor(ColorPickerConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(ColorPickerConfiguration? configuration)
         {
             var configuredItems = configuration?.Items; // ordered
             object editorItems;
@@ -44,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 editorItems = d;
                 var sortOrder = 0;
                 foreach (var item in configuredItems)
-                   d[item.Id.ToString()] = GetItemValue(item, configuration.UseLabel, sortOrder++);
+                   d[item.Id.ToString()] = GetItemValue(item, configuration!.UseLabel, sortOrder++);
             }
 
             var useLabel = configuration?.UseLabel ?? false;
@@ -69,12 +71,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 SortOrder = sortOrder
             };
 
-            if (item.Value.DetectIsJson())
+            if (item.Value?.DetectIsJson() ?? false)
             {
                 try
                 {
                     var o = _jsonSerializer.Deserialize<ItemValue>(item.Value);
-                    o.SortOrder = sortOrder;
+                    o!.SortOrder = sortOrder;
                     return o;
                 }
                 catch
@@ -92,10 +94,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private class ItemValue
         {
             [DataMember(Name ="value")]
-            public string Color { get; set; }
+            public string? Color { get; set; }
 
             [DataMember(Name ="label")]
-            public string Label { get; set; }
+            public string? Label { get; set; }
 
             [DataMember(Name ="sortOrder")]
             public int SortOrder { get; set; }
@@ -104,11 +106,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         // send: { "items": { "<id>": { "value": "<color>", "label": "<label>", "sortOrder": <sortOrder> } , ... }, "useLabel": <bool> }
         // recv: { "items": ..., "useLabel": <bool> }
 
-        public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, ColorPickerConfiguration configuration)
+        public override ColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, ColorPickerConfiguration? configuration)
         {
             var output = new ColorPickerConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // handle useLabel
@@ -153,7 +155,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         internal class ColorListValidator : IValueValidator
         {
-            public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+            public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
             {
                 if (!(value is JArray json)) yield break;
 
@@ -164,10 +166,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (!(i is JObject jItem) || jItem["value"] == null) continue;
 
                     //NOTE: we will be removing empty values when persisting so no need to validate
-                    var asString = jItem["value"].ToString();
+                    var asString = jItem["value"]?.ToString();
                     if (asString.IsNullOrWhiteSpace()) continue;
 
-                    if (Regex.IsMatch(asString, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
+                    if (Regex.IsMatch(asString!, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
                     {
                         yield return new ValidationResult("The value " + asString + " is not a valid hex color", new[]
                             {

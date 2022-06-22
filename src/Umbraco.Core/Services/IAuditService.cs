@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IAuditService : IService
     {
-        void Add(AuditType type, int userId, int objectId, string entityType, string comment, string parameters = null);
+        void Add(AuditType type, int userId, int objectId, string? entityType, string comment, string? parameters = null);
 
         IEnumerable<IAuditItem> GetLogs(int objectId);
         IEnumerable<IAuditItem> GetUserLogs(int userId, AuditType type, DateTime? sinceDate = null);
@@ -37,8 +37,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IAuditItem> GetPagedItemsByEntity(int entityId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
-            AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null);
+            AuditType[]? auditTypeFilter = null,
+            IQuery<IAuditItem>? customFilter = null);
 
         /// <summary>
         /// Returns paged items in the audit trail for a given user
@@ -60,8 +60,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<IAuditItem> GetPagedItemsByUser(int userId, long pageIndex, int pageSize, out long totalRecords,
             Direction orderDirection = Direction.Descending,
-            AuditType[] auditTypeFilter = null,
-            IQuery<IAuditItem> customFilter = null);
+            AuditType[]? auditTypeFilter = null,
+            IQuery<IAuditItem>? customFilter = null);
 
         /// <summary>
         /// Writes an audit entry for an audited event.

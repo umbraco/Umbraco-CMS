@@ -50,14 +50,17 @@ function DashboardController($scope, $q, $routeParams, $location, dashboardResou
         // Check the query parameter for a dashboard alias
         const dashboardAlias = $location.search()[DASHBOARD_QUERY_PARAM];
         const dashboardIndex = $scope.dashboard.tabs.findIndex(tab => tab.alias === dashboardAlias);
+        const showDefaultDashboard = dashboardIndex === -1;
 
         // Set the first dashboard to active if there is no query parameter or we can't find a matching dashboard for the alias
-        const activeIndex = dashboardIndex !== -1 ? dashboardIndex : 0;
+        const activeIndex = showDefaultDashboard ? 0 : dashboardIndex;
 
         const tab = $scope.dashboard.tabs[activeIndex];
 
         tab.active = true;
-        $location.search(DASHBOARD_QUERY_PARAM, tab.alias);
+        if (!showDefaultDashboard) {
+            $location.search(DASHBOARD_QUERY_PARAM, tab.alias);
+        }
     }
 }
 

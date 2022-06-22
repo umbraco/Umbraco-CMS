@@ -12,8 +12,6 @@ namespace Umbraco.Cms.Core.Composing
     {
         private const int LogThresholdMilliseconds = 100;
 
-        private IProfilingLogger _logger;
-
         public ComponentCollectionBuilder()
         { }
 
@@ -21,9 +19,9 @@ namespace Umbraco.Cms.Core.Composing
 
         protected override IEnumerable<IComponent> CreateItems(IServiceProvider factory)
         {
-            _logger = factory.GetRequiredService<IProfilingLogger>();
+            var logger = factory.GetRequiredService<IProfilingLogger>();
 
-            using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
+            using (logger.DebugDuration<ComponentCollectionBuilder>($"Creating components. (log when >{LogThresholdMilliseconds}ms)", "Created."))
             {
                 return base.CreateItems(factory);
             }
@@ -31,7 +29,9 @@ namespace Umbraco.Cms.Core.Composing
 
         protected override IComponent CreateItem(IServiceProvider factory, Type itemType)
         {
-            using (_logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
+            var logger = factory.GetRequiredService<IProfilingLogger>();
+
+            using (logger.DebugDuration<ComponentCollectionBuilder>($"Creating {itemType.FullName}.", $"Created {itemType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
             {
                 return base.CreateItem(factory, itemType);
             }

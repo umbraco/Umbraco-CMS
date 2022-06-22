@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        public IEnumerable<ISearchResult> Search(string query, UmbracoEntityTypes entityType, int pageSize, long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
+        public IEnumerable<ISearchResult> Search(string query, UmbracoEntityTypes entityType, int pageSize, long pageIndex, out long totalFound, string? searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var sb = new StringBuilder();
 
@@ -145,12 +145,10 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             totalFound = result.TotalItemCount;
 
-            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
-
-            return pagedResult;
+            return result;
         }
 
-        private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> fields, string type)
+        private bool BuildQuery(StringBuilder sb, string query, string? searchFrom, List<string> fields, string type)
         {
             //build a lucene query:
             // the nodeName will be boosted 10x without wildcards
@@ -328,7 +326,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[] startNodeIds, string searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
+        private void AppendPath(StringBuilder sb, UmbracoObjectTypes objectType, int[]? startNodeIds, string? searchFrom, bool ignoreUserStartNodes, IEntityService entityService)
         {
             if (sb == null) throw new ArgumentNullException(nameof(sb));
             if (entityService == null) throw new ArgumentNullException(nameof(entityService));
@@ -346,12 +344,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 AppendPath(sb, entityPath.Path, false);
                 sb.Append(" ");
             }
-            else if (startNodeIds.Length == 0)
+            else if (startNodeIds?.Length == 0)
             {
                 // make sure we don't find anything
                 sb.Append("+__Path:none ");
             }
-            else if (startNodeIds.Contains(-1) == false && ignoreUserStartNodes == false) // -1 = no restriction
+            else if (startNodeIds?.Contains(-1) == false && ignoreUserStartNodes == false) // -1 = no restriction
             {
                 var entityPaths = entityService.GetAllPaths(objectType, startNodeIds);
 

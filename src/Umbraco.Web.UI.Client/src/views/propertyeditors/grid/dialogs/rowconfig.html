@@ -18,12 +18,14 @@
 
                     <div class="umb-form-settings form-horizontal">
 
-                        <p><localize key="grid_addRowConfigurationDetail"></localize></p>
+                        <p><localize key="grid_addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</localize></p>
 
                         <div class="alert alert-warn ng-scope" ng-show="nameChanged">
-                            <p>Modifying a row configuration name will result in loss of
-                            data for any existing content that is based on this configuration.</p>
-                            <p><strong>Modifying only the label will not result in data loss.</strong></p>
+                            <localize key="grid_warningText">
+                                <p>Modifying a row configuration name will result in loss of
+                                    data for any existing content that is based on this configuration.</p>
+                                <p><strong>Modifying only the label will not result in data loss.</strong></p>
+                            </localize>
                         </div>
 
                         <umb-control-group label="@general_name">
@@ -70,10 +72,16 @@
                                 <div class="grid-size-scaler">
                                     <button type="button" class="btn-link" ng-click="vm.scaleDown(currentCell)">
                                         <umb-icon icon="icon-remove" class="icon"></umb-icon>
+                                        <span class="sr-only">
+                                            <localize key="general_remove">Remove</localize>
+                                        </span>
                                     </button>
                                     <span>{{currentCell.grid}}</span>
                                     <button type="button" class="btn-link" ng-click="vm.scaleUp(currentCell, availableRowSpace, true)">
                                         <umb-icon icon="icon-add" class="icon"></umb-icon>
+                                        <span class="sr-only">
+                                            <localize key="general_add">Add</localize>
+                                        </span>
                                     </button>
                                 </div>
                             </umb-control-group>

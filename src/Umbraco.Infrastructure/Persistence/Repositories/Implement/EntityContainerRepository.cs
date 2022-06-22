@@ -3,98 +3,107 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
-    /// An internal repository for managing entity containers such as doc type, media type, data type containers.
+    ///     An internal repository for managing entity containers such as doc type, media type, data type containers.
     /// </summary>
     internal class EntityContainerRepository : EntityRepositoryBase<int, EntityContainer>, IEntityContainerRepository
     {
-        private readonly Guid _containerObjectType;
-
-        public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<EntityContainerRepository> logger, Guid containerObjectType)
+        public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache,
+            ILogger<EntityContainerRepository> logger, Guid containerObjectType)
             : base(scopeAccessor, cache, logger)
         {
-            var allowedContainers = new[] { Cms.Core.Constants.ObjectTypes.DocumentTypeContainer, Cms.Core.Constants.ObjectTypes.MediaTypeContainer, Cms.Core.Constants.ObjectTypes.DataTypeContainer };
-            _containerObjectType = containerObjectType;
-            if (allowedContainers.Contains(_containerObjectType) == false)
-                throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
+            Guid[] allowedContainers = new[]
+            {
+                Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer,
+                Constants.ObjectTypes.DataTypeContainer
+            };
+            NodeObjectTypeId = containerObjectType;
+            if (allowedContainers.Contains(NodeObjectTypeId) == false)
+            {
+                throw new InvalidOperationException("No container type exists with ID: " + NodeObjectTypeId);
+            }
         }
+
+        protected Guid NodeObjectTypeId { get; }
 
         // never cache
-        protected override IRepositoryCachePolicy<EntityContainer, int> CreateCachePolicy()
-        {
-            return NoCacheRepositoryCachePolicy<EntityContainer, int>.Instance;
-        }
+        protected override IRepositoryCachePolicy<EntityContainer, int> CreateCachePolicy() =>
+            NoCacheRepositoryCachePolicy<EntityContainer, int>.Instance;
 
-        protected override EntityContainer PerformGet(int id)
+        protected override EntityContainer? PerformGet(int id)
         {
-            var sql = GetBaseQuery(false).Where(GetBaseWhereClause(), new { id = id, NodeObjectType = NodeObjectTypeId });
+            Sql<ISqlContext> sql = GetBaseQuery(false)
+                .Where(GetBaseWhereClause(), new { id, NodeObjectType = NodeObjectTypeId });
 
-            var nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+            NodeDto? nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
         // temp - so we don't have to implement GetByQuery
-        public EntityContainer Get(Guid id)
+        public EntityContainer? Get(Guid id)
         {
-            var sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new { uniqueId = id });
+            Sql<ISqlContext> sql = GetBaseQuery(false).Where("UniqueId=@uniqueId", new { uniqueId = id });
 
-            var nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
         public IEnumerable<EntityContainer> Get(string name, int level)
         {
-            var sql = GetBaseQuery(false).Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId", new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
+            Sql<ISqlContext> sql = GetBaseQuery(false)
+                .Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId",
+                    new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
             return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
 
-        protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
+        protected override IEnumerable<EntityContainer> PerformGetAll(params int[]? ids)
         {
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
-                return Database.FetchByGroups<NodeDto, int>(ids, 2000, batch =>
-                    GetBaseQuery(false)
-                        .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                        .WhereIn<NodeDto>(x => x.NodeId, batch))
+                return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
+                        GetBaseQuery(false)
+                            .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                            .WhereIn<NodeDto>(x => x.NodeId, batch))
                     .Select(CreateEntity);
             }
 
             // else
 
-            var sql = GetBaseQuery(false)
+            Sql<ISqlContext> sql = GetBaseQuery(false)
                 .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
                 .OrderBy<NodeDto>(x => x.Level);
 
             return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
 
-        protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query)
-        {
+        protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query) =>
             throw new NotImplementedException();
-        }
 
         private static EntityContainer CreateEntity(NodeDto nodeDto)
         {
             if (nodeDto.NodeObjectType.HasValue == false)
+            {
                 throw new InvalidOperationException("Node with id " + nodeDto.NodeId + " has no object type.");
+            }
 
             // throws if node is not a container
-            var containedObjectType = EntityContainer.GetContainedObjectType(nodeDto.NodeObjectType.Value);
+            Guid containedObjectType = EntityContainer.GetContainedObjectType(nodeDto.NodeObjectType.Value);
 
             var entity = new EntityContainer(nodeDto.NodeId, nodeDto.UniqueId,
                 nodeDto.ParentId, nodeDto.Path, nodeDto.Level, nodeDto.SortOrder,
                 containedObjectType,
-                nodeDto.Text, nodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId);
+                nodeDto.Text, nodeDto.UserId ?? Constants.Security.UnknownUserId);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -104,11 +113,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = Sql();
+            Sql<ISqlContext> sql = Sql();
             if (isCount)
+            {
                 sql.SelectCount();
+            }
             else
+            {
                 sql.SelectAll();
+            }
+
             sql.From<NodeDto>();
             return sql;
         }
@@ -117,23 +131,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
-        protected Guid NodeObjectTypeId => _containerObjectType;
-
         protected override void PersistDeletedItem(EntityContainer entity)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             EnsureContainerType(entity);
 
-            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
 
-            if (nodeDto == null) return;
+            if (nodeDto == null)
+            {
+                return;
+            }
 
             // move children to the parent so they are not orphans
-            var childDtos = Database.Fetch<NodeDto>(Sql().SelectAll()
+            List<NodeDto> childDtos = Database.Fetch<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
-                .Where("parentID=@parentID AND (nodeObjectType=@containedObjectType OR nodeObjectType=@containerObjectType)",
+                .Where(
+                    "parentID=@parentID AND (nodeObjectType=@containedObjectType OR nodeObjectType=@containerObjectType)",
                     new
                     {
                         parentID = entity.Id,
@@ -141,7 +161,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         containerObjectType = entity.ContainerObjectType
                     }));
 
-            foreach (var childDto in childDtos)
+            foreach (NodeDto childDto in childDtos)
             {
                 childDto.ParentId = nodeDto.ParentId;
                 Database.Update(childDto);
@@ -155,31 +175,51 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(EntityContainer entity)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             EnsureContainerType(entity);
 
-            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
+            if (entity.Name == null)
+            {
+                throw new InvalidOperationException("Entity name can't be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new InvalidOperationException(
+                    "Entity name can't be empty or consist only of white-space characters.");
+            }
+
             entity.Name = entity.Name.Trim();
 
             // guard against duplicates
-            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
-                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(dto =>
+                    dto.ParentId == entity.ParentId && dto.Text == entity.Name &&
+                    dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto != null)
+            {
                 throw new InvalidOperationException("A container with the same name already exists.");
+            }
 
             // create
             var level = 0;
             var path = "-1";
             if (entity.ParentId > -1)
             {
-                var parentDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+                NodeDto parentDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                     .From<NodeDto>()
-                    .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                    .Where<NodeDto>(dto =>
+                        dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                 if (parentDto == null)
+                {
                     throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
+                }
 
                 level = parentDto.Level;
                 path = parentDto.Path;
@@ -203,7 +243,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // insert, get the id, update the path with the id
             var id = Convert.ToInt32(Database.Insert(nodeDto));
             nodeDto.Path = nodeDto.Path + "," + nodeDto.NodeId;
-            Database.Save<NodeDto>(nodeDto);
+            Database.Save(nodeDto);
 
             // refresh the entity
             entity.Id = id;
@@ -218,26 +258,45 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         //
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
             EnsureContainerType(entity);
 
-            if (entity.Name == null) throw new InvalidOperationException("Entity name can't be null.");
-            if (string.IsNullOrWhiteSpace(entity.Name)) throw new InvalidOperationException("Entity name can't be empty or consist only of white-space characters.");
+            if (entity.Name == null)
+            {
+                throw new InvalidOperationException("Entity name can't be null.");
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Name))
+            {
+                throw new InvalidOperationException(
+                    "Entity name can't be empty or consist only of white-space characters.");
+            }
+
             entity.Name = entity.Name.Trim();
 
             // find container to update
-            var nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            NodeDto nodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
                 .Where<NodeDto>(dto => dto.NodeId == entity.Id && dto.NodeObjectType == entity.ContainerObjectType));
             if (nodeDto == null)
+            {
                 throw new InvalidOperationException("Could not find container with id " + entity.Id);
+            }
 
             // guard against duplicates
-            var dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
+            NodeDto dupNodeDto = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                 .From<NodeDto>()
-                .Where<NodeDto>(dto => dto.ParentId == entity.ParentId && dto.Text == entity.Name && dto.NodeObjectType == entity.ContainerObjectType));
+                .Where<NodeDto>(dto =>
+                    dto.ParentId == entity.ParentId && dto.Text == entity.Name &&
+                    dto.NodeObjectType == entity.ContainerObjectType));
             if (dupNodeDto != null && dupNodeDto.NodeId != nodeDto.NodeId)
+            {
                 throw new InvalidOperationException("A container with the same name already exists.");
+            }
 
             // update
             nodeDto.Text = entity.Name;
@@ -247,16 +306,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 nodeDto.Path = "-1";
                 if (entity.ParentId > -1)
                 {
-                    var parent = Database.FirstOrDefault<NodeDto>( Sql().SelectAll()
+                    NodeDto parent = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                         .From<NodeDto>()
-                        .Where<NodeDto>(dto => dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
+                        .Where<NodeDto>(dto =>
+                            dto.NodeId == entity.ParentId && dto.NodeObjectType == entity.ContainerObjectType));
 
                     if (parent == null)
-                        throw new InvalidOperationException("Could not find parent container with id " + entity.ParentId);
+                    {
+                        throw new InvalidOperationException(
+                            "Could not find parent container with id " + entity.ParentId);
+                    }
 
                     nodeDto.Level = Convert.ToInt16(parent.Level + 1);
                     nodeDto.Path = parent.Path + "," + nodeDto.NodeId;
                 }
+
                 nodeDto.ParentId = entity.ParentId;
             }
 

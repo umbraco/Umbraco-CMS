@@ -8,14 +8,13 @@
         show-caret="true"
         has-popup="true"
         is-expanded="dropdown.isOpen"
-        disabled="!actions || !actions.length || isDisabled"
-        >
+        disabled="!actions || !actions.length || isDisabled">
     </umb-button>
 
     <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
-        <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
+        <umb-dropdown-item class="umb-action" ng-class="{'sep': action.separator, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <button type="button" ng-click="executeMenuItem(action)">
-                <umb-icon icon="icon-{{action.cssclass}}" class="icon"></umb-icon>
+                <umb-icon icon="{{action.icon}}" class="icon"></umb-icon>
                 <!-- Render the text that will be visually displayed -->
                 <span class="menu-label" aria-hidden="true">{{action.name}}</span>
                 <!-- Render the textDescription from the language files if it's attached to the action object-->

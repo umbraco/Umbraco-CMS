@@ -1,60 +1,100 @@
-<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm" ng-cloak>
-    <div class="umb-pane">
-        <form novalidate name="createRelationTypeForm"
-              val-form-manager
-              ng-submit="vm.createRelationType()">
+<div ng-cloak ng-controller="Umbraco.Editors.RelationTypes.CreateController as vm">
 
-            <!-- Name -->
-            <umb-control-group label="@relationType_name" alias="relationTypeName">
-                <input type="text" name="relationTypeName" id="relationTypeName" ng-model="vm.relationType.name" class="umb-textstring textstring input-block-level" umb-auto-focus required />
-            </umb-control-group>
+  <form name="createRelationTypeForm" ng-submit="vm.createRelationType()"
+        novalidate
+        val-form-manager>
+    <div class="umbracoDialog umb-dialog-body with-footer">
+      <div class="umb-pane">
+        <!-- Name -->
+        <umb-control-group alias="relationTypeName" label="@relationType_name">
+          <input class="umb-textstring textstring input-block-level" id="relationTypeName" name="relationTypeName" ng-model="vm.relationType.name"
+                 required type="text" umb-auto-focus/>
+        </umb-control-group>
 
-            <!-- Direction -->
-            <umb-control-group label="@relationType_direction">
-                <p tabindex="0" class="sr-only"><localize key="relationType_direction"></localize></p>
-                <ul class="unstyled">
-                    <li>
-                        <label class="radio" for="parentToChild">
-                            <umb-radiobutton name="relationType-direction"
-                                             value="false"
-                                             model="vm.relationType.isBidirectional" required="true" input-id="parentToChild"
-                                             label-key="relationType_parentToChild">
-                            </umb-radiobutton>
-                        </label>
-                    </li>
-                    <li>
-                        <label class="radio" for="bidirectional">
-                            <umb-radiobutton name="relationType-direction"
-                                             value="true"
-                                             model="vm.relationType.isBidirectional" required="true"  input-id="bidirectional"
-                                             label-key="relationType_bidirectional">
-                            </umb-radiobutton>
-                        </label>
-                    </li>
-                </ul>
-            </umb-control-group>
+        <!-- Direction -->
+        <umb-control-group label="@relationType_direction">
+          <p class="sr-only" tabindex="0">
+            <localize key="relationType_direction"></localize>
+          </p>
+          <ul class="unstyled">
+            <li>
+              <label class="radio" for="parentToChild">
+                <umb-radiobutton input-id="parentToChild"
+                                 label-key="relationType_parentToChild"
+                                 model="vm.relationType.isBidirectional" name="relationType-direction" required="true"
+                                 value="false">
+                </umb-radiobutton>
+              </label>
+            </li>
+            <li>
+              <label class="radio" for="bidirectional">
+                <umb-radiobutton input-id="bidirectional"
+                                 label-key="relationType_bidirectional"
+                                 model="vm.relationType.isBidirectional" name="relationType-direction" required="true"
+                                 value="true">
+                </umb-radiobutton>
+              </label>
+            </li>
+          </ul>
+        </umb-control-group>
 
-            <!-- Parent -->
-            <umb-control-group label="@relationType_parent" alias="relationType-parent">
-                <select name="relationType-parent" id="relationType-parent"
-                        ng-model="vm.relationType.parentObjectType"
-                        class="umb-property-editor umb-dropdown" required>
-                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
-                </select>
-            </umb-control-group>
+        <!-- Parent -->
+        <umb-control-group alias="relationType-parent" label="@relationType_parent">
+          <select class="umb-property-editor umb-dropdown" id="relationType-parent"
+                  name="relationType-parent"
+                  ng-model="vm.relationType.parentObjectType" required>
+            <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+          </select>
+        </umb-control-group>
 
-            <!-- Child -->
-            <umb-control-group label="@relationType_child" alias="relationType-child">
-                <select name="relationType-child" id="relationType-child"
-                        ng-model="vm.relationType.childObjectType"
-                        class="umb-property-editor umb-dropdown" required>
-                    <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
-                </select>
-            </umb-control-group>
+        <!-- Child -->
+        <umb-control-group alias="relationType-child" label="@relationType_child">
+          <select class="umb-property-editor umb-dropdown" id="relationType-child"
+                  name="relationType-child"
+                  ng-model="vm.relationType.childObjectType" required>
+            <option ng-repeat="objectType in vm.objectTypes" value="{{objectType.id}}">{{objectType.name}}</option>
+          </select>
+        </umb-control-group>
 
-            <button type="submit" class="btn btn-primary">
-                <localize key="general_create">Create</localize>
-            </button>
-        </form>
+        <!-- IsDependency -->
+
+        <umb-control-group label="@relationType_isDependency">
+          <p class="sr-only" tabindex="0">
+            <localize key="relationType_direction"></localize>
+          </p>
+          <ul class="unstyled">
+            <li>
+              <label class="radio" for="dependency">
+                <umb-radiobutton input-id="dependency"
+                                 label-key="relationType_dependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="true">
+                </umb-radiobutton>
+              </label>
+            </li>
+            <li>
+              <label class="radio" for="nodependency">
+                <umb-radiobutton input-id="nodependency"
+                                 label-key="relationType_noDependency"
+                                 model="vm.relationType.isDependency" name="relationType-isdependency" required="true"
+                                 value="false">
+                </umb-radiobutton>
+              </label>
+            </li>
+          </ul>
+        </umb-control-group>
+      </div>
     </div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+      <umb-button action="close()"
+                  button-style="link"
+                  label-key="general_close"
+                  type="button">
+      </umb-button>
+      <umb-button button-style="primary"
+                  label-key="general_create"
+                  type="submit">
+      </umb-button>
+    </div>
+  </form>
 </div>

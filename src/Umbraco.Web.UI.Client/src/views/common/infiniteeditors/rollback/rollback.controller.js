@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
+    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService, notificationsService) {
 
         var vm = this;
 
@@ -10,6 +10,9 @@
         vm.changeVersion = changeVersion;
         vm.submit = submit;
         vm.close = close;
+        vm.pinVersion = pinVersion;
+        vm.goToPage = goToPage;
+        vm.paginationCount = { from: 0, to: 0, total: 0 };
 
         //////////
 
@@ -21,6 +24,11 @@
             vm.currentVersion = null;
             vm.rollbackButtonDisabled = true;
             vm.labels = {};
+
+            vm.pageSize = 15;
+            vm.pageNumber = 1;
+            vm.totalPages = 1;
+            vm.totalItems = 0;
 
             // find the current version for invariant nodes
             if($scope.model.node.variants.length === 1) {
@@ -49,7 +57,7 @@
             });
 
             // Load in diff library
-            assetsService.loadJs('lib/jsdiff/diff.min.js', $scope).then(function () {
+            assetsService.loadJs('lib/jsdiff/diff.js', $scope).then(function () {
 
                 getVersions().then(function(){
                     vm.loading = false;
@@ -61,27 +69,40 @@
 
         function changeLanguage(language) {
             vm.currentVersion = language;
+            vm.pageNumber = 1;
             getVersions();
         }
 
         function changeVersion(version) {
 
-            if(version && version.versionId) {
+            const canRollback = !version.currentDraftVersion && !version.currentPublishedVersion;
 
-                vm.loading = true;
+            if (canRollback === false) {
+                return;
+            }
 
+            if (vm.previousVersion && version && vm.previousVersion.versionId === version.versionId) {
+                vm.previousVersion = null;
+                vm.diff = null;
+                vm.rollbackButtonDisabled = true;
+                return;
+            }
+
+            if (version && version.versionId) {
+                vm.loadingDiff = true;
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
                 contentResource.getRollbackVersion(version.versionId, culture)
                     .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
+                        vm.previousVersion.displayValue = version.displayValue + ' - ' + version.username;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
-                        vm.loading = false;
+                        vm.loadingDiff = false;
                         vm.rollbackButtonDisabled = false;
                     }, function () {
-                        vm.loading = false;
+                        vm.loadingDiff = false;
                     });
 
             } else {
@@ -93,15 +114,26 @@
         function getVersions() {
 
             const nodeId = $scope.model.node.id;
-            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
+            const culture = vm.currentVersion.language ? vm.currentVersion.language.culture : null;
 
-            return contentResource.getRollbackVersions(nodeId, culture)
+            return contentResource.getPagedContentVersions(nodeId, vm.pageNumber, vm.pageSize, culture)
                 .then(function (data) {
+                    vm.totalPages = data.totalPages;
+                    vm.totalItems = data.totalItems;
+
+                    const possibleTotalItems = vm.pageNumber * vm.pageSize;
+
+                    vm.paginationCount = {
+                        from: (vm.pageNumber * vm.pageSize - vm.pageSize) + 1,
+                        to: vm.totalItems < possibleTotalItems ? vm.totalItems : possibleTotalItems,
+                        total: vm.totalItems
+                    };
+
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        vm.previousVersions = data.map(version => {
+                        vm.previousVersions = data.items.map(version => {
                             var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                            version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
+                            version.displayValue = timestampFormatted;
                             return version;
                         });
                     });
@@ -116,7 +148,7 @@
             vm.diff.properties = [];
 
             // find diff in name
-            vm.diff.name = JsDiff.diffWords(currentVersion.name, previousVersion.name);
+            vm.diff.name = Diff.diffWords(currentVersion.name, previousVersion.name);
 
             // extract all properties from the tabs and create new object for the diff
             currentVersion.tabs.forEach(function (tab) {
@@ -160,7 +192,7 @@
                         const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
-                            'diff': property.isObject ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
+                            'diff': property.isObject ? Diff.diffJson(property.value, oldProperty.value) : Diff.diffWords(property.value, oldProperty.value),
                             'isObject': property.isObject || oldProperty.isObject
                         };
                         
@@ -198,6 +230,39 @@
             if($scope.model.close) {
                 $scope.model.close();
             }
+        }
+
+        function pinVersion (version, event) {
+            if (!version) {
+                return;
+            }
+
+            version.pinningState = 'busy';
+
+            const nodeId = $scope.model.node.id;
+            const versionId = version.versionId;
+            const preventCleanup = !version.preventCleanup;
+
+            contentResource.contentVersionPreventCleanup(nodeId, versionId, preventCleanup)
+                .then(() => {
+                    version.pinningState = 'success';
+                    version.preventCleanup = preventCleanup;
+                }, () => {
+                    version.pinningState = 'error';
+
+                    const localizationKey = preventCleanup ? 'speechBubbles_preventCleanupEnableError' : 'speechBubbles_preventCleanupDisableError';
+
+                    localizationService.localize(localizationKey).then(value => {
+                        notificationsService.error(value);
+                    });
+                });
+
+            event.stopPropagation();
+        }
+
+        function goToPage (pageNumber) {
+            vm.pageNumber = pageNumber;
+            getVersions();
         }
 
         onInit();

@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         {
             public int NodeId { get; set; }
             public int LanguageId { get; set; }
-            public string Name { get; set; }
+            public string? Name { get; set; }
         }
         // ReSharper restore UnusedAutoPropertyAccessor.Local
     }

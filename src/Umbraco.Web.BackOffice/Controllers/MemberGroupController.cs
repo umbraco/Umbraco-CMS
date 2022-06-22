@@ -12,21 +12,20 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
-    /// An API controller used for dealing with member groups
+    ///     An API controller used for dealing with member groups
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
     [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberGroupService _memberGroupService;
         private readonly IUmbracoMapper _umbracoMapper;
-        private readonly ILocalizedTextService _localizedTextService;
 
         public MemberGroupController(
             IMemberGroupService memberGroupService,
@@ -35,34 +34,35 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _localizedTextService =
+                localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
-        /// Gets the member group json for the member group id
+        ///     Gets the member group json for the member group id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberGroupDisplay> GetById(int id)
+        public ActionResult<MemberGroupDisplay?> GetById(int id)
         {
-            IMemberGroup memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
             }
 
-            MemberGroupDisplay dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+            MemberGroupDisplay? dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
             return dto;
         }
 
         /// <summary>
-        /// Gets the member group json for the member group guid
+        ///     Gets the member group json for the member group guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberGroupDisplay> GetById(Guid id)
+        public ActionResult<MemberGroupDisplay?> GetById(Guid id)
         {
-            IMemberGroup memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -72,11 +72,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the member group json for the member group udi
+        ///     Gets the member group json for the member group udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<MemberGroupDisplay> GetById(Udi id)
+        public ActionResult<MemberGroupDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            IMemberGroup memberGroup = _memberGroupService.GetById(guidUdi.Guid);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(guidUdi.Guid);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -94,13 +94,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery] int[] ids)
-            => _memberGroupService.GetByIds(ids).Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
+            => _memberGroupService.GetByIds(ids).Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>).WhereNotNull();
 
         [HttpDelete]
         [HttpPost]
         public IActionResult DeleteById(int id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup? memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -112,34 +112,61 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<MemberGroupDisplay> GetAllGroups()
             => _memberGroupService.GetAll()
-                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
+                .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>).WhereNotNull();
 
-        public MemberGroupDisplay GetEmpty()
+        public MemberGroupDisplay? GetEmpty()
         {
             var item = new MemberGroup();
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(item);
         }
 
-        public ActionResult<MemberGroupDisplay> PostSave(MemberGroupSave saveModel)
+        public bool IsMemberGroupNameUnique(int id, string? oldName, string? newName)
         {
+            if (newName == oldName)
+            {
+                return true; // name hasn't changed
+            }
 
-            var id = int.Parse(saveModel.Id.ToString(), CultureInfo.InvariantCulture);
-            IMemberGroup memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
+            IMemberGroup? memberGroup = _memberGroupService.GetByName(newName);
+            if (memberGroup == null)
+            {
+                return true; // no member group found
+            }
+
+            return memberGroup.Id == id;
+        }
+
+        public ActionResult<MemberGroupDisplay?> PostSave(MemberGroupSave saveModel)
+        {
+            var id = saveModel.Id is not null ? int.Parse(saveModel.Id.ToString()!, CultureInfo.InvariantCulture) : default;
+            IMemberGroup? memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
             {
                 return NotFound();
             }
 
-            memberGroup.Name = saveModel.Name;
-            _memberGroupService.Save(memberGroup);
+            if (IsMemberGroupNameUnique(memberGroup.Id, memberGroup.Name, saveModel.Name))
+            {
+                memberGroup.Name = saveModel.Name;
+                _memberGroupService.Save(memberGroup);
 
-            MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+                MemberGroupDisplay? display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
-            display.AddSuccessNotification(
-                            _localizedTextService.Localize("speechBubbles","memberGroupSavedHeader"),
-                            string.Empty);
+                display?.AddSuccessNotification(
+                    _localizedTextService.Localize("speechBubbles", "memberGroupSavedHeader"),
+                    string.Empty);
 
-            return display;
+                return display;
+            }
+            else
+            {
+                MemberGroupDisplay? display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+                display?.AddErrorNotification(
+                    _localizedTextService.Localize("speechBubbles", "memberGroupNameDuplicate"),
+                    string.Empty);
+
+                return display;
+            }
         }
     }
 }

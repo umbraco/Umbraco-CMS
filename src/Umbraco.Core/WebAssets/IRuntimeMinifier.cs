@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths);
+        void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[]? filePaths);
 
         /// <summary>
         /// Renders the html link tag for the bundle
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths);
+        void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[]? filePaths);
 
         /// <summary>
         /// Renders the html script tag for the bundle
@@ -83,12 +83,23 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <param name="fileContent"></param>
         /// <param name="assetType"></param>
         /// <returns></returns>
-        Task<string> MinifyAsync(string fileContent, AssetType assetType);
+        Task<string> MinifyAsync(string? fileContent, AssetType assetType);
 
         /// <summary>
         /// Ensures that all runtime minifications are refreshed on next request. E.g. Clearing cache.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// No longer necessary, invalidation occurs automatically if any of the following occur.
+        /// </para>
+        /// <list type="bullet">
+        /// <item>Your sites assembly information version changes.</item>
+        /// <item>Umbraco.Cms.Core assembly information version changes.</item>
+        /// <item>RuntimeMinificationSettings Version string changes.</item>
+        /// </list>
+        /// <see href="https://our.umbraco.com/documentation/Reference/V9-Config/RuntimeMinificationSettings/" /> for further details.
+        /// </remarks>
+        [Obsolete("Invalidation is handled automatically. Scheduled for removal V11.")]
         void Reset();
-
     }
 }

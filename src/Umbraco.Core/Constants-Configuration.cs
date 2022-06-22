@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -17,6 +17,7 @@
             public const string ConfigCustomErrorsPrefix = ConfigPrefix + "CustomErrors:";
             public const string ConfigGlobalPrefix = ConfigPrefix + "Global:";
             public const string ConfigGlobalId = ConfigGlobalPrefix + "Id";
+            public const string ConfigGlobalDistributedLockingMechanism = ConfigGlobalPrefix + "DistributedLockingMechanism";
             public const string ConfigHostingPrefix = ConfigPrefix + "Hosting:";
             public const string ConfigModelsBuilderPrefix = ConfigPrefix + "ModelsBuilder:";
             public const string ConfigSecurityPrefix = ConfigPrefix + "Security:";
@@ -26,6 +27,7 @@
             public const string ConfigHostingDebug = ConfigHostingPrefix + "Debug";
             public const string ConfigCustomErrorsMode = ConfigCustomErrorsPrefix + "Mode";
             public const string ConfigActiveDirectory = ConfigPrefix + "ActiveDirectory";
+            public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
             public const string ConfigContent = ConfigPrefix + "Content";
             public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
             public const string ConfigExceptionFilter = ConfigPrefix + "ExceptionFilter";
@@ -53,6 +55,23 @@
             public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
             public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
             public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
+            public const string ConfigContentDashboard = ConfigPrefix + "ContentDashboard";
+            public const string ConfigHelpPage = ConfigPrefix + "HelpPage";
+            public const string ConfigInstallDefaultData = ConfigPrefix + "InstallDefaultData";
+
+            public static class NamedOptions
+            {
+                public static class InstallDefaultData
+                {
+                    public const string Languages = "Languages";
+
+                    public const string DataTypes = "DataTypes";
+
+                    public const string MediaTypes = "MediaTypes";
+
+                    public const string MemberTypes = "MemberTypes";
+                }
+            }
         }
     }
 }

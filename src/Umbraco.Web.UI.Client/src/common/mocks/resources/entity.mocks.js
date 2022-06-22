@@ -34,6 +34,15 @@ angular.module('umbraco.mocks').
           return [200, nodes, null];
       }
 
+      function returnUrlsByIds(status, data, headers) {
+
+          if (!mocksUtils.checkAuth()) {
+              return [401, null, null];
+          }
+
+          return [200, {}, null];
+      }
+
       function returnEntitybyIdsPost(method, url, data, headers) {
 
           if (!mocksUtils.checkAuth()) {
@@ -72,6 +81,10 @@ angular.module('umbraco.mocks').
               $httpBackend
                   .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetByIds'))
                   .respond(returnEntitybyIdsPost);
+
+              $httpBackend
+                  .whenPOST(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetUrlsByIds'))
+                  .respond(returnUrlsByIds);
 
               $httpBackend
                   .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Entity/GetAncestors'))

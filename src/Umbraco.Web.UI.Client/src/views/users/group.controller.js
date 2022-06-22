@@ -219,9 +219,8 @@
                 section: "content",
                 treeAlias: "content",
                 hideSubmitButton: true,
-                submit: function (model) {
-                    if (model.selection) {
-                        var node = model.selection[0];
+                select: function (node) {
+                    if (node) {
                         //check if this is already in our selection
                         var found = _.find(vm.userGroup.assignedPermissions, function (i) {
                             return i.id === node.id;

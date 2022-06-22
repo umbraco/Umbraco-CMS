@@ -13,17 +13,17 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Creates a <see cref="UrlInfo"/> instance representing a true URL.
         /// </summary>
-        public static UrlInfo Url(string text, string culture = null) => new UrlInfo(text, true, culture);
+        public static UrlInfo Url(string text, string? culture = null) => new UrlInfo(text, true, culture);
 
         /// <summary>
         /// Creates a <see cref="UrlInfo"/> instance representing a message.
         /// </summary>
-        public static UrlInfo Message(string text, string culture = null) => new UrlInfo(text, false, culture);
+        public static UrlInfo Message(string text, string? culture = null) => new UrlInfo(text, false, culture);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlInfo"/> class.
         /// </summary>
-        public UrlInfo(string text, bool isUrl, string culture)
+        public UrlInfo(string text, bool isUrl, string? culture)
         {
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(text));
             IsUrl = isUrl;
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Gets the culture.
         /// </summary>
         [DataMember(Name = "culture")]
-        public string Culture { get; }
+        public string? Culture { get; }
 
         /// <summary>
         /// Gets a value indicating whether the URL is a true URL.
@@ -58,14 +58,14 @@ namespace Umbraco.Cms.Core.Routing
         /// <remarks>
         /// Compare both culture and Text as invariant strings since URLs are not case sensitive, nor are culture names within Umbraco
         /// </remarks>
-        public bool Equals(UrlInfo other)
+        public bool Equals(UrlInfo? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(Culture, other.Culture, StringComparison.InvariantCultureIgnoreCase) && IsUrl == other.IsUrl && string.Equals(Text, other.Text, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

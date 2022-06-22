@@ -469,7 +469,7 @@
 .umb-cropper .crop-container {
     position: relative;
     width: 100%;
-    padding-bottom: 9 / 16 * 100%;
+    padding-bottom: (9 / 16 * 100%);
 }
 
 .umb-cropper img {
@@ -519,15 +519,17 @@
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: @zindexCropperOverlay - 1;
+    z-index: (@zindexCropperOverlay - 1);
     box-shadow: 0 0 0 2000px rgba(255, 255, 255, .8);
 }
 .umb-cropper .viewport .__mask-info {
     position: absolute;
     bottom: -20px;
     height: 20px;
+    min-width: 100px;
     right: 0;
-    z-index: @zindexCropperOverlay - 1;
+    text-align: right;
+    z-index: (@zindexCropperOverlay - 1);
     font-size: 12px;
     opacity: 0.7;
     padding: 0px 6px;
@@ -566,12 +568,17 @@
     }
 }
 
-.umb-cropper .crop-controls-wrapper__icon-left {
-    margin-right: 10px;
-
-}
+.umb-cropper .crop-controls-wrapper__icon-left,
 .umb-cropper .crop-controls-wrapper__icon-right {
-    margin-left: 10px;
+    color: @gray-3;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-left {
+    margin-right: 15px;
+}
+
+.umb-cropper .crop-controls-wrapper__icon-right {
+    margin-left: 15px;
     font-size: 22px;
 }
 
@@ -621,6 +628,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
+            > a {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
 
             img {
                 display: block;
@@ -722,7 +735,7 @@
     top: 3px;
     right: 3px;
     cursor: pointer;
-    z-index: @zindexCropperOverlay + 1;
+    z-index: (@zindexCropperOverlay + 1);
 }
 
 .umb-close-cropper:hover {
@@ -815,11 +828,15 @@
 .umb-fileupload {
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    border: 1px solid @inputBorder;
+    box-sizing: border-box;
+    width: 100%;
+    .umb-property-editor--limit-width();
 }
 
 .umb-fileupload .preview {
   border-radius: 5px;
-  border: 1px solid @gray-6;
   padding: 3px;
   background: @gray-9;
   float: left;

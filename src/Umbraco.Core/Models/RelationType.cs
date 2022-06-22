@@ -9,20 +9,28 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RelationType : EntityBase, IRelationType
+    public class RelationType : EntityBase, IRelationType, IRelationTypeWithIsDependency
     {
         private string _name;
         private string _alias;
         private bool _isBidirectional;
+        private bool _isDependency;
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
         public RelationType(string alias, string name)
-            : this(name: name, alias: alias, false, null, null)
+            : this(name: name, alias: alias, false, null, null, false)
         {
         }
 
+        [Obsolete("Use ctor with isDependency parameter")]
         public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
+        :this(name,alias,isBidrectional, parentObjectType, childObjectType, false)
+        {
+
+        }
+
+        public RelationType(string? name, string? alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType, bool isDependency)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
@@ -32,6 +40,7 @@ namespace Umbraco.Cms.Core.Models
             _name = name;
             _alias = alias;
             _isBidirectional = isBidrectional;
+            _isDependency = isDependency;
             _parentObjectType = parentObjectType;
             _childObjectType = childObjectType;
         }
@@ -40,10 +49,10 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets the Name of the RelationType
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
             get => _name;
-            set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+            set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
         }
 
         /// <summary>
@@ -53,7 +62,7 @@ namespace Umbraco.Cms.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            set => SetPropertyValueAndDetectChanges(value, ref _alias!, nameof(Alias));
         }
 
         /// <summary>
@@ -88,5 +97,11 @@ namespace Umbraco.Cms.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _childObjectType, nameof(ChildObjectType));
         }
 
+
+        public bool IsDependency
+        {
+            get => _isDependency;
+            set => SetPropertyValueAndDetectChanges(value, ref _isDependency, nameof(IsDependency));
+        }
     }
 }

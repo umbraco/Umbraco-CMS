@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
@@ -26,26 +28,29 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>, IUserSessionStore<BackOfficeIdentityUser>
     {
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
-        private readonly IExternalLoginService _externalLoginService;
+        private readonly IExternalLoginWithKeyService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
+        private readonly ITwoFactorLoginService _twoFactorLoginService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
         /// </summary>
+        [ActivatorUtilitiesConstructor]
         public BackOfficeUserStore(
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             IUserService userService,
             IEntityService entityService,
-            IExternalLoginService externalLoginService,
-            IOptions<GlobalSettings> globalSettings,
+            IExternalLoginWithKeyService externalLoginService,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
-            AppCaches appCaches)
+            AppCaches appCaches,
+            ITwoFactorLoginService twoFactorLoginService)
             : base(describer)
         {
             _scopeProvider = scopeProvider;
@@ -55,8 +60,69 @@ namespace Umbraco.Cms.Core.Security
             _globalSettings = globalSettings.Value;
             _mapper = mapper;
             _appCaches = appCaches;
+            _twoFactorLoginService = twoFactorLoginService;
             _userService = userService;
             _externalLoginService = externalLoginService;
+        }
+
+        [Obsolete("Use non obsolete ctor")]
+        public BackOfficeUserStore(
+            ICoreScopeProvider scopeProvider,
+            IUserService userService,
+            IEntityService entityService,
+            IExternalLoginWithKeyService externalLoginService,
+            IOptions<GlobalSettings> globalSettings,
+            IUmbracoMapper mapper,
+            BackOfficeErrorDescriber describer,
+            AppCaches appCaches)
+            : this(
+                scopeProvider,
+                userService,
+                entityService,
+                externalLoginService,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
+                mapper,
+                describer,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+        {
+
+        }
+
+        [Obsolete("Use non obsolete ctor")]
+        public BackOfficeUserStore(
+            ICoreScopeProvider scopeProvider,
+            IUserService userService,
+            IEntityService entityService,
+            IExternalLoginService externalLoginService,
+            IOptions<GlobalSettings> globalSettings,
+            IUmbracoMapper mapper,
+            BackOfficeErrorDescriber describer,
+            AppCaches appCaches)
+            : this(
+                scopeProvider,
+                userService,
+                entityService,
+                StaticServiceProvider.Instance.GetRequiredService<IExternalLoginWithKeyService>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<GlobalSettings>>(),
+                mapper,
+                describer,
+                appCaches,
+                StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
+        {
+
+        }
+
+        /// <inheritdoc />
+        public override async Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intUserId))
+            {
+                return await base.GetTwoFactorEnabledAsync(user, cancellationToken);
+            }
+
+            return await _twoFactorLoginService.IsTwoFactorEnabledAsync(user.Key);
         }
 
         /// <inheritdoc />
@@ -104,7 +170,7 @@ namespace Umbraco.Cms.Core.Security
             if (isLoginsPropertyDirty)
             {
                 _externalLoginService.Save(
-                    userEntity.Id,
+                    userEntity.Key,
                     user.Logins.Select(x => new ExternalLogin(
                         x.LoginProvider,
                         x.ProviderKey,
@@ -114,7 +180,7 @@ namespace Umbraco.Cms.Core.Security
             if (isTokensPropertyDirty)
             {
                 _externalLoginService.Save(
-                    userEntity.Id,
+                    userEntity.Key,
                     user.LoginTokens.Select(x => new ExternalLoginToken(
                         x.LoginProvider,
                         x.Name,
@@ -139,9 +205,9 @@ namespace Umbraco.Cms.Core.Security
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            using (IScope scope = _scopeProvider.CreateScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                IUser found = _userService.GetUserById(asInt);
+                IUser? found = _userService.GetUserById(asInt);
                 if (found != null)
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -156,7 +222,7 @@ namespace Umbraco.Cms.Core.Security
                     if (isLoginsPropertyDirty)
                     {
                         _externalLoginService.Save(
-                            found.Id,
+                            found.Key,
                             user.Logins.Select(x => new ExternalLogin(
                                 x.LoginProvider,
                                 x.ProviderKey,
@@ -166,7 +232,7 @@ namespace Umbraco.Cms.Core.Security
                     if (isTokensPropertyDirty)
                     {
                         _externalLoginService.Save(
-                            found.Id,
+                            found.Key,
                             user.LoginTokens.Select(x => new ExternalLoginToken(
                                 x.LoginProvider,
                                 x.Name,
@@ -190,13 +256,14 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IUser found = _userService.GetUserById(UserIdToInt(user.Id));
+            var userId = UserIdToInt(user.Id);
+            IUser? found = _userService.GetUserById(userId);
             if (found != null)
             {
                 _userService.Delete(found);
             }
 
-            _externalLoginService.DeleteUserLogins(UserIdToInt(user.Id));
+            _externalLoginService.DeleteUserLogins(userId.ToGuid());
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -207,13 +274,13 @@ namespace Umbraco.Cms.Core.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            IUser user = _userService.GetUserById(UserIdToInt(userId));
+            IUser? user = _userService.GetUserById(UserIdToInt(userId));
             if (user == null)
             {
-                return Task.FromResult((BackOfficeIdentityUser)null);
+                return Task.FromResult((BackOfficeIdentityUser?)null)!;
             }
 
-            return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)));
+            return Task.FromResult(AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user)))!;
         }
 
         /// <inheritdoc />
@@ -221,15 +288,15 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IUser user = _userService.GetByUsername(userName);
+            IUser? user = _userService.GetByUsername(userName);
             if (user == null)
             {
-                return Task.FromResult((BackOfficeIdentityUser)null);
+                return Task.FromResult((BackOfficeIdentityUser)null!);
             }
 
-            BackOfficeIdentityUser result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
+            BackOfficeIdentityUser? result = AssignLoginsCallback(_mapper.Map<BackOfficeIdentityUser>(user));
 
-            return Task.FromResult(result);
+            return Task.FromResult(result)!;
         }
 
         /// <inheritdoc />
@@ -237,12 +304,12 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            IUser user = _userService.GetByEmail(email);
-            BackOfficeIdentityUser result = user == null
+            IUser? user = _userService.GetByEmail(email);
+            BackOfficeIdentityUser? result = user == null
                 ? null
                 : _mapper.Map<BackOfficeIdentityUser>(user);
 
-            return Task.FromResult(AssignLoginsCallback(result));
+            return Task.FromResult(AssignLoginsCallback(result))!;
         }
 
         /// <inheritdoc />
@@ -270,9 +337,12 @@ namespace Umbraco.Cms.Core.Security
             }
 
             ICollection<IIdentityUserLogin> logins = user.Logins;
-            var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id.ToString());
-            IdentityUserLogin userLogin = instance;
-            logins.Add(userLogin);
+            if (user.Id is not null)
+            {
+                var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id.ToString());
+                IdentityUserLogin userLogin = instance;
+                logins.Add(userLogin);
+            }
 
             return Task.CompletedTask;
         }
@@ -287,7 +357,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IIdentityUserLogin userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
+            IIdentityUserLogin? userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
             if (userLogin != null)
             {
                 user.Logins.Remove(userLogin);
@@ -316,16 +386,16 @@ namespace Umbraco.Cms.Core.Security
             ThrowIfDisposed();
 
             BackOfficeIdentityUser user = await FindUserAsync(userId, cancellationToken);
-            if (user == null)
+            if (user is null || user.Id is null)
             {
-                return null;
+                return null!;
             }
 
             IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
-            UserLoginInfo found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
+            UserLoginInfo? found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
             if (found == null)
             {
-                return null;
+                return null!;
             }
 
             return new IdentityUserLogin<string>
@@ -346,7 +416,7 @@ namespace Umbraco.Cms.Core.Security
             var logins = _externalLoginService.Find(loginProvider, providerKey).ToList();
             if (logins.Count == 0)
             {
-                return Task.FromResult((IdentityUserLogin<string>)null);
+                return Task.FromResult((IdentityUserLogin<string>)null!);
             }
 
             IIdentityUserLogin found = logins[0];
@@ -374,10 +444,10 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(normalizedRoleName));
             }
 
-            IUserGroup userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
+            IUserGroup? userGroup = _userService.GetUserGroupByAlias(normalizedRoleName);
 
-            IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup.Id);
-            IList<BackOfficeIdentityUser> backOfficeIdentityUsers = users.Select(x => _mapper.Map<BackOfficeIdentityUser>(x)).ToList();
+            IEnumerable<IUser> users = _userService.GetAllInGroup(userGroup?.Id);
+            IList<BackOfficeIdentityUser> backOfficeIdentityUsers = users.Select(x => _mapper.Map<BackOfficeIdentityUser>(x)).Where(x => x != null).ToList()!;
 
             return Task.FromResult(backOfficeIdentityUsers);
         }
@@ -385,10 +455,10 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc/>
         protected override Task<IdentityRole<string>> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            IUserGroup group = _userService.GetUserGroupByAlias(normalizedRoleName);
+            IUserGroup? group = _userService.GetUserGroupByAlias(normalizedRoleName);
             if (group == null)
             {
-                return Task.FromResult((IdentityRole<string>)null);
+                return Task.FromResult((IdentityRole<string>)null!);
             }
 
             return Task.FromResult(new IdentityRole<string>(group.Name)
@@ -403,20 +473,20 @@ namespace Umbraco.Cms.Core.Security
             BackOfficeIdentityUser user = await FindUserAsync(userId, cancellationToken);
             if (user == null)
             {
-                return null;
+                return null!;
             }
 
-            IdentityUserRole<string> found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
-            return found;
+            IdentityUserRole<string>? found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
+            return found!;
         }
 
-        private BackOfficeIdentityUser AssignLoginsCallback(BackOfficeIdentityUser user)
+        private BackOfficeIdentityUser? AssignLoginsCallback(BackOfficeIdentityUser? user)
         {
             if (user != null)
             {
-                var userId = UserIdToInt(user.Id);
-                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(userId)));
-                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(userId)));
+                var userId = UserIdToInt(user.Id).ToGuid();
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>?>(() => _externalLoginService.GetExternalLogins(userId)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(userId)));
             }
 
             return user;
@@ -429,12 +499,12 @@ namespace Umbraco.Cms.Core.Security
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastLoginDateUtc))
                 || (user.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
-                || (identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
+                || (identityUser.LastLoginDateUtc.HasValue && user.LastLoginDate?.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
                 anythingChanged = true;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-                DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
+                DateTime? dt = identityUser.LastLoginDateUtc?.ToLocalTime();
                 user.LastLoginDate = dt;
             }
 
@@ -446,11 +516,11 @@ namespace Umbraco.Cms.Core.Security
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
-                || (user.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
-                || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
+                || (user.LastPasswordChangeDate.HasValue && user.LastPasswordChangeDate.Value != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate?.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
                 anythingChanged = true;
-                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.EmailConfirmed))
@@ -465,7 +535,7 @@ namespace Umbraco.Cms.Core.Security
                 && user.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
                 anythingChanged = true;
-                user.Name = identityUser.Name;
+                user.Name = identityUser.Name ?? string.Empty;
             }
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Email))
@@ -544,7 +614,7 @@ namespace Umbraco.Cms.Core.Security
 
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Roles)))
             {
-                var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
+                var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).Where(x => x is not null).ToArray();
 
                 anythingChanged = true;
 
@@ -552,7 +622,7 @@ namespace Umbraco.Cms.Core.Security
                 user.ClearGroups();
 
                 // go lookup all these groups
-                IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles).Select(x => x.ToReadOnlyGroup()).ToArray();
+                IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles!).Select(x => x.ToReadOnlyGroup()).ToArray();
 
                 // use all of the ones assigned and add them
                 foreach (IReadOnlyUserGroup group in groups)
@@ -575,7 +645,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
+        public Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId)
         {
             if (Guid.TryParse(sessionId, out Guid guidSessionId))
             {
@@ -604,7 +674,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
             if (token == null)
             {
                 user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
@@ -635,7 +705,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
             if (token != null)
             {
                 user.LoginTokens.Remove(token);
@@ -652,7 +722,7 @@ namespace Umbraco.Cms.Core.Security
         /// tracking ORMs like EFCore.
         /// </remarks>
         /// <inheritdoc />
-        public override Task<string> GetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        public override Task<string?> GetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -661,7 +731,7 @@ namespace Umbraco.Cms.Core.Security
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            IIdentityUserToken? token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
 
             return Task.FromResult(token?.Value);
         }

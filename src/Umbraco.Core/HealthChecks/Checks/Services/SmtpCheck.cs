@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Services
         {
             var success = false;
 
-            SmtpSettings smtpSettings = _globalSettings.CurrentValue.Smtp;
+            SmtpSettings? smtpSettings = _globalSettings.CurrentValue.Smtp;
 
             string message;
             if (smtpSettings == null)

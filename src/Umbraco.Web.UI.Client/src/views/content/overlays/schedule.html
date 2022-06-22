@@ -4,13 +4,13 @@
     <div ng-if="vm.variants.length === 1">
 
         <div class="mb3">
-            <p><localize key="content_schedulePublishHelp"></localize></p>
+            <p><localize key="content_schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</localize></p>
         </div>
 
         <div class="date-wrapper">
             <div class="date-wrapper__date">
                 <label class="bold">
-                    <localize key="content_releaseDate"></localize>
+                    <localize key="content_releaseDate">Publish at</localize>
                 </label>
 
                 <div class="btn-group flex" style="font-size: 15px;">
@@ -44,7 +44,7 @@
             <div class="date-wrapper__date">
 
                 <label class="bold">
-                    <localize key="content_unpublishDate"></localize>
+                    <localize key="content_unpublishDate">Unpublish at</localize>
                 </label>
 
                 <div class="btn-group flex" style="font-size: 15px;">
@@ -80,7 +80,7 @@
     <div ng-if="vm.variants.length > 1">
 
         <div class="mb3">
-            <p><localize key="content_languagesToSchedule"></localize></p>
+            <p><localize key="content_languagesToSchedule">What languages would you like to schedule?</localize></p>
         </div>
 
         <div class="umb-list umb-list--condensed">
@@ -107,7 +107,7 @@
                             <span class="umb-variant-selector-entry__description"
                                   ng-if="!scheduleSelectorForm.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
-                                <span ng-show="variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
+                                <span ng-show="variant.language.isMandatory"> - <localize key="general_mandatory">Mandatory</localize></span>
                             </span>
 
                         </umb-checkbox>

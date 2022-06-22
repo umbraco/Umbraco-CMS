@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _macroService = macroService;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -39,8 +39,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //check if there are any macros
-            root.HasChildren = _macroService.GetAll().Any();
+            if (root is not null)
+            {
+                // Check if there are any macros
+                root.HasChildren = _macroService.GetAll().Any();
+            }
+
             return root;
         }
 
@@ -71,10 +75,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (id == Constants.System.RootString)
             {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService);
+                // Create the normal create action
+                menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
-                //refresh action
+                // refresh action
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
@@ -83,8 +87,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var macro = _macroService.GetById(int.Parse(id, CultureInfo.InvariantCulture));
             if (macro == null) return menu;
 
-            //add delete option for all macros
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            // add delete option for all macros
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             return menu;
         }

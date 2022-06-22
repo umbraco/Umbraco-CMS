@@ -28,6 +28,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
+        /// Sets the default view content provider
+        /// </summary>
+        /// <typeparam name="T">The type of the provider.</typeparam>
+        /// <param name="builder">The builder.</param>
+        /// <returns></returns>
+        public static IUmbracoBuilder SetDefaultViewContentProvider<T>(this IUmbracoBuilder builder)
+            where T : class, IDefaultViewContentProvider
+        {
+            builder.Services.AddUnique<IDefaultViewContentProvider, T>();
+            return builder;
+        }
+
+        /// <summary>
         /// Sets the culture dictionary factory.
         /// </summary>
         /// <param name="builder">The builder.</param>

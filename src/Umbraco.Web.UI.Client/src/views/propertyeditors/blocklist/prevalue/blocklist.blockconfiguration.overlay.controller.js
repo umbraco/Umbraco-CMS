@@ -109,7 +109,7 @@
                         }
                     ]
                 };
-                
+
                 editorService.contentTypePicker(settingsTypePicker);
 
             });
@@ -174,13 +174,13 @@
                     filterCssClass: "not-allowed",
                     select: node => {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.view = "~/" + filepath;
+                        block.view = "~/" + filepath.replace("wwwroot/", "");
                         editorService.close();
                     },
                     close: () => editorService.close()
                 };
-                
-                editorService.filePicker(filePicker);
+
+                editorService.staticFilePicker(filePicker);
 
             });
         };
@@ -206,26 +206,26 @@
         };
 
         vm.addStylesheetForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(localizedTitle => {
+          localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(localizedTitle => {
 
-                const filePicker = {
-                    title: localizedTitle,
-                    isDialog: true,
-                    filter: i => {
-                        return !(i.name.indexOf(".css") !== -1);
-                    },
-                    filterCssClass: "not-allowed",
-                    select: node => {
-                        const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
-                        block.stylesheet = "~/" + filepath;
-                        editorService.close();
-                    },
-                    close: () => editorService.close()
-                };
+            const filePicker = {
+              title: localizedTitle,
+              isDialog: true,
+              filter: i => {
+                return !(i.name.indexOf(".css") !== -1);
+              },
+              filterCssClass: "not-allowed",
+              select: node => {
+                const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
+                block.stylesheet = "~/" + filepath.replace("wwwroot/", "");
+                editorService.close();
+              },
+              close: () => editorService.close()
+            };
 
-                editorService.filePicker(filePicker);
+            editorService.staticFilePicker(filePicker);
 
-            });
+          });
         };
 
         vm.requestRemoveStylesheetForBlock = function(block) {
@@ -251,7 +251,7 @@
         vm.addThumbnailForBlock = function(block) {
 
           localizationService.localize("blockEditor_headlineAddThumbnail").then(localizedTitle => {
-                
+
                 let allowedFileExtensions = ['jpg', 'jpeg', 'png', 'svg', 'webp', 'gif'];
 
                 const thumbnailPicker = {
@@ -269,7 +269,7 @@
                     },
                     close: () => editorService.close()
                 };
-                
+
                 editorService.staticFilePicker(thumbnailPicker);
 
             });

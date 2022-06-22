@@ -14,9 +14,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("name")]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_LogViewerQuery_name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("query")]
-        public string Query { get; set; }
+        public string? Query { get; set; }
     }
 }

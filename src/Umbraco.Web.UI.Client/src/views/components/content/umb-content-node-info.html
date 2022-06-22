@@ -20,6 +20,9 @@
                 </ul>
             </umb-box-content>
         </umb-box>
+
+        <umb-tracked-references id="node.id" ng-if="loadingReferences" ></umb-tracked-references>
+
         <umb-box data-element="node-info-redirects" ng-cloak ng-show="!urlTrackerDisabled && hasRedirects">
             <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
             <umb-box-content class="block-form">
@@ -66,7 +69,7 @@
                         <umb-empty-state
                             position="center"
                             size="small">
-                            <localize key="content_noChanges"></localize>
+                            <localize key="content_noChanges">No changes have been made</localize>
                         </umb-empty-state>
                     </div>
 
@@ -168,7 +171,7 @@
                             <option value="">{{chooseLabel}}...</option>
                         </select>
                         <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
-                            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{node.template}} <localize key="template_template"></localize></span>
+                            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{node.template}} <localize key="template_template">Template</localize></span>
                         </button>
                     </div>
                 </umb-control-group>

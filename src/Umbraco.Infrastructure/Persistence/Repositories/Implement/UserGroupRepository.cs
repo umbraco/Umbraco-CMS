@@ -10,11 +10,11 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return CacheKeys.UserGroupGetByAliasCacheKeyPrefix + alias;
         }
 
-        public IUserGroup Get(string alias)
+        public IUserGroup? Get(string alias)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Database.Fetch<UserGroupDto>(sql).Select(x => UserGroupFactory.BuildEntity(_shortStringHelper, x));
         }
 
-        public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[] userIds)
+        public void AddOrUpdateGroupWithUsers(IUserGroup userGroup, int[]? userIds)
         {
             _userGroupWithUsersRepository.Save(new UserGroupWithUsers(userGroup, userIds));
         }
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <param name="groups"></param>
         /// <param name="fallbackToDefaultPermissions">If true will include the group's default permissions if no permissions are explicitly assigned</param>
         /// <param name="nodeIds">Array of entity Ids, if empty will return permissions for the group for all entities</param>
-        public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[] groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public EntityPermissionCollection GetPermissions(IReadOnlyUserGroup[]? groups, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             if (groups == null) throw new ArgumentNullException(nameof(groups));
 
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         // a struct of the nodeid + groupid so then we don't actually allocate this class just to check if it's not
                         // going to be included in the result!
 
-                        var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions.ToArray(), isDefaultPermissions: true);
+                        var defaultPermission = new EntityPermission(group.Id, nodeId, group.Permissions?.ToArray() ?? Array.Empty<string>(), isDefaultPermissions: true);
                         //Since this is a hashset, this will not add anything that already exists by group/node combination
                         result.Add(defaultPermission);
                     }
@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <param name="groupId">Id of group</param>
         /// <param name="permissions">Permissions as enumerable list of <see cref="char"/> If nothing is specified all permissions are removed.</param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. </param>
-        public void ReplaceGroupPermissions(int groupId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceGroupPermissions(int groupId, IEnumerable<char>? permissions, params int[] entityIds)
         {
             _permissionRepository.ReplacePermissions(groupId, permissions, entityIds);
         }
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,IUserGroup>
 
-        protected override IUserGroup PerformGet(int id)
+        protected override IUserGroup? PerformGet(int id)
         {
             var sql = GetBaseQuery(QueryType.Single);
             sql.Where(GetBaseWhereClause(), new { id = id });
@@ -189,11 +189,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return userGroup;
         }
 
-        protected override IEnumerable<IUserGroup> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IUserGroup> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(QueryType.Many);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
                 sql.WhereIn<UserGroupDto>(x => x.Id, ids);
             else
                 sql.Where<UserGroupDto>(x => x.Id >= 0);
@@ -286,6 +286,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                            {
                                "DELETE FROM umbracoUser2UserGroup WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup2App WHERE userGroupId = @id",
+                               "DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @id",
                                "DELETE FROM umbracoUserGroup WHERE id = @id"
                            };
@@ -345,7 +346,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         private class UserGroupWithUsers : EntityBase
         {
-            public UserGroupWithUsers(IUserGroup userGroup, int[] userIds)
+            public UserGroupWithUsers(IUserGroup userGroup, int[]? userIds)
             {
                 UserGroup = userGroup;
                 UserIds = userIds;
@@ -354,7 +355,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             public override bool HasIdentity => UserGroup.HasIdentity;
 
             public IUserGroup UserGroup { get; }
-            public int[] UserIds { get; }
+            public int[]? UserIds { get; }
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 throw new InvalidOperationException("This method won't be implemented.");
             }
 
-            protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[] ids)
+            protected override IEnumerable<UserGroupWithUsers> PerformGetAll(params int[]? ids)
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }

@@ -36,7 +36,7 @@
           </umb-box>
 
           <table class="table table-hover" ng-if="vm.items.length > 0">
-            <caption class="sr-only"><localize key="visuallyHiddenTexts_dictionaryListCaption"></localize></caption>
+            <caption class="sr-only"><localize key="visuallyHiddenTexts_dictionaryListCaption">Dictionary items</localize></caption>
             <thead>
               <tr>
                 <th><localize key="general_name">Name</localize></th>
@@ -54,8 +54,8 @@
                               class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}">
                     </umb-icon>
                     <span class="sr-only">
-                      <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation"></localize>
-                      <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation"></localize>
+                      <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation">Has translation</localize>
+                      <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation">Missing translation</localize>
                     </span>
                   </button>
                 </td>

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Models
     public class MemberPropertyModel
     {
         [Required]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         //NOTE: This has to be a string currently, if it is an object it will bind as an array which we don't want.
         // If we want to have this as an 'object' with a true type on it, we have to create a custom model binder
@@ -19,10 +19,10 @@ namespace Umbraco.Cms.Core.Models
         // real type anyways.
 
         [DataType(System.ComponentModel.DataAnnotations.DataType.Text)]
-        public string Value { get; set; }
+        public string? Value { get; set; }
 
         [ReadOnly(true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         // TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers can just render their own inside the view
 

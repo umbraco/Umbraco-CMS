@@ -18,7 +18,7 @@
                     <input type="text" name="name" ng-model="message.name" class="umb-textstring textstring input-block-level"
                            val-server-field="name"
                            required />
-                    <span ng-messages="blueprintForm.name.$error" show-validation-on-submit >
+                    <span ng-messages="blueprintForm.name.$error" show-validation-on-submit>
                         <span class="help-inline" ng-message="required"><localize key="required">Required</localize></span>
                         <span class="help-inline" ng-message="valServerField">{{blueprintForm.name.errorMsg}}</span>
                     </span>           

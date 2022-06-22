@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Serialization;
@@ -16,8 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [HideFromTypeFinder]
     public class VoidEditor : DataEditor
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.
         /// </summary>
@@ -26,7 +24,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <remarks>The default alias of the editor is "Umbraco.Void". When a suffix is provided,
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
         public VoidEditor(
-            string aliasSuffix,
+            string? aliasSuffix,
             IDataValueEditorFactory dataValueEditorFactory)
             : base(dataValueEditorFactory)
         {

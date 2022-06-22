@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
         }
 
-        public IManifestValueValidator Create(string name)
+        public IManifestValueValidator? Create(string name)
         {
             var v = GetByName(name);
 
               // TODO: what is this exactly?
               // we cannot return this instance, need to clone it?
-              return (IManifestValueValidator) Activator.CreateInstance(v.GetType()); // ouch
+              return (IManifestValueValidator?) Activator.CreateInstance(v.GetType()); // ouch
           }
 
         public IManifestValueValidator GetByName(string name)

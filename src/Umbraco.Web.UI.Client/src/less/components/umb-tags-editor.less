@@ -1,4 +1,4 @@
-﻿.umb-tags-editor {
+.umb-tags-editor {
     border: @inputBorder solid 1px;
     padding: 5px;
     min-height: 54px;
@@ -14,24 +14,26 @@
         position: relative;
         user-select: all;
 
+        > .btn-icon {
+            color: @white;
+            padding: 0;
+            position: relative;
+            cursor: pointer;
+            padding-left: 2px;
+            font-size: 15px;
+            right: -5px;
+            bottom: -1px;
+            user-select: none;
+        }
+
         .umb_confirm-action {
 
-            > .btn-icon {
-                color: @white;
-                padding: 0;
-                position: relative;
-                cursor: pointer;
-                padding-left: 2px;
-                font-size: 15px;
-                right: -5px;
-                bottom: -1px;
-                user-select: none;
-            }
-
-            .umb_confirm-action__overlay.-left {
-                top: 8px;
-                left: auto;
-                right: 15px;
+            &__overlay {
+                &.-left {
+                  top: 8px;
+                  left: auto;
+                  right: 15px;
+                }
             }
         }
     }

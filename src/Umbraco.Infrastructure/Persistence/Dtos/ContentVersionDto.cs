@@ -44,10 +44,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
-        public ContentDto ContentDto { get; set; }
+        public ContentDto? ContentDto { get; set; }
+
+        [Column("preventCleanup")]
+        [Constraint(Default = "0")]
+        public bool PreventCleanup { get; set; }
     }
 }

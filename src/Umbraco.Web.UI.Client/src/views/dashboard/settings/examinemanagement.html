@@ -158,9 +158,9 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</a>
-                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</span>
-                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{ ::result.values['nodeName'] | umbCmsJoinArray:', '}}</a>
+                                                                    <span ng-hide="result.editUrl">{{ ::result.values['nodeName'] | umbCmsJoinArray:', '}}</span>
+                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{ ::result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -288,27 +288,52 @@
 
                                                 <div ng-if="!vm.selectedIndex.isProcessing && vm.searchResults">
                                                     <br />
-
-                                                    <table class="table table-bordered table-condensed">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="score">Score</th>
-                                                                <th class="id">Id</th>
-                                                                <th><localize key="general_name">Name</localize></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr ng-repeat="result in vm.searchResults.results track by $index">
-                                                                <td>{{result.score}}</td>
-                                                                <td>{{result.id}}</td>
-                                                                <td>
-                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</a>
-                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</span>
-                                                                    <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
+                                                    <div class="result-table">
+                                                        <table class="table table-bordered table-condensed">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="id nowrap" width="40">Id</th>
+                                                                    <th><localize key="general_name">Name</localize></th>
+                                                                    <th class="nowrap" ng-repeat="field in vm.showSearchResultFields">
+                                                                        <div class="flex justify-between">
+                                                                            <span>{{ field }}</span>
+                                                                            <button type="button" class="btn btn-mini btn-white ml-3" ng-click="vm.toggleField(field)">
+                                                                                &times;
+                                                                            </button>
+                                                                        </div>
+                                                                    </th>
+                                                                    <th class="tr nowrap" width="40">
+                                                                        <button type="button" class="btn btn-reset btn-link" style="font:inherit;color:inherit;" ng-click="vm.showSelectFieldsDialog()">Fields</button>
+                                                                    </th>
+                                                                    <th class="score tr nowrap" width="40">Score</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="result in vm.searchResults.results track by $index" valign="top">
+                                                                    <td class="nowrap">{{result.id}}</td>
+                                                                    <td>
+                                                                        <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">
+                                                                            {{ ::result.values['nodeName'] | umbCmsJoinArray:', ' }}
+                                                                        </a>
+                                                                        <span ng-hide="result.editUrl">{{ ::result.values['nodeName'] | umbCmsJoinArray:', ' }}</span>
+                                                                    </td>
+                                                                    <td ng-repeat="field in vm.showSearchResultFields">
+                                                                        {{ ::result.values[field] | umbCmsJoinArray:', ' }}
+                                                                    </td>
+                                                                    <td class="tr nowrap">
+                                                                        <button type="button" 
+                                                                            class="table__action-overlay color-green" 
+                                                                            ng-click="vm.showSearchResultDialog(result.values)">({{ ::result.fieldCount }} <localize key="examineManagement_fields">fields</localize>)</button>
+                                                                    </td>
+                                                                    <td class="tr nowrap umb-avatar--white">
+                                                                        <span title="{{ result.score }}">
+                                                                            {{ ::result.score | number:4 }}
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
 
                                                     <div class="flex justify-center">
                                                         <umb-pagination page-number="vm.searchResults.pageNumber"

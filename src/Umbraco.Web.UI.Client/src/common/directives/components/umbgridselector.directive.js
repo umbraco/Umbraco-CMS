@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    function GridSelector($location, overlayService, editorService) {
+    function GridSelector(overlayService, editorService) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
 
             var eventBindings = [];
             scope.dialogModel = {};
@@ -33,26 +33,30 @@
             };
 
             scope.openItemPicker = function ($event) {
-                var dialogModel = {
-                    view: "itempicker",
-                    title: "Choose " + scope.itemLabel,
-                    availableItems: scope.availableItems,
-                    selectedItems: scope.selectedItems,
-                    position: "target",
-                    event: $event,
-                    submit: function (model) {
-                        scope.selectedItems.push(model.selectedItem);
-                        // if no default item - set item as default
-                        if (scope.defaultItem === null) {
-                            scope.setAsDefaultItem(model.selectedItem);
+                if (scope.itemPicker) {
+                    scope.itemPicker();
+                } else {
+                    var dialogModel = {
+                        view: "itempicker",
+                        title: "Choose " + scope.itemLabel,
+                        availableItems: scope.availableItems,
+                        selectedItems: scope.selectedItems,
+                        position: "target",
+                        event: $event,
+                        submit: function (model) {
+                            scope.selectedItems.push(model.selectedItem);
+                            // if no default item - set item as default
+                            if (scope.defaultItem === null) {
+                                scope.setAsDefaultItem(model.selectedItem);
+                            }
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
                         }
-                        overlayService.close();
-                    },
-                    close: function() {
-                      overlayService.close();
-                    }
-                };
-                overlayService.open(dialogModel);
+                    };
+                    overlayService.open(dialogModel);
+                }
             };
 
             scope.openTemplate = function (selectedItem) {
@@ -156,7 +160,8 @@
                 availableItems: "=",
                 defaultItem: "=",
                 itemName: "@",
-                updatePlaceholder: "="
+                updatePlaceholder: "=",
+                itemPicker: "="
             },
             link: link
         };

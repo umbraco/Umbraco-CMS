@@ -1,7 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -12,49 +15,93 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_3_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_4_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 {
     /// <summary>
-    /// Represents the Umbraco CMS migration plan.
+    ///     Represents the Umbraco CMS migration plan.
     /// </summary>
     /// <seealso cref="MigrationPlan" />
     public class UmbracoPlan : MigrationPlan
     {
-        private readonly IUmbracoVersion _umbracoVersion;
         private const string InitPrefix = "{init-";
         private const string InitSuffix = "}";
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
+        ///     Initializes a new instance of the <see cref="UmbracoPlan" /> class.
         /// </summary>
         /// <param name="umbracoVersion">The Umbraco version.</param>
         public UmbracoPlan(IUmbracoVersion umbracoVersion)
-            : base(Core.Constants.Conventions.Migrations.UmbracoUpgradePlanName)
+            : base(Constants.Conventions.Migrations.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
             DefinePlan();
         }
 
+        /// <inheritdoc />
+        /// <remarks>
+        ///     <para>The default initial state in plans is string.Empty.</para>
+        ///     <para>
+        ///         When upgrading from version 7, we want to use specific initial states
+        ///         that are e.g. "{init-7.9.3}", "{init-7.11.1}", etc. so we can chain the proper
+        ///         migrations.
+        ///     </para>
+        ///     <para>
+        ///         This is also where we detect the current version, and reject invalid
+        ///         upgrades (from a tool old version, or going back in time, etc).
+        ///     </para>
+        /// </remarks>
+        public override string InitialState
+        {
+            get
+            {
+                SemVersion currentVersion = _umbracoVersion.SemanticVersion;
+
+                // only from 8.0.0 and above
+                var minVersion = new SemVersion(8);
+                if (currentVersion < minVersion)
+                {
+                    throw new InvalidOperationException(
+                        $"Version {currentVersion} cannot be migrated to {_umbracoVersion.SemanticVersion}."
+                        + $" Please upgrade first to at least {minVersion}.");
+                }
+
+                // Force versions between 7.14.*-7.15.* into into 7.14 initial state. Because there is no db-changes,
+                // and we don't want users to workaround my putting in version 7.14.0 them self.
+                if (minVersion <= currentVersion && currentVersion < new SemVersion(7, 16))
+                {
+                    return GetInitState(minVersion);
+                }
+
+                // initial state is eg "{init-7.14.0}"
+                return GetInitState(currentVersion);
+            }
+        }
+
         /// <summary>
-        /// Gets the initial state corresponding to a version.
+        ///     Gets the initial state corresponding to a version.
         /// </summary>
         /// <param name="version">The version.</param>
         /// <returns>
-        /// The initial state.
+        ///     The initial state.
         /// </returns>
         private static string GetInitState(SemVersion version) => InitPrefix + version + InitSuffix;
 
         /// <summary>
-        /// Tries to extract a version from an initial state.
+        ///     Tries to extract a version from an initial state.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <param name="version">The version.</param>
         /// <returns>
-        ///   <c>true</c> when the state contains a version; otherwise, <c>false</c>.D
+        ///     <c>true</c> when the state contains a version; otherwise, <c>false</c>.D
         /// </returns>
-        private static bool TryGetInitStateVersion(string state, out string version)
+        private static bool TryGetInitStateVersion(string state, [MaybeNullWhen(false)] out string version)
         {
             if (state.StartsWith(InitPrefix) && state.EndsWith(InitSuffix))
             {
@@ -67,50 +114,20 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         }
 
         /// <inheritdoc />
-        /// <remarks>
-        /// <para>The default initial state in plans is string.Empty.</para>
-        /// <para>When upgrading from version 7, we want to use specific initial states
-        /// that are e.g. "{init-7.9.3}", "{init-7.11.1}", etc. so we can chain the proper
-        /// migrations.</para>
-        /// <para>This is also where we detect the current version, and reject invalid
-        /// upgrades (from a tool old version, or going back in time, etc).</para>
-        /// </remarks>
-        public override string InitialState
-        {
-            get
-            {
-                var currentVersion = _umbracoVersion.SemanticVersion;
-
-                // only from 8.0.0 and above
-                var minVersion = new SemVersion(8, 0);
-                if (currentVersion < minVersion)
-                    throw new InvalidOperationException($"Version {currentVersion} cannot be migrated to {_umbracoVersion.SemanticVersion}."
-                                                        + $" Please upgrade first to at least {minVersion}.");
-
-                // Force versions between 7.14.*-7.15.* into into 7.14 initial state. Because there is no db-changes,
-                // and we don't want users to workaround my putting in version 7.14.0 them self.
-                if (minVersion <= currentVersion && currentVersion < new SemVersion(7, 16))
-                    return GetInitState(minVersion);
-
-                // initial state is eg "{init-7.14.0}"
-                return GetInitState(currentVersion);
-            }
-        }
-
-        /// <inheritdoc />
         public override void ThrowOnUnknownInitialState(string state)
         {
             if (TryGetInitStateVersion(state, out var initVersion))
             {
-                throw new InvalidOperationException($"Version {_umbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
-                                                    + $" Please verify which versions support migrating from {initVersion}.");
+                throw new InvalidOperationException(
+                    $"Version {_umbracoVersion.SemanticVersion} does not support migrating from {initVersion}."
+                    + $" Please verify which versions support migrating from {initVersion}.");
             }
 
             base.ThrowOnUnknownInitialState(state);
         }
 
         /// <summary>
-        /// Defines the plan.
+        ///     Defines the plan.
         /// </summary>
         protected void DefinePlan()
         {
@@ -131,7 +148,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
 
             // plan starts at 7.14.0 (anything before 7.14.0 is not supported)
-            From(GetInitState(new SemVersion(7, 14, 0)));
+            From(GetInitState(new SemVersion(7, 14)));
 
             // begin migrating from v7 - remove all keys and indexes
             To<DeleteKeysAndIndexes>("{B36B9ABD-374E-465B-9C5F-26AB0D39326F}");
@@ -146,14 +163,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
             To<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
             To<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
-            ToWithReplace<AddVariationTables2, AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}", "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}"); // kill AddVariationTable1
+            ToWithReplace<AddVariationTables2, AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}",
+                "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}"); // kill AddVariationTable1
             To<RefactorMacroColumns>("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
 
             Merge()
                 .To<UserForeignKeys>("{3E44F712-E2E3-473A-AE49-5D7F8E67CE3F}")
-            .With()
+                .With()
                 .To<AddTypedLabels>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}")
-            .As("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
+                .As("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
 
             To<ContentVariationMigration>("{1350617A-4930-4D61-852F-E3AA9E692173}");
             To<FallbackLanguage>("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}");
@@ -175,9 +193,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
             Merge()
                 .To<DropXmlTables>("{CDBEDEE4-9496-4903-9CF2-4104E00FF960}")
-            .With()
+                .With()
                 .To<RadioAndCheckboxPropertyEditorsMigration>("{940FD19A-00A8-4D5C-B8FF-939143585726}")
-            .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
+                .As("{0576E786-5C30-4000-B969-302B61E90CA3}");
 
             To<FixLanguageIsoCodeLength>("{48AD6CCD-C7A4-4305-A8AB-38728AD23FC5}");
             To<AddPackagesSectionAccess>("{DF470D86-E5CA-42AC-9780-9D28070E25F9}");
@@ -219,38 +237,58 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // so we need to ensure that migrations from 8.15 are included in the next
             // v9*.
 
-            Merge()
-                // to 8.15.0
-                .To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}")
-                .To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}")
-                .To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}")
-            .With()
-                // to 9.0.0 RC1
-                .To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}")
-                .To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}")
-                .To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}")
-                .To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}")
-                .To<AddPasswordConfigToMemberTable>("{86AC839A-0D08-4D09-B7B5-027445E255A1}")
-            .As("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
+            // to 8.15.0
+            To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
+            To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
+            To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}");
 
-            Merge()
-                // to 8.17.0
-                .To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}")
-            .With()
-                // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
-                // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
-                // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
-                // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}           
-                .To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}")
-                .To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}")
-                .To<DictionaryTablesIndexes>("{12DCDE7F-9AB7-4617-804F-AB66BF360980}")
-            .As("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
+            // to 8.17.0
+            To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
+
+            // Hack to support migration from 8.18
+            To<NoopMigration>("{03482BB0-CF13-475C-845E-ECB8319DBE3C}");
+
+            // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
+            // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
+            // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
+            // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
+            To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}");
+            To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}");
+            To<DictionaryTablesIndexes>("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
+
+            // to 9.0.0 RC1
+            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
+            To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}");
+            To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
+            To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}");
+            To<AddPasswordConfigToMemberTable>("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
+            To<AddPropertyTypeGroupColumns>(
+                "{A2686B49-A082-4B22-97FD-AAB154D46A57}"); // Re-run this migration to make sure it has executed to account for migrations going out of sync between versions.
 
             // TO 9.0.0-rc4
-            To<UmbracoServerColumn>("5E02F241-5253-403D-B5D3-7DB00157E20F");
+            To<UmbracoServerColumn>(
+                "5E02F241-5253-403D-B5D3-7DB00157E20F"); // Jaddie: This GUID is missing the { }, although this likely can't be changed now as it will break installs going forwards
 
-            // TO 9.0.0
+            // TO 9.1.0
+            To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
 
+            // TO 9.2.0
+            To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
+            To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
+
+
+
+            // TO 9.3.0
+            To<MovePackageXMLToDb>("{A2F22F17-5870-4179-8A8D-2362AA4A0A5F}");
+            To<UpdateExternalLoginToUseKeyInsteadOfId>("{CA7A1D9D-C9D4-4914-BC0A-459E7B9C3C8C}");
+            To<AddTwoFactorLoginTable>("{0828F206-DCF7-4F73-ABBB-6792275532EB}");
+
+            // TO 9.4.0
+            To<AddScheduledPublishingLock>("{DBBA1EA0-25A1-4863-90FB-5D306FB6F1E1}");
+            To<UpdateRelationTypesToHandleDependencies>("{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}");
+
+            // TO 10.0.0
+            To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
         }
     }
 }

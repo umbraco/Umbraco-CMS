@@ -69,4 +69,8 @@
         <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
     </div>
 
+    <ng-form name="vm.modelValueForm">
+        <input type="hidden" name="modelValue" ng-model="vm.model.value.length" ng-required="vm.model.validation.mandatory && vm.model.value.length === 0" />
+    </ng-form>
+
 </div>

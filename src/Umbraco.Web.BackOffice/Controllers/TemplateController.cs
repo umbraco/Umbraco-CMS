@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
@@ -12,6 +13,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -24,15 +27,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IFileService _fileService;
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+        [ActivatorUtilitiesConstructor]
         public TemplateController(
             IFileService fileService,
             IUmbracoMapper umbracoMapper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IDefaultViewContentProvider defaultViewContentProvider)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
+        }
+
+        [Obsolete("Use ctor will all params")]
+        public TemplateController(
+            IFileService fileService,
+            IUmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper)
+            : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
+        {
         }
 
         /// <summary>
@@ -40,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
-        public TemplateDisplay GetByAlias(string alias)
+        public TemplateDisplay? GetByAlias(string alias)
         {
             var template = _fileService.GetTemplate(alias);
             return template == null ? null : _umbracoMapper.Map<ITemplate, TemplateDisplay>(template);
@@ -50,9 +66,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Get all templates
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<EntityBasic> GetAll()
+        public IEnumerable<EntityBasic>? GetAll()
         {
-            return _fileService.GetTemplates().Select(_umbracoMapper.Map<ITemplate, EntityBasic>);
+            return _fileService.GetTemplates()?.Select(_umbracoMapper.Map<ITemplate, EntityBasic>).WhereNotNull();
         }
 
         /// <summary>
@@ -60,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<TemplateDisplay> GetById(int id)
+        public ActionResult<TemplateDisplay?> GetById(int id)
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
@@ -75,7 +91,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<TemplateDisplay> GetById(Guid id)
+        public ActionResult<TemplateDisplay?> GetById(Guid id)
         {
             var template = _fileService.GetTemplate(id);
             if (template == null)
@@ -89,7 +105,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult<TemplateDisplay> GetById(Udi id)
+        public ActionResult<TemplateDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -121,7 +137,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return Ok();
         }
 
-        public TemplateDisplay GetScaffold(int id)
+        public TemplateDisplay? GetScaffold(int id)
         {
             //empty default
             var dt = new Template(_shortStringHelper, string.Empty, string.Empty);
@@ -136,10 +152,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
+            var content = _defaultViewContentProvider.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = _umbracoMapper.Map<ITemplate, TemplateDisplay>(dt);
 
-            scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
+            if (scaffold is not null)
+            {
+                scaffold.Content =  content;
+            }
+
             return scaffold;
         }
 
@@ -229,7 +249,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 //create
-                ITemplate master = null;
+                ITemplate? master = null;
                 if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                 {
                     master = _fileService.GetTemplate(display.MasterTemplateAlias);

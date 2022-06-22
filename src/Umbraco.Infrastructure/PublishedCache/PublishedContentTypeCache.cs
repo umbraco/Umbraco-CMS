@@ -19,15 +19,16 @@ namespace Umbraco.Cms.Core.PublishedCache
         private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new Dictionary<string, IPublishedContentType>();
         private readonly Dictionary<int, IPublishedContentType> _typesById = new Dictionary<int, IPublishedContentType>();
         private readonly Dictionary<Guid, int> _keyToIdMap = new Dictionary<Guid, int>();
-        private readonly IContentTypeService _contentTypeService;
-        private readonly IMediaTypeService _mediaTypeService;
-        private readonly IMemberTypeService _memberTypeService;
+        private readonly IContentTypeService? _contentTypeService;
+        private readonly IMediaTypeService? _mediaTypeService;
+        private readonly IMemberTypeService? _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly ILogger<PublishedContentTypeCache> _logger;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private bool _disposedValue;
 
         // default ctor
-        public PublishedContentTypeCache(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
+        public PublishedContentTypeCache(IContentTypeService? contentTypeService, IMediaTypeService? mediaTypeService, IMemberTypeService? memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory, ILogger<PublishedContentTypeCache> logger)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;
@@ -37,7 +38,9 @@ namespace Umbraco.Cms.Core.PublishedCache
         }
 
         // for unit tests ONLY
+#pragma warning disable CS8618
         internal PublishedContentTypeCache(ILogger<PublishedContentTypeCache> logger, IPublishedContentTypeFactory publishedContentTypeFactory)
+#pragma warning restore CS8618
         {
             _logger = logger;
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -118,7 +121,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             {
                 _lock.EnterWriteLock();
 
-                var toRemove = _typesById.Values.Where(x => x.PropertyTypes.Any(xx => xx.DataType.Id == id)).ToArray();
+                var toRemove = _typesById.Values.Where(x => x.PropertyTypes?.Any(xx => xx.DataType.Id == id) ?? false).ToArray();
                 foreach (var type in toRemove)
                 {
                     _typesByAlias.Remove(GetAliasKey(type));
@@ -244,11 +247,11 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, Guid key)
         {
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(key),
-                PublishedItemType.Media => _mediaTypeService.Get(key),
-                PublishedItemType.Member => _memberTypeService.Get(key),
+                PublishedItemType.Content => _contentTypeService?.Get(key),
+                PublishedItemType.Media => _mediaTypeService?.Get(key),
+                PublishedItemType.Member => _memberTypeService?.Get(key),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)
@@ -259,13 +262,11 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, string alias)
         {
-            if (GetPublishedContentTypeByAlias != null)
-                return GetPublishedContentTypeByAlias(alias);
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(alias),
-                PublishedItemType.Media => _mediaTypeService.Get(alias),
-                PublishedItemType.Member => _memberTypeService.Get(alias),
+                PublishedItemType.Content => _contentTypeService?.Get(alias),
+                PublishedItemType.Media => _mediaTypeService?.Get(alias),
+                PublishedItemType.Member => _memberTypeService?.Get(alias),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)
@@ -276,69 +277,17 @@ namespace Umbraco.Cms.Core.PublishedCache
 
         private IPublishedContentType CreatePublishedContentType(PublishedItemType itemType, int id)
         {
-            if (GetPublishedContentTypeById != null)
-                return GetPublishedContentTypeById(id);
-            IContentTypeComposition contentType = itemType switch
+            IContentTypeComposition? contentType = itemType switch
             {
-                PublishedItemType.Content => _contentTypeService.Get(id),
-                PublishedItemType.Media => _mediaTypeService.Get(id),
-                PublishedItemType.Member => _memberTypeService.Get(id),
+                PublishedItemType.Content => _contentTypeService?.Get(id),
+                PublishedItemType.Media => _mediaTypeService?.Get(id),
+                PublishedItemType.Member => _memberTypeService?.Get(id),
                 _ => throw new ArgumentOutOfRangeException(nameof(itemType)),
             };
             if (contentType == null)
                 throw new Exception($"ContentTypeService failed to find a {itemType.ToString().ToLower()} type with id {id}.");
 
             return _publishedContentTypeFactory.CreateContentType(contentType);
-        }
-
-        // for unit tests - changing the callback must reset the cache obviously
-        // TODO: Why does this even exist? For testing you'd pass in a mocked service to get by id
-        private Func<string, IPublishedContentType> _getPublishedContentTypeByAlias;
-        internal Func<string, IPublishedContentType> GetPublishedContentTypeByAlias
-        {
-            get => _getPublishedContentTypeByAlias;
-            set
-            {
-                try
-                {
-                    _lock.EnterWriteLock();
-
-                    _typesByAlias.Clear();
-                    _typesById.Clear();
-                    _getPublishedContentTypeByAlias = value;
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld)
-                        _lock.ExitWriteLock();
-                }
-            }
-        }
-
-        // for unit tests - changing the callback must reset the cache obviously
-        // TODO: Why does this even exist? For testing you'd pass in a mocked service to get by id
-        private Func<int, IPublishedContentType> _getPublishedContentTypeById;
-        private bool _disposedValue;
-
-        internal Func<int, IPublishedContentType> GetPublishedContentTypeById
-        {
-            get => _getPublishedContentTypeById;
-            set
-            {
-                try
-                {
-                    _lock.EnterWriteLock();
-
-                    _typesByAlias.Clear();
-                    _typesById.Clear();
-                    _getPublishedContentTypeById = value;
-                }
-                finally
-                {
-                    if (_lock.IsWriteLockHeld)
-                        _lock.ExitWriteLock();
-                }
-            }
         }
 
         private static string GetAliasKey(PublishedItemType itemType, string alias)

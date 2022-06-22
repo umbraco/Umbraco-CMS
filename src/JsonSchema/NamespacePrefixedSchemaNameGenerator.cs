@@ -1,13 +1,13 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using NJsonSchema.Generation;
 
 namespace JsonSchema
 {
-    public class NamespacePrefixedSchemaNameGenerator : DefaultSchemaNameGenerator
+    internal class NamespacePrefixedSchemaNameGenerator : DefaultSchemaNameGenerator
     {
-        public override string Generate(Type type)
-        {
-            return type.Namespace.Replace(".", String.Empty) + base.Generate(type);
-        }
+        public override string Generate(Type type) => type.Namespace?.Replace(".", string.Empty) + base.Generate(type);
     }
 }

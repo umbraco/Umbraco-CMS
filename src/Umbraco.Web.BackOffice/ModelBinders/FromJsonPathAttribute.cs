@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Extensions;
+using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
@@ -36,6 +38,10 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                     return;
                 }
 
+                if (TryModelBindFromHttpContextItems(bindingContext))
+                {
+                    return;
+                }
 
                 var strJson =  await bindingContext.HttpContext.Request.GetRawBodyStringAsync();
 
@@ -48,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 var json = JsonConvert.DeserializeObject<JObject>(strJson);
 
                 //if no explicit json path then use the model name
-                var match = json.SelectToken(bindingContext.FieldName ?? bindingContext.ModelName);
+                var match = json?.SelectToken(bindingContext.FieldName ?? bindingContext.ModelName);
 
                 if (match == null)
                 {
@@ -60,6 +66,30 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 bindingContext.Result = ModelBindingResult.Success(model);
             }
 
+            public static bool TryModelBindFromHttpContextItems(ModelBindingContext bindingContext)
+            {
+                const string key = Constants.HttpContext.Items.RequestBodyAsJObject;
+
+                if (!bindingContext.HttpContext.Items.TryGetValue(key, out var cached))
+                {
+                    return false;
+                }
+
+                if (cached is not JObject json)
+                {
+                    return false;
+                }
+
+                JToken? match = json.SelectToken(bindingContext.FieldName);
+
+                // ReSharper disable once InvertIf
+                if (match != null)
+                {
+                    bindingContext.Result = ModelBindingResult.Success(match.ToObject(bindingContext.ModelType));
+                }
+
+                return true;
+            }
         }
     }
 }

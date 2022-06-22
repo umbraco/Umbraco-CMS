@@ -15,15 +15,16 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
     /// </summary>
     public class ThreadAbortExceptionEnricher : ILogEventEnricher
     {
-        private readonly CoreDebugSettings _coreDebugSettings;
+        private CoreDebugSettings _coreDebugSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMarchal _marchal;
 
-        public ThreadAbortExceptionEnricher(IOptions<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        public ThreadAbortExceptionEnricher(IOptionsMonitor<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
         {
-            _coreDebugSettings = coreDebugSettings.Value;
+            _coreDebugSettings = coreDebugSettings.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
             _marchal = marchal;
+            coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -83,7 +84,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
             var timeoutField = stateType.GetField("_timeout", BindingFlags.Instance | BindingFlags.NonPublic);
             if (timeoutField == null) return false;
 
-            return (bool)timeoutField.GetValue(abort.ExceptionState);
+            return (bool?)timeoutField.GetValue(abort.ExceptionState) ?? false;
         }
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
@@ -91,7 +92,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
             if (!(exception is ThreadAbortException abort)) return false;
 
             var stacktrace = abort.StackTrace;
-            return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
+            return stacktrace?.Contains("System.Threading.Monitor.ReliableEnter") ?? false;
         }
 
 

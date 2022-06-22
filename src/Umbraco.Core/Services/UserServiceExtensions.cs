@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
 {
     public static class UserServiceExtensions
     {
-        public static EntityPermission GetPermissions(this IUserService userService, IUser user, string path)
+        public static EntityPermission? GetPermissions(this IUserService userService, IUser? user, string path)
         {
             var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? Attempt<int>.Succeed(value) : Attempt<int>.Fail())
@@ -32,7 +32,7 @@ namespace Umbraco.Extensions
         /// </param>
         /// <param name="nodeIds">Specifying nothing will return all permissions for all nodes</param>
         /// <returns>An enumerable list of <see cref="EntityPermission"/></returns>
-        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup group, bool fallbackToDefaultPermissions, params int[] nodeIds)
+        public static EntityPermissionCollection GetPermissions(this IUserService service, IUserGroup? group, bool fallbackToDefaultPermissions, params int[] nodeIds)
         {
             return service.GetPermissions(new[] {group}, fallbackToDefaultPermissions, nodeIds);
         }
@@ -59,7 +59,7 @@ namespace Umbraco.Extensions
         /// <param name="entityIds"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
+            userService.ReplaceUserGroupPermissions(groupId, null, entityIds);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Umbraco.Extensions
         /// <param name="groupId"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] { });
+            userService.ReplaceUserGroupPermissions(groupId, null);
         }
 
 
@@ -83,6 +83,12 @@ namespace Umbraco.Extensions
                 return asProfile ?? new UserProfile(user.Id, user.Name);
             });
 
+        }
+
+        public static IUser? GetByKey(this IUserService userService, Guid key)
+        {
+            int id = BitConverter.ToInt32(key.ToByteArray(), 0);
+            return userService.GetUserById(id);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Hosting;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         /// but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
         /// </remarks>
         public HstsCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-            : base(hostingEnvironment, textService, "Strict-Transport-Security", "max-age=10886400", "hSTS", true)
+            : base(hostingEnvironment, textService, "Strict-Transport-Security", "hSTS", true)
         {
         }
 

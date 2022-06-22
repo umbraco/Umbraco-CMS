@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Handlers
             IUserService userService,
             IEntityService entityService,
             IIpResolver ipResolver,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IMemberService memberService)
         {
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Handlers
             _ipResolver = ipResolver;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _memberService = memberService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
         }
 
         private IUser CurrentPerformingUser
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Handlers
 
         private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
-        private string FormatEmail(IMember member) => member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? "" : $"<{member.Email}>";
+        private string FormatEmail(IMember? member) => member == null ? string.Empty : member.Email.IsNullOrWhiteSpace() ? "" : $"<{member.Email}>";
 
         private string FormatEmail(IUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
 
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.Handlers
                 var sections = ((UserGroup)group).WasPropertyDirty("AllowedSections")
                     ? string.Join(", ", group.AllowedSections)
                     : null;
-                var perms = ((UserGroup)group).WasPropertyDirty("Permissions")
+                var perms = ((UserGroup)group).WasPropertyDirty("Permissions") && group.Permissions is not null
                     ? string.Join(", ", group.Permissions)
                     : null;
 
@@ -223,16 +223,16 @@ namespace Umbraco.Cms.Core.Handlers
         {
             var performingUser = CurrentPerformingUser;
             var perms = notification.EntityPermissions;
-            foreach (var perm in perms)
+            foreach (EntityPermission perm in perms)
             {
                 var group = _userService.GetUserGroupById(perm.UserGroupId);
-                var assigned = string.Join(", ", perm.AssignedPermissions);
+                var assigned = string.Join(", ", perm.AssignedPermissions ?? Array.Empty<string>());
                 var entity = _entityService.Get(perm.EntityId);
 
                 _auditService.Write(performingUser.Id, $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}", PerformingIp,
                     DateTime.UtcNow,
-                    -1, $"User Group {group.Id} \"{group.Name}\" ({group.Alias})",
-                    "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity.Name}\"");
+                    -1, $"User Group {group?.Id} \"{group?.Name}\" ({group?.Alias})",
+                    "umbraco/user-group/permissions-change", $"assigning {(string.IsNullOrWhiteSpace(assigned) ? "(nothing)" : assigned)} on id:{perm.EntityId} \"{entity?.Name}\"");
             }
         }
     }
