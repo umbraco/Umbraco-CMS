@@ -10,7 +10,8 @@
 
             <umb-property-editor
                 model="property"
-                ng-attr-readonly="{{ readonly || undefined }}">
+                preview="readonly && !property.supportsReadOnly"
+                ng-attr-readonly="{{(readonly && property.supportsReadOnly) || undefined }}">
             </umb-property-editor>
 
         </umb-property>
