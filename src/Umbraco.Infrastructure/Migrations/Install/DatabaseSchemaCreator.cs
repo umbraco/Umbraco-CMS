@@ -82,8 +82,8 @@ public class DatabaseSchemaCreator
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
         typeof(UserGroup2NodeDto),
-            typeof(CreatedPackageSchemaDto),
-            typeof(UserGroup2LanguageDto)
+        typeof(CreatedPackageSchemaDto),
+        typeof(UserGroup2LanguageDto)
     };
 
     private readonly IUmbracoDatabase _database;

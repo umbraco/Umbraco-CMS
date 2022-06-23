@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System.Data;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -11,10 +12,10 @@ public class UserGroup2LanguageDto
 
     [Column("userGroupId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_userGroup2language", OnColumns = "userGroupId, languageId")]
-    [ForeignKey(typeof(UserGroupDto))]
+    [ForeignKey(typeof(UserGroupDto), OnDelete = Rule.Cascade)]
     public int UserGroupId { get; set; }
 
     [Column("languageId")]
-    [ForeignKey(typeof(LanguageDto))]
+    [ForeignKey(typeof(LanguageDto), OnDelete = Rule.Cascade)]
     public int LanguageId { get; set; }
 }
