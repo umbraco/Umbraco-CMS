@@ -14,7 +14,7 @@
         vm.trustHtml = trustHtml;
         vm.validateMandatory = validateMandatory;
 
-        vm.allowMultiple = $scope.model.config.allowmultiple;
+        vm.allowMultiple = $scope.model.config.multiple;
 
         vm.items = Array.isArray($scope.model.value) ? $scope.model.value : [];
 

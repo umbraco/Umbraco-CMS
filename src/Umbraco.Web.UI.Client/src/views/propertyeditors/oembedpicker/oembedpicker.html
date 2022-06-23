@@ -1,7 +1,32 @@
-<div ng-controller="Umbraco.PropertyEditors.OEmbedPickerController as vm" class="umb-property-editor umb-mediapicker umb-mediapicker-multiple">
+<div ng-controller="Umbraco.PropertyEditors.OEmbedPickerController as vm" class="umb-property-editor umb-oembedpicker">
+
   <ng-form name="vm.oembedform">
-    <div ui-sortable="sortableOptions" ng-model="vm.items" class="items-container" ng-hide="!model.value">
-      <div class="umb-sortable-thumbnails umb-table-row" ng-repeat="embed in vm.items track by $index">
+    <div class="umb-media-card-grid">
+      <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.items" ng-hide="!model.value">
+
+        <div ng-repeat="embed in vm.items track by $index" class="umb-media-card-grid__cell">
+
+          <div class="umb-media-card">
+            <div class="__showcase">
+              <div class="preview-item">
+                <span ng-bind-html="vm.trustHtml(embed.preview)"></span>
+              </div>
+            </div>
+            <div class="__actions">
+              <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_edit" ng-click="vm.edit($index, $event)">
+                <umb-icon icon="icon-edit" class="icon"></umb-icon>
+              </button>
+              <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.remove($index, $event)">
+                <umb-icon icon="icon-trash" class="icon"></umb-icon>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!--<div class="umb-sortable-thumbnails umb-table-row" ng-repeat="embed in vm.items track by $index">
         <div class="sort-icon" ng-if="vm.allowMultiple === true && vm.items.length > 1">
           <i class="icon icon-navigation handle" aria-hidden="true"></i>
         </div>
@@ -16,13 +41,30 @@
             <i class="icon icon-delete" aria-hidden="true"></i>
           </button>
         </div>
-      </div>
+      </div>-->
+
+      <!--ng-if="vm.allowMultiple === false && vm.items.length == 1"-->
+      <button 
+          type="button"
+          class="btn-reset umb-media-card-grid__create-button umb-outline"
+          ng-click="vm.add($event)">
+        <div>
+          <umb-icon icon="icon-add" class="icon large"></umb-icon>
+          <localize key="general_add">Add</localize>
+        </div>
+      </button>
+
     </div>
-    <div class="picker-btn" ng-hide="vm.allowMultiple === false && vm.items.length == 1">
+
+    {{model.value | json}}
+    
+
+    <!--<div class="picker-btn" ng-hide="vm.allowMultiple === false && vm.items.length == 1">
       <button type="button" class="add-link btn-reset umb-outline umb-outline--surrounding add-link-square" ng-click="vm.add($event)">
         <i class="icon icon-add large" aria-hidden="true"></i>
       </button>
-    </div>
+    </div>-->
+
     <input type="hidden" name="itemCount" ng-model="vm.items.length" val-property-validator="vm.validateMandatory" />
   </ng-form>
 </div>
