@@ -193,11 +193,12 @@
 
         function initializeLayoutEntry(layoutEntry) {
 
-            // each layoutEntry should have a child array,
-            layoutEntry.areas = layoutEntry.areas || [];
-
             // $block must have the data property to be a valid BlockObject, if not, its considered as a destroyed blockObject.
-            if (layoutEntry.$block === undefined || layoutEntry.$block === null || layoutEntry.$block.data === undefined) {
+            if (!layoutEntry.$block || layoutEntry.$block.data === undefined) {
+
+                // each layoutEntry should have a child array,
+                layoutEntry.areas = layoutEntry.areas || [];
+                
                 var block = getBlockObject(layoutEntry);
 
                 // If this entry was not supported by our property-editor it would return 'null'.
@@ -416,7 +417,11 @@
             // Add the Block Object to our layout entry.
             layoutEntry.$block = blockObject;
 
-            // Development note: Notice this is runned before added to the data model.
+            // set columnSpan to maximum allowed span for this BlockType:
+            // TODO:
+            layoutEntry.columnSpan = 12;
+
+            // Development note: Notice this is ran before added to the data model.
             initializeLayoutEntry(layoutEntry);
 
             // add layout entry at the decided location in layout.
@@ -425,6 +430,10 @@
                 if(!area) {
                     console.error("Could not find area in block creation");
                 }
+
+                // limit columnSpan by areaConfig columnSpan:
+                layoutEntry.columnSpan = Math.min(layoutEntry.columnSpan, area.$config.columnSpan);
+
                 area.items.splice(index, 0, layoutEntry);
             } else {
                 vm.layout.splice(index, 0, layoutEntry);
