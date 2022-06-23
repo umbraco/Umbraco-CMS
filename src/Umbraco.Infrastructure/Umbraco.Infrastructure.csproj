@@ -49,6 +49,7 @@
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
       <PackageReference Include="SixLabors.ImageSharp" Version="2.1.1" />
+      <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.0" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />

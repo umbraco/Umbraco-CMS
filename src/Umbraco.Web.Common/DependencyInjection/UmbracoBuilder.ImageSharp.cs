@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Infrastructure.Imaging;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 using Umbraco.Cms.Web.Common.Media;
@@ -31,6 +32,7 @@ public static partial class UmbracoBuilderExtensions
             .AddProcessor<CropWebProcessor>();
 
         // Configure middleware
+        builder.Services.AddSingleton<IAdditionalImagingOptions, AdditionalImagingOptions>();
         builder.Services
             .AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ConfigureImageSharpMiddlewareOptions>();
 

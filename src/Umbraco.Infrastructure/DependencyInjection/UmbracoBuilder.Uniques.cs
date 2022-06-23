@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
@@ -6,6 +5,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Imaging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -37,6 +37,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             where T : class, IDefaultViewContentProvider
         {
             builder.Services.AddUnique<IDefaultViewContentProvider, T>();
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the default view content provider
+        /// </summary>
+        /// <typeparam name="T">The type of the provider.</typeparam>
+        /// <param name="builder">The builder.</param>
+        /// <returns></returns>
+        public static IUmbracoBuilder SetDefaultAdditionalImagingOptions<T>(this IUmbracoBuilder builder)
+            where T : class, IAdditionalImagingOptions
+        {
+            builder.Services.AddUnique<IAdditionalImagingOptions, T>();
             return builder;
         }
 
