@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         public bool? UseInvariantParsingCulture { get; set; }
 
-        public byte[] HMACSecretKey { get; set; }
+        public byte[]? HMACSecretKey { get; set; }
 
         /// <summary>
         /// Gets or sets a value for imaging cache settings.

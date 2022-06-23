@@ -57,7 +57,7 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
         options.CacheMaxAge = _imagingSettings.Cache.CacheMaxAge;
         options.CacheHashLength = _imagingSettings.Cache.CacheHashLength;
 
-        options.HMACSecretKey = _imagingSettings.HMACSecretKey.Length != 0 ? _imagingSettings.HMACSecretKey : options.HMACSecretKey;
+        options.HMACSecretKey = _imagingSettings.HMACSecretKey?.Length != 0 ? _imagingSettings.HMACSecretKey : options.HMACSecretKey;
         options.UseInvariantParsingCulture = _imagingSettings.UseInvariantParsingCulture.GetValueOrDefault(options.UseInvariantParsingCulture);
 
         options.MemoryStreamManager = _additionalImagingOptions.MemoryStreamManager(options);
