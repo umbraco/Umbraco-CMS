@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -80,8 +80,7 @@ public class ListViewContentAppFactory : IContentAppFactory
             throw new NullReferenceException("The property editor with alias " + dt.EditorAlias + " does not exist");
         }
 
-        IDictionary<string, object> listViewConfig =
-            editor.GetConfigurationEditor().ToConfigurationEditor(dt.Configuration);
+        IDictionary<string, object?> listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditorNullable(dt.Configuration);
 
         // add the entity type to the config
         listViewConfig["entityType"] = entityType;
@@ -90,7 +89,7 @@ public class ListViewContentAppFactory : IContentAppFactory
         if (listViewConfig.ContainsKey("tabName"))
         {
             var configTabName = listViewConfig["tabName"];
-            if (string.IsNullOrWhiteSpace(configTabName.ToString()) == false)
+            if (string.IsNullOrWhiteSpace(configTabName?.ToString()) == false)
             {
                 contentApp.Name = configTabName.ToString();
             }
@@ -100,7 +99,7 @@ public class ListViewContentAppFactory : IContentAppFactory
         if (listViewConfig.ContainsKey("icon"))
         {
             var configIcon = listViewConfig["icon"];
-            if (string.IsNullOrWhiteSpace(configIcon.ToString()) == false)
+            if (string.IsNullOrWhiteSpace(configIcon?.ToString()) == false)
             {
                 contentApp.Icon = configIcon.ToString();
             }
@@ -123,7 +122,7 @@ public class ListViewContentAppFactory : IContentAppFactory
                 Value = null,
                 View = editor.GetValueEditor().View,
                 HideLabel = true,
-                Config = listViewConfig,
+                ConfigNullable = listViewConfig,
             },
         };
 
