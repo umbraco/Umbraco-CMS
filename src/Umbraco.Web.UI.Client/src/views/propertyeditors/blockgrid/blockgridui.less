@@ -184,6 +184,18 @@ umb-block-grid-block {
 }
 */
 
+
+.umb-block-grid__scale-handler {
+    cursor: grab;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width:16px;
+    height:16px;
+    background-color: yellow;
+}
+
+
 .umb-block-grid__block--inline-create-button {
     top: 0px;
     position: absolute;
@@ -302,4 +314,26 @@ umb-block-grid-block {
     border-radius: 3px;
     min-height: 100px;
     min-width: 100px;
+}
+
+
+.umb-block-grid__block-area {
+    position: relative;
+}
+.umb-block-grid__block-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    border: 1px solid red;
+    pointer-events: none;
+    opacity: var(--umb-show-gridblock-area-ui, 0);
+}
+.umb-block-grid__block-area > .umb-block-grid__actions {
+    opacity: var(--umb-show-gridblock-area-ui, 0);
+    transition: opacity 120ms;
+}
+.umb-block-grid__block-area > .umb-block-grid__actions:focus, 
+.umb-block-grid__block-area > .umb-block-grid__actions:focus-within {
+    opacity: 1;
 }

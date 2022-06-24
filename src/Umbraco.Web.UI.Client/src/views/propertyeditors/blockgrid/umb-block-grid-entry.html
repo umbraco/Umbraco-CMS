@@ -1,3 +1,8 @@
+<uui-button-inline-create
+    class="umb-block-grid__block--inline-create-button __above"
+    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
+</uui-button-inline-create>
+
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layoutEntry.$block.content.key, 'valServerMatchSettings': vm.layoutEntry.$block.settings.key } }">
     <div class="umb-block-grid__block" ng-class="{'--active':vm.layoutEntry.$block.active, '--show-validation': vm.layoutEntry.$block.showValidation === true}">
 
@@ -54,5 +59,15 @@
                 </span>
             </button>
         </div>
+
+        <div class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)">
+        </div>
+
     </div>
 </ng-form>
+
+<uui-button-inline-create
+    class="umb-block-grid__block--inline-create-button __after"
+    ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index+1, $event)"
+    vertical>
+</uui-button-inline-create>
