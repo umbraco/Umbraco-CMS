@@ -1,6 +1,6 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.BlockList.BlockConfigurationOverlayController
+ * @name Umbraco.Editors.BlockGrid.BlockConfigurationOverlayController
  * @function
  *
  * @description
@@ -309,6 +309,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockList.BlockConfigurationOverlayController", BlockConfigurationOverlayController);
+    angular.module("umbraco").controller("Umbraco.PropertyEditors.BlockGrid.BlockConfigurationOverlayController", BlockConfigurationOverlayController);
 
 })();
