@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
-    public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
+    public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeWithCulture
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
@@ -369,8 +369,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
         public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+            => await SearchAsync(query, pageSize, pageIndex, searchFrom);
+
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
         {
-            var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, searchFrom);
+            var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
             return new EntitySearchResults(results, totalFound);
         }
     }
