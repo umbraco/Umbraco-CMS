@@ -5,6 +5,14 @@
     position: relative;
     display: grid;
     grid-template-columns: repeat(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)), minmax(0, 1fr));
+    /*
+    Dev note, maybe this concept can be used for somethings:
+    grid-template-columns: 
+        [column-start] 1fr
+        repeat(calc(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)) - 2), minmax(0, 1fr))
+        [column-end] 1fr
+    ;
+    */
     
     grid-gap: 0px;
     grid-auto-flow: row;

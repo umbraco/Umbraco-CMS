@@ -9,11 +9,20 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockGridConfiguration
     {
         [ConfigurationField("blocks", "Available Blocks", "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.html", Description = "Define the available blocks.")]
-        public BlockConfiguration[] Blocks { get; set; }  = null!;
+        public BlockGridBlockConfiguration[] Blocks { get; set; }  = null!;
 
         [DataContract]
-        public class BlockConfiguration
+        public class BlockGridBlockConfiguration
         {
+
+            [DataMember(Name ="columnSpanOptions")]
+            public BlockGridColumnSpanOption[] ColumnSpanOptions { get; set; }  = null!;
+            [DataContract]
+            public class BlockGridColumnSpanOption
+            {
+                [DataMember(Name ="columnSpan")]
+                public int? Min { get; set; }
+            }
 
             [DataMember(Name ="backgroundColor")]
             public string? BackgroundColor { get; set; }

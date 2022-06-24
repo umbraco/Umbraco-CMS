@@ -1,6 +1,7 @@
 <div class="umb-block-grid__layout-container">
     <div ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
+        data-content-element-type-alias="{{layoutEntry.$block.content.contentTypeAlias}}"
         data-element-udi="{{layoutEntry.contentUdi}}"
         data-col-span="{{layoutEntry.columnSpan}}"
         data-row-span="{{layoutEntry.rowSpan}}"
@@ -10,6 +11,7 @@
         "
     >
 
+    <!--
         <button type="button"
                 class="btn-reset umb-block-grid__block--create-button"
                 ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)"
@@ -19,12 +21,24 @@
                 <umb-icon icon="icon-add" class="icon"></umb-icon>
             </div>
         </button>
+    -->
+
+        <uui-button-inline-create
+            class="umb-block-grid__block--inline-create-button __above"
+            ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index, $event)">
+        </uui-button-inline-create>
 
         <umb-block-grid-entry 
             block-editor-api="vm.blockEditorApi"
             layout-entry="layoutEntry"
             index="$index">
         </umb-block-grid-entry>
+
+        <uui-button-inline-create
+            class="umb-block-grid__block--inline-create-button __after"
+            ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, $index+1, $event)"
+            vertical>
+        </uui-button-inline-create>
 
     </div>
 
