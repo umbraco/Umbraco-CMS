@@ -418,8 +418,8 @@
             layoutEntry.$block = blockObject;
 
             // set columnSpan to maximum allowed span for this BlockType:
-            // TODO:
-            layoutEntry.columnSpan = 12;
+            const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
+            layoutEntry.columnSpan = maximumColumnSpan;
 
             // Development note: Notice this is ran before added to the data model.
             initializeLayoutEntry(layoutEntry);
