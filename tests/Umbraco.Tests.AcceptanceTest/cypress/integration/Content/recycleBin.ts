@@ -71,5 +71,8 @@ context('Recycle bin', () => {
 
         cy.get('.umb-content-grid__content').contains(contentToNotDeleteName).should('be.visible');
         cy.umbracoTreeItem('content', ["Recycle Bin", contentToNotDeleteName]).should('be.visible');
+
+        cy.deleteAllContent();
+        cy.umbracoEnsureDocumentTypeNameNotExists(testType);
     });
 });
