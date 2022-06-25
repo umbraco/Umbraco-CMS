@@ -1,21 +1,11 @@
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Runtime.Serialization;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -67,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         protected override IDataValueEditor CreateValueEditor() =>
             DataValueEditorFactory.Create<OEmbedPickerPropertyValueEditor>(Attribute!);
 
-        internal class OEmbedPickerPropertyValueEditor : DataValueEditor, IDataValueReference
+        internal class OEmbedPickerPropertyValueEditor : DataValueEditor
         {
             private readonly IJsonSerializer _jsonSerializer;
             private readonly IDataTypeService _dataTypeService;
@@ -84,9 +74,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _jsonSerializer = jsonSerializer;
                 _dataTypeService = dataTypeService;
             }
-
-            public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
-                => throw new NotImplementedException();
         }
     }
 }

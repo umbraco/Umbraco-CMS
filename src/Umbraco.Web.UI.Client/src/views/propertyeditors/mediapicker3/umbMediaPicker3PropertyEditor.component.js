@@ -58,10 +58,12 @@
         vm.$onInit = function() {
 
             vm.validationLimit = vm.model.config.validationLimit || {};
+            
             // If single-mode we only allow 1 item as the maximum:
-            if(vm.model.config.multiple === false) {
+            if (vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
+            
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
@@ -83,9 +85,9 @@
                 isDisabled: true,
                 useLegacyIcon: false
             };
-
-            var propertyActions = [];
-            if(vm.supportCopy) {
+            
+            let propertyActions = [];
+            if (vm.supportCopy) {
                 propertyActions.push(copyAllMediasAction);
             }
             propertyActions.push(removeAllMediasAction);
@@ -94,7 +96,7 @@
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
 
-            if(vm.model.value === null || !Array.isArray(vm.model.value)) {
+            if (vm.model.value === null || !Array.isArray(vm.model.value)) {
                 vm.model.value = [];
             }
 
@@ -127,7 +129,7 @@
         };
 
         function onServerValueChanged(newVal, oldVal) {
-            if(newVal === null || !Array.isArray(newVal)) {
+            if (newVal === null || !Array.isArray(newVal)) {
                 newVal = [];
                 vm.model.value = newVal;
             }

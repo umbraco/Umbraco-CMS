@@ -19,13 +19,23 @@
         vm.items = Array.isArray($scope.model.value) ? $scope.model.value : [];
 
         vm.sortableOptions = {
-          axis: 'y',
-          containment: 'parent',
-          cursor: 'move',
-          items: '> .umb-table-row',
-          handle: '.handle',
-          tolerance: 'pointer'
+          containment: "parent",
+          cursor: "grabbing",
+          handle: ".umb-media-card",
+          cancel: "input,textarea,select,option",
+          classes: ".umb-media-card--dragging",
+          distance: 5,
+          tolerance: "pointer",
+          update: function (ev, ui) {
+            setDirty();
+          }
         };
+
+        function setDirty() {
+          if (vm.oembedForm) {
+            vm.oembedForm.$setDirty();
+          }
+        }
 
         function openEmbedDialog(embed, onSubmit) {
 
@@ -95,8 +105,8 @@
         function updateModelValue() {
           $scope.model.value = vm.items;
 
-          if (vm.oembedform && vm.oembedform.itemCount) {
-            vm.oembedform.itemCount.$setViewValue(vm.items.length);
+          if (vm.oembedForm && vm.oembedForm.itemCount) {
+            vm.oembedForm.itemCount.$setViewValue(vm.items.length);
           }
         }
 

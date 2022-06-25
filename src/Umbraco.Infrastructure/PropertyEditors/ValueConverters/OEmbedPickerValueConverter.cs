@@ -43,7 +43,16 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return isMultiple ? Enumerable.Empty<OEmbedItem>() : null;
             }
 
-            var items = JsonConvert.DeserializeObject<List<OEmbedItem>>(inter.ToString() ?? string.Empty);
+            List<OEmbedItem>? items = new();
+
+            try
+            {
+                items = JsonConvert.DeserializeObject<List<OEmbedItem>>(inter.ToString() ?? string.Empty);
+            }
+            catch
+            {
+
+            }
 
             return isMultiple ? items : items?.FirstOrDefault();
         }

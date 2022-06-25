@@ -14,9 +14,18 @@
   .preview-item {
       position: relative;
 
+      &::before {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
       iframe,
       span {
-          height: 100%;
+        display: inline-block;
+        height: 100%;
       }
   }
 }

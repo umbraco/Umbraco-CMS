@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new DateTimeConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        protected override IConfigurationEditor CreateConfigurationEditor()
+            => new DateTimeConfigurationEditor(_ioHelper, _editorConfigurationParser);
     }
 }

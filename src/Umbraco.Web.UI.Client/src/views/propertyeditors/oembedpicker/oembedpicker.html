@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.OEmbedPickerController as vm" class="umb-property-editor umb-oembedpicker">
 
-  <ng-form name="vm.oembedform">
-    <div class="umb-media-card-grid">
+  <ng-form name="vm.oembedForm">
+    <div class="umb-media-card-grid" ng-class="{'--singleMode': vm.allowMultiple === false}">
       <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.items" ng-hide="!model.value">
 
         <div ng-repeat="embed in vm.items track by $index" class="umb-media-card-grid__cell">
@@ -26,26 +26,9 @@
 
       </div>
 
-      <!--<div class="umb-sortable-thumbnails umb-table-row" ng-repeat="embed in vm.items track by $index">
-        <div class="sort-icon" ng-if="vm.allowMultiple === true && vm.items.length > 1">
-          <i class="icon icon-navigation handle" aria-hidden="true"></i>
-        </div>
-        <div class="preview-item">
-          <span ng-bind-html="vm.trustHtml(embed.preview)"></span>
-        </div>
-        <div class="umb-sortable-thumbnails__actions">
-          <button type="button" class="umb-node-preview__action" ng-click="vm.edit($index, $event)">
-            <i class="icon icon-edit" aria-hidden="true"></i>
-          </button>
-          <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="vm.remove($index, $event)">
-            <i class="icon icon-delete" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>-->
-
-      <!--ng-if="vm.allowMultiple === false && vm.items.length == 1"-->
       <button 
           type="button"
+          ng-if="(vm.allowMultiple === false && vm.items.length === 0) || vm.allowMultiple === true"
           class="btn-reset umb-media-card-grid__create-button umb-outline"
           ng-click="vm.add($event)">
         <div>
@@ -57,13 +40,6 @@
     </div>
 
     {{model.value | json}}
-    
-
-    <!--<div class="picker-btn" ng-hide="vm.allowMultiple === false && vm.items.length == 1">
-      <button type="button" class="add-link btn-reset umb-outline umb-outline--surrounding add-link-square" ng-click="vm.add($event)">
-        <i class="icon icon-add large" aria-hidden="true"></i>
-      </button>
-    </div>-->
 
     <input type="hidden" name="itemCount" ng-model="vm.items.length" val-property-validator="vm.validateMandatory" />
   </ng-form>
