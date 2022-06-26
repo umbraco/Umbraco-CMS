@@ -1,12 +1,13 @@
 <div ng-controller="Umbraco.PropertyEditors.OEmbedPickerController as vm" class="umb-property-editor umb-oembedpicker">
 
   <ng-form name="vm.oembedForm">
-    <div class="umb-media-card-grid" ng-class="{'--singleMode': vm.allowMultiple === false}">
+    <div class="umb-media-card-grid" ng-class="{'--singleMode': vm.singleMode }">
       <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.items" ng-hide="!model.value">
 
         <div ng-repeat="embed in vm.items track by $index" class="umb-media-card-grid__cell">
 
           <div class="umb-media-card">
+            <div class="__overlay handle"></div>
             <div class="__showcase">
               <div class="preview-item">
                 <span ng-bind-html="vm.trustHtml(embed.preview)"></span>
@@ -26,11 +27,10 @@
 
       </div>
 
-      <button 
-          type="button"
-          ng-if="(vm.allowMultiple === false && vm.items.length === 0) || vm.allowMultiple === true"
-          class="btn-reset umb-media-card-grid__create-button umb-outline"
-          ng-click="vm.add($event)">
+      <button type="button"
+              ng-if="(vm.singleMode === true && vm.items.length === 0) || vm.singleMode !== true"
+              class="btn-reset umb-media-card-grid__create-button umb-outline"
+              ng-click="vm.add($event)">
         <div>
           <umb-icon icon="icon-add" class="icon large"></umb-icon>
           <localize key="general_add">Add</localize>
@@ -42,5 +42,21 @@
     {{model.value | json}}
 
     <input type="hidden" name="itemCount" ng-model="vm.items.length" val-property-validator="vm.validateMandatory" />
+    <input type="hidden" name="minCount" ng-model="vm.items.length" val-server="minCount" />
+    <input type="hidden" name="maxCount" ng-model="vm.items.length" val-server="maxCount" />
+
+    <div ng-messages="vm.oembedForm.minCount.$error">
+      <div class="help text-error" ng-message="minCount">
+        <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.items.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+      </div>
+      <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
+    </div>
+    <div ng-messages="vm.oembedForm.maxCount.$error">
+      <div class="help text-error" ng-message="maxCount">
+        <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.items.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+      </div>
+      <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
+    </div>
+
   </ng-form>
 </div>

@@ -1,6 +1,5 @@
 using System.Runtime.Serialization;
 
-
 namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
@@ -16,8 +15,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public bool Multiple { get; set; }
 
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of medias")]
-        public NumberRange ValidationLimit { get; set; } = new NumberRange();
+        public Models.NumberRange ValidationLimit { get; set; } = new Models.NumberRange();
 
+        // TODO: Remove this in V12
+        [Obsolete("Use NumberRange in Umbraco.Cms.Core.Models namespace")]
         [DataContract]
         public class NumberRange
         {

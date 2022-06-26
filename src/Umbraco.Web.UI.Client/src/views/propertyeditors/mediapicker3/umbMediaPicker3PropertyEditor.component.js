@@ -30,7 +30,7 @@
 
     function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
 
-        var unsubscribe = [];
+        let unsubscribe = [];
 
         // Property actions:
         let copyAllMediasAction = null;
@@ -59,7 +59,7 @@
 
             vm.validationLimit = vm.model.config.validationLimit || {};
             
-            // If single-mode we only allow 1 item as the maximum:
+            // If single-mode we only allow 1 item as the maximum.
             if (vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
@@ -95,7 +95,7 @@
             if (vm.umbProperty) {
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
-
+            
             if (vm.model.value === null || !Array.isArray(vm.model.value)) {
                 vm.model.value = [];
             }

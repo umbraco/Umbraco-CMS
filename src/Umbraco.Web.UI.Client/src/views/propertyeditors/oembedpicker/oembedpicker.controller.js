@@ -8,21 +8,31 @@
 
         const vm = this;
 
+        let unsubscribe = [];
+
         vm.add = addEmbed;
         vm.edit = editEmbed;
         vm.remove = removeEmbed;
         vm.trustHtml = trustHtml;
         vm.validateMandatory = validateMandatory;
 
-        vm.allowMultiple = $scope.model.config.multiple;
+        vm.validationLimit = $scope.model.config.validationLimit || {};
+
+        // If single-mode we only allow 1 item as the maximum.
+        if ($scope.model.config.multiple === false) {
+          vm.validationLimit.max = 1;
+        }
+
+        vm.singleMode = vm.validationLimit.max === 1;
 
         vm.items = Array.isArray($scope.model.value) ? $scope.model.value : [];
 
         vm.sortableOptions = {
-          containment: "parent",
+          //containment: "parent",
           cursor: "grabbing",
-          handle: ".umb-media-card",
-          cancel: "input,textarea,select,option",
+          handle: ".handle", //".umb-media-card",
+          //cancel: "input,textarea,select,option",
+          items: '.umb-media-card',
           classes: ".umb-media-card--dragging",
           distance: 5,
           tolerance: "pointer",
@@ -123,6 +133,37 @@
             errorKey: "required"
           };
         }
+
+        function onAmountOfMediaChanged() {
+
+          // enable/disable property actions
+          //if (copyAllMediasAction) {
+          //  copyAllMediasAction.isDisabled = vm.model.value.length === 0;
+          //}
+          //if (removeAllMediasAction) {
+          //  removeAllMediasAction.isDisabled = vm.model.value.length === 0;
+          //}
+
+          updateModelValue();
+
+          // validate limits:
+          if (vm.oembedForm && vm.validationLimit) {
+
+            var isMinRequirementGood = vm.validationLimit.min === null || $scope.model.value.length >= vm.validationLimit.min;
+            vm.oembedForm.minCount.$setValidity("minCount", isMinRequirementGood);
+
+            var isMaxRequirementGood = vm.validationLimit.max === null || $scope.model.value.length <= vm.validationLimit.max;
+            vm.oembedForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
+          }
+        }
+
+        unsubscribe.push($scope.$watch(() => $scope.model.value.length, onAmountOfMediaChanged));
+
+        $scope.$on("$destroy", function () {
+          for (const subscription of unsubscribe) {
+            subscription();
+          }
+        });
 
       });
 

@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -12,5 +12,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         [ConfigurationField("multiple", "Allow picking of multiple items", "boolean")]
         public bool Multiple { get; set; }
+
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of medias")]
+        public NumberRange ValidationLimit { get; set; } = new NumberRange();
     }
 }
