@@ -110,6 +110,6 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
       pathname: 'info',
       weight: 90,
       icon: 'info',
-    }
-  }
+    },
+  },
 ];

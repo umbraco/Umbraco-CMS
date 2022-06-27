@@ -40,10 +40,10 @@ export class UmbNodeStore {
         'Content-Type': 'application/json',
       },
     })
-    .then((res) => res.json())
-    .then((data) => {
-      this._updateStore(data);
-    });
+      .then((res) => res.json())
+      .then((data) => {
+        this._updateStore(data);
+      });
   }
 
   private _updateStore(fetchedNodes: Array<any>) {

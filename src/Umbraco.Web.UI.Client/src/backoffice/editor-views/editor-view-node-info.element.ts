@@ -4,10 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-editor-view-node-info')
 export class UmbEditorViewNodeInfo extends LitElement {
-  static styles = [
-    UUITextStyles,
-    css``,
-  ];
+  static styles = [UUITextStyles, css``];
 
   @property()
   node: any;

@@ -17,10 +17,8 @@ class UmbEditorPropertyLayout extends LitElement {
 
   render() {
     return html`
-      <slot name="header" class="header">
-      </slot>
-      <slot name="editor" class="editor">
-      </slot>
+      <slot name="header" class="header"> </slot>
+      <slot name="editor" class="editor"> </slot>
     `;
   }
 }

@@ -66,7 +66,7 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
   private _nodeSubscription?: Subscription;
 
   private _notificationService?: UmbNotificationService;
-  
+
   private _extensionRegistry?: UmbExtensionRegistry;
   private _editorViewsSubscription?: Subscription;
 
@@ -83,7 +83,7 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
     this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
       this._notificationService = service;
     });
-    
+
     this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
       this._extensionRegistry = extensionRegistry;
       this._useEditorViews();
@@ -109,7 +109,7 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
     } else {
       console.error('property was not found', target.property.alias);
     }
-  }
+  };
 
   private _useNode() {
     this._nodeSubscription?.unsubscribe();
@@ -158,13 +158,11 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
     this._onSave();
   }
 
-  private async _createRoutes () {
-
+  private async _createRoutes() {
     if (this._node && this._editorViews.length > 0) {
-
       this._routes = [];
 
-      this._routes = this._editorViews.map(view => {
+      this._routes = this._editorViews.map((view) => {
         return {
           path: `view/${view.meta.pathname}`,
           component: () => document.createElement(view.elementName),
@@ -181,18 +179,18 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
         path: '**',
         redirectTo: `view/${this._editorViews?.[0].meta.pathname}`,
       });
-      
+
       this.requestUpdate();
       await this.updateComplete;
 
-      this._forceRouteRender()
+      this._forceRouteRender();
     }
   }
 
   // TODO: Fgure out why this has been necessary for this case. Come up with another case
   private _forceRouteRender() {
     const routerSlotEl = this.shadowRoot?.querySelector('router-slot') as RouterSlot;
-    if(routerSlotEl) {
+    if (routerSlotEl) {
       routerSlotEl.render();
     }
   }
@@ -208,19 +206,21 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
       <umb-editor-layout>
         <uui-input slot="name" .value="${this._node?.name}"></uui-input>
         <uui-tab-group slot="apps">
-          ${this._editorViews.map((view: UmbExtensionManifestEditorView) => html`
-            <uui-tab 
-              .label="${view.name}" 
-              href="${this._routerFolder}/view/${view.meta.pathname}"
-              ?active="${this._currentView.includes(view.meta.pathname)}">
-              <uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-              ${view.name}
-            </uui-tab>
-          `)}
+          ${this._editorViews.map(
+            (view: UmbExtensionManifestEditorView) => html`
+              <uui-tab
+                .label="${view.name}"
+                href="${this._routerFolder}/view/${view.meta.pathname}"
+                ?active="${this._currentView.includes(view.meta.pathname)}">
+                <uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+                ${view.name}
+              </uui-tab>
+            `
+          )}
         </uui-tab-group>
 
         <router-slot .routes="${this._routes}"></router-slot>
-        
+
         <div slot="actions">
           <uui-button @click=${this._onSaveAndPreview} label="Save and preview"></uui-button>
           <uui-button @click=${this._onSave} look="secondary" label="Save"></uui-button>
@@ -231,7 +231,6 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
             label="Save and publish"></uui-button>
         </div>
       </umb-editor-layout>
-      
     `;
   }
 }

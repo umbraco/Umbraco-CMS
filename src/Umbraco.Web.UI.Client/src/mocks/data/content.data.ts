@@ -107,7 +107,8 @@ export const data: Array<DocumentNode> = [
         label: 'Textarea label',
         description: 'This is the a textarea property',
         dataTypeKey: 'dt-2',
-        tempValue: 'So no, there\'s not confetti every day. And no, there\'s not champagne every week or a crazy rabbit running around 🐰',
+        tempValue:
+          "So no, there's not confetti every day. And no, there's not champagne every week or a crazy rabbit running around 🐰",
       },
       {
         alias: 'myExternalEditor',

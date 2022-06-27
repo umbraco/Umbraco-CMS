@@ -20,7 +20,7 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
         height: auto;
         padding: var(--uui-size-layout-1);
       }
-    `
+    `,
   ];
 
   @state()
@@ -29,7 +29,7 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
   private _notificationService?: UmbNotificationService;
   private _notificationSubscription?: Subscription;
 
-  constructor () {
+  constructor() {
     super();
 
     this.consumeContext('umbNotificationService', (notificationService: UmbNotificationService) => {
@@ -41,10 +41,9 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
   private _useNotifications() {
     this._notificationSubscription?.unsubscribe();
 
-    this._notificationService?.notifications
-      .subscribe((notifications: Array<any>) => {
-        this._notifications = notifications;
-      });
+    this._notificationService?.notifications.subscribe((notifications: Array<any>) => {
+      this._notifications = notifications;
+    });
 
     // TODO: listen to close event and remove notification from store.
   }
@@ -60,9 +59,7 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
         ${repeat(
           this._notifications,
           (notification) => notification.key,
-          (notification) => html`
-          <uui-toast-notification 
-            color="positive">
+          (notification) => html` <uui-toast-notification color="positive">
             <uui-toast-notification-layout .headline=${notification.headline}> </uui-toast-notification-layout>
           </uui-toast-notification>`
         )}

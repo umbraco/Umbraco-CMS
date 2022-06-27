@@ -16,7 +16,7 @@ export class UmbEditorViewNodeEdit extends LitElement {
   ];
 
   @property()
-  node: any
+  node: any;
 
   render() {
     return html`
@@ -24,10 +24,7 @@ export class UmbEditorViewNodeEdit extends LitElement {
         <!-- TODO: Make sure map get data from data object?, parse on property object. -->
         ${this.node?.properties.map(
           (property: any) => html`
-            <umb-node-property
-              .property=${property}
-              .value=${property.tempValue}>
-            </umb-node-property>
+            <umb-node-property .property=${property} .value=${property.tempValue}> </umb-node-property>
             <hr />
           `
         )}
