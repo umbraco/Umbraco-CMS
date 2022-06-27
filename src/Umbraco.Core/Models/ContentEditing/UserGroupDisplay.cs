@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The default permissions for the user group organized by permission group name
         /// </summary>
         [DataMember(Name = "defaultPermissions")]
-        public IDictionary<string, IEnumerable<Permission>> DefaultPermissions { get; set; }
+        public IDictionary<string, IEnumerable<Permission>>? DefaultPermissions { get; set; }
 
         /// <summary>
         /// The assigned permissions for the user group organized by permission group name

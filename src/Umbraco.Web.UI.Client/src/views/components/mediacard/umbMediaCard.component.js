@@ -74,6 +74,7 @@
                     vm.media = mediaEntity;
                     checkErrorState();
                     vm.thumbnail = mediaHelper.resolveFileFromEntity(mediaEntity, true);
+                    vm.fileExtension = mediaHelper.getFileExtension(vm.media.metaData.MediaPath);
 
                     vm.loading = false;
                 }, function () {

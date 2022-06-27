@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Common.Testing
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
-            : base(null, hostingSettings, webRoutingSettings, webHostEnvironment)
+            : base(hostingSettings, webRoutingSettings, webHostEnvironment)
         {
         }
 

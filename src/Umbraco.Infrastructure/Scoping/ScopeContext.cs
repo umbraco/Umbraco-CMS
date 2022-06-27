@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Scoping
 {
     internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     {
-        private Dictionary<string, IEnlistedObject> _enlisted;
+        private Dictionary<string, IEnlistedObject>? _enlisted;
 
         public void ScopeExit(bool completed)
         {
@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Scoping
                 return;
 
             // TODO: can we create infinite loops? - what about nested events? will they just be plainly ignored = really bad?
-            List<Exception> exceptions = null;
+            List<Exception>? exceptions = null;
             List<IEnlistedObject> orderedEnlisted;
             while ((orderedEnlisted = _enlisted.Values.OrderBy(x => x.Priority).ToList()).Count > 0)
             {
@@ -55,22 +55,25 @@ namespace Umbraco.Cms.Core.Scoping
 
         private class EnlistedObject<T> : IEnlistedObject
         {
-            private readonly Action<bool, T> _action;
+            private readonly Action<bool, T?>? _action;
 
-            public EnlistedObject(T item, Action<bool, T> action, int priority)
+            public EnlistedObject(T? item, Action<bool, T?>? action, int priority)
             {
                 Item = item;
                 Priority = priority;
                 _action = action;
             }
 
-            public T Item { get; }
+            public T? Item { get; }
 
             public int Priority { get; }
 
             public void Execute(bool completed)
             {
-                _action(completed, Item);
+                if (_action is not null)
+                {
+                    _action(completed, Item);
+                }
             }
         }
 
@@ -79,7 +82,7 @@ namespace Umbraco.Cms.Core.Scoping
             Enlist<object>(key, null, (completed, item) => action(completed), priority);
         }
 
-        public T Enlist<T>(string key, Func<T> creator, Action<bool, T> action = null, int priority = 100)
+        public T? Enlist<T>(string key, Func<T>? creator, Action<bool, T?>? action = null, int priority = 100)
         {
             var enlistedObjects = _enlisted ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
 
@@ -96,7 +99,7 @@ namespace Umbraco.Cms.Core.Scoping
             return enlistedOfT.Item;
         }
 
-        public T GetEnlisted<T>(string key)
+        public T? GetEnlisted<T>(string key)
         {
             var enlistedObjects = _enlisted;
             if (enlistedObjects == null) return default;

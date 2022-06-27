@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -54,7 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.Folder, dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
                         // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -95,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService));
                 return menu;
             }
@@ -106,17 +107,18 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 // set the default to create
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
                 {
-                    Icon = "icon icon-edit"
+                    Icon = "icon-edit",
+                    UseLegacyIcon = false
                 });
 
                 if (container.HasChildren == false)
                 {
                     // can delete doc type
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 }
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
@@ -125,28 +127,30 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 var ct = _mediaTypeService.Get(int.Parse(id, CultureInfo.InvariantCulture));
                 var parent = ct == null ? null : _mediaTypeService.Get(ct.ParentId);
 
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
                 // no move action if this is a child doc type
                 if (parent == null)
                 {
-                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true);
+                    menu.Items.Add<ActionMove>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
                 }
 
-                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
-                if(ct.IsSystemMediaType() == false)
+                menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                if(ct?.IsSystemMediaType() == false)
                 {
-                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 }
-                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
+                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             }
 
             return menu;
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out totalFound, searchFrom);
-
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+        {
+            var results = _treeSearcher.EntitySearch(UmbracoObjectTypes.MediaType, query, pageSize, pageIndex, out long totalFound, searchFrom);
+            return new EntitySearchResults(results, totalFound);
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class DropDownFlexibleConfigurationEditor : ConfigurationEditor<DropDownFlexibleConfiguration>
     {
-        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper): base(ioHelper)
+        public DropDownFlexibleConfigurationEditor(ILocalizedTextService textService, IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
         {
             var items = Fields.First(x => x.Key == "items");
 
@@ -21,11 +21,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
             items.Validators.Add(new ValueListUniqueValueValidator());
         }
 
-        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, DropDownFlexibleConfiguration configuration)
+        public override DropDownFlexibleConfiguration FromConfigurationEditor(IDictionary<string, object?>? editorValues, DropDownFlexibleConfiguration? configuration)
         {
             var output = new DropDownFlexibleConfiguration();
 
-            if (!editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
+            if (editorValues is null || !editorValues.TryGetValue("items", out var jjj) || !(jjj is JArray jItems))
                 return output; // oops
 
             // handle multiple
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return output;
         }
 
-        public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(DropDownFlexibleConfiguration? configuration)
         {
             // map to what the editor expects
             var i = 1;

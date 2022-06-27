@@ -1,26 +1,27 @@
 (function () {
   "use strict";
 
-  function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource,
-    userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
-    usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
+    function UserEditController($scope, eventsService, $q, $location, $routeParams, formHelper, usersResource, twoFactorLoginResource,
+        userService, contentEditingHelper, localizationService, mediaHelper, Upload, umbRequestHelper,
+        usersHelper, authResource, dateHelper, editorService, overlayService, externalLoginInfoService) {
 
     var currentLoggedInUser = null;
 
     var vm = this;
 
-    vm.page = {};
-    vm.page.rootIcon = "icon-folder";
-    vm.user = {
-      changePassword: null
-    };
-    vm.breadcrumbs = [];
-    vm.showBackButton = true;
-    vm.avatarFile = {};
-    vm.labels = {};
-    vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
-    vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-    vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
+        vm.page = {};
+        vm.page.rootIcon = "icon-folder";
+        vm.user = {
+            changePassword: null
+        };
+        vm.breadcrumbs = [];
+        vm.showBackButton = true;
+        vm.hasTwoFactorProviders = false;
+        vm.avatarFile = {};
+        vm.labels = {};
+        vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
     //create the initial model for change password
     vm.changePasswordModel = {
@@ -29,21 +30,22 @@
       value: {}
     };
 
-    vm.goToPage = goToPage;
-    vm.openUserGroupPicker = openUserGroupPicker;
-    vm.openContentPicker = openContentPicker;
-    vm.openMediaPicker = openMediaPicker;
-    vm.editSelectedItem = editSelectedItem;
-    vm.removeSelectedItem = removeSelectedItem;
-    vm.disableUser = disableUser;
-    vm.enableUser = enableUser;
-    vm.unlockUser = unlockUser;
-    vm.resendInvite = resendInvite;
-    vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
-    vm.changeAvatar = changeAvatar;
-    vm.clearAvatar = clearAvatar;
-    vm.save = save;
-    vm.allowGroupEdit = allowGroupEdit;
+        vm.goToPage = goToPage;
+        vm.openUserGroupPicker = openUserGroupPicker;
+        vm.openContentPicker = openContentPicker;
+        vm.openMediaPicker = openMediaPicker;
+        vm.editSelectedItem = editSelectedItem;
+        vm.removeSelectedItem = removeSelectedItem;
+        vm.disableUser = disableUser;
+        vm.enableUser = enableUser;
+        vm.unlockUser = unlockUser;
+        vm.toggleConfigureTwoFactor = toggleConfigureTwoFactor;
+        vm.resendInvite = resendInvite;
+        vm.deleteNonLoggedInUser = deleteNonLoggedInUser;
+        vm.changeAvatar = changeAvatar;
+        vm.clearAvatar = clearAvatar;
+        vm.save = save;
+        vm.allowGroupEdit = allowGroupEdit;
 
     vm.changePassword = changePassword;
     vm.toggleChangePassword = toggleChangePassword;
@@ -99,11 +101,15 @@
 
           vm.changePasswordModel.config.disableToggle = true;
 
-          $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
-          vm.loading = false;
-        });
-      });
-    }
+                    $scope.$emit("$setAccessibleHeader", false, "general_user", false, vm.user.name, "", true);
+                    vm.loading = false;
+                });
+
+              twoFactorLoginResource.get2FAProvidersForUser(vm.user.id).then(function (providers) {
+                vm.hasTwoFactorProviders = providers.length > 0;
+              });
+            });
+        }
 
     function getLocalDate(date, culture, format) {
       if (date) {
@@ -398,8 +404,25 @@
       });
     }
 
-    function resendInvite() {
-      vm.resendInviteButtonState = "busy";
+        function toggleConfigureTwoFactor() {
+
+          var configureTwoFactorSettings = {
+            create: true,
+            user: vm.user,
+            isCurrentUser:  vm.user.isCurrentUser,
+            size: "small",
+            view: "views/common/infiniteeditors/twofactor/configuretwofactor.html",
+            close: function() {
+              editorService.close();
+            }
+          };
+
+          editorService.open(configureTwoFactorSettings);
+        }
+
+
+        function resendInvite() {
+            vm.resendInviteButtonState = "busy";
 
       if (vm.resendInviteMessage) {
         vm.user.message = vm.resendInviteMessage;

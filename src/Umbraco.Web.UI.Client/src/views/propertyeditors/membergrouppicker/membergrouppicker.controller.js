@@ -1,8 +1,8 @@
-//this controller simply tells the dialogs service to open a memberPicker window
+//this controller tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberGroupPicker($scope, editorService, memberGroupResource){
+function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
 
-    var vm = this;
+    const vm = this;
 
     vm.openMemberGroupPicker = openMemberGroupPicker;
     vm.remove = remove;
@@ -13,15 +13,33 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         return str.replace(rgxtrim, '');
     }
 
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
+        labelTokens: [],
+        icon: "icon-trash",
+        method: removeAllEntries,
+        isDisabled: true,
+        useLegacyIcon: false
+    };
+
     $scope.renderModel = [];
     $scope.allowRemove = true;
     $scope.groupIds = [];
 
+    if ($scope.model.config && $scope.umbProperty) {
+        $scope.umbProperty.setPropertyActions([
+            removeAllEntriesAction
+        ]);
+    }
+
     if ($scope.model.value) {
         var groupIds = $scope.model.value.split(',');
+
         memberGroupResource.getByIds(groupIds).then(function(groups) {
             $scope.renderModel = groups;
         });
+
+        removeAllEntriesAction.isDisabled = groupIds.length === 0;
     }
 
     function setDirty() {
@@ -39,8 +57,14 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                     : [model.selectedMemberGroup],
                     function (id) { return parseInt(id); }
                 );
+
+                var currIds = renderModelIds();
+
                 // figure out which groups are new and fetch them
-                var newGroupIds = _.difference(selectedGroupIds, renderModelIds());
+                var newGroupIds = _.difference(selectedGroupIds, currIds);
+
+                removeAllEntriesAction.isDisabled = currIds.length === 0 && newGroupIds.length === 0;
+
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
@@ -62,18 +86,39 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
 
     function remove(index) {
         $scope.renderModel.splice(index, 1);
+
+        var currIds = renderModelIds();
+        removeAllEntriesAction.isDisabled = currIds.length === 0;
+
         setDirty();
     }
 
     function clear() {
         $scope.renderModel = [];
+        removeAllEntriesAction.isDisabled = true;
+
         setDirty();
     }
 
-    function renderModelIds() {
-        return _.map($scope.renderModel, function (i) {
-            return i.id;
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
+            overlayService.confirmDelete({
+                title: data[1],
+                content: data[0],
+                close: () => {
+                    overlayService.close();
+                },
+                submit: () => {
+                    vm.clear();
+                    overlayService.close();
+                }
+            });
         });
+    }
+
+    function renderModelIds() {
+        var currIds = $scope.renderModel.map(i => i.id);
+        return currIds;
     }
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {

@@ -24,9 +24,13 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -58,7 +62,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             var scopeAccessor = (IScopeAccessor)provider;
             var globalSettings = new GlobalSettings();
             var commonRepository = new ContentTypeCommonRepository(scopeAccessor, TemplateRepository, appCaches, ShortStringHelper);
-            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(globalSettings));
+            var languageRepository = new LanguageRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>());
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<MediaTypeRepository>(), commonRepository, languageRepository, ShortStringHelper);
             var tagRepository = new TagRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<TagRepository>());
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
@@ -84,7 +88,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository, appCaches: realCache);
 
-                IUmbracoDatabase udb = scope.Database;
+                IUmbracoDatabase udb = ScopeAccessor.AmbientScope.Database;
 
                 udb.EnableSqlCount = false;
 
@@ -271,7 +275,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
@@ -297,7 +301,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 int[] types = new[] { 1031 };
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentTypeId));
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentTypeId));
                 IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
@@ -327,7 +331,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 }
 
                 string[] types = new[] { "Folder" };
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => types.Contains(x.ContentType.Alias));
                 IEnumerable<IMedia> result = repository.Get(query);
 
                 // Assert
@@ -345,7 +349,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
@@ -365,7 +369,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.GetPage(query, 1, 1, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
@@ -385,7 +389,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 2, out long totalRecords, null, Ordering.By("SortOrder"));
 
                 // Assert
@@ -405,7 +409,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("SortOrder", Direction.Descending));
 
                 // Assert
@@ -425,7 +429,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, null, Ordering.By("Name"));
 
                 // Assert
@@ -445,9 +449,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out MediaTypeRepository mediaTypeRepository);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
-                IQuery<IMedia> filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("File"));
+                IQuery<IMedia> filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("File"));
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
@@ -467,9 +471,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaRepository repository = CreateRepository(provider, out _);
 
                 // Act
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == 2);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == 2);
 
-                IQuery<IMedia> filter = scope.SqlContext.Query<IMedia>().Where(x => x.Name.Contains("Test"));
+                IQuery<IMedia> filter = provider.CreateQuery<IMedia>().Where(x => x.Name.Contains("Test"));
                 IEnumerable<IMedia> result = repository.GetPage(query, 0, 1, out long totalRecords, filter, Ordering.By("SortOrder"));
 
                 // Assert
@@ -559,7 +563,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 int level = 2;
-                IQuery<IMedia> query = scope.SqlContext.Query<IMedia>().Where(x => x.Level == level);
+                IQuery<IMedia> query = provider.CreateQuery<IMedia>().Where(x => x.Level == level);
                 int result = repository.Count(query);
 
                 // Assert

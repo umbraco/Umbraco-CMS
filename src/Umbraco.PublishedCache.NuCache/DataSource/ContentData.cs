@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
@@ -8,13 +9,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public class ContentData
     {
+        // Scheduled for removal in V11
         [Obsolete("Use ctor with all params, as the pros should be immutable")]
         public ContentData()
         {
-
+            Name = string.Empty;
+            UrlSegment = string.Empty;
+            Properties = null!;
+            CultureInfos = null!;
         }
 
-        public ContentData(string name, string urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]> properties, IReadOnlyDictionary<string, CultureVariation> cultureInfos)
+        public ContentData(string? name, string? urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]>? properties, IReadOnlyDictionary<string, CultureVariation>? cultureInfos)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             UrlSegment = urlSegment;
@@ -28,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         }
 
         public string Name { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
-        public string UrlSegment { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public string? UrlSegment { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
         public int VersionId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
         public DateTime VersionDate { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
         public int WriterId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
@@ -40,6 +45,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// <summary>
         /// The collection of language Id to name for the content item
         /// </summary>
-        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public IReadOnlyDictionary<string, CultureVariation>? CultureInfos { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
     }
 }

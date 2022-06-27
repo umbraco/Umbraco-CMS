@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -63,10 +63,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual int Id => _content.Id;
 
         /// <inheritdoc />
-        public virtual string Name => _content.Name;
+        public virtual string? Name => _content.Name;
 
         /// <inheritdoc />
-        public virtual string UrlSegment => _content.UrlSegment;
+        public virtual string? UrlSegment => _content.UrlSegment;
 
         /// <inheritdoc />
         public virtual int SortOrder => _content.SortOrder;
@@ -99,23 +99,23 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual PublishedItemType ItemType => _content.ItemType;
 
         /// <inheritdoc />
-        public virtual bool IsDraft(string culture = null) => _content.IsDraft(culture);
+        public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
 
         /// <inheritdoc />
-        public virtual bool IsPublished(string culture = null) => _content.IsPublished(culture);
+        public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
 
         #endregion
 
         #region Tree
 
         /// <inheritdoc />
-        public virtual IPublishedContent Parent => _content.Parent;
+        public virtual IPublishedContent? Parent => _content.Parent;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+        public virtual IEnumerable<IPublishedContent>? Children => _content.Children;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
+        public virtual IEnumerable<IPublishedContent>? ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
         #endregion
 
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
-        public virtual IPublishedProperty GetProperty(string alias)
+        public virtual IPublishedProperty? GetProperty(string alias)
         {
             return _content.GetProperty(alias);
         }

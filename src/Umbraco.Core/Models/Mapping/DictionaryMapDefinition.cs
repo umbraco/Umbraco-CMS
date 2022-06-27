@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -14,10 +15,18 @@ namespace Umbraco.Cms.Core.Models.Mapping
     public class DictionaryMapDefinition : IMapDefinition
     {
         private readonly ILocalizationService _localizationService;
+        private readonly CommonMapper? _commonMapper;
 
+        [Obsolete("Use the constructor with the CommonMapper")]
         public DictionaryMapDefinition(ILocalizationService localizationService)
         {
             _localizationService = localizationService;
+        }
+
+        public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
+        {
+            _localizationService = localizationService;
+            _commonMapper = commonMapper;
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
@@ -44,6 +53,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Name = source.ItemKey;
             target.ParentId = source.ParentId ?? Guid.Empty;
             target.Udi = Udi.Create(Constants.UdiEntityType.DictionaryItem, source.Key);
+            if (_commonMapper != null)
+            {
+                target.ContentApps.AddRange(_commonMapper.GetContentAppsForEntity(source));
+            }
 
             // build up the path to make it possible to set active item in tree
             // TODO: check if there is a better way
@@ -66,13 +79,13 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var lang in _localizationService.GetAllLanguages())
             {
                 var langId = lang.Id;
-                var translation = source.Translations.FirstOrDefault(x => x.LanguageId == langId);
+                var translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
 
                 target.Translations.Add(new DictionaryTranslationDisplay
                 {
                     IsoCode = lang.IsoCode,
-                    DisplayName = lang.CultureInfo.DisplayName,
-                    Translation = (translation != null) ? translation.Value : string.Empty,
+                    DisplayName = lang.CultureName,
+                    Translation = translation?.Value ?? string.Empty,
                     LanguageId = lang.Id
                 });
             }
@@ -88,12 +101,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
             foreach (var lang in _localizationService.GetAllLanguages())
             {
                 var langId = lang.Id;
-                var translation = source.Translations.FirstOrDefault(x => x.LanguageId == langId);
+                var translation = source.Translations?.FirstOrDefault(x => x.LanguageId == langId);
 
                 target.Translations.Add(
                     new DictionaryOverviewTranslationDisplay
                     {
-                        DisplayName = lang.CultureInfo.DisplayName,
+                        DisplayName = lang.CultureName,
                         HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false
                     });
             }

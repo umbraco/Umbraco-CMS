@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         private IEnumerable<string> GetUiFiles(IEnumerable<string> pathFromNetCore)
         {
             var root = TestContext.CurrentContext.TestDirectory.Split("tests")[0];
-            var pathToFiles = Path.Combine(root, "src", "Umbraco.Web.UI");
+            var pathToFiles = Path.Combine(root, "src", "Umbraco.Cms.StaticAssets");
             foreach (var pathSection in pathFromNetCore)
             {
                 pathToFiles = Path.Combine(pathToFiles, pathSection);
@@ -94,18 +94,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 
             Assert.True(views.Contains(fileName), $"Expected {fileName} to exist, but it didn't");
         }
-
-        [Test]
-        public void LanguageFilesAreLowercase()
-        {
-            IEnumerable<string> files = GetUiFiles(new[] { "umbraco", "config", "lang" });
-            foreach (var fileName in files)
-            {
-                Assert.AreEqual(
-                    fileName.ToLower(),
-                    fileName,
-                    $"Language files must be all lowercase but {fileName} is not lowercase.");
-            }
-        }
+        
     }
 }

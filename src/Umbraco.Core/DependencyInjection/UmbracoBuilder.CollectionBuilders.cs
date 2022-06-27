@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Media;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddComponent<T>(this IUmbracoBuilder builder)
             where T : class, IComponent
         {
-            builder.Components().Append<T>();
+            builder.Components()?.Append<T>();
             return builder;
         }
 
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddContentApp<T>(this IUmbracoBuilder builder)
             where T : class, IContentAppFactory
         {
-            builder.ContentApps().Append<T>();
+            builder.ContentApps()?.Append<T>();
             return builder;
         }
 
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddContentFinder<T>(this IUmbracoBuilder builder)
             where T : class, IContentFinder
         {
-            builder.ContentFinders().Append<T>();
+            builder.ContentFinders()?.Append<T>();
             return builder;
         }
 
@@ -56,7 +57,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddDashboard<T>(this IUmbracoBuilder builder)
             where T : class, IDashboard
         {
-            builder.Dashboards().Add<T>();
+            builder.Dashboards()?.Add<T>();
             return builder;
         }
 
@@ -68,7 +69,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddMediaUrlProvider<T>(this IUmbracoBuilder builder)
             where T : class, IMediaUrlProvider
         {
-            builder.MediaUrlProviders().Append<T>();
+            builder.MediaUrlProviders()?.Append<T>();
             return builder;
         }
 
@@ -80,9 +81,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddEmbedProvider<T>(this IUmbracoBuilder builder)
             where T : class, IEmbedProvider
         {
-            builder.EmbedProviders().Append<T>();
+            builder.EmbedProviders()?.Append<T>();
             return builder;
         }
+
+        [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 10")]
+        public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
+            where T : class, IEmbedProvider => AddEmbedProvider<T>(builder);
 
         /// <summary>
         /// Register a section.
@@ -92,7 +97,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddSection<T>(this IUmbracoBuilder builder)
             where T : class, ISection
         {
-            builder.Sections().Append<T>();
+            builder.Sections()?.Append<T>();
             return builder;
         }
 
@@ -104,7 +109,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddUrlProvider<T>(this IUmbracoBuilder builder)
             where T : class, IUrlProvider
         {
-            builder.UrlProviders().Append<T>();
+            builder.UrlProviders()?.Append<T>();
             return builder;
         }
     }

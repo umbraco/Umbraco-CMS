@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Permissions
             }));
         }
 
-        private string GetErrorDescription(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
+        private string? GetErrorDescription(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
         {
             if (!status.Value.Any())
             {
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Permissions
         private string GetMessage(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
             => _textService.Localize("permissions", status.Key);
 
-        private string GetReadMoreLink(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
+        private string? GetReadMoreLink(KeyValuePair<FilePermissionTest, IEnumerable<string>> status)
         {
             if (!status.Value.Any())
             {

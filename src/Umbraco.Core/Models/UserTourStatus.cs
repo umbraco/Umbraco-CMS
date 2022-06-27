@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models
         /// The tour alias
         /// </summary>
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
 
         /// <summary>
         /// If the tour is completed
@@ -27,14 +27,14 @@ namespace Umbraco.Cms.Core.Models
         [DataMember(Name = "disabled")]
         public bool Disabled { get; set; }
 
-        public bool Equals(UserTourStatus other)
+        public bool Equals(UserTourStatus? other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(Alias, other.Alias);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -47,12 +47,12 @@ namespace Umbraco.Cms.Core.Models
             return Alias.GetHashCode();
         }
 
-        public static bool operator ==(UserTourStatus left, UserTourStatus right)
+        public static bool operator ==(UserTourStatus? left, UserTourStatus? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(UserTourStatus left, UserTourStatus right)
+        public static bool operator !=(UserTourStatus? left, UserTourStatus? right)
         {
             return !Equals(left, right);
         }

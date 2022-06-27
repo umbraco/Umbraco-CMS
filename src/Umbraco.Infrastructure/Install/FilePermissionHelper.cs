@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data),
-                hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPath),
+                hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Preview)
             };
             _packagesPermissionsDirs = new[]
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             EnsureFiles(_permissionFiles, out errors);
             report[FilePermissionTest.FileWriting] = errors.ToList();
 
-            EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPath), out errors);
+            EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath), out errors);
             report[FilePermissionTest.MediaFolderCreation] = errors.ToList();
 
             return report.Sum(x => x.Value.Count()) == 0;
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
         private bool EnsureDirectories(string[] dirs, out IEnumerable<string> errors, bool writeCausesRestart = false)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var dir in dirs)
             {
@@ -99,13 +99,13 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 
         private bool EnsureFiles(string[] files, out IEnumerable<string> errors)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var file in files)
             {
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
         private bool EnsureCanCreateSubDirectories(IEnumerable<string> dirs, out IEnumerable<string> errors)
         {
-            List<string> temp = null;
+            List<string>? temp = null;
             var success = true;
             foreach (var dir in dirs)
             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                 success = false;
             }
 
-            errors = success ? Enumerable.Empty<string>() : temp;
+            errors = success ? Enumerable.Empty<string>() : temp ?? Enumerable.Empty<string>();
             return success;
         }
 

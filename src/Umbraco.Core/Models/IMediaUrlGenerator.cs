@@ -13,6 +13,6 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>
         /// True if a media path was returned
         /// </returns>
-        bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath);
+        bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath);
     }
 }

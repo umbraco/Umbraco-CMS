@@ -1,27 +1,31 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <inheritdoc />
     /// <summary>
-    /// Represents the refresh node menu item
+    /// Represents the refresh node menu item.
     /// </summary>
     public sealed class RefreshNode : ActionMenuItem
     {
+        private const string icon = "icon-refresh";
+
         public override string AngularServiceName => "umbracoMenuActions";
 
         public RefreshNode(string name, bool separatorBefore = false)
             : base("refreshNode", name)
         {
-            Icon = "refresh";
+            Icon = icon;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
 
         public RefreshNode(ILocalizedTextService textService, bool separatorBefore = false)
             : base("refreshNode", textService)
         {
-            Icon = "refresh";
+            Icon = icon;
             SeparatorBefore = separatorBefore;
+            UseLegacyIcon = false;
         }
     }
 }

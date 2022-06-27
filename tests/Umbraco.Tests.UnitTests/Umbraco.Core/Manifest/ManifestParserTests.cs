@@ -484,5 +484,27 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             Assert.AreEqual("Content", manifest.Sections[0].Name);
             Assert.AreEqual("World", manifest.Sections[1].Name);
         }
+
+        [Test]
+        public void CanParseManifest_Version()
+        {
+            const string json = @"{""name"": ""VersionPackage"", ""version"": ""1.0.0""}";
+            PackageManifest manifest = _parser.ParseManifest(json);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("VersionPackage", manifest.PackageName);
+                Assert.AreEqual("1.0.0", manifest.Version);
+            });
+        }
+
+        [Test]
+        public void CanParseManifest_TrackingAllowed()
+        {
+            const string json = @"{""allowPackageTelemetry"": false }";
+            PackageManifest manifest = _parser.ParseManifest(json);
+
+            Assert.IsFalse(manifest.AllowPackageTelemetry);
+        }
     }
 }

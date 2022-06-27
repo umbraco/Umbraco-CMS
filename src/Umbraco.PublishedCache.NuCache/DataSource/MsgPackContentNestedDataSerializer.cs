@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             return json;
         }
 
-        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published)
+        public ContentCacheDataModel? Deserialize(IReadOnlyContentBase content, string? stringData, byte[]? byteData, bool published)
         {
             if (byteData != null)
             {
@@ -93,17 +93,26 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// </remarks>
         private void Compress(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
+            if (model.PropertyData is null)
+            {
+                return;
+            }
+
             foreach(var propertyAliasToData in model.PropertyData)
             {
                 if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key, published))
                 {
                     foreach(var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is string))
                     {
-                        property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes((string)property.Value), LZ4Level.L00_FAST);
+                        if (property.Value is string propertyValue)
+                        {
+                            property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes(propertyValue), LZ4Level.L00_FAST);
+                        }
                     }
+
                     foreach (var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is int intVal))
                     {
-                        property.Value = Convert.ToBoolean((int)property.Value);
+                        property.Value = Convert.ToBoolean((int?)property.Value);
                     }
                 }
             }
@@ -117,6 +126,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// <param name="published"></param>
         private void Expand(IReadOnlyContentBase content, ContentCacheDataModel nestedData, bool published)
         {
+            if (nestedData.PropertyData is null)
+            {
+                return;
+            }
+
             foreach (var propertyAliasToData in nestedData.PropertyData)
             {
                 if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key,published))

@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the user matching the specified <paramref name="userId"/> if it exists.
         /// </returns>
-        Task<TUser> FindByIdAsync(string userId);
+        Task<TUser> FindByIdAsync(string? userId);
 
         /// <summary>
         /// Generates a password reset token for the specified <paramref name="user"/>, using
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Security
         /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
         /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
         /// </remarks>
-        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string newPassword);
+        Task<IdentityResult> ChangePasswordWithResetAsync(string userId, string token, string? newPassword);
 
         /// <summary>
         /// Validates that an email confirmation token matches the specified <paramref name="user"/>.
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ConfirmEmailAsync(TUser user, string token);
+        Task<IdentityResult> ConfirmEmailAsync(TUser user, string? token);
 
         /// <summary>
         /// Gets the user, if any, associated with the normalized value of the specified email address.
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ResetPasswordAsync(TUser user, string token, string newPassword);
+        Task<IdentityResult> ResetPasswordAsync(TUser user, string? token, string? newPassword);
 
         /// <summary>
         /// Override to check the user approval value as well as the user lock out date, by default this only checks the user's locked out date
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation, containing true if
         /// the specified <paramref name="password" /> matches the one store for the <paramref name="user"/>,
         /// otherwise false.</returns>
-        Task<bool> CheckPasswordAsync(TUser user, string password);
+        Task<bool> CheckPasswordAsync(TUser user, string? password);
 
         /// <summary>
         /// Changes a user's password after confirming the specified <paramref name="currentPassword"/> is correct,
@@ -199,13 +199,13 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> ChangePasswordAsync(TUser user, string currentPassword, string newPassword);
+        Task<IdentityResult> ChangePasswordAsync(TUser user, string? currentPassword, string? newPassword);
 
         /// <summary>
         /// Used to validate a user's session
         /// </summary>
         /// <returns>Returns true if the session is valid, otherwise false</returns>
-        Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
+        Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId);
 
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the backing store with no password,
@@ -251,14 +251,14 @@ namespace Umbraco.Cms.Core.Security
         /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
         /// of the operation.
         /// </returns>
-        Task<IdentityResult> CreateAsync(TUser user, string password);
+        Task<IdentityResult> CreateAsync(TUser user, string? password);
 
         /// <summary>
         /// Generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
-        
+
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code
@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="password">The password.</param>
         /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
 
-        Task<IdentityResult> ValidatePasswordAsync(string password);
+        Task<IdentityResult> ValidatePasswordAsync(string? password);
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="loginProvider">The login provide whose information should be removed.</param>
         /// <param name="providerKey">The key given by the external login provider for the specified user.</param>
         /// <returns>The System.Threading.Tasks.Task that represents the asynchronous operation, containing the Microsoft.AspNetCore.Identity.IdentityResult of the operation.</returns>
-        Task<IdentityResult> RemoveLoginAsync(TUser user, string loginProvider, string providerKey);
+        Task<IdentityResult> RemoveLoginAsync(TUser user, string? loginProvider, string? providerKey);
 
         /// <summary>
         /// Resets the access failed count for the user

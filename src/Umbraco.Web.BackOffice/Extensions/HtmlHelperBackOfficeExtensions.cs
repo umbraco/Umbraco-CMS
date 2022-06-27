@@ -75,9 +75,12 @@ namespace Umbraco.Extensions
 
             if (externalLoginErrors != null)
             {
-                foreach (var error in externalLoginErrors.Errors)
+                if (externalLoginErrors.Errors is not null)
                 {
-                    sb.AppendFormat(@"errors.push(""{0}"");", error.ToSingleLine()).AppendLine();
+                    foreach (var error in externalLoginErrors.Errors)
+                    {
+                        sb.AppendFormat(@"errors.push(""{0}"");", error.ToSingleLine()).AppendLine();
+                    }
                 }
             }
 

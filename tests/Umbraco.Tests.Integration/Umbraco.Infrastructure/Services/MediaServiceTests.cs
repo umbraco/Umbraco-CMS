@@ -17,6 +17,9 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
@@ -109,7 +112,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     0,
                     11,
                     out long total,
-                    provider.SqlContext.Query<IMedia>()
+                    provider.CreateQuery<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(11, result.Count());
@@ -120,7 +123,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     1,
                     11,
                     out total,
-                    provider.SqlContext.Query<IMedia>()
+                    provider.CreateQuery<IMedia>()
                         .Where(x => new[] { mediaType1.Id, mediaType2.Id }.Contains(x.ContentTypeId)),
                     Ordering.By("SortOrder", Direction.Ascending));
                 Assert.AreEqual(9, result.Count());

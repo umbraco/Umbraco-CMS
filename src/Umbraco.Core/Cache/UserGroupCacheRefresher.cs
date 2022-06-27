@@ -34,9 +34,9 @@ namespace Umbraco.Cms.Core.Cache
         {
             ClearAllIsolatedCacheByEntityType<IUserGroup>();
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
-            if (userGroupCache)
+            if (userGroupCache.Success)
             {
-                userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
+                userGroupCache.Result?.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 
             //We'll need to clear all user cache too
@@ -54,10 +54,10 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
-            if (userGroupCache)
+            if (userGroupCache.Success)
             {
-                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup, int>(id));
-                userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
+                userGroupCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUserGroup, int>(id));
+                userGroupCache.Result?.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 
             //we don't know what user's belong to this group without doing a look up so we'll need to just clear them all

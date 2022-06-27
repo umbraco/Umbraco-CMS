@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -31,17 +32,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             return Database.Fetch<DataTypeDto>(sql);
         }
 
-        protected int[] ConvertStringValues(string val)
+        protected int[]? ConvertStringValues(string? val)
         {
-            var splitVals = val.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+            var splitVals = val?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
-            var intVals = splitVals
+            var intVals = splitVals?
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : int.MinValue)
                 .Where(x => x != int.MinValue)
                 .ToArray();
 
             //only return if the number of values are the same (i.e. All INTs)
-            if (splitVals.Length == intVals.Length)
+            if (splitVals?.Length == intVals?.Length)
                 return intVals;
 
             return null;
@@ -50,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         internal bool UpdatePropertyDataDto(PropertyDataDto propData, ValueListConfiguration config, bool isMultiple)
         {
             //Get the INT ids stored for this property/drop down
-            int[] ids = null;
+            int[]? ids = null;
             if (!propData.VarcharValue.IsNullOrWhiteSpace())
             {
                 ids = ConvertStringValues(propData.VarcharValue);
@@ -74,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             foreach (var id in ids)
             {
                 var val = config.Items.FirstOrDefault(x => x.Id == id);
-                if (val != null)
+                if (val?.Value != null)
                 {
                     values.Add(val.Value);
                     continue;
@@ -96,7 +97,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         // dummy editor for deserialization
         protected class ValueListConfigurationEditor : ConfigurationEditor<ValueListConfiguration>
         {
-            public ValueListConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
+            public ValueListConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
             {
             }
         }

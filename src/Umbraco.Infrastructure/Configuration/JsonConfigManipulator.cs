@@ -2,41 +2,69 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
 
-        public JsonConfigManipulator(IConfiguration configuration) => _configuration = configuration;
+        [Obsolete]
+        public JsonConfigManipulator(IConfiguration configuration)
+            : this(configuration, StaticServiceProvider.Instance.GetRequiredService<ILogger<JsonConfigManipulator>>())
+        { }
 
-        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
+        public JsonConfigManipulator(
+            IConfiguration configuration,
+            ILogger<JsonConfigManipulator> logger)
+        {
+            _configuration = configuration;
+            _logger = logger;
+        }
+
+        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
         {
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to remove connection string from JSON configuration.");
+                return;
+            }
 
             RemoveJsonKey(json, UmbracoConnectionPath);
 
             SaveJson(provider, json);
         }
 
-        public void SaveConnectionString(string connectionString, string providerName)
+        public void SaveConnectionString(string connectionString, string? providerName)
         {
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save connection string in JSON configuration.");
+                return;
+            }
 
             var item = GetConnectionItem(connectionString, providerName);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
@@ -47,8 +75,13 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration.", key);
+                return;
+            }
 
-            JToken token = json;
+            JToken? token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
             {
                 if (token is null)
@@ -62,7 +95,10 @@ namespace Umbraco.Cms.Core.Configuration
             var writer = new JTokenWriter();
             writer.WriteValue(value);
 
-            token.Replace(writer.Token);
+            if (writer.Token is not null)
+            {
+                token.Replace(writer.Token);
+            }
 
             SaveJson(provider, json);
 
@@ -73,10 +109,18 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save enabled/disabled state for redirect URL tracking in JSON configuration.");
+                return;
+            }
 
             var item = GetDisableRedirectUrlItem(disable);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
@@ -86,15 +130,23 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                _logger.LogWarning("Failed to save global identifier in JSON configuration.");
+                return;
+            }
 
             var item = GetGlobalIdItem(id);
 
-            json.Merge(item, new JsonMergeSettings());
+            if (item is not null)
+            {
+                json?.Merge(item, new JsonMergeSettings());
+            }
 
             SaveJson(provider, json);
         }
 
-        private object GetGlobalIdItem(string id)
+        private object? GetGlobalIdItem(string id)
         {
             JTokenWriter writer = new JTokenWriter();
 
@@ -115,7 +167,7 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken GetDisableRedirectUrlItem(bool value)
+        private JToken? GetDisableRedirectUrlItem(bool value)
         {
             JTokenWriter writer = new JTokenWriter();
 
@@ -136,24 +188,26 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken GetConnectionItem(string connectionString, string providerName)
+        private JToken? GetConnectionItem(string connectionString, string? providerName)
         {
             JTokenWriter writer = new JTokenWriter();
 
             writer.WriteStartObject();
             writer.WritePropertyName("ConnectionStrings");
             writer.WriteStartObject();
-            writer.WritePropertyName(Cms.Core.Constants.System.UmbracoConnectionName);
+            writer.WritePropertyName(Constants.System.UmbracoConnectionName);
             writer.WriteValue(connectionString);
+            writer.WritePropertyName($"{Constants.System.UmbracoConnectionName}{ConnectionStrings.ProviderNamePostfix}");
+            writer.WriteValue(providerName);
             writer.WriteEndObject();
             writer.WriteEndObject();
 
             return writer.Token;
         }
 
-        private static void RemoveJsonKey(JObject json, string key)
+        private static void RemoveJsonKey(JObject? json, string key)
         {
-            JToken token = json;
+            JToken? token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
             {
                 token = CaseSelectPropertyValues(token, propertyName);
@@ -162,7 +216,7 @@ namespace Umbraco.Cms.Core.Configuration
             token?.Parent?.Remove();
         }
 
-        private void SaveJson(JsonConfigurationProvider provider, JObject json)
+        private void SaveJson(JsonConfigurationProvider provider, JObject? json)
         {
             lock (_locker)
             {
@@ -170,39 +224,52 @@ namespace Umbraco.Cms.Core.Configuration
                 {
                     var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
-                    using (var sw = new StreamWriter(jsonFilePath, false))
-                    using (var jsonTextWriter = new JsonTextWriter(sw)
+                    try
                     {
-                        Formatting = Formatting.Indented,
-                    })
+                        using (var sw = new StreamWriter(jsonFilePath, false))
+                        using (var jsonTextWriter = new JsonTextWriter(sw)
+                        {
+                            Formatting = Formatting.Indented,
+                        })
+                        {
+                            json?.WriteTo(jsonTextWriter);
+                        }
+                    }
+                    catch (IOException exception)
                     {
-                        json?.WriteTo(jsonTextWriter);
+                        _logger.LogWarning(exception, "JSON configuration could not be written: {path}", jsonFilePath);
                     }
                 }
             }
         }
 
-        private JObject GetJson(JsonConfigurationProvider provider)
+        private JObject? GetJson(JsonConfigurationProvider provider)
         {
             lock (_locker)
             {
-                if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+                if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
                 {
-                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+                    return null;
+                }
 
+                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+
+                try
+                {
                     var serializer = new JsonSerializer();
-                    using (var sr = new StreamReader(jsonFilePath))
-                    using (var jsonTextReader = new JsonTextReader(sr))
-                    {
-                        return serializer.Deserialize<JObject>(jsonTextReader);
-                    }
+                    using var sr = new StreamReader(jsonFilePath);
+                    using var jsonTextReader = new JsonTextReader(sr);
+                    return serializer.Deserialize<JObject>(jsonTextReader);
                 }
-
-                return null; 
+                catch (IOException exception)
+                {
+                    _logger.LogWarning(exception, "JSON configuration could not be read: {path}", jsonFilePath);
+                    return null;
+                }
             }
         }
 
-        private JsonConfigurationProvider GetJsonConfigurationProvider(string requiredKey = null)
+        private JsonConfigurationProvider GetJsonConfigurationProvider(string? requiredKey = null)
         {
             if (_configuration is IConfigurationRoot configurationRoot)
             {
@@ -227,7 +294,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// This method is required because keys are case insensative in IConfiguration.
         /// JObject[..] do not support case insensative and JObject.Property(...) do not return a new JObject.
         /// </remarks>
-        private static JToken CaseSelectPropertyValues(JToken token, string name)
+        private static JToken? CaseSelectPropertyValues(JToken? token, string name)
         {
             if (token is JObject obj)
             {

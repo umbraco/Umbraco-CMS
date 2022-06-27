@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -32,7 +33,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder> configureMvc = null) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
@@ -54,7 +55,9 @@ namespace Umbraco.Extensions
                 .AddCoreNotifications()
                 .AddLogViewer()
                 .AddExamine()
-                .AddExamineIndexes();
+                .AddExamineIndexes()
+                .AddControllersWithAmbiguousConstructors()
+                .AddSupplemenataryLocalizedTextFileSources();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
@@ -75,19 +78,19 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the back office tree collection builder
         /// </summary>
-        public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
+        public static TreeCollectionBuilder? Trees(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<TreeCollectionBuilder>();
 
         public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<KeepAliveMiddleware>();
             builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
-            builder.Services.AddUnique<ServerVariablesParser>();
-            builder.Services.AddUnique<InstallAreaRoutes>();
-            builder.Services.AddUnique<BackOfficeAreaRoutes>();
-            builder.Services.AddUnique<PreviewRoutes>();
+            builder.Services.AddSingleton<ServerVariablesParser>();
+            builder.Services.AddSingleton<InstallAreaRoutes>();
+            builder.Services.AddSingleton<BackOfficeAreaRoutes>();
+            builder.Services.AddSingleton<PreviewRoutes>();
             builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
-            builder.Services.AddUnique<BackOfficeServerVariables>();
+            builder.Services.AddSingleton<BackOfficeServerVariables>();
             builder.Services.AddScoped<BackOfficeSessionIdValidator>();
             builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
 
@@ -95,7 +98,7 @@ namespace Umbraco.Extensions
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-            builder.Trees()
+            builder.Trees()?
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
             builder.AddWebMappingProfiles();
@@ -114,7 +117,21 @@ namespace Umbraco.Extensions
             });
 
             builder.Services.AddUnique<IIconService, IconService>();
-            builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
+            builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
+            builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds explicit registrations for controllers with ambiguous constructors to prevent downstream issues for
+        /// users who wish to use <see cref="Microsoft.AspNetCore.Mvc.Controllers.ServiceBasedControllerActivator"/>
+        /// </summary>
+        public static IUmbracoBuilder AddControllersWithAmbiguousConstructors(
+            this IUmbracoBuilder builder)
+        {
+            builder.Services.TryAddTransient(sp =>
+                ActivatorUtilities.CreateInstance<CurrentUserController>(sp));
 
             return builder;
         }

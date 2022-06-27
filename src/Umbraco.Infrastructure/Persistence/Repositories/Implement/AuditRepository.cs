@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             });
         }
 
-        protected override IAuditItem PerformGet(int id)
+        protected override IAuditItem? PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 : new AuditItem(dto.NodeId, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Cms.Core.Constants.Security.UnknownUserId, dto.EntityType, dto.Comment, dto.Parameters);
         }
 
-        protected override IEnumerable<IAuditItem> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IAuditItem> PerformGetAll(params int[]? ids)
         {
             throw new NotImplementedException();
         }
@@ -146,8 +146,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <returns></returns>
         public IEnumerable<IAuditItem> GetPagedResultsByQuery(IQuery<IAuditItem> query, long pageIndex, int pageSize,
             out long totalRecords, Direction orderDirection,
-            AuditType[] auditTypeFilter,
-            IQuery<IAuditItem> customFilter)
+            AuditType[]? auditTypeFilter,
+            IQuery<IAuditItem>? customFilter)
         {
             if (auditTypeFilter == null) auditTypeFilter = Array.Empty<AuditType>();
 

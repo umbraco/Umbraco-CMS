@@ -275,7 +275,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 repository.Save(stylesheet);
 
                 Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
-                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("path-2\\test-path-2.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
 
                 stylesheet = repository.Get("path-2/test-path-2.css");
@@ -300,17 +300,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("path-2\\test-path-3.css".Replace("\\", $"{Path.DirectorySeparatorChar}"), stylesheet.Path);
                 Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
 
-                stylesheet = new Stylesheet("\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
-                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                stylesheet = new Stylesheet("..\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+                Assert.Throws<UnauthorizedAccessException>(() =>
                     repository.Save(stylesheet));
 
-                // fixed in 7.3 - 7.2.8 used to throw
+                stylesheet = new Stylesheet("\\test-path-5.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+                repository.Save(stylesheet);
+
+                stylesheet = repository.Get("\\test-path-5.css");
+                Assert.IsNotNull(stylesheet);
+                Assert.AreEqual("test-path-5.css", stylesheet.Path);
+                Assert.AreEqual("/css/test-path-5.css", stylesheet.VirtualPath);
+
                 stylesheet = repository.Get("missing.css");
                 Assert.IsNull(stylesheet);
 
                 // #7713 changes behaviour to return null when outside the filesystem
                 // to accomodate changing the CSS path and not flooding the backoffice with errors
-                stylesheet = repository.Get("\\test-path-4.css"); // outside the filesystem, does not exist
+                stylesheet = repository.Get("..\\test-path-4.css"); // outside the filesystem, does not exist
                 Assert.IsNull(stylesheet);
 
                 stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists

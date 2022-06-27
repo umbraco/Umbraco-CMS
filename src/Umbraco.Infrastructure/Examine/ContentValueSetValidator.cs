@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
     {
-        private readonly IPublicAccessService _publicAccessService;
-        private readonly IScopeProvider _scopeProvider;
+        private readonly IPublicAccessService? _publicAccessService;
+        private readonly IScopeProvider? _scopeProvider;
         private const string PathKey = "path";
         private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Content, IndexTypes.Media };
         protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 // explicit scope since we may be in a background thread
                 using (_scopeProvider.CreateScope(autoComplete: true))
                 {
-                    if (_publicAccessService.IsProtected(path))
+                    if (_publicAccessService.IsProtected(path).Success)
                     {
                         return false;
                     }
@@ -76,16 +76,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         // used for tests
         public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null,
-            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
             : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
         {
         }
 
         public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
-            IPublicAccessService publicAccessService,
-            IScopeProvider scopeProvider,
+            IPublicAccessService? publicAccessService,
+            IScopeProvider? scopeProvider,
             int? parentId = null,
-            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            IEnumerable<string>? includeItemTypes = null, IEnumerable<string>? excludeItemTypes = null)
             : base(includeItemTypes, excludeItemTypes, null, null)
         {
             PublishedValuesOnly = publishedValuesOnly;
@@ -98,22 +98,24 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public override ValueSetValidationResult Validate(ValueSet valueSet)
         {
             var baseValidate = base.Validate(valueSet);
-            if (baseValidate == ValueSetValidationResult.Failed)
-                return ValueSetValidationResult.Failed;
+            valueSet = baseValidate.ValueSet;
+            if (baseValidate.Status == ValueSetValidationStatus.Failed)
+                return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
 
-            var isFiltered = baseValidate == ValueSetValidationResult.Filtered;
+            var isFiltered = baseValidate.Status == ValueSetValidationStatus.Filtered;
 
+            var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
             //check for published content
             if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
             {
                 if (!valueSet.Values.TryGetValue(UmbracoExamineFieldNames.PublishedFieldName, out var published))
                 {
-                    return ValueSetValidationResult.Failed;
+                    return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
                 }
 
                 if (!published[0].Equals("y"))
                 {
-                    return ValueSetValidationResult.Failed;
+                    return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
                 }
 
                 //deal with variants, if there are unpublished variants than we need to remove them from the value set
@@ -129,7 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             var cultureSuffix = publishField.Key.Substring(publishField.Key.LastIndexOf('_'));
                             foreach (var cultureField in valueSet.Values.Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
                             {
-                                valueSet.Values.Remove(cultureField.Key);
+                                filteredValues.Remove(cultureField.Key);
                                 isFiltered = true;
                             }
                         }
@@ -138,21 +140,22 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
 
             //must have a 'path'
-            if (!valueSet.Values.TryGetValue(PathKey, out var pathValues)) return ValueSetValidationResult.Failed;
-            if (pathValues.Count == 0) return ValueSetValidationResult.Failed;
-            if (pathValues[0] == null) return ValueSetValidationResult.Failed;
-            if (pathValues[0].ToString().IsNullOrWhiteSpace()) return ValueSetValidationResult.Failed;
+            if (!valueSet.Values.TryGetValue(PathKey, out var pathValues)) return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            if (pathValues.Count == 0) return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            if (pathValues[0] == null) return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
+            if (pathValues[0].ToString().IsNullOrWhiteSpace()) return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
             var path = pathValues[0].ToString();
 
+            var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x=>x.Key, x=> (IEnumerable<object>)x.Value));
             // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
             // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
             // because we need to remove anything that doesn't pass by protected content in the cases that umbraco data is moved to an illegal parent.
-            if (!ValidatePath(path, valueSet.Category)
-                || !ValidateRecycleBin(path, valueSet.Category)
-                || !ValidateProtectedContent(path, valueSet.Category))
-                return ValueSetValidationResult.Filtered;
+            if (!ValidatePath(path!, valueSet.Category)
+                || !ValidateRecycleBin(path!, valueSet.Category)
+                || !ValidateProtectedContent(path!, valueSet.Category))
+                return new ValueSetValidationResult(ValueSetValidationStatus.Filtered, filteredValueSet);
 
-            return isFiltered ? ValueSetValidationResult.Filtered : ValueSetValidationResult.Valid;
+            return new ValueSetValidationResult(isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
         }
     }
 }

@@ -10,10 +10,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -23,34 +23,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        private readonly GlobalSettings _globalSettings;
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
 
-        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger, IOptions<GlobalSettings> globalSettings)
+        public LanguageRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<LanguageRepository> logger)
             : base(scopeAccessor, cache, logger)
-        {
-            _globalSettings = globalSettings.Value;
-        }
+        { }
 
         protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()
         {
             return new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
-        private FullDataSetRepositoryCachePolicy<ILanguage, int> TypedCachePolicy => CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
+        private FullDataSetRepositoryCachePolicy<ILanguage, int>? TypedCachePolicy => CachePolicy as FullDataSetRepositoryCachePolicy<ILanguage, int>;
 
         #region Overrides of RepositoryBase<int,Language>
 
-        protected override ILanguage PerformGet(int id)
+        protected override ILanguage? PerformGet(int id)
         {
             return PerformGetAll(id).FirstOrDefault();
         }
 
-        protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
+        protected override IEnumerable<ILanguage> PerformGetAll(params int[]? ids)
         {
             var sql = GetBaseQuery(false).Where<LanguageDto>(x => x.Id > 0);
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 sql.WhereIn<LanguageDto>(x => x.Id, ids);
             }
@@ -238,17 +235,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #endregion
 
         protected ILanguage ConvertFromDto(LanguageDto dto)
-        {
-            var entity = LanguageFactory.BuildEntity(_globalSettings, dto);
-            return entity;
-        }
+            => LanguageFactory.BuildEntity(dto);
 
-        public ILanguage GetByIsoCode(string isoCode)
+        public ILanguage? GetByIsoCode(string isoCode)
         {
             // ensure cache is populated, in a non-expensive way
             if (TypedCachePolicy != null)
+            {
                 TypedCachePolicy.GetAllCached(PerformGetAll);
-
+            }
 
             var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
             return id.HasValue ? Get(id.Value) : null;
@@ -256,7 +251,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         // fast way of getting an id for an isoCode - avoiding cloning
         // _codeIdMap is rebuilt whenever PerformGetAll runs
-        public int? GetIdByIsoCode(string isoCode, bool throwOnNotFound = true)
+        public int? GetIdByIsoCode(string? isoCode, bool throwOnNotFound = true)
         {
             if (isoCode == null) return null;
 
@@ -278,7 +273,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         // fast way of getting an isoCode for an id - avoiding cloning
         // _idCodeMap is rebuilt whenever PerformGetAll runs
-        public string GetIsoCodeById(int? id, bool throwOnNotFound = true)
+        public string? GetIsoCodeById(int? id, bool throwOnNotFound = true)
         {
             if (id == null) return null;
 
@@ -300,7 +295,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public string GetDefaultIsoCode()
         {
-            return GetDefault()?.IsoCode;
+            return GetDefault().IsoCode;
         }
 
         public int? GetDefaultId()
@@ -313,7 +308,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             // get all cached
             var languages = (TypedCachePolicy?.GetAllCached(PerformGetAll) //try to get all cached non-cloned if using the correct cache policy (not the case in unit tests)
-                ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)).ToList();
+                ?? CachePolicy.GetAll(Array.Empty<int>(), PerformGetAll)!).ToList();
 
             var language = languages.FirstOrDefault(x => x.IsDefault);
             if (language != null) return language;
@@ -323,14 +318,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // still, don't kill the site, and return "something"
 
-            ILanguage first = null;
+            ILanguage? first = null;
             foreach (var l in languages)
             {
                 if (first == null || l.Id < first.Id)
                     first = l;
             }
 
-            return first;
+            return first!;
         }
     }
 }

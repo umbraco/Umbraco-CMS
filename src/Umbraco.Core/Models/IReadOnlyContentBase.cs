@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the name of the entity.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the identifier of the user who created this entity.
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the path to the entity.
         /// </summary>
-        string Path { get; }
+        string? Path { get; }
 
         /// <summary>
         /// Gets the sort order of the entity.

@@ -1,8 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
@@ -16,33 +18,34 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         internal const bool StaticAddTrailingSlash = true;
         internal const string StaticConvertUrlsToAscii = "try";
+        internal const bool StaticEnableDefaultCharReplacements = true;
 
-        internal static readonly CharItem[] DefaultCharCollection =
+        internal static readonly Umbraco.Cms.Core.Configuration.Models.CharItem[] DefaultCharCollection =
         {
-            new CharItem { Char = " ", Replacement = "-" },
-            new CharItem { Char = "\"", Replacement = string.Empty },
-            new CharItem { Char = "'", Replacement = string.Empty },
-            new CharItem { Char = "%", Replacement = string.Empty },
-            new CharItem { Char = ".", Replacement = string.Empty },
-            new CharItem { Char = ";", Replacement = string.Empty },
-            new CharItem { Char = "/", Replacement = string.Empty },
-            new CharItem { Char = "\\", Replacement = string.Empty },
-            new CharItem { Char = ":", Replacement = string.Empty },
-            new CharItem { Char = "#", Replacement = string.Empty },
-            new CharItem { Char = "+", Replacement = "plus" },
-            new CharItem { Char = "*", Replacement = "star" },
-            new CharItem { Char = "&", Replacement = string.Empty },
-            new CharItem { Char = "?", Replacement = string.Empty },
-            new CharItem { Char = "æ", Replacement = "ae" },
-            new CharItem { Char = "ä", Replacement = "ae" },
-            new CharItem { Char = "ø", Replacement = "oe" },
-            new CharItem { Char = "ö", Replacement = "oe" },
-            new CharItem { Char = "å", Replacement = "aa" },
-            new CharItem { Char = "ü", Replacement = "ue" },
-            new CharItem { Char = "ß", Replacement = "ss" },
-            new CharItem { Char = "|", Replacement = "-" },
-            new CharItem { Char = "<", Replacement = string.Empty },
-            new CharItem { Char = ">", Replacement = string.Empty }
+            new () { Char = " ", Replacement = "-" },
+            new () { Char = "\"", Replacement = string.Empty },
+            new () { Char = "'", Replacement = string.Empty },
+            new () { Char = "%", Replacement = string.Empty },
+            new () { Char = ".", Replacement = string.Empty },
+            new () { Char = ";", Replacement = string.Empty },
+            new () { Char = "/", Replacement = string.Empty },
+            new () { Char = "\\", Replacement = string.Empty },
+            new () { Char = ":", Replacement = string.Empty },
+            new () { Char = "#", Replacement = string.Empty },
+            new () { Char = "+", Replacement = "plus" },
+            new () { Char = "*", Replacement = "star" },
+            new () { Char = "&", Replacement = string.Empty },
+            new () { Char = "?", Replacement = string.Empty },
+            new () { Char = "æ", Replacement = "ae" },
+            new () { Char = "ä", Replacement = "ae" },
+            new () { Char = "ø", Replacement = "oe" },
+            new () { Char = "ö", Replacement = "oe" },
+            new () { Char = "å", Replacement = "aa" },
+            new () { Char = "ü", Replacement = "ue" },
+            new () { Char = "ß", Replacement = "ss" },
+            new () { Char = "|", Replacement = "-" },
+            new () { Char = "<", Replacement = string.Empty },
+            new () { Char = ">", Replacement = string.Empty }
         };
 
         /// <summary>
@@ -67,41 +70,21 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public bool ShouldTryConvertUrlsToAscii => ConvertUrlsToAscii.InvariantEquals("try");
 
-        // We need to special handle ":", as this character is special in keys
-
-        // TODO: implement from configuration
-
-        //// var collection = _configuration.GetSection(Prefix + "CharCollection").GetChildren()
-        ////    .Select(x => new CharItem()
-        ////    {
-        ////        Char = x.GetValue<string>("Char"),
-        ////        Replacement = x.GetValue<string>("Replacement"),
-        ////    }).ToArray();
-
-        //// if (collection.Any() || _configuration.GetSection("Prefix").GetChildren().Any(x =>
-        ////    x.Key.Equals("CharCollection", StringComparison.OrdinalIgnoreCase)))
-        //// {
-        ////    return collection;
-        //// }
-
-        //// return DefaultCharCollection;
+        /// <summary>
+        /// Disable all default character replacements
+        /// </summary>
+        [DefaultValue(StaticEnableDefaultCharReplacements)]
+        public bool EnableDefaultCharReplacements { get; set; } = StaticEnableDefaultCharReplacements;
 
         /// <summary>
-        /// Gets or sets a value for the default character collection for replacements.
+        /// Add additional character replacements, or override defaults
         /// </summary>
-        /// WB-TODO
+        [Obsolete("Use the GetCharReplacements extension method in the Umbraco.Extensions namespace instead. Scheduled for removal in V11")]
         public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
 
         /// <summary>
-        /// Defines a character replacement.
+        /// Add additional character replacements, or override defaults
         /// </summary>
-        public class CharItem : IChar
-        {
-            /// <inheritdoc/>
-            public string Char { get; set; }
-
-            /// <inheritdoc/>
-            public string Replacement { get; set; }
-        }
+        public IEnumerable<Umbraco.Cms.Core.Configuration.Models.CharItem>? UserDefinedCharCollection { get; set; }
     }
 }

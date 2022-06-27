@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="language"></param
         /// <param name="value"></param>
         /// <returns></returns>
-        void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value);
+        void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value);
 
         /// <summary>
         /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
@@ -31,28 +31,28 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="parentId"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null);
+        IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null);
 
         /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its <see cref="Int32"/> id
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        IDictionaryItem GetDictionaryItemById(int id);
+        IDictionaryItem? GetDictionaryItemById(int id);
 
         /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its <see cref="Guid"/> id
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        IDictionaryItem GetDictionaryItemById(Guid id);
+        IDictionaryItem? GetDictionaryItemById(Guid id);
 
         /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its key
         /// </summary>
         /// <param name="key">Key of the <see cref="IDictionaryItem"/></param>
         /// <returns><see cref="IDictionaryItem"/></returns>
-        IDictionaryItem GetDictionaryItemByKey(string key);
+        IDictionaryItem? GetDictionaryItemByKey(string key);
 
         /// <summary>
         /// Gets a list of children for a <see cref="IDictionaryItem"/>
@@ -101,14 +101,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="ILanguage"/></param>
         /// <returns><see cref="ILanguage"/></returns>
-        ILanguage GetLanguageById(int id);
+        ILanguage? GetLanguageById(int id);
 
         /// <summary>
         /// Gets a <see cref="ILanguage"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
         /// <returns><see cref="ILanguage"/></returns>
-        ILanguage GetLanguageByIsoCode(string isoCode);
+        ILanguage? GetLanguageByIsoCode(string? isoCode);
 
         /// <summary>
         /// Gets a language identifier from its ISO code.
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// <para>This can be optimized and bypass all deep cloning.</para>
         /// </remarks>
-        string GetLanguageIsoCodeById(int id);
+        string? GetLanguageIsoCodeById(int id);
 
         /// <summary>
         /// Gets the default language ISO code.

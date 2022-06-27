@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
             Indexes = new List<IndexDefinition>();
         }
 
-        public virtual string Name { get; set; }
-        public virtual string SchemaName { get; set; }
+        public virtual string Name { get; set; } = null!;
+        public virtual string SchemaName { get; set; } = null!;
         public virtual ICollection<ColumnDefinition> Columns { get; set; }
         public virtual ICollection<ForeignKeyDefinition> ForeignKeys { get; set; }
         public virtual ICollection<IndexDefinition> Indexes { get; set; }

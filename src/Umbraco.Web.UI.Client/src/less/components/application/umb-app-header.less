@@ -2,10 +2,70 @@
     background: @blueExtraDark;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     max-width: 100%;
     height: @appHeaderHeight;
     padding: 0 20px;
+}
+
+.umb-app-header__logo {
+    margin-right: 30px;
+    flex-shrink: 0;
+    button {
+        img {
+            height: 30px;
+        }
+    }
+    
+}
+@media (max-width: 1279px) {
+    .umb-app-header__logo {
+        display: none;
+    }
+}
+
+.umb-app-header__logo-modal {
+    position: absolute;
+    z-index: @zindexUmbOverlay;
+    top: 50px;
+    left: 17px;
+    font-size: 13px;
+
+    border-radius: 6px;
+    
+    width: 160px;
+    padding: 20px 20px;
+    background-color:@white;
+    color: @blueExtraDark;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .14), 0 1px 6px 1px rgba(0, 0, 0, .14);
+    text-decoration: none;
+
+    text-align: center;
+
+    &::before {
+        content:'';
+        position: absolute;
+        transform: rotate(45deg);
+        background-color:@white;
+        top: -4px;
+        left: 14px;
+        width: 8px;
+        height: 8px;
+    }
+
+    img {
+        display: block;
+        height: auto;
+        width: 120px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 3px;
+    }
+}
+
+.umb-app-header__right {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
 }
 
 .umb-app-header__actions {

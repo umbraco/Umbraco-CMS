@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <summary>
-    /// A context menu item
+    /// A context menu item.
     /// </summary>
     [DataContract(Name = "menuItem", Namespace = "")]
     public class MenuItem
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Models.Trees
         public MenuItem()
         {
             AdditionalData = new Dictionary<string, object>();
-            Icon = "folder";
+            Icon = Constants.Icons.Folder;
         }
 
         public MenuItem(string alias, string name)
@@ -34,11 +34,11 @@ namespace Umbraco.Cms.Core.Models.Trees
         {
             Alias = alias;
             Name = textService.Localize("actions", Alias);
-            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
+            TextDescription = textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
         }
 
         /// <summary>
-        /// Create a menu item based on an <see cref="IAction"/> definition
+        /// Create a menu item based on an <see cref="IAction"/> definition.
         /// </summary>
         /// <param name="action"></param>
         /// <param name="name"></param>
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Models.Trees
 
         #region Properties
         [IgnoreDataMember]
-        public IAction Action { get; set; }
+        public IAction? Action { get; set; }
 
         /// <summary>
         /// A dictionary to support any additional meta data that should be rendered for the node which is
@@ -70,26 +70,36 @@ namespace Umbraco.Cms.Core.Models.Trees
 
         [DataMember(Name = "name", IsRequired = true)]
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "alias", IsRequired = true)]
         [Required]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [DataMember(Name = "textDescription")]
-        public string TextDescription { get; set; }
+        public string? TextDescription { get; set; }
 
         /// <summary>
-        /// Ensures a menu separator will exist before this menu item
+        /// Ensures a menu separator will exist before this menu item.
         /// </summary>
         [DataMember(Name = "separator")]
         public bool SeparatorBefore { get; set; }
 
-        [DataMember(Name = "cssclass")]
+        /// <summary>
+        /// Icon to use at action menu item.
+        /// </summary>
+        [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
         /// <summary>
-        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
+        /// Used in the UI to indicate whether icons should be prefixed with "icon-".
+        /// If not legacy icon full icon name should be specified.
+        /// </summary>
+        [DataMember(Name = "useLegacyIcon")]
+        public bool UseLegacyIcon { get; set; } = true;
+
+        /// <summary>
+        /// Used in the UI to inform the user that the menu item will open a dialog/confirmation.
         /// </summary>
         [DataMember(Name = "opensDialog")]
         public bool OpensDialog { get; set; }

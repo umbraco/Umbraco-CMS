@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         /// <inheritdoc/>
         protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, MediaPermissionsQueryStringRequirement requirement)
         {
-            if (!HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
+            if (HttpContextAccessor.HttpContext is null || !HttpContextAccessor.HttpContext.Request.Query.TryGetValue(requirement.QueryStringName, out StringValues routeVal))
             {
                 // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
@@ -50,9 +50,9 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             }
 
             MediaPermissions.MediaAccess permissionResult = _mediaPermissions.CheckPermissions(
-                BackOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+                BackOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser,
                 nodeId,
-                out IMedia mediaItem);
+                out IMedia? mediaItem);
 
             if (mediaItem != null)
             {

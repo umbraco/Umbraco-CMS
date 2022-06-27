@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the audited entity type.
         /// </summary>
-        string EntityType { get; }
+        string? EntityType { get; }
 
         /// <summary>
         /// Gets the audit user identifier.
@@ -25,11 +25,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the audit comments.
         /// </summary>
-        string Comment { get; }
+        string? Comment { get; }
 
         /// <summary>
         /// Gets optional additional data parameters.
         /// </summary>
-        string Parameters { get; }
+        string? Parameters { get; }
     }
 }

@@ -19,6 +19,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// values. By default, there would be only one object: the property value. But some implementations may return
         /// more than one value for a given field.</para>
         /// </remarks>
-        IEnumerable<KeyValuePair<string, IEnumerable<object>>> GetIndexValues(IProperty property, string culture, string segment, bool published);
+        IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published);
     }
 }

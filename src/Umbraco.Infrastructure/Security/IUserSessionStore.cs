@@ -12,6 +12,6 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Validates a user's session is still valid
         /// </summary>
-        Task<bool> ValidateSessionIdAsync(string userId, string sessionId);
+        Task<bool> ValidateSessionIdAsync(string? userId, string? sessionId);
     }
 }

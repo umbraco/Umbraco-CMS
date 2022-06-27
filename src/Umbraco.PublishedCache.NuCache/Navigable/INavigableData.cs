@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
 {
     internal interface INavigableData
     {
-        IPublishedContent GetById(bool preview, int contentId);
+        IPublishedContent? GetById(bool preview, int contentId);
         IEnumerable<IPublishedContent> GetAtRoot(bool preview);
     }
 }

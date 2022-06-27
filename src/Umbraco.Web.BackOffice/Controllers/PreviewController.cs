@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public PreviewController(
             UmbracoFeatures features,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizationService localizationService,
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (id.HasValue)
             {
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var content = umbracoContext.Content.GetById(true, id.Value);
+                var content = umbracoContext.Content?.GetById(true, id.Value);
                 if (content is null)
                     return NotFound();
 
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
-                var viewEngineResult = _viewEngines.FindView(ControllerContext, model.PreviewExtendedHeaderView, false);
+                var viewEngineResult = _viewEngines.FindView(ControllerContext, model.PreviewExtendedHeaderView!, false);
                 if (viewEngineResult.View == null)
                     throw new InvalidOperationException("Could not find the view " + model.PreviewExtendedHeaderView + ", the following locations were searched: " + Environment.NewLine + string.Join(Environment.NewLine, viewEngineResult.SearchedLocations));
             }
@@ -126,15 +126,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return RedirectPermanent($"../../{id}{query}");
         }
 
-        public ActionResult EnterPreview(int id)
+        public ActionResult? EnterPreview(int id)
         {
-            var user = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
 
-            return null;
+            return new EmptyResult();
         }
 
-        public ActionResult End(string redir = null)
+        public ActionResult End(string? redir = null)
         {
             _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
 

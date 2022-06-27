@@ -18,23 +18,23 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// <summary>
         /// Gets the alias of the model.
         /// </summary>
-        public string Alias;
+        public string Alias = string.Empty;
 
         /// <summary>
         /// Gets the name of the content type.
         /// </summary>
-        public string Name;
+        public string? Name;
 
         /// <summary>
         /// Gets the description of the content type.
         /// </summary>
-        public string Description;
+        public string? Description;
 
         /// <summary>
         /// Gets the clr name of the model.
         /// </summary>
         /// <remarks>This is the complete name eg "Foo.Bar.MyContent".</remarks>
-        public string ClrName;
+        public string ClrName = string.Empty;
 
         /// <summary>
         /// Gets the unique identifier of the parent.
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         ///     <para>If the content type does not have a base content type, then returns <c>null</c>.</para>
         ///     <para>The current model inherits from its base model.</para>
         /// </remarks>
-        public TypeModel BaseType; // the parent type in Umbraco (type inherits its properties)
+        public TypeModel? BaseType; // the parent type in Umbraco (type inherits its properties)
 
         /// <summary>
         /// Gets the list of properties that are defined by this model.

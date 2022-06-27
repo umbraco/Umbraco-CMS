@@ -39,13 +39,13 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var userCache = AppCaches.IsolatedCaches.Get<IUser>();
-            if (userCache)
+            if (userCache.Success)
             {
-                userCache.Result.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
-                userCache.Result.ClearByKey(CacheKeys.UserContentStartNodePathsPrefix + id);
-                userCache.Result.ClearByKey(CacheKeys.UserMediaStartNodePathsPrefix + id);
-                userCache.Result.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + id);
-                userCache.Result.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + id);
+                userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, int>(id));
+                userCache.Result?.ClearByKey(CacheKeys.UserContentStartNodePathsPrefix + id);
+                userCache.Result?.ClearByKey(CacheKeys.UserMediaStartNodePathsPrefix + id);
+                userCache.Result?.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + id);
+                userCache.Result?.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + id);
             }
 
 

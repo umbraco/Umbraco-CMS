@@ -21,10 +21,19 @@
             DataType = dataType;
         }
 
+        public ColumnInfo(string tableName, string columnName, int ordinal, bool isNullable, string dataType)
+        {
+            TableName = tableName;
+            ColumnName = columnName;
+            Ordinal = ordinal;
+            IsNullable = isNullable;
+            DataType = dataType;
+        }
+
         public string TableName { get; set; }
         public string ColumnName { get; set; }
         public int Ordinal { get; set; }
-        public string ColumnDefault { get; set; }
+        public string? ColumnDefault { get; set; }
         public bool IsNullable { get; set; }
         public string DataType { get; set; }
     }

@@ -96,8 +96,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 target.Id = id;
 
             target.ClearAllowedSections();
-            foreach (var section in source.Sections)
-                target.AddAllowedSection(section);
+            if (source.Sections is not null)
+            {
+                foreach (var section in source.Sections)
+                {
+                    target.AddAllowedSection(section);
+                }
+            }
+
         }
 
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
@@ -234,7 +240,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             //Important! Currently we are never mapping to multiple UserGroupDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
             var users = _userService.GetAllInGroup(source.Id);
-            target.Users = context.MapEnumerable<IUser, UserBasic>(users);
+            target.Users = context.MapEnumerable<IUser, UserBasic>(users).WhereNotNull();
 
             //Deal with assigned permissions:
 
@@ -264,6 +270,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 var contentPermissions = allContentPermissions[entity.Id];
 
                 var assignedContentPermissions = context.Map<AssignedContentPermissions>(entity);
+                if (assignedContentPermissions is null)
+                {
+                    continue;
+                }
                 assignedContentPermissions.AssignedPermissions = AssignedUserGroupPermissions.ClonePermissions(target.DefaultPermissions);
 
                 //since there is custom permissions assigned to this node for this group, we need to clear all of the default permissions
@@ -292,21 +302,21 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.CreateDate = source.CreateDate;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.FailedPasswordAttempts = source.FailedPasswordAttempts;
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLockoutDate = source.LastLockoutDate;
-            target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
+            target.LastLoginDate = source.LastLoginDate == default(DateTime) ? null : (DateTime?)source.LastLoginDate;
             target.LastPasswordChangeDate = source.LastPasswordChangeDate;
             target.Name = source.Name;
             target.Navigation = _commonMapper.GetContentAppsForEntity(source);
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
-            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
+            target.StartContentIds = GetStartNodes(source.StartContentIds?.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
+            target.StartMediaIds = GetStartNodes(source.StartMediaIds?.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
-            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups).WhereNotNull();
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -320,14 +330,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.Id = source.Id;
             target.Key = source.Key;
             target.LastLoginDate = source.LastLoginDate == default ? null : (DateTime?)source.LastLoginDate;
             target.Name = source.Name;
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
+            target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups).WhereNotNull();
             target.Username = source.Username;
             target.UserState = source.UserState;
         }
@@ -339,7 +349,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
-            target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
+            target.EmailHash = source.Email?.ToLowerInvariant().Trim().GenerateHash();
             target.Name = source.Name;
             target.StartContentIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
@@ -356,7 +366,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private void MapUserGroupBasic(UserGroupBasic target, IEnumerable<string> sourceAllowedSections, int? sourceStartContentId, int? sourceStartMediaId, MapperContext context)
         {
             var allSections = _sectionService.GetSections();
-            target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias)));
+            target.Sections = context.MapEnumerable<ISection, Section>(allSections.Where(x => sourceAllowedSections.Contains(x.Alias))).WhereNotNull();
 
             if (sourceStartMediaId > 0)
                 target.MediaStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));
@@ -394,12 +404,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
         }
 
-        private static string MapContentTypeIcon(IEntitySlim entity)
+        private static string? MapContentTypeIcon(IEntitySlim entity)
             => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
-        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedArea,string localizedAlias, MapperContext context)
+        private IEnumerable<EntityBasic> GetStartNodes(int[]? startNodeIds, UmbracoObjectTypes objectType, string localizedArea,string localizedAlias, MapperContext context)
         {
-            if (startNodeIds.Length <= 0)
+            if (startNodeIds is null || startNodeIds.Length <= 0)
                 return Enumerable.Empty<EntityBasic>();
 
             var startNodes = new List<EntityBasic>();
@@ -407,11 +417,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 startNodes.Add(CreateRootNode(_textService.Localize(localizedArea, localizedAlias)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
-            startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems));
+            startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems).WhereNotNull());
             return startNodes;
         }
 
-        private static int GetIntId(object id)
+        private static int GetIntId(object? id)
         {
             if (id is string strId && int.TryParse(strId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
             {

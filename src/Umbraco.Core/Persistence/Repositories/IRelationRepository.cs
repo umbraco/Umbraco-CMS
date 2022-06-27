@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IRelationRepository : IReadWriteQueryRepository<int, IRelation>
     {
-        IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation> query, long pageIndex, int pageSize, out long totalRecords, Ordering ordering);
+        IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering);
 
         /// <summary>
         /// Persist multiple <see cref="IRelation"/> at once

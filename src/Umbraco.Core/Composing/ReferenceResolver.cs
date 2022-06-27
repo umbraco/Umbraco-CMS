@@ -55,9 +55,9 @@ namespace Umbraco.Cms.Core.Composing
             // for Umbraco dependencies/transitive dependencies
             foreach(var dir in assemblyLocations)
             {
-                foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
+                foreach(var dll in Directory.EnumerateFiles(dir ?? string.Empty, "*.dll"))
                 {
-                    AssemblyName assemblyName = null;
+                    AssemblyName? assemblyName = null;
                     try
                     {
                         assemblyName = AssemblyName.GetAssemblyName(dll);
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.Composing
                             continue;
 
                         // don't include this item if it's Umbraco Core
-                        if (Constants.Composing.UmbracoCoreAssemblyNames.Any(x=>assemblyName.FullName.StartsWith(x) || assemblyName.Name.EndsWith(".Views")))
+                        if (Constants.Composing.UmbracoCoreAssemblyNames.Any(x=>assemblyName.FullName.StartsWith(x) || (assemblyName.Name?.EndsWith(".Views") ?? false)))
                             continue;
 
                         var assembly = Assembly.Load(assemblyName);
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Composing
         }
 
 
-        private IEnumerable<string> GetAssemblyFolders(IEnumerable<Assembly> assemblies)
+        private IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies)
         {
             return assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
         }
@@ -133,12 +133,12 @@ namespace Umbraco.Cms.Core.Composing
             classification = Classification.Unknown;
             _classifications[assembly] = classification;
 
-            if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assembly.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
+            if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assembly.FullName?.StartsWith(f, StringComparison.InvariantCultureIgnoreCase) ?? false))
             {
                 // if its part of the filter it doesn't reference umbraco
                 classification = Classification.DoesNotReferenceUmbraco;
             }
-            else if (_umbracoAssemblies.Contains(assembly.GetName().Name))
+            else if (_umbracoAssemblies.Contains(assembly.GetName().Name!))
             {
                 classification = Classification.IsUmbraco;
             }

@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Core
         /// </summary>
         public string EntityType { get; private set; }
 
-        public int CompareTo(Udi other)
+        public int CompareTo(Udi? other)
         {
-            return string.Compare(UriValue.ToString(), other.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
+            return string.Compare(UriValue.ToString(), other?.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         public override string ToString()
@@ -91,9 +91,9 @@ namespace Umbraco.Cms.Core
         /// <param name="entityType">The entity type.</param>
         /// <param name="id">The identifier.</param>
         /// <returns>The Guid Udi for the entity type and identifier.</returns>
-        public static Udi Create(string entityType, Guid id)
+        public static Udi Create(string? entityType, Guid id)
         {
-            if (UdiParser.UdiTypes.TryGetValue(entityType, out var udiType) == false)
+            if (entityType is null || UdiParser.UdiTypes.TryGetValue(entityType, out var udiType) == false)
                 throw new ArgumentException(string.Format("Unknown entity type \"{0}\".", entityType), "entityType");
 
             if (udiType != UdiType.GuidUdi)
@@ -143,10 +143,10 @@ namespace Umbraco.Cms.Core
             return this;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var other = obj as Udi;
-            return other != null && GetType() == other.GetType() && UriValue == other.UriValue;
+            return other is not null && GetType() == other.GetType() && UriValue == other.UriValue;
         }
 
         public override int GetHashCode()
@@ -154,14 +154,14 @@ namespace Umbraco.Cms.Core
             return UriValue.GetHashCode();
         }
 
-        public static bool operator ==(Udi udi1, Udi udi2)
+        public static bool operator ==(Udi? udi1, Udi? udi2)
         {
             if (ReferenceEquals(udi1, udi2)) return true;
-            if ((object)udi1 == null || (object)udi2 == null) return false;
+            if ((object?)udi1 == null || (object?)udi2 == null) return false;
             return udi1.Equals(udi2);
         }
 
-        public static bool operator !=(Udi udi1, Udi udi2)
+        public static bool operator !=(Udi? udi1, Udi? udi2)
         {
             return (udi1 == udi2) == false;
         }

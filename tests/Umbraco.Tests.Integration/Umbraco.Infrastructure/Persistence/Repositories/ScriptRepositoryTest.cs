@@ -20,6 +20,9 @@ using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
+
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
@@ -303,15 +306,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("path-2\\test-path-3.js".Replace("\\", $"{Path.DirectorySeparatorChar}"), script.Path);
                 Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
 
-                script = new Script("\\test-path-4.js") { Content = "// script" };
-                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                script = new Script("..\\test-path-4.js") { Content = "// script" };
+                Assert.Throws<UnauthorizedAccessException>(() =>
                     repository.Save(script));
+
+                script = new Script("\\test-path-5.js") { Content = "// script" };
+                repository.Save(script);
+
+                script = repository.Get("\\test-path-5.js");
+                Assert.IsNotNull(script);
+                Assert.AreEqual("test-path-5.js", script.Path);
+                Assert.AreEqual("/scripts/test-path-5.js", script.VirtualPath);
 
                 script = repository.Get("missing.js");
                 Assert.IsNull(script);
 
-                // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<UnauthorizedAccessException>(() => script = repository.Get("\\test-path-4.js"));
+                Assert.Throws<UnauthorizedAccessException>(() => script = repository.Get("..\\test-path-4.js"));
                 Assert.Throws<UnauthorizedAccessException>(() => script = repository.Get("../packages.config"));
             }
         }

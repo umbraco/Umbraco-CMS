@@ -8,12 +8,12 @@ namespace Umbraco.Extensions
     public static class QueryConditionExtensions
     {
         private static Lazy<MethodInfo> StringContainsMethodInfo =>
-            new Lazy<MethodInfo>(() => typeof(string).GetMethod("Contains", new[] {typeof(string)}));
+            new Lazy<MethodInfo>(() => typeof(string).GetMethod("Contains", new[] {typeof(string)})!);
 
         public static Expression<Func<T, bool>> BuildCondition<T>(this QueryCondition condition, string parameterAlias)
         {
             object constraintValue;
-            switch (condition.Property.Type.ToLowerInvariant())
+            switch (condition.Property.Type?.ToLowerInvariant())
             {
                 case "string":
                     constraintValue = condition.ConstraintValue;

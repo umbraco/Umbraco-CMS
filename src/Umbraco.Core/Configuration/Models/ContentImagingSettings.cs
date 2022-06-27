@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
             }
         };
 
-        internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif";
+        internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
         /// <summary>
         /// Gets or sets a value for the collection of accepted image file extensions.

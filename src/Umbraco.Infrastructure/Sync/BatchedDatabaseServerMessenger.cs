@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             IRequestCache requestCache,
             IRequestAccessor requestAccessor,
             LastSyncedFileManager lastSyncedFileManager,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsMonitor<GlobalSettings> globalSettings)
             : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment, cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
         {
             _requestCache = requestCache;
@@ -45,11 +45,11 @@ namespace Umbraco.Cms.Infrastructure.Sync
         }
 
         /// <inheritdoc/>
-        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object>? ids = null, string? json = null)
         {
             var idsA = ids?.ToArray();
 
-            if (GetArrayType(idsA, out Type arrayType) == false)
+            if (GetArrayType(idsA, out Type? arrayType) == false)
             {
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
             }
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// <inheritdoc/>
         public override void SendMessages()
         {
-            ICollection<RefreshInstructionEnvelope> batch = GetBatch(false);
+            ICollection<RefreshInstructionEnvelope>? batch = GetBatch(false);
             if (batch == null)
             {
                 return;
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             CacheInstructionService.DeliverInstructionsInBatches(instructions, LocalIdentity);
         }
 
-        private ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
+        private ICollection<RefreshInstructionEnvelope>? GetBatch(bool create)
         {
             var key = nameof(BatchedDatabaseServerMessenger);
 
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             }
 
             // No thread-safety here because it'll run in only 1 thread (request) at a time.
-            var batch = (ICollection<RefreshInstructionEnvelope>)_requestCache.Get(key);
+            var batch = (ICollection<RefreshInstructionEnvelope>?)_requestCache.Get(key);
             if (batch == null && create)
             {
                 batch = new List<RefreshInstructionEnvelope>();
@@ -95,11 +95,11 @@ namespace Umbraco.Cms.Infrastructure.Sync
         private void BatchMessage(
             ICacheRefresher refresher,
             MessageType messageType,
-            IEnumerable<object> ids = null,
-            Type idType = null,
-            string json = null)
+            IEnumerable<object>? ids = null,
+            Type? idType = null,
+            string? json = null)
         {
-            ICollection<RefreshInstructionEnvelope> batch = GetBatch(true);
+            ICollection<RefreshInstructionEnvelope>? batch = GetBatch(true);
             IEnumerable<RefreshInstruction> instructions = RefreshInstruction.GetInstructions(refresher, JsonSerializer, messageType, ids, idType, json);
 
             // Batch if we can, else write to DB immediately.

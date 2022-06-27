@@ -8,15 +8,17 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
+using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -24,13 +26,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class LanguageRepositoryTest : UmbracoIntegrationTest
     {
-        private GlobalSettings _globalSettings;
-
         [SetUp]
         public void SetUp()
         {
             CreateTestData();
-            _globalSettings = new GlobalSettings();
         }
 
         [Test]
@@ -40,7 +39,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
@@ -64,9 +63,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 var au = CultureInfo.GetCultureInfo("en-AU");
-                var language = (ILanguage)new Language(_globalSettings, au.Name)
+                ILanguage language = new Language(au.Name, au.EnglishName)
                 {
-                    CultureName = au.DisplayName,
                     FallbackLanguageId = 1
                 };
                 repository.Save(language);
@@ -77,7 +75,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 Assert.That(language, Is.Not.Null);
                 Assert.That(language.HasIdentity, Is.True);
-                Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
+                Assert.That(language.CultureName, Is.EqualTo(au.EnglishName));
                 Assert.That(language.IsoCode, Is.EqualTo(au.Name));
                 Assert.That(language.FallbackLanguageId, Is.EqualTo(1));
             }
@@ -150,13 +148,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<ILanguage> query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode == "da-DK");
+                IQuery<ILanguage> query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode == "da-DK");
                 IEnumerable<ILanguage> result = repository.Get(query);
 
                 // Assert
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Any(), Is.True);
-                Assert.That(result.FirstOrDefault().CultureName, Is.EqualTo("da-DK"));
+                Assert.That(result.FirstOrDefault().IsoCode, Is.EqualTo("da-DK"));
             }
         }
 
@@ -170,7 +168,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                IQuery<ILanguage> query = scope.SqlContext.Query<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
+                IQuery<ILanguage> query = provider.CreateQuery<ILanguage>().Where(x => x.IsoCode.StartsWith("D"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -188,7 +186,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR" };
+                var languageBR = new Language("pt-BR", "Portuguese (Brazil)");
                 repository.Save(languageBR);
 
                 // Assert
@@ -210,7 +208,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
+                var languageBR = new Language("pt-BR", "Portuguese (Brazil)") 
+                {
+                    IsDefault = true,
+                    IsMandatory = true
+                };
                 repository.Save(languageBR);
 
                 // Assert
@@ -232,9 +234,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 LanguageRepository repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language(_globalSettings, "pt-BR")
+                var languageBR = new Language("pt-BR", "Portuguese (Brazil)")
                 {
-                    CultureName = "pt-BR",
                     FallbackLanguageId = 1
                 };
                 repository.Save(languageBR);
@@ -255,16 +256,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 LanguageRepository repository = CreateRepository(provider);
 
-                var languageBR = (ILanguage)new Language(_globalSettings, "pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
+                ILanguage languageBR = new Language("pt-BR", "Portuguese (Brazil)")
+                {
+                    IsDefault = true,
+                    IsMandatory = true
+                };
                 repository.Save(languageBR);
-                var languageEN = new Language(_globalSettings, "en-AU") { CultureName = "en-AU" };
+                var languageEN = new Language("en-AU", "English (Australia)");
                 repository.Save(languageEN);
 
                 Assert.IsTrue(languageBR.IsDefault);
                 Assert.IsTrue(languageBR.IsMandatory);
 
                 // Act
-                var languageNZ = new Language(_globalSettings, "en-NZ") { CultureName = "en-NZ", IsDefault = true, IsMandatory = true };
+                var languageNZ = new Language("en-NZ", "English (New Zealand)") 
+                {
+                    IsDefault = true,
+                    IsMandatory = true
+                };
                 repository.Save(languageNZ);
                 languageBR = repository.Get(languageBR.Id);
 
@@ -286,7 +295,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 ILanguage language = repository.Get(5);
                 language.IsoCode = "pt-BR";
-                language.CultureName = "pt-BR";
+                language.CultureName = "Portuguese (Brazil)";
                 language.FallbackLanguageId = 1;
 
                 repository.Save(language);
@@ -296,7 +305,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Assert
                 Assert.That(languageUpdated, Is.Not.Null);
                 Assert.That(languageUpdated.IsoCode, Is.EqualTo("pt-BR"));
-                Assert.That(languageUpdated.CultureName, Is.EqualTo("pt-BR"));
+                Assert.That(languageUpdated.CultureName, Is.EqualTo("Portuguese (Brazil)"));
                 Assert.That(languageUpdated.FallbackLanguageId, Is.EqualTo(1));
             }
         }
@@ -313,7 +322,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 ILanguage language = repository.Get(5);
                 language.IsoCode = "da-DK";
-                language.CultureName = "da-DK";
+                language.CultureName = "Danish (Denmark)";
 
                 Assert.Throws<InvalidOperationException>(() => repository.Save(language));
             }
@@ -382,23 +391,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             }
         }
 
-        private LanguageRepository CreateRepository(IScopeProvider provider) => new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Microsoft.Extensions.Options.Options.Create(_globalSettings));
+        private LanguageRepository CreateRepository(IScopeProvider provider) => new LanguageRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>());
 
         private void CreateTestData()
         {
-            // Id 1 is en-US - when Umbraco is installed
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
-            var languageDK = new Language(_globalSettings, "da-DK") { CultureName = "da-DK" };
-            localizationService.Save(languageDK); // Id 2
 
-            var languageSE = new Language(_globalSettings, "sv-SE") { CultureName = "sv-SE" };
-            localizationService.Save(languageSE); // Id 3
+            //Id 1 is en-US - when Umbraco is installed
 
-            var languageDE = new Language(_globalSettings, "de-DE") { CultureName = "de-DE" };
-            localizationService.Save(languageDE); // Id 4
+            var languageDK = new Language("da-DK", "Danish (Denmark)");
+            localizationService.Save(languageDK);//Id 2
 
-            var languagePT = new Language(_globalSettings, "pt-PT") { CultureName = "pt-PT" };
-            localizationService.Save(languagePT); // Id 5
+            var languageSE = new Language("sv-SE", "Swedish (Sweden)");
+            localizationService.Save(languageSE);//Id 3
+
+            var languageDE = new Language("de-DE", "German (Germany)");
+            localizationService.Save(languageDE);//Id 4
+
+            var languagePT = new Language("pt-PT", "Portuguese (Portugal)");
+            localizationService.Save(languagePT);//Id 5
         }
     }
 }

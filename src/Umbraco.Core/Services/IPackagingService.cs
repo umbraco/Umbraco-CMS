@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="userId"></param>
         InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
 
-        InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId);
+        InstallationSummary InstallCompiledPackageData(XDocument? packageXml, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Returns the advertised installed packages
@@ -30,20 +30,20 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<InstalledPackage> GetAllInstalledPackages();
 
-        InstalledPackage GetInstalledPackageByName(string packageName);
+        InstalledPackage? GetInstalledPackageByName(string packageName);
 
         /// <summary>
         /// Returns the created packages
         /// </summary>
         /// <returns></returns>
-        IEnumerable<PackageDefinition> GetAllCreatedPackages();
+        IEnumerable<PackageDefinition?> GetAllCreatedPackages();
 
         /// <summary>
         /// Returns a created package by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        PackageDefinition GetCreatedPackageById(int id);
+        PackageDefinition? GetCreatedPackageById(int id);
 
         void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
 

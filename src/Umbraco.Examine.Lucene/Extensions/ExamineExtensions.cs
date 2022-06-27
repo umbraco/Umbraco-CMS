@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Examine;
@@ -53,7 +54,7 @@ namespace Umbraco.Extensions
         /// <param name="indexer"></param>
         /// <param name="ex">The exception returned if there was an error</param>
         /// <returns></returns>
-        public static bool IsHealthy(this LuceneIndex indexer, out Exception ex)
+        public static bool IsHealthy(this LuceneIndex indexer, [MaybeNullWhen(true)] out Exception ex)
         {
             try
             {

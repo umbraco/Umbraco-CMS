@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
             return s_keys.TryGetValue(type, out var key) ? key : (s_keys[type] = "uRepo_" + type.Name + "_");
         }
 
-        public static string GetKey<T, TId>(TId id)
+        public static string GetKey<T, TId>(TId? id)
         {
-            if (EqualityComparer<TId>.Default.Equals(id, default))
+            if (EqualityComparer<TId?>.Default.Equals(id, default))
             {
                 return string.Empty;
             }
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
             }
             else
             {
-                return GetKey<T>() + id.ToString().ToUpperInvariant();
+                return GetKey<T>() + id?.ToString()?.ToUpperInvariant();
             }
         }
     }

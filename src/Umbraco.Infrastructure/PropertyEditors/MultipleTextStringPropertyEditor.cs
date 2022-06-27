@@ -1,14 +1,13 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -16,6 +15,7 @@ using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -32,23 +32,36 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class MultipleTextStringPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
+
+
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public MultipleTextStringPropertyEditor(
+            IIOHelper ioHelper,
+            IDataValueEditorFactory dataValueEditorFactory)
+            : this(ioHelper, dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MultipleTextStringPropertyEditor"/> class.
         /// </summary>
         public MultipleTextStringPropertyEditor(
             IIOHelper ioHelper,
-            IDataValueEditorFactory dataValueEditorFactory)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _editorConfigurationParser = editorConfigurationParser;
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleTextStringPropertyValueEditor>(Attribute!);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MultipleTextStringConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <summary>
         /// Custom value editor so we can format the value for the editor and the database
@@ -77,22 +90,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <remarks>
             /// We will also check the pre-values here, if there are more items than what is allowed we'll just trim the end
             /// </remarks>
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
+            public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 var asArray = editorValue.Value as JArray;
-                if (asArray == null)
+                if (asArray == null || asArray.HasValues == false)
                 {
                     return null;
                 }
 
                 if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
-                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
+                    throw new PanicException($"editorValue.DataTypeConfiguration is {editorValue.DataTypeConfiguration?.GetType()} but must be {typeof(MultipleTextStringConfiguration)}");
                 var max = config.Maximum;
 
                 //The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
                 var array = asArray.OfType<JObject>()
                                    .Where(x => x["value"] != null)
-                                   .Select(x => x["value"].Value<string>());
+                                   .Select(x => x["value"]!.Value<string>());
 
                 //only allow the max if over 0
                 if (max > 0)
@@ -115,10 +128,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment);
-                return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                return val?.ToString()?.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
                            .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
             }
 
@@ -138,7 +151,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _localizedTextService = localizedTextService;
             }
 
-            public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
+            public IEnumerable<ValidationResult> ValidateFormat(object? value, string valueType, string format)
             {
                 var asArray = value as JArray;
                 if (asArray == null)
@@ -148,7 +161,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 var textStrings = asArray.OfType<JObject>()
                     .Where(x => x["value"] != null)
-                    .Select(x => x["value"].Value<string>());
+                    .Select(x => x["value"]!.Value<string>());
                 var textStringValidator = new RegexValidator(_localizedTextService);
                 foreach (var textString in textStrings)
                 {

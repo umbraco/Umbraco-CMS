@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         IEnumerable<ContentNodeKit> GetBranchMediaSources(int id);
         ContentNodeKit GetContentSource(int id);
         ContentNodeKit GetMediaSource(int id);
-        IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids);
+        IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int>? ids);
         IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids);
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
         /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
         void Rebuild(
-            IReadOnlyCollection<int> contentTypeIds = null,
-            IReadOnlyCollection<int> mediaTypeIds = null,
-            IReadOnlyCollection<int> memberTypeIds = null);
+            IReadOnlyCollection<int>? contentTypeIds = null,
+            IReadOnlyCollection<int>? mediaTypeIds = null,
+            IReadOnlyCollection<int>? memberTypeIds = null);
 
         bool VerifyContentDbCache();
         bool VerifyMediaDbCache();

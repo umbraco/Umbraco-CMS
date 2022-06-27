@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <summary>
         /// Gets and cache all types.
         /// </summary>
-        IEnumerable<IContentTypeComposition> GetAllTypes();
+        IEnumerable<IContentTypeComposition>? GetAllTypes();
 
         /// <summary>
         /// Clears the cache.

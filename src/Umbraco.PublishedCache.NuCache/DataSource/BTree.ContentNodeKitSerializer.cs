@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {
-        public ContentNodeKitSerializer(ContentDataSerializer contentDataSerializer = null)
+        public ContentNodeKitSerializer(ContentDataSerializer? contentDataSerializer = null)
         {
             _contentDataSerializer = contentDataSerializer;
             if(_contentDataSerializer == null)
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             }
         }
         static readonly ContentDataSerializer s_defaultDataSerializer = new ContentDataSerializer();
-        private readonly ContentDataSerializer _contentDataSerializer;
+        private readonly ContentDataSerializer? _contentDataSerializer;
 
         //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
 
@@ -33,16 +33,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
             int contentTypeId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var hasDraft = PrimitiveSerializer.Boolean.ReadFrom(stream);
-            ContentData draftData = null;
-            ContentData publishedData = null;
+            ContentData? draftData = null;
+            ContentData? publishedData = null;
             if (hasDraft)
             {
-                draftData = _contentDataSerializer.ReadFrom(stream);
+                draftData = _contentDataSerializer?.ReadFrom(stream);
             }
             var hasPublished = PrimitiveSerializer.Boolean.ReadFrom(stream);
             if (hasPublished)
             {
-                publishedData = _contentDataSerializer.ReadFrom(stream);
+                publishedData = _contentDataSerializer?.ReadFrom(stream);
             }
             var kit = new ContentNodeKit(
                 contentNode,
@@ -55,23 +55,26 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
         public void WriteTo(ContentNodeKit value, Stream stream)
         {
-            PrimitiveSerializer.Int32.WriteTo(value.Node.Id, stream);
-            PrimitiveSerializer.Guid.WriteTo(value.Node.Uid, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.Node.Level, stream);
-            PrimitiveSerializer.String.WriteTo(value.Node.Path, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.Node.SortOrder, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.Node.ParentContentId, stream);
-            PrimitiveSerializer.DateTime.WriteTo(value.Node.CreateDate, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.Node.CreatorId, stream);
-            PrimitiveSerializer.Int32.WriteTo(value.ContentTypeId, stream);
+            if (value.Node is not null)
+            {
+                PrimitiveSerializer.Int32.WriteTo(value.Node.Id, stream);
+                PrimitiveSerializer.Guid.WriteTo(value.Node.Uid, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.Node.Level, stream);
+                PrimitiveSerializer.String.WriteTo(value.Node.Path, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.Node.SortOrder, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.Node.ParentContentId, stream);
+                PrimitiveSerializer.DateTime.WriteTo(value.Node.CreateDate, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.Node.CreatorId, stream);
+                PrimitiveSerializer.Int32.WriteTo(value.ContentTypeId, stream);
+            }
 
             PrimitiveSerializer.Boolean.WriteTo(value.DraftData != null, stream);
             if (value.DraftData != null)
-                _contentDataSerializer.WriteTo(value.DraftData, stream);
+                _contentDataSerializer?.WriteTo(value.DraftData, stream);
 
             PrimitiveSerializer.Boolean.WriteTo(value.PublishedData != null, stream);
             if (value.PublishedData != null)
-                _contentDataSerializer.WriteTo(value.PublishedData, stream);
+                _contentDataSerializer?.WriteTo(value.PublishedData, stream);
         }
     }
 }

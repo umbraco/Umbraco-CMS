@@ -110,11 +110,23 @@
 }
 
 .umb-media-entry-editor__imageholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
     position: relative;
     height: calc(100% - 50px);
+    
+    display: block;
+}
+
+.umb-media-entry-editor__previewholder {
+    
+    position: relative;
+    height: calc(100% - 50px);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    overflow-y: auto;
 }
 
 .umb-media-entry-editor__imageholder-actions {

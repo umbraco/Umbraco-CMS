@@ -1,35 +1,36 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Configuration.Models
 {
+    [TestFixture]
     public class ConnectionStringsTests
     {
         [Test]
-        [TestCase("", ExpectedResult = null)]
-        [TestCase(null, ExpectedResult = null)]
-        [TestCase(@"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;", ExpectedResult = Constants.DbProviderNames.SqlCe)]
-        [TestCase(@"Server=(LocalDb)\Umbraco;Database=NetCore;Integrated Security=true", ExpectedResult = Constants.DbProviderNames.SqlServer)]
-        [TestCase(@"Data Source=(LocalDb)\Umbraco;Initial Catalog=NetCore;Integrated Security=true;", ExpectedResult = Constants.DbProviderNames.SqlServer)]
-        [TestCase(@"Data Source=.\SQLExpress;Integrated Security=true;AttachDbFilename=MyDataFile.mdf;", ExpectedResult = Constants.DbProviderNames.SqlServer)]
-        public string ParseProviderName(string connectionString)
+        public void ProviderName_WhenNotExplicitlySet_HasDefaultSet()
         {
-            var connectionStrings = new ConnectionStrings
+            var sut = new ConnectionStrings();
+            Assert.That(sut.ProviderName, Is.EqualTo(ConnectionStrings.DefaultProviderName));
+        }
+
+        [Test]
+        [AutoMoqData]
+        public void ConnectionString_WhenSetterCalled_ReplacesDataDirectoryPlaceholder(string aDataDirectory)
+        {
+            AppDomain.CurrentDomain.SetData("DataDirectory", aDataDirectory);
+
+            var sut = new ConnectionStrings
             {
-                UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString)
+                ConnectionString = $"{ConnectionStrings.DataDirectoryPlaceholder}/foo"
             };
-
-            var actual = connectionStrings.UmbracoConnectionString;
-
-            Assert.AreEqual(connectionString, actual.ConnectionString);
-            Assert.AreEqual(Constants.System.UmbracoConnectionName, actual.Name);
-
-            return connectionStrings.UmbracoConnectionString.ProviderName;
+            Assert.That(sut.ConnectionString, Contains.Substring($"{aDataDirectory}/foo"));
         }
     }
 }

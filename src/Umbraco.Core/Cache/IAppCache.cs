@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         /// <param name="key">The key of the item.</param>
         /// <returns>The item, or null if the item was not found.</returns>
-        object Get(string key);
+        object? Get(string key);
 
         /// <summary>
         /// Gets or creates an item identified by its key.
@@ -21,21 +21,21 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="key">The key of the item.</param>
         /// <param name="factory">A factory function that can create the item.</param>
         /// <returns>The item.</returns>
-        object Get(string key, Func<object> factory);
+        object? Get(string key, Func<object?> factory);
 
         /// <summary>
         /// Gets items with a key starting with the specified value.
         /// </summary>
         /// <param name="keyStartsWith">The StartsWith value to use in the search.</param>
         /// <returns>Items matching the search.</returns>
-        IEnumerable<object> SearchByKey(string keyStartsWith);
+        IEnumerable<object?> SearchByKey(string keyStartsWith);
 
         /// <summary>
         /// Gets items with a key matching a regular expression.
         /// </summary>
         /// <param name="regex">The regular expression.</param>
         /// <returns>Items matching the search.</returns>
-        IEnumerable<object> SearchByRegex(string regex);
+        IEnumerable<object?> SearchByRegex(string regex);
 
         /// <summary>
         /// Removes all items from the cache.

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository
     {
-        ITemplate Get(string alias);
+        ITemplate? Get(string? alias);
 
         IEnumerable<ITemplate> GetAll(params string[] aliases);
 

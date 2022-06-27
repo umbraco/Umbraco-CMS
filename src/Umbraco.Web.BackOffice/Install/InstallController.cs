@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             var umbracoPath = Url.GetBackOfficeUrl();
 
             if (_runtime.Level == RuntimeLevel.Run)
-                return Redirect(umbracoPath);
+                return Redirect(umbracoPath!);
 
             // TODO: Update for package migrations
             if (_runtime.Level == RuntimeLevel.Upgrade)

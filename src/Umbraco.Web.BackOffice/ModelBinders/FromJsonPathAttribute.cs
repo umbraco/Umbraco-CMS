@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Extensions;
+using HttpMethod = System.Net.Http.HttpMethod;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
@@ -53,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 var json = JsonConvert.DeserializeObject<JObject>(strJson);
 
                 //if no explicit json path then use the model name
-                var match = json.SelectToken(bindingContext.FieldName ?? bindingContext.ModelName);
+                var match = json?.SelectToken(bindingContext.FieldName ?? bindingContext.ModelName);
 
                 if (match == null)
                 {
@@ -79,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                     return false;
                 }
 
-                JToken match = json.SelectToken(bindingContext.FieldName);
+                JToken? match = json.SelectToken(bindingContext.FieldName);
 
                 // ReSharper disable once InvertIf
                 if (match != null)

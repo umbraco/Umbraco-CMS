@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Routing
                 notification.State[NotificationStateKey] = new OldRoutesDictionary();
             }
 
-            return (OldRoutesDictionary)notification.State[NotificationStateKey];
+            return (OldRoutesDictionary?)notification.State[NotificationStateKey] ?? new OldRoutesDictionary();
         }
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
@@ -99,25 +99,32 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return;
             }
-            var contentCache = publishedSnapshot.Content;
-            var entityContent = contentCache?.GetById(entity.Id);
-            if (entityContent == null)
+
+            IPublishedContentCache? contentCache = publishedSnapshot?.Content;
+            IPublishedContent? entityContent = contentCache?.GetById(entity.Id);
+            if (entityContent is null)
+            {
                 return;
+            }
 
             // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
             var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
-                ?? new[] { (string)null };
-            foreach (var x in entityContent.DescendantsOrSelf(_variationContextAccessor))
+                ?? Array.Empty<string>();
+
+            foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_variationContextAccessor))
             {
                 // if this entity defines specific cultures, use those instead of the default ones
-                var cultures = x.Cultures.Any() ? x.Cultures.Keys : defaultCultures;
+                IEnumerable<string> cultures = publishedContent.Cultures.Any() ? publishedContent.Cultures.Keys : defaultCultures;
 
                 foreach (var culture in cultures)
                 {
-                    var route = contentCache.GetRouteById(x.Id, culture);
+                    var route = contentCache?.GetRouteById(publishedContent.Id, culture);
                     if (IsNotRoute(route))
+                    {
                         continue;
-                    oldRoutes[new ContentIdAndCulture(x.Id, culture)] = new ContentKeyAndOldRoute(x.Key, route);
+                    }
+
+                    oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
                 }
             }
         }
@@ -129,24 +136,27 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            var contentCache = publishedSnapshot.Content;
+            var contentCache = publishedSnapshot?.Content;
 
             if (contentCache == null)
             {
                 _logger.LogWarning("Could not track redirects because there is no current published snapshot available.");
                 return;
-            } 
+            }
 
-            foreach (var oldRoute in oldRoutes)
+            foreach (KeyValuePair<ContentIdAndCulture, ContentKeyAndOldRoute> oldRoute in oldRoutes)
             {
                 var newRoute = contentCache.GetRouteById(oldRoute.Key.ContentId, oldRoute.Key.Culture);
                 if (IsNotRoute(newRoute) || oldRoute.Value.OldRoute == newRoute)
+                {
                     continue;
+                }
+
                 _redirectUrlService.Register(oldRoute.Value.OldRoute, oldRoute.Value.ContentKey, oldRoute.Key.Culture);
             }
         }
 
-        private static bool IsNotRoute(string route)
+        private static bool IsNotRoute(string? route)
         {
             // null if content not found
             // err/- if collision or anomaly or ...

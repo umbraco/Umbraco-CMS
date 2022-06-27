@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        private static HttpClient s_httpClient;
+        private static HttpClient? s_httpClient;
 
         private static HttpClient HttpClient => s_httpClient ??= new HttpClient(new HttpClientHandler()
         {
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
             => throw new InvalidOperationException("HttpsCheck action requested is either not executable or does not exist");
 
-        private static bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
+        private static bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage, X509Certificate2? certificate, X509Chain? chain, SslPolicyErrors sslErrors)
         {
             if (certificate is not null)
             {
@@ -98,10 +98,10 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     // Got a valid response, check now if the certificate is expiring within the specified amount of days
-                    int daysToExpiry = 0;
+                    int? daysToExpiry = 0;
                     if (request.Properties.TryGetValue(HttpPropertyKeyCertificateDaysToExpiry, out var certificateDaysToExpiry))
                     {
-                        daysToExpiry = (int)certificateDaysToExpiry;
+                        daysToExpiry = (int?)certificateDaysToExpiry;
                     }
 
                     if (daysToExpiry <= 0)

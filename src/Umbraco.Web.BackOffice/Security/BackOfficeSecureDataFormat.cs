@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
         }
 
-        public string Protect(AuthenticationTicket data, string purpose)
+        public string Protect(AuthenticationTicket data, string? purpose)
         {
             // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
             var ticket = new AuthenticationTicket(data.Principal,
@@ -39,16 +39,16 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public string Protect(AuthenticationTicket data) => Protect(data, string.Empty);
 
 
-        public AuthenticationTicket Unprotect(string protectedText) => Unprotect(protectedText, string.Empty);
+        public AuthenticationTicket? Unprotect(string? protectedText) => Unprotect(protectedText, string.Empty);
 
         /// <summary>
         /// Un-protects the cookie
         /// </summary>
         /// <param name="protectedText"></param>
         /// <returns></returns>
-        public AuthenticationTicket Unprotect(string protectedText, string purpose)
+        public AuthenticationTicket? Unprotect(string? protectedText, string? purpose)
         {
-            AuthenticationTicket decrypt;
+            AuthenticationTicket? decrypt;
             try
             {
                 decrypt = _ticketDataFormat.Unprotect(protectedText);
@@ -59,8 +59,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return null;
             }
 
-            var identity = (ClaimsIdentity)decrypt.Principal.Identity;
-            if (!identity.VerifyBackOfficeIdentity(out ClaimsIdentity verifiedIdentity))
+            var identity = (ClaimsIdentity?)decrypt.Principal.Identity;
+            if (identity is null || !identity.VerifyBackOfficeIdentity(out ClaimsIdentity? verifiedIdentity))
             {
                 return null;
             }

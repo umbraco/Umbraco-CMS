@@ -30,15 +30,15 @@ namespace Umbraco.Cms.Core.Events
             : base(eventObject)
         { }
 
-        public bool Equals(CancellableEnumerableObjectEventArgs<TEventObject> other)
+        public bool Equals(CancellableEnumerableObjectEventArgs<TEventObject>? other)
         {
-            if (other is null) return false;
+            if (other is null || other.EventObject is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return EventObject.SequenceEqual(other.EventObject);
+            return EventObject?.SequenceEqual(other.EventObject) ?? false;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -48,7 +48,12 @@ namespace Umbraco.Cms.Core.Events
 
         public override int GetHashCode()
         {
-            return HashCodeHelper.GetHashCode(EventObject);
+            if (EventObject is not null)
+            {
+                return HashCodeHelper.GetHashCode(EventObject);
+            }
+
+            return base.GetHashCode();
         }
     }
 }

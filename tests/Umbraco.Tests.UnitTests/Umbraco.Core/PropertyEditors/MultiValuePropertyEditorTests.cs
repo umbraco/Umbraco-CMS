@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         {
             var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
             var serializer = new ConfigurationEditorJsonSerializer();
-            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>());
+            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
             var dataType = new DataType(checkBoxListPropertyEditor, serializer)
             {
                 Configuration = new ValueListConfiguration
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
 
             var serializer = new ConfigurationEditorJsonSerializer();
-            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>());
+            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
             var dataType = new DataType(checkBoxListPropertyEditor, serializer)
             {
                 Configuration = new ValueListConfiguration
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 }
             };
 
-            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>());
+            var editor = new ValueListConfigurationEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IIOHelper>(), Mock.Of<IEditorConfigurationParser>());
 
             Dictionary<string, object> result = editor.ToConfigurationEditor(configuration);
 

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Strings
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Core.Strings
 
         public string DefaultCulture { get; set; } = ""; // invariant
 
-        public Dictionary<string, string> UrlReplaceCharacters { get; set; }
+        public Dictionary<string, string>? UrlReplaceCharacters { get; set; }
 
         public DefaultShortStringHelperConfig WithConfig(Config config)
         {
@@ -60,7 +61,9 @@ namespace Umbraco.Cms.Core.Strings
         /// <returns>The short string helper.</returns>
         public DefaultShortStringHelperConfig WithDefault(RequestHandlerSettings requestHandlerSettings)
         {
-            UrlReplaceCharacters = requestHandlerSettings.CharCollection
+            IEnumerable<IChar> charCollection = requestHandlerSettings.GetCharReplacements();
+
+            UrlReplaceCharacters = charCollection
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
                 .ToDictionary(x => x.Char, x => x.Replacement);
 
@@ -165,8 +168,8 @@ namespace Umbraco.Cms.Core.Strings
                 };
             }
 
-            public Func<string, string> PreFilter { get; set; }
-            public Func<string, string> PostFilter { get; set; }
+            public Func<string, string>? PreFilter { get; set; }
+            public Func<string, string>? PostFilter { get; set; }
             public Func<char, bool, bool> IsTerm { get; set; }
 
             public CleanStringType StringType { get; set; }

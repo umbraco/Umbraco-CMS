@@ -32,7 +32,7 @@ namespace Umbraco.TestData
         private const string MediaPickerDataTypeName = "UmbracoTestDataContent.MediaPicker";
         private const string TextDataTypeName = "UmbracoTestDataContent.Text";
         private const string TestDataContentTypeAlias = "umbTestDataContent";
-        private readonly IScopeProvider _scopeProvider;
+        private readonly ICoreScopeProvider _scopeProvider;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly TestDataSettings _testDataSettings;
@@ -44,7 +44,7 @@ namespace Umbraco.TestData
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
-            IScopeProvider scopeProvider,
+            ICoreScopeProvider scopeProvider,
             PropertyEditorCollection propertyEditors,
             IShortStringHelper shortStringHelper,
             IOptions<TestDataSettings> testDataSettings)
@@ -81,7 +81,7 @@ namespace Umbraco.TestData
             var faker = new Faker(locale);
             var company = faker.Company.CompanyName();
 
-            using (IScope scope = _scopeProvider.CreateScope())
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 var imageIds = CreateMediaTree(company, faker, count, depth).ToList();
                 var contentIds = CreateContentTree(company, faker, count, depth, imageIds, out var root).ToList();
