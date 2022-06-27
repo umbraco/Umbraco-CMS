@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-internal class JITOptimizerValidator : RuntimeModeProductionValidatorBase
+public class JITOptimizerValidator : RuntimeModeProductionValidatorBase
 {
     protected override bool Validate([NotNullWhen(false)] out string? validationErrorMessage)
     {

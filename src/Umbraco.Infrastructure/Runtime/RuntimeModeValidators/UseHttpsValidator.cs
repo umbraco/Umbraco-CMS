@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-internal class UseHttpsValidator : RuntimeModeProductionValidatorBase
+public class UseHttpsValidator : RuntimeModeProductionValidatorBase
 {
     private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 

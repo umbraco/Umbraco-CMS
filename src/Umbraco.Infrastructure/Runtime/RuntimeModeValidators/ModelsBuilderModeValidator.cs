@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-internal class ModelsBuilderModeValidator : IRuntimeModeValidator
+public class ModelsBuilderModeValidator : IRuntimeModeValidator
 {
     private readonly IOptionsMonitor<ModelsBuilderSettings> _modelsBuilderSettings;
 

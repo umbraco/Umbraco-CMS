@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-internal class UmbracoApplicationUrlValidator : RuntimeModeProductionValidatorBase
+public class UmbracoApplicationUrlValidator : RuntimeModeProductionValidatorBase
 {
     private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
 

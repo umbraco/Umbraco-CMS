@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 
-internal class RuntimeMinificationValidator : RuntimeModeProductionValidatorBase
+public class RuntimeMinificationValidator : RuntimeModeProductionValidatorBase
 {
     private readonly IOptionsMonitor<RuntimeMinificationSettings> _runtimeMinificationSettings;
 
