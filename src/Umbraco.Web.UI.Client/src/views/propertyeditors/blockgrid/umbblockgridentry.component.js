@@ -51,6 +51,10 @@
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x))
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x))
 
+            // TODO: handle non-css-grid mode,
+            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+            // use item height divided by rowSpan to identify row heights.
+
         }
         vm.onMouseMove = function(e) {
 
@@ -84,7 +88,7 @@
             const elementX = elementRect.left - targetRect.left;
             const elementY = elementRect.top - targetRect.top;
 
-            // Numbers are good now, need to use them to find currentCol / Row and then figure out the new size.
+            // TODO: Numbers are good now, need to use them to find currentCol / Row and then figure out the new size.
             console.log(elementX, elementY)
             console.log(e.offsetX, e.offsetY)
 
