@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         {
             Users = Enumerable.Empty<UserBasic>();
             AssignedPermissions = Enumerable.Empty<AssignedContentPermissions>();
+            ContentApps = Enumerable.Empty<ContentApp>();
         }
 
         [DataMember(Name = "users")]

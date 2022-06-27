@@ -8,21 +8,21 @@ namespace Umbraco.Cms.Core.ContentApps
     {
         internal const int Weight = -100;
 
-        private ContentApp _app;
+        private ContentApp? _app;
 
-        public ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             switch (source)
             {
                 case IUserGroup _:
-                    return _app ?? (_app = new ContentApp()
+                    return _app ??= new ContentApp()
                     {
                         Alias = "umbUserGroup",
                         Name = "Detail",
                         Icon = Constants.Icons.UserGroup,
                         View = "views/users/apps/groups/content/content.html",
                         Weight = Weight
-                    });
+                    };
                 default:
                     return null;
             }
