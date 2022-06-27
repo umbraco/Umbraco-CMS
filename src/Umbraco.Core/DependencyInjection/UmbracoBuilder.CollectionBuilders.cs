@@ -84,10 +84,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
-        [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 10")]
-        public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
-            where T : class, IEmbedProvider => AddEmbedProvider<T>(builder);
-
         /// <summary>
         /// Register a section.
         /// </summary>
