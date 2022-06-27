@@ -221,8 +221,6 @@
                 */
             });
 
-            console.log("sortable:", sortable)
-
         }
     }   
 
