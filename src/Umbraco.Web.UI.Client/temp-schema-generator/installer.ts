@@ -1,6 +1,6 @@
 import { body, endpoint, request, response } from '@airtasker/spot';
 
-import { ErrorResponse } from './models';
+import { ProblemDetails } from './models';
 
 @endpoint({
   method: 'GET',
@@ -23,7 +23,7 @@ export class PostInstall {
   success() {}
 
   @response({ status: 400 })
-  badRequest(@body body: ErrorResponse) {}
+  badRequest(@body body: ProblemDetails) {}
 }
 
 @endpoint({
@@ -38,7 +38,7 @@ export class PostInstallValidateDatabase {
   success() {}
 
   @response({ status: 400 })
-  badRequest(@body body: ErrorResponse) {}
+  badRequest(@body body: ProblemDetails) {}
 }
 
 export interface UmbracoPerformInstallRequest {

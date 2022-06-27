@@ -1,5 +1,6 @@
 import { rest } from 'msw';
-import { ErrorResponse, UmbracoInstaller, UmbracoPerformInstallRequest } from '../../core/models';
+
+import { ProblemDetails, UmbracoInstaller, UmbracoPerformInstallRequest } from '../../core/models';
 
 export const handlers = [
   rest.get('/umbraco/backoffice/install', (_req, res, ctx) => {
@@ -78,8 +79,12 @@ export const handlers = [
       return res(
         // Respond with a 200 status code
         ctx.status(400),
-        ctx.json<ErrorResponse>({
-          errorMessage: 'Database name is invalid',
+        ctx.json<ProblemDetails>({
+          type: 'validation',
+          status: 400,
+          errors: {
+            databaseName: ['Database name is invalid'],
+          },
         })
       );
     }

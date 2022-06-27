@@ -1,10 +1,11 @@
+import { UUIButtonElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
-import { UmbContextConsumerMixin } from '../core/context';
-import { UmbInstallerContext } from './installer-context';
 import { Subscription } from 'rxjs';
-import { UUIButtonElement } from '@umbraco-ui/uui';
+
+import { UmbContextConsumerMixin } from '../core/context';
+import { ProblemDetails, UmbracoInstallerDatabaseModel, UmbracoPerformInstallDatabaseConfiguration } from '../core/models';
+import { UmbInstallerContext } from './installer-context';
 
 @customElement('umb-installer-database')
 export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
@@ -167,9 +168,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   private _handleFulfilled() {
     this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
   }
-  private _handleRejected(error: any) {
+  private _handleRejected(error: ProblemDetails) {
     this._installButton.state = 'failed';
-    this._errorMessage.innerText = error.errorMessage;
+    this._errorMessage.innerText = error.type;
   }
 
   private _onBack() {

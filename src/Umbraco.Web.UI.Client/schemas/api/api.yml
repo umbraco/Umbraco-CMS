@@ -18,7 +18,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /version:
     get:
       operationId: GetVersion
@@ -34,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /install:
     get:
       operationId: GetInstall
@@ -62,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /install/database/validate:
     post:
       operationId: PostInstallValidateDatabase
@@ -81,7 +81,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /user:
     get:
       operationId: GetUser
@@ -97,7 +97,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /user/login:
     post:
       operationId: PostUserLogin
@@ -116,7 +116,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /user/logout:
     post:
       operationId: PostUserLogout
@@ -128,7 +128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /user/sections:
     get:
       operationId: GetAllowedSections
@@ -144,7 +144,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
     InitResponse:
@@ -154,13 +154,25 @@ components:
           type: boolean
       required:
         - installed
-    ErrorResponse:
+    ProblemDetails:
       type: object
       properties:
-        errorMessage:
+        type:
           type: string
+        status:
+          type: number
+          format: float
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: object
       required:
-        - errorMessage
+        - type
+        - status
     VersionResponse:
       type: object
       properties:

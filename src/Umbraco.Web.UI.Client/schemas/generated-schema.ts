@@ -36,8 +36,14 @@ export interface components {
     InitResponse: {
       installed: boolean;
     };
-    ErrorResponse: {
-      errorMessage: string;
+    ProblemDetails: {
+      type: string;
+      /** Format: float */
+      status: number;
+      title?: string;
+      detail?: string;
+      instance?: string;
+      errors?: { [key: string]: unknown };
     };
     VersionResponse: {
       version: string;
@@ -117,7 +123,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -133,7 +139,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -156,7 +162,7 @@ export interface operations {
       /** 400 response */
       400: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -174,7 +180,7 @@ export interface operations {
       /** 400 response */
       400: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -195,7 +201,7 @@ export interface operations {
       /** 403 response */
       403: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -208,7 +214,7 @@ export interface operations {
       /** 403 response */
       403: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -225,7 +231,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -241,7 +247,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
