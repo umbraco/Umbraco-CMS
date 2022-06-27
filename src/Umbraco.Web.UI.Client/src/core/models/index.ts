@@ -1,15 +1,13 @@
 import { components } from '../../../schemas/generated-schema';
 
 export type PostInstallRequest = components['schemas']['UmbracoPerformInstallRequest'];
-export type InitResponse = components['schemas']['InitResponse'];
+export type StatusResponse = components['schemas']['StatusResponse'];
 export type VersionResponse = components['schemas']['VersionResponse'];
 export type ProblemDetails = components['schemas']['ProblemDetails'];
 export type UserResponse = components['schemas']['UserResponse'];
 export type AllowedSectionsResponse = components['schemas']['AllowedSectionsResponse'];
 export type UmbracoInstaller = components['schemas']['UmbracoInstaller'];
-
 export type UmbracoPerformInstallRequest = components['schemas']['UmbracoPerformInstallRequest'];
-
 export type UmbracoPerformInstallDatabaseConfiguration =
   components['schemas']['UmbracoPerformInstallDatabaseConfiguration'];
 

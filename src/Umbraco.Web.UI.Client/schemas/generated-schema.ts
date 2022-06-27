@@ -4,18 +4,18 @@
  */
 
 export interface paths {
-  "/init": {
-    get: operations["GetInit"];
-  };
-  "/version": {
-    get: operations["GetVersion"];
-  };
   "/install": {
     get: operations["GetInstall"];
     post: operations["PostInstall"];
   };
   "/install/database/validate": {
     post: operations["PostInstallValidateDatabase"];
+  };
+  "/server/status": {
+    get: operations["GetStatus"];
+  };
+  "/server/version": {
+    get: operations["GetVersion"];
   };
   "/user": {
     get: operations["GetUser"];
@@ -33,21 +33,6 @@ export interface paths {
 
 export interface components {
   schemas: {
-    InitResponse: {
-      installed: boolean;
-    };
-    ProblemDetails: {
-      type: string;
-      /** Format: float */
-      status: number;
-      title?: string;
-      detail?: string;
-      instance?: string;
-      errors?: { [key: string]: unknown };
-    };
-    VersionResponse: {
-      version: string;
-    };
     /** @enum {string} */
     ConsentLevel: "Minimal" | "Basic" | "Detailed";
     TelemetryModel: {
@@ -96,6 +81,21 @@ export interface components {
       telemetryLevel: components["schemas"]["ConsentLevel"];
       database: components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
     };
+    ProblemDetails: {
+      type: string;
+      /** Format: float */
+      status: number;
+      title?: string;
+      detail?: string;
+      instance?: string;
+      errors?: { [key: string]: unknown };
+    };
+    StatusResponse: {
+      installed: boolean;
+    };
+    VersionResponse: {
+      version: string;
+    };
     UserResponse: {
       username: string;
       role: string;
@@ -112,38 +112,6 @@ export interface components {
 }
 
 export interface operations {
-  GetInit: {
-    responses: {
-      /** 200 response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["InitResponse"];
-        };
-      };
-      /** default response */
-      default: {
-        content: {
-          "application/json": components["schemas"]["ProblemDetails"];
-        };
-      };
-    };
-  };
-  GetVersion: {
-    responses: {
-      /** 200 response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["VersionResponse"];
-        };
-      };
-      /** default response */
-      default: {
-        content: {
-          "application/json": components["schemas"]["ProblemDetails"];
-        };
-      };
-    };
-  };
   GetInstall: {
     responses: {
       /** 200 response */
@@ -187,6 +155,38 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
+      };
+    };
+  };
+  GetStatus: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["StatusResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  GetVersion: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["VersionResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
       };
     };
   };

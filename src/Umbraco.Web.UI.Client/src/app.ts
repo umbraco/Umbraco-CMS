@@ -1,11 +1,11 @@
-import 'router-slot';
 import '@umbraco-ui/uui-css/dist/uui-css.css';
+import 'router-slot';
 
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-import { getInitStatus } from './core/api/fetcher';
+import { getServerStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
 import { internalManifests } from './temp-internal-manifests';
@@ -46,7 +46,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     this._setup();
   }
 
-  private async _setup () {
+  private async _setup() {
     this._iconRegistry.attach(this);
     this.provideContext('umbExtensionRegistry', this._extensionRegistry);
 
@@ -58,14 +58,14 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
   private async _setInitStatus() {
     try {
-      const { data } = await getInitStatus({});
+      const { data } = await getServerStatus({});
       this._isInstalled = data.installed;
     } catch (error) {
       console.log(error);
     }
   }
 
-  private _redirect () {
+  private _redirect() {
     if (!this._isInstalled) {
       history.pushState(null, '', '/install');
       return;
@@ -87,10 +87,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     const res = await fetch('/umbraco/backoffice/manifests');
     const { manifests } = await res.json();
     manifests.forEach((manifest: UmbExtensionManifest) => this._extensionRegistry.register(manifest));
-  };
+  }
 
   private async _registerInternalManifests() {
-    // TODO: where do we get these from?  
+    // TODO: where do we get these from?
     internalManifests.forEach((manifest: UmbExtensionManifestCore) =>
       this._extensionRegistry.register<UmbExtensionManifestCore>(manifest)
     );

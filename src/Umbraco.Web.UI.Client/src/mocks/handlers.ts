@@ -1,5 +1,6 @@
 import { rest } from 'msw';
-import { InitResponse } from '../core/models';
+
+import { StatusResponse } from '../core/models';
 import { handlers as contentHandlers } from './domains/content.handlers';
 import { handlers as installHandlers } from './domains/install.handlers';
 import { handlers as manifestsHandlers } from './domains/manifests.handlers';
@@ -11,7 +12,7 @@ export const handlers = [
     return res(
       // Respond with a 200 status code
       ctx.status(200),
-      ctx.json<InitResponse>({
+      ctx.json<StatusResponse>({
         installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
       })
     );

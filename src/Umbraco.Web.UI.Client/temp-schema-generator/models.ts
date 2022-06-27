@@ -1,4 +1,4 @@
-export interface InitResponse {
+export interface StatusResponse {
   installed: boolean;
 }
 

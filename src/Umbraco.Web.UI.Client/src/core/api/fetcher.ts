@@ -8,7 +8,8 @@ fetcher.configure({
   baseUrl: '/umbraco/backoffice',
 });
 
-export const getInitStatus = fetcher.path('/init').method('get').create();
+export const getServerStatus = fetcher.path('/server/status').method('get').create();
+export const getServerVersion = fetcher.path('/server/version').method('get').create();
 export const getUser = fetcher.path('/user').method('get').create();
 export const postUserLogin = fetcher.path('/user/login').method('post').create();
 export const postUserLogout = fetcher.path('/user/logout').method('post').create();
