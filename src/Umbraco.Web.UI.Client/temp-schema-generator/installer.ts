@@ -1,23 +1,26 @@
-import { body, endpoint, request, response } from '@airtasker/spot';
+import { body, defaultResponse, endpoint, request, response } from '@airtasker/spot';
 
 import { ProblemDetails } from './models';
 
 @endpoint({
   method: 'GET',
-  path: '/install',
+  path: '/install/settings',
 })
-export class GetInstall {
+export class GetInstallSettings {
   @response({ status: 200 })
-  success(@body body: UmbracoInstaller) {}
+  success(@body body: InstallSettingsResponse) {}
+
+  @defaultResponse
+  default(@body body: ProblemDetails) {}
 }
 
 @endpoint({
   method: 'POST',
-  path: '/install',
+  path: '/install/setup',
 })
-export class PostInstall {
+export class PostInstallSetup {
   @request
-  request(@body body: UmbracoPerformInstallRequest) {}
+  request(@body body: InstallSetupRequest) {}
 
   @response({ status: 201 })
   success() {}
@@ -28,11 +31,11 @@ export class PostInstall {
 
 @endpoint({
   method: 'POST',
-  path: '/install/database/validate',
+  path: '/install/validateDatabase',
 })
 export class PostInstallValidateDatabase {
   @request
-  request(@body body: UmbracoPerformInstallDatabaseConfiguration) {}
+  request(@body body: InstallValidateDatabaseRequest) {}
 
   @response({ status: 201 })
   success() {}
@@ -41,16 +44,31 @@ export class PostInstallValidateDatabase {
   badRequest(@body body: ProblemDetails) {}
 }
 
-export interface UmbracoPerformInstallRequest {
+export interface InstallSetupRequest {
   name: string;
   email: string;
   password: string;
   subscribeToNewsletter: boolean;
   telemetryLevel: ConsentLevel;
-  database: UmbracoPerformInstallDatabaseConfiguration;
+  database: InstallSetupDatabaseConfiguration;
 }
 
-export interface UmbracoPerformInstallDatabaseConfiguration {
+export interface InstallValidateDatabaseRequest {
+  database: InstallSetupDatabaseConfiguration;
+}
+
+export interface InstallSettingsResponse {
+  user: InstallUserModel;
+  databases: InstallDatabaseModel[];
+}
+
+export interface InstallUserModel {
+  minCharLength: number;
+  minNonAlphaNumericLength: number;
+  consentLevels: TelemetryModel[];
+}
+
+export interface InstallSetupDatabaseConfiguration {
   server?: string | null;
   password?: string | null;
   username?: string | null;
@@ -60,23 +78,12 @@ export interface UmbracoPerformInstallDatabaseConfiguration {
   connectionString?: string | null;
 }
 
-export interface UmbracoInstaller {
-  user: UmbracoInstallerUserModel;
-  databases: UmbracoInstallerDatabaseModel[];
-}
-
-export interface UmbracoInstallerUserModel {
-  minCharLength: number;
-  minNonAlphaNumericLength: number;
-  consentLevels: TelemetryModel[];
-}
-
 export interface TelemetryModel {
   level: ConsentLevel;
   description: string;
 }
 
-export interface UmbracoInstallerDatabaseModel {
+export interface InstallDatabaseModel {
   id: string;
   sortOrder: number;
   displayName: string;

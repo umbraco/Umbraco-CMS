@@ -1,6 +1,7 @@
-import { getInstall, postInstall } from '../core/api/fetcher';
-import { PostInstallRequest, UmbracoInstaller } from '../core/models';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
+
+import { getInstallSettings, postInstallSetup } from '../core/api/fetcher';
+import { PostInstallRequest, UmbracoInstaller } from '../core/models';
 
 export class UmbInstallerContext {
   private _data: BehaviorSubject<PostInstallRequest> = new BehaviorSubject<PostInstallRequest>({
@@ -30,14 +31,14 @@ export class UmbInstallerContext {
 
   public requestInstall() {
     return new Promise((resolve, reject) => {
-      postInstall(this._data.getValue()).then(resolve, ({ data }) => {
+      postInstallSetup(this._data.getValue()).then(resolve, ({ data }) => {
         reject(data);
       });
     });
   }
 
   private loadIntallerSettings() {
-    getInstall({}).then(({ data }) => {
+    getInstallSettings({}).then(({ data }) => {
       this._settings.next(data);
     });
   }

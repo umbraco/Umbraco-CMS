@@ -4,11 +4,13 @@
  */
 
 export interface paths {
-  "/install": {
-    get: operations["GetInstall"];
-    post: operations["PostInstall"];
+  "/install/settings": {
+    get: operations["GetInstallSettings"];
   };
-  "/install/database/validate": {
+  "/install/setup": {
+    post: operations["PostInstallSetup"];
+  };
+  "/install/validateDatabase": {
     post: operations["PostInstallValidateDatabase"];
   };
   "/server/status": {
@@ -39,14 +41,14 @@ export interface components {
       level: components["schemas"]["ConsentLevel"];
       description: string;
     };
-    UmbracoInstallerUserModel: {
+    InstallUserModel: {
       /** Format: float */
       minCharLength: number;
       /** Format: float */
       minNonAlphaNumericLength: number;
       consentLevels: components["schemas"]["TelemetryModel"][];
     };
-    UmbracoInstallerDatabaseModel: {
+    InstallDatabaseModel: {
       id: string;
       /** Format: float */
       sortOrder: number;
@@ -60,26 +62,9 @@ export interface components {
       supportsIntegratedAuthentication: boolean;
       requiresConnectionTest: boolean;
     };
-    UmbracoInstaller: {
-      user: components["schemas"]["UmbracoInstallerUserModel"];
-      databases: components["schemas"]["UmbracoInstallerDatabaseModel"][];
-    };
-    UmbracoPerformInstallDatabaseConfiguration: {
-      server?: string | null;
-      password?: string | null;
-      username?: string | null;
-      databaseName?: string | null;
-      databaseType?: string | null;
-      useIntegratedAuthentication?: boolean | null;
-      connectionString?: string | null;
-    };
-    UmbracoPerformInstallRequest: {
-      name: string;
-      email: string;
-      password: string;
-      subscribeToNewsletter: boolean;
-      telemetryLevel: components["schemas"]["ConsentLevel"];
-      database: components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
+    InstallSettingsResponse: {
+      user: components["schemas"]["InstallUserModel"];
+      databases: components["schemas"]["InstallDatabaseModel"][];
     };
     ProblemDetails: {
       type: string;
@@ -89,6 +74,26 @@ export interface components {
       detail?: string;
       instance?: string;
       errors?: { [key: string]: unknown };
+    };
+    InstallSetupDatabaseConfiguration: {
+      server?: string | null;
+      password?: string | null;
+      username?: string | null;
+      databaseName?: string | null;
+      databaseType?: string | null;
+      useIntegratedAuthentication?: boolean | null;
+      connectionString?: string | null;
+    };
+    InstallSetupRequest: {
+      name: string;
+      email: string;
+      password: string;
+      subscribeToNewsletter: boolean;
+      telemetryLevel: components["schemas"]["ConsentLevel"];
+      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
+    };
+    InstallValidateDatabaseRequest: {
+      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
     StatusResponse: {
       installed: boolean;
@@ -112,17 +117,23 @@ export interface components {
 }
 
 export interface operations {
-  GetInstall: {
+  GetInstallSettings: {
     responses: {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["UmbracoInstaller"];
+          "application/json": components["schemas"]["InstallSettingsResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
   };
-  PostInstall: {
+  PostInstallSetup: {
     parameters: {};
     responses: {
       /** 201 response */
@@ -136,7 +147,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UmbracoPerformInstallRequest"];
+        "application/json": components["schemas"]["InstallSetupRequest"];
       };
     };
   };
@@ -154,7 +165,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
+        "application/json": components["schemas"]["InstallValidateDatabaseRequest"];
       };
     };
   };

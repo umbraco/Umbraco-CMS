@@ -3,24 +3,31 @@ info:
   title: umbraco-backoffice-api
   version: 1.0.0
 paths:
-  /install:
+  /install/settings:
     get:
-      operationId: GetInstall
+      operationId: GetInstallSettings
       responses:
         '200':
           description: 200 response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UmbracoInstaller'
+                $ref: '#/components/schemas/InstallSettingsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /install/setup:
     post:
-      operationId: PostInstall
+      operationId: PostInstallSetup
       parameters: []
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UmbracoPerformInstallRequest'
+              $ref: '#/components/schemas/InstallSetupRequest'
         required: true
       responses:
         '201':
@@ -31,7 +38,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /install/database/validate:
+  /install/validateDatabase:
     post:
       operationId: PostInstallValidateDatabase
       parameters: []
@@ -39,7 +46,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UmbracoPerformInstallDatabaseConfiguration'
+              $ref: '#/components/schemas/InstallValidateDatabaseRequest'
         required: true
       responses:
         '201':
@@ -163,7 +170,7 @@ components:
       required:
         - level
         - description
-    UmbracoInstallerUserModel:
+    InstallUserModel:
       type: object
       properties:
         minCharLength:
@@ -180,7 +187,7 @@ components:
         - minCharLength
         - minNonAlphaNumericLength
         - consentLevels
-    UmbracoInstallerDatabaseModel:
+    InstallDatabaseModel:
       type: object
       properties:
         id:
@@ -220,19 +227,38 @@ components:
         - requiresCredentials
         - supportsIntegratedAuthentication
         - requiresConnectionTest
-    UmbracoInstaller:
+    InstallSettingsResponse:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/UmbracoInstallerUserModel'
+          $ref: '#/components/schemas/InstallUserModel'
         databases:
           type: array
           items:
-            $ref: '#/components/schemas/UmbracoInstallerDatabaseModel'
+            $ref: '#/components/schemas/InstallDatabaseModel'
       required:
         - user
         - databases
-    UmbracoPerformInstallDatabaseConfiguration:
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: number
+          format: float
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: object
+      required:
+        - type
+        - status
+    InstallSetupDatabaseConfiguration:
       type: object
       properties:
         server:
@@ -256,7 +282,7 @@ components:
         connectionString:
           type: string
           nullable: true
-    UmbracoPerformInstallRequest:
+    InstallSetupRequest:
       type: object
       properties:
         name:
@@ -270,7 +296,7 @@ components:
         telemetryLevel:
           $ref: '#/components/schemas/ConsentLevel'
         database:
-          $ref: '#/components/schemas/UmbracoPerformInstallDatabaseConfiguration'
+          $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
       required:
         - name
         - email
@@ -278,25 +304,13 @@ components:
         - subscribeToNewsletter
         - telemetryLevel
         - database
-    ProblemDetails:
+    InstallValidateDatabaseRequest:
       type: object
       properties:
-        type:
-          type: string
-        status:
-          type: number
-          format: float
-        title:
-          type: string
-        detail:
-          type: string
-        instance:
-          type: string
-        errors:
-          type: object
+        database:
+          $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
       required:
-        - type
-        - status
+        - database
     StatusResponse:
       type: object
       properties:
