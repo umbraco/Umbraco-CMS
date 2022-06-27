@@ -1,4 +1,3 @@
-using System;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Media;
