@@ -11,16 +11,24 @@
     function getIndexOfPositionInWeightMap(position, weights) {
         let i = 0, len = weights.length, calc = 0;
         while(i<len) {
-            if(position > calc && position <= calc+weights[i]) {
+            if(position <= calc+weights[i]) {
                 return i;
             }
 
             calc += weights[i];
             i++;
         }
-        return -1;
+        return i;
     }
 
+    function getAccumulatedValueOfIndex(index, weights) {
+        let i = 0, len = index, calc = 0;
+        while(i<len) {
+            calc += weights[i++];
+        }
+        return calc;
+    }
+    
     function closestColumnSpanOption(target, map) {
         return map.reduce((a, b) => {
             let aDiff = Math.abs(a.columnSpan - target);
@@ -66,13 +74,11 @@
         let layoutContainer = null;
         let gridColumns = null;
         let gridRows = null;
-        //let targetCol = null;
-        //let targetRow = null;
+        let scaleBoxEl = null;
 
 
         function getNewSpans(startX, startY, endX, endY) {
 
-            // Get start col:
             const blockStartCol = getIndexOfPositionInWeightMap(startX, gridColumns);
             const blockStartRow = getIndexOfPositionInWeightMap(startY, gridRows);
             const blockEndCol = getIndexOfPositionInWeightMap(endX, gridColumns);
@@ -82,8 +88,9 @@
             // Find nearest allowed Column:
             newColumnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
 
-            const newRowSpan = Math.max(blockEndRow-blockStartRow, 1);
-            return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan};
+            const newRowSpan = Math.max(blockEndRow-blockStartRow, 0);
+
+            return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan, 'startCol': blockStartCol, 'startRow': blockStartRow};
         }
 
         vm.scaleHandlerMouseDown = function($event) {
@@ -104,9 +111,21 @@
             gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
             gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
 
+            if(gridColumns[gridColumns.length-1] === 0) {
+                gridColumns.pop();
+            }
+            console.log(gridColumns)
+
             gridRows.push(100);
             gridRows.push(100);
             gridRows.push(100);
+
+            scaleBoxEl = document.createElement('div');
+            scaleBoxEl.className = 'umb-block-grid__scalebox';
+
+            $element[0].appendChild(scaleBoxEl);
+
+            console.log(scaleBoxEl)
 
             // ensure all columns are there.
             // add a few extra rows, so there is something to extend too.
@@ -127,8 +146,23 @@
             const endY = e.offsetY;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
+            const endCol = newSpans.startCol + newSpans.columnSpan;
+            const endRow = newSpans.startRow + newSpans.rowSpan;
 
-            console.log("newSpans", newSpans.columnSpan, newSpans.rowSpan)
+
+            const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
+            const startCellY =  getAccumulatedValueOfIndex(newSpans.startRow, gridRows);
+            const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns) + gridColumns[endCol];
+            const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows) + gridRows[endRow];
+
+            console.log(gridColumns)
+            console.log('startCellX', startCellX, newSpans.startCol)
+            console.log('endCellX', endCellX, endCol)
+
+            console.log('endRow', endCellY, endRow)
+            scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
+            scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
+            
         }
 
         vm.onMouseUp = function(e) {
@@ -143,22 +177,21 @@
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
-            console.log("newSpans", newSpans.columnSpan, newSpans.rowSpan)
-
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
-            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+            vm.layoutEntry.rowSpan = Math.max(newSpans.rowSpan, 1);
 
             // Remove listeners:
             window.removeEventListener('mousemove', vm.onMouseMove);
             window.removeEventListener('mouseup', vm.onMouseUp);
             window.removeEventListener('mouseleave', vm.onMouseUp);
 
-            // CLean up variables:
+            $element[0].removeChild(scaleBoxEl);
+
+            // Clean up variables:
             layoutContainer = null;
             gridColumns = null;
             gridRows = null;
-            //targetCol = null;
-            //targetRow = null;
+            scaleBoxEl = null;
         }
 
 
