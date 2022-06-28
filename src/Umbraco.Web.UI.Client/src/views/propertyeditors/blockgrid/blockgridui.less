@@ -33,6 +33,15 @@
     width: 100%;
     height: 100%;
 
+    &::after {
+        content: '';
+        position: absolute;
+        pointer-events: none;
+        inset: 0;
+        border: 1px solid transparent;
+        border-radius: 3px;
+    }
+
     > .umb-block-grid__block--actions {
         opacity: 0;
         transition: opacity 120ms;
@@ -40,6 +49,19 @@
     > umb-block-grid-block > umb-block-grid-entries > .umb-block-grid__actions {
         opacity: 0;
         transition: opacity 120ms;
+    }
+
+    &:hover,
+    &:focus,
+    &:focus-within {
+        &::after {
+            border-color: blue;
+        }
+    }
+    &.--active {
+        &::after {
+            border-color: pink;
+        }
     }
 
     &:hover,
@@ -186,13 +208,34 @@ umb-block-grid-block {
 
 
 .umb-block-grid__scale-handler {
-    cursor: grab;
+    cursor: nwse-resize;
     position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width:16px;
-    height:16px;
-    background-color: yellow;
+    Z-index:10;
+    bottom: -4px;
+    right: -4px;
+    width:8px;
+    height:8px;
+    padding: 0;
+    background-color: white;
+    border: blue solid 1px;
+    opacity: 0;
+    transition: opacity 120ms;
+}
+
+.umb-block-grid__scale-handler::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    background-color: rgba(0,0,0,0);
+}
+.umb-block-grid__block:focus-within, 
+.umb-block-grid__block:hover {
+    > .umb-block-grid__scale-handler {
+        opacity: 1;
+    }
+}
+.umb-block-grid__scale-handler:focus {
+    opacity: 1;
 }
 
 
@@ -304,9 +347,6 @@ umb-block-grid-block {
     }
 }
 
-.umb-block-grid__layout-container {
-    min-height: 40px;
-}
 
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
@@ -325,12 +365,18 @@ umb-block-grid-block {
     position: absolute;
     inset: 0;
     border-radius: 3px;
-    border: 1px solid red;
+    border: 1px solid rgba(125,125,125,0.5);
     pointer-events: none;
-    opacity: var(--umb-show-gridblock-area-ui, 0);
+    opacity: 0;
+    transition: opacity 120ms;
+}
+.umb-block-grid__block-area:focus::after,
+.umb-block-grid__block-area:focus-within::after,
+.umb-block-grid__block-area:hover::after {
+    opacity: 1;
 }
 .umb-block-grid__block-area > .umb-block-grid__actions {
-    opacity: var(--umb-show-gridblock-area-ui, 0);
+    opacity: var(--umb-block-grid--show-area-ui, 0);
     transition: opacity 120ms;
 }
 .umb-block-grid__block-area > .umb-block-grid__actions:focus, 
