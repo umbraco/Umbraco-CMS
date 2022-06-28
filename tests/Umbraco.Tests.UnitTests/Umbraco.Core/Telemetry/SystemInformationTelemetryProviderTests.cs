@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
@@ -116,7 +117,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
                 Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
                 Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings{ UmbracoPath = umbracoPath }),
                 hostEnvironment.Object,
-                Mock.Of<IUmbracoDatabaseFactory>(x=>x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y=>y.DatabaseType == DatabaseType.SQLite)));
+                Mock.Of<IUmbracoDatabaseFactory>(x=>x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y=>y.DatabaseType == DatabaseType.SQLite)),
+                Mock.Of<IServerRoleAccessor>());
         }
     }
 }
