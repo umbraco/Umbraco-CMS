@@ -127,6 +127,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Templates", "templa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms", "src\Umbraco.Cms\Umbraco.Cms.csproj", "{92EAA57A-CC99-4F5D-9D9C-B865293F6000}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoffice", "{995D9EFA-8BB1-4333-80AD-C525A06FD984}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.BackOfficeApi", "Umbraco.Cms.BackOfficeApi\Umbraco.Cms.BackOfficeApi.csproj", "{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +253,12 @@ Global
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{92EAA57A-CC99-4F5D-9D9C-B865293F6000}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -263,6 +273,7 @@ Global
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{05C1D0C8-C592-468F-AF8F-A299B9B3A903} = {6D72A60B-0542-4AA9-A493-DD4179E838A1}
+		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
