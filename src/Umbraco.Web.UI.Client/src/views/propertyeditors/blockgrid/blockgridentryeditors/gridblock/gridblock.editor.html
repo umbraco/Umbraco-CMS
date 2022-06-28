@@ -1,5 +1,23 @@
 <style>
 
+    .umb-icon {
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+    }
+
+    .umb-icon svg {
+        width: 100%;
+        height: 100%;
+        fill: currentColor;
+        animation: inherit;
+    }
+
+    :host {
+        --umb-block-grid--show-area-ui: 0;
+    }
+
     .umb-block-grid__block--view {
         height:100%;/* Add this to fill the cell fully */
     }
@@ -8,23 +26,22 @@
         position: relative;
         border-radius: 3px;
         height: 100%;/* Add this to fill the cell fully */
+        border: 1px solid lightgrey;
     }
     .blockelement-gridblock-editor:hover::after {
         content: '';
         position: absolute;
         inset: 0;
         border-radius: 3px;
-        border: 1px solid blue;
-        pointer-events: none;;
+        pointer-events: none;
     }
     .blockelement-gridblock-editor:focus,
     .blockelement-gridblock-editor:focus-within,
     .blockelement-gridblock-editor:hover {
-        --umb-show-gridblock-area-ui: 1;
+        --umb-block-grid--show-area-ui: 1;
     }
     
     .blockelement-gridblock-editor > button {
-        border: 1px solid lightgrey;
         position: relative;
         display: flex;
         align-items: center;
@@ -36,6 +53,7 @@
         text-align: left;
         padding: 0 20px;
         user-select: none;
+        border: none;
         transition: border-color 120ms, background-color 120ms;
     }
     .blockelement-gridblock-editor .icon {
@@ -56,9 +74,11 @@
         background-color: @ui-action-hover;
     }
 
-    .blockelement-gridblock-editor > button.--active {
-        color: @ui-active-type;
+    .blockelement-gridblock-editor.--active  {
         border-color: @ui-active;
+    }
+    .blockelement-gridblock-editor.--active > button {
+        color: @ui-active-type;
         background-color: @ui-active;
     }
 
@@ -114,18 +134,14 @@
     */
 </style>
 
-<div class="blockelement-gridblock-editor">
-    <button type="button" class="btn-reset umb-outline blockelement__draggable-element"
+<div class="blockelement-gridblock-editor" ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }">
+    <button type="button"
         ng-click="block.edit()"
         ng-focus="block.focus"
-        ng-class="{ '--active': block.active, '--error': parentForm.$invalid && valFormManager.isShowingValidation() }"
         val-server-property-class="">
         <umb-icon icon="{{block.content.icon}}" class="icon"></umb-icon>
         <span>{{block.label}}</span>
     </button>
-
-    <input ng-model="block.layout.columnSpan" type="text"/>
-    <input ng-model="block.layout.rowSpan" type="text"/>
 
     <slot name="areas" part="areas"></slot>
 

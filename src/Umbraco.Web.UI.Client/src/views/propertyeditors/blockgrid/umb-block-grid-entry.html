@@ -60,8 +60,8 @@
             </button>
         </div>
 
-        <div class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)">
-        </div>
+        <button type="button" class="umb-block-grid__scale-handler" ng-mousedown="vm.scaleHandlerMouseDown($event)" ng-keyup="vm.scaleHandlerKeyUp($event)">
+        </button>
 
     </div>
 </ng-form>
