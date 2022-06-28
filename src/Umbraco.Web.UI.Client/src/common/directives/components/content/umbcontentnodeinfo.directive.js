@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
@@ -105,6 +105,7 @@
                 if (activeApp.alias === "umbInfo") {
                     loadRedirectUrls();
                     loadAuditTrail();
+                    isInfoTab = true;
                 }
 
                 // never show templates for element types (if they happen to have been created in the content tree)
