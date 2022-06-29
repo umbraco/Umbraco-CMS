@@ -44,10 +44,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             _getFactory = getFactory;
             _providerSpecificInterceptors = providerSpecificInterceptors;
-            _databaseCreators = databaseCreators.ToDictionary(x => x.ProviderName);
-            _syntaxProviders = syntaxProviders.ToDictionary(x => x.ProviderName);
-            _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x => x.ProviderName);
-            _providerSpecificMapperFactories = providerSpecificMapperFactories.ToDictionary(x => x.ProviderName);
+            _databaseCreators = databaseCreators.ToDictionary(x => x.ProviderName, StringComparer.InvariantCultureIgnoreCase);
+            _syntaxProviders = syntaxProviders.ToDictionary(x => x.ProviderName, StringComparer.InvariantCultureIgnoreCase);
+            _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x => x.ProviderName, StringComparer.InvariantCultureIgnoreCase);
+            _providerSpecificMapperFactories = providerSpecificMapperFactories.ToDictionary(x => x.ProviderName, StringComparer.InvariantCultureIgnoreCase);
         }
 
         public DbProviderFactory? CreateFactory(string? providerName)
@@ -98,6 +98,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         public IEnumerable<IProviderSpecificInterceptor> GetProviderSpecificInterceptors(string providerName)
-            => _providerSpecificInterceptors.Where(x => x.ProviderName == providerName);
+            => _providerSpecificInterceptors.Where(x => x.ProviderName.Equals(providerName, StringComparison.InvariantCultureIgnoreCase));
     }
 }
