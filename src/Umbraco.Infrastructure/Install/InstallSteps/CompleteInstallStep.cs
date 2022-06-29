@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Install.Models;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
+// TODO: Port this to the new setup?? Although not entirely sure why we want to do this
 [InstallSetupStep(
     InstallationType.NewInstall | InstallationType.Upgrade,
     "UmbracoVersion",

@@ -4,9 +4,12 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.InstallSteps;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.NewInstallSteps;
+using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Install.InstallSteps;
+using Umbraco.Cms.Infrastructure.Install.NewInstallSteps;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 
@@ -37,6 +40,20 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<InstallHelper>();
 
         builder.Services.AddTransient<PackageMigrationRunner>();
+
+        builder.AddInstallSteps();
+
+        return builder;
+    }
+
+    internal static IUmbracoBuilder AddInstallSteps(this IUmbracoBuilder builder)
+    {
+        builder.Services.AddScoped<NewInstallSetupStep, NewFilePermissionsStep>();
+        builder.Services.AddScoped<NewInstallSetupStep, NewTelemetryIdentifierStep>();
+        builder.Services.AddScoped<NewInstallSetupStep, NewNewInstallStep>();
+        builder.Services.AddScoped<NewInstallSetupStep, NewDatabaseUpgradeStep>();
+        builder.Services.AddScoped<NewInstallSetupStep, NewDatabaseInstallStep>();
+        builder.Services.AddScoped<NewInstallSetupStep, NewDatabaseConfigureStep>();
 
         return builder;
     }
