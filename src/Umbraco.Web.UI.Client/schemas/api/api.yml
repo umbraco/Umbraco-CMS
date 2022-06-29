@@ -202,7 +202,7 @@ components:
         providerName:
           type: string
           nullable: true
-        isAvailable:
+        isConfigured:
           type: boolean
         requiresServer:
           type: boolean
@@ -221,7 +221,7 @@ components:
         - displayName
         - defaultDatabaseName
         - providerName
-        - isAvailable
+        - isConfigured
         - requiresServer
         - serverPlaceholder
         - requiresCredentials

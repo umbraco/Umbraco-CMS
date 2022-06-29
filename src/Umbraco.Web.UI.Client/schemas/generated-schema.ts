@@ -55,7 +55,7 @@ export interface components {
       displayName: string;
       defaultDatabaseName: string;
       providerName: string | null;
-      isAvailable: boolean;
+      isConfigured: boolean;
       requiresServer: boolean;
       serverPlaceholder: string | null;
       requiresCredentials: boolean;

@@ -89,7 +89,7 @@ export interface InstallDatabaseModel {
   displayName: string;
   defaultDatabaseName: string;
   providerName: null | string;
-  isAvailable: boolean;
+  isConfigured: boolean;
   requiresServer: boolean;
   serverPlaceholder: null | string;
   requiresCredentials: boolean;
