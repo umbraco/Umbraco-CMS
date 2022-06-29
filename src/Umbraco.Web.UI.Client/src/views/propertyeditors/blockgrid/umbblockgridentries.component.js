@@ -103,7 +103,7 @@
 
                 //dataIdAttr: 'data-element-udi', // HTML attribute that is used by the `toArray()` method
 
-                //ghostClass: "umb-block-grid__layout-item-placeholder umb-block-grid__layout-item",  // Class name for the drop placeholder
+                ghostClass: "umb-block-grid__layout-item-placeholder",  // Class name for the drop placeholder
                 //chosenClass: "sortable-chosen",  // Class name for the chosen item
                 //dragClass: "sortable-drag",  // Class name for the dragging item
 
