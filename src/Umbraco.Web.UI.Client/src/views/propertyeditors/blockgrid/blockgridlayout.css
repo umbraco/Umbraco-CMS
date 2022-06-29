@@ -43,9 +43,17 @@
     grid-column-start: 1;
 }
 
-.umb-block-grid__layout-item[data-elementTypeAlias='firthyFirthyLayoutBlock'] {
-    
+/*
+.umb-block-grid__layout-item[data-content-element-type-alias='feature'] {
+    border: 1px solid red;
 }
+*/
+
+/*
+.umb-block-grid__layout-item[data-content-property-hideOnMobile='True'] {
+    display:none;
+}
+*/
 
 /*
 .umb-block-grid__layout-item[data-col-span='4'] {
