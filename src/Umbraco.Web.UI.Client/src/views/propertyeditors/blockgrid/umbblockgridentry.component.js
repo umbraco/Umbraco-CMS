@@ -8,10 +8,11 @@
      * @param {number[]} weights - array of numbers each representing the weight/length.
      * @returns {number} - the index of the weight that contains the accumulated value
      */
+    /*
     function getIndexOfPositionInWeightMap(position, weights) {
         let i = 0, len = weights.length, calc = 0;
         while(i<len) {
-            if(position <= calc) {
+            if(position < calc) {
                 return i;
             }
 
@@ -20,9 +21,37 @@
         }
         return i;
     }
+    */
+    function getIndexOfPositionInWeightMap(target, weights) {
+        const map = [0];
+        weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
+        const foundValue = map.reduce((a, b) => {
+            let aDiff = Math.abs(a - target);
+            let bDiff = Math.abs(b - target);
+    
+            if (aDiff === bDiff) {
+                return a < b ? a : b;
+            } else {
+                return bDiff < aDiff ? b : a;
+            }
+        })
+        const foundIndex = map.indexOf(foundValue);
+        const targetDiff = (target-foundValue);
+        let interpolatedIndex = foundIndex;
+        if (targetDiff < 0 && foundIndex === 0) {
+            // Don't adjust.
+        } else if (targetDiff > 0 && foundIndex === map.length-1) {
+            // Don't adjust.
+        } else {
+            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];// take negative value into account..
+            interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
+        }
+        console.log('find index of ', target, targetDiff, ' -> ', interpolatedIndex, ' ==> ', foundIndex, map);
+        return interpolatedIndex;
+    }
 
     function getAccumulatedValueOfIndex(index, weights) {
-        let i = 0, len = index, calc = 0;
+        let i = 0, len = Math.min(index, weights.length), calc = 0;
         while(i<len) {
             calc += weights[i++];
         }
@@ -34,7 +63,7 @@
             let aDiff = Math.abs(a.columnSpan - target);
             let bDiff = Math.abs(b.columnSpan - target);
     
-            if (aDiff == bDiff) {
+            if (aDiff === bDiff) {
                 return a.columnSpan < b.columnSpan ? a : b;
             } else {
                 return bDiff < aDiff ? b : a;
@@ -75,22 +104,45 @@
         let gridColumns = null;
         let gridRows = null;
         let scaleBoxEl = null;
+        let scaleBoxBackdropEl = null;
 
 
         function getNewSpans(startX, startY, endX, endY) {
 
-            const blockStartCol = getIndexOfPositionInWeightMap(startX, gridColumns);
-            const blockStartRow = getIndexOfPositionInWeightMap(startY, gridRows);
+            const blockStartCol = Math.round(getIndexOfPositionInWeightMap(startX, gridColumns));
+            const blockStartRow = Math.round(getIndexOfPositionInWeightMap(startY, gridRows));
             const blockEndCol = getIndexOfPositionInWeightMap(endX, gridColumns);
             const blockEndRow = getIndexOfPositionInWeightMap(endY, gridRows);
 
             let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
+            console.log('newColumnSpan:', newColumnSpan)
             // Find nearest allowed Column:
-            newColumnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
+            newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
 
-            const newRowSpan = Math.max(blockEndRow-blockStartRow, 0);
+            const newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, 1));
 
             return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan, 'startCol': blockStartCol, 'startRow': blockStartRow};
+        }
+
+        function updateGridLayoutData() {
+
+            const computedStyles = window.getComputedStyle(layoutContainer);
+
+            gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
+            gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
+
+            // remove empties:
+            if(gridColumns[gridColumns.length-1] === 0) {
+                gridColumns.pop();
+            }
+            if(gridRows[gridRows.length-1] === 0) {
+                gridRows.pop();
+            }
+
+            // Add extra options for the ability to extend beyond current content:
+            gridRows.push(100);
+            gridRows.push(100);
+            gridRows.push(100);
         }
 
         vm.scaleHandlerMouseDown = function($event) {
@@ -106,26 +158,20 @@
                 console.error($element[0], 'could not find parent layout-container');
             }
 
-            const computedStyles = window.getComputedStyle(layoutContainer);
+            updateGridLayoutData();
 
-            gridColumns = computedStyles.gridTemplateColumns.trim().split("px").map(x => Number(x));
-            gridRows = computedStyles.gridTemplateRows.trim().split("px").map(x => Number(x));
-
-            if(gridColumns[gridColumns.length-1] === 0) {
-                gridColumns.pop();
-            }
-            console.log(gridColumns)
-
-            gridRows.push(100);
-            gridRows.push(100);
-            gridRows.push(100);
+            scaleBoxBackdropEl = document.createElement('div');
+            scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
+            layoutContainer.appendChild(scaleBoxBackdropEl);
 
             scaleBoxEl = document.createElement('div');
             scaleBoxEl.className = 'umb-block-grid__scalebox';
 
-            $element[0].appendChild(scaleBoxEl);
+            const scaleBoxScaleHandler = document.createElement('button');
+            scaleBoxScaleHandler.className = 'umb-block-grid__scale-handler';
+            scaleBoxEl.appendChild(scaleBoxScaleHandler);
 
-            console.log(scaleBoxEl)
+            $element[0].appendChild(scaleBoxEl);
 
             // ensure all columns are there.
             // add a few extra rows, so there is something to extend too.
@@ -137,6 +183,8 @@
         }
         vm.onMouseMove = function(e) {
 
+            updateGridLayoutData();
+
             console.log('--------')
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
@@ -145,11 +193,12 @@
             const startY = layoutItemRect.top - layoutContainerRect.top;
             const endX = e.offsetX;
             const endY = e.offsetY;
-            console.log(endY-startY)
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
             const endCol = newSpans.startCol + newSpans.columnSpan;
             const endRow = newSpans.startRow + newSpans.rowSpan;
+
+            console.log('newSpans', newSpans)
 
 
             const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
@@ -157,15 +206,14 @@
             const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
             const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
-            console.log(gridColumns)
-            console.log(gridRows)
-            console.log('startCellX', startCellX, newSpans.startCol)
-            console.log('endCellX', endCellX, endCol)
-            console.log('endRow', endCellY, endRow)
-
             scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
             scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
             
+            // update as we go:
+            vm.layoutEntry.columnSpan = newSpans.columnSpan;
+            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+
+            $scope.$evalAsync();
         }
 
         vm.onMouseUp = function(e) {
@@ -181,13 +229,16 @@
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
             vm.layoutEntry.columnSpan = newSpans.columnSpan;
-            vm.layoutEntry.rowSpan = Math.max(newSpans.rowSpan, 1);
+            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+
+            $scope.$evalAsync();
 
             // Remove listeners:
             window.removeEventListener('mousemove', vm.onMouseMove);
             window.removeEventListener('mouseup', vm.onMouseUp);
             window.removeEventListener('mouseleave', vm.onMouseUp);
 
+            layoutContainer.removeChild(scaleBoxBackdropEl);
             $element[0].removeChild(scaleBoxEl);
 
             // Clean up variables:
@@ -195,6 +246,7 @@
             gridColumns = null;
             gridRows = null;
             scaleBoxEl = null;
+            scaleBoxBackdropEl = null;
         }
 
 
