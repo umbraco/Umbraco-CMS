@@ -152,8 +152,8 @@
 
             const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
             const startCellY =  getAccumulatedValueOfIndex(newSpans.startRow, gridRows);
-            const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns) + gridColumns[endCol];
-            const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows) + gridRows[endRow];
+            const endCellX =  getAccumulatedValueOfIndex(endCol, gridColumns);
+            const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
             console.log(gridColumns)
             console.log('startCellX', startCellX, newSpans.startCol)
