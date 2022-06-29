@@ -115,7 +115,6 @@
             const blockEndRow = getIndexOfPositionInWeightMap(endY, gridRows);
 
             let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
-            console.log('newColumnSpan:', newColumnSpan)
             // Find nearest allowed Column:
             newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
 
@@ -185,7 +184,6 @@
 
             updateGridLayoutData();
 
-            console.log('--------')
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
 
@@ -197,8 +195,6 @@
             const newSpans = getNewSpans(startX, startY, endX, endY);
             const endCol = newSpans.startCol + newSpans.columnSpan;
             const endRow = newSpans.startRow + newSpans.rowSpan;
-
-            console.log('newSpans', newSpans)
 
 
             const startCellX =  getAccumulatedValueOfIndex(newSpans.startCol, gridColumns);
@@ -228,11 +224,6 @@
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
-            vm.layoutEntry.columnSpan = newSpans.columnSpan;
-            vm.layoutEntry.rowSpan = newSpans.rowSpan;
-
-            $scope.$evalAsync();
-
             // Remove listeners:
             window.removeEventListener('mousemove', vm.onMouseMove);
             window.removeEventListener('mouseup', vm.onMouseUp);
@@ -247,6 +238,11 @@
             gridRows = null;
             scaleBoxEl = null;
             scaleBoxBackdropEl = null;
+
+            // Update block size:
+            vm.layoutEntry.columnSpan = newSpans.columnSpan;
+            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+            $scope.$evalAsync();
         }
 
 
