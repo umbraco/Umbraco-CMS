@@ -1,6 +1,6 @@
-<div class="umb-block-list-block-configuration-overlay" ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationOverlayController as vm">
+<div class="umb-block-grid-block-configuration-overlay" ng-controller="Umbraco.PropertyEditors.BlockGrid.BlockConfigurationOverlayController as vm">
 
-    <form novalidate name="blockListBlockConfigurationForm" val-form-manager>
+    <form novalidate name="blockGridBlockConfigurationForm" val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
 
@@ -13,7 +13,7 @@
             </umb-editor-header>
 
             <umb-editor-container>
-                <div class="form-vertical umb-block-list-block-configuration-layout">
+                <div class="form-vertical umb-block-grid-block-configuration-layout">
 
                     <div class="umb-group-panel">
 
@@ -237,6 +237,20 @@
 
                         </div>
 
+                    </div>
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_TODO">Block areas</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            Hello world
+
+                        </div>
+                    
                     </div>
 
                     <div class="umb-group-panel">
