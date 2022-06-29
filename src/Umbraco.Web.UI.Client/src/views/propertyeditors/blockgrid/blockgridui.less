@@ -354,10 +354,34 @@ umb-block-grid-block {
 
 .umb-block-grid__layout-item-placeholder {
     background: transparent;
-    border: 1px dashed grey;
     border-radius: 3px;
     min-height: 100px;
     min-width: 100px;
+
+    border: @blueDark solid 1px;
+    border-radius: 3px;
+}
+.umb-block-grid__layout-item-placeholder::before {
+    content: '';
+    position:absolute;
+    z-index:1;
+    inset: 0;
+    border-radius: 3px;
+    background-color: white;
+}
+.umb-block-grid__layout-item-placeholder::after {
+    content: '';
+    position:absolute;
+    z-index:1;
+    inset: 0;
+    border-radius: 3px;
+
+    transition: background-color 240ms ease-in;
+    animation: umb-block-grid__placeholder__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__placeholder__pulse {
+        0%   { background-color: rgba(@blueMidLight, 0.33); }
+        100% { background-color: rgba(@blueMidLight, 0.22); }
+    }
 }
 
 
