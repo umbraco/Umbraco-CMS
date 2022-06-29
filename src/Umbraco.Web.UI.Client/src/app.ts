@@ -10,6 +10,7 @@ import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
 import { ServerStatus } from './core/models';
 import { internalManifests } from './temp-internal-manifests';
+import { IRoute } from 'router-slot/model';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -23,7 +24,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
   `;
 
   @state()
-  private _routes = [
+  private _routes: IRoute[] = [
     {
       path: 'login',
       component: () => import('./auth/login/login.element'),
@@ -35,10 +36,12 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
     {
       path: 'upgrade',
       component: () => import('./upgrader/upgrader.element'),
+      guards: [this._isAuthorizedGuard.bind(this)],
     },
     {
       path: '**',
       component: () => import('./backoffice/backoffice.element'),
+      guards: [this._isAuthorizedGuard.bind(this)],
     },
   ];
 
@@ -77,25 +80,31 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
         break;
 
       case 'must-upgrade':
-        if (this._isAuthorized()) {
-          history.replaceState(null, '', '/upgrade');
-        } else {
-          history.replaceState(null, '', '/login');
-        }
+        history.replaceState(null, '', '/upgrade');
         break;
 
-      case 'running':
-        if (this._isAuthorized()) {
-          history.replaceState(null, '', window.location.pathname);
-        } else {
-          history.replaceState(null, '', '/login');
-        }
+      case 'running': {
+        const pathname =
+          window.location.pathname === '/install' || window.location.pathname === '/upgrade'
+            ? '/'
+            : window.location.pathname;
+        history.replaceState(null, '', pathname);
         break;
+      }
     }
   }
 
   private _isAuthorized(): boolean {
     return sessionStorage.getItem('is-authenticated') === 'true';
+  }
+
+  private _isAuthorizedGuard(): boolean {
+    if (this._isAuthorized()) {
+      return true;
+    }
+
+    history.replaceState(null, '', '/login');
+    return false;
   }
 
   private async _registerExtensionManifestsFromServer() {
