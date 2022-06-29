@@ -1,8 +1,7 @@
-﻿namespace Umbraco.Cms.Core.WebAssets
+namespace Umbraco.Cms.Core.WebAssets;
+
+public enum AssetType
 {
-    public enum AssetType
-    {
-        Javascript,
-        Css
-    }
+    Javascript,
+    Css,
 }

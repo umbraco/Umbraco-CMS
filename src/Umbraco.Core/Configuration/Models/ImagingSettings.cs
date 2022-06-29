@@ -1,27 +1,26 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models;
+
+/// <summary>
+/// Typed configuration options for imaging settings.
+/// </summary>
+[UmbracoOptions(Constants.Configuration.ConfigImaging)]
+public class ImagingSettings
 {
     /// <summary>
-    /// Typed configuration options for imaging settings.
+    /// Gets or sets a value for the Hash-based Message Authentication Code (HMAC) secret key for request authentication.
     /// </summary>
-    [UmbracoOptions(Constants.Configuration.ConfigImaging)]
-    public class ImagingSettings
-    {
-        /// <summary>
-        /// Gets or sets a value for the Hash-based Message Authentication Code (HMAC) secret key for request authentication.
-        /// </summary>
-        public byte[]? HMACSecretKey { get; set; }
+    public byte[]? HMACSecretKey { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value for imaging cache settings.
-        /// </summary>
-        public ImagingCacheSettings Cache { get; set; } = new ImagingCacheSettings();
+    /// <summary>
+    /// Gets or sets a value for imaging cache settings.
+    /// </summary>
+    public ImagingCacheSettings Cache { get; set; } = new ImagingCacheSettings();
 
-        /// <summary>
-        /// Gets or sets a value for imaging resize settings.
-        /// </summary>
-        public ImagingResizeSettings Resize { get; set; } = new ImagingResizeSettings();
-    }
+    /// <summary>
+    ///     Gets or sets a value for imaging resize settings.
+    /// </summary>
+    public ImagingResizeSettings Resize { get; set; } = new();
 }

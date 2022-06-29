@@ -338,7 +338,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
         var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()?
+        builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
             .Add(umbracoApiControllerTypes);
 
         builder.Services.AddSingleton<UmbracoRequestLoggingMiddleware>();

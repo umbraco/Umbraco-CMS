@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json.schemastore.org/template",
+  "$schema": "https://json.schemastore.org/template.json",
   "author": "Umbraco HQ",
   "classifications": [
     "Web",
@@ -7,7 +7,7 @@
     "Umbraco"
   ],
   "name": "Umbraco Project",
-  "description": "An empty Umbraco project ready to get started",
+  "description": "An empty Umbraco project ready to get started.",
   "groupIdentity": "Umbraco.Templates.UmbracoProject",
   "identity": "Umbraco.Templates.UmbracoProject.CSharp",
   "shortName": "umbraco",
@@ -18,6 +18,18 @@
   "sourceName": "UmbracoProject",
   "defaultName": "UmbracoProject1",
   "preferNameDirectory": true,
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(ExcludeGitignore)",
+          "exclude": [
+            ".gitignore"
+          ]
+        }
+      ]
+    }
+  ],
   "symbols": {
     "Framework": {
       "displayName": "Framework",
@@ -56,187 +68,173 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "UnattendedUserName": {
-      "displayName": "Unattended user name",
-      "description": "Used to specify the name of the default admin user when using unattended install (stored as plain text).",
+    "ExcludeGitignore": {
+      "displayName": "Exclude .gitignore",
+      "description": "Whether to exclude .gitignore from the generated template.",
       "type": "parameter",
-      "datatype": "string",
-      "defaultValue": ""
+      "datatype": "bool",
+      "defaultValue": "false"
     },
-    "UnattendedUserNameReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserName",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
-        ]
-      },
-      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
-    },
-    "UnattendedUserEmail": {
-      "displayName": "Unattended user email",
-      "description": "Used to specify the email of the default admin user when using unattended install (stored as plain text).",
+    "MinimalGitignore": {
+      "displayName": "Minimal .gitignore",
+      "description": "Whether to only include minimal (Umbraco specific) rules in the .gitignore.",
       "type": "parameter",
-      "datatype": "string",
-      "defaultValue": ""
-    },
-    "UnattendedUserEmailReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserEmail",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
-        ]
-      },
-      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
-    },
-    "UnattendedUserPassword": {
-      "displayName": "Unattended user password",
-      "description": "Used to specify the password of the default admin user when using unattended install (stored as plain text).",
-      "type": "parameter",
-      "datatype": "string",
-      "defaultValue": ""
-    },
-    "UnattendedUserPasswordReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "UnattendedUserPassword",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
-        ]
-      },
-      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
+      "datatype": "bool",
+      "defaultValue": "false"
     },
     "ConnectionString": {
       "displayName": "Connection string",
       "description": "Database connection string used by Umbraco.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "ConnectionStringReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "ConnectionString",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "CONNECTION_STRING_FROM_TEMPLATE"
     },
+    "ConnectionStringProviderName": {
+      "displayName": "Connection string provider name",
+      "description": "Database connection string provider name used by Umbraco.",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "Microsoft.Data.SqlClient",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "CONNECTION_STRING_PROVIDER_NAME_FROM_TEMPLATE"
+    },
     "HasConnectionString": {
       "type": "computed",
-      "value": "(ConnectionString != \"\")"
+      "value": "(ConnectionString != '')"
+    },
+    "DevelopmentDatabaseType": {
+      "displayName": "Development database type",
+      "description": "Database type used by Umbraco for development.",
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "displayName": "None",
+          "description": "Do not configure a database for development.",
+          "choice": "None"
+        },
+        {
+          "displayName": "SQLite",
+          "description": "Use embedded SQLite database.",
+          "choice": "SQLite"
+        },
+        {
+          "displayName": "SQL Server Express LocalDB",
+          "description": "Use embedded LocalDB database (requires SQL Server Express with Advanced Services).",
+          "choice": "LocalDB"
+        }
+      ],
+      "defaultValue": "None"
+    },
+    "DevelopmentConnectionString": {
+      "type": "generated",
+      "datatype": "string",
+      "generator": "switch",
+      "parameters": {
+        "cases": [
+          {
+            "condition": "(DevelopmentDatabaseType == 'SQLite')",
+            "value": "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
+          },
+          {
+            "condition": "(DevelopmentDatabaseType == 'LocalDB')",
+            "value": "Data Source=(localdb)\\\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\\\Umbraco.mdf;Integrated Security=True"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_DEVELOPMENT_FROM_TEMPLATE"
+    },
+    "DevelopmentConnectionStringProviderName": {
+      "type": "generated",
+      "datatype": "string",
+      "generator": "switch",
+      "parameters": {
+        "cases": [
+          {
+            "condition": "(DevelopmentDatabaseType == 'SQLite')",
+            "value": "Microsoft.Data.SQLite"
+          },
+          {
+            "condition": "(true)",
+            "value": "Microsoft.Data.SqlClient"
+          }
+        ]
+      },
+      "replaces": "CONNECTION_STRING_PROVIDER_NAME_DEVELOPMENT_FROM_TEMPLATE"
+    },
+    "HasDevelopmentConnectionString": {
+      "type": "computed",
+      "value": "(DevelopmentConnectionString != '')"
+    },
+    "UnattendedUserName": {
+      "displayName": "Unattended user name",
+      "description": "Used to specify the name of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_NAME_FROM_TEMPLATE"
+    },
+    "UnattendedUserEmail": {
+      "displayName": "Unattended user email",
+      "description": "Used to specify the email of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_EMAIL_FROM_TEMPLATE"
+    },
+    "UnattendedUserPassword": {
+      "displayName": "Unattended user password",
+      "description": "Used to specify the password of the default admin user when using unattended install on development (stored as plain text).",
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
+        ]
+      },
+      "replaces": "UNATTENDED_USER_PASSWORD_FROM_TEMPLATE"
     },
     "UsingUnattenedInstall": {
       "type": "computed",
-      "value": "(UnattendedUserName != \"\" && UnattendedUserEmail != \"\" && UnattendedUserPassword != \"\" && ConnectionString != \"\")"
+      "value": "(UnattendedUserName != '' && UnattendedUserEmail != '' && UnattendedUserPassword != '' && (HasConnectionString || HasDevelopmentConnectionString))"
     },
     "NoNodesViewPath": {
       "displayName": "No nodes view path",
-      "description": "Path to a custom view presented with the Umbraco installation contains no published content",
+      "description": "Path to a custom view presented with the Umbraco installation contains no published content.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": ""
-    },
-    "NoNodesViewPathReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "NoNodesViewPath",
-        "steps": [
-          {
-            "regex": "\\\\",
-            "replacement": "\\\\"
-          },
-          {
-            "regex": "\\\"",
-            "replacement": "\\\""
-          },
-          {
-            "regex": "\\\n",
-            "replacement": "\\\n"
-          },
-          {
-            "regex": "\\\t",
-            "replacement": "\\\t"
-          }
+      "defaultValue": "",
+      "forms": {
+        "global": [
+          "jsonEncode"
         ]
       },
       "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE"
     },
     "HasNoNodesViewPath": {
       "type": "computed",
-      "value": "(NoNodesViewPath != \"\")"
+      "value": "(NoNodesViewPath != '')"
     },
     "PackageProjectName": {
       "displayName": "Umbraco package project name",
@@ -246,27 +244,10 @@
       "defaultValue": "",
       "replaces": "PACKAGE_PROJECT_NAME_FROM_TEMPLATE"
     },
-    "NamespaceReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": "_"
-          },
-          {
-            "regex": "-",
-            "replacement": "_"
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": "_"
-          }
-        ]
-      },
+    "Namespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
       "replaces": "Umbraco.Cms.Web.UI"
     },
     "HttpPort": {

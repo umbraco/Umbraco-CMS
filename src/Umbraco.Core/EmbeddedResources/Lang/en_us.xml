@@ -662,6 +662,7 @@
     <key alias="folderWasRenamed">%0% was renamed to %1%</key>
   </area>
   <area alias="editdatatype">
+    <key alias="canChangePropertyEditorHelp">Changing a property editor on a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
     <key alias="addPrevalue">Add prevalue</key>
     <key alias="dataBaseDatatype">Database datatype</key>
     <key alias="guid">Property editor GUID</key>
@@ -1061,7 +1062,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="login">
     <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
+    <key alias="greeting1">Happy marvelous Monday</key>
     <key alias="greeting2">Happy tubular Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
     <key alias="greeting4">Happy thunderous Thursday</key>
@@ -1450,6 +1451,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabClipboard">Clipboard</key>
     <key alias="notAllowed">Not allowed</key>
     <key alias="openMediaPicker">Open media picker</key>
+  </area>
+  <area alias="propertyEditorPicker">
+    <key alias="title">Select Property Editor</key>
+    <key alias="openPropertyEditorPicker">Select Property Editor</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -1925,6 +1930,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
+    <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2802,6 +2808,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       will no longer be available and will be shown as unsupported content.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Configuration of '%0%']]></key>
+    <key alias="elementTypeDoesNotExist">Cannot be edited cause ElementType does not exist.</key>
     <key alias="thumbnail">Thumbnail</key>
     <key alias="addThumbnail">Add thumbnail</key>
     <key alias="tabCreateEmpty">Create empty</key>
@@ -2885,7 +2892,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="basicLevelDescription">We will send an anonymized site ID, umbraco version, and packages installed</key>
     <key alias="detailedLevelDescription">
       <![CDATA[
-      <br> We will send:
+          We will send:
           <br>- Anonymized site ID, umbraco version, and packages installed.
           <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
           <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.

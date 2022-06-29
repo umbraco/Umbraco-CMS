@@ -1,20 +1,19 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+[DataContract]
+public class UserTwoFactorProviderModel
 {
-    [DataContract]
-    public class UserTwoFactorProviderModel
+    public UserTwoFactorProviderModel(string providerName, bool isEnabledOnUser)
     {
-        public UserTwoFactorProviderModel(string providerName, bool isEnabledOnUser)
-        {
-            ProviderName = providerName;
-            IsEnabledOnUser = isEnabledOnUser;
-        }
-
-        [DataMember(Name = "providerName")]
-        public string ProviderName { get; }
-
-        [DataMember(Name = "isEnabledOnUser")]
-        public bool IsEnabledOnUser { get; }
+        ProviderName = providerName;
+        IsEnabledOnUser = isEnabledOnUser;
     }
+
+    [DataMember(Name = "providerName")]
+    public string ProviderName { get; }
+
+    [DataMember(Name = "isEnabledOnUser")]
+    public bool IsEnabledOnUser { get; }
 }
