@@ -790,6 +790,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 changedCols.Add("passwordConfig");
             }
 
+            if (entity.IsPropertyDirty("EmailConfirmedDate"))
+            {
+                changedCols.Add("emailConfirmedDate");
+            }
+
             // If userlogin or the email has changed then need to reset security stamp
             if (changedCols.Contains("Email") || changedCols.Contains("LoginName"))
             {
