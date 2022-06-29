@@ -33,6 +33,10 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
       component: () => import('./installer/installer.element'),
     },
     {
+      path: 'upgrade',
+      component: () => import('./upgrader/upgrader.element'),
+    },
+    {
       path: '**',
       component: () => import('./backoffice/backoffice.element'),
     },
