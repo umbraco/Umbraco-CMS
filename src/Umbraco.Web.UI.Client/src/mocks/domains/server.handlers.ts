@@ -8,7 +8,7 @@ export const handlers = [
       // Respond with a 200 status code
       ctx.status(200),
       ctx.json<StatusResponse>({
-        installed: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false',
+        serverStatus: import.meta.env.VITE_UMBRACO_INSTALL_STATUS !== 'false' ? 'must-install' : 'running',
       })
     );
   }),

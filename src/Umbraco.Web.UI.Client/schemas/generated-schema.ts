@@ -95,8 +95,10 @@ export interface components {
     InstallValidateDatabaseRequest: {
       database: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
+    /** @enum {string} */
+    ServerStatus: "running" | "must-install" | "must-upgrade";
     StatusResponse: {
-      installed: boolean;
+      serverStatus: components["schemas"]["ServerStatus"];
     };
     VersionResponse: {
       version: string;

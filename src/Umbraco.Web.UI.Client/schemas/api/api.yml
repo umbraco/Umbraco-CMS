@@ -311,13 +311,19 @@ components:
           $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
       required:
         - database
+    ServerStatus:
+      type: string
+      enum:
+        - running
+        - must-install
+        - must-upgrade
     StatusResponse:
       type: object
       properties:
-        installed:
-          type: boolean
+        serverStatus:
+          $ref: '#/components/schemas/ServerStatus'
       required:
-        - installed
+        - serverStatus
     VersionResponse:
       type: object
       properties:

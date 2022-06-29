@@ -13,6 +13,7 @@ export type UmbracoPerformInstallDatabaseConfiguration = components['schemas']['
 export type UmbracoInstallerDatabaseModel = components['schemas']['InstallDatabaseModel'];
 export type UmbracoInstallerUserModel = components['schemas']['InstallUserModel'];
 export type TelemetryModel = components['schemas']['TelemetryModel'];
+export type ServerStatus = components['schemas']['ServerStatus'];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type HTMLElementConstructor<T = HTMLElement> = new (...args: any[]) => T;

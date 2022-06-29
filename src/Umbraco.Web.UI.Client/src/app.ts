@@ -8,6 +8,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { getServerStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
+import { ServerStatus } from './core/models';
 import { internalManifests } from './temp-internal-manifests';
 
 @customElement('umb-app')
@@ -39,7 +40,7 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 
   private _extensionRegistry: UmbExtensionRegistry = new UmbExtensionRegistry();
   private _iconRegistry: UUIIconRegistryEssential = new UUIIconRegistryEssential();
-  private _isInstalled = false;
+  private _serverStatus: ServerStatus = 'running';
 
   constructor() {
     super();
@@ -59,22 +60,33 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
   private async _setInitStatus() {
     try {
       const { data } = await getServerStatus({});
-      this._isInstalled = data.installed;
+      this._serverStatus = data.serverStatus;
     } catch (error) {
       console.log(error);
     }
   }
 
   private _redirect() {
-    if (!this._isInstalled) {
-      history.pushState(null, '', '/install');
-      return;
-    }
+    switch (this._serverStatus) {
+      case 'must-install':
+        history.replaceState(null, '', '/install');
+        break;
 
-    if (this._isAuthorized()) {
-      history.pushState(null, '', window.location.pathname);
-    } else {
-      history.pushState(null, '', '/login');
+      case 'must-upgrade':
+        if (this._isAuthorized()) {
+          history.replaceState(null, '', '/upgrade');
+        } else {
+          history.replaceState(null, '', '/login');
+        }
+        break;
+
+      case 'running':
+        if (this._isAuthorized()) {
+          history.replaceState(null, '', window.location.pathname);
+        } else {
+          history.replaceState(null, '', '/login');
+        }
+        break;
     }
   }
 

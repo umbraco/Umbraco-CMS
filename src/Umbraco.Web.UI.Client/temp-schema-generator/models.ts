@@ -1,5 +1,7 @@
+export type ServerStatus = 'running' | 'must-install' | 'must-upgrade';
+
 export interface StatusResponse {
-  installed: boolean;
+  serverStatus: ServerStatus;
 }
 
 export interface VersionResponse {
