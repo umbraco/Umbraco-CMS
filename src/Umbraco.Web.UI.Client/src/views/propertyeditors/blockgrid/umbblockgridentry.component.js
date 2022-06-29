@@ -11,7 +11,7 @@
     function getIndexOfPositionInWeightMap(position, weights) {
         let i = 0, len = weights.length, calc = 0;
         while(i<len) {
-            if(position <= calc+weights[i]) {
+            if(position <= calc) {
                 return i;
             }
 
@@ -137,6 +137,7 @@
         }
         vm.onMouseMove = function(e) {
 
+            console.log('--------')
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
 
@@ -144,6 +145,7 @@
             const startY = layoutItemRect.top - layoutContainerRect.top;
             const endX = e.offsetX;
             const endY = e.offsetY;
+            console.log(endY-startY)
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
             const endCol = newSpans.startCol + newSpans.columnSpan;
@@ -156,10 +158,11 @@
             const endCellY =  getAccumulatedValueOfIndex(endRow, gridRows);
 
             console.log(gridColumns)
+            console.log(gridRows)
             console.log('startCellX', startCellX, newSpans.startCol)
             console.log('endCellX', endCellX, endCol)
-
             console.log('endRow', endCellY, endRow)
+
             scaleBoxEl.style.width = Math.round(endCellX-startCellX)+'px';
             scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
             
