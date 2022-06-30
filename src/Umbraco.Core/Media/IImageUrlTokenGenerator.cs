@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Umbraco.Cms.Core.Media
 {
     /// <summary>

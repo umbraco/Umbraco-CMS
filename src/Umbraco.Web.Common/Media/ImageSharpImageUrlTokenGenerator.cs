@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web;
+using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
@@ -61,31 +62,20 @@ namespace Umbraco.Cms.Web.Common.Media
                 return null;
             }
 
-            var queryString = QueryString.Create(StripCommands(commands));
+            QueryString queryString;
+            if (commands is not CommandCollection && _knownCommands.Value is IList<string> knownCommands)
+            {
+                // Commands are of type CommandCollection when validating the HMAC and already filtered, so optimize for that
+                queryString = QueryString.Create(commands.Where(x => knownCommands.Contains(x.Key)));
+            }
+            else
+            {
+                queryString = QueryString.Create(commands);
+            }
+
             string value = CaseHandlingUriBuilder.BuildRelative(_caseHandling, null, imageUrl, queryString);
 
             return ComputeImageUrlToken(value, _hmacSecretKey);
-        }
-
-        /// <summary>
-        /// Strips out any commands from being included in the image URL token.
-        /// </summary>
-        /// <param name="commands">The commands.</param>
-        /// <returns>
-        /// The commands used when generating and validating the image URL token.
-        /// </returns>
-        /// <remarks>
-        /// Unknown commands will already be removed by ImageSharp when generating the image URL token, so this ensures it's also done when validating.
-        /// This can be overwritten to strip out additional commands, enabling a way to whitelist specific commands.
-        /// </remarks>
-        protected virtual IEnumerable<KeyValuePair<string, string?>> StripCommands(IEnumerable<KeyValuePair<string, string?>> commands)
-        {
-            if (_knownCommands.Value is IList<string> knownCommands)
-            {
-                return commands.Where(x => knownCommands.Contains(x.Key));
-            }
-
-            return commands;
         }
 
         /// <summary>
