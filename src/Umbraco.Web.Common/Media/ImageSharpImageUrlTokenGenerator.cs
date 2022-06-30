@@ -1,48 +1,55 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web;
+using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Media;
 
 namespace Umbraco.Cms.Web.Common.Media
 {
     /// <summary>
-    /// Exposes a method that generates an image URL token for request authentication based .
+    /// Exposes a method that generates an image URL token for request authentication.
     /// </summary>
     /// <seealso cref="IImageUrlTokenGenerator" />
     public class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator
     {
         private readonly byte[]? _hmacSecretKey;
+        private readonly Lazy<IList<string>?> _knownCommands;
         private readonly CaseHandlingUriBuilder.CaseHandling _caseHandling;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlTokenGenerator" /> class.
         /// </summary>
         /// <param name="imagingSettings">The Umbraco imaging settings.</param>
-        public ImageSharpImageUrlTokenGenerator(IOptions<ImagingSettings> imagingSettings)
-            : this(imagingSettings.Value.HMACSecretKey, CaseHandlingUriBuilder.CaseHandling.LowerInvariant)
+        /// <param name="imageWebProcessors">"The image web processors to retrieve the known commands, used to strip out unsupported commands from the generated image URL token.</param>
+        public ImageSharpImageUrlTokenGenerator(IOptions<ImagingSettings> imagingSettings, Lazy<IEnumerable<IImageWebProcessor>> imageWebProcessors)
+            : this(imagingSettings.Value.HMACSecretKey, imageWebProcessors, CaseHandlingUriBuilder.CaseHandling.LowerInvariant)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlTokenGenerator" /> class.
         /// </summary>
         /// <param name="hmacSecretKey">The HMAC security key.</param>
+        /// <param name="knownCommands">"The known commands, used to strip out unsupported commands from the generated image URL token.</param>
         /// <remarks>
         /// This constructor is only used for testing.
         /// </remarks>
-        internal ImageSharpImageUrlTokenGenerator(byte[]? hmacSecretKey)
-            : this(hmacSecretKey, CaseHandlingUriBuilder.CaseHandling.LowerInvariant)
-        { }
+        internal ImageSharpImageUrlTokenGenerator(byte[]? hmacSecretKey, IList<string>? knownCommands = null)
+            : this(hmacSecretKey, null, CaseHandlingUriBuilder.CaseHandling.LowerInvariant)
+        {
+            _knownCommands = new Lazy<IList<string>?>(knownCommands);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlTokenGenerator" /> class.
         /// </summary>
         /// <param name="hmacSecretKey">The HMAC security key.</param>
+        /// <param name="imageWebProcessors">"The image web processors to retrieve the known commands, used to strip out unsupported commands from the generated image URL token.</param>
         /// <param name="caseHandling">Determines case handling for the result.</param>
-        protected ImageSharpImageUrlTokenGenerator(byte[]? hmacSecretKey, CaseHandlingUriBuilder.CaseHandling caseHandling)
+        protected ImageSharpImageUrlTokenGenerator(byte[]? hmacSecretKey, Lazy<IEnumerable<IImageWebProcessor>>? imageWebProcessors, CaseHandlingUriBuilder.CaseHandling caseHandling)
         {
             _hmacSecretKey = hmacSecretKey;
+            _knownCommands = new Lazy<IList<string>?>(() => imageWebProcessors?.Value.SelectMany(x => x.Commands).Distinct().ToList());
             _caseHandling = caseHandling;
         }
 
@@ -54,26 +61,32 @@ namespace Umbraco.Cms.Web.Common.Media
                 return null;
             }
 
-            QueryString queryString = CreateImageUrlTokenQueryString(commands);
+            var queryString = QueryString.Create(StripCommands(commands));
             string value = CaseHandlingUriBuilder.BuildRelative(_caseHandling, null, imageUrl, queryString);
 
             return ComputeImageUrlToken(value, _hmacSecretKey);
         }
 
         /// <summary>
-        /// Creates the query string that is included in the image URL token.
+        /// Strips out any commands from being included in the image URL token.
         /// </summary>
-        /// <param name="commands">The commands to include.</param>
+        /// <param name="commands">The commands.</param>
         /// <returns>
-        /// The query string.
+        /// The commands used when generating and validating the image URL token.
         /// </returns>
         /// <remarks>
-        /// The ImageSharp middleware computes the token using only known commands,
-        /// so if you've removed default processors or add unknown commands using the FurtherOptions,
-        /// you can use this method to filter out any unsupported/unknown commands.
+        /// Unknown commands will already be removed by ImageSharp when generating the image URL token, so this ensures it's also done when validating.
+        /// This can be overwritten to strip out additional commands, enabling a way to whitelist specific commands.
         /// </remarks>
-        protected virtual QueryString CreateImageUrlTokenQueryString(IEnumerable<KeyValuePair<string, string?>> commands)
-            => QueryString.Create(commands);
+        protected virtual IEnumerable<KeyValuePair<string, string?>> StripCommands(IEnumerable<KeyValuePair<string, string?>> commands)
+        {
+            if (_knownCommands.Value is IList<string> knownCommands)
+            {
+                return commands.Where(x => knownCommands.Contains(x.Key));
+            }
+
+            return commands;
+        }
 
         /// <summary>
         /// Computes the image URL token by hashing the <paramref name="value" /> using the specified <paramref name="secret" />.
@@ -83,6 +96,9 @@ namespace Umbraco.Cms.Web.Common.Media
         /// <returns>
         /// The computed image URL token.
         /// </returns>
+        /// <remarks>
+        /// This is used for both generating and validating the image URL token, therefore can be overwritten to change the hashing algorithm.
+        /// </remarks>
         protected virtual string ComputeImageUrlToken(string value, byte[] secret)
             => HMACUtilities.ComputeHMACSHA256(value, secret);
     }

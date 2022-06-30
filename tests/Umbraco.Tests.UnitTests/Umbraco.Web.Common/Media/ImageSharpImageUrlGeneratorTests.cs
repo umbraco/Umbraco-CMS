@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Media;
@@ -11,17 +12,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media;
 public class ImageSharpImageUrlGeneratorTests
 {
     private const string MediaPath = "/media/1005/img_0671.jpg";
-    private static readonly ImageUrlGenerationOptions.CropCoordinates s_crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
-    private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.96m, 0.80827067669172936m);
-    private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.4275m, 0.41m);
-    private static readonly ImageSharpImageUrlGenerator s_generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator((byte[])null));
+    private static readonly ImageUrlGenerationOptions.CropCoordinates _crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
+    private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.96m, 0.80827067669172936m);
+    private static readonly ImageUrlGenerationOptions.FocalPointPosition _focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.4275m, 0.41m);
+    private static readonly ImageSharpImageUrlGenerator _generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator((byte[])null));
 
     [Test]
     public void GetImageUrl_CropAliasTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            Crop = s_crop,
+            Crop = _crop,
             Width = 100,
             Height = 100,
         });
@@ -32,9 +33,9 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_WidthHeightTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            FocalPoint = s_focus1,
+            FocalPoint = _focus1,
             Width = 200,
             Height = 300,
         });
@@ -45,9 +46,9 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_FocalPointTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            FocalPoint = s_focus1,
+            FocalPoint = _focus1,
             Width = 100,
             Height = 100,
         });
@@ -58,9 +59,9 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlFurtherOptionsTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            FocalPoint = s_focus1,
+            FocalPoint = _focus1,
             Width = 200,
             Height = 300,
             FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff",
@@ -75,7 +76,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlNullOptionsTest()
     {
-        var urlString = s_generator.GetImageUrl(null);
+        var urlString = _generator.GetImageUrl(null);
         Assert.AreEqual(null, urlString);
     }
 
@@ -85,7 +86,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlNullTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null));
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(null));
         Assert.AreEqual(null, urlString);
     }
 
@@ -95,7 +96,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrlEmptyTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty));
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty));
         Assert.AreEqual(string.Empty, urlString);
     }
 
@@ -105,9 +106,9 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetBaseCropUrlFromModelTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(string.Empty)
         {
-            Crop = s_crop,
+            Crop = _crop,
             Width = 100,
             Height = 100,
         });
@@ -121,35 +122,35 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_SpecifiedCropModeTest()
     {
-        var urlStringMin = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlStringMin = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Min,
             Width = 300,
             Height = 150,
         });
 
-        var urlStringBoxPad = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlStringBoxPad = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.BoxPad,
             Width = 300,
             Height = 150,
         });
 
-        var urlStringPad = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlStringPad = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Pad,
             Width = 300,
             Height = 150,
         });
 
-        var urlStringMax = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlStringMax = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Max,
             Width = 300,
             Height = 150,
         });
 
-        var urlStringStretch = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlStringStretch = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Stretch,
             Width = 300,
@@ -169,7 +170,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_UploadTypeTest()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Crop,
             ImageCropAnchor = ImageCropAnchor.Center,
@@ -186,7 +187,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_PreferFocalPointCenter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             Width = 300,
             Height = 150,
@@ -201,9 +202,9 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPointIgnore()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
-            FocalPoint = s_focus2,
+            FocalPoint = _focus2,
             Width = 270,
             Height = 161,
         });
@@ -217,7 +218,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_WidthOnlyParameter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             Width = 200,
         });
@@ -231,7 +232,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_HeightOnlyParameter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             Height = 200,
         });
@@ -245,7 +246,7 @@ public class ImageSharpImageUrlGeneratorTests
     [Test]
     public void GetImageUrl_BackgroundColorParameter()
     {
-        var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
+        var urlString = _generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath)
         {
             ImageCropMode = ImageCropMode.Pad,
             Width = 400,
@@ -282,5 +283,44 @@ public class ImageSharpImageUrlGeneratorTests
         // But adding it again using FurtherOptions should include it (and produce the same HMAC as before)
         options.FurtherOptions = "height=400";
         Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=not-included-in-hmac", generator.GetImageUrl(options));
+    }
+
+    /// <summary>
+    /// Test to check result when using a HMAC security key and custom known commands.
+    /// </summary>
+    [Test]
+    public void GetImageUrl_HMACSecurityKeyKnownCommands()
+    {
+        var knownCommands = new List<string>()
+        {
+            "width",
+            "height",
+            "v" // The cache buster value is never included in the HMAC
+        };
+
+        var generator = new ImageSharpImageUrlGenerator(new string[0], new ImageSharpImageUrlTokenGenerator(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 }, knownCommands));
+        var options = new ImageUrlGenerationOptions(MediaPath)
+        {
+            Width = 400,
+            Height = 400,
+        };
+
+        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2", generator.GetImageUrl(options));
+
+        // CacheBusterValue isn't included in HMAC generation
+        options.CacheBusterValue = "never-included-in-hmac";
+        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=never-included-in-hmac", generator.GetImageUrl(options));
+
+        // Removing height should generate a different HMAC
+        options.Height = null;
+        Assert.AreEqual(MediaPath + "?width=400&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=never-included-in-hmac", generator.GetImageUrl(options));
+
+        // Adding an unknown command shouldn't chnage the HMAC
+        options.FurtherOptions = "whitelisted=whatever";
+        Assert.AreEqual(MediaPath + "?width=400&whitelisted=whatever&hmac=5bd24a05de5ea068533579863773ddac9269482ad515575be4aace7e9e50c88c&v=never-included-in-hmac", generator.GetImageUrl(options));
+
+        // But adding the height again using FurtherOptions should produce the same HMAC as before
+        options.FurtherOptions = "height=400";
+        Assert.AreEqual(MediaPath + "?width=400&height=400&hmac=6335195986da0663e23eaadfb9bb32d537375aaeec253aae66b8f4388506b4b2&v=never-included-in-hmac", generator.GetImageUrl(options));
     }
 }
