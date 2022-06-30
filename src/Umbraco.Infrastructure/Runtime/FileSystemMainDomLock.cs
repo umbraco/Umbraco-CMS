@@ -11,8 +11,7 @@ internal class FileSystemMainDomLock : IMainDomLock
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly string _lockFilePath;
     private readonly ILogger<FileSystemMainDomLock> _logger;
     private readonly string _releaseSignalFilePath;
@@ -28,7 +27,7 @@ internal class FileSystemMainDomLock : IMainDomLock
     {
         _logger = logger;
         _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings;
+        _globalSettings = globalSettings;
 
         var lockFileName = $"MainDom_{mainDomKeyGenerator.GenerateKey()}.lock";
         _lockFilePath = Path.Combine(hostingEnvironment.LocalTempPath, lockFileName);
@@ -44,7 +43,8 @@ internal class FileSystemMainDomLock : IMainDomLock
         {
             try
             {
-                Directory.CreateDirectory(_hostingEnvironment.LocalTempPath);_logger.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
+                Directory.CreateDirectory(_hostingEnvironment.LocalTempPath);
+                _logger.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
                 _lockFileStream = File.Open(_lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 DeleteLockReleaseSignalFile();
                 return Task.FromResult(true);
@@ -65,8 +65,7 @@ internal class FileSystemMainDomLock : IMainDomLock
                 _lockFileStream?.Close();
                 return Task.FromResult(false);
             }
-        }
-        while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
+        } while (stopwatch.ElapsedMilliseconds < millisecondsTimeout);
 
         return Task.FromResult(false);
     }
@@ -95,7 +94,8 @@ internal class FileSystemMainDomLock : IMainDomLock
     }
 
     public void CreateLockReleaseSignalFile() =>
-        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite | FileShare.Delete)
+        File.Open(_releaseSignalFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite,
+                FileShare.ReadWrite | FileShare.Delete)
             .Close();
 
     public void DeleteLockReleaseSignalFile() =>

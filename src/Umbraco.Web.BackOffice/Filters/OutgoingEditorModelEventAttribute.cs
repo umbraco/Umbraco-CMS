@@ -27,7 +27,7 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
 
     private class OutgoingEditorModelEventFilter : IActionFilter
     {
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;private readonly IUmbracoMapper _mapper;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IEventAggregator _eventAggregator;
         private readonly IUmbracoMapper _mapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
