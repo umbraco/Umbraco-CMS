@@ -103,6 +103,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<Core.Scoping.IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
 
             builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
+
+            builder.Services.AddSingleton<IAmbientScopeStack, AmbientScopeStack>();
         builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<IAmbientScopeStack>());
             builder.Services.AddSingleton<IAmbientScopeContextStack, AmbientScopeContextStack>();
 
