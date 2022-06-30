@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div class="umb-block-grid__wrapper" ng-style="vm.listWrapperStyles">
+    <div class="umb-block-grid__wrapper" ng-style="vm.editorWrapperStyles">
 
         <div ng-if="vm.loading !== true">
 
@@ -33,13 +33,5 @@
         
 
     </div>
-
-    <umb-overlay
-        ng-if="vm.blockTypePicker.show"
-        position="target"
-        size="vm.blockTypePicker.size"
-        view="vm.blockTypePicker.view"
-        model="vm.blockTypePicker">
-    </umb-overlay>
 
 </div>
