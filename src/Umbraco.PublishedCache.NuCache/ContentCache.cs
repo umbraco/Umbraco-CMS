@@ -90,7 +90,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         if ((!_globalSettings.ForceCombineUrlPathLeftToRight
              && CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
             {
-                parts.Reverse();
+                parts = parts.Reverse().ToArray();
             }if (startNodeId > 0)
         {
             // if in a domain then start with the root node of the domain
@@ -198,7 +198,8 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
             if ((_globalSettings.ForceCombineUrlPathLeftToRight
                  || !CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
             {
-        pathParts.Reverse();}
+                pathParts.Reverse();
+            }
         var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
 
         // prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
