@@ -35,6 +35,9 @@
                     "columnSpan": 12
                 }];
             })
+            $scope.model.value.forEach(block => {
+                block.areas = block.areas || [];
+            })
 
             loadElementTypes();
 
@@ -184,7 +187,9 @@
                 "editorSize": "medium",
                 "iconColor": null,
                 "backgroundColor": null,
-                "thumbnail": null
+                "thumbnail": null,
+                "areaGridColumns": null,
+                "areas": []
             };
 
             $scope.model.value.push(blockType);
