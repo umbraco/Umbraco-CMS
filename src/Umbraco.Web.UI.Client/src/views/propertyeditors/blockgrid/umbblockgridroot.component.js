@@ -41,7 +41,6 @@
                 </style>
                 <div class="umb-block-grid__root-container">
                     <umb-block-grid-entries
-                        class="sortablejs-tester"
                         block-editor-api="vm.blockEditorApi"
                         entries="vm.entries">
                     </umb-block-grid-entries>
