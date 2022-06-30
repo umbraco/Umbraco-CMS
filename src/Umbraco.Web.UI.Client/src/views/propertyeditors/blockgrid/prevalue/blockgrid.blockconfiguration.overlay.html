@@ -244,9 +244,6 @@
                         
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_TODO">Block areas</localize>
-                            <umb-property-info-button button-title-key="blockEditor_TODO">
-                                <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
-                            </umb-property-info-button>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -260,9 +257,19 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <umb-block-grid-area-editor model="vm.block.areas"></umb-block-grid-area-editor>
-
+                            
+                            <!-- areas -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Areas</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-block-grid-area-editor model="vm.block.areas"></umb-block-grid-area-editor>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     
                     </div>

@@ -101,9 +101,8 @@
         vm.areaGridStyles = {};
 
         vm.$onInit = function() {
-            console.log('--umb-block-grid--area-grid-columns', vm.layoutEntry.$block.areaGridColumns)
-            if(vm.layoutEntry.$block.areaGridColumns) {
-                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.areaGridColumns;
+            if(vm.layoutEntry.$block.config.areaGridColumns) {
+                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.config.areaGridColumns.toString();
                 $scope.$evalAsync();
             }
         }
