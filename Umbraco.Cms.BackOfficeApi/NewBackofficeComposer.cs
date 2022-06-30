@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.BackOfficeApi.Models.Mapping;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Cms.BackOfficeApi;
@@ -13,13 +15,15 @@ namespace Umbraco.Cms.BackOfficeApi;
 public class NewBackofficeComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
-    private const string ApiDefaultName = "Current";
     private const string ApiAllName = "All";
 
 
     public void Compose(IUmbracoBuilder builder)
     {
         IServiceCollection services = builder.Services;
+
+        builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
+            .Add<InstallMapDefinition>();
 
         services.AddApiVersioning(options =>
         {

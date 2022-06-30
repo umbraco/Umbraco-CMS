@@ -1,6 +1,7 @@
 ﻿using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.NewInstallSteps;
 
 namespace Umbraco.Cms.Core.Install.NewModels;
 

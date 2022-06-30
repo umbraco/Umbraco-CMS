@@ -3,8 +3,9 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Install.NewModels;
-using Umbraco.Cms.Infrastructure.Install.InstallSteps;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Extensions;
 
@@ -14,12 +15,14 @@ public class NewDatabaseConfigureStep : NewInstallSetupStep
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly DatabaseBuilder _databaseBuilder;
-    private readonly ILogger<DatabaseConfigureStep> _logger;
+    private readonly ILogger<NewDatabaseConfigureStep> _logger;
+    private readonly IUmbracoMapper _mapper;
 
     public NewDatabaseConfigureStep(
         DatabaseBuilder databaseBuilder,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
-        ILogger<DatabaseConfigureStep> logger)
+        ILogger<NewDatabaseConfigureStep> logger,
+        IUmbracoMapper mapper)
         : base(
             "DatabaseConfigure",
             30,
@@ -28,11 +31,14 @@ public class NewDatabaseConfigureStep : NewInstallSetupStep
         _databaseBuilder = databaseBuilder;
         _connectionStrings = connectionStrings;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public override Task ExecuteAsync(InstallData model)
     {
-        if (!_databaseBuilder.ConfigureDatabaseConnection(model.Database, false))
+        DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(model.Database)!;
+
+        if (!_databaseBuilder.ConfigureDatabaseConnection(databaseModel, false))
         {
             throw new InstallException("Could not connect to the database");
         }

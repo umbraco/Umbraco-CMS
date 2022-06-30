@@ -3,21 +3,17 @@ using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Install.Models;
+namespace Umbraco.Cms.BackOfficeApi.Models.ViewModels.Installer;
 
-[DataContract(Name = "installData")]
-public class InstallData
+public class InstallViewModel
 {
     [DataMember(Name = "user")]
     [Required]
-    public UserInstallData User { get; init; } = null!;
+    public UserInstallViewModel User { get; init; } = null!;
 
     [DataMember(Name = "database")]
     [Required]
-    public DatabaseModel Database { get; init; } = null!;
-
-    [DataMember(Name = "subscribeToNewsletter")]
-    public bool SubscribeToNewsletter { get; init; }
+    public DatabaseInstallViewModel Database { get; init; } = null!;
 
     [DataMember(Name = "telemetryLevel")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

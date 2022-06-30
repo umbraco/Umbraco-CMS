@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -103,7 +104,7 @@ public class NewNewInstallStep : NewInstallSetupStep
 
             _metricsConsentService.SetConsentLevel(model.TelemetryLevel);
 
-            if (model.SubscribeToNewsletter)
+            if (model.User.SubscribeToNewsletter)
             {
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
                 var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
