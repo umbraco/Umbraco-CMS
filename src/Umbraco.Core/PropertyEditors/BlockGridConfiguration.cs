@@ -21,7 +21,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public class BlockGridColumnSpanOption
             {
                 [DataMember(Name ="columnSpan")]
-                public int? Min { get; set; }
+                public int? ColumnSpan { get; set; }
+            }
+
+            [DataMember(Name ="areas")]
+            public BlockGridAreaConfiguration[] Areas { get; set; }  = null!;
+            [DataContract]
+            public class BlockGridAreaConfiguration
+            {
+                [DataMember(Name ="key")]
+                public Guid? Key { get; set; }
+
+                [DataMember(Name ="alias")]
+                public string? Alias { get; set; }
+                
+                [DataMember(Name ="columnSpan")]
+                public int? ColumnSpan { get; set; }
+
+                [DataMember(Name ="rowSpan")]
+                public int? RowSpan { get; set; }
+
             }
 
             [DataMember(Name ="backgroundColor")]
