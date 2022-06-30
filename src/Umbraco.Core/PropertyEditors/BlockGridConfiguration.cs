@@ -24,11 +24,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public int? ColumnSpan { get; set; }
             }
 
-            [ConfigurationField("areaGridColumns", "Area Grid Columns", "number", Description = "Set the number of columns for the areas layout")]
+            [DataMember(Name ="areaGridColumns")]
             public int? AreaGridColumns { get; set; }
 
             [DataMember(Name ="areas")]
             public BlockGridAreaConfiguration[] Areas { get; set; }  = null!;
+
             [DataContract]
             public class BlockGridAreaConfiguration
             {
