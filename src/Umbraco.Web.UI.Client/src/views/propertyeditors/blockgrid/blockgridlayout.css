@@ -4,7 +4,7 @@
 .umb-block-grid__layout-container {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1)), minmax(0, 1fr));
+    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
     /*
     Dev note, maybe this concept can be used for somethings:
     grid-template-columns: 
@@ -23,14 +23,19 @@
 .umb-block-grid__block-area-container {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(var(--umb-block-grid--grid-columns, 1), minmax(0, 1fr));
-    
+    /* overwrite grid-columns for the areas container: */
+    /* the overwrite of --umb-block-grid--grid-columns needs to be transfered to the next element to not overwrite it self.*/
+    --umb-block-grid--area-grid-columns--overwrite: var(--umb-block-grid--area-grid-columns, var(--umb-block-grid--item-column-span, 1));
+    grid-template-columns: repeat(var(--umb-block-grid--area-grid-columns--overwrite), minmax(0, 1fr));
     grid-gap: 0px;
     grid-auto-flow: row;
     grid-auto-rows: minmax(50px, auto);
 }
 .umb-block-grid__block-area {
-    grid-column: span var(--umb-block-grid--area-column-span, var(--umb-block-grid--grid-columns, 1));
+    /* overwrite grid-columns for the area: */
+    /* notice --umb-block-grid--grid-columns inherits to .umb-block-grid__layout-container to adjust for fitting in the Area*/
+    --umb-block-grid--grid-columns: var(--umb-block-grid--area-column-span, var(--umb-block-grid--area-grid-columns--overwrite, 1));
+    grid-column: span var(--umb-block-grid--area-column-span);
     grid-row: span var(--umb-block-grid--area-row-span, 1);
 }
 
