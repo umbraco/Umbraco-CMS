@@ -98,10 +98,10 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
 
-            vm.listWrapperStyles = {};
+            vm.editorWrapperStyles = {};
 
             if (vm.model.config.maxPropertyWidth) {
-                vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
+                vm.editorWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
             }
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
@@ -579,9 +579,7 @@
         vm.requestShowCreate = requestShowCreate;
         function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent) {
 
-            console.log("requestShowCreate")
-
-            if (vm.blockTypePicker) {
+            if (vm.blockTypePickerIsOpen === true) {
                 return;
             }
 
@@ -607,7 +605,7 @@
         vm.showCreateDialog = showCreateDialog;
         function showCreateDialog(parentBlock, areaKey, createIndex, openClipboard) {
 
-            if (vm.blockTypePicker) {
+            if (vm.blockTypePickerIsOpen === true) {
                 return;
             }
 
@@ -663,6 +661,7 @@
                     }
 
                     editorService.close();
+                    vm.blockTypePickerIsOpen = false;
                 }
             };
 
@@ -673,6 +672,7 @@
 
             blockPickerModel.clipboardItems = vm.clipboardItems;
 
+            vm.blockTypePickerIsOpen = true;
             // open block picker overlay
             editorService.open(blockPickerModel);
 
