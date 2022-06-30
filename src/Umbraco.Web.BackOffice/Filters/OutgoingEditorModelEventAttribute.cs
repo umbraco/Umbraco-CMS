@@ -27,7 +27,7 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
 
     private class OutgoingEditorModelEventFilter : IActionFilter
     {
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;private readonly IUmbracoMapper _mapper;
         private readonly IEventAggregator _eventAggregator;
         private readonly IUmbracoMapper _mapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -92,7 +92,8 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
                         case ContentItemDisplay content:
                             _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
                             break;
-                        case ContentItemDisplayWithSchedule contentWithSchedule:
+
+                            case ContentItemDisplayWithSchedule contentWithSchedule:
                             // This is a bit weird, since ContentItemDisplayWithSchedule was introduced later,
                             // the SendingContentNotification only accepts ContentItemDisplay,
                             // which means we have to map it to this before sending the notification.
@@ -112,27 +113,27 @@ internal sealed class OutgoingEditorModelEventAttribute : TypeFilterAttribute
                             _mapper.Map(display, contentWithSchedule, mapperContext => mapperContext.Items[nameof(contentWithSchedule.Variants)] = contentWithSchedule.Variants);
                             break;
                         case MediaItemDisplay media:
-                            _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
-                            break;
-                        case MemberDisplay member:
-                            _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
-                            break;
-                        case UserDisplay user:
-                            _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
-                            break;
-                        case IEnumerable<Tab<IDashboardSlim>> dashboards:
-                            _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
-                            break;
-                        case IEnumerable<ContentTypeBasic> allowedChildren:
-                            // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
-                            var notification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
-                            _eventAggregator.Publish(notification);
-                            context.Result = new ObjectResult(notification.Children);
-                            break;
+                                _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
+                                break;
+                            case MemberDisplay member:
+                                _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
+                                break;
+                            case UserDisplay user:
+                                _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
+                                break;
+                            case IEnumerable<Tab<IDashboardSlim>> dashboards:
+                                _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
+                                break;
+                            case IEnumerable<ContentTypeBasic> allowedChildren:
+                                // Changing the Enumerable will generate a new instance, so we need to update the context result with the new content
+                                var notification = new SendingAllowedChildrenNotification(allowedChildren, umbracoContext);
+                                _eventAggregator.Publish(notification);
+                                context.Result = new ObjectResult(notification.Children);
+                                break;
+                        }
                     }
                 }
             }
-        }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {

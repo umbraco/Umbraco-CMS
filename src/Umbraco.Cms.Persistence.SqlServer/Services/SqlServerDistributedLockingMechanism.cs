@@ -39,7 +39,7 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
     /// <inheritdoc />
     public bool Enabled => _connectionStrings.CurrentValue.IsConnectionStringConfigured() &&
-                           _connectionStrings.CurrentValue.ProviderName == Constants.ProviderName;
+                           string.Equals(_connectionStrings.CurrentValue.ProviderName,Constants.ProviderName, StringComparison.InvariantCultureIgnoreCase);
 
     /// <inheritdoc />
     public IDistributedLock ReadLock(int lockId, TimeSpan? obtainLockTimeout = null)

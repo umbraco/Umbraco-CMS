@@ -11,6 +11,7 @@ internal class FileSystemMainDomLock : IMainDomLock
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
     private readonly string _lockFilePath;
     private readonly ILogger<FileSystemMainDomLock> _logger;
