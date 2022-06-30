@@ -45,12 +45,9 @@ export class PostInstallValidateDatabase {
 }
 
 export interface InstallSetupRequest {
-  name: string;
-  email: string;
-  password: string;
-  subscribeToNewsletter: boolean;
+  user: InstallSetupUserConfiguration;
   telemetryLevel: ConsentLevel;
-  database: InstallSetupDatabaseConfiguration;
+  database?: InstallSetupDatabaseConfiguration;
 }
 
 export interface InstallValidateDatabaseRequest {
@@ -68,13 +65,20 @@ export interface InstallUserModel {
   consentLevels: TelemetryModel[];
 }
 
+export interface InstallSetupUserConfiguration {
+  name: string;
+  email: string;
+  password: string;
+  subscribeToNewsletter: boolean;
+}
+
 export interface InstallSetupDatabaseConfiguration {
   id?: string;
   server?: string | null;
   password?: string | null;
   username?: string | null;
-  databaseName?: string | null;
-  databaseType?: string | null;
+  name?: string | null;
+  providerName?: string | null;
   useIntegratedAuthentication?: boolean | null;
   connectionString?: string | null;
 }

@@ -258,6 +258,22 @@ components:
       required:
         - type
         - status
+    InstallSetupUserConfiguration:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        subscribeToNewsletter:
+          type: boolean
+      required:
+        - name
+        - email
+        - password
+        - subscribeToNewsletter
     InstallSetupDatabaseConfiguration:
       type: object
       properties:
@@ -272,10 +288,10 @@ components:
         username:
           type: string
           nullable: true
-        databaseName:
+        name:
           type: string
           nullable: true
-        databaseType:
+        providerName:
           type: string
           nullable: true
         useIntegratedAuthentication:
@@ -287,25 +303,15 @@ components:
     InstallSetupRequest:
       type: object
       properties:
-        name:
-          type: string
-        email:
-          type: string
-        password:
-          type: string
-        subscribeToNewsletter:
-          type: boolean
+        user:
+          $ref: '#/components/schemas/InstallSetupUserConfiguration'
         telemetryLevel:
           $ref: '#/components/schemas/ConsentLevel'
         database:
           $ref: '#/components/schemas/InstallSetupDatabaseConfiguration'
       required:
-        - name
-        - email
-        - password
-        - subscribeToNewsletter
+        - user
         - telemetryLevel
-        - database
     InstallValidateDatabaseRequest:
       type: object
       properties:
