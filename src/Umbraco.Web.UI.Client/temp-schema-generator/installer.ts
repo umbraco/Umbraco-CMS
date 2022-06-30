@@ -69,6 +69,7 @@ export interface InstallUserModel {
 }
 
 export interface InstallSetupDatabaseConfiguration {
+  id?: string;
   server?: string | null;
   password?: string | null;
   username?: string | null;

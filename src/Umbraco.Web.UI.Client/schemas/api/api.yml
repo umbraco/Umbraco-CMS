@@ -261,6 +261,8 @@ components:
     InstallSetupDatabaseConfiguration:
       type: object
       properties:
+        id:
+          type: string
         server:
           type: string
           nullable: true

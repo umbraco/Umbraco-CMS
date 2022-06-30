@@ -76,6 +76,7 @@ export interface components {
       errors?: { [key: string]: unknown };
     };
     InstallSetupDatabaseConfiguration: {
+      id?: string;
       server?: string | null;
       password?: string | null;
       username?: string | null;
