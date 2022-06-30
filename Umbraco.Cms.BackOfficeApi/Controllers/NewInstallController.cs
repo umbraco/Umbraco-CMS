@@ -35,15 +35,6 @@ public class NewInstallController : Controller
         _backOfficeSignInManager = backOfficeSignInManager;
     }
 
-    [HttpGet("ping")]
-    [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Ping()
-    {
-        return Ok("Pong");
-    }
-
     [HttpPost("setup")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
