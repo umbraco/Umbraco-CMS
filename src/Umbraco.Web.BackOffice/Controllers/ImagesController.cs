@@ -115,17 +115,17 @@ public class ImagesController : UmbracoAuthorizedApiController
     /// If there is no media, image property or image file is found then this will return not found.
     /// </remarks>
     public string? GetProcessedImageUrl(
-            string imagePath,
-            int? width = null,
-            int? height = null,
-            decimal? focalPointLeft = null,
-            decimal? focalPointTop = null,
-            ImageCropMode mode = ImageCropMode.Max,
-            string cacheBusterValue = "",
-            decimal? cropX1 = null,
-            decimal? cropX2 = null,
-            decimal? cropY1 = null,
-            decimal? cropY2 = null)
+        string imagePath,
+        int? width = null,
+        int? height = null,
+        decimal? focalPointLeft = null,
+        decimal? focalPointTop = null,
+        ImageCropMode mode = ImageCropMode.Max,
+        string cacheBusterValue = "", // TODO Change to: string? cacheBusterValue = null
+        decimal? cropX1 = null,
+        decimal? cropX2 = null,
+        decimal? cropY1 = null,
+        decimal? cropY2 = null)
     {
         var options = new ImageUrlGenerationOptions(imagePath)
         {
