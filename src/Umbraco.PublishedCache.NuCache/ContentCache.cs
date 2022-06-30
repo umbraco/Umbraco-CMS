@@ -89,9 +89,11 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
 
         if ((!_globalSettings.ForceCombineUrlPathLeftToRight
              && CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
-            {
-                parts = parts.Reverse().ToArray();
-            }if (startNodeId > 0)
+        {
+            parts = parts.Reverse().ToArray();
+        }
+
+        if (startNodeId > 0)
         {
             // if in a domain then start with the root node of the domain
             // and follow the path
@@ -195,11 +197,12 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         }
 
         // assemble the route- We only have to reverse for left to right languages
-            if ((_globalSettings.ForceCombineUrlPathLeftToRight
-                 || !CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
-            {
-                pathParts.Reverse();
-            }
+        if ((_globalSettings.ForceCombineUrlPathLeftToRight
+             || !CultureInfo.GetCultureInfo(culture ?? _globalSettings.DefaultUILanguage).TextInfo.IsRightToLeft))
+        {
+            pathParts.Reverse();
+        }
+
         var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
 
         // prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
