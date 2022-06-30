@@ -69,13 +69,13 @@ public class ImagesController : UmbracoAuthorizedApiController
             return NotFound();
         }
 
-        // redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
+        // Redirect to thumbnail with cache buster value generated from last modified time of original media file
         DateTimeOffset? imageLastModified = null;
         try
         {
             imageLastModified = _mediaFileManager.FileSystem.GetLastModified(imagePath);
         }
-        catch (Exception)
+        catch
         {
             // if we get an exception here it's probably because the image path being requested is an image that doesn't exist
             // in the local media file system. This can happen if someone is storing an absolute path to an image online, which
@@ -83,12 +83,12 @@ public class ImagesController : UmbracoAuthorizedApiController
             // so ignore and we won't set a last modified date.
         }
 
-        var rnd = imageLastModified.HasValue ? imageLastModified.Value.ToFileTime().ToString("x", CultureInfo.InvariantCulture) : null;
+        var cacheBusterValue = imageLastModified.HasValue ? imageLastModified.Value.ToFileTime().ToString("x", CultureInfo.InvariantCulture) : null;
         var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(encodedImagePath)
         {
             Width = width,
             ImageCropMode = ImageCropMode.Max,
-            CacheBusterValue = rnd
+            CacheBusterValue = cacheBusterValue
         });
 
         if (Url.IsLocalUrl(imageUrl))

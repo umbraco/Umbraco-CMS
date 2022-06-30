@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp;
@@ -13,7 +14,7 @@ using Umbraco.Cms.Core.Media;
 namespace Umbraco.Cms.Web.Common.DependencyInjection;
 
 /// <summary>
-///     Configures the ImageSharp middleware options.
+/// Configures the ImageSharp middleware options.
 /// </summary>
 /// <seealso cref="IConfigureOptions{ImageSharpMiddlewareOptions}" />
 public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<ImageSharpMiddlewareOptions>
@@ -23,7 +24,7 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
     private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
+    /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="imagingSettings">The Umbraco imaging settings.</param>
@@ -34,6 +35,16 @@ public sealed class ConfigureImageSharpMiddlewareOptions : IConfigureOptions<Ima
         _imagingSettings = imagingSettings.Value;
         _imageUrlTokenGenerator = imageUrlTokenGenerator;
     }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConfigureImageSharpMiddlewareOptions" /> class.
+    /// </summary>
+    /// <param name="configuration">The ImageSharp configuration.</param>
+    /// <param name="imagingSettings">The Umbraco imaging settings.</param>
+    [Obsolete("Use ctor with all params - This will be removed in Umbraco 12.")]
+    public ConfigureImageSharpMiddlewareOptions(Configuration configuration, IOptions<ImagingSettings> imagingSettings)
+        : this(configuration, imagingSettings, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
+    { }
 
     /// <inheritdoc />
     public void Configure(ImageSharpMiddlewareOptions options)

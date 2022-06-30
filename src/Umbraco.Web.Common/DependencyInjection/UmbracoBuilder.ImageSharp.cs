@@ -15,7 +15,7 @@ namespace Umbraco.Extensions;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds ImageSharp with Umbraco settings.
+    /// Adds ImageSharp with Umbraco settings.
     /// </summary>
     public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
     {

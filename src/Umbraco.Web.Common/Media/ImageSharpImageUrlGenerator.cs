@@ -1,18 +1,20 @@
 using System.Globalization;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 using static Umbraco.Cms.Core.Models.ImageUrlGenerationOptions;
 
 namespace Umbraco.Cms.Web.Common.Media;
 
 /// <summary>
-///     Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
+/// Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
 /// </summary>
 /// <seealso cref="IImageUrlGenerator" />
 public class ImageSharpImageUrlGenerator : IImageUrlGenerator
@@ -20,22 +22,30 @@ public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     private readonly IImageUrlTokenGenerator _imageUrlTokenGenerator;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+    /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
     /// <param name="configuration">The ImageSharp configuration.</param>
     /// <param name="imageUrlTokenGenerator">The image URL token generator.</param>
     public ImageSharpImageUrlGenerator(Configuration configuration, IImageUrlTokenGenerator imageUrlTokenGenerator)
         : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray(), imageUrlTokenGenerator)
-    {
-    }
+    { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+    /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+    /// </summary>
+    /// <param name="configuration">The ImageSharp configuration.</param>
+    [Obsolete("Use ctor with all params - This will be removed in Umbraco 12.")]
+    public ImageSharpImageUrlGenerator(Configuration configuration)
+        : this(configuration, StaticServiceProvider.Instance.GetRequiredService<IImageUrlTokenGenerator>())
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
     /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
     /// <param name="imageUrlTokenGenerator">The image URL token generator.</param>
     /// <remarks>
-    ///     This constructor is only used for testing.
+    /// This constructor is only used for testing.
     /// </remarks>
     internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes, IImageUrlTokenGenerator imageUrlTokenGenerator)
     {
