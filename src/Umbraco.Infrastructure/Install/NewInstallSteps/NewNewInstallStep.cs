@@ -73,9 +73,11 @@ public class NewNewInstallStep : NewInstallSetupStep
             {
                 throw new InvalidOperationException("Could not find the super user!");
             }
-            admin.Email = model.Email.Trim();
-            admin.Name = model.Name.Trim();
-            admin.Username = model.Email.Trim();
+
+            UserInstallData user = model.User;
+            admin.Email = user.Email.Trim();
+            admin.Name = user.Name.Trim();
+            admin.Username = user.Email.Trim();
 
             _userService.Save(admin);
 
@@ -93,7 +95,7 @@ public class NewNewInstallStep : NewInstallSetupStep
                 throw new InvalidOperationException("Could not reset password: unable to generate internal reset token");
             }
 
-            IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, model.Password.Trim());
+            IdentityResult resetResult = await _userManager.ChangePasswordWithResetAsync(membershipUser.Id, resetToken, user.Password.Trim());
             if (!resetResult.Succeeded)
             {
                 throw new InvalidOperationException("Could not reset password: " + string.Join(", ", resetResult.Errors.ToErrorMessage()));
