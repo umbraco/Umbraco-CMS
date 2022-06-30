@@ -80,7 +80,7 @@ public class ConfigurationExtensionsTests
 
         AssertResults(
             @"Data Source=C:\Data/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True",
-            "Microsoft.Data.SQLite",
+            "Microsoft.Data.Sqlite",
             connectionString,
             providerName);
     }
