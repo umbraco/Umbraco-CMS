@@ -55,5 +55,5 @@ public class NewDatabaseInstallStep : NewInstallSetupStep
         return Task.CompletedTask;
     }
 
-    public override Task<bool> RequiresExecution(InstallData model) => throw new NotImplementedException();
+    public override Task<bool> RequiresExecution(InstallData model) => Task.FromResult(true);
 }
