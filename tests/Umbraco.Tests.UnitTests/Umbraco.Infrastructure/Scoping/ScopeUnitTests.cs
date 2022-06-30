@@ -592,9 +592,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             using (var scope = scopeProvider.CreateScope())
             {
-                Assert.AreEqual(0, scope.Depth);
+                Assert.AreEqual(0,scope.Depth);
             }
         }
+
 
         [Test]
         public void Depth_WhenChildScope_ReturnsDepth()
