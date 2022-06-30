@@ -12,8 +12,10 @@
                               block="vm.layoutEntry.$block"
                               index="vm.index"
                               parent-form="vm.blockRowForm">
-
-            <div class="umb-block-grid__block-area-container" slot="areas">
+            <div 
+                slot="areas"
+                class="umb-block-grid__block-area-container"
+                ng-style="vm.areaGridStyles">
                 <umb-block-grid-entries
                     class="umb-block-grid__block-area"
                     data-area-col-span="{{areaEntry.$config.columnSpan}}"

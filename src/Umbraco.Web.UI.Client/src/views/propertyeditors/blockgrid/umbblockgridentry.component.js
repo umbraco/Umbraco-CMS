@@ -98,6 +98,15 @@
     function BlockGridEntryController($scope, $element) {
 
         const vm = this;
+        vm.areaGridStyles = {};
+
+        vm.$onInit = function() {
+            console.log('--umb-block-grid--area-grid-columns', vm.layoutEntry.$block.areaGridColumns)
+            if(vm.layoutEntry.$block.areaGridColumns) {
+                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.areaGridColumns;
+                $scope.$evalAsync();
+            }
+        }
 
         // Block sizing functionality:
         let layoutContainer = null;

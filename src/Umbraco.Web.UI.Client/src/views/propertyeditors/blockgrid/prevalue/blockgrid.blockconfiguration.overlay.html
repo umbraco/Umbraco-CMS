@@ -104,7 +104,7 @@
 
                         <div class="umb-group-panel__content">
 
-                            <!-- label -->
+                            <!-- Column span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="label"><localize key="blockEditor_TODO">Column span</localize></label>
@@ -241,13 +241,27 @@
 
                     <div class="umb-group-panel umb-block-grid-block-configuration__umb-group-panel --span-two">
 
+                        
                         <div class="umb-group-panel__header">
                             <localize key="blockEditor_TODO">Block areas</localize>
+                            <umb-property-info-button button-title-key="blockEditor_TODO">
+                                <localize key="blockEditor_TODO">Enable nesting Blocks inside this Block Type. Define one or more Areas for Blocks to be appended within.</localize>
+                            </umb-property-info-button>
                         </div>
 
                         <div class="umb-group-panel__content">
 
-                            Hello world
+                            <!-- areaGridColumns -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Area layout columns</localize></label>
+                                    <div class="controls">
+                                        <input type="text" name="label" ng-model="vm.block.areaGridColumns" style="width:100%"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <umb-block-grid-area-editor model="vm.block.areas"></umb-block-grid-area-editor>
 
                         </div>
                     

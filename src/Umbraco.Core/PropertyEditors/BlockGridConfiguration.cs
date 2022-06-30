@@ -24,6 +24,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public int? ColumnSpan { get; set; }
             }
 
+            [ConfigurationField("areaGridColumns", "Area Grid Columns", "number", Description = "Set the number of columns for the areas layout")]
+            public int? AreaGridColumns { get; set; }
+
             [DataMember(Name ="areas")]
             public BlockGridAreaConfiguration[] Areas { get; set; }  = null!;
             [DataContract]
@@ -92,5 +95,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "optional css overwrite, example: 800px or 100%")]
         public string? MaxPropertyWidth { get; set; }
+
+        [ConfigurationField("gridColumns", "Grid Columns", "number", Description = "Set the number of columns for the layout")]
+        public int? GridColumns { get; set; }
     }
 }
