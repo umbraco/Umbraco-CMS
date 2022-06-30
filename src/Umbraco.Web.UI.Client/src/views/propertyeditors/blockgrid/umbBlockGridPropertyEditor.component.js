@@ -97,6 +97,7 @@
             liveEditing = vm.model.config.useLiveEditing;
 
             vm.validationLimit = vm.model.config.validationLimit;
+            vm.gridColumns = vm.model.config.gridColumns || 12;
 
             vm.editorWrapperStyles = {};
 

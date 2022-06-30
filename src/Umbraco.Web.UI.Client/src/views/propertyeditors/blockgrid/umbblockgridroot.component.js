@@ -15,6 +15,7 @@
             controller: umbBlockGridRootController,
             controllerAs: "vm",
             bindings: {
+                gridColumns: "@",
                 stylesheet: "@",
                 blockEditorApi: "<",
                 entries: "<"
@@ -36,7 +37,7 @@
                     {{vm.stylesheet ? "@import '"+vm.stylesheet+"';" : ""}}
                     @import 'assets/css/blockgridui.css';
                     :host {
-                        --umb-block-grid--grid-columns: 12;
+                        --umb-block-grid--grid-columns: ${vm.gridColumns};
                     }
                 </style>
                 <div class="umb-block-grid__root-container">
