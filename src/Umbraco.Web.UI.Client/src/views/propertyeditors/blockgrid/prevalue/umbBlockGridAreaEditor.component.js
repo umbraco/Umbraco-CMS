@@ -33,6 +33,7 @@
         vm.blockGridColumns = 0;
 
         vm.$onInit = function() {
+            console.log("BlockGridAreaController")
 
             // TODO: Watch for vm.block.areaGridColumns
             // TODO: watch for column span options as fallback for areaGridColumns.
@@ -52,6 +53,8 @@
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid-area-editor__grid-wrapper');
 
+            console.log("gridLayoutContainerEl", gridLayoutContainerEl);
+
             const sortable = Sortable.create(gridLayoutContainerEl, {
                 sort: true,  // sorting inside list
                 animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
@@ -63,12 +66,8 @@
 
         }
 
-        vm.editArea = function(area) {
-            console.log("edit", area);
-        }
-
-        vm.deleteArea = function(area) {
-            console.log("delete", area);
+        vm.onAreaClick = function($event, area) {
+            console.log(area);
         }
 
         vm.onNewAreaClick = function() {

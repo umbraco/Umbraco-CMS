@@ -22,7 +22,7 @@
         return i;
     }
     */
-    function getIndexOfPositionInWeightMap(target, weights) {
+    function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
         const map = [0];
         weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
         const foundValue = map.reduce((a, b) => {
@@ -43,7 +43,7 @@
         } else if (targetDiff > 0 && foundIndex === map.length-1) {
             // Don't adjust.
         } else {
-            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];// take negative value into account..
+            const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
             interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
         }
         console.log('find index of ', target, targetDiff, ' -> ', interpolatedIndex, ' ==> ', foundIndex, map);
@@ -117,10 +117,10 @@
 
         function getNewSpans(startX, startY, endX, endY) {
 
-            const blockStartCol = Math.round(getIndexOfPositionInWeightMap(startX, gridColumns));
-            const blockStartRow = Math.round(getIndexOfPositionInWeightMap(startY, gridRows));
-            const blockEndCol = getIndexOfPositionInWeightMap(endX, gridColumns);
-            const blockEndRow = getIndexOfPositionInWeightMap(endY, gridRows);
+            const blockStartCol = Math.round(getInterpolatedIndexOfPositionInWeightMap(startX, gridColumns));
+            const blockStartRow = Math.round(getInterpolatedIndexOfPositionInWeightMap(startY, gridRows));
+            const blockEndCol = getInterpolatedIndexOfPositionInWeightMap(endX, gridColumns);
+            const blockEndRow = getInterpolatedIndexOfPositionInWeightMap(endY, gridRows);
 
             let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
             // Find nearest allowed Column:
@@ -147,9 +147,9 @@
             }
 
             // Add extra options for the ability to extend beyond current content:
-            gridRows.push(100);
-            gridRows.push(100);
-            gridRows.push(100);
+            gridRows.push(50);
+            gridRows.push(50);
+            gridRows.push(50);
         }
 
         vm.scaleHandlerMouseDown = function($event) {

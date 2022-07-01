@@ -3,8 +3,7 @@
 
     /**
      * 
-     * Note for new backoffice: there is a lot of similarities between the Area configuration and the Block entry, as they both share Grid scaling features.
-     * TODO: Can we already as part of this PR make it shared as a dictionary or something?
+     * Note for new backoffice: there is a lot of simularities between the Area configuration and the Block entry, as they both share Grid scaling features.
      */
 
 
@@ -26,9 +25,7 @@
             } else {
                 return bDiff < aDiff ? b : a;
             }
-        });
-
-        // Adding interpolation to the index, to get 
+        })
         const foundIndex = map.indexOf(foundValue);
         const targetDiff = (target-foundValue);
         let interpolatedIndex = foundIndex;
@@ -66,9 +63,7 @@
             controller: BlockGridConfigurationAreaEntryController,
             controllerAs: "vm",
             bindings: {
-                area: "=",
-                onEdit: "&",
-                onDelete: "&"
+                area: "="
             }
         }
     );
@@ -239,16 +234,6 @@
             vm.area.rowSpan = Math.max(vm.area.rowSpan + addRow, 1);
 
             $event.originalEvent.stopPropagation();
-        }
-
-
-
-        vm.onEditClick = function() {
-            console.log("edit")
-        }
-
-        vm.onDeleteClick = function() {
-            console.log("delete")
         }
 
     }   

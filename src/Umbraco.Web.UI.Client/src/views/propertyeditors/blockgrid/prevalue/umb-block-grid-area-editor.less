@@ -44,69 +44,13 @@ Grid part:
         border: 1px solid @gray-7;
         border-radius: 3px;
     }
-
-    .umb-block-grid__block--actions {
-        opacity: 0;
-        transition: opacity 120ms;
-    }
-
-    &:hover,
-    &:focus,
-    &:focus-within,
-    &.--active {
-        .umb-block-grid__block--actions {
-            opacity: 1;
-        }
-    }
 }
+.umb-block-grid-area-editor__area:focus,
+.umb-block-grid-area-editor__area:focus-within,
 .umb-block-grid-area-editor__area:hover {
     background-color: @gray-9;
     &::after {
         border-color: @blueDark;
-    }
-}
-.umb-block-grid-area-editor__area-placeholder {
-    background: transparent;
-    border-radius: 3px;
-
-    border: @blueDark solid 1px;
-    border-radius: 3px;
-
-    ::after {
-        content: '';
-        position:absolute;
-        z-index:1;
-        inset: 0;
-        border-radius: 3px;
-    
-        transition: background-color 240ms ease-in;
-        animation: umb-block-grid-area-editor__placeholder__pulse 400ms ease-in-out alternate infinite;
-        @keyframes umb-block-grid-area-editor__placeholder__pulse {
-            0%   { background-color: rgba(@blueMidLight, 0.33); }
-            100% { background-color: rgba(@blueMidLight, 0.22); }
-        }
-    }
-}
-
-
-.umb-block-grid__block--actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0;
-    background-color: rgba(255, 255, 255, .96);
-    border-radius: 16px;
-    padding-left: 5px;
-    padding-right: 5px;
-    .action {
-        position: relative;
-        display: inline-block;
-        color: @ui-action-discreet-type;
-        font-size: 18px;
-        padding: 5px;
-        &:hover {
-            color: @ui-action-discreet-type-hover;
-        }
     }
 }
 

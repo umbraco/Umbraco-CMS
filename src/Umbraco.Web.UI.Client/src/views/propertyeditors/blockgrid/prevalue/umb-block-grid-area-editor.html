@@ -11,8 +11,7 @@
             --umb-block-grid--area-column-span: {{area.columnSpan}};
             --umb-block-grid--area-row-span: {{area.rowSpan}};
             "
-            on-edit="vm.editArea(area)"
-            on-delete="vm.deleteArea(area)"
+            ng-click="vm.onAreaClick($event, area)"
         >
         </umb-block-grid-configuration-area-entry>
 
