@@ -15,12 +15,14 @@ public class InstallSettingsMapDefinition : IMapDefinition
         mapper.Define<ConsentLevelModel, ConsentLevelViewModel>((source, context) => new ConsentLevelViewModel(), Map);
     }
 
+    // Umbraco.Code.MapAll
     private static void Map(InstallSettingsModel source, InstallSettingsViewModel target, MapperContext context)
     {
         target.User = context.Map<UserSettingsViewModel>(source.UserSettings)!;
         target.Databases = context.MapEnumerable<IDatabaseProviderMetadata, DatabaseProviderViewModel>(source.DatabaseSettings);
     }
 
+    // Umbraco.Code.MapAll
     private static void Map(UserSettingsModel source, UserSettingsViewModel target, MapperContext context)
     {
         target.MinCharLength = source.PasswordSettings.MinCharLength;
