@@ -31,10 +31,6 @@
   },
   "rules": {
     "no-var": "error",
-    "quotes": [
-      "error",
-      "single"
-    ],
     "import/no-unresolved": "error"
   },
   "settings": {

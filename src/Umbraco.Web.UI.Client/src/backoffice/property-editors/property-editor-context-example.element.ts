@@ -5,26 +5,26 @@ import { UmbNotificationService } from '../../core/services/notification.service
 
 @customElement('umb-property-editor-context-example')
 export default class UmbPropertyEditorContextExample extends UmbContextConsumerMixin(LitElement) {
-  private _notificationService?: UmbNotificationService;
+	private _notificationService?: UmbNotificationService;
 
-  constructor() {
-    super();
-    // TODO: how to deal with single consumption, or situation where you dont want to store the service..
-    this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
-      this._notificationService = service;
-    });
-  }
-  private _onClick = () => {
-    this._notificationService?.peek('Hello from property editor');
-  };
+	constructor() {
+		super();
+		// TODO: how to deal with single consumption, or situation where you dont want to store the service..
+		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
+			this._notificationService = service;
+		});
+	}
+	private _onClick = () => {
+		this._notificationService?.peek('Hello from property editor');
+	};
 
-  render() {
-    return html`<uui-button look="secondary" label="Click to notify" @click=${this._onClick}></uui-button>`;
-  }
+	render() {
+		return html`<uui-button look="secondary" label="Click to notify" @click=${this._onClick}></uui-button>`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-property-editor-context-example': UmbPropertyEditorContextExample;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-property-editor-context-example': UmbPropertyEditorContextExample;
+	}
 }

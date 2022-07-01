@@ -5,7 +5,7 @@ import { paths } from '../../../schemas/generated-schema';
 const fetcher = Fetcher.for<paths>();
 
 fetcher.configure({
-  baseUrl: '/umbraco/backoffice',
+	baseUrl: '/umbraco/backoffice',
 });
 
 export const getServerStatus = fetcher.path('/server/status').method('get').create();

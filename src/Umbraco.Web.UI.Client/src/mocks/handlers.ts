@@ -5,9 +5,9 @@ import { handlers as serverHandlers } from './domains/server.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
 
 export const handlers = [
-  ...serverHandlers,
-  ...contentHandlers,
-  ...installHandlers,
-  ...manifestsHandlers,
-  ...userHandlers,
+	...serverHandlers,
+	...contentHandlers,
+	...installHandlers,
+	...manifestsHandlers,
+	...userHandlers,
 ];

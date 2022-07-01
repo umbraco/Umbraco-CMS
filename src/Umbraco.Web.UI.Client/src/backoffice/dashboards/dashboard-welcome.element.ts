@@ -4,20 +4,20 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-dashboard-welcome')
 export class UmbDashboardWelcome extends LitElement {
-  static styles = [UUITextStyles, css``];
+	static styles = [UUITextStyles, css``];
 
-  render() {
-    return html`
-      <uui-box>
-        <h1>Welcome</h1>
-        <p>You can find details about the POC in the readme.md file.</p>
-      </uui-box>
-    `;
-  }
+	render() {
+		return html`
+			<uui-box>
+				<h1>Welcome</h1>
+				<p>You can find details about the POC in the readme.md file.</p>
+			</uui-box>
+		`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-dashboard-welcome': UmbDashboardWelcome;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-dashboard-welcome': UmbDashboardWelcome;
+	}
 }

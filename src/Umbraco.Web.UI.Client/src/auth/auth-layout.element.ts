@@ -3,70 +3,70 @@ import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayout extends LitElement {
-  static styles: CSSResultGroup = [
-    css`
-      #background {
-        position: fixed;
-        overflow: hidden;
-        background-position: 50%;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-image: url('/login.jpeg');
-        width: 100vw;
-        height: 100vh;
-      }
+	static styles: CSSResultGroup = [
+		css`
+			#background {
+				position: fixed;
+				overflow: hidden;
+				background-position: 50%;
+				background-repeat: no-repeat;
+				background-size: cover;
+				background-image: url('/login.jpeg');
+				width: 100vw;
+				height: 100vh;
+			}
 
-      #logo {
-        position: fixed;
-        top: var(--uui-size-space-5);
-        left: var(--uui-size-space-5);
-        height: 30px;
-      }
+			#logo {
+				position: fixed;
+				top: var(--uui-size-space-5);
+				left: var(--uui-size-space-5);
+				height: 30px;
+			}
 
-      #logo img {
-        height: 100%;
-      }
+			#logo img {
+				height: 100%;
+			}
 
-      #container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 100vh;
-      }
+			#container {
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100vw;
+				height: 100vh;
+			}
 
-      #box {
-        width: 500px;
-        padding: var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-5) var(--uui-size-space-5);
-      }
+			#box {
+				width: 500px;
+				padding: var(--uui-size-space-6) var(--uui-size-space-5) var(--uui-size-space-5) var(--uui-size-space-5);
+			}
 
-      #email,
-      #password {
-        width: 100%;
-      }
-    `,
-  ];
+			#email,
+			#password {
+				width: 100%;
+			}
+		`,
+	];
 
-  render() {
-    return html`
-      <div id="background"></div>
+	render() {
+		return html`
+			<div id="background"></div>
 
-      <div id="logo">
-        <img src="/umbraco_logo_white.svg" alt="Umbraco" />
-      </div>
+			<div id="logo">
+				<img src="/umbraco_logo_white.svg" alt="Umbraco" />
+			</div>
 
-      <div id="container">
-        <uui-box id="box">
-          <slot></slot>
-        </uui-box>
-      </div>
-    `;
-  }
+			<div id="container">
+				<uui-box id="box">
+					<slot></slot>
+				</uui-box>
+			</div>
+		`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-auth-layout': UmbAuthLayout;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-auth-layout': UmbAuthLayout;
+	}
 }

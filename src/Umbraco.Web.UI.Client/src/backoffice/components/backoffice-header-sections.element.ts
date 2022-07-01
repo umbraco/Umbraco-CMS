@@ -11,149 +11,149 @@ import { UmbExtensionManifestSection, UmbExtensionRegistry } from '../../core/ex
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSections extends UmbContextConsumerMixin(LitElement) {
-  static styles: CSSResultGroup = [
-    UUITextStyles,
-    css`
-      #tabs {
-        color: var(--uui-color-header-contrast);
-        height: 60px;
-        font-size: 16px;
-        --uui-tab-text: var(--uui-color-header-contrast);
-        --uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
-        --uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
-        --uui-tab-background: var(--uui-color-header-background);
-      }
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			#tabs {
+				color: var(--uui-color-header-contrast);
+				height: 60px;
+				font-size: 16px;
+				--uui-tab-text: var(--uui-color-header-contrast);
+				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
+				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
+				--uui-tab-background: var(--uui-color-header-background);
+			}
 
-      #dropdown {
-        background-color: white;
-        border-radius: var(--uui-border-radius);
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        box-shadow: var(--uui-shadow-depth-3);
-        min-width: 200px;
-        color: black; /* Change to variable */
-      }
-    `,
-  ];
+			#dropdown {
+				background-color: white;
+				border-radius: var(--uui-border-radius);
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: var(--uui-shadow-depth-3);
+				min-width: 200px;
+				color: black; /* Change to variable */
+			}
+		`,
+	];
 
-  @state()
-  private _open = false;
+	@state()
+	private _open = false;
 
-  @state()
-  private _allowedSection: Array<string> = [];
+	@state()
+	private _allowedSection: Array<string> = [];
 
-  @state()
-  private _sections: Array<UmbExtensionManifestSection> = [];
+	@state()
+	private _sections: Array<UmbExtensionManifestSection> = [];
 
-  @state()
-  private _visibleSections: Array<UmbExtensionManifestSection> = [];
+	@state()
+	private _visibleSections: Array<UmbExtensionManifestSection> = [];
 
-  @state()
-  private _extraSections: Array<UmbExtensionManifestSection> = [];
+	@state()
+	private _extraSections: Array<UmbExtensionManifestSection> = [];
 
-  @state()
-  private _currentSectionAlias = '';
+	@state()
+	private _currentSectionAlias = '';
 
-  private _extensionRegistry?: UmbExtensionRegistry;
+	private _extensionRegistry?: UmbExtensionRegistry;
 
-  private _sectionSubscription?: Subscription;
+	private _sectionSubscription?: Subscription;
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
-      this._extensionRegistry = extensionRegistry;
-      this._useSections();
-    });
-  }
+		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
+			this._extensionRegistry = extensionRegistry;
+			this._useSections();
+		});
+	}
 
-  private _handleMore(e: MouseEvent) {
-    e.stopPropagation();
-    this._open = !this._open;
-  }
+	private _handleMore(e: MouseEvent) {
+		e.stopPropagation();
+		this._open = !this._open;
+	}
 
-  private _handleTabClick(e: PointerEvent) {
-    const tab = e.currentTarget as HTMLElement;
+	private _handleTabClick(e: PointerEvent) {
+		const tab = e.currentTarget as HTMLElement;
 
-    // TODO: we need to be able to prevent the tab from setting the active state
-    if (tab.id === 'moreTab') {
-      return;
-    }
-  }
+		// TODO: we need to be able to prevent the tab from setting the active state
+		if (tab.id === 'moreTab') {
+			return;
+		}
+	}
 
-  private _handleLabelClick() {
-    const moreTab = this.shadowRoot?.getElementById('moreTab');
-    moreTab?.setAttribute('active', 'true');
+	private _handleLabelClick() {
+		const moreTab = this.shadowRoot?.getElementById('moreTab');
+		moreTab?.setAttribute('active', 'true');
 
-    this._open = false;
-  }
+		this._open = false;
+	}
 
-  private async _useSections() {
-    this._sectionSubscription?.unsubscribe();
+	private async _useSections() {
+		this._sectionSubscription?.unsubscribe();
 
-    const { data } = await getUserSections({});
-    this._allowedSection = data.sections;
+		const { data } = await getUserSections({});
+		this._allowedSection = data.sections;
 
-    this._sectionSubscription = this._extensionRegistry
-      ?.extensionsOfType('section')
-      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
-      .subscribe((sections) => {
-        this._sections = sections.filter((section) => this._allowedSection.includes(section.alias));
-        this._visibleSections = this._sections;
-      });
-  }
+		this._sectionSubscription = this._extensionRegistry
+			?.extensionsOfType('section')
+			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
+			.subscribe((sections) => {
+				this._sections = sections.filter((section) => this._allowedSection.includes(section.alias));
+				this._visibleSections = this._sections;
+			});
+	}
 
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._sectionSubscription?.unsubscribe();
-  }
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._sectionSubscription?.unsubscribe();
+	}
 
-  render() {
-    return html`
-      <uui-tab-group id="tabs">
-        ${this._visibleSections.map(
-          (section: UmbExtensionManifestSection) => html`
-            <uui-tab
-              ?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
-              href="${`/section/${section.meta.pathname}`}"
-              label="${section.name}"></uui-tab>
-          `
-        )}
-        ${this._renderExtraSections()}
-      </uui-tab-group>
-    `;
-  }
+	render() {
+		return html`
+			<uui-tab-group id="tabs">
+				${this._visibleSections.map(
+					(section: UmbExtensionManifestSection) => html`
+						<uui-tab
+							?active="${isPathActive(`/section/${section.meta.pathname}`, path())}"
+							href="${`/section/${section.meta.pathname}`}"
+							label="${section.name}"></uui-tab>
+					`
+				)}
+				${this._renderExtraSections()}
+			</uui-tab-group>
+		`;
+	}
 
-  private _renderExtraSections() {
-    return when(
-      this._extraSections.length > 0,
-      () => html`
-        <uui-tab id="moreTab" @click="${this._handleTabClick}">
-          <uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
-            <uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
-              <uui-symbol-more></uui-symbol-more>
-            </uui-button>
+	private _renderExtraSections() {
+		return when(
+			this._extraSections.length > 0,
+			() => html`
+				<uui-tab id="moreTab" @click="${this._handleTabClick}">
+					<uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
+						<uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
+							<uui-symbol-more></uui-symbol-more>
+						</uui-button>
 
-            <div slot="popover" id="dropdown">
-              ${this._extraSections.map(
-                (section) => html`
-                  <uui-menu-item
-                    ?active="${this._currentSectionAlias === section.alias}"
-                    label="${section.name}"
-                    @click-label="${this._handleLabelClick}"></uui-menu-item>
-                `
-              )}
-            </div>
-          </uui-popover>
-        </uui-tab>
-      `
-    );
-  }
+						<div slot="popover" id="dropdown">
+							${this._extraSections.map(
+								(section) => html`
+									<uui-menu-item
+										?active="${this._currentSectionAlias === section.alias}"
+										label="${section.name}"
+										@click-label="${this._handleLabelClick}"></uui-menu-item>
+								`
+							)}
+						</div>
+					</uui-popover>
+				</uui-tab>
+			`
+		);
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-backoffice-header-sections': UmbBackofficeHeaderSections;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-backoffice-header-sections': UmbBackofficeHeaderSections;
+	}
 }

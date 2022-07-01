@@ -17,40 +17,40 @@ import './components/section-sidebar.element';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
-  static styles = [
-    UUITextStyles,
-    css`
-      :host {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-        color: var(--uui-color-text);
-        font-size: 14px;
-        box-sizing: border-box;
-      }
-    `,
-  ];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				width: 100%;
+				color: var(--uui-color-text);
+				font-size: 14px;
+				box-sizing: border-box;
+			}
+		`,
+	];
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    this.provideContext('umbNodeStore', new UmbNodeStore());
-    this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
-    this.provideContext('umbNotificationService', new UmbNotificationService());
-  }
+		this.provideContext('umbNodeStore', new UmbNodeStore());
+		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
+		this.provideContext('umbNotificationService', new UmbNotificationService());
+	}
 
-  render() {
-    return html`
-      <umb-backoffice-header></umb-backoffice-header>
-      <umb-backoffice-main></umb-backoffice-main>
-      <umb-backoffice-notification-container></umb-backoffice-notification-container>
-    `;
-  }
+	render() {
+		return html`
+			<umb-backoffice-header></umb-backoffice-header>
+			<umb-backoffice-main></umb-backoffice-main>
+			<umb-backoffice-notification-container></umb-backoffice-notification-container>
+		`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-backoffice': UmbBackoffice;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-backoffice': UmbBackoffice;
+	}
 }
