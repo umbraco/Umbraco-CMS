@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.BackOfficeApi.Models.ViewModels.Installer;
+namespace Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 
 public class InstallViewModel
 {

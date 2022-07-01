@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.BackOfficeApi.Models.ViewModels.Installer;
+using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Install.NewInstallSteps;

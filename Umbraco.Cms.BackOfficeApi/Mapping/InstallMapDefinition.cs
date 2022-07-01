@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.BackOfficeApi.Models.ViewModels.Installer;
+﻿using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Mapping;
