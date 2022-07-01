@@ -96,6 +96,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   private _databases: UmbracoInstallerDatabaseModel[] = [];
 
   @state()
+  private _preConfiguredDatabase?: UmbracoInstallerDatabaseModel;
+
+  @state()
   private _installerStore!: UmbInstallerContext;
 
   private storeDataSubscription?: Subscription;
@@ -110,7 +113,13 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
       this.storeSettingsSubscription?.unsubscribe();
       this.storeSettingsSubscription = installerStore.settings.subscribe((settings) => {
         this._databases = settings.databases;
-        this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+
+        // If there is an isConfigured database in the databases array then we can skip the database selection step
+        // and just use that.
+        this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
+        if (!this._preConfiguredDatabase) {
+          this._options = settings.databases.map((x, i) => ({ name: x.displayName, value: x.id, selected: i === 0 }));
+        }
       });
 
       this.storeDataSubscription?.unsubscribe();
@@ -147,25 +156,29 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     const isValid = form.checkValidity();
     if (!isValid) return;
 
-    const formData = new FormData(form);
-    const id = formData.get('id') as string;
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
-    const server = formData.get('server') as string;
-    const name = formData.get('name') as string;
-    const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
+    // Only append the database if it's not pre-configured
+    if (!this._preConfiguredDatabase) {
+      const formData = new FormData(form);
+      const id = formData.get('id') as string;
+      const username = formData.get('username') as string;
+      const password = formData.get('password') as string;
+      const server = formData.get('server') as string;
+      const name = formData.get('name') as string;
+      const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
-    const database = {
-      ...this._installerStore.getData().database,
-      id,
-      username,
-      password,
-      server,
-      name,
-      useIntegratedAuthentication,
-    } as UmbracoPerformInstallDatabaseConfiguration;
+      const database = {
+        ...this._installerStore.getData().database,
+        id,
+        username,
+        password,
+        server,
+        name,
+        useIntegratedAuthentication,
+      } as UmbracoPerformInstallDatabaseConfiguration;
 
-    this._installerStore.appendData({ database });
+      this._installerStore.appendData({ database });
+    }
+
     this._installerStore.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
     this._installButton.state = 'waiting';
   };
@@ -295,22 +308,37 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     </uui-form-layout-item>
   `;
 
+  private _renderDatabaseSelection = () => html`
+    <uui-form-layout-item>
+      <uui-label for="database-type" slot="label" required>Database type</uui-label>
+      <uui-select
+        id="database-type"
+        name="id"
+        label="database-type"
+        .options=${this._options || []}
+        @change=${this._handleChange}></uui-select>
+    </uui-form-layout-item>
+
+    ${this._renderSettings()}
+  `;
+
+  private _renderPreConfiguredDatabase = (database: UmbracoInstallerDatabaseModel) => html`
+    <p>A database has already been pre-configured on the server and will be used:</p>
+    <p>
+      Type: <strong>${database.displayName}</strong>
+      <br />
+      Provider: <strong>${database.providerName}</strong>
+    </p>
+  `;
+
   render() {
     return html` <div id="container" class="uui-text">
       <h1 class="uui-h3">Database Configuration</h1>
       <uui-form>
         <form id="database-form" name="database" @submit="${this._handleSubmit}">
-          <uui-form-layout-item>
-            <uui-label for="database-type" slot="label" required>Database type</uui-label>
-            <uui-select
-              id="database-type"
-              name="id"
-              label="database-type"
-              .options=${this._options || []}
-              @change=${this._handleChange}></uui-select>
-          </uui-form-layout-item>
-
-          ${this._renderSettings()}
+          ${this._preConfiguredDatabase
+            ? this._renderPreConfiguredDatabase(this._preConfiguredDatabase)
+            : this._renderDatabaseSelection()}
 
           <!-- TODO: Apply error message to the fields that has errors -->
           <p id="error-message"></p>
