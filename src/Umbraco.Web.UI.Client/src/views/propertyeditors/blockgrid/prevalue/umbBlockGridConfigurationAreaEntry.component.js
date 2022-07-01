@@ -1,6 +1,11 @@
 (function () {
     "use strict";
 
+    /**
+     * 
+     * Note for new backoffice: there is a lot of simularities between the Area configuration and the Block entry, as they both share Grid scaling features.
+     */
+
 
     /**
      * Helper method that takes a weight map and finds the index of the value.
@@ -8,20 +13,6 @@
      * @param {number[]} weights - array of numbers each representing the weight/length.
      * @returns {number} - the index of the weight that contains the accumulated value
      */
-    /*
-    function getIndexOfPositionInWeightMap(position, weights) {
-        let i = 0, len = weights.length, calc = 0;
-        while(i<len) {
-            if(position < calc) {
-                return i;
-            }
-
-            calc += weights[i];
-            i++;
-        }
-        return i;
-    }
-    */
     function getInterpolatedIndexOfPositionInWeightMap(target, weights) {
         const map = [0];
         weights.reduce((a, b, i) => { return map[i+1] = a+b; }, 0);
@@ -46,7 +37,6 @@
             const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
             interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
         }
-        console.log('find index of ', target, targetDiff, ' -> ', interpolatedIndex, ' ==> ', foundIndex, map);
         return interpolatedIndex;
     }
 
@@ -58,54 +48,29 @@
         return calc;
     }
     
-    function closestColumnSpanOption(target, map) {
-        return map.reduce((a, b) => {
-            let aDiff = Math.abs(a.columnSpan - target);
-            let bDiff = Math.abs(b.columnSpan - target);
-    
-            if (aDiff === bDiff) {
-                return a.columnSpan < b.columnSpan ? a : b;
-            } else {
-                return bDiff < aDiff ? b : a;
-            }
-        });
-    }
-
 
 
     /**
      * @ngdoc directive
-     * @name umbraco.directives.directive:umbBlockGridEntry
+     * @name umbraco.directives.directive:umbBlockGridConfigurationAreaEntry
      * @description
-     * renders each row for the block grid editor
+     * Rendering the a specific area configuration for the block grid editor
      */
     angular
         .module("umbraco")
-        .component("umbBlockGridEntry", {
-            templateUrl: 'views/propertyeditors/blockgrid/umb-block-grid-entry.html',
-            controller: BlockGridEntryController,
+        .component("umbBlockGridConfigurationAreaEntry", {
+            templateUrl: 'views/propertyeditors/blockgrid/prevalue/umb-block-grid-configuration-area-entry.html',
+            controller: BlockGridConfigurationAreaEntryController,
             controllerAs: "vm",
             bindings: {
-                blockEditorApi: "<",
-                layoutEntry: "<",
-                index: "<",
-                parentBlock: "<",
-                areaKey: "<"
+                area: "="
             }
         }
     );
 
-    function BlockGridEntryController($scope, $element) {
+    function BlockGridConfigurationAreaEntryController($scope, $element) {
 
         const vm = this;
-        vm.areaGridStyles = {};
-
-        vm.$onInit = function() {
-            if(vm.layoutEntry.$block.config.areaGridColumns) {
-                vm.areaGridStyles['--umb-block-grid--area-grid-columns'] = vm.layoutEntry.$block.config.areaGridColumns.toString();
-                $scope.$evalAsync();
-            }
-        }
 
         // Block sizing functionality:
         let layoutContainer = null;
@@ -122,10 +87,7 @@
             const blockEndCol = getInterpolatedIndexOfPositionInWeightMap(endX, gridColumns);
             const blockEndRow = getInterpolatedIndexOfPositionInWeightMap(endY, gridRows);
 
-            let newColumnSpan = Math.max(blockEndCol-blockStartCol, 1);
-            // Find nearest allowed Column:
-            newColumnSpan = closestColumnSpanOption(newColumnSpan , vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
-
+            const newColumnSpan = Math.round(Math.max(blockEndCol-blockStartCol, 1));
             const newRowSpan = Math.round(Math.max(blockEndRow-blockStartRow, 1));
 
             return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan, 'startCol': blockStartCol, 'startRow': blockStartRow};
@@ -160,32 +122,25 @@
             window.addEventListener('mouseleave', vm.onMouseUp);
 
 
-            layoutContainer = $element[0].closest('.umb-block-grid__layout-container');
+            layoutContainer = $element[0].closest('.umb-block-grid-area-editor__grid-wrapper');
             if(!layoutContainer) {
-                console.error($element[0], 'could not find parent layout-container');
+                console.error($element[0], 'could not find area-container');
             }
 
             updateGridLayoutData();
 
             scaleBoxBackdropEl = document.createElement('div');
-            scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
+            scaleBoxBackdropEl.className = 'umb-block-grid-area-editor__scalebox-backdrop';
             layoutContainer.appendChild(scaleBoxBackdropEl);
 
             scaleBoxEl = document.createElement('div');
-            scaleBoxEl.className = 'umb-block-grid__scalebox';
+            scaleBoxEl.className = 'umb-block-grid-area-editor__scalebox';
 
             const scaleBoxScaleHandler = document.createElement('button');
-            scaleBoxScaleHandler.className = 'umb-block-grid__scale-handler';
+            scaleBoxScaleHandler.className = 'umb-block-grid-area-editor__scale-handler';
             scaleBoxEl.appendChild(scaleBoxScaleHandler);
 
             $element[0].appendChild(scaleBoxEl);
-
-            // ensure all columns are there.
-            // add a few extra rows, so there is something to extend too.
-
-            // TODO: handle non-css-grid mode,
-            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-            // use item height divided by rowSpan to identify row heights.
 
         }
         vm.onMouseMove = function(e) {
@@ -197,8 +152,8 @@
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
             const startY = layoutItemRect.top - layoutContainerRect.top;
-            const endX = e.offsetX;
-            const endY = e.offsetY;
+            const endX = e.pageX - layoutContainerRect.left;
+            const endY = e.pageY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
             const endCol = newSpans.startCol + newSpans.columnSpan;
@@ -214,8 +169,8 @@
             scaleBoxEl.style.height = Math.round(endCellY-startCellY)+'px';
             
             // update as we go:
-            vm.layoutEntry.columnSpan = newSpans.columnSpan;
-            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+            vm.area.columnSpan = newSpans.columnSpan;
+            vm.area.rowSpan = newSpans.rowSpan;
 
             $scope.$evalAsync();
         }
@@ -227,8 +182,8 @@
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
             const startY = layoutItemRect.top - layoutContainerRect.top;
-            const endX = e.offsetX;
-            const endY = e.offsetY;
+            const endX = e.pageX - layoutContainerRect.left;
+            const endY = e.pageY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
@@ -248,8 +203,8 @@
             scaleBoxBackdropEl = null;
 
             // Update block size:
-            vm.layoutEntry.columnSpan = newSpans.columnSpan;
-            vm.layoutEntry.rowSpan = newSpans.rowSpan;
+            vm.area.columnSpan = newSpans.columnSpan;
+            vm.area.rowSpan = newSpans.rowSpan;
             $scope.$evalAsync();
         }
 
@@ -259,8 +214,6 @@
 
             let addCol = 0;
             let addRow = 0;
-
-            console.log($event.originalEvent);
 
             switch ($event.originalEvent.key) {
                 case 'ArrowUp':
@@ -277,10 +230,8 @@
                     break;
             }
 
-            const newColumnSpan = Math.max(vm.layoutEntry.columnSpan + addCol, 1);
-
-            vm.layoutEntry.columnSpan = closestColumnSpanOption(newColumnSpan, vm.layoutEntry.$block.config.columnSpanOptions).columnSpan;
-            vm.layoutEntry.rowSpan = Math.max(vm.layoutEntry.rowSpan + addRow, 1);
+            vm.area.columnSpan = Math.max(vm.area.columnSpan + addCol, 1);
+            vm.area.rowSpan = Math.max(vm.area.rowSpan + addRow, 1);
 
             $event.originalEvent.stopPropagation();
         }
