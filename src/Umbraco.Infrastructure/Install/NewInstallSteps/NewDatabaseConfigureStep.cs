@@ -46,7 +46,7 @@ public class NewDatabaseConfigureStep : NewInstallSetupStep
         return Task.FromResult<InstallSetupResult?>(null);
     }
 
-    public override Task<bool> RequiresExecution(InstallData model)
+    public override Task<bool> RequiresExecutionAsync(InstallData model)
     {
         // If the connection string is already present in config we don't need to show the settings page and we jump to installing/upgrading.
         if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())

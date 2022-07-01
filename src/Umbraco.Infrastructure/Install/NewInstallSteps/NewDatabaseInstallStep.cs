@@ -56,5 +56,5 @@ public class NewDatabaseInstallStep : NewInstallSetupStep
         return Task.CompletedTask;
     }
 
-    public override Task<bool> RequiresExecution(InstallData model) => Task.FromResult(true);
+    public override Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
 }

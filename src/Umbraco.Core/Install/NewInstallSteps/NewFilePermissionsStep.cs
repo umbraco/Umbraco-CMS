@@ -39,5 +39,5 @@ public class NewFilePermissionsStep : NewInstallSetupStep
         return Task.FromResult<InstallSetupResult?>(null);
     }
 
-    public override Task<bool> RequiresExecution(InstallData model) => Task.FromResult(true);
+    public override Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
 }

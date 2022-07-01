@@ -82,7 +82,7 @@ public class NewInstallController : Controller
         {
             var stepName = step.Name;
             _logger.LogInformation("Checking if {StepName} requires execution", stepName);
-            if (!await step.RequiresExecution(data))
+            if (await step.RequiresExecutionAsync(data) is false)
             {
                 _logger.LogInformation("Skipping {StepName}", stepName);
                 continue;

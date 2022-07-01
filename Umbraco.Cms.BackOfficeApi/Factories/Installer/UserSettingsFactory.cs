@@ -21,13 +21,13 @@ public class UserSettingsFactory : IUserSettingsFactory
     }
 
     public UserSettingsModel GetUserSettings() =>
-        new UserSettingsModel
+        new()
         {
             PasswordSettings = CreatePasswordSettingsModel(), ConsentLevels = CreateConsentLevelModels(),
         };
 
     private PasswordSettingsModel CreatePasswordSettingsModel() =>
-        new PasswordSettingsModel
+        new()
         {
             MinCharLength = _passwordConfiguration.RequiredLength,
             MinNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars()

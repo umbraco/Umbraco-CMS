@@ -29,7 +29,7 @@ public class NewTelemetryIdentifierStep : NewInstallSetupStep
         return Task.FromResult<InstallSetupResult?>(null);
     }
 
-    public override Task<bool> RequiresExecution(InstallData model)
+    public override Task<bool> RequiresExecutionAsync(InstallData model)
     {
         // Verify that Json value is not empty string
         // Try & get a value stored in appSettings.json

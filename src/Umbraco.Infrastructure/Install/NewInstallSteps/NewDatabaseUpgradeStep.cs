@@ -66,7 +66,7 @@ public class NewDatabaseUpgradeStep : NewInstallSetupStep
         return Task.FromResult((InstallSetupResult?)null);
     }
 
-    public override Task<bool> RequiresExecution(InstallData model)
+    public override Task<bool> RequiresExecutionAsync(InstallData model)
     {
         // If it's properly configured (i.e. the versions match) then no upgrade necessary
         if (_runtime.Level == RuntimeLevel.Run)

@@ -119,7 +119,7 @@ public class NewNewInstallStep : NewInstallSetupStep
             }
     }
 
-    public override Task<bool> RequiresExecution(InstallData model)
+    public override Task<bool> RequiresExecutionAsync(InstallData model)
     {
         InstallState installState = GetInstallState();
         if (installState.HasFlag(InstallState.Unknown))

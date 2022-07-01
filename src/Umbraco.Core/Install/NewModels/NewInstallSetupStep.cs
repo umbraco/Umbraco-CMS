@@ -20,5 +20,5 @@ public abstract class NewInstallSetupStep
 
     public abstract Task ExecuteAsync(InstallData model);
 
-    public abstract Task<bool> RequiresExecution(InstallData model);
+    public abstract Task<bool> RequiresExecutionAsync(InstallData model);
 }
