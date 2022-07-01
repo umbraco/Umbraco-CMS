@@ -75,7 +75,7 @@ export const handlers = [
   rest.post<PostInstallRequest>('/umbraco/backoffice/install/setup', async (req, res, ctx) => {
     await new Promise((resolve) => setTimeout(resolve, (Math.random() + 1) * 1000)); // simulate a delay of 1-2 seconds
 
-    if (req.body.database.databaseName === 'fail') {
+    if (req.body.database?.name === 'fail') {
       return res(
         // Respond with a 200 status code
         ctx.status(400),
@@ -83,7 +83,7 @@ export const handlers = [
           type: 'validation',
           status: 400,
           errors: {
-            databaseName: ['Database name is invalid'],
+            name: ['Database name is invalid'],
           },
         })
       );

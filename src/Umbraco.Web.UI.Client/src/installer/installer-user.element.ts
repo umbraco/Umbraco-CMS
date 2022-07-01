@@ -70,12 +70,12 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
     this.consumeContext('umbInstallerContext', (installerStore: UmbInstallerContext) => {
       this._installerStore = installerStore;
       this.installerStoreSubscription?.unsubscribe();
-      this.installerStoreSubscription = installerStore.data.subscribe((data) => {
+      this.installerStoreSubscription = installerStore.data.subscribe(({ user }) => {
         this._userFormData = {
-          name: data.name,
-          password: data.password,
-          email: data.email,
-          subscribeToNewsletter: data.subscribeToNewsletter,
+          name: user.name,
+          password: user.password,
+          email: user.email,
+          subscribeToNewsletter: user.subscribeToNewsletter,
         };
       });
     });
@@ -84,14 +84,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this.installerStoreSubscription?.unsubscribe();
-  }
-
-  private _handleChange(e: InputEvent) {
-    const target = e.target as HTMLInputElement;
-
-    const value: { [key: string]: string | boolean } = {};
-    value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
-    this._installerStore.appendData(value);
   }
 
   private _handleSubmit = (e: SubmitEvent) => {
@@ -109,7 +101,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
     const email = formData.get('email');
     const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
-    this._installerStore.appendData({ name, password, email, subscribeToNewsletter });
+    this._installerStore.appendData({ user: { name, password, email, subscribeToNewsletter } });
     this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
   };
 
@@ -124,7 +116,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
               type="text"
               id="name"
               .value=${this._userFormData.name}
-              @input=${this._handleChange}
               name="name"
               required
               required-message="Name is required"></uui-input>
@@ -136,7 +127,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
               type="email"
               id="email"
               .value=${this._userFormData.email}
-              @input=${this._handleChange}
               name="email"
               required
               required-message="Email is required"></uui-input>
@@ -148,7 +138,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
               id="password"
               name="password"
               .value=${this._userFormData.password}
-              @input=${this._handleChange}
               required
               required-message="Password is required"></uui-input-password>
           </uui-form-layout-item>
@@ -157,7 +146,6 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
             <uui-checkbox
               name="subscribeToNewsletter"
               label="Remember me"
-              @input=${this._handleChange}
               .checked=${this._userFormData.subscribeToNewsletter}>
               Keep me updated on Umbraco Versions, Security Bulletins and Community News
             </uui-checkbox>

@@ -75,23 +75,26 @@ export interface components {
       instance?: string;
       errors?: { [key: string]: unknown };
     };
+    InstallSetupUserConfiguration: {
+      name: string;
+      email: string;
+      password: string;
+      subscribeToNewsletter: boolean;
+    };
     InstallSetupDatabaseConfiguration: {
       id?: string;
       server?: string | null;
       password?: string | null;
       username?: string | null;
-      databaseName?: string | null;
-      databaseType?: string | null;
+      name?: string | null;
+      providerName?: string | null;
       useIntegratedAuthentication?: boolean | null;
       connectionString?: string | null;
     };
     InstallSetupRequest: {
-      name: string;
-      email: string;
-      password: string;
-      subscribeToNewsletter: boolean;
+      user: components["schemas"]["InstallSetupUserConfiguration"];
       telemetryLevel: components["schemas"]["ConsentLevel"];
-      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
+      database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
     };
     InstallValidateDatabaseRequest: {
       database: components["schemas"]["InstallSetupDatabaseConfiguration"];

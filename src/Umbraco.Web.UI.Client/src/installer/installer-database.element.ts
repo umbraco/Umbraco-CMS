@@ -115,8 +115,8 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
 
       this.storeDataSubscription?.unsubscribe();
       this.storeDataSubscription = installerStore.data.subscribe((data) => {
-        this.databaseFormData = data.database;
-        this._options.forEach((x, i) => (x.selected = data.database.databaseType === x.value || i === 0));
+        this.databaseFormData = data.database ?? {};
+        this._options.forEach((x, i) => (x.selected = data.database?.id === x.value || i === 0));
       });
     });
   }
@@ -148,22 +148,22 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     if (!isValid) return;
 
     const formData = new FormData(form);
+    const id = formData.get('id') as string;
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     const server = formData.get('server') as string;
-    const databaseName = formData.get('databaseName') as string;
-    const databaseType = formData.get('databaseType') as string;
+    const name = formData.get('name') as string;
     const useIntegratedAuthentication = formData.has('useIntegratedAuthentication');
 
     const database = {
       ...this._installerStore.getData().database,
+      id,
       username,
       password,
       server,
-      databaseName,
-      databaseType,
+      name,
       useIntegratedAuthentication,
-    };
+    } as UmbracoPerformInstallDatabaseConfiguration;
 
     this._installerStore.appendData({ database });
     this._installerStore.requestInstall().then(this._handleFulfilled.bind(this), this._handleRejected.bind(this));
@@ -182,7 +182,8 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
   }
 
   private get selectedDatabase() {
-    const id = this._installerStore.getData().database.databaseType;
+    const id = this._installerStore.getData().database?.id;
+    console.log('selected id', id, this._databases);
     return this._databases.find((x) => x.id === id) ?? this._databases[0];
   }
 
@@ -229,9 +230,9 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
     <uui-label for="database-name" slot="label" required>Database Name</uui-label>
     <uui-input
       type="text"
-      .value=${this.databaseFormData.databaseName ?? ''}
+      .value=${this.databaseFormData.name ?? ''}
       id="database-name"
-      name="databaseName"
+      name="name"
       @input=${this._handleChange}
       placeholder="umbraco-cms"
       required
@@ -303,7 +304,7 @@ export class UmbInstallerDatabase extends UmbContextConsumerMixin(LitElement) {
             <uui-label for="database-type" slot="label" required>Database type</uui-label>
             <uui-select
               id="database-type"
-              name="databaseType"
+              name="id"
               label="database-type"
               .options=${this._options || []}
               @change=${this._handleChange}></uui-select>

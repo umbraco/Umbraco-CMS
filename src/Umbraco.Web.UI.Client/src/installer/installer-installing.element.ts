@@ -25,7 +25,7 @@ export class UmbInstallerInstalling extends LitElement {
 
     if (this._installProgress >= 100) {
       // Redirect to backoffice
-      history.pushState(null, '', '/backoffice/backoffice');
+      history.replaceState(null, '', '/');
       return;
     }
 
