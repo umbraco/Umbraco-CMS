@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Cms.BackOfficeApi.Models.Mapping;
+namespace Umbraco.Cms.BackOfficeApi.Mapping;
 
 public class InstallMapDefinition : IMapDefinition
 {
