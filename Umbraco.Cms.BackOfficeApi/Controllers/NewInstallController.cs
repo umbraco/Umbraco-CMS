@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.BackOfficeApi.Factories.Installer;
+using Umbraco.Cms.BackOfficeApi.Models.Installer;
 using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install.Models;
@@ -13,6 +15,8 @@ using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Cms.BackOfficeApi.Controllers;
 
+// TODO: Create a filter to require install/upgrade for endpoints to be valid
+
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/install")]
@@ -24,6 +28,7 @@ public class NewInstallController : Controller
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IUmbracoMapper _mapper;
+    private readonly IInstallSettingsFactory _installSettingsFactory;
 
     public NewInstallController(
         IEnumerable<NewInstallSetupStep> steps,
@@ -31,7 +36,8 @@ public class NewInstallController : Controller
         IRuntime runtime,
         IBackOfficeUserManager backOfficeUserManager,
         IBackOfficeSignInManager backOfficeSignInManager,
-        IUmbracoMapper mapper)
+        IUmbracoMapper mapper,
+        IInstallSettingsFactory installSettingsFactory)
     {
         _steps = steps;
         _logger = logger;
@@ -39,6 +45,20 @@ public class NewInstallController : Controller
         _backOfficeUserManager = backOfficeUserManager;
         _backOfficeSignInManager = backOfficeSignInManager;
         _mapper = mapper;
+        _installSettingsFactory = installSettingsFactory;
+    }
+
+    [HttpGet("settings")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(InstallSettingsViewModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Settings()
+    {
+        InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
+
+        InstallSettingsViewModel viewModel = _mapper.Map<InstallSettingsViewModel>(installSettings)!;
+
+        return Ok(viewModel);
     }
 
     [HttpPost("setup")]

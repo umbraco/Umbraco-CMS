@@ -1,8 +1,4 @@
-﻿using System.ComponentModel;
-using System.Runtime.Serialization;
-using Microsoft.Build.Framework;
-
-namespace Umbraco.Cms.Core.Install.NewModels;
+﻿namespace Umbraco.Cms.Core.Install.NewModels;
 
 public class DatabaseInstallData
 {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.BackOfficeApi.Factories.Installer;
 using Umbraco.Cms.BackOfficeApi.Mapping;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -23,7 +24,11 @@ public class NewBackofficeComposer : IComposer
         IServiceCollection services = builder.Services;
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<InstallMapDefinition>();
+            .Add<InstallMapDefinition>()
+            .Add<InstallSettingsMapDefinition>();
+
+        services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
+        services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
 
         services.AddApiVersioning(options =>
         {
