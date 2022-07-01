@@ -63,7 +63,9 @@
             controller: BlockGridConfigurationAreaEntryController,
             controllerAs: "vm",
             bindings: {
-                area: "="
+                area: "=",
+                onEdit: "&",
+                onDelete: "&"
             }
         }
     );
@@ -234,6 +236,16 @@
             vm.area.rowSpan = Math.max(vm.area.rowSpan + addRow, 1);
 
             $event.originalEvent.stopPropagation();
+        }
+
+
+
+        vm.onEditClick = function() {
+            console.log("edit")
+        }
+
+        vm.onDeleteClick = function() {
+            console.log("delete")
         }
 
     }   
