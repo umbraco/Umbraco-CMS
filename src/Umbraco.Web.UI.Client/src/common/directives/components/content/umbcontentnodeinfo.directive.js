@@ -9,6 +9,7 @@
             var isInfoTab = false;
             var auditTrailLoaded = false;
             var labels = {};
+
             scope.publishStatus = [];
             scope.currentVariant = null;
             scope.currentUrls = [];
@@ -22,19 +23,17 @@
             scope.historyLabelKey = scope.node.variants && scope.node.variants.length === 1 ? "general_history" : "auditTrails_historyIncludingVariants";
 
             function onInit() {
-                entityResource.getAll("Template").then(function (templates) {
-                    scope.allTemplates = templates;
-                });
+                entityResource.getAll("Template").then(templates => scope.allTemplates = templates);
 
                 // set currentVariant
-                scope.currentVariant = _.find(scope.node.variants, (v) => v.active);
+                scope.currentVariant = scope.node.variants.find(v => v.active);
 
                 updateCurrentUrls();
 
                 // if there are any infinite editors open we are in infinite editing
                 scope.isInfiniteMode = editorService.getNumberOfEditors() > 0 ? true : false;
 
-                userService.getCurrentUser().then(function (user) {
+                userService.getCurrentUser().then(user => {
                     // only allow change of media type if user has access to the settings sections
                     const hasAccessToSettings = user.allowedSections.indexOf("settings") !== -1 ? true : false;
                     scope.allowChangeDocumentType = hasAccessToSettings;
@@ -54,7 +53,7 @@
                 ];
 
                 localizationService.localizeMany(keys)
-                    .then(function (data) {
+                    .then(data => {
                         [labels.deleted,
                         labels.unpublished,
                         labels.published,
@@ -81,7 +80,7 @@
                     });
 
                 scope.auditTrailOptions = {
-                    "id": scope.node.id
+                    id: scope.node.id
                 };
 
                 // make sure dates are formatted to the user's locale
@@ -101,7 +100,7 @@
                     scope.previewOpenUrl = '#/settings/documentTypes/edit/' + scope.documentType.id;
                 }
 
-                var activeApp = _.find(scope.node.apps, (a) => a.active);
+                var activeApp = scope.node.apps.find(a => a.active);
                 if (activeApp.alias === "umbInfo") {
                     loadRedirectUrls();
                     loadAuditTrail();
@@ -119,12 +118,8 @@
 
             scope.openDocumentType = function (documentType) {
 
-                const variantIsDirty = _.some(scope.node.variants, function (variant) {
-                    return variant.isDirty;
-                });
-
                 // add confirmation dialog before opening the doc type editor
-                if (variantIsDirty) {
+                if (scope.node.variants.some(variant => variant.isDirty)) {
                     const confirm = {
                         title: labels.unsavedChanges,
                         view: "default",
@@ -150,7 +145,7 @@
             function openDocTypeEditor(documentType) {
                 const editor = {
                     id: documentType.id,
-                    submit: function (model) {
+                    submit: function () {
                         editorService.close();
                     },
                     close: function () {
@@ -161,13 +156,14 @@
             }
 
             scope.openTemplate = function () {
-                var template = _.findWhere(scope.allTemplates, { alias: scope.node.template })
+                var template = scope.allTemplates.find(x => x.alias === scope.node.template);
+
                 if (!template) {
                     return;
                 }
                 var templateEditor = {
                     id: template.id,
-                    submit: function (model) {
+                    submit: function () {
                         editorService.close();
                     },
                     close: function () {
@@ -186,7 +182,7 @@
 
                 var rollback = {
                     node: scope.node,
-                    submit: function (model) {
+                    submit: function () {
                         const args = { node: scope.node };
                         eventsService.emit("editors.content.reload", args);
                         editorService.close();
@@ -212,7 +208,7 @@
 
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(currentUser => {
-                            Utilities.forEach(data.items, item => {
+                            data.items.forEach(item => {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
@@ -256,7 +252,7 @@
             }
 
             function setAuditTrailLogTypeColor(auditTrail) {
-                Utilities.forEach(auditTrail, item => {
+                auditTrail.forEach(item => {
 
                     switch (item.logType) {
                         case "Save":
@@ -326,10 +322,14 @@
 
                 // find the urls for the currently selected language
                 // when there is no selected language (allow vary by culture == false), show all urls of the node.
-                scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture));
+                scope.currentUrls = scope.node.urls.filter(url => scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture);
 
                 // figure out if multiple cultures apply across the content URLs
-                scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
+                // by getting an array of the url cultures, then checking that more than one culture exists in the array
+                scope.currentUrlsHaveMultipleCultures = scope.currentUrls
+                    .map(x => x.culture)
+                    .filter((v, i, arr) => arr.indexOf(v) === i)
+                    .length > 1;
             }
 
             // load audit trail and redirects when on the info tab
