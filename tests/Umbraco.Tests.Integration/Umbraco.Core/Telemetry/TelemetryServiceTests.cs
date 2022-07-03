@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -53,6 +53,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Telemetry
                 Constants.Telemetry.AspEnvironment,
                 Constants.Telemetry.IsDebug,
                 Constants.Telemetry.DatabaseProvider,
+                Constants.Telemetry.CurrentServerRole
             };
 
             MetricsConsentService.SetConsentLevel(TelemetryLevel.Detailed);
