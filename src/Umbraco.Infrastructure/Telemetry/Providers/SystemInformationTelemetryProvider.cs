@@ -77,7 +77,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
             new(Constants.Telemetry.AspEnvironment, AspEnvironment), new(Constants.Telemetry.IsDebug, IsDebug),
             new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
-            new(Constants.Telemetry.CurrentServerRole, CurrentServerRole)
+            new(Constants.Telemetry.CurrentServerRole, CurrentServerRole),
         };
 
     public IEnumerable<UserData> GetUserData() =>
@@ -90,7 +90,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
             new("Current Webserver", CurrentWebServer), new("Models Builder Mode", ModelsBuilderMode),
             new("Debug Mode", IsDebug.ToString()), new("Database Provider", DatabaseProvider),
-            new("Current Server Role", CurrentServerRole)
+            new("Current Server Role", CurrentServerRole),
         };
 
     private bool IsRunningInProcessIIS()
