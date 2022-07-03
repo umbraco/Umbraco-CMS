@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
-        [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 10")]
+        [Obsolete("Use AddEmbedProvider instead. This will be removed in Umbraco 11")]
         public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
             where T : class, IEmbedProvider => AddEmbedProvider<T>(builder);
 
