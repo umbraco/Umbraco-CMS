@@ -13,7 +13,9 @@ import './components/backoffice-notification-container.element';
 import './components/editor-layout.element';
 import './components/editor-property-layout.element';
 import './components/node-property.element';
+import './components/section-layout.element';
 import './components/section-sidebar.element';
+import './components/section-main.element';
 
 @defineElement('umb-backoffice')
 export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
