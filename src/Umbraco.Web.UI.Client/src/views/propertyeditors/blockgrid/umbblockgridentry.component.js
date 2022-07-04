@@ -46,7 +46,6 @@
             const foundInterpolationWeight = weights[targetDiff >= 0 ? foundIndex : foundIndex-1];
             interpolatedIndex += foundInterpolationWeight === 0 ? interpolatedIndex : (targetDiff/foundInterpolationWeight)
         }
-        console.log('find index of ', target, targetDiff, ' -> ', interpolatedIndex, ' ==> ', foundIndex, map);
         return interpolatedIndex;
     }
 
@@ -131,7 +130,7 @@
             return {'columnSpan': newColumnSpan, 'rowSpan': newRowSpan, 'startCol': blockStartCol, 'startRow': blockStartRow};
         }
 
-        function updateGridLayoutData() {
+        function updateGridLayoutData(layoutContainerRect, layoutItemRect) {
 
             const computedStyles = window.getComputedStyle(layoutContainer);
 
@@ -145,7 +144,30 @@
             if(gridRows[gridRows.length-1] === 0) {
                 gridRows.pop();
             }
+            // ensure all columns are there.
+            // This will ensure handling non-css-grid mode,
+            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
+            let amountOfColumnsInWeightMap = gridColumns.length;
+            let gridColumnNumber = parseInt(computedStyles.getPropertyValue('--umb-block-grid--grid-columns'));
+            const amountOfUnknownColumns = gridColumnNumber-amountOfColumnsInWeightMap;
+            if(amountOfUnknownColumns > 0) {
+                let accumulatedValue = getAccumulatedValueOfIndex(amountOfColumnsInWeightMap, gridColumns);
+                const layoutWidth = layoutContainerRect.width;
+                const missingColumnWidth = (layoutWidth-accumulatedValue)/amountOfUnknownColumns;
+                while(amountOfColumnsInWeightMap++ < gridColumnNumber) {
+                    gridColumns.push(missingColumnWidth);
+                }
+            }
 
+            // Handle non css grid mode for Rows:
+            // use item height divided by rowSpan to identify row heights.
+            if(gridRows.length === 0) {
+                // Push its own height twice, to give something to scale with.
+                gridRows.push(layoutItemRect.height);
+                gridRows.push(layoutItemRect.height);
+            }
+
+            // add a few extra rows, so there is something to extend too.
             // Add extra options for the ability to extend beyond current content:
             gridRows.push(50);
             gridRows.push(50);
@@ -165,7 +187,9 @@
                 console.error($element[0], 'could not find parent layout-container');
             }
 
-            updateGridLayoutData();
+            const layoutContainerRect = layoutContainer.getBoundingClientRect();
+            const layoutItemRect = $element[0].getBoundingClientRect();
+            updateGridLayoutData(layoutContainerRect, layoutItemRect);
 
             scaleBoxBackdropEl = document.createElement('div');
             scaleBoxBackdropEl.className = 'umb-block-grid__scalebox-backdrop';
@@ -180,20 +204,14 @@
 
             $element[0].appendChild(scaleBoxEl);
 
-            // ensure all columns are there.
-            // add a few extra rows, so there is something to extend too.
-
-            // TODO: handle non-css-grid mode,
-            // use container width divided by amount of columns( or the item width divided by its amount of columnSpan)
-            // use item height divided by rowSpan to identify row heights.
 
         }
         vm.onMouseMove = function(e) {
 
-            updateGridLayoutData();
-
             const layoutContainerRect = layoutContainer.getBoundingClientRect();
             const layoutItemRect = $element[0].getBoundingClientRect();
+            updateGridLayoutData(layoutContainerRect, layoutItemRect);
+
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
             const startY = layoutItemRect.top - layoutContainerRect.top;
