@@ -9,112 +9,112 @@ import '../auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLogin extends LitElement {
-  static styles: CSSResultGroup = [
-    UUITextStyles,
-    css`
-      #email,
-      #password {
-        width: 100%;
-      }
-    `,
-  ];
+	static styles: CSSResultGroup = [
+		UUITextStyles,
+		css`
+			#email,
+			#password {
+				width: 100%;
+			}
+		`,
+	];
 
-  @state()
-  private _loggingIn = false;
+	@state()
+	private _loggingIn = false;
 
-  private _handleSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
+	private _handleSubmit = (e: SubmitEvent) => {
+		e.preventDefault();
 
-    const form = e.target as HTMLFormElement;
-    if (!form) return;
+		const form = e.target as HTMLFormElement;
+		if (!form) return;
 
-    const isValid = form.checkValidity();
-    if (!isValid) return;
+		const isValid = form.checkValidity();
+		if (!isValid) return;
 
-    const formData = new FormData(form);
+		const formData = new FormData(form);
 
-    const username = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const persist = formData.has('persist');
+		const username = formData.get('email') as string;
+		const password = formData.get('password') as string;
+		const persist = formData.has('persist');
 
-    this._login(username, password, persist);
-  };
+		this._login(username, password, persist);
+	};
 
-  private async _login(username: string, password: string, persist: boolean) {
-    this._loggingIn = true;
+	private async _login(username: string, password: string, persist: boolean) {
+		this._loggingIn = true;
 
-    try {
-      await postUserLogin({ username, password, persist });
-      this._loggingIn = false;
-      history.pushState(null, '', '/section');
-    } catch (error) {
-      console.log(error);
-      this._loggingIn = false;
-    }
-  }
+		try {
+			await postUserLogin({ username, password, persist });
+			this._loggingIn = false;
+			history.pushState(null, '', '/section');
+		} catch (error) {
+			console.log(error);
+			this._loggingIn = false;
+		}
+	}
 
-  private _greetings: Array<string> = [
-    'Happy super Sunday',
-    'Happy marvelous Monday',
-    'Happy tubular Tuesday',
-    'Happy wonderful Wednesday',
-    'Happy thunderous Thursday',
-    'Happy funky Friday',
-    'Happy Saturday',
-  ];
+	private _greetings: Array<string> = [
+		'Happy super Sunday',
+		'Happy marvelous Monday',
+		'Happy tubular Tuesday',
+		'Happy wonderful Wednesday',
+		'Happy thunderous Thursday',
+		'Happy funky Friday',
+		'Happy Saturday',
+	];
 
-  @state()
-  private _greeting: string = this._greetings[new Date().getDay()];
+	@state()
+	private _greeting: string = this._greetings[new Date().getDay()];
 
-  render() {
-    return html`
-      <umb-auth-layout>
-        <div class="uui-text">
-          <h1 class="uui-h3">${this._greeting}</h1>
-          <uui-form>
-            <form id="LoginForm" name="login" @submit="${this._handleSubmit}">
-              <uui-form-layout-item>
-                <uui-label for="email" slot="label" required>Email</uui-label>
-                <uui-input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Enter your email..."
-                  required
-                  required-message="Email is required"></uui-input>
-              </uui-form-layout-item>
+	render() {
+		return html`
+			<umb-auth-layout>
+				<div class="uui-text">
+					<h1 class="uui-h3">${this._greeting}</h1>
+					<uui-form>
+						<form id="LoginForm" name="login" @submit="${this._handleSubmit}">
+							<uui-form-layout-item>
+								<uui-label for="email" slot="label" required>Email</uui-label>
+								<uui-input
+									type="email"
+									id="email"
+									name="email"
+									placeholder="Enter your email..."
+									required
+									required-message="Email is required"></uui-input>
+							</uui-form-layout-item>
 
-              <uui-form-layout-item>
-                <uui-label for="password" slot="label" required>Password</uui-label>
-                <uui-input-password
-                  id="password"
-                  name="password"
-                  placeholder="Enter your password..."
-                  required
-                  required-message="Password is required"></uui-input-password>
-              </uui-form-layout-item>
+							<uui-form-layout-item>
+								<uui-label for="password" slot="label" required>Password</uui-label>
+								<uui-input-password
+									id="password"
+									name="password"
+									placeholder="Enter your password..."
+									required
+									required-message="Password is required"></uui-input-password>
+							</uui-form-layout-item>
 
-              <uui-form-layout-item>
-                <uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
-              </uui-form-layout-item>
+							<uui-form-layout-item>
+								<uui-checkbox name="persist" label="Remember me"> Remember me </uui-checkbox>
+							</uui-form-layout-item>
 
-              <uui-button
-                type="submit"
-                label="Login"
-                look="primary"
-                color="positive"
-                state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
-              <uui-button type="button" label="Forgot Password?"></uui-button>
-            </form>
-          </uui-form>
-        </div>
-      </umb-auth-layout>
-    `;
-  }
+							<uui-button
+								type="submit"
+								label="Login"
+								look="primary"
+								color="positive"
+								state=${ifDefined(this._loggingIn ? 'waiting' : undefined)}></uui-button>
+							<uui-button type="button" label="Forgot Password?"></uui-button>
+						</form>
+					</uui-form>
+				</div>
+			</umb-auth-layout>
+		`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-login': UmbLogin;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-login': UmbLogin;
+	}
 }

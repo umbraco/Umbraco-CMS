@@ -12,42 +12,42 @@ import '../property-actions/property-action-menu/property-action-menu.element';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
-  static styles = [
-    UUITextStyles,
-    css`
-      :host {
-        display: block;
-      }
-      p {
-        color: var(--uui-color-text-alt);
-      }
-    `,
-  ];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				display: block;
+			}
+			p {
+				color: var(--uui-color-text-alt);
+			}
+		`,
+	];
 
-  private _property: any; // TODO: property data model interface..
-  @property()
-  public get property(): any {
-    return this._property;
-  }
-  public set property(value: any) {
-    this._property = value;
-    this._useDataType();
-  }
+	private _property: any; // TODO: property data model interface..
+	@property()
+	public get property(): any {
+		return this._property;
+	}
+	public set property(value: any) {
+		this._property = value;
+		this._useDataType();
+	}
 
-  @property()
-  value?: string;
+	@property()
+	value?: string;
 
-  // TODO: make interface for UMBPropertyEditorElement
-  @state()
-  private _element?: { value?: string } & HTMLElement; // TODO: invent interface for propertyEditorUI.
+	// TODO: make interface for UMBPropertyEditorElement
+	@state()
+	private _element?: { value?: string } & HTMLElement; // TODO: invent interface for propertyEditorUI.
 
-  private _dataType?: DataTypeEntity;
-  private _extensionRegistry?: UmbExtensionRegistry;
-  private _dataTypeStore?: UmbDataTypeStore;
-  private _dataTypeSubscription?: Subscription;
+	private _dataType?: DataTypeEntity;
+	private _extensionRegistry?: UmbExtensionRegistry;
+	private _dataTypeStore?: UmbDataTypeStore;
+	private _dataTypeSubscription?: Subscription;
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
     /** TODO: Use DI for these types of services. */
     this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
@@ -79,28 +79,28 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
             }
             this._dataType = dataTypeEntity;
 
-            return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
-          })
-        )
-        .subscribe((propertyEditorUI) => {
-          if (propertyEditorUI) {
-            this._gotData(propertyEditorUI);
-          }
-          // TODO: If gone what then...
-        });
-    }
-  }
+						return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
+					})
+				)
+				.subscribe((propertyEditorUI) => {
+					if (propertyEditorUI) {
+						this._gotData(propertyEditorUI);
+					}
+					// TODO: If gone what then...
+				});
+		}
+	}
 
-  private _gotData(_propertyEditorUI?: UmbExtensionManifest) {
-    if (!this._dataType || !_propertyEditorUI) {
-      // TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
-      return;
-    }
+	private _gotData(_propertyEditorUI?: UmbExtensionManifest) {
+		if (!this._dataType || !_propertyEditorUI) {
+			// TODO: if dataTypeKey didn't exist in store, we should do some nice UI.
+			return;
+		}
 
-    createExtensionElement(_propertyEditorUI)
-      .then((el) => {
-        const oldValue = this._element;
-        this._element = el;
+		createExtensionElement(_propertyEditorUI)
+			.then((el) => {
+				const oldValue = this._element;
+				this._element = el;
 
         // TODO: Set/Parse Data-Type-UI-configuration
         if (this._element) {
@@ -120,22 +120,22 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
     e.stopPropagation();
   };
 
-  /** Lit does not currently handle dynamic tag names, therefor we are doing some manual rendering */
-  // TODO: Refactor into a base class for dynamic-tag element? we will be using this a lot for extensions.
-  // This could potentially hook into Lit and parse all properties defined in the specific class on to the dynamic-element. (see static elementProperties: PropertyDeclarationMap;)
-  willUpdate(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-    super.willUpdate(changedProperties);
+	/** Lit does not currently handle dynamic tag names, therefor we are doing some manual rendering */
+	// TODO: Refactor into a base class for dynamic-tag element? we will be using this a lot for extensions.
+	// This could potentially hook into Lit and parse all properties defined in the specific class on to the dynamic-element. (see static elementProperties: PropertyDeclarationMap;)
+	willUpdate(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.willUpdate(changedProperties);
 
-    const hasChangedProps = changedProperties.has('value');
-    if (hasChangedProps && this._element) {
-      this._element.value = this.value; // Be aware its duplicated code
-    }
-  }
+		const hasChangedProps = changedProperties.has('value');
+		if (hasChangedProps && this._element) {
+			this._element.value = this.value; // Be aware its duplicated code
+		}
+	}
 
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._dataTypeSubscription?.unsubscribe();
-  }
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._dataTypeSubscription?.unsubscribe();
+	}
 
   private _renderPropertyActions () {
     return html`${ this._dataType ? html`<umb-property-action-menu .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
@@ -156,7 +156,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-node-property': UmbNodeProperty;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-node-property': UmbNodeProperty;
+	}
 }

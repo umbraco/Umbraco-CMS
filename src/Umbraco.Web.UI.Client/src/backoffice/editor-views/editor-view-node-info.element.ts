@@ -4,23 +4,20 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-editor-view-node-info')
 export class UmbEditorViewNodeInfo extends LitElement {
-  static styles = [
-    UUITextStyles,
-    css``,
-  ];
+	static styles = [UUITextStyles, css``];
 
-  @property()
-  node: any;
+	@property()
+	node: any;
 
-  render() {
-    return html`<div>Info Editor View</div>`;
-  }
+	render() {
+		return html`<div>Info Editor View</div>`;
+	}
 }
 
 export default UmbEditorViewNodeInfo;
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-editor-view-node-info': UmbEditorViewNodeInfo;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-editor-view-node-info': UmbEditorViewNodeInfo;
+	}
 }

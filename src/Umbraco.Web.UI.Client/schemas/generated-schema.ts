@@ -4,18 +4,20 @@
  */
 
 export interface paths {
-  "/init": {
-    get: operations["GetInit"];
+  "/install/settings": {
+    get: operations["GetInstallSettings"];
   };
-  "/version": {
-    get: operations["GetVersion"];
+  "/install/setup": {
+    post: operations["PostInstallSetup"];
   };
-  "/install": {
-    get: operations["GetInstall"];
-    post: operations["PostInstall"];
-  };
-  "/install/database/validate": {
+  "/install/validateDatabase": {
     post: operations["PostInstallValidateDatabase"];
+  };
+  "/server/status": {
+    get: operations["GetStatus"];
+  };
+  "/server/version": {
+    get: operations["GetVersion"];
   };
   "/user": {
     get: operations["GetUser"];
@@ -33,62 +35,77 @@ export interface paths {
 
 export interface components {
   schemas: {
-    InitResponse: {
-      installed: boolean;
-    };
-    ErrorResponse: {
-      errorMessage: string;
-    };
-    VersionResponse: {
-      version: string;
-    };
     /** @enum {string} */
     ConsentLevel: "Minimal" | "Basic" | "Detailed";
     TelemetryModel: {
       level: components["schemas"]["ConsentLevel"];
       description: string;
     };
-    UmbracoInstallerUserModel: {
+    InstallUserModel: {
       /** Format: float */
       minCharLength: number;
       /** Format: float */
       minNonAlphaNumericLength: number;
       consentLevels: components["schemas"]["TelemetryModel"][];
     };
-    UmbracoInstallerDatabaseModel: {
+    InstallDatabaseModel: {
       id: string;
       /** Format: float */
       sortOrder: number;
       displayName: string;
       defaultDatabaseName: string;
       providerName: string | null;
-      isAvailable: boolean;
+      isConfigured: boolean;
       requiresServer: boolean;
       serverPlaceholder: string | null;
       requiresCredentials: boolean;
       supportsIntegratedAuthentication: boolean;
       requiresConnectionTest: boolean;
     };
-    UmbracoInstaller: {
-      user: components["schemas"]["UmbracoInstallerUserModel"];
-      databases: components["schemas"]["UmbracoInstallerDatabaseModel"][];
+    InstallSettingsResponse: {
+      user: components["schemas"]["InstallUserModel"];
+      databases: components["schemas"]["InstallDatabaseModel"][];
     };
-    UmbracoPerformInstallDatabaseConfiguration: {
-      server?: string | null;
-      password?: string | null;
-      username?: string | null;
-      databaseName?: string | null;
-      databaseType?: string | null;
-      useIntegratedAuthentication?: boolean | null;
-      connectionString?: string | null;
+    ProblemDetails: {
+      type: string;
+      /** Format: float */
+      status: number;
+      title?: string;
+      detail?: string;
+      instance?: string;
+      errors?: { [key: string]: unknown };
     };
-    UmbracoPerformInstallRequest: {
+    InstallSetupUserConfiguration: {
       name: string;
       email: string;
       password: string;
       subscribeToNewsletter: boolean;
+    };
+    InstallSetupDatabaseConfiguration: {
+      id?: string;
+      server?: string | null;
+      password?: string | null;
+      username?: string | null;
+      name?: string | null;
+      providerName?: string | null;
+      useIntegratedAuthentication?: boolean | null;
+      connectionString?: string | null;
+    };
+    InstallSetupRequest: {
+      user: components["schemas"]["InstallSetupUserConfiguration"];
       telemetryLevel: components["schemas"]["ConsentLevel"];
-      database: components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
+      database?: components["schemas"]["InstallSetupDatabaseConfiguration"];
+    };
+    InstallValidateDatabaseRequest: {
+      database: components["schemas"]["InstallSetupDatabaseConfiguration"];
+    };
+    /** @enum {string} */
+    ServerStatus: "running" | "must-install" | "must-upgrade";
+    StatusResponse: {
+      serverStatus: components["schemas"]["ServerStatus"];
+    };
+    VersionResponse: {
+      version: string;
     };
     UserResponse: {
       username: string;
@@ -106,18 +123,70 @@ export interface components {
 }
 
 export interface operations {
-  GetInit: {
+  GetInstallSettings: {
     responses: {
       /** 200 response */
       200: {
         content: {
-          "application/json": components["schemas"]["InitResponse"];
+          "application/json": components["schemas"]["InstallSettingsResponse"];
         };
       };
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+  };
+  PostInstallSetup: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InstallSetupRequest"];
+      };
+    };
+  };
+  PostInstallValidateDatabase: {
+    parameters: {};
+    responses: {
+      /** 201 response */
+      201: unknown;
+      /** 400 response */
+      400: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InstallValidateDatabaseRequest"];
+      };
+    };
+  };
+  GetStatus: {
+    responses: {
+      /** 200 response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["StatusResponse"];
+        };
+      };
+      /** default response */
+      default: {
+        content: {
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -133,54 +202,8 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
-      };
-    };
-  };
-  GetInstall: {
-    responses: {
-      /** 200 response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UmbracoInstaller"];
-        };
-      };
-    };
-  };
-  PostInstall: {
-    parameters: {};
-    responses: {
-      /** 201 response */
-      201: unknown;
-      /** 400 response */
-      400: {
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UmbracoPerformInstallRequest"];
-      };
-    };
-  };
-  PostInstallValidateDatabase: {
-    parameters: {};
-    responses: {
-      /** 201 response */
-      201: unknown;
-      /** 400 response */
-      400: {
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UmbracoPerformInstallDatabaseConfiguration"];
       };
     };
   };
@@ -195,7 +218,7 @@ export interface operations {
       /** 403 response */
       403: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -208,7 +231,7 @@ export interface operations {
       /** 403 response */
       403: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -225,7 +248,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };
@@ -241,7 +264,7 @@ export interface operations {
       /** default response */
       default: {
         content: {
-          "application/json": components["schemas"]["ErrorResponse"];
+          "application/json": components["schemas"]["ProblemDetails"];
         };
       };
     };

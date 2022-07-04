@@ -9,72 +9,72 @@ import { createExtensionElement, UmbExtensionManifestSection, UmbExtensionRegist
 
 @defineElement('umb-backoffice-main')
 export class UmbBackofficeMain extends UmbContextConsumerMixin(LitElement) {
-  static styles = [
-    UUITextStyles,
-    css`
-      :host {
-        background-color: var(--uui-color-background);
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ];
+	static styles = [
+		UUITextStyles,
+		css`
+			:host {
+				background-color: var(--uui-color-background);
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	];
 
-  @state()
-  private _routes: Array<any> = [];
+	@state()
+	private _routes: Array<any> = [];
 
-  @state()
-  private _sections: Array<UmbExtensionManifestSection> = [];
+	@state()
+	private _sections: Array<UmbExtensionManifestSection> = [];
 
-  private _extensionRegistry?: UmbExtensionRegistry;
-  private _sectionSubscription?: Subscription;
+	private _extensionRegistry?: UmbExtensionRegistry;
+	private _sectionSubscription?: Subscription;
 
-  constructor() {
-    super();
+	constructor() {
+		super();
 
-    this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-      this._extensionRegistry = _instance;
-      this._useSections();
-    });
-  }
+		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
+			this._extensionRegistry = _instance;
+			this._useSections();
+		});
+	}
 
-  private _useSections() {
-    this._sectionSubscription?.unsubscribe();
+	private _useSections() {
+		this._sectionSubscription?.unsubscribe();
 
-    this._sectionSubscription = this._extensionRegistry
-      ?.extensionsOfType('section')
-      .pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
-      .subscribe((sections) => {
-        this._routes = [];
-        this._sections = sections as Array<UmbExtensionManifestSection>;
+		this._sectionSubscription = this._extensionRegistry
+			?.extensionsOfType('section')
+			.pipe(map((extensions) => extensions.sort((a, b) => b.meta.weight - a.meta.weight)))
+			.subscribe((sections) => {
+				this._routes = [];
+				this._sections = sections as Array<UmbExtensionManifestSection>;
 
-        this._routes = this._sections.map((section) => {
-          return {
-            path: 'section/' + section.meta.pathname,
-            component: () => createExtensionElement(section),
-          };
-        });
+				this._routes = this._sections.map((section) => {
+					return {
+						path: 'section/' + section.meta.pathname,
+						component: () => createExtensionElement(section),
+					};
+				});
 
-        this._routes.push({
-          path: '**',
-          redirectTo: 'section/' + this._sections[0].meta.pathname,
-        });
-      });
-  }
+				this._routes.push({
+					path: '**',
+					redirectTo: 'section/' + this._sections[0].meta.pathname,
+				});
+			});
+	}
 
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._sectionSubscription?.unsubscribe();
-  }
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this._sectionSubscription?.unsubscribe();
+	}
 
-  render() {
-    return html`<router-slot .routes=${this._routes}></router-slot>`;
-  }
+	render() {
+		return html`<router-slot .routes=${this._routes}></router-slot>`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    'umb-backoffice-main': UmbBackofficeMain;
-  }
+	interface HTMLElementTagNameMap {
+		'umb-backoffice-main': UmbBackofficeMain;
+	}
 }
