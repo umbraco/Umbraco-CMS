@@ -26,8 +26,13 @@ public class ContentPropertyDisplay : ContentPropertyBasic
     [Required(AllowEmptyStrings = false)]
     public string? View { get; set; }
 
+    [Obsolete("The value type parameter of the dictionary will be made nullable in V11, use ConfigNullable instead.")]
     [DataMember(Name = "config")]
     public IDictionary<string, object>? Config { get; set; }
+
+    // TODO: Obsolete in V11.
+    [IgnoreDataMember]
+    public IDictionary<string, object?>? ConfigNullable { get => Config!; set => Config = value!; }
 
     [DataMember(Name = "hideLabel")]
     public bool HideLabel { get; set; }

@@ -24,7 +24,7 @@ COPY --from=build dist .
 
 ENV ASPNETCORE_URLS="http://0.0.0.0:5000"
 ENV Umbraco__CMS__Global__InstallMissingDatabase="true"
-ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.SQLite"
+ENV ConnectionStrings__umbracoDbDSN_ProviderName="Microsoft.Data.Sqlite"
 ENV ConnectionStrings__umbracoDbDSN="Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True"
 ENV Umbraco__CMS__Unattended__InstallUnattended="true"
 ENV Umbraco__CMS__Unattended__UnattendedUserName="Cypress Test"

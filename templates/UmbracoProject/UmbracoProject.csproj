@@ -21,17 +21,14 @@
     <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
-  </PropertyGroup>
-
   <ItemGroup>
     <Folder Include="wwwroot" />
   </ItemGroup>
 
-  <!-- Keep this as false if ModelsBuilder mode is InMemoryAuto -->
+  <!-- Remove RazorCompileOnBuild, RazorCompileOnPublish and CopyRazorGenerateFilesToPublishDirectory when not using ModelsMode InMemoryAuto -->
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
 </Project>

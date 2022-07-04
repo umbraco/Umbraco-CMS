@@ -71,7 +71,7 @@ public class ConfigurationExtensionsTests
     {
         const string ConfiguredConnectionString =
             "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True";
-        const string ConfiguredProviderName = "Microsoft.Data.SQLite";
+        const string ConfiguredProviderName = "Microsoft.Data.Sqlite";
 
         var mockedConfig = CreateConfig(ConfiguredConnectionString, ConfiguredProviderName);
         SetDataDirectory();
@@ -80,7 +80,7 @@ public class ConfigurationExtensionsTests
 
         AssertResults(
             @"Data Source=C:\Data/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True",
-            "Microsoft.Data.SQLite",
+            "Microsoft.Data.Sqlite",
             connectionString,
             providerName);
     }
