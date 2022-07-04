@@ -1,4 +1,4 @@
-using Serilog;
+﻿using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
 
@@ -27,14 +27,14 @@ public class MessageTemplates : IMessageTemplates
             throw new FormatException($"Could not format message \"{messageTemplate}\" with {args.Length} args.");
         }
 
-        var values = boundProperties.ToDictionary(x => x.Name, x => x.Value);
+        var values = boundProperties!.ToDictionary(x => x.Name, x => x.Value);
 
         // this ends up putting every string parameter between quotes
         // return parsedTemplate.Render(values);
 
         // this does not
         var tw = new StringWriter();
-        foreach (MessageTemplateToken? t in parsedTemplate.Tokens)
+        foreach (MessageTemplateToken? t in parsedTemplate!.Tokens)
         {
             if (t is PropertyToken pt &&
                 values.TryGetValue(pt.PropertyName, out LogEventPropertyValue? propVal) &&

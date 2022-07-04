@@ -73,7 +73,12 @@ public interface IConfigurationEditor
     ///     Converts the configuration object to values for the configuration editor.
     /// </summary>
     /// <param name="configuration">The configuration.</param>
+    [Obsolete("The value type parameter of the dictionary will be made nullable in V11, use ToConfigurationEditorNullable.")]
     IDictionary<string, object> ToConfigurationEditor(object? configuration);
+
+    // TODO: Obsolete in V11.
+    IDictionary<string, object?> ToConfigurationEditorNullable(object? configuration) =>
+        ToConfigurationEditor(configuration)!;
 
     /// <summary>
     ///     Converts the configuration object to values for the value editor.

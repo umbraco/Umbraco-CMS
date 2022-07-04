@@ -17,9 +17,9 @@ public class ContentItemDisplayWithSchedule : ContentItemDisplay<ContentVariantS
 ///     A model representing a content item to be displayed in the back office
 /// </summary>
 [DataContract(Name = "content", Namespace = "")]
-public class
-    ContentItemDisplay<TVariant> : INotificationModel,
-        IErrorModel // ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
+public class ContentItemDisplay<TVariant> :
+    INotificationModel,
+    IErrorModel // ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     where TVariant : ContentVariantDisplay
 {
     public ContentItemDisplay()

@@ -12,18 +12,18 @@ public class LegacyScopeProviderTests : UmbracoIntegrationTest
     [Test]
     public void CreateScope_Always_ReturnsLegacyIScope()
     {
-        var scopeProvider = GetRequiredService<global::Umbraco.Cms.Core.Scoping.IScopeProvider>();
+        var scopeProvider = GetRequiredService<IScopeProvider>();
 
         using (var scope = scopeProvider.CreateScope())
         {
-            Assert.IsInstanceOf<global::Umbraco.Cms.Core.Scoping.IScope>(scope);
+            Assert.IsInstanceOf<IScope>(scope);
         }
     }
 
     [Test]
     public void LegacyScopeProvider_Always_IsACoreScopeProvider()
     {
-        var scopeProvider = GetRequiredService<global::Umbraco.Cms.Core.Scoping.IScopeProvider>();
+        var scopeProvider = GetRequiredService<IScopeProvider>();
 
         Assert.IsInstanceOf<ICoreScopeProvider>(scopeProvider);
     }

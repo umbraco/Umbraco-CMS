@@ -3,8 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -16,15 +18,26 @@ public class ReportSiteTask : RecurringHostedServiceBase
     private static HttpClient _httpClient = new();
     private readonly ILogger<ReportSiteTask> _logger;
     private readonly ITelemetryService _telemetryService;
+    private readonly IRuntimeState _runtimeState;
 
     public ReportSiteTask(
         ILogger<ReportSiteTask> logger,
-        ITelemetryService telemetryService)
-        : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+        ITelemetryService telemetryService,
+        IRuntimeState runtimeState)
+        : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(5))
     {
         _logger = logger;
         _telemetryService = telemetryService;
+        _runtimeState = runtimeState;
         _httpClient = new HttpClient();
+    }
+
+    [Obsolete("Use the constructor that takes IRuntimeState, scheduled for removal in V12")]
+    public ReportSiteTask(
+        ILogger<ReportSiteTask> logger,
+        ITelemetryService telemetryService)
+        : this(logger, telemetryService, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
+    {
     }
 
     [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
@@ -42,6 +55,12 @@ public class ReportSiteTask : RecurringHostedServiceBase
     /// </summary>
     public override async Task PerformExecuteAsync(object? state)
     {
+        if (_runtimeState.Level is not RuntimeLevel.Run)
+        {
+            // We probably haven't installed yet, so we can't get telemetry.
+            return;
+        }
+
         if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
         {
             _logger.LogWarning("No telemetry marker found");
@@ -66,7 +85,8 @@ public class ReportSiteTask : RecurringHostedServiceBase
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
-                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json");
+                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8,
+                    "application/json");
 
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/

@@ -33,6 +33,7 @@ public class GlobalSettings
     internal const string StaticDistributedLockingWriteLockDefaultTimeout = "00:00:05";
     internal const bool StaticSanitizeTinyMce = false;
     internal const int StaticMainDomReleaseSignalPollingInterval = 2000;
+    private const bool StaticForceCombineUrlPathLeftToRight = true;
 
     /// <summary>
     ///     Gets or sets a value for the reserved URLs (must end with a comma).
@@ -226,7 +227,25 @@ public class GlobalSettings
         TimeSpan.Parse(StaticDistributedLockingWriteLockDefaultTimeout);
 
     /// <summary>
-    ///     Gets or sets a value representing the DistributedLockingMechanism to use.
+    /// Gets or sets a value representing the DistributedLockingMechanism to use.
     /// </summary>
     public string DistributedLockingMechanism { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Force url paths to be left to right, even when the culture has right to left text
+    /// </summary>
+    /// <example>
+    /// For the following hierarchy
+    /// - Root (/ar)
+    ///   - 1 (/ar/1)
+    ///     - 2 (/ar/1/2)
+    ///       - 3 (/ar/1/2/3)
+    ///         - 3 (/ar/1/2/3/4)
+    /// When forced
+    /// - https://www.umbraco.com/ar/1/2/3/4
+    /// when not
+    /// - https://www.umbraco.com/ar/4/3/2/1
+    /// </example>
+    [DefaultValue(StaticForceCombineUrlPathLeftToRight)]
+    public bool ForceCombineUrlPathLeftToRight { get; set; }  = StaticForceCombineUrlPathLeftToRight;
 }
