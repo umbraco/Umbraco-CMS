@@ -17,7 +17,7 @@
 
                 <ul ng-if="nodeUrl" class="nav nav-stacked mb0">
                     <li>
-                        <a href="" ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank" rel="noopener" class="umb-outline">
+                        <a href="" ng-attr-href="{{nodeUrl}}" target="_blank" rel="noopener" class="umb-outline">
                             <umb-icon icon="icon-out" class="icon"></umb-icon>
                             <span>{{nodeFileName}}</span>
                         </a>
