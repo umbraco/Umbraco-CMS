@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.BackOfficeApi.Factories.Installer;
-using Umbraco.Cms.BackOfficeApi.Models.Installer;
 using Umbraco.Cms.BackOfficeApi.Services.Installer;
 using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
-using Umbraco.Cms.Core.Install.NewInstallSteps;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.New.Cms.Core.Factories;
+using Umbraco.New.Cms.Core.Models.Installer;
+using Umbraco.New.Cms.Core.Services.Installer;
 
 namespace Umbraco.Cms.BackOfficeApi.Controllers;
 

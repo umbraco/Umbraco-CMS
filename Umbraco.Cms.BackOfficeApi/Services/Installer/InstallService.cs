@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Install;
-using Umbraco.Cms.Core.Install.NewInstallSteps;
-using Umbraco.Cms.Core.Install.NewModels;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.New.Cms.Core.Installer;
+using Umbraco.New.Cms.Core.Installer.Steps;
+using Umbraco.New.Cms.Core.Models.Installer;
+using Umbraco.New.Cms.Core.Services.Installer;
 
+// TODO: Move me when post install step is created.
 namespace Umbraco.Cms.BackOfficeApi.Services.Installer;
 
 public class InstallService : IInstallService

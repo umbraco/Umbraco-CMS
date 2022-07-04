@@ -1,7 +1,7 @@
-using Umbraco.Cms.BackOfficeApi.Models.Installer;
 using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.BackOfficeApi.Mapping.Installer;
 

@@ -33,8 +33,7 @@ public static partial class UmbracoBuilderExtensions
             .Add<UserMapDefinition>()
             .Add<MemberMapDefinition>()
             .Add<LanguageMapDefinition>()
-            .Add<IdentityMapDefinition>()
-            .Add<InstallMapDefinition>();
+            .Add<IdentityMapDefinition>();
 
         builder.Services.AddTransient<CommonMapper>();
         builder.Services.AddTransient<MemberTabsAndPropertiesMapper>();

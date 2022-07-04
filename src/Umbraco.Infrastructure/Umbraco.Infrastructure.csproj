@@ -16,6 +16,11 @@
       <DefineConstants>TRACE_SCOPES;</DefineConstants>
     </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Umbraco.New.Cms.Infrastructure</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
