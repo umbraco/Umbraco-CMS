@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 
 [DataContract(Name = "databaseSettings")]
-public class DatabaseProviderViewModel
+public class DatabaseSettingsViewModel
 {
     [DataMember(Name = "id")]
     public Guid Id { get; set; }

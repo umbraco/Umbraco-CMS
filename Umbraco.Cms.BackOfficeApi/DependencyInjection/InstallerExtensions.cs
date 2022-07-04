@@ -22,6 +22,7 @@ public static class InstallerExtensions
 
         services.AddTransient<IUserSettingsFactory, UserSettingsFactory>();
         services.AddTransient<IInstallSettingsFactory, InstallSettingsFactory>();
+        services.AddTransient<IDatabaseSettingsFactory, DatabaseSettingsFactory>();
 
         builder.AddInstallSteps();
         services.AddScoped<IInstallService, InstallService>();

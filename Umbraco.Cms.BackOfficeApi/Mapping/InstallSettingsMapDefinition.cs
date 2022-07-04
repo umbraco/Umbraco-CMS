@@ -11,7 +11,8 @@ public class InstallSettingsMapDefinition : IMapDefinition
     {
         mapper.Define<InstallSettingsModel, InstallSettingsViewModel>((source, context) => new InstallSettingsViewModel(), Map);
         mapper.Define<UserSettingsModel, UserSettingsViewModel>((source, context) => new UserSettingsViewModel(), Map);
-        mapper.Define<IDatabaseProviderMetadata, DatabaseProviderViewModel>((source, context) => new DatabaseProviderViewModel(), Map);
+        mapper.Define<IDatabaseProviderMetadata, DatabaseSettingsModel>((source, context) => new DatabaseSettingsModel(), Map);
+        mapper.Define<DatabaseSettingsModel, DatabaseSettingsViewModel>((source, context) => new DatabaseSettingsViewModel(), Map);
         mapper.Define<ConsentLevelModel, ConsentLevelViewModel>((source, context) => new ConsentLevelViewModel(), Map);
     }
 
@@ -19,7 +20,7 @@ public class InstallSettingsMapDefinition : IMapDefinition
     private static void Map(InstallSettingsModel source, InstallSettingsViewModel target, MapperContext context)
     {
         target.User = context.Map<UserSettingsViewModel>(source.UserSettings)!;
-        target.Databases = context.MapEnumerable<IDatabaseProviderMetadata, DatabaseProviderViewModel>(source.DatabaseSettings);
+        target.Databases = context.MapEnumerable<DatabaseSettingsModel, DatabaseSettingsViewModel>(source.DatabaseSettings);
     }
 
     // Umbraco.Code.MapAll
@@ -31,7 +32,7 @@ public class InstallSettingsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(IDatabaseProviderMetadata source, DatabaseProviderViewModel target, MapperContext context)
+    private static void Map(IDatabaseProviderMetadata source, DatabaseSettingsModel target, MapperContext context)
     {
         target.DefaultDatabaseName = source.DefaultDatabaseName;
         target.DisplayName = source.DisplayName;
@@ -43,7 +44,23 @@ public class InstallSettingsMapDefinition : IMapDefinition
         target.ServerPlaceholder = source.ServerPlaceholder ?? string.Empty;
         target.SortOrder = source.SortOrder;
         target.SupportsIntegratedAuthentication = source.SupportsIntegratedAuthentication;
-        target.IsConfigured = false; // TODO: actually read this correctly
+        target.IsConfigured = false; // Defaults to false, we'll set this to true if needed,
+    }
+
+    // Umbraco.Code.MapAll
+    private static void Map(DatabaseSettingsModel source, DatabaseSettingsViewModel target, MapperContext context)
+    {
+        target.DefaultDatabaseName = source.DefaultDatabaseName;
+        target.DisplayName = source.DisplayName;
+        target.Id = source.Id;
+        target.IsConfigured = source.IsConfigured;
+        target.ProviderName = source.ProviderName;
+        target.RequiresConnectionTest = source.RequiresConnectionTest;
+        target.RequiresCredentials = source.RequiresCredentials;
+        target.RequiresServer = source.RequiresServer;
+        target.ServerPlaceholder = source.ServerPlaceholder;
+        target.SortOrder = source.SortOrder;
+        target.SupportsIntegratedAuthentication = source.SupportsIntegratedAuthentication;
     }
 
     // Umbraco.Code.MapAll

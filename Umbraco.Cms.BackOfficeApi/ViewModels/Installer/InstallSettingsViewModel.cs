@@ -9,5 +9,5 @@ public class InstallSettingsViewModel
     public UserSettingsViewModel User { get; set; } = null!;
 
     [DataMember(Name = "databases")]
-    public IEnumerable<DatabaseProviderViewModel> Databases { get; set; } = Enumerable.Empty<DatabaseProviderViewModel>();
+    public IEnumerable<DatabaseSettingsViewModel> Databases { get; set; } = Enumerable.Empty<DatabaseSettingsViewModel>();
 }

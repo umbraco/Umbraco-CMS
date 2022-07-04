@@ -1,25 +1,24 @@
 using Umbraco.Cms.BackOfficeApi.Models.Installer;
-using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.BackOfficeApi.Factories.Installer;
 
 public class InstallSettingsFactory : IInstallSettingsFactory
 {
     private readonly IUserSettingsFactory _userSettingsFactory;
-    private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
+    private readonly IDatabaseSettingsFactory _databaseSettingsFactory;
 
     public InstallSettingsFactory(
         IUserSettingsFactory userSettingsFactory,
-        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata)
+        IDatabaseSettingsFactory databaseSettingsFactory)
     {
         _userSettingsFactory = userSettingsFactory;
-        _databaseProviderMetadata = databaseProviderMetadata;
+        _databaseSettingsFactory = databaseSettingsFactory;
     }
 
     public InstallSettingsModel GetInstallSettings() =>
-        new InstallSettingsModel
+        new()
         {
-            DatabaseSettings = _databaseProviderMetadata.GetAvailable(),
+            DatabaseSettings = _databaseSettingsFactory.GetDatabaseSettings(),
             UserSettings = _userSettingsFactory.GetUserSettings(),
         };
 }
