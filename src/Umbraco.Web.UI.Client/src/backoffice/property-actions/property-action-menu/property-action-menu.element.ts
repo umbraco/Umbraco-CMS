@@ -2,13 +2,14 @@ import { UUITextStyles } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription, map } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbExtensionManifestPropertyAction, UmbExtensionRegistry } from '../../core/extension';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
+import { UmbExtensionManifestPropertyAction, UmbExtensionRegistry } from '../../../core/extension';
+import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
-import './node-property-action.element';
+import './property-action.element';
 
-@customElement('umb-node-property-actions')
-export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-property-action-menu')
+export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
   static styles: CSSResultGroup = [
     UUITextStyles,
     css`
@@ -54,14 +55,21 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
   
   private _extensionRegistry?: UmbExtensionRegistry;
   private _subscription?: Subscription;
+  private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
   
   constructor () {
     super();
+    
+    this._propertyActionMenuContext.isOpen.subscribe((value: boolean) => {
+      this._open = value;
+    });
 
     this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
       this._extensionRegistry = extensionRegistry;
       this._usePropertyActions();
     });
+
+    this.provideContext('umbPropertyActionMenu', this._propertyActionMenuContext);
   }
 
   private _usePropertyActions () {
@@ -76,7 +84,8 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
   }
 
   private _toggleMenu () {
-    this._open = !this._open;
+    //this._open = !this._open;
+    this._open ? this._propertyActionMenuContext.close() : this._propertyActionMenuContext.open();
   }
 
   private _handleClose (event: CustomEvent) {
@@ -110,7 +119,7 @@ export class UmbNodePropertyActions extends UmbContextConsumerMixin(LitElement) 
           <div slot="popover" id="dropdown">
             ${this._actions.map(
               action => html`
-                <umb-node-property-action .propertyAction=${action} .value="${this.value}"></umb-node-property-action>
+                <umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
               `
             )}
           </div>

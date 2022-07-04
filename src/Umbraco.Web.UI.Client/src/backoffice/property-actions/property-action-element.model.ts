@@ -1,4 +1,4 @@
 // TODO: Where should things like these live?
-export interface UmbPropertyActionElement extends HTMLElement {
+export interface UmbPropertyAction extends HTMLElement {
   value?: string;
 }

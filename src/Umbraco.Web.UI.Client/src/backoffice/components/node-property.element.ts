@@ -8,7 +8,7 @@ import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } fr
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/content.data';
 
-import './node-property-actions.element';
+import '../property-actions/property-action-menu/property-action-menu.element';
 
 @customElement('umb-node-property')
 class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
@@ -138,7 +138,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
   }
 
   private _renderPropertyActions () {
-    return html`${ this._dataType ? html`<umb-node-property-actions .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-node-property-actions>`: '' }`;
+    return html`${ this._dataType ? html`<umb-property-action-menu .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
   }
 
   render() {

@@ -2,10 +2,10 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbNotificationService } from '../../core/services/notification.service';
-import type { UmbPropertyActionElement } from './property-action-element.model';
+import type { UmbPropertyAction } from './property-action-element.model';
 
 @customElement('umb-property-action-copy')
-export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitElement) implements UmbPropertyActionElement {
+export default class UmbPropertyActionCopyElement extends UmbContextConsumerMixin(LitElement) implements UmbPropertyAction {
   
   @property()
   value = '';
@@ -41,6 +41,6 @@ export default class UmbPropertyActionCopy extends UmbContextConsumerMixin(LitEl
 
 declare global {
   interface HTMLElementTagNameMap {
-    'umb-property-action-copy': UmbPropertyActionCopy;
+    'umb-property-action-copy': UmbPropertyActionCopyElement;
   }
 }
