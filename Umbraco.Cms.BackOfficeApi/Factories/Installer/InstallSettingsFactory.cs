@@ -19,6 +19,7 @@ public class InstallSettingsFactory : IInstallSettingsFactory
     public InstallSettingsModel GetInstallSettings() =>
         new InstallSettingsModel
         {
-            DatabaseSettings = _databaseProviderMetadata, UserSettings = _userSettingsFactory.GetUserSettings()
+            DatabaseSettings = _databaseProviderMetadata.GetAvailable(),
+            UserSettings = _userSettingsFactory.GetUserSettings(),
         };
 }

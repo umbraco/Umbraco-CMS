@@ -43,16 +43,6 @@ public class NewDatabaseInstallStep : NewInstallSetupStep
             throw new InstallException("The database failed to install. ERROR: " + result.Message);
         }
 
-        // TODO: Handle this
-        // For some reason it's this steps that decides if the upgrade step needs to run :( We don't want this, these steps should be isolated from each other
-        if (result?.RequiresUpgrade == false)
-        {
-            // return Task.FromResult<InstallSetupResult?>(null);
-            return Task.CompletedTask;
-        }
-
-        // Upgrade is required, so set the flag for the next step
-        // return Task.FromResult(new InstallSetupResult(new Dictionary<string, object> { { "upgrade", true } }));
         return Task.CompletedTask;
     }
 
