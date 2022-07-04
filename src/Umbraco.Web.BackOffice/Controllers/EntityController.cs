@@ -243,8 +243,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IEnumerable<SearchResultEntity> results = (
                 searcher is ISearchableTreeWithCulture searcherWithCulture
                     ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
-                    : await searcher.SearchAsync(query, pageSize, 0)
-            ).WhereNotNull();
+                    : await searcher.SearchAsync(query, pageSize, 0))
+            .WhereNotNull();
 
             var searchResult = new TreeSearchResult
             {
