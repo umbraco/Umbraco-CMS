@@ -4,8 +4,8 @@ export interface DocumentNode {
 	name: string;
 	alias: string;
 	icon: string; // TODO: should come from the doc type?
-	properties: NodeProperty[];
-	//data: any; // TODO: define data type
+	properties: Array<NodeProperty>;
+	data: Array<NodePropertyData>;
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
@@ -23,7 +23,11 @@ export interface NodeProperty {
 	label: string;
 	description: string;
 	dataTypeKey: string;
-	tempValue: string; // TODO: remove this - only used for testing
+}
+
+export interface NodePropertyData {
+	alias: string;
+	value: unknown;
 }
 
 /* TODO:
@@ -46,29 +50,24 @@ export const data: Array<DocumentNode> = [
 				label: 'Headline',
 				description: 'Text string property',
 				dataTypeKey: 'dt-1',
-				tempValue: 'The daily life at Umbraco HQ',
 			},
 			{
 				alias: 'myDescription',
 				label: 'Description',
 				description: 'Textarea property',
 				dataTypeKey: 'dt-2',
-				tempValue: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
-		/*
-    // Concept for stored values, better approach for variants, separating data from structure/configuration, still needs structure for variants. (We could actually split it up so we have each variants data through a separate end-point?)
-    data: [
-      {
-        alias: 'myHeadline',
-        value: 'hello world',
-      },
-      {
-        alias: 'myDescription',
-        value: 'Teeeeexxxt areaaaaaa',
-      },
-    ],
-    */
+		data: [
+			{
+				alias: 'myHeadline',
+				value: 'The daily life at Umbraco HQ',
+			},
+			{
+				alias: 'myDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
 		/*
     // Concept for node layout, separation of design from config and data.
     layout: [
@@ -100,29 +99,43 @@ export const data: Array<DocumentNode> = [
 				label: 'Text string label',
 				description: 'this is a text string property',
 				dataTypeKey: 'dt-1',
-				tempValue: 'Is it all just fun and curling and scary rabbits?',
 			},
 			{
 				alias: 'myDescription',
 				label: 'Textarea label',
 				description: 'This is the a textarea property',
 				dataTypeKey: 'dt-2',
-				tempValue:
-					"So no, there's not confetti every day. And no, there's not champagne every week or a crazy rabbit running around 🐰",
 			},
 			{
 				alias: 'myExternalEditor',
 				label: 'My JS Property Editor',
 				description: 'This is the a external property',
 				dataTypeKey: 'dt-3',
-				tempValue: 'Tex lkasdfkljdfsa 1',
 			},
 			{
 				alias: 'myContextExampleEditor',
 				label: 'Context example label',
 				description: 'This is the a example property',
 				dataTypeKey: 'dt-4',
-				tempValue: '',
+			},
+		],
+		data: [
+			{
+				alias: 'myHeadline',
+				value: 'Is it all just fun and curling and scary rabbits?',
+			},
+			{
+				alias: 'myDescription',
+				value:
+					"So no, there's not confetti every day. And no, there's not champagne every week or a crazy rabbit running around 🐰",
+			},
+			{
+				alias: 'myExternalEditor',
+				value: 'Tex lkasdfkljdfsa 1',
+			},
+			{
+				alias: 'myContextExampleEditor',
+				value: '',
 			},
 		],
 	},

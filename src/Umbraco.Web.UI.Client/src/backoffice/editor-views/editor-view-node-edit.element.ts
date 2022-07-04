@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property } from 'lit/decorators.js';
+import { DocumentNode, NodeProperty } from '../../mocks/data/content.data';
 
 @customElement('umb-editor-view-node-edit')
 export class UmbEditorViewNodeEdit extends LitElement {
@@ -15,16 +16,17 @@ export class UmbEditorViewNodeEdit extends LitElement {
 		`,
 	];
 
-	@property()
-	node: any;
+	@property({ type: Object })
+	node?: DocumentNode;
 
 	render() {
 		return html`
 			<uui-box>
-				<!-- TODO: Make sure map get data from data object?, parse on property object. -->
 				${this.node?.properties.map(
-					(property: any) => html`
-						<umb-node-property .property=${property} .value=${property.tempValue}> </umb-node-property>
+					(property: NodeProperty) => html`
+						<umb-node-property
+							.property=${property}
+							.value=${this.node?.data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
 						<hr />
 					`
 				)}

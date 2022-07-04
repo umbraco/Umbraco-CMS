@@ -104,12 +104,19 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
 		// TODO: Set value.
 		const property = this._node?.properties.find((x) => x.alias === target.property.alias);
 		if (property) {
-			// TODO: Dont set the temp value, but set it on the data part of our model.
-			property.tempValue = target.value;
+			this._setPropertyValue(property.alias, target.value);
 		} else {
 			console.error('property was not found', target.property.alias);
 		}
 	};
+
+	private _setPropertyValue(alias: string, value: unknown) {
+		this._node?.data.forEach((data) => {
+			if (data.alias === alias) {
+				data.value = value;
+			}
+		});
+	}
 
 	private _useNode() {
 		this._nodeSubscription?.unsubscribe();
