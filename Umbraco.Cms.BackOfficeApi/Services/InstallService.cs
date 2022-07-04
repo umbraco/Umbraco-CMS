@@ -42,6 +42,29 @@ public class InstallService : IInstallService
         }
 
         IEnumerable<NewInstallSetupStep> steps = _installSteps.GetInstallSteps();
+        await RunSteps(steps, model);
+
+        await _runtime.RestartAsync();
+
+        // Sign the newly created user in (Not sure if we want this separately in the future?
+        BackOfficeIdentityUser identityUser =
+            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+        await _backOfficeSignInManager.SignInAsync(identityUser, false);
+    }
+
+    public async Task Upgrade()
+    {
+        // Need to figure out how to handle the install data, this is only needed when installing, not upgrading.
+        var model = new InstallData();
+
+        IEnumerable<NewInstallSetupStep> steps = _installSteps.GetUpgradeSteps();
+        await RunSteps(steps, model);
+
+        await _runtime.RestartAsync();
+    }
+
+    private async Task RunSteps(IEnumerable<NewInstallSetupStep> steps, InstallData model)
+    {
         foreach (NewInstallSetupStep step in steps)
         {
             var stepName = step.Name;
@@ -55,12 +78,5 @@ public class InstallService : IInstallService
             _logger.LogInformation("Running {StepName}", stepName);
             await step.ExecuteAsync(model);
         }
-
-        await _runtime.RestartAsync();
-
-        // Sign the newly created user in (Not sure if we want this separately in the future?
-        BackOfficeIdentityUser identityUser =
-            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-        await _backOfficeSignInManager.SignInAsync(identityUser, false);
     }
 }
