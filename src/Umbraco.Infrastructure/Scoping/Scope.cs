@@ -834,7 +834,9 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     }
                     else
                     {
+#if DEBUG
                         throw new InvalidOperationException($"The {nameof(Scope)} hasn't been completed nor rolled back");
+#endif
                     }
                 }
                 catch
