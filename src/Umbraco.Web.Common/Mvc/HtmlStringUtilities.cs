@@ -30,25 +30,15 @@ public sealed class HtmlStringUtilities
 
     public HtmlString StripHtmlTags(string html, params string[]? tags)
     {
-        var doc = new HtmlDocument();
+        HtmlDocument doc = new HtmlDocument();
+        doc.LoadHtml(html);
 
-        // If the html string already starts with a tag we don't want to add extra tags
-        // as this would cause doc.DocumentNode.FirstChild.SelectNodes(".//*") to return null
-        if (Regex.IsMatch(html, @"^<[^>^<.]*>"))
-        {
-            doc.LoadHtml(html);
-        }
-        else
-        {
-            doc.LoadHtml("<p>" + html + "</p>");
-        }
+        List<HtmlNode> targets = new List<HtmlNode>();
+        HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes(".//*");
 
-        var targets = new List<HtmlNode>();
-
-        HtmlNodeCollection? nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
         if (nodes != null)
         {
-            foreach (HtmlNode? node in nodes)
+            foreach (HtmlNode node in nodes)
             {
                 // is element
                 if (node.NodeType != HtmlNodeType.Element)
@@ -56,7 +46,7 @@ public sealed class HtmlStringUtilities
                     continue;
                 }
 
-                var filterAllTags = tags == null || !tags.Any();
+                bool filterAllTags = tags == null || !tags.Any();
                 if (filterAllTags ||
                     (tags?.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)) ??
                      false))
@@ -65,9 +55,11 @@ public sealed class HtmlStringUtilities
                 }
             }
 
+            // we have to reverse the list in order to not override the changes to the nodes later
+            targets.Reverse();
             foreach (HtmlNode target in targets)
             {
-                HtmlNode content = doc.CreateTextNode(target.InnerText);
+                HtmlNode content = doc.CreateTextNode(target.InnerHtml);
                 target.ParentNode.ReplaceChild(content, target);
             }
         }
@@ -76,7 +68,7 @@ public sealed class HtmlStringUtilities
             return new HtmlString(html);
         }
 
-        return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml.Replace("  ", " "));
+        return new HtmlString(doc.DocumentNode.InnerHtml.Replace("  ", " "));
     }
 
     public string Join(string separator, params object[] args)
