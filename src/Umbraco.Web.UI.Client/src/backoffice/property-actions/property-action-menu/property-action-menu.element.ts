@@ -6,7 +6,7 @@ import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/
 import { UmbExtensionManifestPropertyAction, UmbExtensionRegistry } from '../../../core/extension';
 import { UmbPropertyActionMenuContext } from './property-action-menu.context';
 
-import './property-action.element';
+import '../property-action/property-action.element';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {
