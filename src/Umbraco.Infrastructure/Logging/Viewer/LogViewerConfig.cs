@@ -27,27 +27,19 @@ public class LogViewerConfig : ILogViewerConfig
 
     public IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query)
     {
-        using (IScope scope = _scopeProvider.CreateScope())
-        {
-            _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
-
-            scope.Complete();
-        }
+        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
 
         return GetSavedSearches();
     }
 
     public IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query)
     {
-        using (IScope scope = _scopeProvider.CreateScope())
+        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        ILogViewerQuery? item = name is null ? null : _logViewerQueryRepository.GetByName(name);
+        if (item is not null)
         {
-            ILogViewerQuery? item = name is null ? null : _logViewerQueryRepository.GetByName(name);
-            if (item is not null)
-            {
-                _logViewerQueryRepository.Delete(item);
-            }
-
-            scope.Complete();
+            _logViewerQueryRepository.Delete(item);
         }
 
         // Return the updated object - so we can instantly reset the entire array from the API response

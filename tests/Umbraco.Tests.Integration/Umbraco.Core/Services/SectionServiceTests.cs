@@ -56,6 +56,10 @@ public class SectionServiceTests : UmbracoIntegrationTest
         userGroupB.AddAllowedSection("member");
         UserService.Save(userGroupB, new[] { user.Id });
 
-        return UserService.GetUserById(user.Id);
+        var testUser = UserService.GetUserById(user.Id);
+
+        scope.Complete();
+
+        return testUser;
     }
 }

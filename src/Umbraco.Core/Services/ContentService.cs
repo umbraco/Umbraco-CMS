@@ -2921,7 +2921,7 @@ public class ContentService : RepositoryService, IContentService
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
@@ -2933,6 +2933,8 @@ public class ContentService : RepositoryService, IContentService
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             }
+
+            scope.Complete();
 
             return report;
         }

@@ -34,13 +34,15 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     [Test]
     public void GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
-        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        using var scope = ScopeProvider.CreateScope();
         using var _ = scope.Notifications.Suppress();
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         ContentTypeService.Save(contentType);
         var content = ContentBuilder.CreateBasicContent(contentType);
         ContentService.Save(content);
+
+        scope.Complete();
     }
 
     [Test]
@@ -50,12 +52,14 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
         {
             using var _ = parentScope.Notifications.Suppress();
 
-            using (var childScope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var childScope = ScopeProvider.CreateScope())
             {
                 var contentType = ContentTypeBuilder.CreateBasicContentType();
                 ContentTypeService.Save(contentType);
                 var content = ContentBuilder.CreateBasicContent(contentType);
                 ContentService.Save(content);
+
+                childScope.Complete();
             }
         }
     }
@@ -64,7 +68,7 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     public void GivenSuppressedNotifications_WhenDisposed_ThenNotificationsExecute()
     {
         var asserted = 0;
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (var scope = ScopeProvider.CreateScope())
         {
             using var suppressed = scope.Notifications.Suppress();
 
@@ -76,6 +80,8 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
             asserted = TestContext.CurrentContext.AssertCount;
             var media = MediaBuilder.CreateMediaImage(mediaType, -1);
             MediaService.Save(media);
+
+            scope.Complete();
         }
 
         Assert.AreEqual(asserted + 1, TestContext.CurrentContext.AssertCount);
