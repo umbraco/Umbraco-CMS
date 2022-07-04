@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.BackOfficeApi.Factories.Installer;
-using Umbraco.Cms.BackOfficeApi.Mapping;
-using Umbraco.Cms.BackOfficeApi.Services;
+using Umbraco.Cms.BackOfficeApi.Mapping.Installer;
+using Umbraco.Cms.BackOfficeApi.Services.Installer;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.NewInstallSteps;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Infrastructure.Install.NewInstallSteps;
 
 namespace Umbraco.Cms.BackOfficeApi.DependencyInjection;
 
-public static class InstallerExtensions
+public static class InstallerBuilderExtensions
 {
     internal static IUmbracoBuilder AddNewInstaller(this IUmbracoBuilder builder)
     {

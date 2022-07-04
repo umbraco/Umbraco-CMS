@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Cms.BackOfficeApi.Services;
+namespace Umbraco.Cms.BackOfficeApi.Services.Installer;
 
 public class InstallService : IInstallService
 {

@@ -3,7 +3,7 @@ using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.BackOfficeApi.Mapping;
+namespace Umbraco.Cms.BackOfficeApi.Mapping.Installer;
 
 public class InstallSettingsMapDefinition : IMapDefinition
 {

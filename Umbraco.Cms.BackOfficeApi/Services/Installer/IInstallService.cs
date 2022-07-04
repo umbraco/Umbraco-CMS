@@ -1,6 +1,6 @@
 ﻿using Umbraco.Cms.Core.Install.NewInstallSteps;
 
-namespace Umbraco.Cms.BackOfficeApi.Services;
+namespace Umbraco.Cms.BackOfficeApi.Services.Installer;
 
 public interface IInstallService
 {
