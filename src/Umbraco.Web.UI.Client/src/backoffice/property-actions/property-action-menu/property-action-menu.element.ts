@@ -54,13 +54,14 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
   private _open = false;
   
   private _extensionRegistry?: UmbExtensionRegistry;
-  private _subscription?: Subscription;
+  private _propertyActionsSubscription?: Subscription;
   private _propertyActionMenuContext = new UmbPropertyActionMenuContext();
+  private _propertyActionMenuOpenSubscription?: Subscription;
   
   constructor () {
     super();
     
-    this._propertyActionMenuContext.isOpen.subscribe((value: boolean) => {
+    this._propertyActionMenuOpenSubscription = this._propertyActionMenuContext.isOpen.subscribe((value: boolean) => {
       this._open = value;
     });
 
@@ -73,7 +74,7 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
   }
 
   private _usePropertyActions () {
-    this._subscription?.unsubscribe();
+    this._propertyActionsSubscription?.unsubscribe();
 
     this._extensionRegistry?.extensionsOfType('propertyAction')
     .pipe(
@@ -95,7 +96,8 @@ export class UmbPropertyActionMenuElement extends UmbContextProviderMixin(UmbCon
 
   disconnectedCallback () {
     super.disconnectedCallback();
-    this._subscription?.unsubscribe();
+    this._propertyActionMenuOpenSubscription?.unsubscribe();
+    this._propertyActionsSubscription?.unsubscribe();
   }
   
   render () {
