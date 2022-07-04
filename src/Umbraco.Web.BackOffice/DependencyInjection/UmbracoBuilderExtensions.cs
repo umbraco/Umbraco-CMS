@@ -23,39 +23,38 @@ using Umbraco.Cms.Web.BackOffice.Trees;
 namespace Umbraco.Extensions;
 
 /// <summary>
-///     Extension methods for <see cref="IUmbracoBuilder" /> for the Umbraco back office
+/// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Adds all required components to run the Umbraco back office
+    /// Adds all required components to run the Umbraco back office
     /// </summary>
-    public static IUmbracoBuilder
-        AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
-        .AddConfiguration()
-        .AddUmbracoCore()
-        .AddWebComponents()
-        .AddRuntimeMinifier()
-        .AddBackOfficeCore()
-        .AddBackOfficeAuthentication()
-        .AddBackOfficeIdentity()
-        .AddMembersIdentity()
-        .AddBackOfficeAuthorizationPolicies()
-        .AddUmbracoProfiler()
-        .AddMvcAndRazor(configureMvc)
-        .AddWebServer()
-        .AddPreviewSupport()
-        .AddHostedServices()
-        .AddNuCache()
-        .AddDistributedCache()
-        .AddModelsBuilderDashboard()
-        .AddUnattendedInstallInstallCreateUser()
-        .AddCoreNotifications()
-        .AddLogViewer()
-        .AddExamine()
-        .AddExamineIndexes()
-        .AddControllersWithAmbiguousConstructors()
-        .AddSupplemenataryLocalizedTextFileSources();
+    public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
+            .AddConfiguration()
+            .AddUmbracoCore()
+            .AddWebComponents()
+            .AddRuntimeMinifier()
+            .AddBackOfficeCore()
+            .AddBackOfficeAuthentication()
+            .AddBackOfficeIdentity()
+            .AddMembersIdentity()
+            .AddBackOfficeAuthorizationPolicies()
+            .AddUmbracoProfiler()
+            .AddMvcAndRazor(configureMvc)
+            .AddWebServer()
+            .AddPreviewSupport()
+            .AddHostedServices()
+            .AddNuCache()
+            .AddDistributedCache()
+            .TryAddModelsBuilderDashboard()
+            .AddUnattendedInstallInstallCreateUser()
+            .AddCoreNotifications()
+            .AddLogViewer()
+            .AddExamine()
+            .AddExamineIndexes()
+            .AddControllersWithAmbiguousConstructors()
+            .AddSupplemenataryLocalizedTextFileSources();
 
     public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
     {
