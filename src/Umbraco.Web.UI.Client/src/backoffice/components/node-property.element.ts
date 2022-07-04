@@ -137,7 +137,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 		this._dataTypeSubscription?.unsubscribe();
 	}
 
-  private _renderPropertyActions () {
+  private _renderPropertyActionMenu () {
     return html`${ this._dataType ? html`<umb-property-action-menu .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
   }
 
@@ -146,7 +146,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
       <umb-editor-property-layout>
         <div slot="header">
           <uui-label>${this.property.label}</uui-label>
-          ${ this._renderPropertyActions() }
+          ${ this._renderPropertyActionMenu() }
           <p>${this.property.description}</p>
         </div>
         <div slot="editor">${this._element}</div>
