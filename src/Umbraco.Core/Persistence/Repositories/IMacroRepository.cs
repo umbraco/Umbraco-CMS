@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IMacroRepository : IReadWriteQueryRepository<int, IMacro>, IReadRepository<Guid, IMacro>
     {
+        IMacro? GetByAlias(string alias);
 
-        //IEnumerable<IMacro> GetAll(params string[] aliases);
-
+        IEnumerable<IMacro> GetAllByAlias(string[] aliases);
     }
 }

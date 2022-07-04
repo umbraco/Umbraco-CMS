@@ -26,12 +26,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILogViewer _logViewer;
         private readonly ILogLevelLoader _logLevelLoader;
 
-        [Obsolete]
-        public LogViewerController(ILogViewer logViewer)
-            : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
-        {
-        }
-
         [ActivatorUtilitiesConstructor]
         public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
         {
@@ -152,13 +146,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
             return _logLevelLoader.GetLogLevelsFromSinks();
-        }
-
-        [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
-        [HttpGet]
-        public string GetLogLevel()
-        {
-            return _logViewer.GetLogLevel();
         }
     }
 }

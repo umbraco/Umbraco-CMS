@@ -37,20 +37,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
         private readonly IShortStringHelper _shortStringHelper;
         private ContentSettings _contentSettings;
 
-
-        [Obsolete("Use ctor with all params injected")]
-        public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
-            IDataTypeService dataTypeService, IFileService fileService,
-            IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
-            IMemberTypeService memberTypeService,
-            ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment)
-            : this(commonMapper, propertyEditors, dataTypeService, fileService, contentTypeService, mediaTypeService,
-                memberTypeService, loggerFactory, shortStringHelper, globalSettings, hostingEnvironment,
-                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
-        {
-        }
-
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
@@ -131,7 +117,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
 
-            if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
+            if (target is IContentType targetWithHistoryCleanup)
             {
                 MapHistoryCleanup(source, targetWithHistoryCleanup);
             }
@@ -147,7 +133,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 : _fileService.GetTemplate(source.DefaultTemplate));
         }
 
-        private static void MapHistoryCleanup(DocumentTypeSave source, IContentTypeWithHistoryCleanup target)
+        private static void MapHistoryCleanup(DocumentTypeSave source, IContentType target)
         {
             // If source history cleanup is null we don't have to map all properties
             if (source.HistoryCleanup is null)
@@ -209,7 +195,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
-            if (source is IContentTypeWithHistoryCleanup sourceWithHistoryCleanup)
+            if (source is IContentType sourceWithHistoryCleanup)
             {
                 target.HistoryCleanup = new HistoryCleanupViewModel
                 {

@@ -27,15 +27,6 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
             _siteIdentifierService = siteIdentifierService;
         }
 
-        [Obsolete("Use constructor that takes GlobalSettings and ISiteIdentifierService")]
-        public TelemetryIdentifierStep(
-            ILogger<TelemetryIdentifierStep> logger,
-            IOptions<GlobalSettings> globalSettings,
-            IConfigManipulator configManipulator)
-        : this(globalSettings, StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
-        {
-        }
-
         public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
             _siteIdentifierService.TryCreateSiteIdentifier(out _);

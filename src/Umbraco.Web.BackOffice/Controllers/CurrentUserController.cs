@@ -84,39 +84,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userDataService = userDataService;
         }
 
-        [Obsolete("This constructor is obsolete and will be removed in v11, use constructor with all values")]
-        public CurrentUserController(
-            MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
-            IHostingEnvironment hostingEnvironment,
-            IImageUrlGenerator imageUrlGenerator,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IUserService userService,
-            IUmbracoMapper umbracoMapper,
-            IBackOfficeUserManager backOfficeUserManager,
-            ILoggerFactory loggerFactory,
-            ILocalizedTextService localizedTextService,
-            AppCaches appCaches,
-            IShortStringHelper shortStringHelper,
-            IPasswordChanger<BackOfficeIdentityUser> passwordChanger) : this(
-                mediaFileManager,
-                StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
-                hostingEnvironment,
-                imageUrlGenerator,
-                backofficeSecurityAccessor,
-                userService,
-                umbracoMapper,
-                backOfficeUserManager,
-                localizedTextService,
-                appCaches,
-                shortStringHelper,
-                passwordChanger,
-                StaticServiceProvider.Instance.GetRequiredService<IUserDataService>())
-        {
-
-        }
-
-
         /// <summary>
         /// Returns permissions for all nodes passed in for the current user
         /// </summary>

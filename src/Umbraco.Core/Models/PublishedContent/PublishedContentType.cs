@@ -54,18 +54,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
             InitializeIndexes();
         }
 
-        [Obsolete("Use the overload specifying a key instead")]
-        public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
-            : this (Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
-        {
-            var propertyTypesA = propertyTypes.ToArray();
-            foreach (var propertyType in propertyTypesA)
-                propertyType.ContentType = this;
-            _propertyTypes = propertyTypesA;
-
-            InitializeIndexes();
-        }
-
         /// <summary>
         /// This constructor is for tests and is not intended to be used directly from application code.
         /// </summary>
@@ -74,15 +62,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// </remarks>
         public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(key, id, alias, itemType, compositionAliases, variations, isElement)
-        {
-            _propertyTypes = propertyTypes(this).ToArray();
-
-            InitializeIndexes();
-        }
-
-        [Obsolete("Use the overload specifying a key instead")]
-        public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
-            : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
         {
             _propertyTypes = propertyTypes(this).ToArray();
 

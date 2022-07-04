@@ -692,11 +692,6 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             return Database.ExecuteScalar<int>(sql);
         }
 
-        public bool Exists(string username)
-        {
-            return ExistsByUserName(username);
-        }
-
         public bool ExistsByUserName(string username)
         {
             var sql = SqlContext.Sql()

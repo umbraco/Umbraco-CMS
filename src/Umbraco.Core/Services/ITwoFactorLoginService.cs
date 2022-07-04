@@ -57,13 +57,15 @@ namespace Umbraco.Cms.Core.Services
         /// Gets all the enabled 2FA providers for the user or member with the specified key.
         /// </summary>
         Task<IEnumerable<string>> GetEnabledTwoFactorProviderNamesAsync(Guid userOrMemberKey);
-    }
 
-    [Obsolete("This will be merged into ITwoFactorLoginService in Umbraco 11")]
-    public interface ITwoFactorLoginService2 : ITwoFactorLoginService
-    {
+        /// <summary>
+        /// Disables 2FA with Code.
+        /// </summary>
         Task<bool> DisableWithCodeAsync(string providerName, Guid userOrMemberKey, string code);
 
+        /// <summary>
+        /// Validates and Saves.
+        /// </summary>
         Task<bool> ValidateAndSaveAsync(string providerName, Guid userKey, string secret, string code);
     }
 }

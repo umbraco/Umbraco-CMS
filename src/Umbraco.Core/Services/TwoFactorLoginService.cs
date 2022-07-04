@@ -15,7 +15,7 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 namespace Umbraco.Cms.Core.Services
 {
     /// <inheritdoc />
-    public class TwoFactorLoginService : ITwoFactorLoginService2
+    public class TwoFactorLoginService : ITwoFactorLoginService
     {
         private readonly ITwoFactorLoginRepository _twoFactorLoginRepository;
         private readonly ICoreScopeProvider _scopeProvider;
@@ -41,23 +41,6 @@ namespace Umbraco.Cms.Core.Services
             _backOfficeIdentityOptions = backOfficeIdentityOptions;
             _logger = logger;
             _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x =>x.ProviderName);
-        }
-
-        [Obsolete("Use ctor with all params - This will be removed in v11")]
-        public TwoFactorLoginService(
-            ITwoFactorLoginRepository twoFactorLoginRepository,
-            ICoreScopeProvider scopeProvider,
-            IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
-            IOptions<IdentityOptions> identityOptions,
-            IOptions<BackOfficeIdentityOptions> backOfficeIdentityOptions)
-        : this(twoFactorLoginRepository,
-            scopeProvider,
-            twoFactorSetupGenerators,
-            identityOptions,
-            backOfficeIdentityOptions,
-            StaticServiceProvider.Instance.GetRequiredService<ILogger<TwoFactorLoginService>>())
-        {
-
         }
 
         /// <inheritdoc />

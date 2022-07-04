@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Create_RelationType_Without_Name()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media);
+            IRelationType rt = new RelationType("Test", "repeatedEventOccurence", false, Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, false);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Create_Relation_Type_Without_Object_Types()
         {
             IRelationService rs = RelationService;
-            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null);
+            IRelationType rt = new RelationType("repeatedEventOccurence", "repeatedEventOccurence", false, null, null, false);
 
             Assert.DoesNotThrow(() => rs.Save(rt));
 
@@ -215,7 +215,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IRelation CreateAndSaveRelation(string name, string alias)
         {
             IRelationService rs = RelationService;
-            var rt = new RelationType(name, alias, false, null, null);
+            var rt = new RelationType(name, alias, false, null, null, false);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();
@@ -244,7 +244,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IRelationService rs = RelationService;
             string rtName = Guid.NewGuid().ToString();
-            var rt = new RelationType(rtName, rtName, false, null, null);
+            var rt = new RelationType(rtName, rtName, false, null, null, false);
             rs.Save(rt);
 
             ContentType ct = ContentTypeBuilder.CreateBasicContentType();

@@ -7,17 +7,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     public struct ContentNodeKit
     {
-        [Obsolete("This will be changed to a property in future versions")]
-        public ContentNode Node = null!;
+        public ContentNode Node { get; } = null!;
 
-        [Obsolete("This will be changed to a property in future versions")]
-        public int ContentTypeId;
+        public int ContentTypeId { get; }
 
-        [Obsolete("This will be changed to a property in future versions")]
-        public ContentData? DraftData;
+        public ContentData? DraftData { get; }
 
-        [Obsolete("This will be changed to a property in future versions")]
-        public ContentData? PublishedData;
+        public ContentData? PublishedData { get; }
 
         public ContentNodeKit(ContentNode node, int contentTypeId, ContentData? draftData, ContentData? publishedData)
         {

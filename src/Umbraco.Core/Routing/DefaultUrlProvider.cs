@@ -26,14 +26,6 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        [Obsolete("Use ctor with all parameters")]
-        public DefaultUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger,
-            ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
-            : this(requestSettings, logger, siteDomainMapper, umbracoContextAccessor, uriUtility,
-                StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
-        {
-        }
-
         public DefaultUrlProvider(
             IOptionsMonitor<RequestHandlerSettings> requestSettings,
             ILogger<DefaultUrlProvider> logger,

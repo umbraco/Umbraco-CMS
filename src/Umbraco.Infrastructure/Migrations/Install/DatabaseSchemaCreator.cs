@@ -96,17 +96,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptionsMonitor<InstallDefaultDataSettings> _defaultDataCreationSettings;
 
-        [Obsolete("Please use constructor taking all parameters. Scheduled for removal in V11.")]
-        public DatabaseSchemaCreator(
-            IUmbracoDatabase? database,
-            ILogger<DatabaseSchemaCreator> logger,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
-            IEventAggregator eventAggregator)
-            : this (database, logger, loggerFactory, umbracoVersion, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<InstallDefaultDataSettings>>())
-        {
-        }
-
         public DatabaseSchemaCreator(
             IUmbracoDatabase? database,
             ILogger<DatabaseSchemaCreator> logger,

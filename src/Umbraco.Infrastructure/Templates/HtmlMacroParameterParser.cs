@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Templates
         private IEnumerable<UmbracoEntityReference> GetUmbracoEntityReferencesFromMacros(List<Tuple<string?, Dictionary<string, string>>> macros)
         {
 
-            if (_macroService is not IMacroWithAliasService macroWithAliasService)
+            if (_macroService is not IMacroService macroWithAliasService)
             {
                 yield break;
             }

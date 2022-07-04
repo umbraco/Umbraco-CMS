@@ -16,14 +16,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         private readonly ILogLevelLoader _logLevelLoader;
         private readonly global::Serilog.ILogger _serilogLog;
 
-        [Obsolete("Please use ctor with all params instead. Scheduled for removal in V11.")]
-        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
-        {
-            _logViewerConfig = logViewerConfig;
-            _logLevelLoader = StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>();
-            _serilogLog = serilogLog;
-        }
-
         protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, global::Serilog.ILogger serilogLog)
         {
             _logViewerConfig = logViewerConfig;
@@ -62,16 +54,6 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
             return _logLevelLoader.GetLogLevelsFromSinks();
-        }
-
-        /// <summary>
-        /// Get the Serilog minimum-level value from the config file.
-        /// </summary>
-        [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead. Scheduled for removal in V11.")]
-        public string GetLogLevel()
-        {
-            var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
-            return logLevel?.ToString() ?? string.Empty;
         }
 
         public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)

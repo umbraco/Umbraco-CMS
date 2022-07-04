@@ -42,15 +42,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
         }
 
-        [Obsolete("Use ctor will all params")]
-        public TemplateController(
-            IFileService fileService,
-            IUmbracoMapper umbracoMapper,
-            IShortStringHelper shortStringHelper)
-            : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
-        {
-        }
-
         /// <summary>
         /// Gets data type by alias
         /// </summary>

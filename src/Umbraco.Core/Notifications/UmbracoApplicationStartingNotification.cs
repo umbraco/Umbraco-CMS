@@ -12,17 +12,6 @@ namespace Umbraco.Cms.Core.Notifications
         /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification" /> class.
         /// </summary>
         /// <param name="runtimeLevel">The runtime level</param>
-        [Obsolete("Use ctor with all params")]
-        public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel)
-            : this(runtimeLevel, false)
-        {
-            // TODO: Remove this constructor in V10
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification" /> class.
-        /// </summary>
-        /// <param name="runtimeLevel">The runtime level</param>
         /// <param name="isRestarting">Indicates whether Umbraco is restarting.</param>
         public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel, bool isRestarting)
         {
