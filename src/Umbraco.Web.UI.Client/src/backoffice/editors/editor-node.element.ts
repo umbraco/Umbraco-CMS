@@ -14,8 +14,8 @@ import { IRoutingInfo, RouterSlot } from 'router-slot';
 import '../editor-views/editor-view-node-edit.element';
 import '../editor-views/editor-view-node-info.element';
 
-@customElement('umb-node-editor')
-export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
+@customElement('umb-editor-node')
+export class UmbEditorNode extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -242,10 +242,10 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbNodeEditor;
+export default UmbEditorNode;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-node-editor': UmbNodeEditor;
+		'umb-editor-node': UmbEditorNode;
 	}
 }
