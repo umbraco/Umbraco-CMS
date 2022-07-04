@@ -15,7 +15,7 @@ import '../editor-views/editor-view-node-edit.element';
 import '../editor-views/editor-view-node-info.element';
 
 @customElement('umb-editor-node')
-export class UmbEditorNode extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -242,10 +242,10 @@ export class UmbEditorNode extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbEditorNode;
+export default UmbEditorNodeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-editor-node': UmbEditorNode;
+		'umb-editor-node': UmbEditorNodeElement;
 	}
 }

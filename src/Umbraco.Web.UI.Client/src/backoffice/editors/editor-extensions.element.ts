@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
 
 @customElement('umb-editor-extensions')
-export class UmbEditorExtensions extends UmbContextConsumerMixin(LitElement) {
+export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {
 	@state()
 	private _extensions: Array<UmbExtensionManifest> = [];
 
@@ -69,4 +69,10 @@ export class UmbEditorExtensions extends UmbContextConsumerMixin(LitElement) {
 	}
 }
 
-export default UmbEditorExtensions;
+export default UmbEditorExtensionsElement;
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-editor-extensions': UmbEditorExtensionsElement;
+	}
+}
