@@ -369,7 +369,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
         public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
-            => await SearchAsync(query, pageSize, pageIndex, searchFrom);
+            => await SearchAsync(query, pageSize, pageIndex, searchFrom, null);
 
         public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
         {
