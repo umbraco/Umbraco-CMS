@@ -3,7 +3,8 @@
 
     /**
      * 
-     * Note for new backoffice: there is a lot of simularities between the Area configuration and the Block entry, as they both share Grid scaling features.
+     * Note for new backoffice: there is a lot of similarities between the Area configuration and the Block entry, as they both share Grid scaling features.
+     * TODO: Can we already as part of this PR make it shared as a dictionary or something?
      */
 
 
@@ -25,7 +26,9 @@
             } else {
                 return bDiff < aDiff ? b : a;
             }
-        })
+        });
+
+        // Adding interpolation to the index, to get 
         const foundIndex = map.indexOf(foundValue);
         const targetDiff = (target-foundValue);
         let interpolatedIndex = foundIndex;
