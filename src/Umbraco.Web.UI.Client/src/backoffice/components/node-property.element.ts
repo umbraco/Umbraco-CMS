@@ -18,8 +18,19 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 			:host {
 				display: block;
 			}
+
 			p {
 				color: var(--uui-color-text-alt);
+			}
+
+			#property-action-menu {
+				opacity: 0;
+			}
+
+			#layout:focus-within #property-action-menu,
+			#layout:hover #property-action-menu,
+			#property-action-menu[open] {
+				opacity: 1;
 			}
 		`,
 	];
@@ -54,6 +65,7 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
       this._dataTypeStore = _instance;
       this._useDataType();
     });
+
     this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
       this._extensionRegistry = _instance;
       this._useDataType();
@@ -138,12 +150,12 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 	}
 
   private _renderPropertyActionMenu () {
-    return html`${ this._dataType ? html`<umb-property-action-menu .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
+    return html`${ this._dataType ? html`<umb-property-action-menu id="property-action-menu" .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
   }
 
   render() {
     return html`
-      <umb-editor-property-layout>
+      <umb-editor-property-layout id="layout">
         <div slot="header">
           <uui-label>${this.property.label}</uui-label>
           ${ this._renderPropertyActionMenu() }
