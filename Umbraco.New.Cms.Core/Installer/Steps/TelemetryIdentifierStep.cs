@@ -6,12 +6,12 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Core.Installer.Steps;
 
-public class NewTelemetryIdentifierStep : NewInstallSetupStep
+public class TelemetryIdentifierStep : InstallSetupStep
 {
     private readonly IOptions<GlobalSettings> _globalSettings;
     private readonly ISiteIdentifierService _siteIdentifierService;
 
-    public NewTelemetryIdentifierStep(
+    public TelemetryIdentifierStep(
         IOptions<GlobalSettings> globalSettings,
         ISiteIdentifierService siteIdentifierService)
         : base(

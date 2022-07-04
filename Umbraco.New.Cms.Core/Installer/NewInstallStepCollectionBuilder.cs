@@ -4,7 +4,7 @@ using Umbraco.New.Cms.Core.Installer.Steps;
 
 namespace Umbraco.New.Cms.Core.Installer;
 
-public class NewInstallStepCollectionBuilder : OrderedCollectionBuilderBase<NewInstallStepCollectionBuilder, NewInstallStepCollection, NewInstallSetupStep>
+public class NewInstallStepCollectionBuilder : OrderedCollectionBuilderBase<NewInstallStepCollectionBuilder, NewInstallStepCollection, InstallSetupStep>
 {
     protected override NewInstallStepCollectionBuilder This => this;
 

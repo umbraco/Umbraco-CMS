@@ -6,12 +6,12 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Core.Installer.Steps;
 
-public class NewFilePermissionsStep : NewInstallSetupStep
+public class FilePermissionsStep : InstallSetupStep
 {
     private readonly IFilePermissionHelper _filePermissionHelper;
     private readonly ILocalizedTextService _localizedTextService;
 
-    public NewFilePermissionsStep(
+    public FilePermissionsStep(
         IFilePermissionHelper filePermissionHelper,
         ILocalizedTextService localizedTextService)
         : base(

@@ -1,11 +1,11 @@
 ﻿using Umbraco.Cms.Core.Install.Models;
 using Umbraco.New.Cms.Core.Models.Installer;
 
-namespace Umbraco.New.Cms.Core.Installer.Steps;
+namespace Umbraco.New.Cms.Core.Installer;
 
-public abstract class NewInstallSetupStep
+public abstract class InstallSetupStep
 {
-    public NewInstallSetupStep(string name, int order, InstallationType target)
+    public InstallSetupStep(string name, int order, InstallationType target)
     {
         Name = name;
         Order = order;

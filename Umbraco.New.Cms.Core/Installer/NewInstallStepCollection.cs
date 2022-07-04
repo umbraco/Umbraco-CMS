@@ -4,16 +4,16 @@ using Umbraco.New.Cms.Core.Installer.Steps;
 
 namespace Umbraco.New.Cms.Core.Installer;
 
-public class NewInstallStepCollection : BuilderCollectionBase<NewInstallSetupStep>
+public class NewInstallStepCollection : BuilderCollectionBase<InstallSetupStep>
 {
-    public NewInstallStepCollection(Func<IEnumerable<NewInstallSetupStep>> items)
+    public NewInstallStepCollection(Func<IEnumerable<InstallSetupStep>> items)
         : base(items)
     {
     }
 
-    public IEnumerable<NewInstallSetupStep> GetInstallSteps()
+    public IEnumerable<InstallSetupStep> GetInstallSteps()
         => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.NewInstall));
 
-    public IEnumerable<NewInstallSetupStep> GetUpgradeSteps()
+    public IEnumerable<InstallSetupStep> GetUpgradeSteps()
         => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.Upgrade));
 }

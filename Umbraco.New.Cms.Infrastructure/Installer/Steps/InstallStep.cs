@@ -13,14 +13,16 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Constants = Umbraco.Cms.Core.Constants;
 using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
+using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class NewNewInstallStep : NewInstallSetupStep
+public class InstallStep : InstallSetupStep
 {
     private readonly IUserService _userService;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -35,7 +37,7 @@ public class NewNewInstallStep : NewInstallSetupStep
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IMetricsConsentService _metricsConsentService;
 
-    public NewNewInstallStep(
+    public InstallStep(
         IUserService userService,
         DatabaseBuilder databaseBuilder,
         IHttpClientFactory httpClientFactory,

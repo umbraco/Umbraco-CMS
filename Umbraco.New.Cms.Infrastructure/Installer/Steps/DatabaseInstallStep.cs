@@ -3,18 +3,20 @@ using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
+using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class NewDatabaseInstallStep : NewInstallSetupStep
+public class DatabaseInstallStep : InstallSetupStep
 {
 
     private readonly IRuntimeState _runtime;
     private readonly DatabaseBuilder _databaseBuilder;
 
-    public NewDatabaseInstallStep(IRuntimeState runtime, DatabaseBuilder databaseBuilder)
+    public DatabaseInstallStep(IRuntimeState runtime, DatabaseBuilder databaseBuilder)
         : base(
             "DatabaseInstall",
             40,

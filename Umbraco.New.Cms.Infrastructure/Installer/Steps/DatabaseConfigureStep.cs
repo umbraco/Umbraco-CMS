@@ -6,22 +6,24 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Extensions;
+using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
+using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class NewDatabaseConfigureStep : NewInstallSetupStep
+public class DatabaseConfigureStep : InstallSetupStep
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly DatabaseBuilder _databaseBuilder;
-    private readonly ILogger<NewDatabaseConfigureStep> _logger;
+    private readonly ILogger<DatabaseConfigureStep> _logger;
     private readonly IUmbracoMapper _mapper;
 
-    public NewDatabaseConfigureStep(
+    public DatabaseConfigureStep(
         DatabaseBuilder databaseBuilder,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
-        ILogger<NewDatabaseConfigureStep> logger,
+        ILogger<DatabaseConfigureStep> logger,
         IUmbracoMapper mapper)
         : base(
             "DatabaseConfigure",

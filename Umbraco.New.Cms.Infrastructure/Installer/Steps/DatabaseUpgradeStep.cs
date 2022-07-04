@@ -7,23 +7,25 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
+using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class NewDatabaseUpgradeStep : NewInstallSetupStep
+public class DatabaseUpgradeStep : InstallSetupStep
 {
     private readonly DatabaseBuilder _databaseBuilder;
     private readonly IRuntimeState _runtime;
-    private readonly ILogger<NewDatabaseUpgradeStep> _logger;
+    private readonly ILogger<DatabaseUpgradeStep> _logger;
     private readonly IUmbracoVersion _umbracoVersion;
     private readonly IKeyValueService _keyValueService;
 
-    public NewDatabaseUpgradeStep(
+    public DatabaseUpgradeStep(
         DatabaseBuilder databaseBuilder,
         IRuntimeState runtime,
-        ILogger<NewDatabaseUpgradeStep> logger,
+        ILogger<DatabaseUpgradeStep> logger,
         IUmbracoVersion umbracoVersion,
         IKeyValueService keyValueService)
         : base(

@@ -35,12 +35,12 @@ public static class InstallerBuilderExtensions
     internal static IUmbracoBuilder AddInstallSteps(this IUmbracoBuilder builder)
     {
         builder.InstallSteps()
-            .Append<NewFilePermissionsStep>()
-            .Append<NewTelemetryIdentifierStep>()
-            .Append<NewDatabaseConfigureStep>()
-            .Append<NewDatabaseInstallStep>()
-            .Append<NewDatabaseUpgradeStep>()
-            .Append<NewNewInstallStep>();
+            .Append<FilePermissionsStep>()
+            .Append<TelemetryIdentifierStep>()
+            .Append<DatabaseConfigureStep>()
+            .Append<DatabaseInstallStep>()
+            .Append<DatabaseUpgradeStep>()
+            .Append<InstallStep>();
 
         return builder;
     }
