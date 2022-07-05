@@ -63,15 +63,21 @@ namespace Umbraco.Cms.Web.Common.Media
                 return null;
             }
 
-            QueryString queryString;
-            if (commands is not CommandCollection && _knownCommands.Value is IList<string> knownCommands)
+            if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? imageUri))
             {
-                // Commands are of type CommandCollection when validating the HMAC and already filtered, so optimize for that
-                queryString = QueryString.Create(commands.Where(x => knownCommands.Contains(x.Key)));
+                // Only use the path
+                imageUrl = imageUri.AbsolutePath;
+            }
+
+            QueryString queryString;
+            if (commands is CommandCollection || _knownCommands.Value is not IList<string> knownCommands)
+            {
+                // Commands are of type CommandCollection when validating the HMAC and already filtered (so optimize for that)
+                queryString = QueryString.Create(commands);
             }
             else
             {
-                queryString = QueryString.Create(commands);
+                queryString = QueryString.Create(commands.Where(x => knownCommands.Contains(x.Key)));
             }
 
             string value = CaseHandlingUriBuilder.BuildRelative(_caseHandling, null, imageUrl, queryString);
