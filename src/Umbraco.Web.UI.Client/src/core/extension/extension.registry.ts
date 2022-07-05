@@ -40,12 +40,12 @@ export type UmbExtensionManifestPropertyEditor = {
 
 // Property Actions
 export type UmbExtensionManifestPropertyAction = {
-  type: 'propertyAction';
-  meta: UmbManifestPropertyActionMeta;
+	type: 'propertyAction';
+	meta: UmbManifestPropertyActionMeta;
 } & UmbExtensionManifestBase;
 
 export type UmbManifestPropertyActionMeta = {
-  propertyEditors: Array<string>;
+	propertyEditors: Array<string>;
 };
 
 // Dashboard:
@@ -61,6 +61,7 @@ export type UmbExtensionManifestDashboard = {
 
 // Editor View:
 export type UmbManifestEditorViewMeta = {
+	editors: Array<string>; // TODO: how to we want to filter views?
 	pathname: string; // TODO: how to we want to support pretty urls?
 	icon: string;
 	weight: number;
@@ -114,6 +115,7 @@ export class UmbExtensionRegistry {
 	// Typings concept, need to put all core types to get a good array return type for the provided type...
 	extensionsOfType(type: 'section'): Observable<Array<UmbExtensionManifestSection>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<UmbExtensionManifestDashboard>>;
+	extensionsOfType(type: 'editorView'): Observable<Array<UmbExtensionManifestEditorView>>;
 	extensionsOfType(type: 'propertyEditor'): Observable<Array<UmbExtensionManifestPropertyEditor>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<UmbExtensionManifestPropertyAction>>;
 	extensionsOfType(type: UmbExtensionManifestCoreTypes): Observable<Array<UmbExtensionManifestCore>>;

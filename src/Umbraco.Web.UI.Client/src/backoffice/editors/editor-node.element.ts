@@ -133,16 +133,17 @@ export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 		this._editorViewsSubscription?.unsubscribe();
 
 		// TODO: how do we know which editor to show the views for?
-		this._editorViewsSubscription = this._extensionRegistry?.extensions
+		this._editorViewsSubscription = this._extensionRegistry
+			?.extensionsOfType('editorView')
 			.pipe(
-				map((extensions: Array<UmbExtensionManifest>) =>
+				map((extensions) =>
 					extensions
-						.filter((extension) => extension.type === 'editorView')
-						.sort((a: any, b: any) => b.meta.weight - a.meta.weight)
+						.filter((extension) => extension.meta.editors.includes('Umb.Editor.Node'))
+						.sort((a, b) => b.meta.weight - a.meta.weight)
 				)
 			)
-			.subscribe((dashboards: Array<UmbExtensionManifest>) => {
-				this._editorViews = dashboards as Array<UmbExtensionManifestEditorView>;
+			.subscribe((editorViews) => {
+				this._editorViews = editorViews;
 				// TODO: merge observables
 				this._createRoutes();
 			});
@@ -165,6 +166,7 @@ export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 		this._onSave();
 	}
 
+	// TODO: simplify setting up editors with views. This code has to be duplicated in each editor.
 	private async _createRoutes() {
 		if (this._node && this._editorViews.length > 0) {
 			this._routes = [];

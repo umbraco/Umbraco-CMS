@@ -95,6 +95,9 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-editor-view-node-edit',
 		js: () => import('./backoffice/editor-views/editor-view-node-edit.element'),
 		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.Node'],
 			pathname: 'content',
 			weight: 100,
 			icon: 'document',
@@ -107,9 +110,27 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-editor-view-node-info',
 		js: () => import('./backoffice/editor-views/editor-view-node-info.element'),
 		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.Node'],
 			pathname: 'info',
 			weight: 90,
 			icon: 'info',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DataTypeEdit',
+		name: 'Edit',
+		elementName: 'umb-editor-view-data-type-edit',
+		js: () => import('./backoffice/editor-views/editor-view-data-type-edit.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DataType'],
+			pathname: 'edit',
+			weight: 90,
+			icon: 'edit',
 		},
 	},
 	{
