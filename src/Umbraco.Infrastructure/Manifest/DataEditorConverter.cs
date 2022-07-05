@@ -110,6 +110,11 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
             throw new InvalidOperationException("Missing 'editor' value.");
         }
 
+        if (jobject.Property("supportsReadOnly") is null)
+        {
+            jobject["supportsReadOnly"] = false;
+        }
+
         // explicitly assign a value editor of type ValueEditor
         // (else the deserializer will try to read it before setting it)
         // (and besides it's an interface)
@@ -202,6 +207,11 @@ internal class DataEditorConverter : JsonReadConverter<IDataEditor>
             // move the 'view' property
             jobject["editor"] = new JObject { ["view"] = jobject["view"] };
             jobject.Property("view")?.Remove();
+        }
+
+        if (jobject.Property("supportsReadOnly") is null)
+        {
+            jobject["supportsReadOnly"] = false;
         }
 
         // in the manifest, default configuration is named 'config', rename
