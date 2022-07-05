@@ -6,6 +6,7 @@ import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
+import { UmbNotificationService } from '../../core/services/notification.service';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
@@ -64,6 +65,7 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 	private _dataTypeSubscription?: Subscription;
 	private _extensionRegistry?: UmbExtensionRegistry;
 	private _editorViewsSubscription?: Subscription;
+	private _notificationService?: UmbNotificationService;
 
 	private _routerFolder = '';
 
@@ -78,6 +80,10 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 		this.consumeContext('umbExtensionRegistry', (extensionRegistry: UmbExtensionRegistry) => {
 			this._extensionRegistry = extensionRegistry;
 			this._useEditorViews();
+		});
+
+		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
+			this._notificationService = service;
 		});
 
 		// TODO: temp solution to handle property editor UI change
@@ -176,6 +182,7 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 		try {
 			this._saveButtonState = 'waiting';
 			await this._dataTypeStore.save([this._dataType]);
+			this._notificationService?.peek('Data Type saved');
 			this._saveButtonState = 'success';
 		} catch (error) {
 			this._saveButtonState = 'failed';
