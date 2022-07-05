@@ -236,7 +236,9 @@
 
                 // if no columnSpan, then we set one:
                 if (!layoutEntry.columnSpan) {
-                    layoutEntry.columnSpan = 4;
+                    // set columnSpan to minimum allowed span for this BlockType:
+                    const minimumColumnSpan = block.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), vm.gridColumns);
+                    layoutEntry.columnSpan = minimumColumnSpan;
                 }
                 // if no rowSpan, then we set one:
                 if (!layoutEntry.rowSpan) {
@@ -390,26 +392,18 @@
                 return false;
             }
 
-            // create array for areas.
-            layoutEntry.areas = [];
+            // Development note: Notice this is ran before added to the data model.
+            initializeLayoutEntry(layoutEntry);
 
             // make block model
-            var blockObject = getBlockObject(layoutEntry);
+            var blockObject = layoutEntry.$block;
             if (blockObject === null) {
                 return false;
             }
 
-            // If we reach this line, we are good to add the layoutEntry and blockObject to our models.
-
-            // Add the Block Object to our layout entry.
-            layoutEntry.$block = blockObject;
-
             // set columnSpan to maximum allowed span for this BlockType:
             const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
             layoutEntry.columnSpan = maximumColumnSpan;
-
-            // Development note: Notice this is ran before added to the data model.
-            initializeLayoutEntry(layoutEntry);
 
             // add layout entry at the decided location in layout.
             if(parentBlock != null) {
@@ -445,6 +439,30 @@
                 }
             }
             return null;
+        }
+
+        function getAllowedTypesOfArea(parentBlock, areaKey) {
+
+            if(areaKey == null) {
+                return vm.availableBlockTypes;
+            }
+
+            const area = parentBlock.layout.areas.find(x => x.key === areaKey);
+
+            if(area && area?.$config.onlySpecifiedAllowance) {
+
+                const allowedTypes = [];
+
+                area.$config.specifiedAllowance?.forEach(allowance => {
+                    // Future room for group support:
+                    if(allowance.elementTypeKey != null) {
+                        allowedTypes.push(allowance.elementTypeKey);
+                    }
+                });
+
+                return allowedTypes;
+            }
+            return vm.availableBlockTypes;
         }
 
         function deleteBlock(block) {
@@ -570,7 +588,9 @@
                 return;
             }
 
-            if (vm.availableBlockTypes.length === 1) {
+            const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
+
+            if (availableTypes.length === 1) {
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
@@ -596,15 +616,21 @@
                 return;
             }
 
-            if (vm.availableBlockTypes.length === 0) {
+            const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
+
+            if (availableTypes.length === 0) {
                 return;
             }
 
-            var amountOfAvailableTypes = vm.availableBlockTypes.length;
+            var amountOfAvailableTypes = availableTypes.length;
+            var availableContentTypesAliases = modelObject.getAvailableAliasesOfElementTypeKeys(availableTypes);
+            // TODO: Filter clipboard items to only fit with availableContentTypesAliases, and ensure settings key as well?
+            var availableClipboardItems = vm.clipboardItems;//.filter(entry => console.log(entry.entryData.)
+            
             var blockPickerModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
-                availableItems: vm.availableBlockTypes,
+                availableItems: availableTypes,
                 title: vm.labels.grid_addElement,
                 openClipboard: openClipboard,
                 orderBy: "$index",
@@ -615,12 +641,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(parentBlock, createIndex + indexIncrementor, entry, item.type)) {
+                            if (requestPasteFromClipboard(parentBlock, areaKey, createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(parentBlock, createIndex, item.pasteData, item.type);
+                        requestPasteFromClipboard(parentBlock, areaKey, createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -633,7 +659,7 @@
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                        editorService.close();
+                        blockPickerModel.close();
                         if (wasAdded) {
                             userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
                         }
@@ -653,11 +679,11 @@
             };
 
             blockPickerModel.clickClearClipboard = function ($event) {
-                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
-                clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, availableContentTypesAliases);
             };
 
-            blockPickerModel.clipboardItems = vm.clipboardItems;
+            blockPickerModel.clipboardItems = availableClipboardItems;
 
             vm.blockTypePickerIsOpen = true;
             // open block picker overlay
@@ -793,7 +819,7 @@
             clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
 
-        function requestPasteFromClipboard(parentLayoutEntry, index, pasteEntry, pasteType) {
+        function requestPasteFromClipboard(parentBlock,  areaKey, index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
@@ -814,27 +840,21 @@
                 return false;
             }
 
-            layoutEntry.areas = layoutEntry.areas || [];
-
-            // TODO: create areas based on config.
-
-            // make block model
-            var blockObject = getBlockObject(layoutEntry);
-            if (blockObject === null) {
+            initializeLayoutEntry(layoutEntry);
+            
+            if (layoutEntry.$block === null) {
                 // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
                 return false;
             }
 
-            // set the BlockObject on our layout entry.
-            layoutEntry.$block = blockObject;
-
-            initializeLayoutEntry(layoutEntry);
 
             // insert layout entry at the decided location in layout.
-            if(parentLayoutEntry != null) {
-                // TODO: find right area
-                console.error("TODO: find area...")
-                parentLayoutEntry.items.splice(index, 0, layoutEntry);
+            if(parentBlock != null) {
+                var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                if (!area) {
+                    console.error("Area could not be found...", parentBlock, areaKey)
+                }
+                area.items.splice(index, 0, layoutEntry);
             } else {
                 vm.layout.splice(index, 0, layoutEntry);
             }

@@ -475,6 +475,24 @@
 
             /**
              * @ngdoc method
+             * @name getAvailableAliasesOfElementTypeKeys
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Retrieve a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
+             * @return {Array} array of strings representing alias.
+             */
+             getAvailableAliasesOfElementTypeKeys: function (elementTypeKeys) {
+                return elementTypeKeys.map(
+                    (key) => {
+                        var scaffold = this.getScaffoldFromKey(key);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
+            },
+
+            /**
+             * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
              * @description Retrieve a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).

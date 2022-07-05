@@ -1,17 +1,22 @@
-<div>
+<div class="umb-block-grid-area-allowance-editor">
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div ng-show="vm.loading !== true">
+    <div ng-show="vm.loading !== true" class="__list" ng-class="{'--disabled': vm.disabled}">
 
         
-        <div ng-repeat="allowance in vm.allowedTypes track by allowance.$key">
+        <div ng-repeat="allowance in vm.model track by allowance.$key">
             <div>
-                <select ng-model="allowance.elementTypeKey" required>
+                <select 
+                    ng-model="allowance.elementTypeKey"
+                    ng-disabled="vm.disabled"
+                    required
+                >
                     <option ng-repeat="blockType in vm.allBlockTypes" ng-init="elementType = vm.getElementTypeByKey(blockType.contentElementTypeKey)" value="{{elementType.key}}">{{elementType.name}}</option>
                 </select>
                 <input 
                     type="number"
+                    ng-disabled="vm.disabled"
                     name="label"
                     min="0"
                     ng-max="model.value.max"
@@ -22,6 +27,7 @@
                 <span>–</span>
                 <input 
                     type="number"
+                    ng-disabled="vm.disabled"
                     name="label"
                     ng-model="allowance.maxAllowed"
                     placeholder="∞"
@@ -34,6 +40,7 @@
 
         <button
             type="button"
+            ng-disabled="vm.disabled"
             class="btn-reset umb-block-grid-area-editor__create-button umb-outline"
             ng-click="vm.onNewAllowanceClick()">
             <localize key="blockEditor_TODO">Add allowance</localize>

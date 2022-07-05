@@ -89,8 +89,8 @@
                 'rowSpan': 1,
                 'minAllowed': 0,
                 'maxAllowed': null,
-                'allowAll': true,
-                'allowedTypes': [
+                'onlySpecifiedAllowance': false,
+                'specifiedAllowance': [
                     /*{
                         'elementTypeKey': 345,
                         'min': 0,

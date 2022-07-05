@@ -18,7 +18,7 @@
                     <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineEditorAppearance">Identification</localize>
+                            <localize key="blockEditor_TODO">Identification</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -40,7 +40,7 @@
                     <div class="umb-group-panel">
 
                         <div class="umb-group-panel__header">
-                            <localize key="blockEditor_headlineEditorAppearance">Requirements</localize>
+                            <localize key="blockEditor_TODO">Requirements</localize>
                         </div>
 
                         <div class="umb-group-panel__content">
@@ -55,7 +55,21 @@
                                 </div>
                             </div>
 
-                            <!-- min/max -->
+                            <!-- onlySpecifiedAllowance -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="onlySpecifiedAllowance"><localize key="blockEditor_TODO">Only allow specific Blocks</localize></label>
+                                    <div class="controls">
+                                        <umb-toggle
+                                            input-id="onlySpecifiedAllowance"
+                                            checked="vm.area.onlySpecifiedAllowance"
+                                            on-click="vm.area.onlySpecifiedAllowance = !vm.area.onlySpecifiedAllowance || false">
+                                        </umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- specifiedAllowance -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" ><localize key="blockEditor_TODO">Allowed Block Types</localize></label>
@@ -63,7 +77,7 @@
                                         <localize key="blockEditor_TODO">Define which specific Blocks that are allowed in this Area.</localize>
                                     </umb-property-info-button>
                                     <div class="controls">
-                                        <umb-block-grid-area-block-allowance-editor allowed-types="vm.area.allowedTypes" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-block-allowance-editor>
+                                        <umb-block-grid-area-block-allowance-editor disabled="vm.area.onlySpecifiedAllowance !== true" model="vm.area.specifiedAllowance" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-block-allowance-editor>
                                     </div>
                                 </div>
                             </div>

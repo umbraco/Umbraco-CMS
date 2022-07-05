@@ -179,6 +179,7 @@
                 "columnSpanOptions": [{
                     "columnSpan": 12
                 }],
+                "allowAtRoot": true,
                 "contentElementTypeKey": key,
                 "settingsElementTypeKey": null,
                 "labelTemplate": "",

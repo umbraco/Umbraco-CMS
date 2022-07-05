@@ -187,14 +187,18 @@ Grid part:
     margin: -1px;
     padding: 5px 15px;
 
-    border: 1px dashed transparent;
+    border: 1px dashed @ui-action-discreet-border;
     border-radius: @baseBorderRadius;
     box-sizing: border-box;
     
-    &:hover {
+    &:not([disabled]):hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-border-hover;
         text-decoration: none;
         z-index: 1;
     }
+}
+.umb-block-grid-area-editor__create-button[disabled] {
+    color: @ui-disabled-type;
+    border-color: @ui-disabled-border;
 }

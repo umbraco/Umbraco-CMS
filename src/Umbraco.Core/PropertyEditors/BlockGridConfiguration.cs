@@ -24,6 +24,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 public int? ColumnSpan { get; set; }
             }
 
+            [DataMember(Name ="rowMaxSpan")]
+            public int? rowMaxSpan { get; set; }  = null!;
+
+            [DataMember(Name ="allowAtRoot")]
+            public bool? AllowAtRoot { get; set; } = true;
+
             [DataMember(Name ="areaGridColumns")]
             public int? AreaGridColumns { get; set; }
 
@@ -34,7 +40,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public class BlockGridAreaConfiguration
             {
                 [DataMember(Name ="key")]
-                public Guid? Key { get; set; }
+                public Guid Key { get; set; }
 
                 [DataMember(Name ="alias")]
                 public string? Alias { get; set; }
@@ -51,17 +57,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 [DataMember(Name ="maxAllowed")]
                 public int? MaxAllowed { get; set; }
 
-                [DataMember(Name ="allowAll")]
-                public bool? AllowAll { get; set; }
+                [DataMember(Name ="onlySpecifiedAllowance")]
+                public bool? OnlySpecifiedAllowance { get; set; }
 
-                [DataMember(Name ="allowedTypes")]
-                public BlockGridAreaConfigurationAllowedType[] AllowedTypes { get; set; }  = null!;
+                [DataMember(Name ="specifiedAllowance")]
+                public BlockGridAreaConfigurationSpecifiedAllowance[] SpecifiedAllowance { get; set; }  = null!;
 
                 [DataContract]
-                public class BlockGridAreaConfigurationAllowedType
+                public class BlockGridAreaConfigurationSpecifiedAllowance
                 {
                     [DataMember(Name ="elementTypeKey")]
                     public Guid? ElementTypeKey { get; set; }
+
+                    /*
+                    [DataMember(Name ="groupKey")]
+                    public Guid? groupKey { get; set; }
+                    */
 
                     [DataMember(Name ="minAllowed")]
                     public int? MinAllowed { get; set; }

@@ -107,7 +107,7 @@
                             <!-- Column span options -->
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
-                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Column span</localize></label>
+                                    <label class="control-label" for="addNewColumnSpan"><localize key="blockEditor_TODO">Column span</localize></label>
                                     <div class="controls">
                                         <input 
                                             ng-repeat="columnSpanOption in vm.block.columnSpanOptions"
@@ -116,11 +116,43 @@
                                             name="label"
                                             style="width:48px"/>
                                         <umb-button
+                                            id="addNewColumnSpan"
                                             size="xs"
                                             button-style="action"
                                             type="button"
                                             action="vm.block.columnSpanOptions.push({columnSpan: 12})" 
                                             label="Add option">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row span options -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="label"><localize key="blockEditor_TODO">Maximum row span</localize></label>
+                                    <div class="controls">
+                                        <input 
+                                            type="number"
+                                            name="label"
+                                            ng-model="vm.block.rowMaxSpan"
+                                            placeholder="∞"
+                                            ng-min="1"
+                                            fix-number
+                                            style="width:80px"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- allowAtRoot -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="allowAtRoot"><localize key="blockEditor_TODO">Allow in root</localize></label>
+                                    <div class="controls">
+                                        <umb-toggle
+                                            input-id="allowAtRoot"
+                                            checked="vm.block.allowAtRoot"
+                                            on-click="vm.block.allowAtRoot = !vm.block.allowAtRoot || false">
+                                        </umb-toggle>
                                     </div>
                                 </div>
                             </div>

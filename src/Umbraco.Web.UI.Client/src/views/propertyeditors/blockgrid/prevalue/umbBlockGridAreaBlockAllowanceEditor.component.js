@@ -16,9 +16,10 @@
             controller: BlockGridAreaBlockAllowanceController,
             controllerAs: "vm",
             bindings: {
-                allowedTypes: "=",
+                model: "=",
                 allBlockTypes: "<",
-                loadedElementTypes: "<"
+                loadedElementTypes: "<",
+                disabled: "<"
             },
             require: {
                 propertyForm: "^form"
@@ -35,12 +36,9 @@
         vm.$onInit = function() {
             vm.loading = false;
 
-            vm.allowedTypes.forEach((x) => {
+            vm.model.forEach((x) => {
                 x['$key'] = String.CreateGuid()
             })
-
-            console.log("allBlockTypes", vm.allBlockTypes)
-            console.log("loadedElementTypes", vm.loadedElementTypes)
         };
 
         vm.getElementTypeByKey = function(key) {
@@ -54,7 +52,7 @@
         vm.deleteAllowance = function(allowance) {
             const index = vm.model.indexOf(allowance);
             if(index !== -1) {
-                vm.allowedTypes.splice(index, 1);
+                vm.model.splice(index, 1);
             }
         }
 
@@ -65,7 +63,7 @@
                 min: 0,
                 max: 0
             };
-            vm.allowedTypes.push(allowance);
+            vm.model.push(allowance);
             setDirty();
         }
         
