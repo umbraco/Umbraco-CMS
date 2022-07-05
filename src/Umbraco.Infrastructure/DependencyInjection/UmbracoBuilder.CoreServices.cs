@@ -210,6 +210,8 @@ public static partial class UmbracoBuilderExtensions
 
         // Services required to run background jobs (with out the handler)
         builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+
+        builder.Services.AddTransient<IFireAndForgetRunner, FireAndForgetRunner>();
         return builder;
     }
 
