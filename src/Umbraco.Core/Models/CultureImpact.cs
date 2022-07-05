@@ -105,7 +105,7 @@ public sealed class CultureImpact
     /// </summary>
     public bool ImpactsAlsoInvariantProperties => !ImpactsOnlyInvariantCulture &&
                                                   !ImpactsAllCultures &&
-                                                  ImpactsOnlyDefaultCulture;
+                                                  (ImpactsOnlyDefaultCulture || AllowEditInvariantFromNonDefault);
 
     public Behavior CultureBehavior
     {
