@@ -72,6 +72,11 @@ public class ManagementApiComposer : IComposer
                 },
                 applicationBuilder =>
                 {
+                    applicationBuilder.UseEndpoints(endpoints =>
+                    {
+                        // Maps attribute routed controllers.
+                        endpoints.MapControllers();
+                    });
                 }
             ));
         });

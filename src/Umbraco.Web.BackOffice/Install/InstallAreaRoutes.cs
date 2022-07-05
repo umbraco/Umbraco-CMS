@@ -33,9 +33,6 @@ public class InstallAreaRoutes : IAreaRoutes
                     "api", includeControllerNameInRoute: false);
                 endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Constants.Web.Mvc.InstallArea,
                     string.Empty, includeControllerNameInRoute: false);
-                // MapControllers only routes atrribute routed controllers, sadly we can't only route a single one of the,
-                // TODO: Reject requests that is not going to NewInstallController
-                endpoints.MapControllers();
 
                 // register catch all because if we are in install/upgrade mode then we'll catch everything and redirect
                 endpoints.MapFallbackToAreaController(
