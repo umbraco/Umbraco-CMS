@@ -38,6 +38,7 @@ namespace Umbraco.Cms.Web.Common.Media
         internal ImageSharpImageUrlTokenGenerator(byte[]? hmacSecretKey, IList<string>? knownCommands = null)
             : this(hmacSecretKey, null, CaseHandlingUriBuilder.CaseHandling.LowerInvariant)
         {
+            // Overwrite with the list explicitly passed into this overload
             _knownCommands = new Lazy<IList<string>?>(knownCommands);
         }
 
