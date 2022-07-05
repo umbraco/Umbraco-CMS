@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
+namespace Umbraco.Cms.ManagementApi.ViewModels.Installer;
 
 [DataContract(Name = "user")]
 public class UserSettingsViewModel

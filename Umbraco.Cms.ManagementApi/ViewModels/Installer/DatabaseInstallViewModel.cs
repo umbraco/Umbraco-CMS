@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
+namespace Umbraco.Cms.ManagementApi.ViewModels.Installer;
 
 [DataContract(Name = "databaseInstall")]
 public class DatabaseInstallViewModel

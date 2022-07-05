@@ -4,12 +4,11 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.New.Cms.Core.Installer;
-using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Core.Services.Installer;
 
 // TODO: Move me when post install step is created.
-namespace Umbraco.Cms.BackOfficeApi.Services.Installer;
+namespace Umbraco.Cms.ManagementApi.Services.Installer;
 
 public class InstallService : IInstallService
 {

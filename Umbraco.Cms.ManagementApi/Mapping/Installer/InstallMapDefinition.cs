@@ -1,9 +1,9 @@
-﻿using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
-using Umbraco.Cms.Core.Install.Models;
+﻿using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.New.Cms.Core.Models.Installer;
 
-namespace Umbraco.Cms.BackOfficeApi.Mapping.Installer;
+namespace Umbraco.Cms.ManagementApi.Mapping.Installer;
 
 public class InstallMapDefinition : IMapDefinition
 {

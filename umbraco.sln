@@ -129,7 +129,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms", "src\Umbraco.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewBackoffice", "NewBackoffice", "{995D9EFA-8BB1-4333-80AD-C525A06FD984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.BackOfficeApi", "Umbraco.Cms.BackOfficeApi\Umbraco.Cms.BackOfficeApi.csproj", "{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.ManagementApi", "Umbraco.Cms.ManagementApi\Umbraco.Cms.ManagementApi.csproj", "{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Core", "Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj", "{625AE972-D863-4B53-A243-5134AA1DFCBA}"
 EndProject

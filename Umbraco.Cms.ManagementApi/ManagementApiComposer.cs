@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.BackOfficeApi.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
-namespace Umbraco.Cms.BackOfficeApi;
+namespace Umbraco.Cms.ManagementApi;
 
-public class NewBackofficeComposer : IComposer
+public class ManagementApiComposer : IComposer
 {
     private const string ApiTitle = "Umbraco Backoffice API";
     private const string ApiAllName = "All";

@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
       <WarningsAsErrors>nullable</WarningsAsErrors>
+      <RootNamespace>Umbraco.Cms.ManagementApi</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

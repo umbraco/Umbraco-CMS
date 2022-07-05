@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.BackOfficeApi.Services.Installer;
-using Umbraco.Cms.BackOfficeApi.ViewModels.Installer;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Core.Services.Installer;
 
-namespace Umbraco.Cms.BackOfficeApi.Controllers;
+namespace Umbraco.Cms.ManagementApi.Controllers;
 
 // TODO: Create a filter to require install/upgrade for endpoints to be valid
 
