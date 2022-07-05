@@ -289,7 +289,7 @@ public class UmbracoPlan : MigrationPlan
         // TO 10.0.0
         To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
 
-            // TO 10.1.0
-            To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
+        // TO 10.1.0
+        To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
     }
 }

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -38,17 +38,17 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             ILoggerFactory loggerFactory,
             IContentService contentService,
             IPropertyValidationService propertyValidationService,
-                IAuthorizationService authorizationService,
-                IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-                ILocalizationService localizationService)
+            IAuthorizationService authorizationService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            ILocalizationService localizationService)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _propertyValidationService = propertyValidationService ??
                                          throw new ArgumentNullException(nameof(propertyValidationService));
             _authorizationService = authorizationService;
-                _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-                _localizationService = localizationService;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _localizationService = localizationService;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -144,29 +144,29 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             IContent? contentToCheck = null;
             int contentIdToCheck;
 
-                // First check if user has Access to that language
-                IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-                bool hasAccess = false;
-                if (currentUser is null)
-                {
-                    return false;
-                }
+            // First check if user has Access to that language
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            bool hasAccess = false;
+            if (currentUser is null)
+            {
+                return false;
+            }
 
-                foreach (IReadOnlyUserGroup group in currentUser.Groups)
+            foreach (IReadOnlyUserGroup group in currentUser.Groups)
+            {
+                IEnumerable<ILanguage> languages = _localizationService.GetAllLanguages().Where(x => group.AllowedLanguages.Contains(x.Id));
+                if (group.AllowedLanguages.Count() is 0 ||
+                    languages.Select(x => x.IsoCode).Intersect(contentItem?.Variants.Where(x => x.Save || x.Publish).Select(x => x.Culture) ?? Enumerable.Empty<string>()).Count() is not 0)
                 {
-                    IEnumerable<ILanguage> languages = _localizationService.GetAllLanguages().Where(x => group.AllowedLanguages.Contains(x.Id));
-                    if (group.AllowedLanguages.Count() is 0 ||
-                        languages.Select(x => x.IsoCode).Intersect(contentItem?.Variants.Where(x => x.Save || x.Publish).Select(x => x.Culture) ?? Enumerable.Empty<string>()).Count() is not 0)
-                    {
-                        hasAccess = true;
-                    }
+                    hasAccess = true;
                 }
+            }
 
-                if (!hasAccess && contentItem?.Variants.First().Culture is not null)
-                {
-                    actionContext.ModelState.AddModelError(Constants.ModelStateErrorKeys.PermissionError, "User does not have access to save language");
-                    return false;
-                }
+            if (!hasAccess && contentItem?.Variants.First().Culture is not null)
+            {
+                actionContext.ModelState.AddModelError(Constants.ModelStateErrorKeys.PermissionError, "User does not have access to save language");
+                return false;
+            }
 
             switch (contentItem?.Action)
             {

@@ -66,7 +66,7 @@ public class ContentController : ContentControllerBase
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
 
-        [ActivatorUtilitiesConstructor]
+    [ActivatorUtilitiesConstructor]
     public ContentController(
         ICultureDictionary cultureDictionary,
         ILoggerFactory loggerFactory,
@@ -90,8 +90,8 @@ public class ContentController : ContentControllerBase
         IJsonSerializer serializer,
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
-            IContentVersionService contentVersionService,
-            ICultureImpactService cultureImpactService)
+        IContentVersionService contentVersionService,
+        ICultureImpactService cultureImpactService)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -111,68 +111,68 @@ public class ContentController : ContentControllerBase
         _sqlContext = sqlContext;
         _authorizationService = authorizationService;
         _contentVersionService = contentVersionService;
-            _cultureImpactService = cultureImpactService;
+        _cultureImpactService = cultureImpactService;
         _logger = loggerFactory.CreateLogger<ContentController>();
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
-            _localizationService.GetAllLanguages()
-                .ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
     }
+
+    [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
+    public ContentController(
+        ICultureDictionary cultureDictionary,
+        ILoggerFactory loggerFactory,
+        IShortStringHelper shortStringHelper,
+        IEventMessagesFactory eventMessages,
+        ILocalizedTextService localizedTextService,
+        PropertyEditorCollection propertyEditors,
+        IContentService contentService,
+        IUserService userService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IContentTypeService contentTypeService,
+        IUmbracoMapper umbracoMapper,
+        IPublishedUrlProvider publishedUrlProvider,
+        IDomainService domainService,
+        IDataTypeService dataTypeService,
+        ILocalizationService localizationService,
+        IFileService fileService,
+        INotificationService notificationService,
+        ActionCollection actionCollection,
+        ISqlContext sqlContext,
+        IJsonSerializer serializer,
+        ICoreScopeProvider scopeProvider,
+        IAuthorizationService authorizationService,
+        IContentVersionService contentVersionService)
+        : this(
+            cultureDictionary,
+            loggerFactory,
+            shortStringHelper,
+            eventMessages,
+            localizedTextService,
+            propertyEditors,
+            contentService,
+            userService,
+            backofficeSecurityAccessor,
+            contentTypeService,
+            umbracoMapper,
+            publishedUrlProvider,
+            domainService,
+            dataTypeService,
+            localizationService,
+            fileService,
+            notificationService,
+            actionCollection,
+            sqlContext,
+            serializer,
+            scopeProvider,
+            authorizationService,
+            contentVersionService,
+            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
+      {
+      }
 
     public object? Domains { get; private set; }
 
-        [Obsolete("Use constructor that accepts ICultureImpactService as a parameter, scheduled for removal in V12")]
-        public ContentController(
-            ICultureDictionary cultureDictionary,
-            ILoggerFactory loggerFactory,
-            IShortStringHelper shortStringHelper,
-            IEventMessagesFactory eventMessages,
-            ILocalizedTextService localizedTextService,
-            PropertyEditorCollection propertyEditors,
-            IContentService contentService,
-            IUserService userService,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IContentTypeService contentTypeService,
-            IUmbracoMapper umbracoMapper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IDomainService domainService,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IFileService fileService,
-            INotificationService notificationService,
-            ActionCollection actionCollection,
-            ISqlContext sqlContext,
-            IJsonSerializer serializer,
-            ICoreScopeProvider scopeProvider,
-            IAuthorizationService authorizationService,
-            IContentVersionService contentVersionService)
-            : this(
-                cultureDictionary,
-                loggerFactory,
-                shortStringHelper,
-                eventMessages,
-                localizedTextService,
-                propertyEditors,
-                contentService,
-                userService,
-                backofficeSecurityAccessor,
-                contentTypeService,
-                umbracoMapper,
-                publishedUrlProvider,
-                domainService,
-                dataTypeService,
-                localizationService,
-                fileService,
-                notificationService,
-                actionCollection,
-                sqlContext,
-                serializer,
-                scopeProvider,
-                authorizationService,
-                contentVersionService,
-                StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
-              {
-              }
 
     /// <summary>
     ///     Return content for the specified ids
@@ -898,12 +898,12 @@ public class ContentController : ContentControllerBase
         // we will continue to save if model state is invalid, however we cannot save if critical data is missing.
         if (!ModelState.IsValid)
         {
-                // Don't try and save if we do not have access
-                if (ModelState.Keys.Contains(Constants.ModelStateErrorKeys.PermissionError))
-                {
-                    var forDisplay = mapToDisplay(contentItem.PersistedContent);
-                    return ValidationProblem(forDisplay, ModelState);
-                }
+            // Don't try and save if we do not have access
+            if (ModelState.Keys.Contains(Constants.ModelStateErrorKeys.PermissionError))
+            {
+                var forDisplay = mapToDisplay(contentItem.PersistedContent);
+                return ValidationProblem(forDisplay, ModelState);
+            }
 
             // check for critical data validation issues, we can't continue saving if this data is invalid
             if (!passesCriticalValidationRules)
@@ -950,10 +950,10 @@ public class ContentController : ContentControllerBase
         //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
         // not marked to be saved, it will be the first culture in the list marked for saving.
         var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
-            var cultureForInvariantErrors = _cultureImpactService.GetCultureForInvariantErrors(
-            contentItem.PersistedContent,
-            contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
-            defaultCulture);
+        var cultureForInvariantErrors = _cultureImpactService.GetCultureForInvariantErrors(
+        contentItem.PersistedContent,
+        contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
+        defaultCulture);
 
         //get the updated model
         var isBlueprint = contentItem.PersistedContent?.Blueprint ?? false;
@@ -1847,7 +1847,7 @@ public class ContentController : ContentControllerBase
         foreach (ContentVariantSave variant in cultureVariants.Where(x => x.Publish))
         {
             // publishing any culture, implies the invariant culture
-                var valid = persistentContent.PublishCulture(_cultureImpactService.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
+            var valid = persistentContent.PublishCulture(_cultureImpactService.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
             if (!valid)
             {
                 AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");

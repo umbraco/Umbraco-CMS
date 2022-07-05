@@ -31,24 +31,24 @@ public class ContentService : RepositoryService, IContentService
     private readonly ILogger<ContentService> _logger;
     private readonly Lazy<IPropertyValidationService> _propertyValidationService;
     private readonly IShortStringHelper _shortStringHelper;
-        private readonly ICultureImpactService _cultureImpactService;
+    private readonly ICultureImpactService _cultureImpactService;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
 
         public ContentService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-            IDocumentRepository documentRepository,
-            IEntityRepository entityRepository,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
         IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IDocumentBlueprintRepository documentBlueprintRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
         ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService,
-            IShortStringHelper shortStringHelper,
-            ICultureImpactService cultureImpactService)
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactService cultureImpactService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -63,34 +63,34 @@ public class ContentService : RepositoryService, IContentService
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
-        [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
-        public ContentService(
-            ICoreScopeProvider provider,
-            ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory,
-            IDocumentRepository documentRepository,
-            IEntityRepository entityRepository,
-            IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository,
-            IDocumentBlueprintRepository documentBlueprintRepository,
-            ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService,
-            IShortStringHelper shortStringHelper)
-            : this(
-                provider,
-                loggerFactory,
-                eventMessagesFactory,
-                documentRepository,
-                entityRepository,
-                auditRepository,
-                contentTypeRepository,
-                documentBlueprintRepository,
-                languageRepository,
-                propertyValidationService,
-                shortStringHelper,
-                StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
-        {
-        }
+    [Obsolete("Use constructor that takes ICultureImpactService as a parameter, scheduled for removal in V12")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditRepository auditRepository,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditRepository,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
+    {
+    }
 
     #endregion
 

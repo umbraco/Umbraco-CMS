@@ -299,7 +299,7 @@ internal class ContentMapDefinition : IMapDefinition
         target.State = _stateMapper.Map(source, context);
         target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
         target.UpdateDate = source.UpdateDate;
-            target.AllowedActions = new[] { ActionBrowse.ActionLetter.ToString() };
+        target.AllowedActions = new[] { ActionBrowse.ActionLetter.ToString() };
     }
 
     private void Map(IContent source, ContentVariantScheduleDisplay target, MapperContext context)

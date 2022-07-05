@@ -293,18 +293,18 @@ public static class ContentRepositoryExtensions
     /// </returns>
     public static bool PublishCulture(this IContent content, CultureImpact? impact)
     {
-            if (impact == null)
-            {
-                throw new ArgumentNullException(nameof(impact));
-            }
+        if (impact == null)
+        {
+            throw new ArgumentNullException(nameof(impact));
+        }
 
         // the variation should be supported by the content type properties
         //  if the content type is invariant, only '*' and 'null' is ok
         //  if the content type varies, everything is ok because some properties may be invariant
         if (!content.ContentType.SupportsPropertyVariation(impact.Culture, "*", true))
-            {
-                throw new NotSupportedException($"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
-            }
+        {
+            throw new NotSupportedException($"Culture \"{impact.Culture}\" is not supported by content type \"{content.ContentType.Alias}\" with variation \"{content.ContentType.Variations}\".");
+        }
 
         // set names
         if (impact.ImpactsAllCultures)
@@ -314,11 +314,11 @@ public static class ContentRepositoryExtensions
             {
                 var name = content.GetCultureName(culture);
                 if (string.IsNullOrWhiteSpace(name))
-                    {
+                {
                     return false;
-                    }
+                }
 
-                    content.SetPublishInfo(culture, name, DateTime.Now);
+                content.SetPublishInfo(culture, name, DateTime.Now);
             }
         }
         else if (impact.ImpactsOnlyInvariantCulture)
@@ -333,9 +333,9 @@ public static class ContentRepositoryExtensions
         {
             var name = content.GetCultureName(impact.Culture);
             if (string.IsNullOrWhiteSpace(name))
-                {
+            {
                 return false;
-                }
+            }
 
             content.SetPublishInfo(impact.Culture, name, DateTime.Now);
         }
@@ -343,19 +343,18 @@ public static class ContentRepositoryExtensions
         // set values
         // property.PublishValues only publishes what is valid, variation-wise,
         // but accepts any culture arg: null, all, specific
-            foreach (IProperty property in content.Properties)
+        foreach (IProperty property in content.Properties)
         {
             // for the specified culture (null or all or specific)
             property.PublishValues(impact.Culture);
 
             // maybe the specified culture did not impact the invariant culture, so PublishValues
             // above would skip it, yet it *also* impacts invariant properties
-                if (impact.ImpactsAlsoInvariantProperties &&
-                    (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
-                {
-                    property.PublishValues(null);
-                }
+            if (impact.ImpactsAlsoInvariantProperties && (property.PropertyType.VariesByCulture() is false || impact.ImpactsOnlyDefaultCulture))
+            {
+                property.PublishValues(null);
             }
+        }
 
         content.PublishedState = PublishedState.Publishing;
         return true;

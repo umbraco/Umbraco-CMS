@@ -10,14 +10,12 @@ internal static class UserGroupFactory
 {
     public static IUserGroup BuildEntity(IShortStringHelper shortStringHelper, UserGroupDto dto)
     {
-            var userGroup = new UserGroup(
-                shortStringHelper,
-                dto.UserCount,
-                dto.Alias,
-                dto.Name,
-                dto.DefaultPermissions.IsNullOrWhiteSpace()
-                    ? Enumerable.Empty<string>()
-                    : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
+        var userGroup = new UserGroup(
+            shortStringHelper,
+            dto.UserCount,
+            dto.Alias,
+            dto.Name,
+            dto.DefaultPermissions.IsNullOrWhiteSpace() ? Enumerable.Empty<string>() : dto.DefaultPermissions!.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)).ToList(),
             dto.Icon);
 
         try
@@ -36,10 +34,10 @@ internal static class UserGroupFactory
                 }
             }
 
-                foreach (UserGroup2LanguageDto language in dto.UserGroup2LanguageDtos)
-                {
-                    userGroup.AddAllowedLanguage(language.LanguageId);
-                }
+            foreach (UserGroup2LanguageDto language in dto.UserGroup2LanguageDtos)
+            {
+                userGroup.AddAllowedLanguage(language.LanguageId);
+            }
 
             userGroup.ResetDirtyProperties(false);
             return userGroup;
