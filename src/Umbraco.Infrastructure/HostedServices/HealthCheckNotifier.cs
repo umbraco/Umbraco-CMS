@@ -110,7 +110,7 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         // Ensure we use an explicit scope since we are running on a background thread and plugin health
         // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
         // isn't used since that can be problematic.
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         using (_profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
         {
             // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
@@ -132,6 +132,8 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
             {
                 await notificationMethod.SendAsync(results);
             }
+
+            scope.Complete();
         }
     }
 }

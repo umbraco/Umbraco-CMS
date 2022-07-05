@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -11,14 +12,15 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
@@ -141,7 +143,18 @@ public class HealthCheckNotifierTests
         var mockMainDom = new Mock<IMainDom>();
         mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
-        var mockScopeProvider = new Mock<IScopeProvider>();
+        // Create a scope provider
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider.Setup(x => x.CreateCoreScope(
+            It.IsAny<IsolationLevel>(),
+            It.IsAny<RepositoryCacheMode>(),
+            It.IsAny<IEventDispatcher>(),
+            It.IsAny<IScopedNotificationPublisher>(),
+            It.IsAny<bool?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>())
+        ).Returns(Mock.Of<ICoreScope>);
+
         var mockLogger = new Mock<ILogger<HealthCheckNotifier>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 

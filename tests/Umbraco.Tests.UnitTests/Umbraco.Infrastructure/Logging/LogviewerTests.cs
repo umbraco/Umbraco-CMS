@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,7 @@ using Moq;
 using NUnit.Framework;
 using Serilog;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -48,8 +50,20 @@ public class LogviewerTests
         // Copy the sample files
         File.Copy(exampleLogfilePath, _newLogfilePath, true);
 
+        // Create a scope provider
+        var mockScopeProvider = new Mock<IScopeProvider>();
+        mockScopeProvider.Setup(x => x.CreateScope(
+            It.IsAny<IsolationLevel>(),
+            It.IsAny<RepositoryCacheMode>(),
+            It.IsAny<IEventDispatcher>(),
+            It.IsAny<IScopedNotificationPublisher>(),
+            It.IsAny<bool?>(),
+            It.IsAny<bool>(),
+            It.IsAny<bool>())
+        ).Returns(Mock.Of<IScope>);
+
         var logger = Mock.Of<ILogger<SerilogJsonLogViewer>>();
-        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, Mock.Of<IScopeProvider>());
+        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, mockScopeProvider.Object);
         var logLevelLoader = Mock.Of<ILogLevelLoader>();
         _logViewer =
             new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, logLevelLoader, Log.Logger);
