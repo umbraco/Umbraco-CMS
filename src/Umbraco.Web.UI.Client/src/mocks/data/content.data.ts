@@ -9,15 +9,6 @@ export interface DocumentNode {
 	//layout?: any; // TODO: define layout type - make it non-optional
 }
 
-export interface DataTypeEntity {
-	id: number;
-	key: string;
-	name: string;
-	//icon: string; // TODO: should come from the doc type?
-	//configUI: any; // this is the prevalues...
-	propertyEditorUIAlias: string;
-}
-
 export interface NodeProperty {
 	alias: string;
 	label: string;

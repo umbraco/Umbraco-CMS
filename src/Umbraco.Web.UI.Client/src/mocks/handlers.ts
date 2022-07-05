@@ -3,6 +3,7 @@ import { handlers as installHandlers } from './domains/install.handlers';
 import { handlers as manifestsHandlers } from './domains/manifests.handlers';
 import { handlers as serverHandlers } from './domains/server.handlers';
 import { handlers as userHandlers } from './domains/user.handlers';
+import { handlers as dataTypeHandlers } from './domains/data-type.handlers';
 
 export const handlers = [
 	...serverHandlers,
@@ -10,4 +11,5 @@ export const handlers = [
 	...installHandlers,
 	...manifestsHandlers,
 	...userHandlers,
+	...dataTypeHandlers,
 ];

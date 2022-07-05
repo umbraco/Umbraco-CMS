@@ -1,30 +1,71 @@
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { DataTypeEntity } from '../../mocks/data/content.data';
-import { data } from '../../mocks/data/data-type.data';
+import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
 export class UmbDataTypeStore {
 	private _dataTypes: BehaviorSubject<Array<DataTypeEntity>> = new BehaviorSubject(<Array<DataTypeEntity>>[]);
 	public readonly dataTypes: Observable<Array<DataTypeEntity>> = this._dataTypes.asObservable();
 
-	constructor() {
-		this._dataTypes.next(data);
-	}
-
 	getById(id: number): Observable<DataTypeEntity | null> {
-		// no fetch..
+		// TODO: use Fetcher API.
+		// TODO: only fetch if the data type is not in the store?
+		fetch(`/umbraco/backoffice/data-type/${id}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this._updateStore(data);
+			});
 
-		// TODO: make pipes prettier/simpler/reuseable
 		return this.dataTypes.pipe(
 			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.id === id) || null)
 		);
 	}
 
 	getByKey(key: string): Observable<DataTypeEntity | null> {
-		// no fetch..
+		// TODO: use Fetcher API.
+		// TODO: only fetch if the data type is not in the store?
+		fetch(`/umbraco/backoffice/data-type/by-key/${key}`)
+			.then((res) => res.json())
+			.then((data) => {
+				this._updateStore(data);
+			});
 
-		// TODO: make pipes prettier/simpler/reuseable
 		return this.dataTypes.pipe(
 			map((dataTypes: Array<DataTypeEntity>) => dataTypes.find((node: DataTypeEntity) => node.key === key) || null)
 		);
+	}
+
+	async save(dataTypes: Array<DataTypeEntity>) {
+		// TODO: use Fetcher API.
+		try {
+			const res = await fetch('/umbraco/backoffice/data-type/save', {
+				method: 'POST',
+				body: JSON.stringify(dataTypes),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
+			const json = await res.json();
+			this._updateStore(json);
+		} catch (error) {
+			console.error('Save Data Type error', error);
+		}
+	}
+
+	private _updateStore(fetchedDataTypes: Array<DataTypeEntity>) {
+		const storedDataTypes = this._dataTypes.getValue();
+		const updated: DataTypeEntity[] = [...storedDataTypes];
+
+		fetchedDataTypes.forEach((fetchedDataType) => {
+			const index = storedDataTypes.map((storedNode) => storedNode.id).indexOf(fetchedDataType.id);
+
+			if (index !== -1) {
+				// If the data type is already in the store, update it
+				updated[index] = fetchedDataType;
+			} else {
+				// If the data type is not in the store, add it
+				updated.push(fetchedDataType);
+			}
+		});
+
+		this._dataTypes.next([...updated]);
 	}
 }

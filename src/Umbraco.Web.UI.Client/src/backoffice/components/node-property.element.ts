@@ -6,7 +6,7 @@ import { EMPTY, of, Subscription, switchMap } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { createExtensionElement, UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
-import { DataTypeEntity } from '../../mocks/data/content.data';
+import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
 import '../property-actions/property-action-menu/property-action-menu.element';
 
@@ -60,36 +60,36 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 	constructor() {
 		super();
 
-    /** TODO: Use DI for these types of services. */
-    this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
-      this._dataTypeStore = _instance;
-      this._useDataType();
-    });
+		/** TODO: Use DI for these types of services. */
+		this.consumeContext('umbDataTypeStore', (_instance: UmbDataTypeStore) => {
+			this._dataTypeStore = _instance;
+			this._useDataType();
+		});
 
-    this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
-      this._extensionRegistry = _instance;
-      this._useDataType();
-    });
-    // TODO: solution to know when both contexts are available
-  }
+		this.consumeContext('umbExtensionRegistry', (_instance: UmbExtensionRegistry) => {
+			this._extensionRegistry = _instance;
+			this._useDataType();
+		});
+		// TODO: solution to know when both contexts are available
+	}
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
-  }
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.addEventListener('property-editor-change', this._onPropertyEditorChange as any as EventListener);
+	}
 
-  // TODO: use subscribtion, rename to _useDataType:
-  private _useDataType() {
-    this._dataTypeSubscription?.unsubscribe();
-    if (this._property.dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
-      this._dataTypeSubscription = this._dataTypeStore
-        .getByKey(this._property.dataTypeKey)
-        .pipe(
-          switchMap((dataTypeEntity) => {
-            if (!dataTypeEntity) {
-              return EMPTY;
-            }
-            this._dataType = dataTypeEntity;
+	// TODO: use subscribtion, rename to _useDataType:
+	private _useDataType() {
+		this._dataTypeSubscription?.unsubscribe();
+		if (this._property.dataTypeKey && this._extensionRegistry && this._dataTypeStore) {
+			this._dataTypeSubscription = this._dataTypeStore
+				.getByKey(this._property.dataTypeKey)
+				.pipe(
+					switchMap((dataTypeEntity) => {
+						if (!dataTypeEntity) {
+							return EMPTY;
+						}
+						this._dataType = dataTypeEntity;
 
 						return this._extensionRegistry?.getByAlias(dataTypeEntity.propertyEditorUIAlias) ?? of(null);
 					})
@@ -114,23 +114,23 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 				const oldValue = this._element;
 				this._element = el;
 
-        // TODO: Set/Parse Data-Type-UI-configuration
-        if (this._element) {
-          this._element.value = this.value; // Be aware its duplicated code
-        }
-        this.requestUpdate('element', oldValue);
-      })
-      .catch(() => {
-        // TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
-      });
-  }
+				// TODO: Set/Parse Data-Type-UI-configuration
+				if (this._element) {
+					this._element.value = this.value; // Be aware its duplicated code
+				}
+				this.requestUpdate('element', oldValue);
+			})
+			.catch(() => {
+				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
+			});
+	}
 
-  private _onPropertyEditorChange = (e: CustomEvent) => {
-    const target = e.composedPath()[0] as any;
-    this.value = target.value;
-    this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
-    e.stopPropagation();
-  };
+	private _onPropertyEditorChange = (e: CustomEvent) => {
+		const target = e.composedPath()[0] as any;
+		this.value = target.value;
+		this.dispatchEvent(new CustomEvent('property-value-change', { bubbles: true, composed: true }));
+		e.stopPropagation();
+	};
 
 	/** Lit does not currently handle dynamic tag names, therefor we are doing some manual rendering */
 	// TODO: Refactor into a base class for dynamic-tag element? we will be using this a lot for extensions.
@@ -149,22 +149,27 @@ class UmbNodeProperty extends UmbContextConsumerMixin(LitElement) {
 		this._dataTypeSubscription?.unsubscribe();
 	}
 
-  private _renderPropertyActionMenu () {
-    return html`${ this._dataType ? html`<umb-property-action-menu id="property-action-menu" .propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}" .value="${this.value}"></umb-property-action-menu>`: '' }`;
-  }
+	private _renderPropertyActionMenu() {
+		return html`${this._dataType
+			? html`<umb-property-action-menu
+					id="property-action-menu"
+					.propertyEditorUIAlias="${this._dataType.propertyEditorUIAlias}"
+					.value="${this.value}"></umb-property-action-menu>`
+			: ''}`;
+	}
 
-  render() {
-    return html`
-      <umb-editor-property-layout id="layout">
-        <div slot="header">
-          <uui-label>${this.property.label}</uui-label>
-          ${ this._renderPropertyActionMenu() }
-          <p>${this.property.description}</p>
-        </div>
-        <div slot="editor">${this._element}</div>
-      </umb-editor-property-layout>
-    `;
-  }
+	render() {
+		return html`
+			<umb-editor-property-layout id="layout">
+				<div slot="header">
+					<uui-label>${this.property.label}</uui-label>
+					${this._renderPropertyActionMenu()}
+					<p>${this.property.description}</p>
+				</div>
+				<div slot="editor">${this._element}</div>
+			</umb-editor-property-layout>
+		`;
+	}
 }
 
 declare global {

@@ -1,3 +1,4 @@
+import { UUIButtonState, UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -6,7 +7,7 @@ import { map, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
-import { DataTypeEntity } from '../../mocks/data/content.data';
+import { DataTypeEntity } from '../../mocks/data/data-type.data';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -45,7 +46,7 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 	id!: string;
 
 	@state()
-	_dataType!: DataTypeEntity;
+	private _dataType?: DataTypeEntity;
 
 	@state()
 	private _editorViews: Array<UmbExtensionManifestEditorView> = [];
@@ -55,6 +56,9 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 
 	@state()
 	private _routes: Array<IRoute> = [];
+
+	@state()
+	private _saveButtonState?: UUIButtonState;
 
 	private _dataTypeStore?: UmbDataTypeStore;
 	private _dataTypeSubscription?: Subscription;
@@ -75,6 +79,17 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 			this._extensionRegistry = extensionRegistry;
 			this._useEditorViews();
 		});
+
+		// TODO: temp solution to handle property editor UI change
+		this.addEventListener('change', this._handleChange);
+	}
+
+	private _handleChange(event: any) {
+		if (!this._dataType) return;
+
+		const target = event.composedPath()[0] as UUIComboboxListElement;
+		const value = target.value as string;
+		this._dataType.propertyEditorUIAlias = value;
 	}
 
 	connectedCallback(): void {
@@ -153,14 +168,24 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 		}
 	}
 
-	private _onSave() {
-		console.log('SAVE DATA TYPE');
+	private async _onSave() {
+		// TODO: What if store is not present, what if node is not loaded....
+		if (!this._dataTypeStore) return;
+		if (!this._dataType) return;
+
+		try {
+			this._saveButtonState = 'waiting';
+			await this._dataTypeStore.save([this._dataType]);
+			this._saveButtonState = 'success';
+		} catch (error) {
+			this._saveButtonState = 'failed';
+		}
 	}
 
 	render() {
 		return html`
 			<umb-editor-layout>
-				<uui-input slot="name" .value="${this._dataType.name}"></uui-input>
+				<uui-input slot="name" .value="${this._dataType?.name}"></uui-input>
 
 				<uui-tab-group slot="apps">
 					${this._editorViews.map(
@@ -179,7 +204,12 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 				<router-slot .routes="${this._routes}"></router-slot>
 
 				<div slot="actions">
-					<uui-button @click=${this._onSave} look="primary" color="positive" label="Save"></uui-button>
+					<uui-button
+						@click=${this._onSave}
+						look="primary"
+						color="positive"
+						label="Save"
+						.state="${this._saveButtonState}"></uui-button>
 				</div>
 			</umb-editor-layout>
 		`;

@@ -3,7 +3,7 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../core/context';
-import type { DataTypeEntity } from '../../mocks/data/content.data';
+import type { DataTypeEntity } from '../../mocks/data/data-type.data';
 import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../core/extension';
 
 @customElement('umb-editor-view-data-type-edit')

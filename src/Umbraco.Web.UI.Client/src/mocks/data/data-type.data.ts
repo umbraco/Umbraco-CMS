@@ -1,4 +1,12 @@
-export const data: Array<any> = [
+export interface DataTypeEntity {
+	id: number;
+	key: string;
+	name: string;
+	//configUI: any; // this is the prevalues...
+	propertyEditorUIAlias: string;
+}
+
+export const data: Array<DataTypeEntity> = [
 	{
 		id: 1245,
 		key: 'dt-1',
@@ -24,3 +32,37 @@ export const data: Array<any> = [
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
 ];
+
+// Temp mocked database
+class UmbDataTypeData {
+	private _data: Array<DataTypeEntity> = [];
+
+	constructor() {
+		this._data = data;
+	}
+
+	getById(id: number) {
+		return this._data.find((item) => item.id === id);
+	}
+
+	getByKey(key: string) {
+		return this._data.find((item) => item.key === key);
+	}
+
+	save(nodes: DataTypeEntity[]) {
+		nodes.forEach((node) => {
+			const foundIndex = this._data.findIndex((item) => item.id === node.id);
+			if (foundIndex !== -1) {
+				// replace
+				this._data[foundIndex] = node;
+			} else {
+				// new
+				this._data.push(node);
+			}
+		});
+		//console.log('save:', nodes);
+		return nodes;
+	}
+}
+
+export const umbDataTypeData = new UmbDataTypeData();
