@@ -35,13 +35,13 @@ public class NewInstallController : Controller
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsViewModel), StatusCodes.Status200OK)]
     [RequireRuntimeLevel(RuntimeLevel.Install)]
-    public async Task<IActionResult> Settings()
+    public async Task<ActionResult<InstallSettingsViewModel>> Settings()
     {
         InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
 
         InstallSettingsViewModel viewModel = _mapper.Map<InstallSettingsViewModel>(installSettings)!;
 
-        return Ok(viewModel);
+        return viewModel;
     }
 
     [HttpPost("setup")]
