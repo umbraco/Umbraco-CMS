@@ -135,6 +135,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Core", "Umb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Infrastructure", "Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj", "{13B3302F-ECEE-4552-9DB9-773A82ECBF1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.New.Cms.Web.Common", "Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj", "{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -275,6 +277,12 @@ Global
 		{13B3302F-ECEE-4552-9DB9-773A82ECBF1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{13B3302F-ECEE-4552-9DB9-773A82ECBF1C}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{13B3302F-ECEE-4552-9DB9-773A82ECBF1C}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -292,6 +300,7 @@ Global
 		{3E7F6CED-50BF-4AAD-800B-2F56E8A0D93D} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 		{625AE972-D863-4B53-A243-5134AA1DFCBA} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 		{13B3302F-ECEE-4552-9DB9-773A82ECBF1C} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
+		{2CC18E6F-9866-4B36-B543-F9B7ED0C080A} = {995D9EFA-8BB1-4333-80AD-C525A06FD984}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

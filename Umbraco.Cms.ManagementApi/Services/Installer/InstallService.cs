@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Core.Services.Installer;
@@ -15,24 +13,14 @@ public class InstallService : IInstallService
     private readonly ILogger<InstallService> _logger;
     private readonly NewInstallStepCollection _installSteps;
     private readonly IRuntimeState _runtimeState;
-    private readonly IRuntime _runtime;
-    private readonly IBackOfficeSignInManager _backOfficeSignInManager;
-    private readonly IBackOfficeUserManager _backOfficeUserManager;
-
     public InstallService(
         ILogger<InstallService> logger,
         NewInstallStepCollection installSteps,
-        IRuntimeState runtimeState,
-        IRuntime runtime,
-        IBackOfficeSignInManager backOfficeSignInManager,
-        IBackOfficeUserManager backOfficeUserManager)
+        IRuntimeState runtimeState)
     {
         _logger = logger;
         _installSteps = installSteps;
         _runtimeState = runtimeState;
-        _runtime = runtime;
-        _backOfficeSignInManager = backOfficeSignInManager;
-        _backOfficeUserManager = backOfficeUserManager;
     }
 
     public async Task Install(InstallData model)
@@ -44,24 +32,20 @@ public class InstallService : IInstallService
 
         IEnumerable<IInstallStep> steps = _installSteps.GetInstallSteps();
         await RunSteps(steps, model);
-
-        await _runtime.RestartAsync();
-
-        // Sign the newly created user in (Not sure if we want this separately in the future?
-        BackOfficeIdentityUser identityUser =
-            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
-        await _backOfficeSignInManager.SignInAsync(identityUser, false);
     }
 
     public async Task Upgrade()
     {
+        if (_runtimeState.Level != RuntimeLevel.Upgrade)
+        {
+            throw new InvalidOperationException($"Runtime level must be Upgrade to upgrade but was: {_runtimeState.Level}");
+        }
+
         // Need to figure out how to handle the install data, this is only needed when installing, not upgrading.
         var model = new InstallData();
 
         IEnumerable<IInstallStep> steps = _installSteps.GetUpgradeSteps();
         await RunSteps(steps, model);
-
-        await _runtime.RestartAsync();
     }
 
     private async Task RunSteps(IEnumerable<IInstallStep> steps, InstallData model)

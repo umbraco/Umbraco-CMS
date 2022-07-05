@@ -13,6 +13,7 @@
       <ProjectReference Include="..\src\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
       <ProjectReference Include="..\Umbraco.New.Cms.Core\Umbraco.New.Cms.Core.csproj" />
       <ProjectReference Include="..\Umbraco.New.Cms.Infrastructure\Umbraco.New.Cms.Infrastructure.csproj" />
+      <ProjectReference Include="..\Umbraco.New.Cms.Web.Common\Umbraco.New.Cms.Web.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
