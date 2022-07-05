@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
 import { map, Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
+import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
 import { DataTypeEntity } from '../../mocks/data/content.data';
 
