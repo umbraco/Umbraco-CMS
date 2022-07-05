@@ -221,6 +221,9 @@
                 */
             });
 
+
+            // TODO: setDirty if sort has happened.
+
         }
     }   
 

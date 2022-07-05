@@ -1,6 +1,12 @@
 (function () {
     "use strict";
 
+    function TransferProperties(fromObject, toObject) {
+        for (var p in fromObject) {
+            toObject[p] = fromObject[p];
+        }
+    }
+
     /**
      * @ngdoc directive
      * @name umbraco.directives.directive:umbBlockGridAreaEditor
@@ -17,14 +23,16 @@
             controllerAs: "vm",
             bindings: {
                 model: "=",
-                block: "<"
+                block: "<",
+                allBlockTypes: "<",
+                loadedElementTypes: "<"
             },
             require: {
                 propertyForm: "^form"
             }
         });
 
-    function BlockGridAreaController($scope, $element, assetsService) {
+    function BlockGridAreaController($scope, $element, assetsService, localizationService, editorService) {
 
         var unsubscribe = [];
 
@@ -61,10 +69,12 @@
                 ghostClass: "umb-block-grid-area-editor__area-placeholder"
             });
 
+            // TODO: setDirty if sort has happend.
+
         }
 
         vm.editArea = function(area) {
-            console.log("edit", area);
+            vm.openAreaOverlay(area);
         }
 
         vm.deleteArea = function(area) {
@@ -72,13 +82,61 @@
         }
 
         vm.onNewAreaClick = function() {
-            vm.model.push({
+            const newArea = {
                 'key': String.CreateGuid(),
                 'alias': '',
                 'columnSpan': (vm.blockGridColumns),
-                'rowSpan': 1
-            })
+                'rowSpan': 1,
+                'minAllowed': 0,
+                'maxAllowed': null,
+                'allowAll': true,
+                'allowedTypes': [
+                    /*{
+                        'elementTypeKey': 345,
+                        'min': 0,
+                        'max': null
+                    }*/
+                ]
+
+            };
+            vm.model.push(newArea)
+            vm.openAreaOverlay(newArea);
+            setDirty();
         }
+
+        vm.openArea = null;
+        vm.openAreaOverlay = function (area) {
+
+            // TODO: use the right localization key:
+            localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [area.alias]).then(function (localized) {
+
+                var clonedAreaData = Utilities.copy(area);
+                vm.openArea = area;
+
+                var overlayModel = {
+                    area: clonedAreaData,
+                    title: localized,
+                    allBlockTypes: vm.allBlockTypes,
+                    loadedElementTypes: vm.loadedElementTypes,
+                    view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.area.overlay.html",
+                    size: "small",
+                    submit: function(overlayModel) {
+                        TransferProperties(overlayModel.area, area);
+                        overlayModel.close();
+                        setDirty();
+                    },
+                    close: function() {
+                        editorService.close();
+                        vm.openArea = null;
+                    }
+                };
+
+                // open property settings editor
+                editorService.open(overlayModel);
+
+            });
+
+        };
         
         function setDirty() {
             if (vm.propertyForm) {

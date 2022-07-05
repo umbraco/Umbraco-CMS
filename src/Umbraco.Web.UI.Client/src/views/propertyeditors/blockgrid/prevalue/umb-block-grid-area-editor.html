@@ -6,6 +6,7 @@
 
         <umb-block-grid-configuration-area-entry ng-repeat="area in vm.model track by area.key"
             class="umb-block-grid-area-editor__area"
+            ng-class="{'--isOpen':vm.openArea === area}"
             area="area"
             style="
             --umb-block-grid--area-column-span: {{area.columnSpan}};

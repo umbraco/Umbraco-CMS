@@ -214,6 +214,8 @@
 
                     var overlayModel = {
                         block: clonedBlockData,
+                        allBlockTypes: $scope.model.value,
+                        loadedElementTypes: vm.elementTypes,
                         title: data,
                         view: "views/propertyeditors/blockgrid/prevalue/blockgrid.blockconfiguration.overlay.html",
                         size: "large",

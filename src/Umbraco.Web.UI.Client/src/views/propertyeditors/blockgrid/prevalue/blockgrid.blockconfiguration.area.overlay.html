@@ -1,0 +1,103 @@
+<div ng-controller="Umbraco.PropertyEditors.BlockGrid.BlockConfigurationAreaOverlayController as vm">
+
+    <form novalidate name="blockGridBlockConfigurationAreaForm" val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+                <div class="form-vertical umb-block-grid-block-configuration-layout">
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineEditorAppearance">Identification</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- alias -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="alias"><localize key="blockEditor_TODO">alias</localize></label>
+                                    <div class="controls">
+                                        <input type="text" name="alias" ng-model="vm.area.alias" style="width:100%" umb-auto-focus/>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineEditorAppearance">Requirements</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- min/max -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="minMaxEditor"><localize key="blockEditor_TODO">Required amount of Blocks</localize></label>
+                                    <div class="controls">
+                                        <umb-property-editor name="minMaxEditor" model="vm.minMaxModel" is-pre-value="true"></umb-property-editor>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- min/max -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" ><localize key="blockEditor_TODO">Allowed Block Types</localize></label>
+                                    <umb-property-info-button button-title-key="blockEditor_TODO">
+                                        <localize key="blockEditor_TODO">Define which specific Blocks that are allowed in this Area.</localize>
+                                    </umb-property-info-button>
+                                    <div class="controls">
+                                        <umb-block-grid-area-block-allowance-editor allowed-types="vm.area.allowedTypes" all-block-types="model.allBlockTypes" loaded-element-types="model.loadedElementTypes"></umb-block-grid-area-block-allowance-editor>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        action="vm.close()"
+                        shortcut="esc"
+                        button-style="link"
+                        label-key="general_close"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        action="vm.submit()"
+                        button-style="primary"
+                        state="submitButtonState"
+                        label-key="buttons_submitChanges"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
+</div>

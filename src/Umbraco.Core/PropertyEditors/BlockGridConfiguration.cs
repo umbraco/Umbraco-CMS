@@ -45,6 +45,32 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 [DataMember(Name ="rowSpan")]
                 public int? RowSpan { get; set; }
 
+                [DataMember(Name ="minAllowed")]
+                public int? MinAllowed { get; set; }
+                
+                [DataMember(Name ="maxAllowed")]
+                public int? MaxAllowed { get; set; }
+
+                [DataMember(Name ="allowAll")]
+                public bool? AllowAll { get; set; }
+
+                [DataMember(Name ="allowedTypes")]
+                public BlockGridAreaConfigurationAllowedType[] AllowedTypes { get; set; }  = null!;
+
+                [DataContract]
+                public class BlockGridAreaConfigurationAllowedType
+                {
+                    [DataMember(Name ="elementTypeKey")]
+                    public Guid? ElementTypeKey { get; set; }
+
+                    [DataMember(Name ="minAllowed")]
+                    public int? MinAllowed { get; set; }
+                    
+                    [DataMember(Name ="maxAllowed")]
+                    public int? MaxAllowed { get; set; }
+
+                }
+
             }
 
             [DataMember(Name ="backgroundColor")]

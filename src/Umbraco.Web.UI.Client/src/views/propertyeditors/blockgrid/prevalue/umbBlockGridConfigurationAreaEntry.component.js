@@ -244,11 +244,11 @@
 
 
         vm.onEditClick = function() {
-            console.log("edit")
+            vm.onEdit();
         }
 
         vm.onDeleteClick = function() {
-            console.log("delete")
+            vm.onDelete();
         }
 
     }   

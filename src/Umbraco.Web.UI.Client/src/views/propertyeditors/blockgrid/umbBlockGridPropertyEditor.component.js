@@ -336,20 +336,6 @@
                 this._parentForm = parentForm;
             };
 
-            // TODO: temporary hack to get areas:
-            block.config.areas = [
-                {
-                    key: 'test1',
-                    columnSpan: 6,
-                    rowSpan: 1
-                },
-                {
-                    key: 'test2',
-                    columnSpan: 6,
-                    rowSpan: 2
-                }
-            ]
-
             /** decorator methods, to enable switching out methods without loosing references that would have been made in Block Views codes */
             block.activate = function() {
                 this._activate();
@@ -657,7 +643,7 @@
                     // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
                     if (createIndex < vm.layout.length) {
                         // TODO: handle areas:
-                        const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.children[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
+                        const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.items[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
                         vm.setBlockFocus(blockOfInterest);
                     }
 
@@ -848,7 +834,7 @@
             if(parentLayoutEntry != null) {
                 // TODO: find right area
                 console.error("TODO: find area...")
-                parentLayoutEntry.children.splice(index, 0, layoutEntry);
+                parentLayoutEntry.items.splice(index, 0, layoutEntry);
             } else {
                 vm.layout.splice(index, 0, layoutEntry);
             }
