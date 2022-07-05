@@ -3,16 +3,15 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.New.Cms.Core.Installer;
 using Umbraco.New.Cms.Core.Models.Installer;
-using Umbraco.New.Cms.Core.Services.Installer;
 
-// TODO: Move me when post install step is created.
-namespace Umbraco.Cms.ManagementApi.Services.Installer;
+namespace Umbraco.New.Cms.Core.Services.Installer;
 
 public class InstallService : IInstallService
 {
     private readonly ILogger<InstallService> _logger;
     private readonly NewInstallStepCollection _installSteps;
     private readonly IRuntimeState _runtimeState;
+
     public InstallService(
         ILogger<InstallService> logger,
         NewInstallStepCollection installSteps,
