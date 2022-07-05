@@ -26,6 +26,19 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartMediaId = startMediaId == 0 ? null : startMediaId;
     }
 
+    public ReadOnlyUserGroup(
+        int id,
+        string? name,
+        string? icon,
+        int? startContentId,
+        int? startMediaId,
+        string? alias,
+        IEnumerable<string> allowedSections,
+        IEnumerable<string>? permissions)
+    : this(id, name, icon, startContentId, startMediaId, alias, Enumerable.Empty<int>(), allowedSections, permissions)
+    {
+    }
+
     public int Id { get; }
 
     public bool Equals(ReadOnlyUserGroup? other)

@@ -37,13 +37,19 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
 
     void ClearAllowedSections();
 
-    IEnumerable<int> AllowedLanguages { get; }
+    IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
 
-    void RemoveAllowedLanguage(int languageId);
+    void RemoveAllowedLanguage(int languageId)
+    {
+    }
 
-    void AddAllowedLanguage(int languageId);
+    void AddAllowedLanguage(int languageId)
+    {
+    }
 
-    void ClearAllowedLanguages();
+    void ClearAllowedLanguages()
+    {
+    }
 
     /// <summary>
     ///     Specifies the number of users assigned to this group
