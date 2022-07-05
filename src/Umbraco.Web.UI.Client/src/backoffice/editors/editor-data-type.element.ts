@@ -122,7 +122,7 @@ export class UmbEditorDataTypeElement extends UmbContextConsumerMixin(LitElement
 			this._routes = this._editorViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
-					component: () => document.createElement(view.elementName),
+					component: () => document.createElement(view.elementName || 'div'),
 					setup: (element: HTMLElement, info: IRoutingInfo) => {
 						// TODO: make interface for EditorViews
 						const editorView = element as any;

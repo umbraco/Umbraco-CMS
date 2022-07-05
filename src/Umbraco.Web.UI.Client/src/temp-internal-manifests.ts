@@ -63,7 +63,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Text',
 		js: () => import('./backoffice/property-editors/property-editor-text.element'),
 		meta: {
-			icon: 'document',
+			icon: 'edit',
 			group: 'common',
 		},
 	},
@@ -74,7 +74,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		elementName: 'umb-property-editor-textarea',
 		js: () => import('./backoffice/property-editors/property-editor-textarea.element'),
 		meta: {
-			icon: 'document',
+			icon: 'edit',
 			group: 'common',
 		},
 	},
@@ -84,7 +84,7 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 		name: 'Context Example',
 		js: () => import('./backoffice/property-editors/property-editor-context-example.element'),
 		meta: {
-			icon: 'document',
+			icon: 'favorite',
 			group: 'common',
 		},
 	},

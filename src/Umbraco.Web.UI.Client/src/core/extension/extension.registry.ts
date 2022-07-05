@@ -33,7 +33,7 @@ export type UmbManifestPropertyEditorMeta = {
 	//description: string;
 	//configConfig: unknown; // we need a name and concept for how to setup editor-UI for
 };
-export type UmbExtensionManifestPropertyEditor = {
+export type UmbExtensionManifestPropertyEditorUI = {
 	type: 'propertyEditorUI';
 	meta: UmbManifestPropertyEditorMeta;
 } & UmbExtensionManifestBase;
@@ -74,7 +74,7 @@ export type UmbExtensionManifestEditorView = {
 export type UmbExtensionManifestCore =
 	| UmbExtensionManifestSection
 	| UmbExtensionManifestDashboard
-	| UmbExtensionManifestPropertyEditor
+	| UmbExtensionManifestPropertyEditorUI
 	| UmbExtensionManifestPropertyAction
 	| UmbExtensionManifestEditorView;
 
@@ -116,7 +116,7 @@ export class UmbExtensionRegistry {
 	extensionsOfType(type: 'section'): Observable<Array<UmbExtensionManifestSection>>;
 	extensionsOfType(type: 'dashboard'): Observable<Array<UmbExtensionManifestDashboard>>;
 	extensionsOfType(type: 'editorView'): Observable<Array<UmbExtensionManifestEditorView>>;
-	extensionsOfType(type: 'propertyEditor'): Observable<Array<UmbExtensionManifestPropertyEditor>>;
+	extensionsOfType(type: 'propertyEditorUI'): Observable<Array<UmbExtensionManifestPropertyEditorUI>>;
 	extensionsOfType(type: 'propertyAction'): Observable<Array<UmbExtensionManifestPropertyAction>>;
 	extensionsOfType(type: UmbExtensionManifestCoreTypes): Observable<Array<UmbExtensionManifestCore>>;
 	extensionsOfType(type: string): Observable<Array<UmbExtensionManifestOther>>;

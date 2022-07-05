@@ -6,8 +6,8 @@ import { UmbNodeStore } from '../../core/stores/node.store';
 import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../mocks/data/content.data';
 import { UmbNotificationService } from '../../core/services/notification.service';
-import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
-import { IRoutingInfo, RouterSlot } from 'router-slot';
+import { UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
+import { IRoute, IRoutingInfo, RouterSlot } from 'router-slot';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
@@ -54,10 +54,10 @@ export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 	_node?: DocumentNode;
 
 	@state()
-	private _routes: Array<any> = [];
+	private _routes: Array<IRoute> = [];
 
 	@state()
-	private _editorViews: Array<any> = [];
+	private _editorViews: Array<UmbExtensionManifestEditorView> = [];
 
 	@state()
 	private _currentView = '';
@@ -174,7 +174,7 @@ export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 			this._routes = this._editorViews.map((view) => {
 				return {
 					path: `view/${view.meta.pathname}`,
-					component: () => document.createElement(view.elementName),
+					component: () => document.createElement(view.elementName || 'div'),
 					setup: (element: HTMLElement, info: IRoutingInfo) => {
 						// TODO: make interface for EditorViews
 						const editorView = element as any;
