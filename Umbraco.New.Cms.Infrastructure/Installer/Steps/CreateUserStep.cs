@@ -20,7 +20,7 @@ using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class InstallStep : IInstallStep
+public class CreateUserStep : IInstallStep
 {
     private readonly IUserService _userService;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -32,7 +32,7 @@ public class InstallStep : IInstallStep
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
     private readonly IMetricsConsentService _metricsConsentService;
 
-    public InstallStep(
+    public CreateUserStep(
         IUserService userService,
         DatabaseBuilder databaseBuilder,
         IHttpClientFactory httpClientFactory,

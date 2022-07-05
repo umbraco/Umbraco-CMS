@@ -40,7 +40,7 @@ public static class InstallerBuilderExtensions
             .Append<DatabaseConfigureStep>()
             .Append<DatabaseInstallStep>()
             .Append<DatabaseUpgradeStep>()
-            .Append<InstallStep>();
+            .Append<CreateUserStep>();
 
         return builder;
     }
