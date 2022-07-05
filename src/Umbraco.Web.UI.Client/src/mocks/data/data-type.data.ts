@@ -10,25 +10,25 @@ export const data: Array<DataTypeEntity> = [
 	{
 		id: 1245,
 		key: 'dt-1',
-		name: 'TextString (DataType)',
+		name: 'Text',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Text',
 	},
 	{
 		id: 1244,
 		key: 'dt-2',
-		name: 'Textarea (DataType)',
+		name: 'Textarea',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.Textarea',
 	},
 	{
 		id: 1246,
 		key: 'dt-3',
-		name: 'My JS Property Editor (DataType)',
+		name: 'My JS Property Editor',
 		propertyEditorUIAlias: 'My.PropertyEditorUI.Custom',
 	},
 	{
 		id: 1247,
 		key: 'dt-4',
-		name: 'Context Example (DataType)',
+		name: 'Context Example',
 		propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 	},
 ];
