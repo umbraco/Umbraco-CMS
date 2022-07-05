@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
-        public Func<int, ILanguage> GetLanguage { get; set; }
+        public Func<int, ILanguage?>? GetLanguage { get; set; }
 
-        private ILanguage _language;
+        private ILanguage? _language;
         private string _value;
         //note: this will be memberwise cloned
         private int _languageId;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         [DataMember]
         [DoNotClone]
-        public ILanguage Language
+        public ILanguage? Language
         {
             get
             {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Models
         public string Value
         {
             get { return _value; }
-            set { SetPropertyValueAndDetectChanges(value, ref _value, nameof(Value)); }
+            set { SetPropertyValueAndDetectChanges(value, ref _value!, nameof(Value)); }
         }
 
         protected override void PerformDeepClone(object clone)

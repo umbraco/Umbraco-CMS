@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="siteUri"></param>
         /// <param name="createSubject"></param>
         /// <param name="createBody"></param>
-        void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string action, string actionName, Uri siteUri,
+        void SendNotifications(IUser operatingUser, IEnumerable<IContent> entities, string? action, string? actionName, Uri siteUri,
                                Func<(IUser user, NotificationEmailSubjectParams subject), string> createSubject,
                                Func<(IUser user, NotificationEmailBodyParams body, bool isHtml), string> createBody);
 
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        IEnumerable<Notification> GetUserNotifications(IUser user);
+        IEnumerable<Notification>? GetUserNotifications(IUser user);
 
         /// <summary>
         /// Gets the notifications for the user based on the specified node path
@@ -38,14 +38,14 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// Notifications are inherited from the parent so any child node will also have notifications assigned based on it's parent (ancestors)
         /// </remarks>
-        IEnumerable<Notification> GetUserNotifications(IUser user, string path);
+        IEnumerable<Notification>? GetUserNotifications(IUser? user, string path);
 
         /// <summary>
         /// Returns the notifications for an entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        IEnumerable<Notification> GetEntityNotifications(IEntity entity);
+        IEnumerable<Notification>? GetEntityNotifications(IEntity entity);
 
         /// <summary>
         /// Deletes notifications by entity
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>
         /// This performs a full replace
         /// </remarks>
-        IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions);
+        IEnumerable<Notification>? SetNotifications(IUser? user, IEntity entity, string[] actions);
 
         /// <summary>
         /// Creates a new notification

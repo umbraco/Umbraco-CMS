@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
             DefaultConfiguration.Add("maxNumber", 0);
         }
 
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleContentPickerParameterEditor.MultipleContentPickerParamateterValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleContentPickerParameterEditor.MultipleContentPickerParamateterValueEditor>(Attribute!);
 
         internal class MultipleContentPickerParamateterValueEditor : MultiplePickerParamateterValueEditorBase
         {

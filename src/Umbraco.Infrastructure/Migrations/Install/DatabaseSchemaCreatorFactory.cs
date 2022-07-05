@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _installDefaultDataSettings = installDefaultDataSettings;
         }
 
-        public DatabaseSchemaCreator Create(IUmbracoDatabase database)
+        public DatabaseSchemaCreator Create(IUmbracoDatabase? database)
         {
             return new DatabaseSchemaCreator(database, _logger, _loggerFactory, _umbracoVersion, _eventAggregator, _installDefaultDataSettings);
         }

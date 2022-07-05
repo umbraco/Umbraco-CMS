@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     /// <summary>
     /// Manages a pool of LocalDb databases for integration testing
     /// </summary>
-    public class LocalDbTestDatabase : BaseTestDatabase, ITestDatabase
+    public class LocalDbTestDatabase : SqlServerBaseTestDatabase, ITestDatabase
     {
         public const string InstanceName = "UmbracoTests";
         public const string DatabaseName = "UmbracoTests";
@@ -25,19 +25,15 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private static LocalDb.Instance s_localDbInstance;
         private static string s_filesPath;
 
-        public static LocalDbTestDatabase Instance { get; private set; }
-
         // It's internal because `Umbraco.Core.Persistence.LocalDb` is internal
-        internal LocalDbTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, LocalDb localDb, string filesPath, IUmbracoDatabaseFactory dbFactory)
+        internal LocalDbTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, LocalDb localDb, IUmbracoDatabaseFactory dbFactory)
         {
             _loggerFactory = loggerFactory;
             _databaseFactory = dbFactory;
 
             _settings = settings;
             _localDb = localDb;
-            s_filesPath = filesPath;
-
-            Instance = this; // For GlobalSetupTeardown.cs
+            s_filesPath = settings.FilesPath;
 
             var counter = 0;
 
@@ -90,7 +86,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             }
         }
 
-        public void Finish()
+        public override void TearDown()
         {
             if (_prepareQueue == null)
             {

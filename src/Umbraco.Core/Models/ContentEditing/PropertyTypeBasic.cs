@@ -25,17 +25,17 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [Required]
         [RegularExpression(@"^([a-zA-Z]\w.*)$", ErrorMessage = "Invalid alias")]
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DataMember(Name = "validation")]
-        public PropertyTypeValidation Validation { get; set; }
+        public PropertyTypeValidation? Validation { get; set; }
 
         [DataMember(Name = "label")]
         [Required]
-        public string Label { get; set; }
+        public string Label { get; set; } = null!;
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
@@ -50,11 +50,11 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "dataTypeName")]
         [ReadOnly(true)]
-        public string DataTypeName { get; set; }
+        public string? DataTypeName { get; set; }
 
         [DataMember(Name = "dataTypeIcon")]
         [ReadOnly(true)]
-        public string DataTypeIcon { get; set; }
+        public string? DataTypeIcon { get; set; }
 
         //SD: Is this really needed ?
         [DataMember(Name = "groupId")]

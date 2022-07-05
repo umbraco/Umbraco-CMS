@@ -12,12 +12,12 @@
         /// <summary>
         /// Gets or sets the source name.
         /// </summary>
-        public virtual string OldName { get; set; }
+        public virtual string? OldName { get; set; }
 
         /// <summary>
         /// Gets or sets the target name.
         /// </summary>
-        public virtual string NewName { get; set; }
+        public virtual string? NewName { get; set; }
 
         /// <inheritdoc />
         /// <inheritdoc />

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -50,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override IAuditEntry PerformGet(int id)
+        protected override IAuditEntry? PerformGet(int id)
         {
             Sql<ISqlContext> sql = Sql()
                 .Select<AuditEntryDto>()
@@ -62,9 +63,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc />
-        protected override IEnumerable<IAuditEntry> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IAuditEntry> PerformGetAll(params int[]? ids)
         {
-            if (ids.Length == 0)
+            if (ids?.Length == 0)
             {
                 Sql<ISqlContext> sql = Sql()
                     .Select<AuditEntryDto>()

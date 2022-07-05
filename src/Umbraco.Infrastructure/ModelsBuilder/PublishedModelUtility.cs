@@ -31,23 +31,23 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         //    // etc...
         //}
 
-        public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
+        public static IPublishedContentType? GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
             var publishedSnapshot = publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    return publishedSnapshot.Content.GetContentType(alias);
+                    return publishedSnapshot.Content?.GetContentType(alias);
                 case PublishedItemType.Media:
-                    return publishedSnapshot.Media.GetContentType(alias);
+                    return publishedSnapshot.Media?.GetContentType(alias);
                 case PublishedItemType.Member:
-                    return publishedSnapshot.Members.GetContentType(alias);
+                    return publishedSnapshot.Members?.GetContentType(alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }
         }
 
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+        public static IPublishedPropertyType? GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
         //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here

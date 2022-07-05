@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -13,12 +14,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
@@ -49,16 +50,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
-        protected override IDataType PerformGet(int id)
+        protected override IDataType? PerformGet(int id)
         {
-            return GetMany(id).FirstOrDefault();
+            return GetMany(id)?.FirstOrDefault();
         }
 
-        protected override IEnumerable<IDataType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IDataType> PerformGetAll(params int[]? ids)
         {
             var dataTypeSql = GetBaseQuery(false);
 
-            if (ids.Any())
+            if (ids?.Any() ?? false)
             {
                 dataTypeSql.Where("umbracoNode.id in (@ids)", new { ids });
             }
@@ -123,7 +124,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.AddingEntity();
 
             //ensure a datatype has a unique name before creating it
-            entity.Name = EnsureUniqueNodeName(entity.Name);
+            entity.Name = EnsureUniqueNodeName(entity.Name)!;
 
             // TODO: should the below be removed?
             //Cannot add a duplicate data type
@@ -173,7 +174,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IDataType entity)
         {
 
-            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
+            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id)!;
 
             //Cannot change to a duplicate alias
             var existsSql = Sql()
@@ -244,7 +245,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #endregion
 
-        public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer container)
+        public IEnumerable<MoveEventInfo<IDataType>> Move(IDataType toMove, EntityContainer? container)
         {
             var parentId = -1;
             if (container != null)
@@ -278,15 +279,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var descendants = Get(Query<IDataType>().Where(type => type.Path.StartsWith(origPath + ",")));
 
             var lastParent = toMove;
-            foreach (var descendant in descendants.OrderBy(x => x.Level))
+            if (descendants is not null)
             {
-                moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
+                foreach (var descendant in descendants.OrderBy(x => x.Level))
+                {
+                    moveInfo.Add(new MoveEventInfo<IDataType>(descendant, descendant.Path, descendant.ParentId));
 
-                descendant.ParentId = lastParent.Id;
-                descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
+                    descendant.ParentId = lastParent.Id;
+                    descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
 
-                //schedule it for updating in the transaction
-                Save(descendant);
+                    //schedule it for updating in the transaction
+                    Save(descendant);
+                }
             }
 
             return moveInfo;
@@ -310,11 +314,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var dtos = Database.FetchOneToMany<ContentTypeReferenceDto>(ct => ct.PropertyTypes, sql);
 
             return dtos.ToDictionary(
-                x => (Udi)new GuidUdi(ObjectTypes.GetUdiType(x.NodeDto.NodeObjectType.Value), x.NodeDto.UniqueId).EnsureClosed(),
+                x => (Udi)new GuidUdi(ObjectTypes.GetUdiType(x.NodeDto.NodeObjectType!.Value), x.NodeDto.UniqueId).EnsureClosed(),
                 x => (IEnumerable<string>)x.PropertyTypes.Select(p => p.Alias).ToList());
         }
 
-        private string EnsureUniqueNodeName(string nodeName, int id = 0)
+        private string? EnsureUniqueNodeName(string? nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
@@ -333,17 +337,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             [ResultColumn]
             [Reference(ReferenceType.Many)]
-            public List<PropertyTypeReferenceDto> PropertyTypes { get; set; }
+            public List<PropertyTypeReferenceDto> PropertyTypes { get; set; } = null!;
         }
 
         [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
         private class PropertyTypeReferenceDto
         {
             [Column("ptAlias")]
-            public string Alias { get; set; }
+            public string? Alias { get; set; }
 
             [Column("ptName")]
-            public string Name { get; set; }
+            public string? Name { get; set; }
         }
     }
 }

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata minClientVersion="4.1.0">
         <id>Umbraco.Cms</id>
-        <version>9.0.0</version>
+        <version>10.0.0</version>
         <title>Umbraco Cms</title>
         <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
@@ -16,18 +16,16 @@
         <tags>umbraco</tags>
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
-            <group targetFramework="net5.0">
+            <group targetFramework="net6.0">
                 <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
                 <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
                 <dependency id="Umbraco.Cms.StaticAssets" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Persistence.SqlServer" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Persistence.Sqlite" version="[$version$]" />
             </group>
         </dependencies>
-        <!--
-        We can't use content files, as the files need to be copied into the solution, links/shortcuts to the files
-        are not good enough
-        -->
-        <contentFiles />
     </metadata>
-    <files>
-    </files>
+  <files>
+    <file src="buildTransitive\Umbraco.Cms.props" target="buildTransitive" />
+  </files>
 </package>

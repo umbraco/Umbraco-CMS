@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Core.Models
 
         public PartialViewMacroModel(IPublishedContent page,
             int macroId,
-            string macroAlias,
-            string macroName,
-            IDictionary<string, object> macroParams)
+            string? macroAlias,
+            string? macroName,
+            IDictionary<string, object?> macroParams)
         {
             Content = page;
             MacroParameters = macroParams;
@@ -23,9 +23,9 @@ namespace Umbraco.Cms.Core.Models
         }
 
         public IPublishedContent Content { get; }
-        public string MacroName { get; }
-        public string MacroAlias { get; }
+        public string? MacroName { get; }
+        public string? MacroAlias { get; }
         public int MacroId { get; }
-        public IDictionary<string, object> MacroParameters { get; }
+        public IDictionary<string, object?> MacroParameters { get; }
     }
 }

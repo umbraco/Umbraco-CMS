@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="loginProviderOptions"></param>
         /// <param name="build"></param>
         /// <returns></returns>
-        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(            
+        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
             Action<BackOfficeAuthenticationBuilder> build,
-            Action<BackOfficeExternalLoginProviderOptions> loginProviderOptions = null)
+            Action<BackOfficeExternalLoginProviderOptions>? loginProviderOptions = null)
         {
             build(new BackOfficeAuthenticationBuilder(_services, loginProviderOptions));
             return this;

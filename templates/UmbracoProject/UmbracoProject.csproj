@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
         <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-        <PackageReference Include="Umbraco.Cms.SqlCe" Version="UMBRACO_VERSION_FROM_TEMPLATE" Condition="'$(UseSqlCe)' == 'true'" />
-        <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
     <!-- Force Windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older Windows 10 and most, if not all, Windows Server editions will run NLS -->
@@ -25,6 +24,10 @@
     <PropertyGroup>
         <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
     </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot" />
+  </ItemGroup>
 
     <!-- Keep this as false if ModelsBuilder mode is InMemoryAuto -->
     <PropertyGroup>

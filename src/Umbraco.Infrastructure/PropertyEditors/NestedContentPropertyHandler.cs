@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys) => CreateNestedContentKeys(rawJson, onlyMissingKeys, null);
 
         // internal for tests
-        internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid> createGuid = null)
+        internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid>? createGuid = null)
         {
             // used so we can test nicely
             if (createGuid == null)
@@ -48,11 +48,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (prop.Name == NestedContentPropertyEditor.ContentTypeAliasPropertyKey)
                 {
                     // get it's sibling 'key' property
-                    var ncKeyVal = prop.Parent["key"] as JValue;
+                    var ncKeyVal = prop.Parent?["key"] as JValue;
                     if ((onlyMissingKeys && ncKeyVal == null) || (!onlyMissingKeys && ncKeyVal != null))
                     {
                         // create or replace
-                        prop.Parent["key"] = createGuid().ToString();
+                        prop.Parent!["key"] = createGuid().ToString();
                     }
                 }
                 else if (!isNestedContent || prop.Name != "key")
@@ -60,10 +60,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     // this is an arbitrary property that could contain a nested complex editor
                     var propVal = prop.Value?.ToString();
                     // check if this might contain a nested NC
-                    if (!propVal.IsNullOrWhiteSpace() && propVal.DetectIsJson() && propVal.InvariantContains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
+                    if (!propVal.IsNullOrWhiteSpace() && propVal!.DetectIsJson() && propVal!.InvariantContains(NestedContentPropertyEditor.ContentTypeAliasPropertyKey))
                     {
                         // recurse
-                        var parsed = JToken.Parse(propVal);
+                        var parsed = JToken.Parse(propVal!);
                         UpdateNestedContentKeysRecursively(parsed, onlyMissingKeys, createGuid);
                         // set the value to the updated one
                         prop.Value = parsed.ToString(Formatting.None);

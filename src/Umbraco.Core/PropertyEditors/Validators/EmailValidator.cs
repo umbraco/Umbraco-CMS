@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.Validators
         public string ValidationName => "Email";
 
         /// <inheritdoc />
-        public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
+        public IEnumerable<ValidationResult> Validate(object? value, string? valueType, object? dataTypeConfiguration)
         {
             var asString = value == null ? "" : value.ToString();
 

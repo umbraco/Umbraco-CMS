@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="requestHeaders"></param>
         /// <param name="failedReason"></param>
         /// <returns></returns>
-        Task<Attempt<string>> ValidateRequestAsync(HttpContext httpContext);
+        Task<Attempt<string?>> ValidateRequestAsync(HttpContext httpContext);
 
         /// <summary>
         /// Generates tokens to use for the cookie and header antiforgery values

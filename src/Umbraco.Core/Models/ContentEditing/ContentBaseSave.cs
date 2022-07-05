@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         //These need explicit implementation because we are using internal models
         /// <inheritdoc />
         [IgnoreDataMember]
-        TPersisted IContentSave<TPersisted>.PersistedContent { get; set; }
+        TPersisted IContentSave<TPersisted>.PersistedContent { get; set; } = default!;
 
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        public ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
+        public ContentPropertyCollectionDto? PropertyCollectionDto { get; set; }
 
         #endregion
     }

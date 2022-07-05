@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
-            model.Name = model.Name.Trim();
+            model.Name = model.Name?.Trim();
 
             bindingContext.Result = ModelBindingResult.Success(model);
         }
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             FilterMembershipProviderProperties(contentType);
 
             //return the new member with the details filled in
-            return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, contentType);
+            return new Member(model.Name, model.Email, model.Username, model.Password?.NewPassword, contentType);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
@@ -10,9 +11,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     [ExplicitColumns]
     internal class AuditEntryDto
     {
-        public const int IpLength = 64;
-        public const int EventTypeLength = 256;
-        public const int DetailsLength = 1024;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -27,13 +25,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("performingDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(DetailsLength)]
-        public string PerformingDetails { get; set; }
+        [Length(Constants.Audit.DetailsLength)]
+        public string? PerformingDetails { get; set; }
 
         [Column("performingIp")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(IpLength)]
-        public string PerformingIp { get; set; }
+        [Length(Constants.Audit.IpLength)]
+        public string? PerformingIp { get; set; }
 
         [Column("eventDateUtc")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
@@ -44,16 +42,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("affectedDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(DetailsLength)]
-        public string AffectedDetails { get; set; }
+        [Length(Constants.Audit.DetailsLength)]
+        public string? AffectedDetails { get; set; }
 
         [Column("eventType")]
-        [Length(EventTypeLength)]
-        public string EventType { get; set; }
+        [Length(Constants.Audit.EventTypeLength)]
+        public string? EventType { get; set; }
 
         [Column("eventDetails")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(DetailsLength)]
-        public string EventDetails { get; set; }
+        [Length(Constants.Audit.DetailsLength)]
+        public string? EventDetails { get; set; }
     }
 }

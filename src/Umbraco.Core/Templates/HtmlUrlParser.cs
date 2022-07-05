@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Templates
 {
     public sealed class HtmlUrlParser
     {
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly ILogger<HtmlUrlParser> _logger;
         private readonly IIOHelper _ioHelper;
         private readonly IProfilingLogger _profilingLogger;
@@ -17,12 +17,14 @@ namespace Umbraco.Cms.Core.Templates
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptionsMonitor<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _logger = logger;
             _ioHelper = ioHelper;
             _profilingLogger = profilingLogger;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace Umbraco.Cms.Core.Templates
             {
                 // find all relative URLs (ie. URLs that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

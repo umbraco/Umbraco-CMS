@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Routing
                 notification.State[NotificationStateKey] = new OldRoutesDictionary();
             }
 
-            return (OldRoutesDictionary)notification.State[NotificationStateKey];
+            return (OldRoutesDictionary?)notification.State[NotificationStateKey] ?? new OldRoutesDictionary();
         }
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
@@ -100,8 +100,8 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            IPublishedContentCache contentCache = publishedSnapshot.Content;
-            IPublishedContent entityContent = contentCache?.GetById(entity.Id);
+            IPublishedContentCache? contentCache = publishedSnapshot?.Content;
+            IPublishedContent? entityContent = contentCache?.GetById(entity.Id);
             if (entityContent is null)
             {
                 return;
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // get the default affected cultures by going up the tree until we find the first culture variant entity (default to no cultures)
             var defaultCultures = entityContent.AncestorsOrSelf()?.FirstOrDefault(a => a.Cultures.Any())?.Cultures.Keys.ToArray()
-                ?? new[] { (string)null };
+                ?? Array.Empty<string>();
 
             foreach (IPublishedContent publishedContent in entityContent.DescendantsOrSelf(_variationContextAccessor))
             {
@@ -118,13 +118,13 @@ namespace Umbraco.Cms.Core.Routing
 
                 foreach (var culture in cultures)
                 {
-                    var route = contentCache.GetRouteById(publishedContent.Id, culture);
+                    var route = contentCache?.GetRouteById(publishedContent.Id, culture);
                     if (IsNotRoute(route))
                     {
                         continue;
                     }
 
-                    oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route);
+                    oldRoutes[new ContentIdAndCulture(publishedContent.Id, culture)] = new ContentKeyAndOldRoute(publishedContent.Key, route!);
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            var contentCache = publishedSnapshot.Content;
+            var contentCache = publishedSnapshot?.Content;
 
             if (contentCache == null)
             {
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
-        private static bool IsNotRoute(string route)
+        private static bool IsNotRoute(string? route)
         {
             // null if content not found
             // err/- if collision or anomaly or ...

@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ILanguage languageNbNo = new LanguageBuilder()
                 .WithCultureInfo("nb-NO")
-                .WithCultureName("Norwegian")
+                .WithCultureName("Norwegian Bokmål (Norway)")
                 .Build();
             localizationService.Save(languageNbNo);
 
@@ -180,9 +180,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             var ignored = new FileUploadPropertyEditor(
                 DataValueEditorFactory,
                 mediaFileManager,
-                Options.Create(contentSettings),
+                Mock.Of<IOptionsMonitor<ContentSettings>>(x=>x.CurrentValue == contentSettings),
                 TextService,
-                Services.GetRequiredService<UploadAutoFillProperties>(),                
+                Services.GetRequiredService<UploadAutoFillProperties>(),
                 ContentService,
                 IOHelper);
 

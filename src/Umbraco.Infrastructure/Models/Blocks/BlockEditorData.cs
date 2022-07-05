@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
 
         private BlockEditorData()
         {
+            _propertyEditorAlias = string.Empty;
             BlockValue = new BlockValue();
         }
 
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// <summary>
         /// Returns the layout for this specific property editor
         /// </summary>
-        public JToken Layout => BlockValue.Layout.TryGetValue(_propertyEditorAlias, out var layout) ? layout : null;
+        public JToken? Layout => BlockValue.Layout.TryGetValue(_propertyEditorAlias, out var layout) ? layout : null;
 
         /// <summary>
         /// Returns the reference to the original BlockValue

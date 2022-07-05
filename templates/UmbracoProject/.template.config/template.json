@@ -26,37 +26,25 @@
       "datatype": "choice",
       "choices": [
         {
-          "displayName": ".NET 5.0",
-          "description": "Target net5.0",
-          "choice": "net5.0"
-        },
-        {
           "displayName": ".NET 6.0",
           "description": "Target net6.0",
           "choice": "net6.0"
         }
       ],
-      "defaultValue": "net5.0",
-      "replaces": "net5.0"
+      "defaultValue": "net6.0",
+      "replaces": "net6.0"
     },
     "UmbracoVersion": {
       "displayName": "Umbraco version",
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "9.5.0-rc",
+      "defaultValue": "10.0.0-rc1",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "UseHttpsRedirect": {
       "displayName": "Use HTTPS redirect",
       "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting.",
-      "type": "parameter",
-      "datatype": "bool",
-      "defaultValue": "false"
-    },
-    "UseSqlCe": {
-      "displayName": "Add dependencies to use SQL CE database provider",
-      "description": "Adds the required dependencies to use SQL Compact Edition as database provider (Windows only).",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"

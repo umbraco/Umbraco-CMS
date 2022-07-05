@@ -1,4 +1,5 @@
 using System;
+using System.Xml;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -14,12 +15,16 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Constants = Umbraco.Cms.Core.Constants;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -42,14 +47,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IUmbracoMapper _umbracoMapper;
+        private readonly IEntityXmlSerializer _serializer;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly PackageDataInstallation _packageDataInstallation;
 
         public DictionaryController(
             ILogger<DictionaryController> logger,
             ILocalizationService localizationService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
-            IUmbracoMapper umbracoMapper
+            IUmbracoMapper umbracoMapper,
+            IEntityXmlSerializer serializer,
+            IHostingEnvironment hostingEnvironment,
+            PackageDataInstallation packageDataInstallation
             )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -58,6 +69,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
         }
 
         /// <summary>
@@ -78,10 +92,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             foreach (var dictionaryItem in foundDictionaryDescendants)
             {
-                _localizationService.Delete(dictionaryItem, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+                _localizationService.Delete(dictionaryItem, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             }
 
-            _localizationService.Delete(foundDictionary, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            _localizationService.Delete(foundDictionary, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
 
             return Ok();
         }
@@ -108,8 +122,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var message = _localizedTextService.Localize(
                      "dictionaryItem","changeKeyError",
-                     _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
-                     new Dictionary<string, string> { { "0", key } });
+                     _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings),
+                     new Dictionary<string, string?> { { "0", key } });
                 return ValidationProblem(message);
             }
 
@@ -118,7 +132,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 Guid? parentGuid = null;
 
                 if (parentId > 0)
-                    parentGuid = _localizationService.GetDictionaryItemById(parentId).Key;
+                    parentGuid = _localizationService.GetDictionaryItemById(parentId)?.Key;
 
                 var item = _localizationService.CreateDictionaryItemWithIdentity(
                     key,
@@ -144,7 +158,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        public ActionResult<DictionaryDisplay> GetById(int id)
+        public ActionResult<DictionaryDisplay?> GetById(int id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
             if (dictionary == null)
@@ -162,7 +176,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        public ActionResult<DictionaryDisplay> GetById(Guid id)
+        public ActionResult<DictionaryDisplay?> GetById(Guid id)
         {
             var dictionary = _localizationService.GetDictionaryItemById(id);
             if (dictionary == null)
@@ -180,7 +194,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>. Returns a not found response when dictionary item does not exist
         /// </returns>
-        public ActionResult<DictionaryDisplay> GetById(Udi id)
+        public ActionResult<DictionaryDisplay?> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
@@ -198,7 +212,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="move"></param>
         /// <returns></returns>
-        public IActionResult PostMove(MoveOrCopy move)
+        public IActionResult? PostMove(MoveOrCopy move)
         {
             var dictionaryItem = _localizationService.GetDictionaryItemById(move.Id);
             if (dictionaryItem == null)
@@ -209,21 +223,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 if (move.ParentId == Constants.System.Root)
                     dictionaryItem.ParentId = null;
-                else                   
+                else
                     return ValidationProblem(_localizedTextService.Localize("dictionary", "parentDoesNotExists"));
             }
             else
             {
                 dictionaryItem.ParentId = parent.Key;
-                if (dictionaryItem.Key == parent.ParentId)              
-                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));               
+                if (dictionaryItem.Key == parent.ParentId)
+                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
             }
-               
+
             _localizationService.Save(dictionaryItem);
 
             var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
-            return Content(model.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+            return Content(model!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
         }
 
         /// <summary>
@@ -235,20 +249,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>
         /// The <see cref="DictionaryDisplay"/>.
         /// </returns>
-        public ActionResult<DictionaryDisplay> PostSave(DictionarySave dictionary)
+        public ActionResult<DictionaryDisplay?> PostSave(DictionarySave dictionary)
         {
-            var dictionaryItem =
-                _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString(), CultureInfo.InvariantCulture));
+            var dictionaryItem = dictionary.Id is null ? null :
+                _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()!, CultureInfo.InvariantCulture));
 
             if (dictionaryItem == null)
                 return ValidationProblem("Dictionary item does not exist");
 
-            var userCulture = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
+            var userCulture = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings);
 
             if (dictionary.NameIsDirty)
             {
                 // if the name (key) has changed, we need to check if the new key does not exist
-                var dictionaryByKey = _localizationService.GetDictionaryItemByKey(dictionary.Name);
+                var dictionaryByKey = _localizationService.GetDictionaryItemByKey(dictionary.Name!);
 
                 if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
                 {
@@ -256,12 +270,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var message = _localizedTextService.Localize(
                         "dictionaryItem","changeKeyError",
                         userCulture,
-                        new Dictionary<string, string> { { "0", dictionary.Name } });
+                        new Dictionary<string, string?> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
                     return ValidationProblem(ModelState);
                 }
 
-                dictionaryItem.ItemKey = dictionary.Name;
+                dictionaryItem.ItemKey = dictionary.Name!;
             }
 
             foreach (var translation in dictionary.Translations)
@@ -276,7 +290,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
-                model.Notifications.Add(new BackOfficeNotification(
+                model?.Notifications.Add(new BackOfficeNotification(
                     _localizedTextService.Localize("speechBubbles","dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 
@@ -312,8 +326,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 foreach(var child in children.OrderBy(ItemSort()))
                 {
                     var display = _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
-                    display.Level = level;
-                    list.Add(display);
+                    if (display is not null)
+                    {
+                        display.Level = level;
+                        list.Add(display);
+                    }
 
                     BuildTree(level + 1, child.Key);
                 }
@@ -338,14 +355,137 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </param>
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, ICollection<DictionaryOverviewDisplay> list)
         {
-            foreach (var childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key).OrderBy(ItemSort()))
+            foreach (var childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key)?.OrderBy(ItemSort()) ?? Enumerable.Empty<IDictionaryItem>())
             {
                 var item = _umbracoMapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
-                item.Level = level;
-                list.Add(item);
+                if (item is not null)
+                {
+                    item.Level = level;
+                    list.Add(item);
+                }
 
                 GetChildItemsForList(childItem, level + 1, list);
             }
+        }
+
+        public IActionResult ExportDictionary(int id, bool includeChildren = false)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemById(id);
+            if (dictionaryItem == null)
+                throw new NullReferenceException("No dictionary item found with id " + id);
+
+            var xml = _serializer.Serialize(dictionaryItem, includeChildren);
+
+            var fileName = $"{dictionaryItem.ItemKey}.udt";
+            // Set custom header so umbRequestHelper.downloadFile can save the correct filename
+            HttpContext.Response.Headers.Add("x-filename", fileName);
+
+            return File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName);
+        }
+
+        public IActionResult ImportDictionary(string file, int parentId)
+        {
+            if (string.IsNullOrWhiteSpace(file))
+                return NotFound();
+
+            var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var xd = new XmlDocument { XmlResolver = null };
+            xd.Load(filePath);
+
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0;
+            var element = XElement.Parse(xd.InnerXml);
+
+            var parentDictionaryItem = _localizationService.GetDictionaryItemById(parentId);
+            var dictionaryItems = _packageDataInstallation.ImportDictionaryItem(element, userId, parentDictionaryItem?.Key);
+
+            // Try to clean up the temporary file.
+            try
+            {
+                System.IO.File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cleaning up temporary udt file in {File}", filePath);
+            }
+
+            var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItems.FirstOrDefault());
+            return Content(model!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+        }
+
+        public ActionResult<DictionaryImportModel> Upload(IFormFile file)
+        {
+
+            if (file == null)
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+
+            var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
+            var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+            var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
+            var tempPath = Path.Combine(root, fileName);
+
+            if (!Path.GetFullPath(tempPath).StartsWith(Path.GetFullPath(root)))
+                return ValidationProblem(
+                     _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("media", "invalidFileName"));
+
+            if (!ext.InvariantEquals("udt"))
+                return ValidationProblem(
+                     _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("media", "disallowedFileType"));
+
+            using (var stream = System.IO.File.Create(tempPath))
+            {
+                file.CopyToAsync(stream).GetAwaiter().GetResult();
+            }
+
+            var xd = new XmlDocument
+            {
+                XmlResolver = null
+            };
+            xd.Load(tempPath);
+
+            if (xd.DocumentElement == null)
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+
+            DictionaryImportModel model = new DictionaryImportModel()
+            {
+                TempFileName = tempPath,
+                DictionaryItems = new List<DictionaryPreviewImportModel>()
+            };
+
+            int level = 1;
+            string curentParrent = string.Empty;
+            foreach (XmlNode dictionaryItem in xd.GetElementsByTagName("DictionaryItem"))
+            {
+                var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
+                var parentKey = dictionaryItem?.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
+
+                if (parentKey != curentParrent || level == 1)
+                {
+                    level += 1;
+                    curentParrent = parentKey;
+                }
+
+                model.DictionaryItems.Add(new DictionaryPreviewImportModel()
+                {
+                    Level = level,
+                    Name = name
+                });
+            }
+  
+            if (!model.DictionaryItems.Any())
+                return ValidationProblem(
+                    _localizedTextService.Localize("media", "failedFileUpload"),
+                    _localizedTextService.Localize("dictionary", "noItemsInFile"));
+
+            return model;
         }
 
         private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;

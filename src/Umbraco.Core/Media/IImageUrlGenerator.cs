@@ -23,6 +23,6 @@ namespace Umbraco.Cms.Core.Media
         /// <returns>
         /// The generated image URL.
         /// </returns>
-        string GetImageUrl(ImageUrlGenerationOptions options);
+        string? GetImageUrl(ImageUrlGenerationOptions options);
     }
 }

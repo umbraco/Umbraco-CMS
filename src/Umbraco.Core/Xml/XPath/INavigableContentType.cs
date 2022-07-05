@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets the name of the content type.
         /// </summary>
-        string Name { get; }
+        string? Name { get; }
 
         /// <summary>
         /// Gets the field types of the content type.

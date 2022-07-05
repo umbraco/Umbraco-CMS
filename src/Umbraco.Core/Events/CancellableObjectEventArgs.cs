@@ -7,30 +7,30 @@ namespace Umbraco.Cms.Core.Events
     /// </summary>
     public abstract class CancellableObjectEventArgs : CancellableEventArgs
     {
-        protected CancellableObjectEventArgs(object eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+        protected CancellableObjectEventArgs(object? eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
             : base(canCancel, messages, additionalData)
         {
             EventObject = eventObject;
         }
 
-        protected CancellableObjectEventArgs(object eventObject, bool canCancel, EventMessages eventMessages)
+        protected CancellableObjectEventArgs(object? eventObject, bool canCancel, EventMessages eventMessages)
             : base(canCancel, eventMessages)
         {
             EventObject = eventObject;
         }
 
-        protected CancellableObjectEventArgs(object eventObject, EventMessages eventMessages)
+        protected CancellableObjectEventArgs(object? eventObject, EventMessages eventMessages)
             : this(eventObject, true, eventMessages)
         {
         }
 
-        protected CancellableObjectEventArgs(object eventObject, bool canCancel)
+        protected CancellableObjectEventArgs(object? eventObject, bool canCancel)
             : base(canCancel)
         {
             EventObject = eventObject;
         }
 
-        protected CancellableObjectEventArgs(object eventObject)
+        protected CancellableObjectEventArgs(object? eventObject)
             : this(eventObject, true)
         {
         }
@@ -41,6 +41,6 @@ namespace Umbraco.Cms.Core.Events
         /// <remarks>
         /// This is protected so that inheritors can expose it with their own name
         /// </remarks>
-        public object EventObject { get; set; }
+        public object? EventObject { get; set; }
     }
 }

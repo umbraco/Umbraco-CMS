@@ -34,6 +34,18 @@
             ]
         },
         {
+            "label": "Client Watch",
+            "detail": "runs npm run dev for Umbraco.Web.UI.Client",
+            "promptOnClose": true,
+            "group": "build",
+            "type": "npm",
+            "script": "dev",
+            "path": "src/Umbraco.Web.UI.Client/",
+            "problemMatcher": [
+                "$gulp-tsc"
+            ]
+        },
+        {
             "label": "Dotnet build",
             "detail": "Dotnet build of SLN",
             "promptOnClose": true,
@@ -42,7 +54,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/umbraco-netcore-only.sln",
+                "${workspaceFolder}/src/umbraco.sln",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

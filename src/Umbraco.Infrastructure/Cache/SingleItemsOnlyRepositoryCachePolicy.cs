@@ -1,8 +1,9 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Scoping;
 
 namespace Umbraco.Cms.Core.Cache
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Core.Cache
             : base(cache, scopeAccessor, options)
         { }
 
-        protected override void InsertEntities(TId[] ids, TEntity[] entities)
+        protected override void InsertEntities(TId[]? ids, TEntity[]? entities)
         {
             // nop
         }

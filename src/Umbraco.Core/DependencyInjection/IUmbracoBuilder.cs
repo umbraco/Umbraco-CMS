@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -27,11 +28,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <remarks>
         /// This may be null.
         /// </remarks>
-        IHostingEnvironment BuilderHostingEnvironment { get; }
+        [Obsolete("This property will be removed in a future version, please find an alternative approach.")]
+        IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         IProfiler Profiler { get; }
         AppCaches AppCaches { get; }
-        TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder, new();
+        TBuilder? WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder;
         void Build();
     }
 }

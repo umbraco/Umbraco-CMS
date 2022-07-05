@@ -28,10 +28,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         // this is convenient to carry the culture around, but has no db counterpart
         [Ignore]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         [Column("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [Column("date")] // TODO: db rename to 'updateDate'
         public DateTime UpdateDate { get; set; }

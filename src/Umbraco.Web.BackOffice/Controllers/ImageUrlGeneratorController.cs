@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ImageUrlGeneratorController(IImageUrlGenerator imageUrlGenerator) => _imageUrlGenerator = imageUrlGenerator;
 
-        public string GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null) => _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaPath)
+        public string? GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null) => _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaPath)
         {
             Width = width,
             Height = height,

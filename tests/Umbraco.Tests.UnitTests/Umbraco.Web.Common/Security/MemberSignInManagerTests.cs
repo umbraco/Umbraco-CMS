@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
                     Mock.Of<IServiceProvider>(),
                     Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
-                    Options.Create(new MemberPasswordConfigurationSettings()),
+                    new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
                     Mock.Of<IPublicAccessService>(),
                     Mock.Of<IHttpContextAccessor>());
 
@@ -95,7 +96,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
         public async Task WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()
         {
             //arrange
-            var userId = "bo8w3d32q9b98";            
+            var userId = "bo8w3d32q9b98";
             MemberSignInManager sut = CreateSut();
             var fakeUser = new MemberIdentityUser(777)
             {

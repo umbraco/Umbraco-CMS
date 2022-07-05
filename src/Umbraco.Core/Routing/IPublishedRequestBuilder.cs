@@ -26,12 +26,12 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets the <see cref="DomainAndUri"/> assigned (if any)
         /// </summary>
-        DomainAndUri Domain { get; }
+        DomainAndUri? Domain { get; }
 
         /// <summary>
         /// Gets the <see cref="CultureInfo"/> assigned (if any)
         /// </summary>
-        string Culture { get; }
+        string? Culture { get; }
 
         /// <summary>
         /// Gets a value indicating whether the current published content has been obtained
@@ -49,12 +49,12 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Gets the current <see cref="IPublishedContent"/> assigned (if any)
         /// </summary>
-        IPublishedContent PublishedContent { get; }
+        IPublishedContent? PublishedContent { get; }
 
         /// <summary>
         /// Gets the template assigned to the request (if any)
         /// </summary>
-        ITemplate Template { get; }
+        ITemplate? Template { get; }
 
         /// <summary>
         /// Builds the <see cref="IPublishedRequest"/>
@@ -69,13 +69,13 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Sets the culture for the request
         /// </summary>
-        IPublishedRequestBuilder SetCulture(string culture);
+        IPublishedRequestBuilder SetCulture(string? culture);
 
         /// <summary>
         /// Sets the found <see cref="IPublishedContent"/> for the request
         /// </summary>
         /// <remarks>Setting the content clears the template and redirect</remarks>
-        IPublishedRequestBuilder SetPublishedContent(IPublishedContent content);
+        IPublishedRequestBuilder SetPublishedContent(IPublishedContent? content);
 
         /// <summary>
         /// Sets the requested content, following an internal redirect.
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="template">The template.</param>
         /// <remarks>Setting the template does refresh <c>RenderingEngine</c>.</remarks>
-        IPublishedRequestBuilder SetTemplate(ITemplate template);
+        IPublishedRequestBuilder SetTemplate(ITemplate? template);
 
         /// <summary>
         /// Indicates that the content request should trigger a permanent redirect (301).

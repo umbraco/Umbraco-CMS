@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
     [CoreTree]
     [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
-    public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
+    public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeWithCulture
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
@@ -82,15 +83,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override bool RecycleBinSmells => _contentService.RecycleBinSmells();
 
-        private int[] _userStartNodes;
+        private int[]? _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(_entityService, _appCaches) ?? Array.Empty<int>());
 
 
 
         /// <inheritdoc />
-        protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection queryStrings)
+        protected override TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
         {
             var culture = queryStrings?["culture"].ToString();
 
@@ -137,7 +138,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 node.AdditionalData.Add("variesByCulture", documentEntity.Variations.VariesByCulture());
                 node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
 
-                if (_publicAccessService.IsProtected(entity.Path))
+                if (_publicAccessService.IsProtected(entity.Path).Success)
                     node.SetProtectedStyle();
 
                 return node;
@@ -163,13 +164,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
                 // we need to get the default permissions as you can't set permissions on the very root node
-                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, Constants.System.Root).First();
+                var permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, Constants.System.Root).First();
                 var nodeActions = _actions.FromEntityPermission(permission)
                     .Select(x => new MenuItem(x));
 
                 //these two are the standard items
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true, useLegacyIcon: false);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -199,7 +200,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService, _appCaches))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasContentPathAccess(item, _entityService, _appCaches) ?? false)
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -255,7 +256,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var cultureVal = (culture.Success ? culture.Result : null).IfNullOrWhiteSpace(_localizationService.GetDefaultLanguageIsoCode());
 
             // set names according to variations
-            foreach (var entity in result.Value)
+            foreach (var entity in result.Value!)
             {
                 EnsureName(entity, cultureVal);
             }
@@ -270,23 +271,24 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
         {
             var menu = _menuItemCollectionFactory.Create();
-            AddActionNode<ActionNew>(item, menu, opensDialog: true);
-            AddActionNode<ActionDelete>(item, menu, opensDialog: true);
-            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
-            AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
-            AddActionNode<ActionCopy>(item, menu, opensDialog: true);
-            AddActionNode<ActionSort>(item, menu, true, opensDialog: true);
-            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
-            AddActionNode<ActionRights>(item, menu, opensDialog: true);
-            AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);
+            AddActionNode<ActionNew>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionDelete>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionMove>(item, menu, true, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionCopy>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionSort>(item, menu, true, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionRights>(item, menu, opensDialog: true, useLegacyIcon: false);
+            AddActionNode<ActionProtect>(item, menu, true, opensDialog: true, useLegacyIcon: false);
 
             if (_emailSender.CanSendRequiredEmail())
             {
                 menu.Items.Add(new MenuItem("notify", LocalizedTextService)
                 {
-                    Icon = "megaphone",
+                    Icon = "icon-megaphone",
                     SeparatorBefore = true,
-                    OpensDialog = true
+                    OpensDialog = true,
+                    UseLegacyIcon = false,
                 });
             }
 
@@ -306,9 +308,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = _menuItemCollectionFactory.Create();
-            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
@@ -320,7 +322,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="culture"></param>
-        private void EnsureName(IEntitySlim entity, string culture)
+        private void EnsureName(IEntitySlim entity, string? culture)
         {
             if (culture == null)
             {
@@ -360,15 +362,19 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
         }
 
-        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
+        private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
             where TAction : IAction
         {
-            var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);
+            var menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog, useLegacyIcon);
         }
 
-        public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null)
+            => await SearchAsync(query, pageSize, pageIndex, searchFrom, null);
+
+        public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
         {
-            return _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out totalFound, searchFrom);
+            var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
+            return new EntitySearchResults(results, totalFound);
         }
     }
 }

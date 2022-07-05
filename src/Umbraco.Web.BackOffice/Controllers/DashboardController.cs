@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings,
+            IOptionsSnapshot<ContentDashboardSettings> dashboardSettings,
             ISiteIdentifierService siteIdentifierService)
 
         {
@@ -74,41 +74,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardSettings = dashboardSettings.Value;
         }
 
-
-        [Obsolete("Use the constructor that accepts ISiteIdentifierService")]
-        public DashboardController(
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            AppCaches appCaches,
-            ILogger<DashboardController> logger,
-            IDashboardService dashboardService,
-            IUmbracoVersion umbracoVersion,
-            IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings)
-        : this(
-            backOfficeSecurityAccessor,
-            appCaches,
-            logger,
-            dashboardService,
-            umbracoVersion,
-            shortStringHelper,
-            dashboardSettings,
-            StaticServiceProvider.Instance.GetRequiredService<ISiteIdentifierService>())
-        {
-        }
-
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
 
         // TODO(V10) : change return type to Task<ActionResult<JObject>> and consider removing baseUrl as parameter
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string? baseUrl)
         {
-            var user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            var allowedSections = string.Join(",", user.AllowedSections);
-            var language = user.Language;
+            if (baseUrl is null)
+            {
+                baseUrl = "https://dashboard.umbraco.com/";
+            }
+
+            var user = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            var allowedSections = string.Join(",", user?.AllowedSections ?? Array.Empty<string>());
+            var language = user?.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
-            var isAdmin = user.IsAdmin();
+            var isAdmin = user?.IsAdmin() ?? false;
             _siteIdentifierService.TryGetOrCreateSiteIdentifier(out Guid siteIdentifier);
 
             if (!IsAllowedUrl(baseUrl))
@@ -163,8 +146,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         // TODO(V10) : consider removing baseUrl as parameter
-        public async Task<IActionResult> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<IActionResult> GetRemoteDashboardCss(string section, string? baseUrl)
         {
+            if (baseUrl is null)
+            {
+                baseUrl = "https://dashboard.umbraco.org/";
+            }
+
             if (!IsAllowedUrl(baseUrl))
             {
                 _logger.LogError($"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}");
@@ -282,7 +270,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public IEnumerable<Tab<IDashboardSlim>> GetDashboard(string section)
         {
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             return _dashboardService.GetDashboards(section, currentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
@@ -292,7 +280,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 Type = x.Type,
                 Expanded = x.Expanded,
                 IsActive = x.IsActive,
-                Properties = x.Properties.Select(y => new DashboardSlim
+                Properties = x.Properties?.Select(y => new DashboardSlim
                 {
                     Alias = y.Alias,
                     View = y.View

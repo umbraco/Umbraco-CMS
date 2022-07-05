@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Models
         /// The file name for the tour
         /// </summary>
         [DataMember(Name = "fileName")]
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         /// <summary>
         /// The plugin folder that the tour comes from
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         /// If this is null it means it's a Core tour
         /// </remarks>
         [DataMember(Name = "pluginName")]
-        public string PluginName { get; set; }
+        public string? PluginName { get; set; }
 
         [DataMember(Name = "tours")]
         public IEnumerable<BackOfficeTour> Tours { get; set; }

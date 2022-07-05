@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Represent the state of an artifact being deployed.
@@ -15,7 +15,7 @@
         /// <param name="connector">The service connector deploying the artifact.</param>
         /// <param name="nextPass">The next pass number.</param>
         /// <returns>A deploying artifact.</returns>
-        public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity entity, IServiceConnector connector, int nextPass)
+        public static ArtifactDeployState<TArtifact, TEntity> Create<TArtifact, TEntity>(TArtifact art, TEntity? entity, IServiceConnector connector, int nextPass)
             where TArtifact : IArtifact
         {
             return new ArtifactDeployState<TArtifact, TEntity>(art, entity, connector, nextPass);
@@ -24,10 +24,7 @@
         /// <summary>
         /// Gets the artifact.
         /// </summary>
-        public IArtifact Artifact
-        {
-            get { return GetArtifactAsIArtifact(); }
-        }
+        public IArtifact Artifact => GetArtifactAsIArtifact();
 
         /// <summary>
         /// Gets the artifact as an <see cref="IArtifact"/>.
@@ -40,7 +37,7 @@
         /// <summary>
         /// Gets or sets the service connector in charge of deploying the artifact.
         /// </summary>
-        public IServiceConnector Connector { get; set; }
+        public IServiceConnector? Connector { get; set; }
 
         /// <summary>
         /// Gets or sets the next pass number.

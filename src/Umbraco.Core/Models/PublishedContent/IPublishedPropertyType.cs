@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <summary>
         /// Gets the published content type containing the property type.
         /// </summary>
-        IPublishedContentType ContentType { get; }
+        IPublishedContentType? ContentType { get; }
 
         /// <summary>
         /// Gets the data type.
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// Determines whether a value is an actual value, or not a value.
         /// </summary>
         /// <remarks>Used by property.HasValue and, for instance, in fallback scenarios.</remarks>
-        bool? IsValue(object value, PropertyValueLevel level);
+        bool? IsValue(object? value, PropertyValueLevel level);
 
         /// <summary>
         /// Gets the property cache level.
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <param name="source">The source value.</param>
         /// <param name="preview">A value indicating whether content should be considered draft.</param>
         /// <returns>The intermediate value.</returns>
-        object ConvertSourceToInter(IPublishedElement owner, object source, bool preview);
+        object? ConvertSourceToInter(IPublishedElement owner, object? source, bool preview);
 
         /// <summary>
         /// Converts the intermediate value into the object value.
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <param name="inter">The intermediate value.</param>
         /// <param name="preview">A value indicating whether content should be considered draft.</param>
         /// <returns>The object value.</returns>
-        object ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object? ConvertInterToObject(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
         /// <summary>
         /// Converts the intermediate value into the XPath value.
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <remarks>
         /// <para>The XPath value can be either a string or an XPathNavigator.</para>
         /// </remarks>
-        object ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object inter, bool preview);
+        object? ConvertInterToXPath(IPublishedElement owner, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 
         /// <summary>
         /// Gets the property model CLR type.
@@ -103,6 +103,6 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <para>Mapping from <see cref="ModelClrType"/> may throw if some <see cref="ModelType"/> instances
         /// could not be mapped to actual CLR types.</para>
         /// </remarks>
-        Type ClrType { get; }
+        Type? ClrType { get; }
     }
 }

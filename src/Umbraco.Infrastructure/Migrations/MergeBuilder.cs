@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     {
         private readonly MigrationPlan _plan;
         private readonly List<Type> _migrations = new List<Type>();
-        private string _withLast;
+        private string? _withLast;
         private bool _with;
 
         /// <summary>

@@ -21,6 +21,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "contentTypeAliases")]
         [Required]
-        public string[] ContentTypeAliases { get; set; }
+        public string[]? ContentTypeAliases { get; set; }
     }
 }

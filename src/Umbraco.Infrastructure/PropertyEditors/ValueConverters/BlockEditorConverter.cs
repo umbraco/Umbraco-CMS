@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -23,12 +22,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             _publishedModelFactory = publishedModelFactory;
         }
 
-        public IPublishedElement ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
+        public IPublishedElement? ConvertToElement(BlockItemData data, PropertyCacheLevel referenceCacheLevel, bool preview)
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
 
             // Only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-            var publishedContentType = publishedContentCache.GetContentType(data.ContentTypeKey);
+            var publishedContentType = publishedContentCache?.GetContentType(data.ContentTypeKey);
             if (publishedContentType == null || publishedContentType.IsElement == false)
             {
                 return null;
@@ -40,7 +39,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var key = (data.Udi is GuidUdi gudi) ? gudi.Guid : Guid.Empty;
             if (key == Guid.Empty && propertyValues.TryGetValue("key", out var keyo))
             {
-                Guid.TryParse(keyo.ToString(), out key);
+                Guid.TryParse(keyo!.ToString(), out key);
             }
 
             IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, _publishedSnapshotAccessor);
@@ -52,12 +51,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public Type GetModelType(Guid contentTypeKey)
         {
             var publishedContentCache = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot().Content;
-            var publishedContentType = publishedContentCache.GetContentType(contentTypeKey);
-            if (publishedContentType != null)
+            var publishedContentType = publishedContentCache?.GetContentType(contentTypeKey);
+            if (publishedContentType is not null && publishedContentType.IsElement)
             {
-                var modelType = ModelType.For(publishedContentType.Alias);
-
-                return _publishedModelFactory.MapModelType(modelType);
+                return _publishedModelFactory.GetModelType(publishedContentType.Alias);
             }
 
             return typeof(IPublishedElement);

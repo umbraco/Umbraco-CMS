@@ -9,27 +9,27 @@ namespace Umbraco.Cms.Core.Events
     /// <typeparam name="TEventObject">The type of the exposed, impacted object.</typeparam>
     public class CancellableObjectEventArgs<TEventObject> : CancellableObjectEventArgs, IEquatable<CancellableObjectEventArgs<TEventObject>>
     {
-        public CancellableObjectEventArgs(TEventObject eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
+        public CancellableObjectEventArgs(TEventObject? eventObject, bool canCancel, EventMessages messages, IDictionary<string, object> additionalData)
             : base(eventObject, canCancel, messages, additionalData)
         {
         }
 
-        public CancellableObjectEventArgs(TEventObject eventObject, bool canCancel, EventMessages eventMessages)
+        public CancellableObjectEventArgs(TEventObject? eventObject, bool canCancel, EventMessages eventMessages)
             : base(eventObject, canCancel, eventMessages)
         {
         }
 
-        public CancellableObjectEventArgs(TEventObject eventObject, EventMessages eventMessages)
+        public CancellableObjectEventArgs(TEventObject? eventObject, EventMessages eventMessages)
             : base(eventObject, eventMessages)
         {
         }
 
-        public CancellableObjectEventArgs(TEventObject eventObject, bool canCancel)
+        public CancellableObjectEventArgs(TEventObject? eventObject, bool canCancel)
             : base(eventObject, canCancel)
         {
         }
 
-        public CancellableObjectEventArgs(TEventObject eventObject)
+        public CancellableObjectEventArgs(TEventObject? eventObject)
             : base(eventObject)
         {
         }
@@ -40,20 +40,20 @@ namespace Umbraco.Cms.Core.Events
         /// <remarks>
         /// This is protected so that inheritors can expose it with their own name
         /// </remarks>
-        protected new TEventObject EventObject
+        protected new TEventObject? EventObject
         {
-            get => (TEventObject) base.EventObject;
+            get => (TEventObject?) base.EventObject;
             set => base.EventObject = value;
         }
 
-        public bool Equals(CancellableObjectEventArgs<TEventObject> other)
+        public bool Equals(CancellableObjectEventArgs<TEventObject>? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return base.Equals(other) && EqualityComparer<TEventObject>.Default.Equals(EventObject, other.EventObject);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -65,7 +65,12 @@ namespace Umbraco.Cms.Core.Events
         {
             unchecked
             {
-                return (base.GetHashCode() * 397) ^ EqualityComparer<TEventObject>.Default.GetHashCode(EventObject);
+                if (EventObject is not null)
+                {
+                    return (base.GetHashCode() * 397) ^ EqualityComparer<TEventObject>.Default.GetHashCode(EventObject);
+                }
+
+                return base.GetHashCode() * 397;
             }
         }
 

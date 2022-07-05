@@ -66,27 +66,27 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAwaiter().GetResult().Text));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)!).GetAwaiter().GetResult().Text));
 
                 return sb.ToString();
             }
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
         {
             var converted = Convert(inter, preview);
 
             return new HtmlEncodedString(converted == null ? string.Empty : converted);
         }
 
-        private string Convert(object source, bool preview)
+        private string? Convert(object? source, bool preview)
         {
             if (source == null)
             {
                 return null;
             }
 
-            var sourceString = source.ToString();
+            var sourceString = source.ToString()!;
 
             // ensures string is parsed for {localLink} and URLs and media are resolved correctly
             sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);

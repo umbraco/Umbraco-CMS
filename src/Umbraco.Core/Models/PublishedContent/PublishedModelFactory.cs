@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -10,19 +8,19 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </summary>
     public class PublishedModelFactory : IPublishedModelFactory
     {
-        private readonly Dictionary<string, ModelInfo> _modelInfos;
+        private readonly Dictionary<string, ModelInfo>? _modelInfos;
         private readonly Dictionary<string, Type> _modelTypeMap;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
         private class ModelInfo
         {
-            public Type ParameterType { get; set; }
+            public Type? ParameterType { get; set; }
 
-            public Func<object, IPublishedValueFallback, object> Ctor { get; set; }
+            public Func<object, IPublishedValueFallback, object>? Ctor { get; set; }
 
-            public Type ModelType { get; set; }
+            public Type? ModelType { get; set; }
 
-            public Func<IList> ListCtor { get; set; }
+            public Func<IList>? ListCtor { get; set; }
         }
 
         /// <summary>
@@ -50,8 +48,8 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 // IPublishedElement - but it can be IPublishedContent - so we cannot get one precise ctor,
                 // we have to iterate over all ctors and try to find the right one
 
-                ConstructorInfo constructor = null;
-                Type parameterType = null;
+                ConstructorInfo? constructor = null;
+                Type? parameterType = null;
 
                 foreach (var ctor in type.GetConstructors())
                 {
@@ -59,20 +57,27 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                     if (parms.Length == 2 && typeof(IPublishedElement).IsAssignableFrom(parms[0].ParameterType) && typeof(IPublishedValueFallback).IsAssignableFrom(parms[1].ParameterType))
                     {
                         if (constructor != null)
+                        {
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPublishedElement.");
+                        }
+
                         constructor = ctor;
                         parameterType = parms[0].ParameterType;
                     }
                 }
 
                 if (constructor == null)
+                {
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPublishedElement.");
+                }
 
                 var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
-                    throw new InvalidOperationException($"Both types '{type.AssemblyQualifiedName}' and '{modelInfo.ModelType.AssemblyQualifiedName}' want to be a model type for content type with alias \"{typeName}\".");
+                {
+                    throw new InvalidOperationException($"Both types '{type.AssemblyQualifiedName}' and '{modelInfo.ModelType?.AssemblyQualifiedName}' want to be a model type for content type with alias \"{typeName}\".");
+                }
 
                 // have to use an unsafe ctor because we don't know the types, really
                 var modelCtor = ReflectionUtilities.EmitConstructorUnsafe<Func<object, IPublishedValueFallback, object>>(constructor);
@@ -89,36 +94,59 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public IPublishedElement CreateModel(IPublishedElement element)
         {
             // fail fast
-            if (_modelInfos == null)
+            if (_modelInfos is null || element.ContentType.Alias is null || !_modelInfos.TryGetValue(element.ContentType.Alias, out var modelInfo))
+            {
                 return element;
-
-            if (!_modelInfos.TryGetValue(element.ContentType.Alias, out var modelInfo))
-                return element;
+            }
 
             // ReSharper disable once UseMethodIsInstanceOfType
-            if (modelInfo.ParameterType.IsAssignableFrom(element.GetType()) == false)
+            if (modelInfo.ParameterType?.IsAssignableFrom(element.GetType()) == false)
+            {
                 throw new InvalidOperationException($"Model {modelInfo.ModelType} expects argument of type {modelInfo.ParameterType.FullName}, but got {element.GetType().FullName}.");
+            }
 
             // can cast, because we checked when creating the ctor
-            return (IPublishedElement)modelInfo.Ctor(element, _publishedValueFallback);
+            return (IPublishedElement)modelInfo.Ctor!(element, _publishedValueFallback);
         }
 
         /// <inheritdoc />
-        public IList CreateModelList(string alias)
+        public IList? CreateModelList(string? alias)
         {
             // fail fast
-            if (_modelInfos == null)
+            if (_modelInfos is null || alias is null || !_modelInfos.TryGetValue(alias, out var modelInfo) || modelInfo.ModelType is null)
+            {
                 return new List<IPublishedElement>();
-
-            if (!_modelInfos.TryGetValue(alias, out var modelInfo))
-                return new List<IPublishedElement>();
+            }
 
             var ctor = modelInfo.ListCtor;
-            if (ctor != null) return ctor();
+            if (ctor != null)
+            {
+                return ctor();
+            }
 
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
             ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
-            return ctor();
+            if (ctor is not null)
+            {
+                return ctor();
+            }
+
+            return null;
+        }
+
+        /// <inheritdoc />
+        public Type GetModelType(string? alias)
+        {
+            // fail fast
+            if (_modelInfos is null ||
+                alias is null ||
+                !_modelInfos.TryGetValue(alias, out var modelInfo) ||
+                modelInfo.ModelType is null)
+            {
+                return typeof(IPublishedElement);
+            }
+
+            return modelInfo.ModelType;
         }
 
         /// <inheritdoc />

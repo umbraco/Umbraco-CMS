@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Core.Routing
     public class PublishedRequestBuilder : IPublishedRequestBuilder
     {
         private readonly IFileService _fileService;
-        private IReadOnlyDictionary<string, string> _headers;
+        private IReadOnlyDictionary<string, string>? _headers;
         private bool _cacheability;
-        private IReadOnlyList<string> _cacheExtensions;
-        private string _redirectUrl;
+        private IReadOnlyList<string>? _cacheExtensions;
+        private string? _redirectUrl;
         private HttpStatusCode? _responseStatus;
-        private IPublishedContent _publishedContent;
+        private IPublishedContent? _publishedContent;
         private bool _ignorePublishedContentCollisions;
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace Umbraco.Cms.Core.Routing
         public string AbsolutePathDecoded { get; }
 
         /// <inheritdoc/>
-        public DomainAndUri Domain { get; private set; }
+        public DomainAndUri? Domain { get; private set; }
 
         /// <inheritdoc/>
-        public string Culture { get; private set; }
+        public string? Culture { get; private set; }
 
         /// <inheritdoc/>
-        public ITemplate Template { get; private set; }
+        public ITemplate? Template { get; private set; }
 
         /// <inheritdoc/>
         public bool IsInternalRedirect { get; private set; }
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Routing
         public int? ResponseStatusCode => _responseStatus.HasValue ? (int?)_responseStatus : null;
 
         /// <inheritdoc/>
-        public IPublishedContent PublishedContent
+        public IPublishedContent? PublishedContent
         {
             get => _publishedContent;
             private set
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetCulture(string culture)
+        public IPublishedRequestBuilder SetCulture(string? culture)
         {
             Culture = culture;
             return this;
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetPublishedContent(IPublishedContent content)
+        public IPublishedRequestBuilder SetPublishedContent(IPublishedContent? content)
         {
             PublishedContent = content;
             IsInternalRedirect = false;
@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc/>
-        public IPublishedRequestBuilder SetTemplate(ITemplate template)
+        public IPublishedRequestBuilder SetTemplate(ITemplate? template)
         {
             Template = template;
             return this;
@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Core.Routing
             // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
             alias = alias.Replace(" ", string.Empty);
 
-            ITemplate model = _fileService.GetTemplate(alias);
+            ITemplate? model = _fileService.GetTemplate(alias);
             if (model == null)
             {
                 return false;

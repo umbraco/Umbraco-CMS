@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services
@@ -10,6 +7,7 @@ namespace Umbraco.Cms.Core.Services
     /// </summary>
     public interface IFileService : IService
     {
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetNames() or SnippetCollection.GetPartialViewMacroSnippetNames() instead. Scheduled for removal in V12.")]
         IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames);
         void CreatePartialViewFolder(string folderPath);
         void CreatePartialViewMacroFolder(string folderPath);
@@ -22,14 +20,14 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An enumerable list of <see cref="IPartialView"/> objects</returns>
         IEnumerable<IPartialView> GetPartialViews(params string[] names);
 
-        IPartialView GetPartialView(string path);
-        IPartialView GetPartialViewMacro(string path);
-        Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
-        bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
-        bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
-        Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
+        IPartialView? GetPartialView(string path);
+        IPartialView? GetPartialViewMacro(string path);
+        Attempt<IPartialView?> CreatePartialView(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
+        Attempt<IPartialView?> CreatePartialViewMacro(IPartialView partialView, string? snippetName = null, int? userId = Constants.Security.SuperUserId);
+        bool DeletePartialView(string path, int? userId = null);
+        bool DeletePartialViewMacro(string path, int? userId = null);
+        Attempt<IPartialView?> SavePartialView(IPartialView partialView, int? userId = null);
+        Attempt<IPartialView?> SavePartialViewMacro(IPartialView partialView, int? userId = null);
 
         /// <summary>
         /// Gets the content of a partial view as a stream.
@@ -84,21 +82,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="path">Path of the stylesheet incl. extension</param>
         /// <returns>A <see cref="IStylesheet"/> object</returns>
-        IStylesheet GetStylesheet(string path);
+        IStylesheet? GetStylesheet(string? path);
 
         /// <summary>
         /// Saves a <see cref="IStylesheet"/>
         /// </summary>
         /// <param name="stylesheet"><see cref="IStylesheet"/> to save</param>
         /// <param name="userId">Optional id of the user saving the stylesheet</param>
-        void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId);
+        void SaveStylesheet(IStylesheet? stylesheet, int? userId = null);
 
         /// <summary>
         /// Deletes a stylesheet by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
-        void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
+        void DeleteStylesheet(string path, int? userId = null);
 
         /// <summary>
         /// Creates a folder for style sheets
@@ -145,21 +143,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
         /// <returns>A <see cref="IScript"/> object</returns>
-        IScript GetScript(string name);
+        IScript? GetScript(string? name);
 
         /// <summary>
         /// Saves a <see cref="Script"/>
         /// </summary>
         /// <param name="script"><see cref="IScript"/> to save</param>
         /// <param name="userId">Optional id of the user saving the script</param>
-        void SaveScript(IScript script, int userId = Constants.Security.SuperUserId);
+        void SaveScript(IScript? script, int? userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a script by its name
         /// </summary>
         /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
-        void DeleteScript(string path, int userId = Constants.Security.SuperUserId);
+        void DeleteScript(string path, int? userId = null);
 
         /// <summary>
         /// Creates a folder for scripts
@@ -212,21 +210,21 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">The alias of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
-        ITemplate GetTemplate(string alias);
+        ITemplate? GetTemplate(string? alias);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
         /// <param name="id">The identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        ITemplate GetTemplate(int id);
+        ITemplate? GetTemplate(int id);
 
         /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its guid identifier.
         /// </summary>
         /// <param name="id">The guid identifier of the template.</param>
         /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
-        ITemplate GetTemplate(Guid id);
+        ITemplate? GetTemplate(Guid id);
 
         /// <summary>
         /// Gets the template descendants
@@ -251,9 +249,9 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>
         /// The template created
         /// </returns>
-        Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, ITemplate>?> CreateTemplateForContentType(string contentTypeAlias, string? contentTypeName, int userId = Constants.Security.SuperUserId);
 
-        ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId);
+        ITemplate CreateTemplateWithIdentity(string? name, string? alias, string? content, ITemplate? masterTemplate = null, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a template by its alias
@@ -295,6 +293,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns></returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewMacroSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewMacroSnippetContent(string snippetName);
 
         /// <summary>
@@ -302,6 +301,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns>The content of the partial view.</returns>
+        [Obsolete("Please use SnippetCollection.GetPartialViewSnippetContent instead. Scheduled for removal in V12.")]
         string GetPartialViewSnippetContent(string snippetName);
     }
 }

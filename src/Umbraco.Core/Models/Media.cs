@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name">name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="mediaType">MediaType for the current Media object</param>
-        public Media(string name, IMedia parent, IMediaType mediaType)
+        public Media(string? name, IMedia? parent, IMediaType mediaType)
             : this(name, parent, mediaType, new PropertyCollection())
         { }
 
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
         /// <param name="mediaType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, IMedia parent, IMediaType mediaType, IPropertyCollection properties)
+        public Media(string? name, IMedia? parent, IMediaType mediaType, IPropertyCollection properties)
             : base(name, parent, mediaType, properties)
         { }
 
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name">name of the Media object</param>
         /// <param name="parentId">Id of the Parent IMedia</param>
         /// <param name="mediaType">MediaType for the current Media object</param>
-        public Media(string name, int parentId, IMediaType mediaType)
+        public Media(string? name, int parentId, IMediaType? mediaType)
             : this(name, parentId, mediaType, new PropertyCollection())
         { }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parentId">Id of the Parent IMedia</param>
         /// <param name="mediaType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, int parentId, IMediaType mediaType, IPropertyCollection properties)
+        public Media(string? name, int parentId, IMediaType? mediaType, IPropertyCollection properties)
             : base(name, parentId, mediaType, properties)
         { }
 

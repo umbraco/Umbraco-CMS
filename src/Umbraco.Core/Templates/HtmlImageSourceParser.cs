@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Templates
             this._getMediaUrl = getMediaUrl;
         }
 
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly IPublishedUrlProvider? _publishedUrlProvider;
 
         public HtmlImageSourceParser(IPublishedUrlProvider publishedUrlProvider)
         {
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Templates
         private static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-        private Func<Guid, string> _getMediaUrl;
+        private Func<Guid, string?>? _getMediaUrl;
 
         /// <summary>
         /// Parses out media UDIs from an html string based on 'data-udi' html attributes
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Templates
         public string EnsureImageSources(string text)
         {
             if(_getMediaUrl == null)
-                _getMediaUrl = (guid) => _publishedUrlProvider.GetMediaUrl(guid);
+                _getMediaUrl = (guid) => _publishedUrlProvider?.GetMediaUrl(guid);
 
             return ResolveImgPattern.Replace(text, match =>
             {

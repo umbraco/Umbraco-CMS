@@ -1,13 +1,21 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {
@@ -86,10 +94,50 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
             });
         }
 
-        private UserDataService CreateUserDataService(string culture)
+        [Test]
+        [TestCase(ModelsMode.Nothing)]
+        [TestCase(ModelsMode.InMemoryAuto)]
+        [TestCase(ModelsMode.SourceCodeAuto)]
+        [TestCase(ModelsMode.SourceCodeManual)]
+        public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
+        {
+            var userDataService = CreateUserDataService(modelsMode: modelsMode);
+            UserData[] userData = userDataService.GetUserData().ToArray();
+
+            var actual = userData.FirstOrDefault(x => x.Name == "Models Builder Mode");
+            Assert.IsNotNull(actual?.Data);
+            Assert.AreEqual(modelsMode.ToString(), actual.Data);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void ReportsDebugModeCorrectly(bool isDebug)
+        {
+            var userDataService = CreateUserDataService(isDebug: isDebug);
+            UserData[] userData = userDataService.GetUserData().ToArray();
+
+            var actual = userData.FirstOrDefault(x => x.Name == "Debug Mode");
+            Assert.IsNotNull(actual?.Data);
+            Assert.AreEqual(isDebug.ToString(), actual.Data);
+        }
+
+        private SystemInformationTelemetryProvider CreateUserDataService(string culture = "", ModelsMode modelsMode = ModelsMode.InMemoryAuto, bool isDebug = true)
         {
             var localizationService = CreateILocalizationService(culture);
-            return new UserDataService(_umbracoVersion, localizationService);
+
+            var databaseMock = new Mock<IUmbracoDatabase>();
+            databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
+
+            return new SystemInformationTelemetryProvider(
+                _umbracoVersion,
+                localizationService,
+                Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+                Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
+                Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings()),
+                Mock.Of<IHostEnvironment>(),
+                Mock.Of<IUmbracoDatabaseFactory>(x=>x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y=>y.DatabaseType == DatabaseType.SQLite)),
+                Mock.Of<IServerRoleAccessor>());
         }
 
         private ILocalizationService CreateILocalizationService(string culture)

@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="alias">Alias to retrieve an <see cref="IMacro"/> for</param>
         /// <returns>An <see cref="IMacro"/> object</returns>
-        IMacro GetByAlias(string alias);
+        IMacro? GetByAlias(string alias);
 
         IEnumerable<IMacro> GetAll();
 
@@ -23,9 +23,9 @@ namespace Umbraco.Cms.Core.Services
 
         IEnumerable<IMacro> GetAll(params Guid[] ids);
 
-        IMacro GetById(int id);
+        IMacro? GetById(int id);
 
-        IMacro GetById(Guid id);
+        IMacro? GetById(Guid id);
 
         /// <summary>
         /// Deletes an <see cref="IMacro"/>

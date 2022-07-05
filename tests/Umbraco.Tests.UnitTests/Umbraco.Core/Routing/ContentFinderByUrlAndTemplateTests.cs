@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -69,9 +70,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                 _fileService,
                 ContentTypeService,
                 umbracoContextAccessor,
-                Microsoft.Extensions.Options.Options.Create(webRoutingSettings));
+                Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x=>x.CurrentValue == webRoutingSettings));
 
-            var result = lookup.TryFindContent(frequest);
+            var result = await lookup.TryFindContent(frequest);
 
             IPublishedRequest request = frequest.Build();
 

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.Trees
@@ -25,24 +25,26 @@ namespace Umbraco.Cms.Core.Models.Trees
         /// <summary>
         /// The angular service method name to call for this menu item
         /// </summary>
-        public virtual string AngularServiceMethodName { get; } = null;
+        public virtual string? AngularServiceMethodName { get; } = null;
 
-        protected ActionMenuItem(string alias, string name) : base(alias, name)
+        protected ActionMenuItem(string alias, string name)
+            : base(alias, name)
         {
             Initialize();
         }
 
-        protected ActionMenuItem(string alias, ILocalizedTextService textService) : base(alias, textService)
+        protected ActionMenuItem(string alias, ILocalizedTextService textService)
+            : base(alias, textService)
         {
             Initialize();
         }
 
         private void Initialize()
         {
-            //add the current type to the metadata
+            // add the current type to the metadata
             if (AngularServiceMethodName.IsNullOrWhiteSpace())
             {
-                //if no method name is supplied we will assume that the menu action is the type name of the current menu class
+                // if no method name is supplied we will assume that the menu action is the type name of the current menu class
                 ExecuteJsMethod($"{AngularServiceName}.{this.GetType().Name}");
             }
             else

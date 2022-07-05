@@ -16,7 +16,7 @@ namespace JsonSchema
         /// <summary>
         ///     Gets or sets the Umbraco
         /// </summary>
-        public UmbracoDefinition Umbraco { get; set; }
+        public UmbracoDefinition? Umbraco { get; set; }
 
         /// <summary>
         ///     Configuration of Umbraco CMS and packages
@@ -24,76 +24,76 @@ namespace JsonSchema
         internal class UmbracoDefinition
         {
             // ReSharper disable once InconsistentNaming
-            public CmsDefinition CMS { get; set; }
+            public CmsDefinition? CMS { get; set; }
 
-            public FormsDefinition Forms { get; set; }
+            public FormsDefinition? Forms { get; set; }
 
-            public DeployDefinition Deploy { get; set; }
+            public DeployDefinition? Deploy { get; set; }
 
             /// <summary>
             ///     Configurations for the Umbraco CMS
             /// </summary>
             public class CmsDefinition
             {
-                public ActiveDirectorySettings ActiveDirectory { get; set; }
+                public ActiveDirectorySettings? ActiveDirectory { get; set; }
 
-                public ContentSettings Content { get; set; }
+                public ContentSettings? Content { get; set; }
 
-                public ExceptionFilterSettings ExceptionFilter { get; set; }
+                public ExceptionFilterSettings? ExceptionFilter { get; set; }
 
-                public ModelsBuilderSettings ModelsBuilder { get; set; }
+                public ModelsBuilderSettings? ModelsBuilder { get; set; }
 
-                public GlobalSettings Global { get; set; }
+                public GlobalSettings? Global { get; set; }
 
-                public HealthChecksSettings HealthChecks { get; set; }
+                public HealthChecksSettings? HealthChecks { get; set; }
 
-                public HostingSettings Hosting { get; set; }
+                public HostingSettings? Hosting { get; set; }
 
-                public ImagingSettings Imaging { get; set; }
+                public ImagingSettings? Imaging { get; set; }
 
-                public IndexCreatorSettings Examine { get; set; }
+                public IndexCreatorSettings? Examine { get; set; }
 
-                public KeepAliveSettings KeepAlive { get; set; }
+                public KeepAliveSettings? KeepAlive { get; set; }
 
-                public LoggingSettings Logging { get; set; }
+                public LoggingSettings? Logging { get; set; }
 
-                public MemberPasswordConfigurationSettings MemberPassword { get; set; }
+                public MemberPasswordConfigurationSettings? MemberPassword { get; set; }
 
-                public NuCacheSettings NuCache { get; set; }
+                public NuCacheSettings? NuCache { get; set; }
 
-                public RequestHandlerSettings RequestHandler { get; set; }
+                public RequestHandlerSettings? RequestHandler { get; set; }
 
-                public RuntimeSettings Runtime { get; set; }
+                public RuntimeSettings? Runtime { get; set; }
 
-                public SecuritySettings Security { get; set; }
+                public SecuritySettings? Security { get; set; }
 
-                public TourSettings Tours { get; set; }
+                public TourSettings? Tours { get; set; }
 
-                public TypeFinderSettings TypeFinder { get; set; }
+                public TypeFinderSettings? TypeFinder { get; set; }
 
-                public UserPasswordConfigurationSettings UserPassword { get; set; }
+                public UserPasswordConfigurationSettings? UserPassword { get; set; }
 
-                public WebRoutingSettings WebRouting { get; set; }
+                public WebRoutingSettings? WebRouting { get; set; }
 
-                public UmbracoPluginSettings Plugins { get; set; }
+                public UmbracoPluginSettings? Plugins { get; set; }
 
-                public UnattendedSettings Unattended { get; set; }
+                public UnattendedSettings? Unattended { get; set; }
 
-                public RichTextEditorSettings RichTextEditor { get; set; }
+                public RichTextEditorSettings? RichTextEditor { get; set; }
 
-                public RuntimeMinificationSettings RuntimeMinification { get; set; }
+                public RuntimeMinificationSettings? RuntimeMinification { get; set; }
 
-                public BasicAuthSettings BasicAuth { get; set; }
+                public BasicAuthSettings? BasicAuth { get; set; }
 
-                public PackageMigrationSettings PackageMigration { get; set; }
+                public PackageMigrationSettings? PackageMigration { get; set; }
 
-                public LegacyPasswordMigrationSettings LegacyPasswordMigration { get; set; }
+                public LegacyPasswordMigrationSettings? LegacyPasswordMigration { get; set; }
 
-                public ContentDashboardSettings ContentDashboard { get; set; }
+                public ContentDashboardSettings? ContentDashboard { get; set; }
 
-                public HelpPageSettings HelpPage { get; set; }
+                public HelpPageSettings? HelpPage { get; set; }
 
-                public InstallDefaultDataSettings DefaultDataCreation { get; set; }
+                public InstallDefaultDataSettings? DefaultDataCreation { get; set; }
             }
 
             /// <summary>
@@ -101,24 +101,24 @@ namespace JsonSchema
             /// </summary>
             public class FormsDefinition
             {
-                public FormDesignSettings FormDesign { get; set; }
+                public FormDesignSettings? FormDesign { get; set; }
 
-                public PackageOptionSettings Options { get; set; }
+                public PackageOptionSettings? Options { get; set; }
 
-                public Umbraco.Forms.Core.Configuration.SecuritySettings Security { get; set; }
+                public Umbraco.Forms.Core.Configuration.SecuritySettings? Security { get; set; }
 
-                public FieldTypesDefinition FieldTypes { get; set; }
+                public FieldTypesDefinition? FieldTypes { get; set; }
 
                 /// <summary>
                 ///     Configurations for the Umbraco Forms Field Types
                 /// </summary>
                 public class FieldTypesDefinition
                 {
-                    public DatePickerSettings DatePicker { get; set; }
+                    public DatePickerSettings? DatePicker { get; set; }
 
-                    public Recaptcha2Settings Recaptcha2 { get; set; }
+                    public Recaptcha2Settings? Recaptcha2 { get; set; }
 
-                    public Recaptcha3Settings Recaptcha3 { get; set; }
+                    public Recaptcha3Settings? Recaptcha3 { get; set; }
                 }
             }
 
@@ -127,11 +127,11 @@ namespace JsonSchema
             /// </summary>
             public class DeployDefinition
             {
-                public DeploySettings Settings { get; set; }
+                public DeploySettings? Settings { get; set; }
 
-                public DeployProjectConfig Project { get; set; }
+                public DeployProjectConfig? Project { get; set; }
 
-                public DebugSettings Debug { get; set; }
+                public DebugSettings? Debug { get; set; }
             }
         }
     }

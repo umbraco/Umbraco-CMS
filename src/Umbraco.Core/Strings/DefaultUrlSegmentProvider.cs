@@ -21,14 +21,14 @@ namespace Umbraco.Cms.Core.Strings
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The URL segment.</returns>
-        public string GetUrlSegment(IContentBase content, string culture = null)
+        public string? GetUrlSegment(IContentBase content, string? culture = null)
         {
-            return GetUrlSegmentSource(content, culture).ToUrlSegment(_shortStringHelper, culture);
+            return GetUrlSegmentSource(content, culture)?.ToUrlSegment(_shortStringHelper, culture);
         }
 
-        private static string GetUrlSegmentSource(IContentBase content, string culture)
+        private static string? GetUrlSegmentSource(IContentBase content, string? culture)
         {
-            string source = null;
+            string? source = null;
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
                 source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))

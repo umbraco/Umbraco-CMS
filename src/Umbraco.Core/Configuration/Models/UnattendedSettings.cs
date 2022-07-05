@@ -44,17 +44,17 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value to use for creating a user with a name for Unattended Installs
         /// </summary>
-        public string UnattendedUserName { get; set; } = null;
+        public string? UnattendedUserName { get; set; } = null;
 
         /// <summary>
         /// Gets or sets a value to use for creating a user with an email for Unattended Installs
         /// </summary>
         [EmailAddress]
-        public string UnattendedUserEmail { get; set; } = null;
+        public string? UnattendedUserEmail { get; set; } = null;
 
         /// <summary>
         /// Gets or sets a value to use for creating a user with a password for Unattended Installs
         /// </summary>
-        public string UnattendedUserPassword { get; set; } = null;
+        public string? UnattendedUserPassword { get; set; } = null;
     }
 }

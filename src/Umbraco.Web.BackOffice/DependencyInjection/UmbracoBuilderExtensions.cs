@@ -33,7 +33,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder> configureMvc = null) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
@@ -56,7 +56,8 @@ namespace Umbraco.Extensions
                 .AddLogViewer()
                 .AddExamine()
                 .AddExamineIndexes()
-                .AddControllersWithAmbiguousConstructors();
+                .AddControllersWithAmbiguousConstructors()
+                .AddSupplemenataryLocalizedTextFileSources();
 
         public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
@@ -77,7 +78,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the back office tree collection builder
         /// </summary>
-        public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
+        public static TreeCollectionBuilder? Trees(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<TreeCollectionBuilder>();
 
         public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
@@ -97,7 +98,7 @@ namespace Umbraco.Extensions
             // the collection builder only accepts types inheriting from TreeControllerBase
             // and will filter out those that are not attributed with TreeAttribute
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
-            builder.Trees()
+            builder.Trees()?
                 .AddTreeControllers(umbracoApiControllerTypes.Where(x => typeof(TreeControllerBase).IsAssignableFrom(x)));
 
             builder.AddWebMappingProfiles();

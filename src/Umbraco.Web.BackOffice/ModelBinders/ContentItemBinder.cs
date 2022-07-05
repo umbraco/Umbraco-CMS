@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             _modelBinderHelper = new ContentModelBinderHelper();
         }
 
-        protected virtual IContent GetExisting(ContentItemSave model)
+        protected virtual IContent? GetExisting(ContentItemSave model)
         {
             return _contentService.GetById(model.Id);
         }
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             }
 
             var persistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
-            BindModel(model, persistedContent, _modelBinderHelper, _umbracoMapper);
+            BindModel(model, persistedContent!, _modelBinderHelper, _umbracoMapper);
 
             bindingContext.Result = ModelBindingResult.Success(model);
         }

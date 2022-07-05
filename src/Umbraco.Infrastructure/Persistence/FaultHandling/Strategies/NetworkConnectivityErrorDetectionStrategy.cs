@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
 {
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
     {
         public bool IsTransient(Exception ex)
         {
-            SqlException sqlException;
+            SqlException? sqlException;
 
             if (ex != null && (sqlException = ex as SqlException) != null)
             {

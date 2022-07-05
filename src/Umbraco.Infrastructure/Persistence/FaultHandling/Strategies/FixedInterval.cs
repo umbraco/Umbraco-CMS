@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
         /// <param name="retryCount">The number of retry attempts.</param>
         /// <param name="retryInterval">The time interval between retries.</param>
         /// <param name="firstFastRetry">a value indicating whether or not the very first retry attempt will be made immediately whereas the subsequent retries will remain subject to retry interval.</param>
-        public FixedInterval(string name, int retryCount, TimeSpan retryInterval, bool firstFastRetry)
+        public FixedInterval(string? name, int retryCount, TimeSpan retryInterval, bool firstFastRetry)
             : base(name, firstFastRetry)
         {
             //Guard.ArgumentNotNegativeValue(retryCount, "retryCount");

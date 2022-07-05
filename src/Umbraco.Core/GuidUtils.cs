@@ -60,6 +60,7 @@ namespace Umbraco.Cms.Core
         /// </remarks>
         public static string ToBase32String(Guid guid, int length = 26)
         {
+
             if (length <= 0 || length > 26)
                 length = 26;
 

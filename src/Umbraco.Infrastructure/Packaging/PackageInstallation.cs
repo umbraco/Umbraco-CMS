@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         }
 
-        public CompiledPackage ReadPackage(XDocument packageXmlFile)
+        public CompiledPackage ReadPackage(XDocument? packageXmlFile)
         {
             if (packageXmlFile == null)
                 throw new ArgumentNullException(nameof(packageXmlFile));
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 packageDefinition.PartialViews.Add(x.Path);
 
             packageDefinition.ContentNodeId = installationSummary.ContentInstalled.FirstOrDefault()?.Id.ToInvariantString();
-            
+
             foreach (var x in installationSummary.MediaInstalled)
                 packageDefinition.MediaUdis.Add(x.GetUdi());
 

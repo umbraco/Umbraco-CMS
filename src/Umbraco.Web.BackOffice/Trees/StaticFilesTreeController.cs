@@ -16,15 +16,21 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     public class StaticFilesTreeController : TreeController
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
         private const string AppPlugins = "App_Plugins";
         private const string Webroot = "wwwroot";
 
-        public StaticFilesTreeController(ILocalizedTextService localizedTextService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IEventAggregator eventAggregator,
-            IPhysicalFileSystem fileSystem) :
-            base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
+        public StaticFilesTreeController(
+            ILocalizedTextService localizedTextService,
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator,
+            IPhysicalFileSystem fileSystem,
+            IMenuItemCollectionFactory menuItemCollectionFactory)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _fileSystem = fileSystem;
+            _menuItemCollectionFactory = menuItemCollectionFactory;
         }
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
@@ -73,6 +79,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         }
 
         // We don't have any menu item options (such as create/delete/reload) & only use the root node to load a custom UI
-        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings) => null;
+        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings) => _menuItemCollectionFactory.Create();
     }
 }
