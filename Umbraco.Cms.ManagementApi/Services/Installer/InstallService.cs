@@ -42,7 +42,7 @@ public class InstallService : IInstallService
             throw new InvalidOperationException($"Runtime level must be Install to install but was: {_runtimeState.Level}");
         }
 
-        IEnumerable<InstallSetupStep> steps = _installSteps.GetInstallSteps();
+        IEnumerable<IInstallStep> steps = _installSteps.GetInstallSteps();
         await RunSteps(steps, model);
 
         await _runtime.RestartAsync();
@@ -58,17 +58,17 @@ public class InstallService : IInstallService
         // Need to figure out how to handle the install data, this is only needed when installing, not upgrading.
         var model = new InstallData();
 
-        IEnumerable<InstallSetupStep> steps = _installSteps.GetUpgradeSteps();
+        IEnumerable<IInstallStep> steps = _installSteps.GetUpgradeSteps();
         await RunSteps(steps, model);
 
         await _runtime.RestartAsync();
     }
 
-    private async Task RunSteps(IEnumerable<InstallSetupStep> steps, InstallData model)
+    private async Task RunSteps(IEnumerable<IInstallStep> steps, InstallData model)
     {
-        foreach (InstallSetupStep step in steps)
+        foreach (IInstallStep step in steps)
         {
-            var stepName = step.Name;
+            var stepName = step.GetType().Name;
             _logger.LogInformation("Checking if {StepName} requires execution", stepName);
             if (await step.RequiresExecutionAsync(model) is false)
             {

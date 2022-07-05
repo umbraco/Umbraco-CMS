@@ -7,13 +7,11 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Installer;
-using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
-using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseConfigureStep : InstallSetupStep
+public class DatabaseConfigureStep : IInstallStep
 {
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly DatabaseBuilder _databaseBuilder;
@@ -25,10 +23,6 @@ public class DatabaseConfigureStep : InstallSetupStep
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         ILogger<DatabaseConfigureStep> logger,
         IUmbracoMapper mapper)
-        : base(
-            "DatabaseConfigure",
-            30,
-            InstallationType.NewInstall)
     {
         _databaseBuilder = databaseBuilder;
         _connectionStrings = connectionStrings;
@@ -36,7 +30,9 @@ public class DatabaseConfigureStep : InstallSetupStep
         _mapper = mapper;
     }
 
-    public override Task ExecuteAsync(InstallData model)
+    public InstallationType InstallationTypeTarget => InstallationType.NewInstall;
+
+    public Task ExecuteAsync(InstallData model)
     {
         DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(model.Database)!;
 
@@ -48,7 +44,7 @@ public class DatabaseConfigureStep : InstallSetupStep
         return Task.FromResult<InstallSetupResult?>(null);
     }
 
-    public override Task<bool> RequiresExecutionAsync(InstallData model)
+    public Task<bool> RequiresExecutionAsync(InstallData model)
     {
         // If the connection string is already present in config we don't need to show the settings page and we jump to installing/upgrading.
         if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())

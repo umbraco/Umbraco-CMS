@@ -6,7 +6,7 @@ using Umbraco.New.Cms.Core.Models.Installer;
 
 namespace Umbraco.New.Cms.Core.Installer.Steps;
 
-public class FilePermissionsStep : InstallSetupStep
+public class FilePermissionsStep : IInstallStep
 {
     private readonly IFilePermissionHelper _filePermissionHelper;
     private readonly ILocalizedTextService _localizedTextService;
@@ -14,16 +14,14 @@ public class FilePermissionsStep : InstallSetupStep
     public FilePermissionsStep(
         IFilePermissionHelper filePermissionHelper,
         ILocalizedTextService localizedTextService)
-        : base(
-            "Permissions",
-            10,
-            InstallationType.NewInstall | InstallationType.Upgrade)
     {
         _filePermissionHelper = filePermissionHelper;
         _localizedTextService = localizedTextService;
     }
 
-    public override Task ExecuteAsync(InstallData model)
+    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
+
+    public Task ExecuteAsync(InstallData model)
     {
         // validate file permissions
         var permissionsOk =
@@ -40,5 +38,5 @@ public class FilePermissionsStep : InstallSetupStep
         return Task.FromResult<InstallSetupResult?>(null);
     }
 
-    public override Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
+    public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
 }

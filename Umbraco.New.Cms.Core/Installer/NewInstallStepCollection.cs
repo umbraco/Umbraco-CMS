@@ -1,19 +1,18 @@
 ﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Install.Models;
-using Umbraco.New.Cms.Core.Installer.Steps;
 
 namespace Umbraco.New.Cms.Core.Installer;
 
-public class NewInstallStepCollection : BuilderCollectionBase<InstallSetupStep>
+public class NewInstallStepCollection : BuilderCollectionBase<IInstallStep>
 {
-    public NewInstallStepCollection(Func<IEnumerable<InstallSetupStep>> items)
+    public NewInstallStepCollection(Func<IEnumerable<IInstallStep>> items)
         : base(items)
     {
     }
 
-    public IEnumerable<InstallSetupStep> GetInstallSteps()
+    public IEnumerable<IInstallStep> GetInstallSteps()
         => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.NewInstall));
 
-    public IEnumerable<InstallSetupStep> GetUpgradeSteps()
+    public IEnumerable<IInstallStep> GetUpgradeSteps()
         => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.Upgrade));
 }

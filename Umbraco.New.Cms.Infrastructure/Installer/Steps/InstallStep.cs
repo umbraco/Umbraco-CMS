@@ -14,62 +14,49 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Installer;
-using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Constants = Umbraco.Cms.Core.Constants;
 using HttpResponseMessage = System.Net.Http.HttpResponseMessage;
-using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class InstallStep : InstallSetupStep
+public class InstallStep : IInstallStep
 {
     private readonly IUserService _userService;
     private readonly DatabaseBuilder _databaseBuilder;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly UserPasswordConfigurationSettings _passwordConfiguration;
     private readonly SecuritySettings _securitySettings;
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly ICookieManager _cookieManager;
     private readonly IBackOfficeUserManager _userManager;
     private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
-    private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
-    private readonly ILocalizedTextService _localizedTextService;
     private readonly IMetricsConsentService _metricsConsentService;
 
     public InstallStep(
         IUserService userService,
         DatabaseBuilder databaseBuilder,
         IHttpClientFactory httpClientFactory,
-        IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
         IOptions<SecuritySettings> securitySettings,
         IOptionsMonitor<ConnectionStrings> connectionStrings,
         ICookieManager cookieManager,
         IBackOfficeUserManager userManager,
         IDbProviderFactoryCreator dbProviderFactoryCreator,
-        IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
-        ILocalizedTextService localizedTextService,
         IMetricsConsentService metricsConsentService)
-        : base(
-            "User",
-            60,
-            InstallationType.NewInstall)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
         _httpClientFactory = httpClientFactory;
-        _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
         _connectionStrings = connectionStrings;
         _cookieManager = cookieManager;
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-        _databaseProviderMetadata = databaseProviderMetadata;
-        _localizedTextService = localizedTextService;
         _metricsConsentService = metricsConsentService;
     }
 
-    public override async Task ExecuteAsync(InstallData model)
+    public InstallationType InstallationTypeTarget => InstallationType.NewInstall;
+
+    public async Task ExecuteAsync(InstallData model)
     {
             IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
@@ -121,7 +108,7 @@ public class InstallStep : InstallSetupStep
             }
     }
 
-    public override Task<bool> RequiresExecutionAsync(InstallData model)
+    public Task<bool> RequiresExecutionAsync(InstallData model)
     {
         InstallState installState = GetInstallState();
         if (installState.HasFlag(InstallState.Unknown))

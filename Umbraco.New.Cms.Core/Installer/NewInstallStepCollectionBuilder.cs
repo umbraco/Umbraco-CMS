@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.New.Cms.Core.Installer.Steps;
 
 namespace Umbraco.New.Cms.Core.Installer;
 
-public class NewInstallStepCollectionBuilder : OrderedCollectionBuilderBase<NewInstallStepCollectionBuilder, NewInstallStepCollection, InstallSetupStep>
+public class NewInstallStepCollectionBuilder : OrderedCollectionBuilderBase<NewInstallStepCollectionBuilder, NewInstallStepCollection, IInstallStep>
 {
     protected override NewInstallStepCollectionBuilder This => this;
 

@@ -4,29 +4,24 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.New.Cms.Core.Installer;
-using Umbraco.New.Cms.Core.Installer.Steps;
 using Umbraco.New.Cms.Core.Models.Installer;
-using InstallSetupStep = Umbraco.New.Cms.Core.Installer.InstallSetupStep;
 
 namespace Umbraco.New.Cms.Infrastructure.Installer.Steps;
 
-public class DatabaseInstallStep : InstallSetupStep
+public class DatabaseInstallStep : IInstallStep
 {
-
     private readonly IRuntimeState _runtime;
     private readonly DatabaseBuilder _databaseBuilder;
 
     public DatabaseInstallStep(IRuntimeState runtime, DatabaseBuilder databaseBuilder)
-        : base(
-            "DatabaseInstall",
-            40,
-            InstallationType.NewInstall | InstallationType.Upgrade)
     {
         _runtime = runtime;
         _databaseBuilder = databaseBuilder;
     }
 
-    public override Task ExecuteAsync(InstallData model)
+    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
+
+    public Task ExecuteAsync(InstallData model)
     {
         if (_runtime.Level == RuntimeLevel.Run)
         {
@@ -48,5 +43,5 @@ public class DatabaseInstallStep : InstallSetupStep
         return Task.CompletedTask;
     }
 
-    public override Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
+    public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
 }
