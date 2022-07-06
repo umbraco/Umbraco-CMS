@@ -31,6 +31,12 @@ export class UmbDataTypeStore {
 				name: 'Context Example (DataType)',
 				propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContextExample',
 			},
+			{
+				id: 1248,
+				key: 'dt-5',
+				name: 'Content Picker (DataType)',
+				propertyEditorUIAlias: 'Umb.PropertyEditorUI.ContentPicker',
+			},
 		]);
 	}
 
