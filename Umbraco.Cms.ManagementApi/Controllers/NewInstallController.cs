@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Core.Services.Installer;
@@ -18,15 +22,21 @@ public class NewInstallController : Controller
     private readonly IUmbracoMapper _mapper;
     private readonly IInstallSettingsFactory _installSettingsFactory;
     private readonly IInstallService _installService;
+    private readonly GlobalSettings _globalSettings;
+    private readonly IHostingEnvironment _hostingEnvironment;
 
     public NewInstallController(
         IUmbracoMapper mapper,
         IInstallSettingsFactory installSettingsFactory,
-        IInstallService installService)
+        IInstallService installService,
+        IOptions<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnvironment)
     {
         _mapper = mapper;
         _installSettingsFactory = installSettingsFactory;
         _installService = installService;
+        _globalSettings = globalSettings.Value;
+        _hostingEnvironment = hostingEnvironment;
     }
 
     [HttpGet("settings")]
@@ -61,7 +71,8 @@ public class NewInstallController : Controller
 
         await _installService.Install(data);
 
-        return Created("/", null);
+        var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
+        return Created(backOfficePath, null);
     }
 
     [HttpPost("upgrade")]
