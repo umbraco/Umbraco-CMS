@@ -7,9 +7,14 @@ import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
 import '@umbraco-ui/uui-modal-sidebar';
 import { UUIModalSidebarElement } from '@umbraco-ui/uui-modal-sidebar';
+import { UmbContextConsumerMixin } from '../../core/context';
+import { UmbModalService } from '../../core/services/modal.service';
+import { Subscription } from 'rxjs';
+
+import '../../core/services/modal-content-picker.element';
 
 @customElement('umb-property-editor-content-picker')
-class UmbPropertyEditorContentPicker extends LitElement {
+class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement) {
 	static styles = [
 		UUITextStyles,
 		css`
@@ -30,39 +35,27 @@ class UmbPropertyEditorContentPicker extends LitElement {
 		`,
 	];
 
-	@state()
-	open = false;
-
 	@query('uui-modal-sidebar')
 	sidebar?: UUIModalSidebarElement;
 
-	private _renderModal() {
-		return this.open
-			? html`<uui-modal-sidebar data-modal-size="small" @closed=${() => (this.open = false)}>
-					<umb-editor-layout>
-						<h3 slot="name">Select content</h3>
-						<uui-box>
-							<uui-input></uui-input>
-							<hr />
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab minima et praesentium rem, nesciunt,
-							blanditiis culpa esse tempore perspiciatis recusandae magni voluptas tempora officiis commodi nihil
-							deserunt quidem aliquid sed?
-						</uui-box>
-						<div slot="actions">
-							<uui-button look="secondary" label="close" @click=${(e: Event) => this.sidebar?.close(e)}
-								>Close</uui-button
-							>
-						</div>
-					</umb-editor-layout>
-			  </uui-modal-sidebar>`
-			: '';
+	private _modalService?: UmbModalService;
+
+	constructor() {
+		super();
+		this.consumeContext('umbModalService', (modalService: UmbModalService) => {
+			this._modalService = modalService;
+		});
+	}
+
+	private _open() {
+		const modalHandler = this._modalService?.open('umb-modal-content-picker');
+		modalHandler?.onClose().then((result) => {
+			console.log('result', result);
+		});
 	}
 
 	render() {
-		return html`
-			<uui-button look="primary" @click=${() => (this.open = !this.open)} label="open">Open</uui-button>
-			<uui-modal-container>${this._renderModal()}</uui-modal-container>
-		`;
+		return html` <uui-button look="primary" @click=${this._open} label="open">Open</uui-button> `;
 	}
 }
 
