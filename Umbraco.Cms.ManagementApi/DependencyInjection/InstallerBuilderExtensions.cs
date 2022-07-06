@@ -41,6 +41,7 @@ public static class InstallerBuilderExtensions
             .Append<DatabaseInstallStep>()
             .Append<DatabaseUpgradeStep>()
             .Append<CreateUserStep>()
+            .Append<RegisterInstallCompleteStep>()
             .Append<RestartRuntimeStep>()
             .Append<SignInUserStep>();
 

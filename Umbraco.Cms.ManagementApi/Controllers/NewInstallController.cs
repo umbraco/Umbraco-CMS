@@ -5,6 +5,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.ManagementApi.Filters;
 using Umbraco.Cms.ManagementApi.ViewModels.Installer;
 using Umbraco.Extensions;
@@ -24,19 +25,22 @@ public class NewInstallController : Controller
     private readonly IInstallService _installService;
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly InstallHelper _installHelper;
 
     public NewInstallController(
         IUmbracoMapper mapper,
         IInstallSettingsFactory installSettingsFactory,
         IInstallService installService,
         IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
+        IHostingEnvironment hostingEnvironment,
+        InstallHelper installHelper)
     {
         _mapper = mapper;
         _installSettingsFactory = installSettingsFactory;
         _installService = installService;
         _globalSettings = globalSettings.Value;
         _hostingEnvironment = hostingEnvironment;
+        _installHelper = installHelper;
     }
 
     [HttpGet("settings")]
@@ -47,8 +51,10 @@ public class NewInstallController : Controller
     [RequireRuntimeLevel(RuntimeLevel.Install)]
     public async Task<ActionResult<InstallSettingsViewModel>> Settings()
     {
-        InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
+        // Register that the install has started
+        await _installHelper.SetInstallStatusAsync(false, string.Empty);
 
+        InstallSettingsModel installSettings = _installSettingsFactory.GetInstallSettings();
         InstallSettingsViewModel viewModel = _mapper.Map<InstallSettingsViewModel>(installSettings)!;
 
         return viewModel;
@@ -68,7 +74,6 @@ public class NewInstallController : Controller
         }
 
         InstallData data = _mapper.Map<InstallData>(installData)!;
-
         await _installService.Install(data);
 
         var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
