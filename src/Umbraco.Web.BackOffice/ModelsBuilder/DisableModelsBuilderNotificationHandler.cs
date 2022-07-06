@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Notifications;
 namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 
 /// <summary>
-///     Used in conjunction with <see cref="UmbracoBuilderExtensions.DisableModelsBuilderControllers" />
+/// Used in conjunction with <see cref="UmbracoBuilderExtensions.DisableModelsBuilderControllers"/>
 /// </summary>
 internal class DisableModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStartingNotification>
 {

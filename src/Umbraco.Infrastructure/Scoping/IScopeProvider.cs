@@ -11,11 +11,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping;
 /// </summary>
 public interface IScopeProvider : ICoreScopeProvider
 {
-    /// <summary>
-    ///     Gets the scope context.
-    /// </summary>
-    IScopeContext? Context { get; }
-
     /// <inheritdoc />
     ICoreScope ICoreScopeProvider.CreateCoreScope(
         IsolationLevel isolationLevel,

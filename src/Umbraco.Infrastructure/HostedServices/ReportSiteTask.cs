@@ -85,7 +85,8 @@ public class ReportSiteTask : RecurringHostedServiceBase
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
-                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json");
+                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8,
+                    "application/json");
 
                 // Make a HTTP Post to telemetry service
                 // https://telemetry.umbraco.com/installs/

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -8,10 +9,12 @@ internal static class LanguageFactory
     public static ILanguage BuildEntity(LanguageDto dto)
     {
         ArgumentNullException.ThrowIfNull(dto);
-        if (dto.IsoCode == null || dto.CultureName == null)
+        if (dto.IsoCode is null)
         {
-            throw new InvalidOperationException("Language ISO code and/or culture name can't be null.");
+            throw new InvalidOperationException("Language ISO code can't be null.");
         }
+
+        dto.CultureName ??= CultureInfo.GetCultureInfo(dto.IsoCode).EnglishName;
 
         var lang = new Language(dto.IsoCode, dto.CultureName)
         {
