@@ -429,9 +429,18 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             .From<UserGroup2LanguageDto>()
             .WhereIn<UserGroup2LanguageDto>(x => x.UserGroupId, groupIds);
 
-        var groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
-            .GroupBy(x => x.UserGroupId)
-            .ToDictionary(x => x.Key, x => x);
+        Dictionary<int, IGrouping<int, UserGroup2LanguageDto>> groups2languages;
+        try
+        {
+            groups2languages = Database.Fetch<UserGroup2LanguageDto>(sql)
+                .GroupBy(x => x.UserGroupId)
+                .ToDictionary(x => x.Key, x => x);
+        }
+        catch
+        {
+            // If we get an error, the table has not been made in the database yet, set the list to an empty one
+            groups2languages = new Dictionary<int, IGrouping<int, UserGroup2LanguageDto>>();
+        }
 
         // map groups
 
