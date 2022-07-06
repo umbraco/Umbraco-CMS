@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -141,7 +141,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </returns>
     public IDictionaryItem? GetDictionaryItemById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(id);
 
@@ -160,7 +160,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </returns>
     public IDictionaryItem? GetDictionaryItemById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(id);
 
@@ -179,7 +179,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </returns>
     public IDictionaryItem? GetDictionaryItemByKey(string key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(key);
 
@@ -189,20 +189,20 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
-        /// <summary>
-        /// Gets a list of children for a <see cref="IDictionaryItem"/>
-        /// </summary>
-        /// <param name="parentId">Id of the parent</param>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+    /// <summary>
+    /// Gets a list of children for a <see cref="IDictionaryItem"/>
+    /// </summary>
+    /// <param name="parentId">Id of the parent</param>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
+            var query = Query<IDictionaryItem>().Where(x => x.ParentId == parentId);
+            var items = _dictionaryRepository.Get(query).ToArray();
+            //ensure the lazy Language callback is assigned
+            foreach (var item in items)
+                EnsureDictionaryItemLanguageCallback(item);
 
             return items;
         }
@@ -215,7 +215,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
     public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem[] items = _dictionaryRepository.GetDictionaryItemDescendants(parentId).ToArray();
 
@@ -229,22 +229,26 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         }
     }
 
-        /// <summary>
-        /// Gets the root/top <see cref="IDictionaryItem"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-        public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+    /// <summary>
+    /// Gets the root/top <see cref="IDictionaryItem"/> objects
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+    public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
-            using (var scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
+            var items = _dictionaryRepository.Get(query).ToArray();
+
+            //ensure the lazy Language callback is assigned
+            foreach (var item in items)
             {
-                var query = Query<IDictionaryItem>().Where(x => x.ParentId == null);
-                var items = _dictionaryRepository.Get(query).ToArray();
-                //ensure the lazy Language callback is assigned
-                foreach (var item in items)
-                    EnsureDictionaryItemLanguageCallback(item);
-                return items;
+                EnsureDictionaryItemLanguageCallback(item);
             }
+
+            return items;
         }
+    }
 
     /// <summary>
     ///     Checks if a <see cref="IDictionaryItem" /> with given key exists
@@ -253,7 +257,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>True if a <see cref="IDictionaryItem" /> exists, otherwise false</returns>
     public bool DictionaryItemExists(string key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IDictionaryItem? item = _dictionaryRepository.Get(key);
             return item != null;
@@ -328,7 +332,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// </returns>
     public ILanguage? GetLanguageById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _languageRepository.Get(id);
         }
@@ -348,7 +352,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
             return null;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _languageRepository.GetByIsoCode(isoCode);
         }
@@ -396,7 +400,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <returns>An enumerable list of <see cref="ILanguage" /> objects</returns>
     public IEnumerable<ILanguage> GetAllLanguages()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _languageRepository.GetMany();
         }
@@ -482,7 +486,7 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
     public Dictionary<string, Guid> GetDictionaryItemKeyMap()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _dictionaryRepository.GetDictionaryItemKeyMap();
         }

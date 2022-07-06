@@ -17,13 +17,17 @@ public class NodeCountService : INodeCountService
 
     public int GetNodeCount(Guid nodeType)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _nodeCountRepository.GetNodeCount(nodeType);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _nodeCountRepository.GetNodeCount(nodeType);
+        }
     }
 
     public int GetMediaCount()
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _nodeCountRepository.GetMediaCount();
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _nodeCountRepository.GetMediaCount();
+        }
     }
 }

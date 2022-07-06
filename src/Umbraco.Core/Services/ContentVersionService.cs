@@ -57,36 +57,37 @@ internal class ContentVersionService : IContentVersionService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            var languageId = _languageRepository.GetIdByIsoCode(culture, true);
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
-        }
+        using ICoreScope? scope = _scopeProvider.CreateCoreScope();
+        var languageId = _languageRepository.GetIdByIsoCode(culture, true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var items = _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
+        scope.Complete();
+
+        return items;
     }
 
     /// <inheritdoc />
     public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
 
             ContentVersionMeta? version = _documentVersionRepository.Get(versionId);
 
-            if (version is null)
+            if (version is not null)
             {
-                return;
+                AuditType auditType = preventCleanup
+                    ? AuditType.ContentVersionPreventCleanup
+                    : AuditType.ContentVersionEnableCleanup;
+
+                var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
+
+                Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
             }
 
-            AuditType auditType = preventCleanup
-                ? AuditType.ContentVersionPreventCleanup
-                : AuditType.ContentVersionEnableCleanup;
-
-            var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
-
-            Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
+            scope.Complete();
         }
     }
 
@@ -120,13 +121,15 @@ internal class ContentVersionService : IContentVersionService
          *
          * tl;dr lots of scopes to enable other connections to use the DB whilst we work.
          */
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             IReadOnlyCollection<ContentVersionMeta>? allHistoricVersions =
                 _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
             if (allHistoricVersions is null)
             {
+                scope.Complete();
+
                 return Array.Empty<ContentVersionMeta>();
             }
 
@@ -149,6 +152,8 @@ internal class ContentVersionService : IContentVersionService
 
                 versionsToDelete.Add(version);
             }
+
+            scope.Complete();
         }
 
         if (!versionsToDelete.Any())
@@ -161,7 +166,7 @@ internal class ContentVersionService : IContentVersionService
 
         foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var groupEnumerated = group.ToList();
@@ -174,12 +179,16 @@ internal class ContentVersionService : IContentVersionService
                     scope.Notifications.Publish(
                         new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
                 }
+
+                scope.Complete();
             }
         }
 
-        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
+
+            scope.Complete();
         }
 
         return versionsToDelete;

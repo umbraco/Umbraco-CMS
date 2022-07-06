@@ -277,34 +277,34 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
             => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
             {
-                using ICoreScope scope =
-                    examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
-
-                // for content we have a different builder for published vs unpublished
-                // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
-                var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                using (examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true))
                 {
-                    [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                    [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
-                };
-
-                // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
-                foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
-                             .OfType<IUmbracoContentIndex>()
-                             //filter the indexers
-                             .Where(x => isPublished || !x.PublishedValuesOnly)
-                             .Where(x => x.EnableDefaultEventHandler))
-                {
-                    if (cancellationToken.IsCancellationRequested)
+                    // for content we have a different builder for published vs unpublished
+                    // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
+                    var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                     {
-                        return Task.CompletedTask;
+                        [true] = new(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                        [false] = new(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
+                    };
+
+                    // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                                 .OfType<IUmbracoContentIndex>()
+                                 //filter the indexers
+                                 .Where(x => isPublished || !x.PublishedValuesOnly)
+                                 .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return Task.CompletedTask;
+                        }
+
+                        List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
+                        index.IndexItems(valueSet);
                     }
 
-                    List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
-                    index.IndexItems(valueSet);
+                    return Task.CompletedTask;
                 }
-
-                return Task.CompletedTask;
             });
     }
 
@@ -335,22 +335,22 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             // perform the ValueSet lookup on a background thread
             backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
             {
-                using ICoreScope scope =
-                    examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
-
-                var valueSet = examineUmbracoIndexingHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
-
-                // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
-                foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
-                             .OfType<IUmbracoContentIndex>()
-                             //filter the indexers
-                             .Where(x => isPublished || !x.PublishedValuesOnly)
-                             .Where(x => x.EnableDefaultEventHandler))
+                using (examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true))
                 {
-                    index.IndexItems(valueSet);
-                }
+                    var valueSet = examineUmbracoIndexingHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                return Task.CompletedTask;
+                    // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                                 .OfType<IUmbracoContentIndex>()
+                                 //filter the indexers
+                                 .Where(x => isPublished || !x.PublishedValuesOnly)
+                                 .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        index.IndexItems(valueSet);
+                    }
+
+                    return Task.CompletedTask;
+                }
             });
     }
 
@@ -378,21 +378,21 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             // perform the ValueSet lookup on a background thread
             backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
             {
-                using ICoreScope scope =
-                    examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
-
-                var valueSet = examineUmbracoIndexingHandler._memberValueSetBuilder.GetValueSets(member).ToList();
-
-                // only process for IUmbracoMemberIndex (not content indexes)
-                foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
-                             .OfType<IUmbracoMemberIndex>()
-                             //filter the indexers
-                             .Where(x => x.EnableDefaultEventHandler))
+                using (examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true))
                 {
-                    index.IndexItems(valueSet);
-                }
+                    var valueSet = examineUmbracoIndexingHandler._memberValueSetBuilder.GetValueSets(member).ToList();
 
-                return Task.CompletedTask;
+                    // only process for IUmbracoMemberIndex (not content indexes)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                                 .OfType<IUmbracoMemberIndex>()
+                                 //filter the indexers
+                                 .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        index.IndexItems(valueSet);
+                    }
+
+                    return Task.CompletedTask;
+                }
             });
     }
 

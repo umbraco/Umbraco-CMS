@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Scoping;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 using PropertyCollection = Umbraco.Cms.Core.Models.PropertyCollection;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping;
@@ -24,8 +23,8 @@ public class MappingTests
     [SetUp]
     public void MockScopeProvider()
     {
-        var scopeMock = new Mock<IScopeProvider>();
-        scopeMock.Setup(x => x.CreateScope(
+        var scopeMock = new Mock<ICoreScopeProvider>();
+        scopeMock.Setup(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
                 It.IsAny<IEventDispatcher>(),
@@ -33,12 +32,12 @@ public class MappingTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>);
+            .Returns(Mock.Of<ICoreScope>);
 
         _scopeProvider = scopeMock.Object;
     }
 
-    private IScopeProvider _scopeProvider;
+    private ICoreScopeProvider _scopeProvider;
 
     [Test]
     public void SimpleMap()

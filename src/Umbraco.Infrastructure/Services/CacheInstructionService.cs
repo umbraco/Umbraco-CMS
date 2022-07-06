@@ -76,44 +76,51 @@ namespace Umbraco.Cms
             /// <inheritdoc />
             public bool IsColdBootRequired(int lastId)
             {
-                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-                if (lastId <= 0)
+                using (ScopeProvider.CreateCoreScope(autoComplete: true))
                 {
-                    var count = _cacheInstructionRepository.CountAll();
-
-                    // If there are instructions but we haven't synced, then a cold boot is necessary.
-                    if (count > 0)
+                    if (lastId <= 0)
                     {
-                        return true;
-                    }
-                }
-                else
-                {
-                    // If the last synced instruction is not found in the db, then a cold boot is necessary.
-                    if (!_cacheInstructionRepository.Exists(lastId))
-                    {
-                        return true;
-                    }
-                }
+                        var count = _cacheInstructionRepository.CountAll();
 
-                return false;
+                        // If there are instructions but we haven't synced, then a cold boot is necessary.
+                        if (count > 0)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        // If the last synced instruction is not found in the db, then a cold boot is necessary.
+                        if (!_cacheInstructionRepository.Exists(lastId))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
             }
 
             /// <inheritdoc />
             public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
             {
-                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-                // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                // row so we will sum these numbers to get the actual count.
-                count = _cacheInstructionRepository.CountPendingInstructions(lastId);
-                return count > limit;
+                using (ScopeProvider.CreateCoreScope(autoComplete: true))
+                {
+                    // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    // row so we will sum these numbers to get the actual count.
+                    count = _cacheInstructionRepository.CountPendingInstructions(lastId);
+
+                    return count > limit;
+                }
             }
 
             /// <inheritdoc />
             public int GetMaxInstructionId()
             {
-                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-                return _cacheInstructionRepository.GetMaxId();
+                using (ScopeProvider.CreateCoreScope(autoComplete: true))
+                {
+                    return _cacheInstructionRepository.GetMaxId();
+                }
             }
 
             /// <inheritdoc />

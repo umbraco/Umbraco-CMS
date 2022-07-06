@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -10,13 +11,14 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -31,12 +33,22 @@ public class MemberManagerTests
     private Mock<IOptions<IdentityOptions>> _mockIdentityOptions;
     private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
     private Mock<IMemberService> _mockMemberService;
-    private Mock<IServiceProvider> _mockServiceProviders;
+    private Mock<IServiceProvider> _mockServiceProvider;
     private Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
     public MemberManager CreateSut()
     {
-        var scopeProvider = new Mock<IScopeProvider>().Object;
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider.Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<IScopedNotificationPublisher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(Mock.Of<ICoreScope>);
+
         _mockMemberService = new Mock<IMemberService>();
 
         var mapDefinitions = new List<IMapDefinition>
@@ -50,8 +62,8 @@ public class MemberManagerTests
 
         _fakeMemberStore = new MemberUserStore(
             _mockMemberService.Object,
-            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
-            scopeProvider,
+            new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), mockScopeProvider.Object),
+            mockScopeProvider.Object,
             new IdentityErrorDescriber(),
             Mock.Of<IPublishedSnapshotAccessor>(),
             Mock.Of<IExternalLoginWithKeyService>(),
@@ -66,10 +78,9 @@ public class MemberManagerTests
         var validator = new Mock<IUserValidator<MemberIdentityUser>>();
         userValidators.Add(validator.Object);
 
-        _mockServiceProviders = new Mock<IServiceProvider>();
+        _mockServiceProvider = new Mock<IServiceProvider>();
         _mockPasswordConfiguration = new Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>>();
-        _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
-            new MemberPasswordConfigurationSettings());
+        _mockPasswordConfiguration.Setup(x => x.Value).Returns(() => new MemberPasswordConfigurationSettings());
 
         var pwdValidators = new List<PasswordValidator<MemberIdentityUser>> { new() };
 
@@ -81,7 +92,7 @@ public class MemberManagerTests
             userValidators,
             pwdValidators,
             new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
-            _mockServiceProviders.Object,
+            _mockServiceProvider.Object,
             new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
             _mockPasswordConfiguration.Object,
             Mock.Of<IPublicAccessService>(),

@@ -54,7 +54,7 @@ public class ExternalLoginService : RepositoryService, IExternalLoginService, IE
 
     public IEnumerable<IIdentityUserLogin> Find(string loginProvider, string providerKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _externalLoginRepository.Get(Query<IIdentityUserLogin>()
                     .Where(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider))
@@ -65,7 +65,7 @@ public class ExternalLoginService : RepositoryService, IExternalLoginService, IE
     /// <inheritdoc />
     public IEnumerable<IIdentityUserLogin> GetExternalLogins(Guid userOrMemberKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.Key == userOrMemberKey))
                 .ToList();
@@ -75,7 +75,7 @@ public class ExternalLoginService : RepositoryService, IExternalLoginService, IE
     /// <inheritdoc />
     public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(Guid userOrMemberKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.Key == userOrMemberKey))
                 .ToList();

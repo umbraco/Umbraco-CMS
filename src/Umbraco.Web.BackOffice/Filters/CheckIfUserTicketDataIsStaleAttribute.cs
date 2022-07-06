@@ -95,7 +95,7 @@ internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribut
 
         private async Task CheckStaleData(ActionExecutingContext actionContext)
         {
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (_scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                 {

@@ -77,7 +77,7 @@ public class PackageMigrationRunner
         // all executed in a single transaction. If one package migration fails,
         // none of them will be committed. This is intended behavior so we can
         // ensure when we publish the success notification that is is done when they all succeed.
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             foreach (var migrationName in plansToRun)
             {
@@ -96,6 +96,8 @@ public class PackageMigrationRunner
                     results.Add(upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService));
                 }
             }
+
+            scope.Complete();
         }
 
         var executedPlansNotification = new MigrationPlansExecutedNotification(results);

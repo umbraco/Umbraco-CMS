@@ -73,7 +73,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
 
     public string GetDefault()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(ReadLockIds);
 
@@ -81,6 +81,7 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
             {
                 if (e.MoveNext() == false)
                 {
+                    scope.Complete();
                     throw new InvalidOperationException("No member types could be resolved");
                 }
 
@@ -89,6 +90,8 @@ public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, I
                 while (e.Current.Alias.InvariantEquals("Member") == false && (current = e.MoveNext()))
                 {
                 }
+
+                scope.Complete();
 
                 return current ? e.Current.Alias : first;
             }

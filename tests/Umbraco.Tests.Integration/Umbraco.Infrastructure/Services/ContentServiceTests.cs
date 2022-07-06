@@ -132,7 +132,7 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
     [Test]
     public void Create_Content_From_Blueprint()
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (var scope = ScopeProvider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
@@ -150,6 +150,8 @@ public class ContentServiceTests : UmbracoIntegrationTestWithContent
 
             var fromBlueprint = ContentService.CreateContentFromBlueprint(blueprint, "hello world");
             ContentService.Save(fromBlueprint);
+
+            scope.Complete();
 
             Assert.IsTrue(fromBlueprint.HasIdentity);
             Assert.AreEqual("blueprint 1", fromBlueprint.Properties["title"].GetValue());

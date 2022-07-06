@@ -19,7 +19,9 @@ public class DataTypeUsageService : IDataTypeUsageService
     /// <inheritdoc/>
     public bool HasSavedValues(int dataTypeId)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _dataTypeUsageRepository.HasSavedValues(dataTypeId);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _dataTypeUsageRepository.HasSavedValues(dataTypeId);
+        }
     }
 }

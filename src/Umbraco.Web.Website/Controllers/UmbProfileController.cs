@@ -102,7 +102,7 @@ public class UmbProfileController : SurfaceController
 
     private async Task<IdentityResult> UpdateMemberAsync(ProfileModel model, MemberIdentityUser currentMember)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         currentMember.Email = model.Email;
         currentMember.Name = model.Name;
@@ -139,6 +139,8 @@ public class UmbProfileController : SurfaceController
         }
 
         _memberService.Save(member);
+
+        scope.Complete();
 
         return saveResult;
     }

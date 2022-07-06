@@ -442,7 +442,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual UmbracoObjectTypes GetObjectType(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetObjectType(id);
         }
@@ -451,7 +451,7 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public virtual UmbracoObjectTypes GetObjectType(Guid key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetObjectType(key);
         }
@@ -507,10 +507,11 @@ public class EntityService : RepositoryService, IEntityService
     /// <inheritdoc />
     public int ReserveId(Guid key)
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _entityRepository.ReserveId(key);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        var id = _entityRepository.ReserveId(key);
+        scope.Complete();
+
+        return id;
     }
 
     // gets the object type, throws if not supported

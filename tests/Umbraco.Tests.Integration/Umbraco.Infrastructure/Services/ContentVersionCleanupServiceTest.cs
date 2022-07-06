@@ -74,7 +74,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
     private Report GetReport()
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (ScopeProvider.CreateScope(autoComplete: true))
         {
             // SQL CE is fun!
             var contentVersions =
@@ -96,7 +96,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
     private void InsertCleanupPolicy(IContentType contentType, int daysToKeepAll, int daysToRollupAll,
         bool preventCleanup = false)
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (var scope = ScopeProvider.CreateScope())
         {
             var entity = new ContentVersionCleanupPolicyDto
             {
@@ -108,6 +108,8 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
             };
 
             ScopeAccessor.AmbientScope.Database.Insert(entity);
+
+            scope.Complete();
         }
     }
 

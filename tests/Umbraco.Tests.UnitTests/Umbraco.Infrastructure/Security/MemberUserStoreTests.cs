@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
-using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security;
 
@@ -27,10 +26,9 @@ public class MemberUserStoreTests
     public MemberUserStore CreateSut()
     {
         _mockMemberService = new Mock<IMemberService>();
-        var mockScope = new Mock<IScope>();
-        var mockScopeProvider = new Mock<IScopeProvider>();
-        mockScopeProvider
-            .Setup(x => x.CreateScope(
+
+        var mockScopeProvider = new Mock<ICoreScopeProvider>();
+        mockScopeProvider.Setup(x => x.CreateCoreScope(
                 It.IsAny<IsolationLevel>(),
                 It.IsAny<RepositoryCacheMode>(),
                 It.IsAny<IEventDispatcher>(),
@@ -38,7 +36,7 @@ public class MemberUserStoreTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(mockScope.Object);
+            .Returns(Mock.Of<ICoreScope>());
 
         return new MemberUserStore(
             _mockMemberService.Object,

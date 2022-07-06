@@ -138,24 +138,33 @@ public class NuCacheContentService : RepositoryService, INuCacheContentService
     /// <inheritdoc />
     public bool VerifyContentDbCache()
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
-        return _repository.VerifyContentDbCache();
+        var verify = _repository.VerifyContentDbCache();
+        scope.Complete();
+
+        return verify;
     }
 
     /// <inheritdoc />
     public bool VerifyMediaDbCache()
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.MediaTree);
-        return _repository.VerifyMediaDbCache();
+        var verify = _repository.VerifyMediaDbCache();
+        scope.Complete();
+
+        return verify;
     }
 
     /// <inheritdoc />
     public bool VerifyMemberDbCache()
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.MemberTree);
-        return _repository.VerifyMemberDbCache();
+        var verify = _repository.VerifyMemberDbCache();
+        scope.Complete();
+
+        return verify;
     }
 }

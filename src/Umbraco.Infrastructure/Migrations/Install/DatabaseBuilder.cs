@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         internal bool IsUmbracoInstalled()
         {
-            using (var scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (_scopeProvider.CreateCoreScope(autoComplete: true))
             {
                 return _scopeAccessor.AmbientScope?.Database.IsUmbracoInstalled() ?? false;
             }

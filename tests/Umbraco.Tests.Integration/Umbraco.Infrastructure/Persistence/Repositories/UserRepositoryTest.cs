@@ -407,13 +407,14 @@ public class UserRepositoryTest : UmbracoIntegrationTest
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         var user = UserBuilder.CreateUser();
-        using (var scope = provider.CreateCoreScope(autoComplete: true))
+        using (var scope = provider.CreateCoreScope())
         {
             var repository = CreateRepository(provider);
             repository.Save(user);
+            scope.Complete();
         }
 
-        using (var scope = provider.CreateCoreScope(autoComplete: true))
+        using (var scope = provider.CreateCoreScope())
         {
             var repository = CreateRepository(provider);
             var sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
@@ -430,6 +431,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             sessionId = repository.CreateLoginSession(user.Id, "1.2.3.4");
             isValid = repository.ValidateLoginSession(user.Id, sessionId);
             Assert.IsTrue(isValid);
+
+            scope.Complete();
         }
     }
 
@@ -441,7 +444,7 @@ public class UserRepositoryTest : UmbracoIntegrationTest
 
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
-        using (var scope = provider.CreateCoreScope(autoComplete: true))
+        using (var scope = provider.CreateCoreScope())
         {
             var userRepository = CreateRepository(provider);
             var userGroupRepository = CreateUserGroupRepository(provider);
@@ -477,6 +480,8 @@ public class UserRepositoryTest : UmbracoIntegrationTest
             userRepository.Save(resolved);
 
             var updatedItem = (User)userRepository.Get(user.Id);
+
+            scope.Complete();
 
             // Assert
             Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));

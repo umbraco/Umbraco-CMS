@@ -91,12 +91,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // create member
             IMember memberEntity = _memberService.CreateMember(
@@ -150,6 +151,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                         x.Value)));
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -168,20 +170,15 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
-            {
-                // TODO: should this be thrown, or an identity result?
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-            IMember? found = _memberService.GetById(asInt);
+            IMember? found = _memberService.GetById(UserIdToInt(user.Id));
             if (found != null)
             {
                 // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -214,6 +211,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 }
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -232,10 +230,13 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
+
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             IMember? found = _memberService.GetById(UserIdToInt(user.Id));
             if (found != null)
@@ -245,6 +246,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             _externalLoginService.DeleteUserLogins(user.Key);
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)

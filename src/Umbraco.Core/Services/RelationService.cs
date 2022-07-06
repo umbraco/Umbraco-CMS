@@ -29,7 +29,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IRelation? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationRepository.Get(id);
         }
@@ -38,7 +38,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IRelationType? GetRelationTypeById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationTypeRepository.Get(id);
         }
@@ -47,7 +47,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IRelationType? GetRelationTypeById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationTypeRepository.Get(id);
         }
@@ -59,7 +59,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetAllRelations(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationRepository.GetMany(ids);
         }
@@ -72,7 +72,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
             return _relationRepository.Get(query);
@@ -82,7 +82,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationTypeRepository.GetMany(ids);
         }
@@ -94,7 +94,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentId(int id, string? relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             if (relationTypeAlias.IsNullOrWhiteSpace())
             {
@@ -127,7 +127,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByChildId(int id, string? relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             if (relationTypeAlias.IsNullOrWhiteSpace())
             {
@@ -157,7 +157,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentOrChildId(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
             return _relationRepository.Get(query);
@@ -166,7 +166,7 @@ public class RelationService : RepositoryService, IRelationService
 
     public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IRelationType? relationType = GetRelationType(relationTypeAlias);
             if (relationType == null)
@@ -183,7 +183,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId &&
                                                                     x.ChildId == childId &&
@@ -196,7 +196,7 @@ public class RelationService : RepositoryService, IRelationService
     public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
     {
         List<int>? relationTypeIds;
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             // This is a silly query - but i guess it's needed in case someone has more than one relation with the same Name (not alias), odd.
             IQuery<IRelationType> query = Query<IRelationType>().Where(x => x.Name == relationTypeName);
@@ -222,7 +222,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
             return _relationRepository.Get(query);
@@ -232,7 +232,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation>? query = Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
             return _relationRepository.GetPagedRelationsByQuery(query, pageIndex, pageSize, out totalRecords, ordering);
@@ -307,7 +307,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationRepository.GetPagedParentEntitiesByChildId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
         }
@@ -316,7 +316,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _relationRepository.GetPagedChildEntitiesByParentId(id, pageIndex, pageSize, out totalChildren, entityTypes.Select(x => x.GetGuid()).ToArray());
         }
@@ -360,13 +360,14 @@ public class RelationService : RepositoryService, IRelationService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
+                 
                 return relation; // TODO: returning sth that does not exist here?!
             }
 
             _relationRepository.Save(relation);
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+            scope.Notifications.Publish(new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
             scope.Complete();
+
             return relation;
         }
     }
@@ -404,7 +405,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public bool HasRelations(IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
             return _relationRepository.Get(query).Any();
@@ -414,7 +415,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public bool IsRelated(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
             return _relationRepository.Get(query).Any();
@@ -424,7 +425,7 @@ public class RelationService : RepositoryService, IRelationService
     /// <inheritdoc />
     public bool AreRelated(int parentId, int childId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
             return _relationRepository.Get(query).Any();
@@ -460,13 +461,13 @@ public class RelationService : RepositoryService, IRelationService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
+
                 return;
             }
 
             _relationRepository.Save(relation);
+            scope.Notifications.Publish(new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
         }
     }
 
@@ -481,13 +482,13 @@ public class RelationService : RepositoryService, IRelationService
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
+
                 return;
             }
 
             _relationRepository.Save(relationsA);
+            scope.Notifications.Publish(new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
             scope.Complete();
-            scope.Notifications.Publish(
-                new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
         }
     }
 
@@ -576,7 +577,7 @@ public class RelationService : RepositoryService, IRelationService
 
     public bool AreRelated(int parentId, int childId, IRelationType relationType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelation> query = Query<IRelation>().Where(x =>
                 x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
@@ -588,7 +589,7 @@ public class RelationService : RepositoryService, IRelationService
 
     private IRelationType? GetRelationType(string relationTypeAlias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IRelationType> query = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
             return _relationTypeRepository.Get(query).FirstOrDefault();
@@ -598,7 +599,7 @@ public class RelationService : RepositoryService, IRelationService
     private IEnumerable<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
     {
         var relations = new List<IRelation>();
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             foreach (var relationTypeId in relationTypeIds)
             {
