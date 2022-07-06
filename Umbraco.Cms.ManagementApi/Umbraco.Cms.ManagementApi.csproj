@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+      <TargetFramework>net6.0</TargetFramework>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
       <WarningsAsErrors>nullable</WarningsAsErrors>
       <RootNamespace>Umbraco.Cms.ManagementApi</RootNamespace>
+      <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
