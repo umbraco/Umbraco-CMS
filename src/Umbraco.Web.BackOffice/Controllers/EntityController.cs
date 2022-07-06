@@ -204,6 +204,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return result;
             }
 
+            var culture = ClientCulture();
             var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
 
             var searchTasks = new List<Task>();
@@ -221,7 +222,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
                     if (rootNodeDisplayName is not null)
                     {
-                        searchTasks.Add(ExecuteSearchAsync(query, searchableTree, rootNodeDisplayName,result));
+                        searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName,result));
                     }
                 }
             }
@@ -232,13 +233,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private static async Task ExecuteSearchAsync(
             string query,
+            string? culture,
             KeyValuePair<string, SearchableApplicationTree> searchableTree,
             string rootNodeDisplayName,
             ConcurrentDictionary<string, TreeSearchResult> result)
         {
+            ISearchableTree searcher = searchableTree.Value.SearchableTree;
+            const int pageSize = 200;
+            IEnumerable<SearchResultEntity> results = (
+                searcher is ISearchableTreeWithCulture searcherWithCulture
+                    ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
+                    : await searcher.SearchAsync(query, pageSize, 0))
+            .WhereNotNull();
+
             var searchResult = new TreeSearchResult
             {
-                Results = (await searchableTree.Value.SearchableTree.SearchAsync(query, 200, 0)).WhereNotNull(),
+                Results = results,
                 TreeAlias = searchableTree.Key,
                 AppAlias = searchableTree.Value.AppAlias,
                 JsFormatterService = searchableTree.Value.FormatterService,
