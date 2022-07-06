@@ -18,6 +18,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Install;
 
+[Obsolete("Will be replaced with a new API controller in the new backoffice api")]
 [UmbracoApiController]
 [AngularJsonOnlyConfiguration]
 [InstallAuthorize]

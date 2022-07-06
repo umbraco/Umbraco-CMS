@@ -4,6 +4,7 @@ using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
 namespace Umbraco.Cms.Infrastructure.Install;
 
+[Obsolete("This will be replaced with an ordered collection with the new backoffice")]
 public sealed class InstallStepCollection
 {
     private readonly InstallHelper _installHelper;

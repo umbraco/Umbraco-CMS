@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Collections;
+﻿using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Core.Install;
 /// <summary>
 ///     An internal in-memory status tracker for the current installation
 /// </summary>
+[Obsolete("This will no longer be used with the new backoffice APi, instead all steps run in one go")]
 public class InstallStatusTracker
 {
     private static ConcurrentHashSet<InstallTrackingItem> _steps = new();

@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install;
 
@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Install;
 /// </summary>
 /// <seealso cref="System.Exception" />
 [Serializable]
+[Obsolete("This will no longer be used with the new backoffice, instead the endpoint will return ProblemDetails")]
 public class InstallException : Exception
 {
     /// <summary>
