@@ -17,7 +17,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("/[backoffice]/api/v{version:apiVersion}/install")]
+[Route("[backoffice]/api/v{version:apiVersion}/install")]
 public class NewInstallController : Controller
 {
     private readonly IUmbracoMapper _mapper;

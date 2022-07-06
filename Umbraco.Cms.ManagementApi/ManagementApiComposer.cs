@@ -48,10 +48,11 @@ public class ManagementApiComposer : IComposer
         // To be able to replace the route template token
         GlobalSettings? globalSettings =
             builder.Config.GetSection(Constants.Configuration.ConfigGlobal).Get<GlobalSettings>();
+        var backofficePath = globalSettings.UmbracoPath.TrimStart(Constants.CharArrays.TildeForwardSlash);
 
         services.AddControllers(options =>
         {
-            options.Conventions.Add(new UmbracoBackofficeToken("backoffice", globalSettings.UmbracoPath));
+            options.Conventions.Add(new UmbracoBackofficeToken("backoffice", backofficePath));
         });
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>

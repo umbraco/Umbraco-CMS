@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Umbraco.Extensions;
 
 namespace Umbraco.New.Cms.Web.Common.Routing;
 
@@ -15,7 +14,7 @@ public class UmbracoBackofficeToken : IApplicationModelConvention
 
     public UmbracoBackofficeToken(string tokenName, string umbracoPath)
     {
-        _umbracoPath = umbracoPath.TrimStart("~/");
+        _umbracoPath = umbracoPath;
         _tokenRegex = $@"(\[{tokenName}])(?<!\[\1(?=]))";
     }
 
