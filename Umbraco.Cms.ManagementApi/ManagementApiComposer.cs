@@ -5,12 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using NSwag.AspNetCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Extensions;
 using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi;
@@ -42,6 +46,15 @@ public class ManagementApiComposer : IComposer
             options.Version = ApiAllName;
             options.DocumentName = ApiAllName;
             options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
+        });
+
+        services.AddVersionedApiExplorer(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+            options.AddApiVersionParametersWhenVersionNeutral = true;
+            options.AssumeDefaultVersionWhenUnspecified = true;
         });
 
         // Not super happy with this, but we need to know the UmbracoPath when registering the controller
@@ -82,8 +95,25 @@ public class ManagementApiComposer : IComposer
                 },
                 applicationBuilder =>
                 {
-                    applicationBuilder.UseOpenApi();  // serve documents (same as app.UseSwagger())
-                    applicationBuilder.UseSwaggerUi3(); // Serve Swagger UI
+                    IServiceProvider provider = applicationBuilder.ApplicationServices;
+                    GlobalSettings? settings = provider.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                    IHostingEnvironment hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+                    var officePath = settings.GetBackOfficePath(hostingEnvironment);
+
+                    // serve documents (same as app.UseSwagger())
+                    applicationBuilder.UseOpenApi(config =>
+                    {
+                        config.Path = officePath + "/swagger/{documentName}/swagger.json";
+                    });
+
+                    // Serve Swagger UI
+                    applicationBuilder.UseSwaggerUi3(config =>
+                    {
+                        config.Path = officePath + "/swagger";
+                        config.SwaggerRoutes.Clear();
+                        var swaggerPath = $"{officePath}/swagger/{ApiAllName}/swagger.json";
+                        config.SwaggerRoutes.Add(new SwaggerUi3Route(ApiAllName, swaggerPath));
+                    });
                 },
                 applicationBuilder =>
                 {
