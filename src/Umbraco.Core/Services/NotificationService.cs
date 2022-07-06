@@ -163,7 +163,7 @@ public class NotificationService : INotificationService
     /// <returns></returns>
     public IEnumerable<Notification>? GetUserNotifications(IUser user)
     {
-        using (ICoreScope scope = _uowProvider.CreateCoreScope(autoComplete: true))
+        using (_uowProvider.CreateCoreScope(autoComplete: true))
         {
             return _notificationsRepository.GetUserNotifications(user);
         }
@@ -196,7 +196,7 @@ public class NotificationService : INotificationService
     /// <param name="entity"></param>
     public IEnumerable<Notification>? GetEntityNotifications(IEntity entity)
     {
-        using (ICoreScope scope = _uowProvider.CreateCoreScope(autoComplete: true))
+        using (_uowProvider.CreateCoreScope(autoComplete: true))
         {
             return _notificationsRepository.GetEntityNotifications(entity);
         }
@@ -315,7 +315,7 @@ public class NotificationService : INotificationService
 
     private IEnumerable<Notification>? GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
-        using (ICoreScope scope = _uowProvider.CreateCoreScope(autoComplete: true))
+        using (_uowProvider.CreateCoreScope(autoComplete: true))
         {
             return _notificationsRepository.GetUsersNotifications(userIds, action, nodeIds, objectType);
         }

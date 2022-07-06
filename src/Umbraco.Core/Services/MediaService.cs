@@ -56,14 +56,17 @@ namespace Umbraco.Cms.Core.Services
 
         public int Count(string? mediaTypeAlias = null)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.Count(mediaTypeAlias);
+            var count = _mediaRepository.Count(mediaTypeAlias);
+            scope.Complete();
+
+            return count;
         }
 
         public int CountNotTrashed(string? mediaTypeAlias = null)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
 
             var mediaTypeId = 0;
@@ -72,6 +75,8 @@ namespace Umbraco.Cms.Core.Services
                 IMediaType? mediaType = _mediaTypeRepository.Get(mediaTypeAlias);
                 if (mediaType == null)
                 {
+                    scope.Complete();
+
                     return 0;
                 }
 
@@ -84,23 +89,30 @@ namespace Umbraco.Cms.Core.Services
                 query = query.Where(x => x.ContentTypeId == mediaTypeId);
             }
 
-            return _mediaRepository.Count(query);
+            var count = _mediaRepository.Count(query);
+            scope.Complete();
+
+            return count;
         }
 
         public int CountChildren(int parentId, string? mediaTypeAlias = null)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                return _mediaRepository.CountChildren(parentId, mediaTypeAlias);
-            }
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.ReadLock(Constants.Locks.MediaTree);
+            var count = _mediaRepository.CountChildren(parentId, mediaTypeAlias);
+            scope.Complete();
+
+            return count;
         }
 
         public int CountDescendants(int parentId, string? mediaTypeAlias = null)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.CountDescendants(parentId, mediaTypeAlias);
+            var count = _mediaRepository.CountDescendants(parentId, mediaTypeAlias);
+            scope.Complete();
+
+            return count;
         }
 
         #endregion
@@ -346,9 +358,12 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia? GetById(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.Get(id);
+            var media = _mediaRepository.Get(id);
+            scope.Complete();
+
+            return media;
         }
 
         /// <summary>
@@ -364,9 +379,12 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<IMedia>();
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetMany(idsA);
+            var medias = _mediaRepository.GetMany(idsA);
+            scope.Complete();
+
+            return medias;
         }
 
         /// <summary>
@@ -376,9 +394,12 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia? GetById(Guid key)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.Get(key);
+            var media = _mediaRepository.Get(key);
+            scope.Complete();
+
+            return media;
         }
 
         /// <summary>
@@ -394,9 +415,12 @@ namespace Umbraco.Cms.Core.Services
                 return Enumerable.Empty<IMedia>();
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetMany(idsA);
+            var medias = _mediaRepository.GetMany(idsA);
+            scope.Complete();
+
+            return medias;
         }
 
         /// <inheritdoc />
@@ -417,9 +441,12 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("sortOrder");
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.ContentTree);
-            return _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
+            var page = _mediaRepository.GetPage(Query<IMedia>()?.Where(x => x.ContentTypeId == contentTypeId), pageIndex, pageSize, out totalRecords, filter, ordering);
+            scope.Complete();
+
+            return page;
         }
 
         /// <inheritdoc />
@@ -440,10 +467,12 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("sortOrder");
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.ContentTree);
-            return _mediaRepository.GetPage(
-                Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+            var page = _mediaRepository.GetPage(Query<IMedia>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)), pageIndex, pageSize, out totalRecords, filter, ordering);
+            scope.Complete();
+
+            return page;
         }
 
         /// <summary>
@@ -454,10 +483,13 @@ namespace Umbraco.Cms.Core.Services
         /// <remarks>Contrary to most methods, this method filters out trashed media items.</remarks>
         public IEnumerable<IMedia>? GetByLevel(int level)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
             IQuery<IMedia> query = Query<IMedia>().Where(x => x.Level == level && x.Trashed == false);
-            return _mediaRepository.Get(query);
+            var medias = _mediaRepository.Get(query);
+            scope.Complete();
+
+            return medias;
         }
 
         /// <summary>
@@ -467,9 +499,12 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An <see cref="IMedia"/> item</returns>
         public IMedia? GetVersion(int versionId)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetVersion(versionId);
+            var version = _mediaRepository.GetVersion(versionId);
+            scope.Complete();
+
+            return version;
         }
 
         /// <summary>
@@ -479,9 +514,12 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetVersions(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetAllVersions(id);
+            var versions = _mediaRepository.GetAllVersions(id);
+            scope.Complete();
+
+            return versions;
         }
 
         /// <summary>
@@ -519,9 +557,12 @@ namespace Umbraco.Cms.Core.Services
                 return new List<IMedia>();
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.GetMany(ids);
+            var ancestors = _mediaRepository.GetMany(ids);
+            scope.Complete();
+
+            return ancestors;
         }
 
         /// <inheritdoc />
@@ -542,11 +583,13 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("sortOrder");
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.ParentId == id);
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            var page = _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            scope.Complete();
+
+            return page;
         }
 
         /// <inheritdoc />
@@ -557,23 +600,33 @@ namespace Umbraco.Cms.Core.Services
                 ordering = Ordering.By("Path");
             }
 
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            IEnumerable<IMedia> descendants;
+
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
 
-            //if the id is System Root, then just get all
+            // If the id is System Root, then just get all
             if (id != Constants.System.Root)
             {
                 TreeEntityPath[] mediaPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Media, id).ToArray();
                 if (mediaPath.Length == 0)
                 {
+                    descendants = Enumerable.Empty<IMedia>();
                     totalChildren = 0;
-                    return Enumerable.Empty<IMedia>();
                 }
-
-                return GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                else
+                {
+                    descendants = GetPagedLocked(GetPagedDescendantQuery(mediaPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                }
+            }
+            else
+            {
+                descendants = GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
             }
 
-            return GetPagedLocked(GetPagedDescendantQuery(null), pageIndex, pageSize, out totalChildren, filter, ordering);
+            scope.Complete();
+
+            return descendants;
         }
 
         private IQuery<IMedia>? GetPagedDescendantQuery(string? mediaPath)
@@ -641,24 +694,30 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetRootMedia()
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
             IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == Constants.System.Root);
-            return _mediaRepository.Get(query);
+            var medias = _mediaRepository.Get(query);
+            scope.Complete();
+
+            return medias;
         }
 
         /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedMediaInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IMedia>? filter = null, Ordering? ordering = null)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
             if (ordering == null)
             {
                 ordering = Ordering.By("Path");
             }
 
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
             IQuery<IMedia>? query = Query<IMedia>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
-            return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            var page = _mediaRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            scope.Complete();
+
+            return page;
         }
 
         /// <summary>
@@ -668,10 +727,13 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>True if the media has any children otherwise False</returns>
         public bool HasChildren(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == id);
-            var count = _mediaRepository.Count(query);
-            return count > 0;
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == id);
+                var count = _mediaRepository.Count(query);
+
+                return count > 0;
+            }
         }
 
         /// <summary>
@@ -1125,9 +1187,12 @@ namespace Umbraco.Cms.Core.Services
 
         public bool RecycleBinSmells()
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
             scope.ReadLock(Constants.Locks.MediaTree);
-            return _mediaRepository.RecycleBinSmells();
+            var recycleBinSmells = _mediaRepository.RecycleBinSmells();
+            scope.Complete();
+
+            return recycleBinSmells;
         }
 
         #endregion
@@ -1195,21 +1260,21 @@ namespace Umbraco.Cms.Core.Services
 
         public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using ICoreScope scope = ScopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.MediaTree);
+
+            ContentDataIntegrityReport report = _mediaRepository.CheckDataIntegrity(options);
+
+            if (report.FixedIssues.Count > 0)
             {
-                scope.WriteLock(Constants.Locks.MediaTree);
-
-                ContentDataIntegrityReport report = _mediaRepository.CheckDataIntegrity(options);
-
-                if (report.FixedIssues.Count > 0)
-                {
-                    //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
-                    var root = new Core.Models.Media("root", -1, new MediaType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
-                    scope.Notifications.Publish(new MediaTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-                }
-
-                return report;
+                //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
+                var root = new Core.Models.Media("root", -1, new MediaType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
+                scope.Notifications.Publish(new MediaTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             }
+
+            scope.Complete();
+
+            return report;
         }
 
         #endregion

@@ -88,7 +88,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns><c>True</c> if the User exists otherwise <c>False</c></returns>
     public bool Exists(string username)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.ExistsByUserName(username);
         }
@@ -146,7 +146,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IUser? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.Get(id);
         }
@@ -244,7 +244,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IUser? GetByEmail(string email)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUser> query = Query<IUser>().Where(x => x.Email.Equals(email));
             return _userRepository.Get(query)?.FirstOrDefault();
@@ -265,7 +265,7 @@ internal class UserService : RepositoryService, IUserService
             return null;
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             try
             {
@@ -455,7 +455,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IEnumerable<IUser> FindByEmail(string emailStringToMatch, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUser> query = Query<IUser>();
 
@@ -500,7 +500,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IEnumerable<IUser> FindByUsername(string login, long pageIndex, int pageSize, out long totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUser> query = Query<IUser>();
 
@@ -543,7 +543,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns><see cref="System.int" /> with number of Users for passed in type</returns>
     public int GetCount(MemberCountType countType)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUser>? query;
 
@@ -607,7 +607,7 @@ internal class UserService : RepositoryService, IUserService
 
     public IDictionary<UserState, int> GetUserStates()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetUserStates();
         }
@@ -636,7 +636,7 @@ internal class UserService : RepositoryService, IUserService
         string[]? excludeUserGroups = null,
         IQuery<IUser>? filter = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             Expression<Func<IUser, object?>> sort;
             switch (orderBy.ToUpperInvariant())
@@ -690,7 +690,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IEnumerable<IUser> GetAll(long pageIndex, int pageSize, out long totalRecords)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Name);
         }
@@ -698,7 +698,7 @@ internal class UserService : RepositoryService, IUserService
 
     public IEnumerable<IUser> GetNextUsers(int id, int count)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetNextUsers(id, count);
         }
@@ -718,7 +718,7 @@ internal class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetAllInGroup(groupId.Value);
         }
@@ -772,7 +772,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IProfile? GetProfileByUserName(string username)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetProfile(username);
         }
@@ -787,7 +787,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IUser? GetUserById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             try
             {
@@ -817,7 +817,7 @@ internal class UserService : RepositoryService, IUserService
             return Enumerable.Empty<IUser>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userRepository.GetMany(ids);
         }
@@ -891,7 +891,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>An enumerable list of <see cref="IUserGroup" /></returns>
     public IEnumerable<IUserGroup> GetAllUserGroups(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.GetMany(ids).OrderBy(x => x.Name);
         }
@@ -904,7 +904,7 @@ internal class UserService : RepositoryService, IUserService
             return Enumerable.Empty<IUserGroup>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => aliases.SqlIn(x.Alias));
             IEnumerable<IUserGroup> contents = _userGroupRepository.Get(query);
@@ -926,7 +926,7 @@ internal class UserService : RepositoryService, IUserService
             throw new ArgumentException("Value cannot be null or whitespace.", "alias");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<IUserGroup> query = Query<IUserGroup>().Where(x => x.Alias == alias);
             IEnumerable<IUserGroup> contents = _userGroupRepository.Get(query);
@@ -943,7 +943,7 @@ internal class UserService : RepositoryService, IUserService
     /// </returns>
     public IUserGroup? GetUserGroupById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.Get(id);
         }
@@ -1075,7 +1075,7 @@ internal class UserService : RepositoryService, IUserService
     /// <returns>An enumerable list of <see cref="EntityPermission" /></returns>
     public EntityPermissionCollection GetPermissions(IUser? user, params int[] nodeIds)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.GetPermissions(user?.Groups.ToArray(), true, nodeIds);
         }
@@ -1098,7 +1098,7 @@ internal class UserService : RepositoryService, IUserService
             throw new ArgumentNullException(nameof(groups));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.GetPermissions(
                 groups.WhereNotNull().Select(x => x.ToReadOnlyGroup()).ToArray(),
@@ -1124,7 +1124,7 @@ internal class UserService : RepositoryService, IUserService
             throw new ArgumentNullException(nameof(groups));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _userGroupRepository.GetPermissions(groups, fallbackToDefaultPermissions, nodeIds);
         }

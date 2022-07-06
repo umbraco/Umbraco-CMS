@@ -12,12 +12,12 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
     private readonly IMemberGroupRepository _memberGroupRepository;
 
     public MemberGroupService(ICoreScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberGroupRepository memberGroupRepository)
-        : base(provider, loggerFactory, eventMessagesFactory) =>
-        _memberGroupRepository = memberGroupRepository;
+        : base(provider, loggerFactory, eventMessagesFactory)
+        => _memberGroupRepository = memberGroupRepository;
 
     public IEnumerable<IMemberGroup> GetAll()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _memberGroupRepository.GetMany();
         }
@@ -30,7 +30,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             return new IMemberGroup[0];
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _memberGroupRepository.GetMany(ids.ToArray());
         }
@@ -38,7 +38,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
     public IMemberGroup? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _memberGroupRepository.Get(id);
         }
@@ -46,7 +46,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
     public IMemberGroup? GetById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _memberGroupRepository.Get(id);
         }
@@ -54,7 +54,7 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
 
     public IMemberGroup? GetByName(string? name)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _memberGroupRepository.GetByName(name);
         }
@@ -79,10 +79,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             }
 
             _memberGroupRepository.Save(memberGroup);
-            scope.Complete();
 
-            scope.Notifications.Publish(
-                new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
+            scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
+            scope.Complete();
         }
     }
 
@@ -100,10 +99,9 @@ internal class MemberGroupService : RepositoryService, IMemberGroupService
             }
 
             _memberGroupRepository.Delete(memberGroup);
-            scope.Complete();
 
-            scope.Notifications.Publish(
-                new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
+            scope.Notifications.Publish(new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
+            scope.Complete();
         }
     }
 }

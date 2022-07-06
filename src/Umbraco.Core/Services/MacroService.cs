@@ -39,7 +39,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
             return GetAll().FirstOrDefault(x => x.Alias == alias);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return macroWithAliasRepository.GetByAlias(alias);
         }
@@ -49,7 +49,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
     public IEnumerable<IMacro> GetAll(params int[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _macroRepository.GetMany(ids);
         }
@@ -57,7 +57,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
     public IEnumerable<IMacro> GetAll(params Guid[] ids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _macroRepository.GetMany(ids);
         }
@@ -71,7 +71,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
             return GetAll().Where(x => hashset.Contains(x.Alias));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return macroWithAliasRepository.GetAllByAlias(aliases);
         }
@@ -79,7 +79,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
     public IMacro? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _macroRepository.Get(id);
         }
@@ -87,7 +87,7 @@ internal class MacroService : RepositoryService, IMacroWithAliasService
 
     public IMacro? GetById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _macroRepository.Get(id);
         }

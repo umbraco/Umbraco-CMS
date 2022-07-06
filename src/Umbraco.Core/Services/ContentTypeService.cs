@@ -42,12 +42,14 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <remarks>Beware! Works across content, media and member types.</remarks>
     public IEnumerable<string> GetAllPropertyTypeAliases()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // that one is special because it works across content, media and member types
-            scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-            return Repository.GetAllPropertyTypeAliases();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+        var aliases = Repository.GetAllPropertyTypeAliases();
+        scope.Complete();
+
+        return aliases;
     }
 
     /// <summary>
@@ -58,12 +60,14 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <remarks>Beware! Works across content, media and member types.</remarks>
     public IEnumerable<string> GetAllContentTypeAliases(params Guid[] guids)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // that one is special because it works across content, media and member types
-            scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-            return Repository.GetAllContentTypeAliases(guids);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+        var aliases = Repository.GetAllContentTypeAliases(guids);
+        scope.Complete();
+
+        return aliases;
     }
 
     /// <summary>
@@ -74,23 +78,23 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <remarks>Beware! Works across content, media and member types.</remarks>
     public IEnumerable<int> GetAllContentTypeIds(string[] aliases)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            // that one is special because it works across content, media and member types
-            scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
-            return Repository.GetAllContentTypeIds(aliases);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // that one is special because it works across content, media and member types
+        scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+        var ids = Repository.GetAllContentTypeIds(aliases);
+        scope.Complete();
+
+        return ids;
     }
 
     protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var typeIdsA = typeIds.ToArray();
-            ContentService.DeleteOfTypes(typeIdsA);
-            ContentService.DeleteBlueprintsOfTypes(typeIdsA);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        var typeIdsA = typeIds.ToArray();
+        ContentService.DeleteOfTypes(typeIdsA);
+        ContentService.DeleteBlueprintsOfTypes(typeIdsA);
+        scope.Complete();
     }
 
     #region Notifications

@@ -18,7 +18,7 @@ internal class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public string? GetValue(string key)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _repository.Get(key)?.Value;
         }
@@ -27,7 +27,7 @@ internal class KeyValueService : IKeyValueService
     /// <inheritdoc />
     public IReadOnlyDictionary<string, string?>? FindByKeyPrefix(string keyPrefix)
     {
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _repository.FindByKeyPrefix(keyPrefix);
         }

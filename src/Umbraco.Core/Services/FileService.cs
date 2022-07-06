@@ -65,7 +65,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _stylesheetRepository.GetMany(paths);
         }
@@ -77,7 +77,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public IStylesheet? GetStylesheet(string? path)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _stylesheetRepository.Get(path);
         }
@@ -165,7 +165,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public Stream GetStylesheetFileContentStream(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _stylesheetRepository.GetFileContentStream(filepath);
         }
@@ -184,7 +184,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public long GetStylesheetFileSize(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _stylesheetRepository.GetFileSize(filepath);
         }
@@ -197,7 +197,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public IEnumerable<IScript> GetScripts(params string[] names)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _scriptRepository.GetMany(names);
         }
@@ -206,7 +206,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public IScript? GetScript(string? name)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _scriptRepository.Get(name);
         }
@@ -297,7 +297,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public Stream GetScriptFileContentStream(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _scriptRepository.GetFileContentStream(filepath);
         }
@@ -316,7 +316,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public long GetScriptFileSize(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _scriptRepository.GetFileSize(filepath);
         }
@@ -435,7 +435,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     public IEnumerable<ITemplate> GetTemplates(params string[] aliases)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.GetAll(aliases).OrderBy(x => x.Name);
         }
@@ -447,7 +447,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>An enumerable list of <see cref="ITemplate" /> objects</returns>
     public IEnumerable<ITemplate> GetTemplates(int masterTemplateId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.GetChildren(masterTemplateId).OrderBy(x => x.Name);
         }
@@ -460,7 +460,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the alias, or null.</returns>
     public ITemplate? GetTemplate(string? alias)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.Get(alias);
         }
@@ -473,7 +473,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     public ITemplate? GetTemplate(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.Get(id);
         }
@@ -486,7 +486,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns>The <see cref="ITemplate" /> object matching the identifier, or null.</returns>
     public ITemplate? GetTemplate(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             IQuery<ITemplate>? query = Query<ITemplate>().Where(x => x.Key == id);
             return _templateRepository.Get(query)?.SingleOrDefault();
@@ -500,7 +500,7 @@ public class FileService : RepositoryService, IFileService
     /// <returns></returns>
     public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.GetDescendants(masterTemplateId);
         }
@@ -612,7 +612,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public Stream GetTemplateFileContentStream(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.GetFileContentStream(filepath);
         }
@@ -651,7 +651,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public long GetTemplateFileSize(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _templateRepository.GetFileSize(filepath);
         }
@@ -700,7 +700,7 @@ public class FileService : RepositoryService, IFileService
 
     public IEnumerable<IPartialView> GetPartialViews(params string[] names)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.GetMany(names);
         }
@@ -708,7 +708,7 @@ public class FileService : RepositoryService, IFileService
 
     public IPartialView? GetPartialView(string path)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.Get(path);
         }
@@ -716,7 +716,7 @@ public class FileService : RepositoryService, IFileService
 
     public IPartialView? GetPartialViewMacro(string path)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewMacroRepository.Get(path);
         }
@@ -915,7 +915,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public Stream GetPartialViewFileContentStream(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.GetFileContentStream(filepath);
         }
@@ -947,7 +947,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public long GetPartialViewFileSize(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewRepository.GetFileSize(filepath);
         }
@@ -956,7 +956,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public Stream GetPartialViewMacroFileContentStream(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewMacroRepository.GetFileContentStream(filepath);
         }
@@ -975,7 +975,7 @@ public class FileService : RepositoryService, IFileService
     /// <inheritdoc />
     public long GetPartialViewMacroFileSize(string filepath)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _partialViewMacroRepository.GetFileSize(filepath);
         }

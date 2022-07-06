@@ -19,7 +19,9 @@ public class PropertyTypeUsageService : IPropertyTypeUsageService
     /// <inheritdoc/>
     public bool HasSavedPropertyValues(string propertyTypeAlias)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return _propertyTypeUsageRepository.HasSavedPropertyValues(propertyTypeAlias);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _propertyTypeUsageRepository.HasSavedPropertyValues(propertyTypeAlias);
+        }
     }
 }

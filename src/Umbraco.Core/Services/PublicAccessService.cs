@@ -27,7 +27,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
     /// <returns></returns>
     public IEnumerable<PublicAccessEntry> GetAll()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _publicAccessRepository.GetMany();
         }
@@ -61,7 +61,7 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
         // start with the deepest id
         ids.Reverse();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             // This will retrieve from cache!
             var entries = _publicAccessRepository.GetMany().ToList();

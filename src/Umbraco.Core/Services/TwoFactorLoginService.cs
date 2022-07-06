@@ -124,9 +124,11 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
     /// <inheritdoc />
     public async Task<string?> GetSecretForUserAndProviderAsync(Guid userOrMemberKey, string providerName)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
-            .FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
+                .FirstOrDefault(x => x.ProviderName == providerName)?.Secret;
+        }
     }
 
     /// <inheritdoc />
@@ -192,11 +194,13 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
 
     private async Task<IEnumerable<string>> GetEnabledProviderNamesAsync(Guid userOrMemberKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
-            .Select(x => x.ProviderName).ToArray();
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var providersOnUser = (await _twoFactorLoginRepository.GetByUserOrMemberKeyAsync(userOrMemberKey))
+                .Select(x => x.ProviderName).ToArray();
 
-        return providersOnUser.Where(IsKnownProviderName);
+            return providersOnUser.Where(IsKnownProviderName);
+        }
     }
 
     /// <summary>

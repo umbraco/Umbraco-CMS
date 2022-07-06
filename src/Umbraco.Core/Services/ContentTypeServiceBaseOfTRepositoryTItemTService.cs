@@ -77,10 +77,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     {
         try
         {
-            using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = ScopeProvider.CreateCoreScope())
             {
                 scope.ReadLock(ReadLockIds);
                 ValidateLocked(compo!);
+                scope.Complete();
             }
 
             return Attempt<string[]?>.Succeed();
@@ -288,30 +289,42 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public TItem? Get(int id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.Get(id);
+        var item = Repository.Get(id);
+        scope.Complete();
+
+        return item;
     }
 
     public TItem? Get(string alias)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.Get(alias);
+        var item = Repository.Get(alias);
+        scope.Complete();
+
+        return item;
     }
 
     public TItem? Get(Guid id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.Get(id);
+        var item = Repository.Get(id);
+        scope.Complete();
+
+        return item;
     }
 
     public IEnumerable<TItem> GetAll(params int[] ids)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.GetMany(ids);
+        var items = Repository.GetMany(ids);
+        scope.Complete();
+
+        return items;
     }
 
     public IEnumerable<TItem> GetAll(IEnumerable<Guid>? ids)
@@ -321,59 +334,78 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Enumerable.Empty<TItem>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            return Repository.GetMany(ids.ToArray());
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
+        var items = Repository.GetMany(ids.ToArray());
+        scope.Complete();
+
+        return items;
     }
 
     public IEnumerable<TItem> GetChildren(int id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == id);
-        return Repository.Get(query);
+        var children = Repository.Get(query);
+        scope.Complete();
+
+        return children;
     }
 
     public IEnumerable<TItem> GetChildren(Guid id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
+
+        IEnumerable<TItem> items;
         TItem? found = Get(id);
         if (found == null)
         {
-            return Enumerable.Empty<TItem>();
+            items = Enumerable.Empty<TItem>();
+        }
+        else
+        {
+            IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == found.Id);
+            items = Repository.Get(query);
         }
 
-        IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == found.Id);
-        return Repository.Get(query);
+        scope.Complete();
+
+        return items;
     }
 
     public bool HasChildren(int id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
         IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == id);
-        var count = Repository.Count(query);
-        return count > 0;
+        var hasChildren = Repository.Count(query) > 0;
+        scope.Complete();
+
+        return hasChildren;
     }
 
     public bool HasChildren(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(ReadLockIds);
-            TItem? found = Get(id);
-            if (found == null)
-            {
-                return false;
-            }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(ReadLockIds);
 
-            IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == found.Id);
-            var count = Repository.Count(query);
-            return count > 0;
+        bool hasChildren;
+        TItem? found = Get(id);
+        if (found == null)
+        {
+            hasChildren = false;
         }
+        else
+        {
+            IQuery<TItem> query = Query<TItem>().Where(x => x.ParentId == found.Id);
+            hasChildren = Repository.Count(query) > 0;
+        }
+
+        scope.Complete();
+
+        return hasChildren;
     }
 
     /// <summary>
@@ -383,21 +415,25 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     /// <returns></returns>
     public bool HasContainerInPath(string contentPath)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        // can use same repo for both content and media
-        return Repository.HasContainerInPath(contentPath);
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            // can use same repo for both content and media
+            return Repository.HasContainerInPath(contentPath);
+        }
     }
 
     public bool HasContainerInPath(params int[] ids)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        // can use same repo for both content and media
-        return Repository.HasContainerInPath(ids);
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            // can use same repo for both content and media
+            return Repository.HasContainerInPath(ids);
+        }
     }
 
     public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
 
         var descendants = new List<TItem>();
@@ -429,6 +465,8 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
         }
 
+        scope.Complete();
+
         return descendants.ToArray();
     }
 
@@ -445,16 +483,22 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public int Count()
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.Count(Query<TItem>());
+        var count = Repository.Count(Query<TItem>());
+        scope.Complete();
+
+        return count;
     }
 
     public bool HasContentNodes(int id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds);
-        return Repository.HasContentNodes(id);
+        var hasContentNodes = Repository.HasContentNodes(id);
+        scope.Complete();
+
+        return hasContentNodes;
     }
 
     #endregion
@@ -980,26 +1024,32 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public EntityContainer? GetContainer(int containerId)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds); // also for containers
+        var container = _containerRepository.Get(containerId);
+        scope.Complete();
 
-        return _containerRepository.Get(containerId);
+        return container;
     }
 
     public EntityContainer? GetContainer(Guid containerId)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds); // also for containers
+        var container = _containerRepository.Get(containerId);
+        scope.Complete();
 
-        return _containerRepository.Get(containerId);
+        return container;
     }
 
     public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds); // also for containers
+        var containers = _containerRepository.GetMany(containerIds);
+        scope.Complete();
 
-        return _containerRepository.GetMany(containerIds);
+        return containers;
     }
 
     public IEnumerable<EntityContainer> GetContainers(TItem item)
@@ -1014,10 +1064,12 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     public IEnumerable<EntityContainer> GetContainers(string name, int level)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.ReadLock(ReadLockIds); // also for containers
+        var containers = _containerRepository.Get(name, level);
+        scope.Complete();
 
-        return _containerRepository.Get(name, level);
+        return containers;
     }
 
     public Attempt<OperationResult?> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)

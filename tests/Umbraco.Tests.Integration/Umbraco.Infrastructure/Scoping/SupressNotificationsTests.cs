@@ -5,6 +5,7 @@ using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -35,12 +36,13 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     public void GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
         using var scope = ScopeProvider.CreateScope();
-        using var _ = scope.Notifications.Suppress();
-
-        var contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
-        var content = ContentBuilder.CreateBasicContent(contentType);
-        ContentService.Save(content);
+        using (scope.Notifications.Suppress())
+        {
+            var contentType = ContentTypeBuilder.CreateBasicContentType();
+            ContentTypeService.Save(contentType);
+            var content = ContentBuilder.CreateBasicContent(contentType);
+            ContentService.Save(content);
+        }
 
         scope.Complete();
     }
@@ -48,34 +50,34 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     [Test]
     public void GivenNestedScope_WhenOuterNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
-        using (var parentScope = ScopeProvider.CreateScope(autoComplete: true))
+        using var parentScope = ScopeProvider.CreateScope();
+        using (parentScope.Notifications.Suppress())
         {
-            using var _ = parentScope.Notifications.Suppress();
+            using var childScope = ScopeProvider.CreateScope();
 
-            using (var childScope = ScopeProvider.CreateScope())
-            {
-                var contentType = ContentTypeBuilder.CreateBasicContentType();
-                ContentTypeService.Save(contentType);
-                var content = ContentBuilder.CreateBasicContent(contentType);
-                ContentService.Save(content);
+            var contentType = ContentTypeBuilder.CreateBasicContentType();
+            ContentTypeService.Save(contentType);
+            var content = ContentBuilder.CreateBasicContent(contentType);
+            ContentService.Save(content);
 
-                childScope.Complete();
-            }
+            childScope.Complete();
         }
+
+        parentScope.Complete();
     }
 
     [Test]
     public void GivenSuppressedNotifications_WhenDisposed_ThenNotificationsExecute()
     {
-        var asserted = 0;
+        int asserted;
         using (var scope = ScopeProvider.CreateScope())
         {
-            using var suppressed = scope.Notifications.Suppress();
-
-            var mediaType = MediaTypeBuilder.CreateImageMediaType("test");
-            MediaTypeService.Save(mediaType);
-
-            suppressed.Dispose();
+            MediaType mediaType;
+            using (scope.Notifications.Suppress())
+            {
+                mediaType = MediaTypeBuilder.CreateImageMediaType("test");
+                MediaTypeService.Save(mediaType);
+            }
 
             asserted = TestContext.CurrentContext.AssertCount;
             var media = MediaBuilder.CreateMediaImage(mediaType, -1);
@@ -90,10 +92,10 @@ public class SuppressNotificationsTests : UmbracoIntegrationTest
     [Test]
     public void GivenSuppressedNotificationsOnParent_WhenChildSuppresses_ThenExceptionIsThrown()
     {
-        using (var parentScope = ScopeProvider.CreateScope(autoComplete: true))
-        using (var parentSuppressed = parentScope.Notifications.Suppress())
+        using (var parentScope = ScopeProvider.CreateScope())
+        using (parentScope.Notifications.Suppress())
         {
-            using (var childScope = ScopeProvider.CreateScope(autoComplete: true))
+            using (var childScope = ScopeProvider.CreateScope())
             {
                 Assert.Throws<InvalidOperationException>(() => childScope.Notifications.Suppress());
             }

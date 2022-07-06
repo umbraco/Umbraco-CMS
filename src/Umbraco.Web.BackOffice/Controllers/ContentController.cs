@@ -417,10 +417,13 @@ public class ContentController : ContentControllerBase
         ContentTypesByAliases contentTypesByAliases)
     {
         // It's important to do this operation within a scope to reduce the amount of readlock queries.
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IContentType>? contentTypes = contentTypesByAliases.ContentTypeAliases
-            ?.Select(alias => _contentTypeService.Get(alias)).WhereNotNull();
-        return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<IContentType>? contentTypes = contentTypesByAliases.ContentTypeAliases
+                ?.Select(alias => _contentTypeService.Get(alias)).WhereNotNull();
+
+            return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        }
     }
 
     /// <summary>
@@ -531,9 +534,12 @@ public class ContentController : ContentControllerBase
         Guid[]? contentTypeKeys,
         int parentId)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
-        return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
+
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
     }
 
     /// <summary>

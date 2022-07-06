@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -75,7 +75,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public IRedirectUrl? GetMostRecentRedirectUrl(string url)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.GetMostRecentUrl(url);
         }
@@ -83,7 +83,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.GetContentUrls(contentKey);
         }
@@ -91,7 +91,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.GetAllUrls(pageIndex, pageSize, out total);
         }
@@ -99,7 +99,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
         }
@@ -107,7 +107,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
 
     public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
         }
@@ -120,7 +120,7 @@ internal class RedirectUrlService : RepositoryService, IRedirectUrlService
             return GetMostRecentRedirectUrl(url);
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _redirectUrlRepository.GetMostRecentUrl(url, culture);
         }

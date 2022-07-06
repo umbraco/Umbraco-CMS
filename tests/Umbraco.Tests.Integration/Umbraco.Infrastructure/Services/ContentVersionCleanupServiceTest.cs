@@ -74,7 +74,7 @@ internal class ContentVersionCleanupServiceTest : UmbracoIntegrationTest
 
     private Report GetReport()
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (ScopeProvider.CreateScope(autoComplete: true))
         {
             // SQL CE is fun!
             var contentVersions =

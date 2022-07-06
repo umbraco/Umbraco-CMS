@@ -18,12 +18,13 @@ public class LogViewerConfig : ILogViewerConfig
 
     public IReadOnlyList<SavedLogSearch>? GetSavedSearches()
     {
-        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+        using (_scopeProvider.CreateScope(autoComplete: true))
+        {
+            IEnumerable<ILogViewerQuery>? logViewerQueries = _logViewerQueryRepository.GetMany();
+            SavedLogSearch[]? result = logViewerQueries?.Select(x => new SavedLogSearch() { Name = x.Name, Query = x.Query }).ToArray();
 
-        IEnumerable<ILogViewerQuery>? logViewerQueries = _logViewerQueryRepository.GetMany();
-        SavedLogSearch[]? result = logViewerQueries?.Select(x => new SavedLogSearch() { Name = x.Name, Query = x.Query }).ToArray();
-
-        return result;
+            return result;
+        }
     }
 
     public IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query)

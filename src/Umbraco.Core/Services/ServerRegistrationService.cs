@@ -154,16 +154,17 @@ public sealed class ServerRegistrationService : RepositoryService, IServerRegist
     /// </remarks>
     public IEnumerable<IServerRegistration> GetServers(bool refresh = false)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.Servers);
+        if (refresh)
         {
-            scope.ReadLock(Constants.Locks.Servers);
-            if (refresh)
-            {
-                _serverRegistrationRepository.ClearCache();
-            }
-
-            return _serverRegistrationRepository.GetMany().ToArray(); // fast, cached // fast, cached
+            _serverRegistrationRepository.ClearCache();
         }
+
+        var serverRegistrations = _serverRegistrationRepository.GetMany().ToArray(); // fast, cached // fast, cached
+        scope.Complete();
+
+        return serverRegistrations;
     }
 
     /// <summary>

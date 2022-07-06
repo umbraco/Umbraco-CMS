@@ -55,7 +55,7 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
     private string GetJson(int id)
     {
-        using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+        using (ScopeProvider.CreateScope(autoComplete: true))
         {
             var selectJson = SqlContext.Sql().Select<ContentNuDto>().From<ContentNuDto>()
                 .Where<ContentNuDto>(x => x.NodeId == id && !x.Published);

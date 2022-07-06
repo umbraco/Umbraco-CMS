@@ -37,29 +37,30 @@ public class SectionServiceTests : UmbracoIntegrationTest
 
     private IUser CreateTestUser()
     {
-        using var scope = ScopeProvider.CreateScope(autoComplete: true);
-        using var _ = scope.Notifications.Suppress();
+        using var scope = ScopeProvider.CreateScope();
+        using (scope.Notifications.Suppress())
+        {
+            var globalSettings = new GlobalSettings();
+            var user = new User(globalSettings) { Name = "Test user", Username = "testUser", Email = "testuser@test.com" };
+            UserService.Save(user);
 
-        var globalSettings = new GlobalSettings();
-        var user = new User(globalSettings) { Name = "Test user", Username = "testUser", Email = "testuser@test.com" };
-        UserService.Save(user);
+            var userGroupA = new UserGroup(ShortStringHelper) { Alias = "GroupA", Name = "Group A" };
+            userGroupA.AddAllowedSection("media");
+            userGroupA.AddAllowedSection("settings");
 
-        var userGroupA = new UserGroup(ShortStringHelper) { Alias = "GroupA", Name = "Group A" };
-        userGroupA.AddAllowedSection("media");
-        userGroupA.AddAllowedSection("settings");
+            // TODO: This is failing the test
+            UserService.Save(userGroupA, new[] { user.Id });
 
-        // TODO: This is failing the test
-        UserService.Save(userGroupA, new[] { user.Id });
+            var userGroupB = new UserGroup(ShortStringHelper) { Alias = "GroupB", Name = "Group B" };
+            userGroupB.AddAllowedSection("settings");
+            userGroupB.AddAllowedSection("member");
+            UserService.Save(userGroupB, new[] { user.Id });
 
-        var userGroupB = new UserGroup(ShortStringHelper) { Alias = "GroupB", Name = "Group B" };
-        userGroupB.AddAllowedSection("settings");
-        userGroupB.AddAllowedSection("member");
-        UserService.Save(userGroupB, new[] { user.Id });
+            var testUser = UserService.GetUserById(user.Id);
 
-        var testUser = UserService.GetUserById(user.Id);
+            scope.Complete();
 
-        scope.Complete();
-
-        return testUser;
+            return testUser;
+        }
     }
 }

@@ -57,12 +57,13 @@ internal class ContentVersionService : IContentVersionService
             throw new ArgumentOutOfRangeException(nameof(pageSize));
         }
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            var languageId = _languageRepository.GetIdByIsoCode(culture, true);
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
-        }
+        using ICoreScope? scope = _scopeProvider.CreateCoreScope();
+        var languageId = _languageRepository.GetIdByIsoCode(culture, true);
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var items = _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
+        scope.Complete();
+
+        return items;
     }
 
     /// <inheritdoc />

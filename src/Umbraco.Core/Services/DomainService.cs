@@ -21,7 +21,7 @@ public class DomainService : RepositoryService, IDomainService
 
     public bool Exists(string domainName)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _domainRepository.Exists(domainName);
         }
@@ -52,7 +52,7 @@ public class DomainService : RepositoryService, IDomainService
 
     public IDomain? GetByName(string name)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _domainRepository.GetByName(name);
         }
@@ -60,7 +60,7 @@ public class DomainService : RepositoryService, IDomainService
 
     public IDomain? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _domainRepository.Get(id);
         }
@@ -68,7 +68,7 @@ public class DomainService : RepositoryService, IDomainService
 
     public IEnumerable<IDomain> GetAll(bool includeWildcards)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _domainRepository.GetAll(includeWildcards);
         }
@@ -76,7 +76,7 @@ public class DomainService : RepositoryService, IDomainService
 
     public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
         }

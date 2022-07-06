@@ -26,10 +26,12 @@ public class TrackedReferencesService : ITrackedReferencesService
     /// </summary>
     public PagedResult<RelationItem> GetPagedRelationsForItem(int id, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedRelationsForItem(id, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+        }
     }
 
     /// <summary>
@@ -37,10 +39,12 @@ public class TrackedReferencesService : ITrackedReferencesService
     /// </summary>
     public PagedResult<RelationItem> GetPagedItemsWithRelations(int[] ids, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedItemsWithRelations(ids, pageIndex, pageSize, filterMustBeIsDependency, out var totalItems);
 
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+        }
     }
 
     /// <summary>
@@ -48,14 +52,16 @@ public class TrackedReferencesService : ITrackedReferencesService
     /// </summary>
     public PagedResult<RelationItem> GetPagedDescendantsInReferences(int parentId, long pageIndex, int pageSize, bool filterMustBeIsDependency)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using (_scopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedDescendantsInReferences(
+                parentId,
+                pageIndex,
+                pageSize,
+                filterMustBeIsDependency,
+                out var totalItems);
 
-        IEnumerable<RelationItem> items = _trackedReferencesRepository.GetPagedDescendantsInReferences(
-            parentId,
-            pageIndex,
-            pageSize,
-            filterMustBeIsDependency,
-            out var totalItems);
-        return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+            return new PagedResult<RelationItem>(totalItems, pageIndex + 1, pageSize) { Items = items };
+        }
     }
 }

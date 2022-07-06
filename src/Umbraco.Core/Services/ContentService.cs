@@ -133,38 +133,42 @@ public class ContentService : RepositoryService, IContentService
 
     public int CountPublished(string? contentTypeAlias = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountPublished(contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var count = _documentRepository.CountPublished(contentTypeAlias);
+        scope.Complete();
+
+        return count;
     }
 
     public int Count(string? contentTypeAlias = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Count(contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var count = _documentRepository.Count(contentTypeAlias);
+        scope.Complete();
+
+        return count;
     }
 
     public int CountChildren(int parentId, string? contentTypeAlias = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountChildren(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var count = _documentRepository.CountChildren(parentId, contentTypeAlias);
+        scope.Complete();
+
+        return count;
     }
 
     public int CountDescendants(int parentId, string? contentTypeAlias = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.CountDescendants(parentId, contentTypeAlias);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var count = _documentRepository.CountDescendants(parentId, contentTypeAlias);
+        scope.Complete();
+
+        return count;
     }
 
     #endregion
@@ -178,12 +182,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.ReplaceContentPermissions(permissionSet);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+        _documentRepository.ReplaceContentPermissions(permissionSet);
+        scope.Complete();
     }
 
     /// <summary>
@@ -194,12 +196,10 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="groupIds"></param>
     public void SetPermission(IContent entity, char permission, IEnumerable<int> groupIds)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.AssignEntityPermission(entity, permission, groupIds);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+        _documentRepository.AssignEntityPermission(entity, permission, groupIds);
+        scope.Complete();
     }
 
     /// <summary>
@@ -209,11 +209,12 @@ public class ContentService : RepositoryService, IContentService
     /// <returns></returns>
     public EntityPermissionCollection GetPermissions(IContent content)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPermissionsForEntity(content.Id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var permissions = _documentRepository.GetPermissionsForEntity(content.Id);
+        scope.Complete();
+
+        return permissions;
     }
 
     #endregion
@@ -418,11 +419,12 @@ public class ContentService : RepositoryService, IContentService
     /// </returns>
     public IContent? GetById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.Get(id);
+        scope.Complete();
+
+        return content;
     }
 
     /// <summary>
@@ -440,13 +442,12 @@ public class ContentService : RepositoryService, IContentService
             return Enumerable.Empty<IContent>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IEnumerable<IContent> items = _documentRepository.GetMany(idsA);
-            var index = items.ToDictionary(x => x.Id, x => x);
-            return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var items = _documentRepository.GetMany(idsA).ToDictionary(x => x.Id, x => x);
+        scope.Complete();
+
+        return idsA.Select(x => items.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
     }
 
     /// <summary>
@@ -458,33 +459,33 @@ public class ContentService : RepositoryService, IContentService
     /// </returns>
     public IContent? GetById(Guid key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(key);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.Get(key);
+        scope.Complete();
+
+        return content;
     }
 
     /// <inheritdoc />
     public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetContentSchedule(contentId);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.GetContentSchedule(contentId);
+        scope.Complete();
+
+        return content;
     }
 
     /// <inheritdoc />
     public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-            _documentRepository.PersistContentSchedule(content, contentSchedule);
-
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+        _documentRepository.PersistContentSchedule(content, contentSchedule);
+        scope.Complete();
     }
 
     /// <summary>
@@ -492,8 +493,8 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="contents"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
+    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId)
+        => Attempt.Succeed(Save(contents, userId));
 
     /// <summary>
     ///     Gets <see cref="IContent" /> objects by Ids
@@ -510,20 +511,19 @@ public class ContentService : RepositoryService, IContentService
             return Enumerable.Empty<IContent>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IEnumerable<IContent>? items = _documentRepository.GetMany(idsA);
+        scope.Complete();
+
+        if (items is not null)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IEnumerable<IContent>? items = _documentRepository.GetMany(idsA);
+            var index = items.ToDictionary(x => x.Key, x => x);
 
-            if (items is not null)
-            {
-                var index = items.ToDictionary(x => x.Key, x => x);
-
-                return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
-            }
-
-            return Enumerable.Empty<IContent>();
+            return idsA.Select(x => index.TryGetValue(x, out IContent? c) ? c : null).WhereNotNull();
         }
+
+        return Enumerable.Empty<IContent>();
     }
 
     /// <inheritdoc />
@@ -550,17 +550,18 @@ public class ContentService : RepositoryService, IContentService
             ordering = Ordering.By("sortOrder");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => x.ContentTypeId == contentTypeId),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                filter,
-                ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var page = _documentRepository.GetPage(
+            Query<IContent>()?.Where(x => x.ContentTypeId == contentTypeId),
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            filter,
+            ordering);
+        scope.Complete();
+
+        return page;
     }
 
     /// <inheritdoc />
@@ -581,17 +582,18 @@ public class ContentService : RepositoryService, IContentService
             ordering = Ordering.By("sortOrder");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetPage(
-                Query<IContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
-                pageIndex,
-                pageSize,
-                out totalRecords,
-                filter,
-                ordering);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var page = _documentRepository.GetPage(
+            Query<IContent>()?.Where(x => contentTypeIds.Contains(x.ContentTypeId)),
+            pageIndex,
+            pageSize,
+            out totalRecords,
+            filter,
+            ordering);
+        scope.Complete();
+
+        return page;
     }
 
     /// <summary>
@@ -602,12 +604,13 @@ public class ContentService : RepositoryService, IContentService
     /// <remarks>Contrary to most methods, this method filters out trashed content items.</remarks>
     public IEnumerable<IContent> GetByLevel(int level)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
-            return _documentRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IQuery<IContent>? query = Query<IContent>().Where(x => x.Level == level && x.Trashed == false);
+        var content = _documentRepository.Get(query);
+        scope.Complete();
+
+        return content;
     }
 
     /// <summary>
@@ -617,11 +620,12 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An <see cref="IContent" /> item</returns>
     public IContent? GetVersion(int versionId)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetVersion(versionId);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var version = _documentRepository.GetVersion(versionId);
+        scope.Complete();
+
+        return version;
     }
 
     /// <summary>
@@ -631,11 +635,12 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetVersions(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetAllVersions(id);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var versions = _documentRepository.GetAllVersions(id);
+        scope.Complete();
+
+        return versions;
     }
 
     /// <summary>
@@ -644,11 +649,12 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetVersionsSlim(int id, int skip, int take)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetAllVersionsSlim(id, skip, take);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var versions = _documentRepository.GetAllVersionsSlim(id, skip, take);
+        scope.Complete();
+
+        return versions;
     }
 
     /// <summary>
@@ -701,11 +707,12 @@ public class ContentService : RepositoryService, IContentService
             return new List<IContent>();
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetMany(ids!);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var ancestors = _documentRepository.GetMany(ids!);
+        scope.Complete();
+
+        return ancestors;
     }
 
     /// <summary>
@@ -715,12 +722,13 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of published <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetPublishedChildren(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
-            return _documentRepository.Get(query).OrderBy(x => x.SortOrder);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IQuery<IContent>? query = Query<IContent>().Where(x => x.ParentId == id && x.Published);
+        var children = _documentRepository.Get(query).OrderBy(x => x.SortOrder);
+        scope.Complete();
+
+        return children;
     }
 
     /// <inheritdoc />
@@ -741,13 +749,13 @@ public class ContentService : RepositoryService, IContentService
             ordering = Ordering.By("sortOrder");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
+        var page = _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+        scope.Complete();
 
-            IQuery<IContent>? query = Query<IContent>()?.Where(x => x.ParentId == id);
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
-        }
+        return page;
     }
 
     /// <inheritdoc />
@@ -758,26 +766,32 @@ public class ContentService : RepositoryService, IContentService
             ordering = Ordering.By("Path");
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+
+        // if the id is System Root, then just get all
+        IEnumerable<IContent> descendants;
+        if (id != Constants.System.Root)
         {
-            scope.ReadLock(Constants.Locks.ContentTree);
-
-            // if the id is System Root, then just get all
-            if (id != Constants.System.Root)
+            TreeEntityPath[] contentPath = _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
+            if (contentPath.Length == 0)
             {
-                TreeEntityPath[] contentPath =
-                    _entityRepository.GetAllPaths(Constants.ObjectTypes.Document, id).ToArray();
-                if (contentPath.Length == 0)
-                {
-                    totalChildren = 0;
-                    return Enumerable.Empty<IContent>();
-                }
-
-                return GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+                totalChildren = 0;
+                descendants = Enumerable.Empty<IContent>();
             }
-
-            return GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+            else
+            {
+                descendants = GetPagedLocked(GetPagedDescendantQuery(contentPath[0].Path), pageIndex, pageSize, out totalChildren, filter, ordering);
+            }
         }
+        else
+        {
+            descendants = GetPagedLocked(null, pageIndex, pageSize, out totalChildren, filter, ordering);
+        }
+
+        scope.Complete();
+
+        return descendants;
     }
 
     private IQuery<IContent>? GetPagedDescendantQuery(string contentPath)
@@ -845,12 +859,13 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetRootContent()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
-            return _documentRepository.Get(query);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IQuery<IContent> query = Query<IContent>().Where(x => x.ParentId == Constants.System.Root);
+        var content = _documentRepository.Get(query);
+        scope.Complete();
+
+        return content;
     }
 
     /// <summary>
@@ -859,31 +874,34 @@ public class ContentService : RepositoryService, IContentService
     /// <returns></returns>
     internal IEnumerable<IContent> GetAllPublished()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.Get(QueryNotTrashed);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.Get(QueryNotTrashed);
+        scope.Complete();
+
+        return content;
     }
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetContentForExpiration(DateTime date)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetContentForExpiration(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.GetContentForExpiration(date);
+        scope.Complete();
+
+        return content;
     }
 
     /// <inheritdoc />
     public IEnumerable<IContent> GetContentForRelease(DateTime date)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.GetContentForRelease(date);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var content = _documentRepository.GetContentForRelease(date);
+        scope.Complete();
+
+        return content;
     }
 
     /// <summary>
@@ -892,18 +910,18 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     public IEnumerable<IContent> GetPagedContentInRecycleBin(long pageIndex, int pageSize, out long totalRecords, IQuery<IContent>? filter = null, Ordering? ordering = null)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        if (ordering == null)
         {
-            if (ordering == null)
-            {
-                ordering = Ordering.By("Path");
-            }
-
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IQuery<IContent>? query = Query<IContent>()?
-                .Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
-            return _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+            ordering = Ordering.By("Path");
         }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IQuery<IContent>? query = Query<IContent>()?.Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
+        var page = _documentRepository.GetPage(query, pageIndex, pageSize, out totalRecords, filter, ordering);
+        scope.Complete();
+
+        return page;
     }
 
     /// <summary>
@@ -938,11 +956,12 @@ public class ContentService : RepositoryService, IContentService
 
     public bool IsPathPublished(IContent? content)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.IsPathPublished(content);
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var isPathPublished = _documentRepository.IsPathPublished(content);
+        scope.Complete();
+
+        return isPathPublished;
     }
 
     #endregion
@@ -2580,11 +2599,12 @@ public class ContentService : RepositoryService, IContentService
 
     public bool RecycleBinSmells()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return _documentRepository.RecycleBinSmells();
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var recycleBinSmells = _documentRepository.RecycleBinSmells();
+        scope.Complete();
+
+        return recycleBinSmells;
     }
 
     #endregion
@@ -2951,11 +2971,12 @@ public class ContentService : RepositoryService, IContentService
     /// <returns>An Enumerable list of <see cref="IContent" /> objects</returns>
     internal IEnumerable<IContent> GetPublishedDescendants(IContent content)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            return GetPublishedDescendantsLocked(content).ToArray(); // ToArray important in uow!
-        }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        var descendants = GetPublishedDescendantsLocked(content).ToArray(); // ToArray important in uow!
+        scope.Complete();
+
+        return descendants;
     }
 
     internal IEnumerable<IContent> GetPublishedDescendantsLocked(IContent content)
@@ -3422,32 +3443,6 @@ public class ContentService : RepositoryService, IContentService
     public void DeleteOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
         DeleteOfTypes(new[] { contentTypeId }, userId);
 
-    private IContentType GetContentType(ICoreScope scope, string contentTypeAlias)
-    {
-        if (contentTypeAlias == null)
-        {
-            throw new ArgumentNullException(nameof(contentTypeAlias));
-        }
-
-        if (string.IsNullOrWhiteSpace(contentTypeAlias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
-        }
-
-        scope.ReadLock(Constants.Locks.ContentTypes);
-
-        IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
-        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
-
-        if (contentType == null)
-        {
-            throw new Exception(
-                $"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found"); // causes rollback
-        }
-
-        return contentType;
-    }
-
     private IContentType GetContentType(string contentTypeAlias)
     {
         if (contentTypeAlias == null)
@@ -3460,10 +3455,18 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(contentTypeAlias));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTypes);
+        IQuery<IContentType> query = Query<IContentType>().Where(x => x.Alias == contentTypeAlias);
+        IContentType? contentType = _contentTypeRepository.Get(query).FirstOrDefault();
+        scope.Complete();
+
+        if (contentType == null)
         {
-            return GetContentType(scope, contentTypeAlias);
+            throw new Exception($"No ContentType matching the passed in Alias: '{contentTypeAlias}' was found");
         }
+
+        return contentType;
     }
 
     #endregion
@@ -3472,32 +3475,32 @@ public class ContentService : RepositoryService, IContentService
 
     public IContent? GetBlueprintById(int id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IContent? blueprint = _documentBlueprintRepository.Get(id);
+        scope.Complete();
 
-            return blueprint;
+        if (blueprint != null)
+        {
+            blueprint.Blueprint = true;
         }
+
+        return blueprint;
     }
 
     public IContent? GetBlueprintById(Guid id)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            scope.ReadLock(Constants.Locks.ContentTree);
-            IContent? blueprint = _documentBlueprintRepository.Get(id);
-            if (blueprint != null)
-            {
-                blueprint.Blueprint = true;
-            }
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.ReadLock(Constants.Locks.ContentTree);
+        IContent? blueprint = _documentBlueprintRepository.Get(id);
+        scope.Complete();
 
-            return blueprint;
+        if (blueprint != null)
+        {
+            blueprint.Blueprint = true;
         }
+
+        return blueprint;
     }
 
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
@@ -3617,38 +3620,37 @@ public class ContentService : RepositoryService, IContentService
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var contentTypeIdsA = contentTypeIds.ToArray();
+        IQuery<IContent> query = Query<IContent>();
+        if (contentTypeIdsA.Length > 0)
         {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            var contentTypeIdsA = contentTypeIds.ToArray();
-            IQuery<IContent> query = Query<IContent>();
-            if (contentTypeIdsA.Length > 0)
-            {
-                query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
-            }
-
-            IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
-            {
-                x.Blueprint = true;
-                return x;
-            }).ToArray();
-
-            if (blueprints is not null)
-            {
-                foreach (IContent blueprint in blueprints)
-                {
-                    _documentBlueprintRepository.Delete(blueprint);
-                }
-
-                scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
-                scope.Complete();
-            }
+            query.Where(x => contentTypeIdsA.Contains(x.ContentTypeId));
         }
+
+        IContent[]? blueprints = _documentBlueprintRepository.Get(query)?.Select(x =>
+        {
+            x.Blueprint = true;
+            return x;
+        }).ToArray();
+
+        if (blueprints is not null)
+        {
+            foreach (IContent blueprint in blueprints)
+            {
+                _documentBlueprintRepository.Delete(blueprint);
+            }
+
+            scope.Notifications.Publish(new ContentDeletedBlueprintNotification(blueprints, evtMsgs));
+        }
+
+        scope.Complete();
     }
 
-    public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId) =>
-        DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
+    public void DeleteBlueprintsOfType(int contentTypeId, int userId = Constants.Security.SuperUserId)
+        => DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
 
     #endregion
 }

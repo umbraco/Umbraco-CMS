@@ -218,9 +218,11 @@ public class UmbracoMapper : IUmbracoMapper
         if (ctor != null && map != null)
         {
             var target = ctor(source, context);
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 map(source, target, context);
+
+                scope.Complete();
             }
 
             return (TTarget)target;
@@ -281,7 +283,7 @@ public class UmbracoMapper : IUmbracoMapper
     {
         var targetList = (IList?)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             foreach (var sourceItem in source)
             {
@@ -289,6 +291,8 @@ public class UmbracoMapper : IUmbracoMapper
                 map(sourceItem, targetItem, context);
                 targetList?.Add(targetItem);
             }
+
+            scope.Complete();
         }
 
         object? target = targetList;
@@ -355,9 +359,11 @@ public class UmbracoMapper : IUmbracoMapper
         // if there is a direct map, map
         if (map != null)
         {
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
                 map(source!, target!, context);
+
+                scope.Complete();
             }
 
             return target;

@@ -155,20 +155,26 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public EntityContainer? GetContainer(int containerId)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeContainerRepository.Get(containerId);
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _dataTypeContainerRepository.Get(containerId);
+            }
         }
 
         public EntityContainer? GetContainer(Guid containerId)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeContainerRepository.Get(containerId);
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _dataTypeContainerRepository.Get(containerId);
+            }
         }
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeContainerRepository.Get(name, level);
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _dataTypeContainerRepository.Get(name, level);
+            }
         }
 
         public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
@@ -187,8 +193,10 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            return _dataTypeContainerRepository.GetMany(containerIds);
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _dataTypeContainerRepository.GetMany(containerIds);
+            }
         }
 
         public Attempt<OperationResult?> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
@@ -310,10 +318,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(string name)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IDataType? dataType = _dataTypeRepository.Get(Query<IDataType>().Where(x => x.Name == name))?.FirstOrDefault();
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+
+                return dataType;
+            }
         }
 
         /// <summary>
@@ -323,10 +334,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IDataType? dataType = _dataTypeRepository.Get(id);
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IDataType? dataType = _dataTypeRepository.Get(id);
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+
+                return dataType;
+            }
         }
 
         /// <summary>
@@ -336,11 +350,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IDataType"/></returns>
         public IDataType? GetDataType(Guid id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
-            IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
-            ConvertMissingEditorOfDataTypeToLabel(dataType);
-            return dataType;
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IQuery<IDataType> query = Query<IDataType>().Where(x => x.Key == id);
+                IDataType? dataType = _dataTypeRepository.Get(query).FirstOrDefault();
+                ConvertMissingEditorOfDataTypeToLabel(dataType);
+
+                return dataType;
+            }
         }
 
         /// <summary>
@@ -350,11 +367,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         public IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
-            IEnumerable<IDataType> dataType = _dataTypeRepository.Get(query).ToArray();
-            ConvertMissingEditorsOfDataTypesToLabels(dataType);
-            return dataType;
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IQuery<IDataType> query = Query<IDataType>().Where(x => x.EditorAlias == propertyEditorAlias);
+                IEnumerable<IDataType> dataType = _dataTypeRepository.Get(query).ToArray();
+                ConvertMissingEditorsOfDataTypesToLabels(dataType);
+
+                return dataType;
+            }
         }
 
         /// <summary>
@@ -364,11 +384,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
         public IEnumerable<IDataType> GetAll(params int[] ids)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-            IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                IEnumerable<IDataType> dataTypes = _dataTypeRepository.GetMany(ids).ToArray();
+                ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
 
-            ConvertMissingEditorsOfDataTypesToLabels(dataTypes);
-            return dataTypes;
+                return dataTypes;
+            }
         }
 
         private void ConvertMissingEditorOfDataTypeToLabel(IDataType? dataType)
@@ -566,8 +588,10 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
         {
-            using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
-            return _dataTypeRepository.FindUsages(id);
+            using (ScopeProvider.CreateCoreScope(autoComplete: true))
+            {
+                return _dataTypeRepository.FindUsages(id);
+            }
         }
 
         private void Audit(AuditType type, int userId, int objectId)
