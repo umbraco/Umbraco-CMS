@@ -218,50 +218,49 @@ public class ContentVariantMapper
     {
         context.Items.TryGetValue("CurrentUser", out var currentBackofficeUser);
 
-        IEnumerable<IReadOnlyUserGroup>? userGroups = null;
+        IUser? currentUser = null;
+
         if (currentBackofficeUser is IUser currentIUserBackofficeUser)
         {
-            userGroups = currentIUserBackofficeUser.Groups;
+            currentUser = currentIUserBackofficeUser;
         }
-
-        // Map allowed actions
-        userGroups ??= _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Groups;
-        bool hasAccess = false;
-        if (userGroups is not null)
+        else if(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
         {
-            foreach (IReadOnlyUserGroup group in userGroups)
-            {
-                // Handle invariant
-                if (variantDisplay.Language is null)
-                {
-                    int? defaultLanguageId = _localizationService.GetDefaultLanguageId();
-                    if (defaultLanguageId is not null && (group.AllowedLanguages.Contains(defaultLanguageId.Value) ||
-                                                          _securitySettings.AllowEditInvariantFromNonDefault || group.HasAccessToLanguage(defaultLanguageId.Value)))
-                    {
-                        hasAccess = true;
-                    }
-                }
-
-                if (variantDisplay.Language is not null && group.HasAccessToLanguage(variantDisplay.Language.Id))
-                {
-                    hasAccess = true;
-                    break;
-                }
-            }
-
-            // If user does not have access, return only browse permission
-            if (!hasAccess)
-            {
-                return new[] { ActionBrowse.ActionLetter.ToString() };
-            }
+            currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
         }
 
-        IBackOfficeSecurity? backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
-
-        //cannot check permissions without a context
-        if (backOfficeSecurity is null)
+        if (currentUser is null)
         {
             return Enumerable.Empty<string>();
+        }
+
+        IEnumerable<IReadOnlyUserGroup> userGroups = currentUser.Groups;
+
+        // Map allowed actions
+        var hasAccess = false;
+        foreach (IReadOnlyUserGroup group in userGroups)
+        {
+            // Handle invariant
+            if (variantDisplay.Language is null)
+            {
+                var defaultLanguageId = _localizationService.GetDefaultLanguageId();
+                if (_securitySettings.AllowEditInvariantFromNonDefault || (defaultLanguageId.HasValue && group.HasAccessToLanguage(defaultLanguageId.Value)))
+                {
+                    hasAccess = true;
+                }
+            }
+
+            if (variantDisplay.Language is not null && group.HasAccessToLanguage(variantDisplay.Language.Id))
+            {
+                hasAccess = true;
+                break;
+            }
+        }
+
+        // If user does not have access, return only browse permission
+        if (!hasAccess)
+        {
+            return new[] { ActionBrowse.ActionLetter.ToString() };
         }
 
         IContent? parent;
@@ -286,14 +285,11 @@ public class ContentVariantMapper
         }
 
         // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
-        if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
-            context.Items.TryGetValue("Permissions", out var permissionsObject) &&
-            userObject is IUser currentUser &&
-            permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
+        if (context.Items.TryGetValue("Permissions", out var permissionsObject) && permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
         {
             // If we already have permissions for a given path,
             // and the current user is the same as was used to generate the permissions, return the stored permissions.
-            if (backOfficeSecurity.CurrentUser?.Id == currentUser.Id &&
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id == currentUser.Id &&
                 permissionsDict.TryGetValue(path, out EntityPermissionSet? permissions))
             {
                 return permissions.GetAllPermissions();
@@ -304,6 +300,6 @@ public class ContentVariantMapper
         // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
         // reference exception :(
 
-        return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
+        return _userService.GetPermissionsForPath(currentUser, path).GetAllPermissions();
     }
 }

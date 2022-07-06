@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface ICultureImpactService
+public interface ICultureImpactFactory
 {
     /// <summary>
     /// Creates an impact instance representing the impact of a culture set,

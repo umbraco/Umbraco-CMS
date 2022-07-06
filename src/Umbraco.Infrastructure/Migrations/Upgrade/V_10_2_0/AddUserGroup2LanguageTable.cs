@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 
 public class AddUserGroup2LanguageTable : MigrationBase
 {
@@ -12,6 +12,7 @@ public class AddUserGroup2LanguageTable : MigrationBase
     protected override void Migrate()
     {
         IEnumerable<string> tables = SqlSyntax.GetTablesInSchema(Context.Database);
+
         if (tables.InvariantContains(UserGroup2LanguageDto.TableName))
         {
             return;

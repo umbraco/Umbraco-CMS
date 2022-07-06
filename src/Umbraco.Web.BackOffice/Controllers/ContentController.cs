@@ -57,7 +57,7 @@ public class ContentController : ContentControllerBase
     private readonly ILocalizationService _localizationService;
     private readonly ILocalizedTextService _localizedTextService;
     private readonly INotificationService _notificationService;
-    private readonly ICultureImpactService _cultureImpactService;
+    private readonly ICultureImpactFactory _cultureImpactFactory;
     private readonly ILogger<ContentController> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -91,7 +91,7 @@ public class ContentController : ContentControllerBase
         ICoreScopeProvider scopeProvider,
         IAuthorizationService authorizationService,
         IContentVersionService contentVersionService,
-        ICultureImpactService cultureImpactService)
+        ICultureImpactFactory cultureImpactFactory)
         : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
     {
         _propertyEditors = propertyEditors;
@@ -111,7 +111,7 @@ public class ContentController : ContentControllerBase
         _sqlContext = sqlContext;
         _authorizationService = authorizationService;
         _contentVersionService = contentVersionService;
-        _cultureImpactService = cultureImpactService;
+        _cultureImpactFactory = cultureImpactFactory;
         _logger = loggerFactory.CreateLogger<ContentController>();
         _scopeProvider = scopeProvider;
         _allLangs = new Lazy<IDictionary<string, ILanguage>>(() =>
@@ -167,7 +167,7 @@ public class ContentController : ContentControllerBase
             scopeProvider,
             authorizationService,
             contentVersionService,
-            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactService>())
+            StaticServiceProvider.Instance.GetRequiredService<ICultureImpactFactory>())
       {
       }
 
@@ -950,7 +950,7 @@ public class ContentController : ContentControllerBase
         //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
         // not marked to be saved, it will be the first culture in the list marked for saving.
         var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
-        var cultureForInvariantErrors = _cultureImpactService.GetCultureForInvariantErrors(
+        var cultureForInvariantErrors = _cultureImpactFactory.GetCultureForInvariantErrors(
         contentItem.PersistedContent,
         contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
         defaultCulture);
@@ -1847,7 +1847,7 @@ public class ContentController : ContentControllerBase
         foreach (ContentVariantSave variant in cultureVariants.Where(x => x.Publish))
         {
             // publishing any culture, implies the invariant culture
-            var valid = persistentContent.PublishCulture(_cultureImpactService.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
+            var valid = persistentContent.PublishCulture(_cultureImpactFactory.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
             if (!valid)
             {
                 AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");

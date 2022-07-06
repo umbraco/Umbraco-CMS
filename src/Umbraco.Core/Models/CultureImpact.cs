@@ -237,7 +237,8 @@ public sealed class CultureImpact
     /// <remarks>
     ///     <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    // TODO: Remove this once Create() can be removed (V12), this already lives in CultureImpactService
+    // Remove this once Create() can be removed (V12), this already lives in CultureImpactFactory
+    [Obsolete("Please use the CultureImpactFactory instead, scheduled for removal in v12")]
     internal static bool TryCreate(string culture, bool isDefault, ContentVariation variation, bool throwOnFail,
         bool editInvariantFromNonDefault, out CultureImpact? impact)
     {

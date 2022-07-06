@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
@@ -289,7 +290,8 @@ public class UmbracoPlan : MigrationPlan
         // TO 10.0.0
         To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
 
-        // TO 10.1.0
+        // TO 10.2.0
         To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
+        To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
     }
 }

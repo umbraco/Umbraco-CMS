@@ -26,6 +26,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         StartMediaId = startMediaId == 0 ? null : startMediaId;
     }
 
+    [Obsolete("please use ctor that takes allowedActions instead, scheduled for removal in v12")]
     public ReadOnlyUserGroup(
         int id,
         string? name,
@@ -65,6 +66,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public int? StartMediaId { get; }
 
     public string Alias { get; }
+
+    public bool HasAccessToAllLanguages { get; set; }
 
     /// <summary>
     ///     The set of default permissions
