@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_10_2_0;
 
 public class AddUserGroup2LanguageTable : MigrationBase
 {
