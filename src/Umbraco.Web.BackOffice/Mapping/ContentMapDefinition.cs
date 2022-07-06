@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
+using HeyRed.MarkdownSharp;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -158,6 +160,41 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
             target.ContentDto = new ContentPropertyCollectionDto();
             target.ContentDto.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+            var markdown = new Markdown();
+            var linkCheck = new Regex("<a[^>]+>", RegexOptions.IgnoreCase);
+            var evaluator = new MatchEvaluator(AddRelNoReferrer);
+            foreach (ContentVariantDisplay variant in target.Variants)
+            {
+                foreach (Tab<ContentPropertyDisplay> tab in variant.Tabs)
+                {
+                    foreach (ContentPropertyDisplay property in tab.Properties)
+                    {
+                        if (!string.IsNullOrEmpty(property.Description))
+                        {
+                            var description = markdown.Transform(property.Description);
+                            property.Description = linkCheck.Replace(description, evaluator);
+                        }
+                    }
+                }
+            }
+        }
+
+        private string AddRelNoReferrer(Match m)
+        {
+            string result = m.Value;
+            if (result.IndexOf("rel=") == -1)
+            {
+                result = result.Replace(">", " rel=\"noreferrer\">");
+            }
+            if (result.IndexOf("class=") == -1)
+            {
+                result = result.Replace(">", " class=\"underline\">");
+            }
+            if (result.IndexOf("target=") == -1)
+            {
+                result = result.Replace(">", " target=\"_blank\">");
+            }
+            return result;
         }
 
         // Umbraco.Code.MapAll -Segment -Language -DisplayName
