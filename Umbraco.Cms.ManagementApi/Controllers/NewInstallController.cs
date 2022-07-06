@@ -12,12 +12,13 @@ using Umbraco.Extensions;
 using Umbraco.New.Cms.Core.Factories;
 using Umbraco.New.Cms.Core.Models.Installer;
 using Umbraco.New.Cms.Core.Services.Installer;
+using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("[backoffice]/api/v{version:apiVersion}/install")]
+[BackofficeRoute("api/v{version:apiVersion}/install")]
 public class NewInstallController : Controller
 {
     private readonly IUmbracoMapper _mapper;
