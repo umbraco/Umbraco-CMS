@@ -49,6 +49,10 @@ public class UserGroupDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Icon { get; set; }
 
+    [Column("hasAccessToAllLanguages")]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    public bool HasAccessToAllLanguages { get; set; }
+
     [Column("startContentId")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [ForeignKey(typeof(NodeDto), Name = "FK_startContentId_umbracoNode_id")]

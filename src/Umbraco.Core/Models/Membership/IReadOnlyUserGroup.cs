@@ -20,6 +20,9 @@ public interface IReadOnlyUserGroup
     /// </summary>
     string Alias { get; }
 
+    // This is set to return true as default to avoid breaking changes.
+    bool HasAccessToAllLanguages => true;
+
     /// <summary>
     ///     The set of default permissions
     /// </summary>
@@ -33,5 +36,5 @@ public interface IReadOnlyUserGroup
 
     IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
 
-    public bool HasAccessToLanguage( int languageId) => AllowedLanguages.Any() is false || AllowedLanguages.Contains(languageId);
+    public bool HasAccessToLanguage( int languageId) => HasAccessToAllLanguages || AllowedLanguages.Any() is false || AllowedLanguages.Contains(languageId);
 }

@@ -67,6 +67,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
 
     public string Alias { get; }
 
+    public bool HasAccessToAllLanguages { get; set; }
+
     /// <summary>
     ///     The set of default permissions
     /// </summary>
