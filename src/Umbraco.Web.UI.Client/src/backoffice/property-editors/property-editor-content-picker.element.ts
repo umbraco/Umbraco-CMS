@@ -1,15 +1,13 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, state, query } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 
 import '@umbraco-ui/uui-modal';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
-import '@umbraco-ui/uui-modal-sidebar';
 import { UUIModalSidebarElement } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbModalService } from '../../core/services/modal.service';
-import { Subscription } from 'rxjs';
 
 import '../../core/services/modal-content-picker.element';
 

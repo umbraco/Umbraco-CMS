@@ -18,6 +18,7 @@ export class UmbModalService {
 
 	private _close(modalHandler: UmbModalHandler) {
 		console.log('close', modalHandler);
+		//TODO clicking escape doesn't trigger the cleanup
 		modalHandler.modal.close();
 		modalHandler.modal.addEventListener('close-end', () =>
 			this._modals.next(this._modals.getValue().filter((modal) => modal.key !== modalHandler.key))
