@@ -266,7 +266,7 @@ public class ContentControllerTests
             Mock.Of<ICoreScopeProvider>(),
             Mock.Of<IAuthorizationService>(),
             Mock.Of<IContentVersionService>(),
-            Mock.Of<ICultureImpactService>());
+            Mock.Of<ICultureImpactFactory>());
 
         return controller;
     }

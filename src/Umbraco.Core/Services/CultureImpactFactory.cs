@@ -5,11 +5,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class CultureImpactService : ICultureImpactService
+public class CultureImpactFactory : ICultureImpactFactory
 {
     private SecuritySettings _securitySettings;
 
-    public CultureImpactService(IOptionsMonitor<SecuritySettings> securitySettings)
+    public CultureImpactFactory(IOptionsMonitor<SecuritySettings> securitySettings)
     {
         _securitySettings = securitySettings.CurrentValue;
 
