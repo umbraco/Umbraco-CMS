@@ -64,28 +64,18 @@ namespace Umbraco.Cms.Infrastructure.Install
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
             IUmbracoDatabaseFactory umbracoDatabaseFactory)
-        : this(
-            databaseBuilder,
-            logger,
-            umbracoVersion,
-            connectionStrings,
-            installationService,
-            cookieManager,
-            userAgentProvider,
-            umbracoDatabaseFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IFireAndForgetRunner>())
+            : this(
+                databaseBuilder,
+                logger,
+                umbracoVersion,
+                connectionStrings,
+                installationService,
+                cookieManager,
+                userAgentProvider,
+                umbracoDatabaseFactory,
+                StaticServiceProvider.Instance.GetRequiredService<IFireAndForgetRunner>())
         {
-            _logger = logger;
-            _umbracoVersion = umbracoVersion;
-            _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings;
-            _installationService = installationService;
-            _cookieManager = cookieManager;
-            _userAgentProvider = userAgentProvider;
-            _umbracoDatabaseFactory = umbracoDatabaseFactory;
 
-            // We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
-            GetInstallationType();
         }
 
         public InstallationType GetInstallationType() => _installationType ??= IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade;
