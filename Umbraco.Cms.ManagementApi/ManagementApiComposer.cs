@@ -3,11 +3,15 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.ManagementApi.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.New.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.ManagementApi;
 
@@ -38,6 +42,16 @@ public class ManagementApiComposer : IComposer
             options.Version = ApiAllName;
             options.DocumentName = ApiAllName;
             options.Description = "This shows all APIs available in this version of Umbraco - Including all the legacy apis that is available for backward compatibility";
+        });
+
+        // Not super happy with this, but we need to know the UmbracoPath when registering the controller
+        // To be able to replace the route template token
+        GlobalSettings? globalSettings =
+            builder.Config.GetSection(Constants.Configuration.ConfigGlobal).Get<GlobalSettings>();
+
+        services.AddControllers(options =>
+        {
+            options.Conventions.Add(new UmbracoBackofficeToken("backoffice", globalSettings.UmbracoPath));
         });
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>

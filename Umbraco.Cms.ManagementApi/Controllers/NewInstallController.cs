@@ -17,7 +17,7 @@ namespace Umbraco.Cms.ManagementApi.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/install")]
+[Route("/[backoffice]/api/v{version:apiVersion}/install")]
 public class NewInstallController : Controller
 {
     private readonly IUmbracoMapper _mapper;
@@ -45,10 +45,10 @@ public class NewInstallController : Controller
 
     [HttpGet("settings")]
     [MapToApiVersion("1.0")]
+    [RequireRuntimeLevel(RuntimeLevel.Install)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(typeof(InstallSettingsViewModel), StatusCodes.Status200OK)]
-    [RequireRuntimeLevel(RuntimeLevel.Install)]
     public async Task<ActionResult<InstallSettingsViewModel>> Settings()
     {
         // Register that the install has started
@@ -61,11 +61,11 @@ public class NewInstallController : Controller
     }
 
     [HttpPost("setup")]
+    [MapToApiVersion("1.0")]
+    [RequireRuntimeLevel(RuntimeLevel.Install)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Install)]
     public async Task<IActionResult> Setup(InstallViewModel installData)
     {
         if (ModelState.IsValid is false)
@@ -82,10 +82,10 @@ public class NewInstallController : Controller
 
     [HttpPost("upgrade")]
     [MapToApiVersion("1.0")]
+    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
     public async Task<IActionResult> Upgrade()
     {
         await _installService.Upgrade();
