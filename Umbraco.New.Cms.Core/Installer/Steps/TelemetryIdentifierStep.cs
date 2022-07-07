@@ -24,7 +24,7 @@ public class TelemetryIdentifierStep : IInstallStep
     public Task ExecuteAsync(InstallData model)
     {
         _siteIdentifierService.TryCreateSiteIdentifier(out _);
-        return Task.FromResult<InstallSetupResult?>(null);
+        return Task.CompletedTask;
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model)

@@ -41,7 +41,7 @@ public class DatabaseConfigureStep : IInstallStep
             throw new InstallException("Could not connect to the database");
         }
 
-        return Task.FromResult<InstallSetupResult?>(null);
+        return Task.CompletedTask;
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model)

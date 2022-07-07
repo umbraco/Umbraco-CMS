@@ -35,7 +35,7 @@ public class FilePermissionsStep : IInstallStep
             throw new InstallException("Permission check failed", "permissionsreport", new { errors = translatedErrors });
         }
 
-        return Task.FromResult<InstallSetupResult?>(null);
+        return Task.CompletedTask;
     }
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);
