@@ -22,6 +22,7 @@
 
     vm.goToPage = goToPage;
     vm.openLanguagePicker = openLanguagePicker;
+    vm.toggleAllowAllLanguages = toggleAllowAllLanguages;
     vm.removeLanguage = removeLanguage;
     vm.openSectionPicker = openSectionPicker;
     vm.openContentPicker = openContentPicker;
@@ -46,7 +47,8 @@
         "defaultdialogs_selectNode",
         "general_groups",
         "content_contentRoot",
-        "media_mediaRoot"
+        "media_mediaRoot",
+        "user_allowAccessToAllLanguages"
       ];
 
       localizationService.localizeMany(labelKeys).then(function (values) {
@@ -57,6 +59,7 @@
         vm.labels.groups = values[4];
         vm.labels.contentRoot = values[5];
         vm.labels.mediaRoot = values[6];
+        vm.labels.allowAccessToAllLanguages = values[7];
       });
       localizationService.localize("general_add").then(function (name) {
         vm.labels.add = name;
@@ -112,6 +115,10 @@
 
     function goToPage(ancestor) {
       $location.path(ancestor.path);
+    }
+
+    function toggleAllowAllLanguages () {
+      vm.userGroup.hasAccessToAllLanguages = !vm.userGroup.hasAccessToAllLanguages;
     }
 
     function openLanguagePicker() {
