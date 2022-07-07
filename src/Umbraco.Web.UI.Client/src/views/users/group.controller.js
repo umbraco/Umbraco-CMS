@@ -119,6 +119,7 @@
 
     function toggleAllowAllLanguages () {
       vm.userGroup.hasAccessToAllLanguages = !vm.userGroup.hasAccessToAllLanguages;
+      setDirty();
     }
 
     function openLanguagePicker() {
@@ -128,6 +129,7 @@
         selection: currentSelection,
         submit: function (model) {
           vm.userGroup.languages = model.selection;
+          setDirty();
           editorService.close();
         },
         close: function () {
@@ -139,6 +141,7 @@
 
     function removeLanguage (index) {
       vm.userGroup.languages.splice(index, 1);
+      setDirty();
     }
 
     function openSectionPicker() {
@@ -148,6 +151,7 @@
         selection: currentSelection,
         submit: function (model) {
           vm.userGroup.sections = model.selection;
+          setDirty();
           editorService.close();
         },
         close: function () {
@@ -171,6 +175,7 @@
               vm.userGroup.contentStartNode.name = vm.labels.contentRoot;
               vm.userGroup.contentStartNode.icon = "icon-folder";
             }
+            setDirty();
           }
           editorService.close();
         },
@@ -196,6 +201,7 @@
               vm.userGroup.mediaStartNode.name = vm.labels.mediaRoot;
               vm.userGroup.mediaStartNode.icon = "icon-folder";
             }
+            setDirty();
           }
           editorService.close();
         },
@@ -213,6 +219,7 @@
         selection: currentSelection,
         submit: function (model) {
           vm.userGroup.users = model.selection;
+          setDirty();
           editorService.close();
         },
         close: function () {
@@ -258,6 +265,7 @@
             });
             node = found ? found : node;
             setPermissionsForNode(node);
+            setDirty();
           }
         },
         close: function () {
@@ -315,10 +323,12 @@
 
     function removeSection(index) {
       vm.userGroup.sections.splice(index, 1);
+      setDirty();
     }
 
     function removeAssignedPermissions(index) {
       vm.userGroup.assignedPermissions.splice(index, 1);
+      setDirty();
     }
 
     function removeUser(index) {
@@ -331,7 +341,7 @@
 
         submit: function () {
           vm.userGroup.users.splice(index, 1);
-
+          setDirty();
           overlayService.close();
         },
         close: function () {
@@ -348,6 +358,7 @@
       } else if (type === "media") {
         vm.userGroup.mediaStartNode = null;
       }
+      setDirty();
     }
 
     function makeBreadcrumbs() {
@@ -366,6 +377,10 @@
       sections.forEach(function (section) {
         section.icon = "icon-section";
       });
+    }
+
+    function setDirty() {
+      $scope.editUserGroupForm.$setDirty();
     }
 
     init();
