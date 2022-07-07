@@ -2,8 +2,8 @@
     
     <div ng-if="preview && allowUnlock" class="umb-property-editor__lock-overlay-container">
         <div class="umb-property-editor__lock-overlay">
-            {{ labels.invariantPropertyUnlockHelp }}
-            <umb-button button-style="warning" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
+            <span ng-bind-html="labels.invariantPropertyUnlockHelp"></span>
+            <umb-button button-style="success" type="button" action="unlock()" label-key="general_edit" size="xxs"></umb-button>
         </div>
     </div>
     

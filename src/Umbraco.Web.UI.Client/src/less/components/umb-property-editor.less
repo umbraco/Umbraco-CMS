@@ -32,6 +32,7 @@
     height: 100%;
     width: 100%;
     box-sizing: border-box;
+    cursor: not-allowed;
     z-index: 9999999999;
 }
 
@@ -45,14 +46,21 @@
     transform: translate(-50%, 0);
     max-width: 800px;
     min-width: 300px;
-    padding: 9px 15px;
-    background: white;
+    padding: 12px 20px;
+    background: rgba(242,246,255,.8);
+    border: 1px solid @blueMid;
+    color: @blueMid;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-size: 85%;
-    box-shadow: 0 6px 12px rgb(0 0 0 / 20%);
+    font-size: 14px;
+    box-shadow: 0 0 4px 2px rgb(@blueDark, 12%);
     border-radius: 6px;
+
+    > span {
+      margin-left: auto;
+      margin-right: auto;
+    }
 }
