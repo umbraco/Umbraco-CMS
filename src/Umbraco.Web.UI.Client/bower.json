@@ -21,7 +21,6 @@
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",
     "jquery": "2.2.4",
-    "jquery-ui": "1.11.4",
     "jquery-migrate": "1.4.0",
     "angular-dynamic-locale": "0.1.28",
     "ng-file-upload": "~7.3.8",
@@ -74,7 +73,6 @@
       "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
       "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
       "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
-      "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",
       "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
       "clipboard": "bower_components/clipboard/dist/clipboard.min.js"
     }

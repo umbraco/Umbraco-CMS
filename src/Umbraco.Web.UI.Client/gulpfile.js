@@ -181,6 +181,14 @@ gulp.task('dependencies', function () {
             .pipe(gulp.dest(root + targets.lib + "/ace-builds"))
     );
 
+    // jQuery-UI
+    console.log(`Copying 'jquery-ui-dist' from node_modules/jquery-ui-dist/jquery-ui.min.js/  to ${root + targets.lib + "/jquery-ui"}`);
+    stream.add(
+        gulp.src(["node_modules/jquery-ui-dist/jquery-ui.min.js"],
+            { base: "./node_modules/jquery-ui-dist/" })
+            .pipe(gulp.dest(root + targets.lib + "/jquery-ui"))
+    );
+
     // code mirror
     stream.add(
         gulp.src([

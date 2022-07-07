@@ -143,3 +143,4 @@ build.out/
 build.tmp/
 build/Modules/*/temp/
 /src/.idea/*
+/build/temp/

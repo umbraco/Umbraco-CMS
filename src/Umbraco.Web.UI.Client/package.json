@@ -4,7 +4,9 @@
     "test": "karma start test/config/karma.conf.js --singlerun",
     "build": "gulp"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jquery-ui-dist": "1.13.1"
+  },
   "devDependencies": {
     "autoprefixer": "^6.5.0",
     "bower-installer": "^1.2.0",
