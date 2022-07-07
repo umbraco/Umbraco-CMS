@@ -97,12 +97,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public override ValueSetValidationResult Validate(ValueSet valueSet)
         {
+            // Notes on status on the result:
+            // A result status of filtered means that this whole value set result is to be filtered from the index
+            // For example the path is incorrect or it is in the recycle bin
+            // It does not mean that the values it contains have been through a filtering (for example if an language variant is not published)
+            // See notes on issue 11383
+
             var baseValidate = base.Validate(valueSet);
             valueSet = baseValidate.ValueSet;
             if (baseValidate.Status == ValueSetValidationStatus.Failed)
                 return new ValueSetValidationResult(ValueSetValidationStatus.Failed, valueSet);
-
-            var isFiltered = baseValidate.Status == ValueSetValidationStatus.Filtered;
 
             var filteredValues = valueSet.Values.ToDictionary(x => x.Key, x => x.Value.ToList());
             //check for published content
@@ -132,7 +136,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             foreach (var cultureField in valueSet.Values.Where(x => x.Key.InvariantEndsWith(cultureSuffix)).ToList())
                             {
                                 filteredValues.Remove(cultureField.Key);
-                                isFiltered = true;
                             }
                         }
                     }
@@ -147,15 +150,17 @@ namespace Umbraco.Cms.Infrastructure.Examine
             var path = pathValues[0].ToString();
 
             var filteredValueSet = new ValueSet(valueSet.Id, valueSet.Category, valueSet.ItemType, filteredValues.ToDictionary(x=>x.Key, x=> (IEnumerable<object>)x.Value));
+
             // We need to validate the path of the content based on ParentId, protected content and recycle bin rules.
             // We cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
             // because we need to remove anything that doesn't pass by protected content in the cases that umbraco data is moved to an illegal parent.
+            // Therefore we return FILTERED to indicate this whole set needs to be filtered out
             if (!ValidatePath(path!, valueSet.Category)
                 || !ValidateRecycleBin(path!, valueSet.Category)
                 || !ValidateProtectedContent(path!, valueSet.Category))
                 return new ValueSetValidationResult(ValueSetValidationStatus.Filtered, filteredValueSet);
 
-            return new ValueSetValidationResult(isFiltered ? ValueSetValidationStatus.Filtered : ValueSetValidationStatus.Valid, filteredValueSet);
+            return new ValueSetValidationResult(ValueSetValidationStatus.Valid, filteredValueSet);
         }
     }
 }
