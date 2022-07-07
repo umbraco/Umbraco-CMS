@@ -18,7 +18,7 @@
                     <umb-property-editor
                         model="property"
                         preview="(vm.model.variants.length > 1 && !activeVariant.language.isDefault && !property.culture && !property.unlockInvariantValue) || (!vm.allowUpdate && !property.supportsReadOnly)"
-                        ng-attr-readonly="{{(!vm.allowUpdate && property.supportsReadOnly) || undefined}}">
+                        ng-attr-readonly="{{!vm.allowUpdate || undefined}}">
                     </umb-property-editor>
 
                 </umb-property>
