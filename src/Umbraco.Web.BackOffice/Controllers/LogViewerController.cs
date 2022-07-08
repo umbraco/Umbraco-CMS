@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -22,10 +24,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class LogViewerController : BackOfficeNotificationsController
     {
         private readonly ILogViewer _logViewer;
+        private readonly ILogLevelLoader _logLevelLoader;
 
+        [Obsolete]
         public LogViewerController(ILogViewer logViewer)
+            : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
+        {
+        }
+
+        [ActivatorUtilitiesConstructor]
+        public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
         {
             _logViewer = logViewer ?? throw new ArgumentNullException(nameof(logViewer));
+            _logLevelLoader = logLevelLoader ?? throw new ArgumentNullException(nameof(logLevelLoader));
         }
 
         private bool CanViewLogs(LogTimePeriod logTimePeriod)
@@ -85,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<PagedResult<LogMessage>> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromQuery(Name = "logLevels[]")]string[] logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
+        public ActionResult<PagedResult<LogMessage>> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string? filterExpression = null, [FromQuery(Name = "logLevels[]")]string[]? logLevels = null, [FromQuery]DateTime? startDate = null, [FromQuery]DateTime? endDate = null)
         {
             var logTimePeriod = GetTimePeriod(startDate, endDate);
 
@@ -120,27 +131,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<SavedLogSearch> GetSavedSearches()
+        public IEnumerable<SavedLogSearch>? GetSavedSearches()
         {
             return _logViewer.GetSavedSearches();
         }
 
         [HttpPost]
-        public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item)
+        public IEnumerable<SavedLogSearch>? PostSavedSearch(SavedLogSearch item)
         {
             return _logViewer.AddSavedSearch(item.Name, item.Query);
         }
 
         [HttpPost]
-        public IEnumerable<SavedLogSearch> DeleteSavedSearch(SavedLogSearch item)
+        public IEnumerable<SavedLogSearch>? DeleteSavedSearch(SavedLogSearch item)
         {
             return _logViewer.DeleteSavedSearch(item.Name, item.Query);
         }
 
         [HttpGet]
-        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
-            return _logViewer.GetLogLevels();
+            return _logLevelLoader.GetLogLevelsFromSinks();
         }
 
         [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]

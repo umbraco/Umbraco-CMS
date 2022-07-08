@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -22,9 +23,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IReadWriteQueryRepository<TId, TEntity>
         where TEntity : class, IEntity
     {
-        private static RepositoryCachePolicyOptions s_defaultOptions;
-        private IRepositoryCachePolicy<TEntity, TId> _cachePolicy;
-        private IQuery<TEntity> _hasIdQuery;
+        private static RepositoryCachePolicyOptions? s_defaultOptions;
+        private IRepositoryCachePolicy<TEntity, TId>? _cachePolicy;
+        private IQuery<TEntity>? _hasIdQuery;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="EntityRepositoryBase{TId, TEntity}" /> class.
@@ -135,16 +136,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         ///     Gets an entity by the passed in Id utilizing the repository's cache policy
         /// </summary>
-        public TEntity Get(TId id)
+        public TEntity? Get(TId? id)
             => CachePolicy.Get(id, PerformGet, PerformGetAll);
 
         /// <summary>
         ///     Gets all entities of type TEntity or a list according to the passed in Ids
         /// </summary>
-        public IEnumerable<TEntity> GetMany(params TId[] ids)
+        public IEnumerable<TEntity> GetMany(params TId[]? ids)
         {
             // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct()
+            ids = ids?.Distinct()
 
                 // don't query by anything that is a default of T (like a zero)
                 // TODO: I think we should enabled this in case accidental calls are made to get all with invalid ids
@@ -153,15 +154,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
             // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-            if (ids.Length <= Constants.Sql.MaxParameterCount)
+            if (ids?.Length <= Constants.Sql.MaxParameterCount)
             {
-                return CachePolicy.GetAll(ids, PerformGetAll);
+                return CachePolicy.GetAll(ids, PerformGetAll) ?? Enumerable.Empty<TEntity>();
             }
 
             var entities = new List<TEntity>();
             foreach (IEnumerable<TId> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                entities.AddRange(CachePolicy.GetAll(group.ToArray(), PerformGetAll));
+                var groups = CachePolicy.GetAll(group.ToArray(), PerformGetAll);
+                if (groups is not null)
+                {
+                    entities.AddRange(groups);
+                }
             }
 
             return entities;
@@ -171,8 +176,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         ///     Gets a list of entities by the passed in query
         /// </summary>
         public IEnumerable<TEntity> Get(IQuery<TEntity> query)
-            => PerformGetByQuery(query)
-                .WhereNotNull(); // ensure we don't include any null refs in the returned collection!
+        {
+
+            // ensure we don't include any null refs in the returned collection!
+            return PerformGetByQuery(query)
+                .WhereNotNull();
+        }
 
         /// <summary>
         ///     Returns a boolean indicating whether an entity with the passed Id exists
@@ -198,9 +207,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected virtual IRepositoryCachePolicy<TEntity, TId> CreateCachePolicy()
             => new DefaultRepositoryCachePolicy<TEntity, TId>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
 
-        protected abstract TEntity PerformGet(TId id);
+        protected abstract TEntity? PerformGet(TId? id);
 
-        protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
+        protected abstract IEnumerable<TEntity> PerformGetAll(params TId[]? ids);
 
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
 

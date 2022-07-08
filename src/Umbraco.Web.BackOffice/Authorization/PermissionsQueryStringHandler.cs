@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 nodeId = parsedId;
                 return true;
             }
-            else if (UdiParser.TryParse(argument, true, out Udi udi))
+            else if (UdiParser.TryParse(argument, true, out Udi? udi))
             {
                 nodeId = EntityService.GetId(udi).Result;
                 return true;

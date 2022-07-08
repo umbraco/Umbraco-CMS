@@ -12,35 +12,35 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// <summary>
         /// Gets the alias of the property.
         /// </summary>
-        public string Alias;
+        public string Alias = string.Empty;
 
         /// <summary>
         /// Gets the name of the property.
         /// </summary>
-        public string Name;
+        public string Name = string.Empty;
 
         /// <summary>
         /// Gets the description of the property.
         /// </summary>
-        public string Description;
+        public string? Description;
 
         /// <summary>
         /// Gets the clr name of the property.
         /// </summary>
         /// <remarks>This is just the local name eg "Price".</remarks>
-        public string ClrName;
+        public string ClrName = string.Empty;
 
         /// <summary>
         /// Gets the Model Clr type of the property values.
         /// </summary>
         /// <remarks>As indicated by the <c>PublishedPropertyType</c>, ie by the <c>IPropertyValueConverter</c>
         /// if any, else <c>object</c>. May include some ModelType that will need to be mapped.</remarks>
-        public Type ModelClrType;
+        public Type ModelClrType = null!;
 
         /// <summary>
         /// Gets the CLR type name of the property values.
         /// </summary>
-        public string ClrTypeName;
+        public string ClrTypeName = string.Empty;
 
         /// <summary>
         /// Gets the generation errors for the property.
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// <remarks>This should be null, unless something prevents the property from being
         /// generated, and then the value should explain what. This can be used to generate
         /// commented out code eg in <see cref="ModelsMode.InMemoryAuto"/> mode.</remarks>
-        public List<string> Errors;
+        public List<string>? Errors;
 
         /// <summary>
         /// Adds an error.

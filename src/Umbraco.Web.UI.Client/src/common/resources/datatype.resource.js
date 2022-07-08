@@ -7,28 +7,28 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
   return {
 
-    /**
-     * @ngdoc method
-     * @name umbraco.resources.dataTypeResource#getPreValues
-     * @methodOf umbraco.resources.dataTypeResource
-     *
-     * @description
-     * Retrieves available prevalues for a given data type + editor
-     *
-     * ##usage
-     * <pre>
-     * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
-     *    .then(function(prevalues) {
-     *        alert('its gone!');
-     *    });
-     * </pre>
-     *
-     * @param {String} editorAlias string alias of editor type to retrive prevalues configuration for
-     * @param {Int} id id of datatype to retrieve prevalues for
-     * @returns {Promise} resourcePromise object.
-     *
-     */
-    getPreValues: function (editorAlias, dataTypeId) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getPreValues
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Retrieves available prevalues for a given data type + editor
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
+         *    .then(function(prevalues) {
+         *        alert('its gone!');
+         *    });
+         * </pre>
+         *
+         * @param {String} editorAlias string alias of editor type to retrieve prevalues configuration for
+         * @param {Int} id id of datatype to retrieve prevalues for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getPreValues: function (editorAlias, dataTypeId) {
 
       if (!dataTypeId) {
         dataTypeId = -1;

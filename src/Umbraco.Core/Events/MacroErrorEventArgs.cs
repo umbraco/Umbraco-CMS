@@ -9,22 +9,22 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// Name of the faulting macro.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Alias of the faulting macro.
         /// </summary>
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         /// <summary>
         /// Filename, file path, fully qualified class name, or other key used by the macro engine to do it's processing of the faulting macro.
         /// </summary>
-        public string MacroSource { get; set; }
+        public string? MacroSource { get; set; }
 
         /// <summary>
         /// Exception raised.
         /// </summary>
-        public Exception Exception { get; set; }
+        public Exception? Exception { get; set; }
 
         /// <summary>
         /// Gets or sets the desired behaviour when a matching macro causes an error. See
@@ -37,6 +37,6 @@ namespace Umbraco.Cms.Core.Events
         /// <summary>
         /// The HTML code to display when Behavior is Content.
         /// </summary>
-        public string Html { get; set; }
+        public string? Html { get; set; }
     }
 }

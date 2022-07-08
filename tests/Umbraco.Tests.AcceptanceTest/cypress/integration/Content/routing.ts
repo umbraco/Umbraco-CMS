@@ -35,6 +35,7 @@ context('Routing', () => {
         const swedishRequestBody = {
             culture: swedishCulture
         }
+
         cy.umbracoApiRequest(url, "POST", swedishRequestBody).then((responseBody) => {
             swedishLanguageId = responseBody["id"];
         });
@@ -60,16 +61,16 @@ context('Routing', () => {
         // Ensure cleaned before tests run
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
-        cy.umbracoEnsureLanguageNotExists(danishCulture);
-        cy.umbracoEnsureLanguageNotExists(swedishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(danishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(swedishCulture);
     });
 
     afterEach(() => {
         // Cleanup after tests
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
-        cy.umbracoEnsureLanguageNotExists(danishCulture);
-        cy.umbracoEnsureLanguageNotExists(swedishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(danishCulture);
+        cy.umbracoEnsureLanguageCultureNotExists(swedishCulture);
     })
 
     it('Root node published in language A, Child node published in language A', () => {
@@ -257,6 +258,8 @@ context('Routing', () => {
         cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
+        // Close success notifications
+        cy.get('.alert-success > .close').click({multiple : true});
         // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();

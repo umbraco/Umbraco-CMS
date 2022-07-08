@@ -48,6 +48,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var attribute = controllerType.GetCustomAttribute<TreeAttribute>(false);
             if (attribute == null) return;
+
+            bool isCoreTree = controllerType.HasCustomAttribute<CoreTreeAttribute>(false);
+
+            // Use section as tree group if core tree, so it isn't grouped by empty key and thus end up in "Third Party" tree group if adding custom tree nodes in other groups, e.g. "Settings" tree group.
+            attribute.TreeGroup = attribute.TreeGroup ?? (isCoreTree ? attribute.SectionAlias : attribute.TreeGroup);
+
             var tree = new Tree(attribute.SortOrder, attribute.SectionAlias, attribute.TreeGroup, attribute.TreeAlias, attribute.TreeTitle, attribute.TreeUse, controllerType, attribute.IsSingleNodeTree);
             _trees.Add(tree);
         }
@@ -58,15 +64,34 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 AddTreeController(controllerType);
         }
 
-        public void RemoveTreeController<T>() => RemoveTreeController(typeof(T));
+        public void RemoveTree(Tree treeDefinition)
+        {
+            if (treeDefinition == null)
+                throw new ArgumentNullException(nameof(treeDefinition));
+            _trees.Remove(treeDefinition);
+        }
 
+        public void RemoveTreeController<T>()
+            where T : TreeControllerBase
+            => RemoveTreeController(typeof(T));
+
+        // TODO: Change parameter name to "controllerType" in a major version to make it consistent with AddTreeController method.
         public void RemoveTreeController(Type type)
         {
-            var tree = _trees.FirstOrDefault(it => it.TreeControllerType == type);
+            if (!typeof(TreeControllerBase).IsAssignableFrom(type))
+                throw new ArgumentException($"Type {type} does not inherit from {typeof(TreeControllerBase).FullName}.");
+
+            var tree = _trees.FirstOrDefault(x => x.TreeControllerType == type);
             if (tree != null)
             {
                 _trees.Remove(tree);
             }
+        }
+
+        public void RemoveTreeControllers(IEnumerable<Type> controllerTypes)
+        {
+            foreach (var controllerType in controllerTypes)
+                RemoveTreeController(controllerType);
         }
     }
 }

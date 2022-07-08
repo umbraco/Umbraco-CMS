@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             // just like the base class does, we'll just resolve the required services from the httpcontext.
             // we want to re-use their code so we don't have much choice, else we have to do some code tricks,
             // this is just easiest.
-            var optionsAccessor = filterContext.HttpContext.RequestServices.GetRequiredService<IOptions<GlobalSettings>>();
+            var optionsAccessor = filterContext.HttpContext.RequestServices.GetRequiredService<IOptionsSnapshot<GlobalSettings>>();
             if (optionsAccessor.Value.UseHttps)
             {
                 // only continue if this flag is set

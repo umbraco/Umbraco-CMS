@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int NodeId { get; set; }
 
         [Column("alias")]
-        public string Alias { get; set; }
+        public string? Alias { get; set; }
 
         [Column("ParentID")]
         public int ParentId { get; set; }

@@ -35,14 +35,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             DefineMap<Member, MemberDto>(nameof(Member.Email), nameof(MemberDto.Email));
             DefineMap<Member, MemberDto>(nameof(Member.Username), nameof(MemberDto.LoginName));
             DefineMap<Member, MemberDto>(nameof(Member.RawPasswordValue), nameof(MemberDto.Password));
+            DefineMap<Member, MemberDto>(nameof(Member.IsApproved), nameof(MemberDto.IsApproved));
+            DefineMap<Member, MemberDto>(nameof(Member.IsLockedOut), nameof(MemberDto.IsLockedOut));
+            DefineMap<Member, MemberDto>(nameof(Member.FailedPasswordAttempts), nameof(MemberDto.FailedPasswordAttempts));
+            DefineMap<Member, MemberDto>(nameof(Member.LastLockoutDate), nameof(MemberDto.LastLockoutDate));
+            DefineMap<Member, MemberDto>(nameof(Member.LastLoginDate), nameof(MemberDto.LastLoginDate));
+            DefineMap<Member, MemberDto>(nameof(Member.LastPasswordChangeDate), nameof(MemberDto.LastPasswordChangeDate));
 
-            DefineMap<Member, PropertyDataDto>(nameof(Member.IsApproved), nameof(PropertyDataDto.IntegerValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.IsLockedOut), nameof(PropertyDataDto.IntegerValue));
             DefineMap<Member, PropertyDataDto>(nameof(Member.Comments), nameof(PropertyDataDto.TextValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.FailedPasswordAttempts), nameof(PropertyDataDto.IntegerValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.LastLockoutDate), nameof(PropertyDataDto.DateValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.LastLoginDate), nameof(PropertyDataDto.DateValue));
-            DefineMap<Member, PropertyDataDto>(nameof(Member.LastPasswordChangeDate), nameof(PropertyDataDto.DateValue));
 
             /* Internal experiment */
             DefineMap<Member, PropertyDataDto>(nameof(Member.DateTimePropertyValue), nameof(PropertyDataDto.DateValue));

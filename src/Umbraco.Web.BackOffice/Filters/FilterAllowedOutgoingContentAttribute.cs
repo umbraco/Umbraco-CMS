@@ -43,12 +43,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
         }
 
-        public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName, char permissionToCheck)
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, string? propertyName, char permissionToCheck)
             : base(typeof(FilterAllowedOutgoingContentFilter))
         {
             Arguments = new object[]
             {
-                outgoingType, propertyName, permissionToCheck
+                outgoingType, propertyName ?? string.Empty, permissionToCheck
             };
         }
     }
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             FilterBasedOnPermissions(items, user);
         }
 
-        protected override int[] GetUserStartNodes(IUser user)
+        protected override int[]? GetUserStartNodes(IUser user)
         {
             return user.CalculateContentStartNodeIds(_entityService, _appCaches);
         }
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 var ids = new List<int>();
                 for (var i = 0; i < length; i++)
                 {
-                    ids.Add(((dynamic)items[i]).Id);
+                    ids.Add(((dynamic)items[i]!).Id);
                 }
                 //get all the permissions for these nodes in one call
                 var permissions = _userService.GetPermissions(user, ids.ToArray());

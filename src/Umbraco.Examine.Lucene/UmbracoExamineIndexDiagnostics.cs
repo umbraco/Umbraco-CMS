@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             _index = index;
         }
 
-        public override IReadOnlyDictionary<string, object> Metadata
+        public override IReadOnlyDictionary<string, object?> Metadata
         {
             get
             {

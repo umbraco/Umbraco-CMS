@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -68,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
             var result = _auditService.GetPagedItemsByEntity(id, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter: dateQuery);
-            var mapped = result.Select(item => _umbracoMapper.Map<AuditLog>(item));
+            var mapped = result.Select(item => _umbracoMapper.Map<AuditLog>(item)).WhereNotNull();
 
             var page = new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
@@ -91,9 +92,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             long totalRecords;
             var dateQuery = sinceDate.HasValue ? _sqlContext.Query<IAuditItem>().Where(x => x.CreateDate >= sinceDate) : null;
-            var userId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0);
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1;
             var result = _auditService.GetPagedItemsByUser(userId, pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
-            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result).WhereNotNull();
             return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
                 Items = MapAvatarsAndNames(mapped)
@@ -103,7 +104,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate = null)
         {
             var result = _auditService.GetLogs(Enum<AuditType>.Parse(logType.ToString()), sinceDate);
-            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result);
+            var mapped = _umbracoMapper.MapEnumerable<IAuditItem, AuditLog>(result).WhereNotNull();
             return mapped;
         }
 

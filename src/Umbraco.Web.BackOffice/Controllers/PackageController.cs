@@ -16,6 +16,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
         {
-            return _packagingService.GetAllCreatedPackages();
+            return _packagingService.GetAllCreatedPackages().WhereNotNull();
         }
 
         public ActionResult<PackageDefinition> GetCreatedPackageById(int id)
@@ -69,7 +70,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ModelState.IsValid == false)
                 return ValidationProblem(ModelState);
 
-            //save it
+            // Save it
             if (!_packagingService.SaveCreatedPackage(model))
             {
                 return ValidationProblem(
@@ -78,9 +79,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                             : $"The package with id {model.Id} was not found");
             }
 
-            _packagingService.ExportCreatedPackage(model);
-
-            //the packagePath will be on the model
+            // The packagePath will be on the model
             return model;
         }
 
@@ -93,7 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpDelete]
         public IActionResult DeleteCreatedPackage(int packageId)
         {
-            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
 
             return Ok();
         }
@@ -112,11 +111,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 return ValidationErrorResult.CreateNotificationValidationErrorResult(
                     $"Package migration failed on package {packageName} with error: {ex.Message}. Check log for full details.");
-            }            
+            }
         }
 
         [HttpGet]
-        public IActionResult DownloadCreatedPackage(int id) 
+        public IActionResult DownloadCreatedPackage(int id)
         {
             var package = _packagingService.GetCreatedPackageById(id);
             if (package == null)
@@ -146,7 +145,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<InstalledPackage> GetInstalledPackageByName([FromQuery] string packageName)
         {
-            InstalledPackage pack = _packagingService.GetInstalledPackageByName(packageName);
+            InstalledPackage? pack = _packagingService.GetInstalledPackageByName(packageName);
             if (pack == null)
             {
                 return NotFound();

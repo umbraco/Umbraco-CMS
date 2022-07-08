@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         [MaxLength(255, ErrorMessage ="Name must be less than 255 characters")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "properties")]
         public IEnumerable<ContentPropertyBasic> Properties { get; set; }
@@ -26,13 +26,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The culture of this variant, if this is invariant than this is null or empty
         /// </summary>
         [DataMember(Name = "culture")]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         /// <summary>
         /// The segment of this variant, if this is invariant than this is null or empty
         /// </summary>
         [DataMember(Name = "segment")]
-        public string Segment { get; set; }
+        public string? Segment { get; set; }
 
         /// <summary>
         /// Indicates if the variant should be updated
@@ -68,6 +68,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        public ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
+        public ContentPropertyCollectionDto? PropertyCollectionDto { get; set; }
     }
 }

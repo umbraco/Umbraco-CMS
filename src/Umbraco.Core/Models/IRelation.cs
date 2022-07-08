@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models
         /// Gets or sets a comment for the Relation
         /// </summary>
         [DataMember]
-        string Comment { get; set; }
+        string? Comment { get; set; }
 
         /// <summary>
         /// Gets the Id of the <see cref="RelationType"/> that this Relation is based on.

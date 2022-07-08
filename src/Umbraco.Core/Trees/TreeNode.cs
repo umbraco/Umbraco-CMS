@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Trees
         /// <param name="parentId">The parent id for the current node</param>
         /// <param name="getChildNodesUrl"></param>
         /// <param name="menuUrl"></param>
-        public TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
+        public TreeNode(string nodeId, string? parentId, string? getChildNodesUrl, string? menuUrl)
         {
             if (nodeId == null) throw new ArgumentNullException(nameof(nodeId));
             if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(nodeId));
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Trees
         }
 
         [DataMember(Name = "parentId", IsRequired = true)]
-        public new object ParentId { get; set; }
+        public new object? ParentId { get; set; }
 
         /// <summary>
         /// A flag to set whether or not this node has children
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Trees
         /// The tree nodetype which refers to the type of node rendered in the tree
         /// </summary>
         [DataMember(Name = "nodeType")]
-        public string NodeType { get; set; }
+        public string? NodeType { get; set; }
 
         /// <summary>
         /// Optional: The Route path for the editor for this node
@@ -59,19 +59,19 @@ namespace Umbraco.Cms.Core.Trees
         /// If this is not set, then the route path will be automatically determined by: {section}/edit/{id}
         /// </remarks>
         [DataMember(Name = "routePath")]
-        public string RoutePath { get; set; }
+        public string? RoutePath { get; set; }
 
         /// <summary>
         /// The JSON URL to load the nodes children
         /// </summary>
         [DataMember(Name = "childNodesUrl")]
-        public string ChildNodesUrl { get; set; }
+        public string? ChildNodesUrl { get; set; }
 
         /// <summary>
         /// The JSON URL to load the menu from
         /// </summary>
         [DataMember(Name = "menuUrl")]
-        public string MenuUrl { get; set; }
+        public string? MenuUrl { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Trees
                     return true;
                 }
 
-                if (Icon.StartsWith(".."))
+                if (Icon!.StartsWith(".."))
                     return false;
 
 

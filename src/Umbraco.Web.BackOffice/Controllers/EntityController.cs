@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -160,7 +162,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="dataTypeKey">If set used to look up whether user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string searchFrom = null,
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type, string? searchFrom = null,
             Guid? dataTypeKey = null)
         {
             // NOTE: Theoretically you shouldn't be able to see member data if you don't have access to members right? ... but there is a member picker, so can't really do that
@@ -193,42 +195,68 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         ///     methods might be used in things like pickers in the content editor.
         /// </remarks>
         [HttpGet]
-        public IDictionary<string, TreeSearchResult> SearchAll(string query)
+        public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
         {
-            var result = new Dictionary<string, TreeSearchResult>();
+            var result = new ConcurrentDictionary<string, TreeSearchResult>();
 
             if (string.IsNullOrEmpty(query))
             {
                 return result;
             }
 
-            var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.ToArray();
+            var culture = ClientCulture();
+            var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.AllowedSections.ToArray();
 
+            var searchTasks = new List<Task>();
             foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
                          .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
-                if (allowedSections.Contains(searchableTree.Value.AppAlias))
+                if (allowedSections?.Contains(searchableTree.Value.AppAlias) ?? false)
                 {
-                    Tree tree = _treeService.GetByAlias(searchableTree.Key);
+                    Tree? tree = _treeService.GetByAlias(searchableTree.Key);
                     if (tree == null)
                     {
                         continue; //shouldn't occur
                     }
 
-                    result[Tree.GetRootNodeDisplayName(tree, _localizedTextService)] = new TreeSearchResult
+                    var rootNodeDisplayName = Tree.GetRootNodeDisplayName(tree, _localizedTextService);
+                    if (rootNodeDisplayName is not null)
                     {
-                        Results = searchableTree.Value.SearchableTree.Search(query, 200, 0, out var total),
-                        TreeAlias = searchableTree.Key,
-                        AppAlias = searchableTree.Value.AppAlias,
-                        JsFormatterService = searchableTree.Value.FormatterService,
-                        JsFormatterMethod = searchableTree.Value.FormatterMethod
-                    };
+                        searchTasks.Add(ExecuteSearchAsync(query, culture, searchableTree, rootNodeDisplayName,result));
+                    }
                 }
             }
 
+            await Task.WhenAll(searchTasks);
             return result;
         }
 
+        private static async Task ExecuteSearchAsync(
+            string query,
+            string? culture,
+            KeyValuePair<string, SearchableApplicationTree> searchableTree,
+            string rootNodeDisplayName,
+            ConcurrentDictionary<string, TreeSearchResult> result)
+        {
+            ISearchableTree searcher = searchableTree.Value.SearchableTree;
+            const int pageSize = 200;
+            IEnumerable<SearchResultEntity> results = (
+                searcher is ISearchableTreeWithCulture searcherWithCulture
+                    ? await searcherWithCulture.SearchAsync(query, pageSize, 0, culture: culture)
+                    : await searcher.SearchAsync(query, pageSize, 0))
+            .WhereNotNull();
+
+            var searchResult = new TreeSearchResult
+            {
+                Results = results,
+                TreeAlias = searchableTree.Key,
+                AppAlias = searchableTree.Value.AppAlias,
+                JsFormatterService = searchableTree.Value.FormatterService,
+                JsFormatterMethod = searchableTree.Value.FormatterMethod
+            };
+
+            result.AddOrUpdate(rootNodeDisplayName, _=> searchResult, (_,_) => searchResult);
+        }
         /// <summary>
         ///     Gets the path for a given node ID
         /// </summary>
@@ -237,8 +265,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public IConvertToActionResult GetPath(int id, UmbracoEntityTypes type)
         {
-            ActionResult<EntityBasic> foundContentResult = GetResultForId(id, type);
-            EntityBasic foundContent = foundContentResult.Value;
+            ActionResult<EntityBasic?> foundContentResult = GetResultForId(id, type);
+            EntityBasic? foundContent = foundContentResult.Value;
             if (foundContent is null)
             {
                 return foundContentResult;
@@ -257,8 +285,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public IConvertToActionResult GetPath(Guid id, UmbracoEntityTypes type)
         {
-            ActionResult<EntityBasic> foundContentResult = GetResultForKey(id, type);
-            EntityBasic foundContent = foundContentResult.Value;
+            ActionResult<EntityBasic?> foundContentResult = GetResultForKey(id, type);
+            EntityBasic? foundContent = foundContentResult.Value;
             if (foundContent is null)
             {
                 return foundContentResult;
@@ -333,14 +361,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IDictionary<int, string> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        public IDictionary<int, string?> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
         {
             if (ids == null || !ids.Any())
             {
-                return new Dictionary<int, string>();
+                return new Dictionary<int, string?>();
             }
 
-            string MediaOrDocumentUrl(int id)
+            string? MediaOrDocumentUrl(int id)
             {
                 switch (type)
                 {
@@ -349,7 +377,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     case UmbracoEntityTypes.Media:
                     {
-                        IPublishedContent media = _publishedContentQuery.Media(id);
+                        IPublishedContent? media = _publishedContentQuery.Media(id);
 
                         // NOTE: If culture is passed here we get an empty string rather than a media item URL.
                         return _publishedUrlProvider.GetMediaUrl(media, culture: null);
@@ -382,14 +410,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IDictionary<Guid, string> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        public IDictionary<Guid, string?> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
         {
             if (ids == null || !ids.Any())
             {
-                return new Dictionary<Guid, string>();
+                return new Dictionary<Guid, string?>();
             }
 
-            string MediaOrDocumentUrl(Guid id)
+            string? MediaOrDocumentUrl(Guid id)
             {
                 return type switch
                 {
@@ -424,15 +452,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IDictionary<Udi, string> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        public IDictionary<Udi, string?> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string? culture = null)
         {
             if (ids == null || !ids.Any())
             {
-                return new Dictionary<Udi, string>();
+                return new Dictionary<Udi, string?>();
             }
 
             // TODO: PMJ 2021-09-27 - Should GetUrl(Udi) exist as an extension method on UrlProvider/IUrlProvider (in v9)
-            string MediaOrDocumentUrl(Udi id)
+            string? MediaOrDocumentUrl(Udi id)
             {
                 if (id is not GuidUdi guidUdi)
                 {
@@ -472,11 +500,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         [HttpPost]
         [Obsolete("Use GetUrlsByIds instead.")]
-        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
+        public IDictionary<Udi, string?> GetUrlsByUdis([FromJsonPath] Udi[] udis, string? culture = null)
         {
             if (udis == null || !udis.Any())
             {
-                return new Dictionary<Udi, string>();
+                return new Dictionary<Udi, string?>();
             }
 
             var udiEntityType = udis.First().EntityType;
@@ -508,7 +536,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         ///     We are not restricting this with security because there is no sensitive data
         /// </remarks>
-        public IActionResult GetUrl(int id, UmbracoEntityTypes type, string culture = null)
+        public IActionResult GetUrl(int id, UmbracoEntityTypes type, string? culture = null)
         {
             culture = culture ?? ClientCulture();
 
@@ -546,7 +574,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="nodeContextId"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public ActionResult<EntityBasic> GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
             // TODO: Rename this!!! It's misleading, it should be GetByXPath
 
@@ -558,7 +586,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
 
             var q = ParseXPathQuery(query, nodeContextId);
-            IPublishedContent node = _publishedContentQuery.ContentSingleAtXPath(q);
+            IPublishedContent? node = _publishedContentQuery.ContentSingleAtXPath(q);
 
             if (node == null)
             {
@@ -575,8 +603,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 id,
                 nodeid =>
                 {
-                    IEntitySlim ent = _entityService.Get(nodeid);
-                    return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
+                    IEntitySlim? ent = _entityService.Get(nodeid);
+                    return ent?.Path.Split(Constants.CharArrays.Comma).Reverse();
                 },
                 i => _publishedContentQuery.Content(i) != null);
 
@@ -593,7 +621,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
+        public UrlAndAnchors GetUrlAndAnchors(int id, string? culture = "*")
         {
             culture = culture ?? ClientCulture();
 
@@ -606,6 +634,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IEnumerable<string> GetAnchors(AnchorsModel model)
         {
+            if (model.RteContent is null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
             IEnumerable<string> anchorValues = _contentService.GetAnchorValuesFromRTEContent(model.RteContent);
             return anchorValues;
         }
@@ -631,15 +664,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         return Enumerable.Empty<EntityBasic>();
                     }
 
-                    var pr = new List<EntityBasic>(nodes.Select(_umbracoMapper.Map<EntityBasic>));
+                    var pr = new List<EntityBasic>(nodes.Select(_umbracoMapper.Map<EntityBasic>).WhereNotNull());
                     return pr;
                 }
 
                 // else proceed as usual
 
                 return _entityService.GetChildren(id, objectType.Value)
-                    .WhereNotNull()
-                    .Select(_umbracoMapper.Map<EntityBasic>);
+                    .Select(_umbracoMapper.Map<EntityBasic>)
+                    .WhereNotNull();
             }
 
             //now we need to convert the unknown ones
@@ -760,27 +793,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (id == Constants.System.Root && startNodes.Length > 0 &&
                     startNodes.Contains(Constants.System.Root) == false && !ignoreUserStartNodes)
                 {
-                    if (pageNumber > 0)
-                    {
-                        return new PagedResult<EntityBasic>(0, 0, 0);
-                    }
-
-                    IEntitySlim[] nodes = _entityService.GetAll(objectType.Value, startNodes).ToArray();
-                    if (nodes.Length == 0)
-                    {
-                        return new PagedResult<EntityBasic>(0, 0, 0);
-                    }
-
-                    if (pageSize < nodes.Length)
-                    {
-                        pageSize = nodes.Length; // bah
-                    }
-
-                    var pr = new PagedResult<EntityBasic>(nodes.Length, pageNumber, pageSize)
-                    {
-                        Items = nodes.Select(_umbracoMapper.Map<EntityBasic>)
-                    };
-                    return pr;
+                    return new PagedResult<EntityBasic>(0, 0, 0);
                 }
 
                 // else proceed as usual
@@ -788,7 +801,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     out totalRecords,
                     filter.IsNullOrWhiteSpace()
                         ? null
-                        : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                        : _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
                     Ordering.By(orderBy, orderDirection));
 
 
@@ -802,15 +815,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     Items = entities.Select(source =>
                     {
-                        EntityBasic target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
+                        EntityBasic? target = _umbracoMapper.Map<IEntitySlim, EntityBasic>(source, context =>
                         {
                             context.SetCulture(culture);
                             context.SetCulture(culture);
                         });
-                        //TODO: Why is this here and not in the mapping?
-                        target.AdditionalData["hasChildren"] = source.HasChildren;
+
+                        if (target is not null)
+                        {
+                            //TODO: Why is this here and not in the mapping?
+                            target.AdditionalData["hasChildren"] = source.HasChildren;
+                        }
                         return target;
-                    })
+                    }).WhereNotNull(),
                 };
 
                 return pagedResult;
@@ -835,11 +852,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(
-                        _entityService, _appCaches);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateContentStartNodeIds(
+                        _entityService, _appCaches) ?? Array.Empty<int>();
                 case UmbracoEntityTypes.Media:
-                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(
-                        _entityService, _appCaches);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateMediaStartNodeIds(
+                        _entityService, _appCaches) ?? Array.Empty<int>();
                 default:
                     return Array.Empty<int>();
             }
@@ -884,18 +901,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     entities = aids == null || aids.Contains(Constants.System.Root) || ignoreUserStartNodes
                         ? _entityService.GetPagedDescendants(objectType.Value, pageNumber - 1, pageSize,
                             out totalRecords,
-                            _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
                             Ordering.By(orderBy, orderDirection), false)
                         : _entityService.GetPagedDescendants(aids, objectType.Value, pageNumber - 1, pageSize,
                             out totalRecords,
-                            _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                            _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
                             Ordering.By(orderBy, orderDirection));
                 }
                 else
                 {
                     entities = _entityService.GetPagedDescendants(id, objectType.Value, pageNumber - 1, pageSize,
                         out totalRecords,
-                        _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name.Contains(filter)),
+                        _sqlContext.Query<IUmbracoEntity>().Where(x => x.Name!.Contains(filter)),
                         Ordering.By(orderBy, orderDirection));
                 }
 
@@ -906,7 +923,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 var pagedResult = new PagedResult<EntityBasic>(totalRecords, pageNumber, pageSize)
                 {
-                    Items = entities.Select(MapEntities())
+                    Items = entities.Select(MapEntities()).WhereNotNull(),
                 };
 
                 return pagedResult;
@@ -940,7 +957,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             [ModelBinder(typeof(HttpQueryStringModelBinder))]
             FormCollection queryStrings)
         {
-            IEntitySlim entity = _entityService.Get(id);
+            IEntitySlim? entity = _entityService.Get(id);
             if (entity is null)
             {
                 return NotFound();
@@ -958,7 +975,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="ignoreUserStartNodes">If set to true, user and group start node permissions will be ignored.</param>
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType,
-            string searchFrom = null, bool ignoreUserStartNodes = false)
+            string? searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var culture = ClientCulture();
             return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, culture, searchFrom,
@@ -973,8 +990,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
                 return _entityService.GetChildren(id, objectType.Value)
-                    .WhereNotNull()
-                    .Select(MapEntities());
+                    .Select(MapEntities())
+                    .WhereNotNull();
             }
 
             //now we need to convert the unknown ones
@@ -990,30 +1007,30 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType,
-            FormCollection queryStrings = null)
+            FormCollection? queryStrings = null)
         {
             UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = _entityService.Get(id).Path.Split(Constants.CharArrays.Comma)
+                var ids = _entityService.Get(id)?.Path.Split(Constants.CharArrays.Comma)
                     .Select(s => int.Parse(s, CultureInfo.InvariantCulture)).Distinct().ToArray();
 
                 var ignoreUserStartNodes =
                     IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)
                 {
-                    int[] aids = null;
+                    int[]? aids = null;
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser
+                            aids = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?
                                 .CalculateContentStartNodeIds(_entityService, _appCaches);
                             break;
                         case UmbracoEntityTypes.Media:
                             aids =
-                                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(
+                                _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.CalculateMediaStartNodeIds(
                                     _entityService, _appCaches);
                             break;
                     }
@@ -1022,18 +1039,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     {
                         var lids = new List<int>();
                         var ok = false;
-                        foreach (var i in ids)
+                        if (ids is not null)
                         {
-                            if (ok)
+                            foreach (var i in ids)
                             {
-                                lids.Add(i);
-                                continue;
-                            }
+                                if (ok)
+                                {
+                                    lids.Add(i);
+                                    continue;
+                                }
 
-                            if (aids.Contains(i))
-                            {
-                                lids.Add(i);
-                                ok = true;
+                                if (aids.Contains(i))
+                                {
+                                    lids.Add(i);
+                                    ok = true;
+                                }
                             }
                         }
 
@@ -1043,12 +1063,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 var culture = queryStrings?.GetValue<string>("culture");
 
-                return ids.Length == 0
+                return ids is null || ids.Length == 0
                     ? Enumerable.Empty<EntityBasic>()
                     : _entityService.GetAll(objectType.Value, ids)
-                        .WhereNotNull()
                         .OrderBy(x => x.Level)
-                        .Select(MapEntities(culture));
+                        .Select(MapEntities(culture))
+                        .WhereNotNull();
             }
 
             //now we need to convert the unknown ones
@@ -1076,13 +1096,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (objectType.HasValue)
             {
                 IEnumerable<EntityBasic> entities = _entityService.GetAll(objectType.Value, keys)
-                    .WhereNotNull()
-                    .Select(MapEntities());
+                    .Select(MapEntities())
+                    .WhereNotNull();
 
                 // entities are in "some" order, put them back in order
                 var xref = entities.ToDictionary(x => x.Key);
                 IEnumerable<EntityBasic> result = keys.Select(x => xref.ContainsKey(x) ? xref[x] : null)
-                    .Where(x => x != null);
+                    .WhereNotNull();
 
                 return result;
             }
@@ -1112,13 +1132,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (objectType.HasValue)
             {
                 IEnumerable<EntityBasic> entities = _entityService.GetAll(objectType.Value, ids)
-                    .WhereNotNull()
-                    .Select(MapEntities());
+                    .Select(MapEntities())
+                    .WhereNotNull();
 
                 // entities are in "some" order, put them back in order
-                var xref = entities.ToDictionary(x => x.Id);
+                var xref = entities.Where(x => x.Id != null).ToDictionary(x => x.Id!);
                 IEnumerable<EntityBasic> result = ids.Select(x => xref.ContainsKey(x) ? xref[x] : null)
-                    .Where(x => x != null);
+                    .WhereNotNull();
 
                 return result;
             }
@@ -1137,12 +1157,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private ActionResult<EntityBasic> GetResultForKey(Guid key, UmbracoEntityTypes entityType)
+        private ActionResult<EntityBasic?> GetResultForKey(Guid key, UmbracoEntityTypes entityType)
         {
             UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                IEntitySlim found = _entityService.Get(key, objectType.Value);
+                IEntitySlim? found = _entityService.Get(key, objectType.Value);
                 if (found == null)
                 {
                     return NotFound();
@@ -1165,7 +1185,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.Macro:
 
                 case UmbracoEntityTypes.Template:
-                    ITemplate template = _fileService.GetTemplate(key);
+                    ITemplate? template = _fileService.GetTemplate(key);
                     if (template is null)
                     {
                         return NotFound();
@@ -1179,12 +1199,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private ActionResult<EntityBasic> GetResultForId(int id, UmbracoEntityTypes entityType)
+        private ActionResult<EntityBasic?> GetResultForId(int id, UmbracoEntityTypes entityType)
         {
             UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                IEntitySlim found = _entityService.Get(id, objectType.Value);
+                IEntitySlim? found = _entityService.Get(id, objectType.Value);
                 if (found == null)
                 {
                     return NotFound();
@@ -1207,7 +1227,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.Macro:
 
                 case UmbracoEntityTypes.Template:
-                    ITemplate template = _fileService.GetTemplate(id);
+                    ITemplate? template = _fileService.GetTemplate(id);
                     if (template is null)
                     {
                         return NotFound();
@@ -1255,7 +1275,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         ///     ignored.
         /// </param>
         /// <returns></returns>
-        public IEnumerable<EntityBasic> GetAll(UmbracoEntityTypes type, string postFilter) =>
+        public IEnumerable<EntityBasic>? GetAll(UmbracoEntityTypes type, string postFilter) =>
             GetResultForAll(type, postFilter);
 
         /// <summary>
@@ -1264,14 +1284,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="entityType"></param>
         /// <param name="postFilter">A string where filter that will filter the results dynamically with linq - optional</param>
         /// <returns></returns>
-        private IEnumerable<EntityBasic> GetResultForAll(UmbracoEntityTypes entityType, string postFilter = null)
+        private IEnumerable<EntityBasic>? GetResultForAll(UmbracoEntityTypes entityType, string? postFilter = null)
         {
             UmbracoObjectTypes? objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
                 // TODO: Should we order this by something ?
                 IEnumerable<EntityBasic> entities =
-                    _entityService.GetAll(objectType.Value).WhereNotNull().Select(MapEntities());
+                    _entityService.GetAll(objectType.Value).Select(MapEntities()).WhereNotNull();
                 return ExecutePostFilter(entities, postFilter);
             }
 
@@ -1279,15 +1299,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (entityType)
             {
                 case UmbracoEntityTypes.Template:
-                    IEnumerable<ITemplate> templates = _fileService.GetTemplates();
-                    IEnumerable<ITemplate> filteredTemplates = ExecutePostFilter(templates, postFilter);
-                    return filteredTemplates.Select(MapEntities());
+                    IEnumerable<ITemplate>? templates = _fileService.GetTemplates();
+                    IEnumerable<ITemplate>? filteredTemplates = ExecutePostFilter(templates, postFilter);
+                    return filteredTemplates?.Select(MapEntities()).WhereNotNull();
 
                 case UmbracoEntityTypes.Macro:
                     //Get all macros from the macro service
                     IOrderedEnumerable<IMacro> macros = _macroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
-                    IEnumerable<IMacro> filteredMacros = ExecutePostFilter(macros, postFilter);
-                    return filteredMacros.Select(MapEntities());
+                    IEnumerable<IMacro>? filteredMacros = ExecutePostFilter(macros, postFilter);
+                    return filteredMacros?.Select(MapEntities()).WhereNotNull();
 
                 case UmbracoEntityTypes.PropertyType:
 
@@ -1298,8 +1318,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         .ToArray()
                         .SelectMany(x => x.PropertyTypes)
                         .DistinctBy(composition => composition.Alias);
-                    IEnumerable<IPropertyType> filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
-                    return _umbracoMapper.MapEnumerable<IPropertyType, EntityBasic>(filteredPropertyTypes);
+                    IEnumerable<IPropertyType>? filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter);
+                    return _umbracoMapper.MapEnumerable<IPropertyType, EntityBasic>(filteredPropertyTypes ?? Enumerable.Empty<IPropertyType>()).WhereNotNull();
 
                 case UmbracoEntityTypes.PropertyGroup:
 
@@ -1310,14 +1330,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         .ToArray()
                         .SelectMany(x => x.PropertyGroups)
                         .DistinctBy(composition => composition.Name);
-                    IEnumerable<PropertyGroup> filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
-                    return _umbracoMapper.MapEnumerable<PropertyGroup, EntityBasic>(filteredpropertyGroups);
+                    IEnumerable<PropertyGroup>? filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter);
+                    return _umbracoMapper.MapEnumerable<PropertyGroup, EntityBasic>(filteredpropertyGroups ?? Enumerable.Empty<PropertyGroup>()).WhereNotNull();
 
                 case UmbracoEntityTypes.User:
 
                     IEnumerable<IUser> users = _userService.GetAll(0, int.MaxValue, out _);
-                    IEnumerable<IUser> filteredUsers = ExecutePostFilter(users, postFilter);
-                    return _umbracoMapper.MapEnumerable<IUser, EntityBasic>(filteredUsers);
+                    IEnumerable<IUser>? filteredUsers = ExecutePostFilter(users, postFilter);
+                    return _umbracoMapper.MapEnumerable<IUser, EntityBasic>(filteredUsers ?? Enumerable.Empty<IUser>()).WhereNotNull();
 
                 case UmbracoEntityTypes.Stylesheet:
 
@@ -1326,7 +1346,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         throw new NotSupportedException("Filtering on stylesheets is not currently supported");
                     }
 
-                    return _fileService.GetStylesheets().Select(MapEntities());
+                    return _fileService.GetStylesheets().Select(MapEntities()).WhereNotNull();
 
                 case UmbracoEntityTypes.Script:
 
@@ -1335,7 +1355,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         throw new NotSupportedException("Filtering on scripts is not currently supported");
                     }
 
-                    return _fileService.GetScripts().Select(MapEntities());
+                    return _fileService.GetScripts().Select(MapEntities()).WhereNotNull();
 
                 case UmbracoEntityTypes.PartialView:
 
@@ -1344,7 +1364,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         throw new NotSupportedException("Filtering on partial views is not currently supported");
                     }
 
-                    return _fileService.GetPartialViews().Select(MapEntities());
+                    return _fileService.GetPartialViews().Select(MapEntities()).WhereNotNull();
 
                 case UmbracoEntityTypes.Language:
 
@@ -1353,7 +1373,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         throw new NotSupportedException("Filtering on languages is not currently supported");
                     }
 
-                    return _localizationService.GetAllLanguages().Select(MapEntities());
+                    return _localizationService.GetAllLanguages().Select(MapEntities()).WhereNotNull();
                 case UmbracoEntityTypes.DictionaryItem:
 
                     if (!postFilter.IsNullOrWhiteSpace())
@@ -1369,31 +1389,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter)
+        private IEnumerable<T>? ExecutePostFilter<T>(IEnumerable<T>? entities, string? postFilter)
         {
             if (postFilter.IsNullOrWhiteSpace())
             {
                 return entities;
             }
 
-            var postFilterConditions = postFilter.Split(Constants.CharArrays.Ampersand);
+            var postFilterConditions = postFilter!.Split(Constants.CharArrays.Ampersand);
 
             foreach (var postFilterCondition in postFilterConditions)
             {
-                QueryCondition queryCondition = BuildQueryCondition<T>(postFilterCondition);
+                QueryCondition? queryCondition = BuildQueryCondition<T>(postFilterCondition);
 
                 if (queryCondition != null)
                 {
                     Expression<Func<T, bool>> whereClauseExpression = queryCondition.BuildCondition<T>("x");
 
-                    entities = entities.Where(whereClauseExpression.Compile());
+                    entities = entities?.Where(whereClauseExpression.Compile());
                 }
             }
 
             return entities;
         }
 
-        private static QueryCondition BuildQueryCondition<T>(string postFilter)
+        private static QueryCondition? BuildQueryCondition<T>(string postFilter)
         {
             var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
 
@@ -1419,7 +1439,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             Type type = typeof(T);
-            PropertyInfo property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo? property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
 
             if (property == null)
             {
@@ -1439,19 +1459,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return queryCondition;
         }
 
-        private Func<object, EntityBasic> MapEntities(string culture = null)
+        private Func<object, EntityBasic?> MapEntities(string? culture = null)
         {
             culture = culture ?? ClientCulture();
             return x => MapEntity(x, culture);
         }
 
-        private EntityBasic MapEntity(object entity, string culture = null)
+        private EntityBasic? MapEntity(object entity, string? culture = null)
         {
             culture = culture ?? ClientCulture();
             return _umbracoMapper.Map<EntityBasic>(entity, context => { context.SetCulture(culture); });
         }
 
-        private string ClientCulture() => Request.ClientCulture();
+        private string? ClientCulture() => Request.ClientCulture();
 
 
         #region GetById
@@ -1462,7 +1482,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public ActionResult<EntityBasic> GetById(int id, UmbracoEntityTypes type) => GetResultForId(id, type);
+        public ActionResult<EntityBasic?> GetById(int id, UmbracoEntityTypes type) => GetResultForId(id, type);
 
         /// <summary>
         ///     Gets an entity by it's key
@@ -1470,7 +1490,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public ActionResult<EntityBasic> GetById(Guid id, UmbracoEntityTypes type) => GetResultForKey(id, type);
+        public ActionResult<EntityBasic?> GetById(Guid id, UmbracoEntityTypes type) => GetResultForKey(id, type);
 
         /// <summary>
         ///     Gets an entity by it's UDI
@@ -1478,7 +1498,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public ActionResult<EntityBasic> GetById(Udi id, UmbracoEntityTypes type)
+        public ActionResult<EntityBasic?> GetById(Udi id, UmbracoEntityTypes type)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -1584,12 +1604,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var list = new List<EntityBasic>();
 
-            foreach (IDictionaryItem dictionaryItem in _localizationService.GetRootDictionaryItems()
-                         .OrderBy(DictionaryItemSort()))
+            var rootDictionaryItems = _localizationService.GetRootDictionaryItems();
+            if (rootDictionaryItems is not null)
             {
-                EntityBasic item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
-                list.Add(item);
-                GetChildItemsForList(dictionaryItem, list);
+                foreach (IDictionaryItem dictionaryItem in rootDictionaryItems
+                             .OrderBy(DictionaryItemSort()))
+                {
+                    EntityBasic? item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
+                    if (item is not null)
+                    {
+                        list.Add(item);
+                    }
+
+                    GetChildItemsForList(dictionaryItem, list);
+                }
             }
 
             return list;
@@ -1599,14 +1627,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, ICollection<EntityBasic> list)
         {
-            foreach (IDictionaryItem childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key)
-                         .OrderBy(DictionaryItemSort()))
-            {
-                EntityBasic item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(childItem);
-                list.Add(item);
+            var itemChildren = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
 
-                GetChildItemsForList(childItem, list);
+            if (itemChildren is not null)
+            {
+                foreach (IDictionaryItem childItem in itemChildren
+                             .OrderBy(DictionaryItemSort()))
+                {
+                    EntityBasic? item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(childItem);
+                    if (item is not null)
+                    {
+                        list.Add(item);
+                    }
+
+                    GetChildItemsForList(childItem, list);
+                }
             }
+
         }
 
         #endregion

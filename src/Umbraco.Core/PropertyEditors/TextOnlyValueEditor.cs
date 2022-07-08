@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <remarks>
         /// The object returned will always be a string and if the database type is not a valid string type an exception is thrown
         /// </remarks>
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
 
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 case ValueStorageType.Ntext:
                 case ValueStorageType.Nvarchar:
-                    return val.ToString();
+                    return val.ToString() ?? string.Empty;
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
                 case ValueStorageType.Date:

@@ -14,19 +14,21 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
-        private readonly RequestHandlerSettings _requestConfig;
+        private RequestHandlerSettings _requestConfig;
         private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IOptions<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _requestConfig = requestConfig.Value;
+            _requestConfig = requestConfig.CurrentValue;
             _siteDomainMapper = siteDomainMapper;
             _uriUtility = uriUtility;
             _publishedValueFallback = publishedValueFallback;
             _umbracoContextAccessor = umbracoContextAccessor;
+
+            requestConfig.OnChange(x => _requestConfig = x);
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -36,7 +38,7 @@ namespace Umbraco.Cms.Core.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
         {
             return null; // we have nothing to say
         }
@@ -59,7 +61,7 @@ namespace Umbraco.Cms.Core.Routing
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var node = umbracoContext.Content.GetById(id);
+            var node = umbracoContext.Content?.GetById(id);
             if (node == null)
                 yield break;
 
@@ -77,7 +79,7 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // determine whether the alias property varies
-            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias).PropertyType.VariesByCulture();
+            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias)!.PropertyType.VariesByCulture();
 
             if (domainUris == null)
             {

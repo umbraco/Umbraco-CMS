@@ -11,16 +11,16 @@ namespace Umbraco.Cms.Infrastructure.Serialization
             return objectType == typeof (object) || objectType == typeof (int);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             var jsonValue = serializer.Deserialize<JValue>(reader);
 
-            return jsonValue.Type == JTokenType.Integer
+            return jsonValue?.Type == JTokenType.Integer
                 ? jsonValue.Value<int>()
                 : serializer.Deserialize(reader);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }

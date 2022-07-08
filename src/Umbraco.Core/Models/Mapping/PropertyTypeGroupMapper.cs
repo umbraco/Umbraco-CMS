@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <param name="contentType">The composition.</param>
         /// <param name="propertyGroupId">The identifier of the property group.</param>
         /// <returns>The composition content type that defines the specified property group.</returns>
-        private static IContentTypeComposition GetContentTypeForPropertyGroup(IContentTypeComposition contentType, int propertyGroupId)
+        private static IContentTypeComposition? GetContentTypeForPropertyGroup(IContentTypeComposition contentType, int propertyGroupId)
         {
             // test local groups
             if (contentType.PropertyGroups.Any(x => x.Id == propertyGroupId))
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <param name="contentType">The composition.</param>
         /// <param name="propertyTypeId">The identifier of the property type.</param>
         /// <returns>The composition content type that defines the specified property group.</returns>
-        private static IContentTypeComposition GetContentTypeForPropertyType(IContentTypeComposition contentType, int propertyTypeId)
+        private static IContentTypeComposition? GetContentTypeForPropertyType(IContentTypeComposition contentType, int propertyTypeId)
         {
             // test local property types
             if (contentType.PropertyTypes.Any(x => x.Id == propertyTypeId))
@@ -165,7 +165,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // lock properties by aliases
             foreach (var property in groups.SelectMany(x => x.Properties))
             {
-                property.Locked = lockedPropertyAliases.Contains(property.Alias);
+                if (property.Alias is not null)
+                {
+                    property.Locked = lockedPropertyAliases.Contains(property.Alias);
+                }
             }
 
             // now merge tabs based on alias
@@ -202,11 +205,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<TPropertyType> MapProperties(IEnumerable<IPropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<IPropertyType>? properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<TPropertyType>();
 
-            foreach (var p in properties.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder))
+            foreach (var p in properties?.Where(x => x.DataTypeId != 0).OrderBy(x => x.SortOrder) ?? Enumerable.Empty<IPropertyType>())
             {
                 var propertyEditorAlias = p.PropertyEditorAlias;
                 var propertyEditor = _propertyEditors[propertyEditorAlias];
@@ -220,9 +223,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     propertyEditor = _propertyEditors[propertyEditorAlias];
                 }
 
-                var config = propertyEditor == null
+                var config = propertyEditor is null || dataType is null
                     ? new Dictionary<string, object>()
-                    : dataType.Editor.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
+                    : dataType.Editor?.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
 
                 mappedProperties.Add(new TPropertyType
                 {
@@ -239,15 +242,15 @@ namespace Umbraco.Cms.Core.Models.Mapping
                         PatternMessage = p.ValidationRegExpMessage,
                     },
                     Label = p.Name,
-                    View = propertyEditor.GetValueEditor().View,
+                    View = propertyEditor?.GetValueEditor().View,
                     Config = config,
                     //Value = "",
                     GroupId = groupId,
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
                     DataTypeKey = p.DataTypeKey,
-                    DataTypeName = dataType.Name,
-                    DataTypeIcon = propertyEditor.Icon,
+                    DataTypeName = dataType?.Name,
+                    DataTypeIcon = propertyEditor?.Icon,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,

@@ -90,13 +90,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         internal void MapPropertyValuesForPersistence<TPersisted, TSaved>(
             TSaved contentItem,
-            ContentPropertyCollectionDto dto,
-            Func<TSaved, IProperty, object> getPropertyValue,
-            Action<TSaved, IProperty, object> savePropertyValue,
-            string culture)
+            ContentPropertyCollectionDto? dto,
+            Func<TSaved, IProperty?, object?> getPropertyValue,
+            Action<TSaved, IProperty?, object?> savePropertyValue,
+            string? culture)
             where TPersisted : IContentBase
             where TSaved : IContentSave<TPersisted>
         {
+            if (dto is null)
+            {
+                return;
+            }
+
             // map the property values
             foreach (ContentPropertyDto propertyDto in dto.Properties)
             {
@@ -116,7 +121,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 // get the property
-                IProperty property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+                IProperty property = contentItem.PersistedContent.Properties[propertyDto.Alias]!;
 
                 // prepare files, if any matching property and culture
                 ContentPropertyFile[] files = contentItem.UploadedFiles
@@ -125,32 +130,33 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 foreach (ContentPropertyFile file in files)
                 {
-                    file.FileName = file.FileName.ToSafeFileName(ShortStringHelper);
+                    file.FileName = file.FileName?.ToSafeFileName(ShortStringHelper);
                 }
 
+
                 // create the property data for the property editor
-                var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType.Configuration)
+                var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType?.Configuration)
                 {
-                    ContentKey = contentItem.PersistedContent.Key,
+                    ContentKey = contentItem.PersistedContent!.Key,
                     PropertyTypeKey = property.PropertyType.Key,
                     Files = files
                 };
 
                 // let the editor convert the value that was received, deal with files, etc
-                object value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
+                object? value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
 
                 // set the value - tags are special
-                TagsPropertyEditorAttribute tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
+                TagsPropertyEditorAttribute? tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
                 if (tagAttribute != null)
                 {
-                    TagConfiguration tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
-                    if (tagConfiguration.Delimiter == default)
+                    TagConfiguration? tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType?.Configuration);
+                    if (tagConfiguration is not null && tagConfiguration.Delimiter == default)
                     {
                         tagConfiguration.Delimiter = tagAttribute.Delimiter;
                     }
 
-                    var tagCulture = property.PropertyType.VariesByCulture() ? culture : null;
-                    property.SetTagsValue(_serializer, value, tagConfiguration, tagCulture);
+                    var tagCulture = property?.PropertyType.VariesByCulture() ?? false ? culture : null;
+                    property?.SetTagsValue(_serializer, value, tagConfiguration, tagCulture);
                 }
                 else
                 {
@@ -170,12 +176,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// This is useful for when filters have already looked up a persisted entity and we don't want to have
         /// to look it up again.
         /// </remarks>
-        protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
+        protected TPersisted? GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
         {
             // checks if the request contains the key and the item is not null, if that is the case, return it from the request, otherwise return
             // it from the callback
             return HttpContext.Items.ContainsKey(typeof(TPersisted).ToString()) && HttpContext.Items[typeof(TPersisted).ToString()] != null
-                ? (TPersisted)HttpContext.Items[typeof(TPersisted).ToString()]
+                ? (TPersisted?)HttpContext.Items[typeof(TPersisted).ToString()]
                 : getFromService();
         }
 
@@ -194,19 +200,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="messageAlias"></param>
         /// <param name="messageParams"></param>
         protected void AddCancelMessage(
-            INotificationModel display,
+            INotificationModel? display,
             string messageArea = "speechBubbles",
             string messageAlias ="operationCancelledText",
-            string[] messageParams = null)
+            string[]? messageParams = null)
         {
             // if there's already a default event message, don't add our default one
             IEventMessagesFactory messages = EventMessages;
-            if (messages != null && messages.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage))
+            if (messages != null && (messages.GetOrDefault()?.GetAll().Any(x => x.IsDefaultEventMessage) ?? false))
             {
                 return;
             }
 
-            display.AddWarningNotification(
+            display?.AddWarningNotification(
                 LocalizedTextService.Localize("speechBubbles", "operationCancelledHeader"),
                 LocalizedTextService.Localize(messageArea, messageAlias, messageParams));
         }
@@ -224,7 +230,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             // if there's already a default event message, don't add our default one
             IEventMessagesFactory messages = EventMessages;
-            if (messages != null && messages.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage))
+            if (messages?.GetOrDefault()?.GetAll().Any(x => x.IsDefaultEventMessage) == true)
             {
                 return;
             }

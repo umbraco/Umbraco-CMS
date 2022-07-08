@@ -8,11 +8,13 @@ using System.Linq;
 using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
@@ -39,9 +41,9 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
         /// <summary>
         /// Uses/Replaces services with testing services
         /// </summary>
-        public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper, AppCaches appCaches = null)
+        public static IUmbracoBuilder AddTestServices(this IUmbracoBuilder builder, TestHelper testHelper)
         {
-            builder.Services.AddUnique(appCaches ?? AppCaches.NoCache);
+            builder.Services.AddUnique(AppCaches.NoCache);
             builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique(testHelper.MainDom);
 
@@ -90,7 +92,9 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
                     return new LocalizedTextServiceFileSources(
                         loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),
                         appCaches,
-                        mainLangFolder);
+                        mainLangFolder,
+                        Array.Empty<LocalizedTextServiceSupplementaryFileSource>(),
+                    new EmbeddedFileProvider(typeof(IAssemblyProvider).Assembly, "Umbraco.Cms.Core.EmbeddedResources.Lang").GetDirectoryContents(string.Empty));
                 }),
                 loggerFactory.CreateLogger<LocalizedTextService>());
 

@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     public class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, NuCacheSettings settings, ContentDataSerializer contentDataSerializer = null)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, NuCacheSettings settings, ContentDataSerializer? contentDataSerializer = null)
         {
             var keySerializer = new PrimitiveSerializer();
             var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);

@@ -1,17 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Persistence.Sqlite.Interceptors;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
@@ -20,6 +23,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class LocksTests : UmbracoIntegrationTest
     {
+        protected override void ConfigureTestServices(IServiceCollection services)
+        {
+            // SQLite + retry policy makes tests fail, we retry before throwing distributed locking timeout.
+            services.RemoveAll(x => x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
+        }
+
         [SetUp]
         protected void SetUp()
         {
@@ -27,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             // create a few lock objects
             using (var scope = ScopeProvider.CreateScope())
             {
-                var database = scope.Database;
+                var database = ScopeAccessor.AmbientScope.Database;
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 1, Name = "Lock.1" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 2, Name = "Lock.2" });
                 database.Insert("umbracoLock", "id", false, new LockDto { Id = 3, Name = "Lock.3" });
@@ -48,6 +57,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ConcurrentReadersTest()
         {
+
             const int threadCount = 8;
             var threads = new Thread[threadCount];
             var exceptions = new Exception[threadCount];
@@ -121,7 +131,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var db = scope.Database;
+                var db = ScopeAccessor.AmbientScope.Database;
                 try
                 {
                     db.EnableSqlCount = true;
@@ -146,6 +156,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void ConcurrentWritersTest()
         {
+
             const int threadCount = 8;
             var threads = new Thread[threadCount];
             var exceptions = new Exception[threadCount];
@@ -240,6 +251,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void DeadLockTest()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
+                return;
+            }
+
             Exception e1 = null, e2 = null;
             AutoResetEvent ev1 = new AutoResetEvent(false), ev2 = new AutoResetEvent(false);
 
@@ -265,7 +282,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             //Assert.IsNotNull(e1);
             if (e1 != null)
             {
-                AssertIsSqlLockException(e1);
+                AssertIsDistributedLockingTimeoutException(e1);
             }
 
             // the assertion below depends on timing conditions - on a fast enough environment,
@@ -276,17 +293,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             //Assert.IsNull(e2);
             if (e2 != null)
             {
-                AssertIsSqlLockException(e2);
+                AssertIsDistributedLockingTimeoutException(e2);
             }
 
         }
 
-        private void AssertIsSqlLockException(Exception e)
+        private void AssertIsDistributedLockingTimeoutException(Exception e)
         {
-            var sqlException = e as SqlException;
+            var sqlException = e as DistributedLockingTimeoutException;
             Assert.IsNotNull(sqlException);
-            Assert.AreEqual(1222, sqlException.Number);
         }
+
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -297,7 +314,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id1}] WAIT {id1}");
                     scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                     myEv.Set();
 
                     if (id1 == 1)
@@ -312,7 +329,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id1}] WAIT {id2}");
                     scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                 }
                 catch (Exception e)
                 {
@@ -328,6 +345,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         [Test]
         public void NoDeadLockTest()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                Assert.Ignore("This test doesn't work with Microsoft.Data.Sqlite - SELECT * FROM sys.dm_tran_locks;");
+                return;
+            }
+
+
             Exception e1 = null, e2 = null;
             AutoResetEvent ev1 = new AutoResetEvent(false), ev2 = new AutoResetEvent(false);
 
@@ -354,18 +378,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             Assert.IsNull(e2);
         }
 
-                [Test]
-        public void Throws_When_Lock_Timeout_Is_Exceeded()
+        [Test]
+        public void Throws_When_Lock_Timeout_Is_Exceeded_Read()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // Reader reads snapshot, isolated from the writer.
+                Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+            }
+
             using (ExecutionContext.SuppressFlow())
             {
-
-
                 var t1 = Task.Run(() =>
                 {
                     using (var scope = ScopeProvider.CreateScope())
                     {
-
                         Console.WriteLine("Write lock A");
                         // This will acquire right away
                         scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
@@ -385,36 +412,93 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
-                        Assert.Throws<SqlException>(() =>
+                        Assert.Throws<DistributedReadLockTimeoutException>(() =>
                             scope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
                         scope.Complete();
                         Console.WriteLine("Finished Read lock B");
                     }
                 });
 
-                var t3 = Task.Run(() =>
+                Task.WaitAll(t1, t2);
+            }
+        }
+
+        [Test]
+        public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
+        {
+            var counter = 0;
+            var gate = new ManualResetEventSlim(false);
+            var logger = GetRequiredService<ILogger<LocksTests>>();
+
+            using (ExecutionContext.SuppressFlow())
+            {
+                var t1 = Task.Run(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using var scope = ScopeProvider.CreateScope();
+
+                    _ = scope.Database; // Begin transaction
+                    Interlocked.Increment(ref counter);
+                    gate.Wait();
+
+                    logger.LogInformation("t1 - Attempting to acquire write lock");
+                    Assert.DoesNotThrow(() =>
                     {
-                        Console.WriteLine("Write lock C");
+                        // ReSharper disable once AccessToDisposedClosure
+                        // This will acquire right away
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(1000), Constants.Locks.ContentTree);
+                    });
 
-                        // This will wait for the write lock to release but it isn't going to wait long
-                        // enough so an exception will be thrown.
-                        Assert.Throws<SqlException>(() =>
-                            scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+                    logger.LogInformation("t1 - Acquired write lock, sleeping");
+                    Thread.Sleep(1500); // Wait longer than the Read Lock B timeout
 
-                        scope.Complete();
-                        Console.WriteLine("Finished Write lock C");
-                    }
+                    scope.Complete();
+                    logger.LogInformation("t1 -  Complete transaction");
                 });
 
-                Task.WaitAll(t1, t2, t3);
+                var t2 = Task.Run(() =>
+                {
+                    using var scope = ScopeProvider.CreateScope();
+
+                    _ = scope.Database; // Begin transaction
+                    Interlocked.Increment(ref counter);
+                    gate.Wait();
+                    Thread.Sleep(100); // Let other transaction obtain write lock first.
+
+                    logger.LogInformation("t2 - Attempting to acquire write lock");
+                    var ex = Assert.Throws<DistributedWriteLockTimeoutException>(() =>
+                    {
+                        // ReSharper disable once AccessToDisposedClosure
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(1000), Constants.Locks.ContentTree);
+                        logger.LogInformation("t2 - Acquired write lock, something has gone wrong.");
+                    });
+
+                    if (ex != null)
+                    {
+                        logger.LogInformation("t2 - Failed to acquire write lock in time, all is well.");
+                    }
+
+                    scope.Complete();
+                });
+
+                while (counter < 2)
+                {
+                    Thread.Sleep(10);
+                }
+
+                gate.Set();
+                Task.WaitAll(t1, t2);
             }
         }
 
         [Test]
         public void Read_Lock_Waits_For_Write_Lock()
         {
+            if (BaseTestDatabase.IsSqlite())
+            {
+                // Reader reads snapshot, isolated from the writer.
+                Assert.Ignore("Doesn't apply to SQLite with journal_mode=wal");
+            }
+
             var locksCompleted = 0;
 
             using (ExecutionContext.SuppressFlow())
@@ -483,7 +567,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var realDb = (Database)scope.Database;
+                var realDb = (Database)ScopeAccessor.AmbientScope.Database;
                 realDb.CommandTimeout = 1000;
 
                 Console.WriteLine("Write lock A");
@@ -505,7 +589,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     Console.WriteLine($"[{id}] WAIT {id}");
                     scope.EagerWriteLock(id);
                     Console.WriteLine($"[{id}] GRANT {id}");
-                    WriteLocks(scope.Database);
+                    WriteLocks(ScopeAccessor.AmbientScope.Database);
                     myEv.Set();
                     otherEv.WaitOne();
                 }

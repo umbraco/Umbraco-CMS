@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions
             Columns = new List<ColumnDefinition>();
         }
 
-        public virtual string SchemaName { get; set; }
-        public virtual string TableName { get; set; }
+        public virtual string SchemaName { get; set; } = null!;
+        public virtual string TableName { get; set; } = null!;
         public virtual IList<ColumnDefinition> Columns { get; set; }
 
         protected override string GetSql()

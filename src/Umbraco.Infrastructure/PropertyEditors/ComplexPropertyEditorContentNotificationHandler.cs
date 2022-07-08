@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -41,11 +43,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 foreach (var cultureVal in propVals)
                 {
                     // Remove keys from published value & any nested properties
-                    var updatedPublishedVal = FormatPropertyValue(cultureVal.PublishedValue?.ToString(), onlyMissingKeys);
+                    var publishedValue = cultureVal.PublishedValue is JToken jsonPublishedValue ? jsonPublishedValue.ToString(Formatting.None) : cultureVal.PublishedValue?.ToString();
+                    var updatedPublishedVal = FormatPropertyValue(publishedValue!, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                     cultureVal.PublishedValue = updatedPublishedVal;
 
                     // Remove keys from edited/draft value & any nested properties
-                    var updatedEditedVal = FormatPropertyValue(cultureVal.EditedValue?.ToString(), onlyMissingKeys);
+                    var editedValue = cultureVal.EditedValue is JToken jsonEditedValue ? jsonEditedValue.ToString(Formatting.None) : cultureVal.EditedValue?.ToString();
+                    var updatedEditedVal = FormatPropertyValue(editedValue!, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                     cultureVal.EditedValue = updatedEditedVal;
                 }
             }

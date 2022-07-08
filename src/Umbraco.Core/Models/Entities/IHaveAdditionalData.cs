@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Entities
         /// </summary>
         /// <remarks>Can be empty, but never null. To avoid allocating, do not
         /// test for emptiness, but use <see cref="HasAdditionalData"/> instead.</remarks>
-        IDictionary<string, object> AdditionalData { get; }
+        IDictionary<string, object?>? AdditionalData { get; }
 
         /// <summary>
         /// Determines whether this entity has additional data.

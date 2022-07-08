@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
             public IHostingEnvironment BuilderHostingEnvironment { get; }
             public IProfiler Profiler { get; }
             public AppCaches AppCaches { get; }
-            public TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder, new() => default;
+            public TBuilder WithCollectionBuilder<TBuilder>() where TBuilder : ICollectionBuilder => default;
 
             public UmbracoBuildStub() => Services = new ServiceCollection();
 

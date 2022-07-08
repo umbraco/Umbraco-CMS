@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Dictionary
     {
         private readonly ILocalizationService _localizationService;
         private readonly IAppCache _requestCache;
-        private readonly CultureInfo _specificCulture;
+        private readonly CultureInfo? _specificCulture;
 
         /// <summary>
         /// Default constructor which will use the current thread's culture
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Dictionary
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string this[string key]
+        public string? this[string key]
         {
             get
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Dictionary
                     return string.Empty;
                 }
 
-                var byLang = found.Translations.FirstOrDefault(x => x.Language.Equals(Language));
+                var byLang = found.Translations?.FirstOrDefault(x => x.Language?.Equals(Language) ?? false);
                 if (byLang == null)
                 {
                     return string.Empty;
@@ -105,8 +105,8 @@ namespace Umbraco.Cms.Core.Dictionary
 
             foreach (var dictionaryItem in children)
             {
-                var byLang = dictionaryItem.Translations.FirstOrDefault((x => x.Language.Equals(Language)));
-                if (byLang != null)
+                var byLang = dictionaryItem.Translations?.FirstOrDefault((x => x.Language?.Equals(Language) ?? false));
+                if (byLang != null && dictionaryItem.ItemKey is not null && byLang.Value is not null)
                 {
                     result.Add(dictionaryItem.ItemKey, byLang.Value);
                 }
@@ -115,13 +115,13 @@ namespace Umbraco.Cms.Core.Dictionary
             return result;
         }
 
-        private ILanguage Language
+        private ILanguage? Language
         {
             get
             {
                 //ensure it's stored/retrieved from request cache
                 //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
-                return _requestCache.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
+                return _requestCache.GetCacheItem<ILanguage?>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
                     () => {
                         // find a language that matches the current culture or any of its parent cultures
                         var culture = Culture;

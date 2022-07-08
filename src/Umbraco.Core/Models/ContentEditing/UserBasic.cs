@@ -20,13 +20,13 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         }
 
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         /// <summary>
         /// The MD5 lowercase hash of the email which can be used by gravatar
         /// </summary>
         [DataMember(Name = "emailHash")]
-        public string EmailHash { get; set; }
+        public string? EmailHash { get; set; }
 
         [DataMember(Name = "lastLoginDate")]
         public DateTime? LastLoginDate { get; set; }
@@ -35,16 +35,16 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// Returns a list of different size avatars
         /// </summary>
         [DataMember(Name = "avatars")]
-        public string[] Avatars { get; set; }
+        public string[]? Avatars { get; set; }
 
         [DataMember(Name = "userState")]
         public UserState UserState { get; set; }
 
         [DataMember(Name = "culture", IsRequired = true)]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         [DataMember(Name = "email", IsRequired = true)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// The list of group aliases assigned to the user

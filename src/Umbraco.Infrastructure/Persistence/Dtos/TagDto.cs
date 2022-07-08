@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("group")]
         [Length(100)]
-        public string Group { get; set; }
+        public string Group { get; set; } = null!;
 
         [Column("languageId")]
         [ForeignKey(typeof(LanguageDto))]
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("tag")]
         [Length(200)]
         [Index(IndexTypes.UniqueNonClustered, ForColumns = "group,tag,languageId", Name = "IX_cmsTags")]
-        public string Text { get; set; }
+        public string Text { get; set; } = null!;
 
         //[Column("key")]
         //[Length(301)] // de-normalized "{group}/{tag}"

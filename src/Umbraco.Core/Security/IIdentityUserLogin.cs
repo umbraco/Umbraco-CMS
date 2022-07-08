@@ -19,13 +19,13 @@ namespace Umbraco.Cms.Core.Security
         string ProviderKey { get; set; }
 
         /// <summary>
-        /// Gets or sets user Id for the user who owns this login
+        /// Gets or sets user or member key (Guid) for the user/member who owns this login
         /// </summary>
         string UserId { get; set; } // TODO: This should be able to be used by both users and members
 
         /// <summary>
         /// Gets or sets any arbitrary data for the user and external provider
         /// </summary>
-        string UserData { get; set; }
+        string? UserData { get; set; }
     }
 }

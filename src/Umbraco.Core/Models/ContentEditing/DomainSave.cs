@@ -15,6 +15,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public int Language { get; set; }
 
         [DataMember(Name = "domains")]
-        public DomainDisplay[] Domains { get; set; }
+        public DomainDisplay[]? Domains { get; set; }
     }
 }

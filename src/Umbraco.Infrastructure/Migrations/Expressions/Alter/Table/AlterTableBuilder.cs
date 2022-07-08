@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
 
         public void Do() => Expression.Execute();
 
-        public ColumnDefinition CurrentColumn { get; set; }
+        public ColumnDefinition CurrentColumn { get; set; } = null!;
 
-        public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ForeignKeyDefinition CurrentForeignKey { get; set; } = null!;
 
         public override ColumnDefinition GetColumnForType()
         {
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
             return Indexed(null);
         }
 
-        public IAlterTableColumnOptionBuilder Indexed(string indexName)
+        public IAlterTableColumnOptionBuilder Indexed(string? indexName)
         {
             CurrentColumn.IsIndexed = true;
 
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
             return Unique(null);
         }
 
-        public IAlterTableColumnOptionBuilder Unique(string indexName)
+        public IAlterTableColumnOptionBuilder Unique(string? indexName)
         {
             CurrentColumn.IsUnique = true;
 
@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string foreignKeyName, string primaryTableSchema,
+        public IAlterTableColumnOptionForeignKeyCascadeBuilder ForeignKey(string? foreignKeyName, string? primaryTableSchema,
                                                                          string primaryTableName, string primaryColumnName)
         {
             CurrentColumn.IsForeignKey = true;
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string foreignKeyName, string foreignTableSchema,
+        public IAlterTableColumnOptionForeignKeyCascadeBuilder ReferencedBy(string? foreignKeyName, string? foreignTableSchema,
                                                                            string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression(_context, new ForeignKeyDefinition

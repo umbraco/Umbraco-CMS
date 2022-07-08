@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -40,13 +40,13 @@ namespace Umbraco.Cms.Core.Logging.Viewer
 
         public abstract bool CheckCanOpenLogs(LogTimePeriod logTimePeriod);
 
-        public virtual IReadOnlyList<SavedLogSearch> GetSavedSearches()
+        public virtual IReadOnlyList<SavedLogSearch>? GetSavedSearches()
             => _logViewerConfig.GetSavedSearches();
 
-        public virtual IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch>? AddSavedSearch(string? name, string? query)
             => _logViewerConfig.AddSavedSearch(name, query);
 
-        public virtual IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
+        public virtual IReadOnlyList<SavedLogSearch>? DeleteSavedSearch(string? name, string? query)
             => _logViewerConfig.DeleteSavedSearch(name, query);
 
         public int GetNumberOfErrors(LogTimePeriod logTimePeriod)
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Get the Serilog minimum-level and UmbracoFile-level values from the config file.
         /// </summary>
-        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        public ReadOnlyDictionary<string, LogEventLevel?> GetLogLevels()
         {
             return _logLevelLoader.GetLogLevelsFromSinks();
         }
@@ -96,8 +96,8 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         public PagedResult<LogMessage> GetLogs(LogTimePeriod logTimePeriod,
             int pageNumber = 1, int pageSize = 100,
             Direction orderDirection = Direction.Descending,
-            string filterExpression = null,
-            string[] logLevels = null)
+            string? filterExpression = null,
+            string[]? logLevels = null)
         {
             var expression = new ExpressionFilter(filterExpression);
             var filteredLogs = GetLogs(logTimePeriod, expression, 0, int.MaxValue);

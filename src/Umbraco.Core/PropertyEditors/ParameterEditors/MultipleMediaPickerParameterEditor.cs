@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Hosting;
+using System;
+using System.Collections.Generic;
+using System.Reflection.Metadata;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -25,6 +29,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
             : base(dataValueEditorFactory)
         {
             DefaultConfiguration.Add("multiPicker", "1");
+        }
+
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleMediaPickerPropertyValueEditor>(Attribute!);
+
+        internal class MultipleMediaPickerPropertyValueEditor : MultiplePickerParamateterValueEditorBase
+        {
+            public MultipleMediaPickerPropertyValueEditor(ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, IIOHelper ioHelper, DataEditorAttribute attribute, IEntityService entityService) : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute, entityService)
+            {
+            }
+
+            public override string UdiEntityType { get; } = Constants.UdiEntityType.Media;
+            public override UmbracoObjectTypes UmbracoObjectType { get; } = UmbracoObjectTypes.Media;
         }
     }
 }

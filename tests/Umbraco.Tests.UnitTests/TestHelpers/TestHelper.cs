@@ -38,6 +38,7 @@ using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlServer.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
@@ -60,8 +61,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
                 : base(typeof(TestHelperInternal).Assembly)
             {
             }
-
-            public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = Mock.Of<IDbProviderFactoryCreator>();
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = Mock.Of<IBulkSqlInsertProvider>();
 
@@ -113,8 +112,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static IVariationContextAccessor VariationContextAccessor => s_testHelperInternal.VariationContextAccessor;
 
-        public static IDbProviderFactoryCreator DbProviderFactoryCreator => s_testHelperInternal.DbProviderFactoryCreator;
-
         public static IBulkSqlInsertProvider BulkSqlInsertProvider => s_testHelperInternal.BulkSqlInsertProvider;
 
         public static IMarchal Marchal => s_testHelperInternal.Marchal;
@@ -127,16 +124,16 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
+        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>());
 
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name
         /// </summary>
         public static string MapPathForTestFiles(string relativePath) => s_testHelperInternal.MapPathForTestFiles(relativePath);
 
-        public static void InitializeContentDirectories() => CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath, Constants.SystemDirectories.AppPlugins });
+        public static void InitializeContentDirectories() => CreateDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath, Constants.SystemDirectories.AppPlugins });
 
-        public static void CleanContentDirectories() => CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPath });
+        public static void CleanContentDirectories() => CleanDirectories(new[] { Constants.SystemDirectories.MvcViews, new GlobalSettings().UmbracoMediaPhysicalRootPath });
 
         public static void CreateDirectories(string[] directories)
         {

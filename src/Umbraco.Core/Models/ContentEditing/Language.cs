@@ -1,4 +1,3 @@
-﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -12,11 +11,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "culture", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
-        public string IsoCode { get; set; }
+        public string IsoCode { get; set; } = null!;
 
         [DataMember(Name = "name")]
-        [ReadOnly(true)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "isDefault")]
         public bool IsDefault { get; set; }

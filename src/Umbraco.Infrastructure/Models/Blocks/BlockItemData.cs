@@ -17,14 +17,14 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// not serialized, manually set and used during internally
         /// </summary>
         [JsonIgnore]
-        public string ContentTypeAlias { get; set; }
+        public string ContentTypeAlias { get; set; } = string.Empty;
 
         [JsonProperty("udi")]
         [JsonConverter(typeof(UdiJsonConverter))]
-        public Udi Udi { get; set; }
+        public Udi? Udi { get; set; }
 
         [JsonIgnore]
-        public Guid Key => Udi != null ? ((GuidUdi)Udi).Guid : throw new InvalidOperationException("No Udi assigned");
+        public Guid Key => Udi is not null ? ((GuidUdi)Udi).Guid : throw new InvalidOperationException("No Udi assigned");
 
         /// <summary>
         /// The remaining properties will be serialized to a dictionary
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.Models.Blocks
         ///   "stringValue":"Some String","numericValue":125,"otherNumeric":null
         /// </remarks>
         [JsonExtensionData]
-        public Dictionary<string, object> RawPropertyValues { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object?> RawPropertyValues { get; set; } = new Dictionary<string, object?>();
 
         /// <summary>
         /// Used during deserialization to convert the raw property data into data with a property type context
@@ -49,13 +49,13 @@ namespace Umbraco.Cms.Core.Models.Blocks
         /// </summary>
         public class BlockPropertyValue
         {
-            public BlockPropertyValue(object value, IPropertyType propertyType)
+            public BlockPropertyValue(object? value, IPropertyType propertyType)
             {
                 Value = value;
                 PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             }
 
-            public object Value { get; }
+            public object? Value { get; }
             public IPropertyType PropertyType { get; }
         }
     }

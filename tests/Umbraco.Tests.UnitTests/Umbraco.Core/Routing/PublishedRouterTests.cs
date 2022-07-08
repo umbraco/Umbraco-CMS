@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
     {
         private PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor)
             => new PublishedRouter(
-                Microsoft.Extensions.Options.Options.Create(new WebRoutingSettings()),
+                Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x=>x.CurrentValue == new WebRoutingSettings()),
                 new ContentFinderCollection(() => Enumerable.Empty<IContentFinder>()),
                 new TestLastChanceFinder(),
                 new TestVariationContextAccessor(),

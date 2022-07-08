@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
             _root = new RootContent(contentAtRoot.Select(x => x.Id));
         }
 
-        public INavigableContent Get(int id)
+        public INavigableContent? Get(int id)
         {
             // wrap in a navigable content
 

@@ -12,6 +12,7 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 const del = require('del')
+const { isFileExist } = require('cy-verify-downloads');
 
 /**
  * @type {Cypress.PluginConfig}
@@ -25,6 +26,7 @@ module.exports = (on, config) => {
     config.baseUrl = baseUrl;
   }
 
+  on('task', { isFileExist })
   on('after:spec', (spec, results) => {
     if(results.stats.failures === 0 && results.video) {
       // `del()` returns a promise, so it's important to return it to ensure
@@ -32,6 +34,12 @@ module.exports = (on, config) => {
       return del(results.video)
     }
   })
+
+  
+on('task', {
+  isFileExist
+});
+
 
   return config;
 }

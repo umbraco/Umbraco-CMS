@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -20,10 +21,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void CanSetAndGet()
         {
-            IScopeProvider provider = ScopeProvider;
+            ICoreScopeProvider provider = ScopeProvider;
 
             // Insert new key/value
-            using (IScope scope = provider.CreateScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 var keyValue = new KeyValue
                 {
@@ -37,7 +38,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             }
 
             // Retrieve key/value
-            using (IScope scope = provider.CreateScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 IKeyValueRepository repo = CreateRepository(provider);
                 IKeyValue keyValue = repo.Get("foo");
@@ -47,7 +48,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             }
 
             // Update value
-            using (IScope scope = provider.CreateScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 IKeyValueRepository repo = CreateRepository(provider);
                 IKeyValue keyValue = repo.Get("foo");
@@ -58,7 +59,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             }
 
             // Retrieve key/value again
-            using (IScope scope = provider.CreateScope())
+            using (ICoreScope scope = provider.CreateCoreScope())
             {
                 IKeyValueRepository repo = CreateRepository(provider);
                 IKeyValue keyValue = repo.Get("foo");
@@ -68,6 +69,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             }
         }
 
-        private IKeyValueRepository CreateRepository(IScopeProvider provider) => new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>());
+        private IKeyValueRepository CreateRepository(ICoreScopeProvider provider) => new KeyValueRepository((IScopeAccessor)provider, LoggerFactory.CreateLogger<KeyValueRepository>());
     }
 }

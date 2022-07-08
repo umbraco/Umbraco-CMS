@@ -31,6 +31,8 @@ const coreBuild = parallel(dependencies, js, less, views);
 // ***********************************************************
 
 exports.build = series(coreBuild, testUnit);
+exports.buildDev = series(setDevelopmentMode, coreBuild);
+
 exports.coreBuild = coreBuild;
 exports.dev = series(setDevelopmentMode, coreBuild, runUnitTestServer, watchTask);
 exports.watch = series(watchTask);

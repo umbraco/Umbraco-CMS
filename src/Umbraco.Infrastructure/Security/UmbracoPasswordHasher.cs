@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Models.Membership;
@@ -10,7 +11,6 @@ namespace Umbraco.Cms.Core.Security
         where TUser: UmbracoIdentityUser
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly PasswordHasher<TUser> _aspnetV2PasswordHasher = new PasswordHasher<TUser>(new V2PasswordHasherOptions());
 
         public UmbracoPasswordHasher(LegacyPasswordSecurity legacyPasswordSecurity, IJsonSerializer jsonSerializer)
         {
@@ -43,57 +43,64 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user is null)
             {
-                throw new System.ArgumentNullException(nameof(user));
+                throw new ArgumentNullException(nameof(user));
             }
 
-            if (!user.PasswordConfig.IsNullOrWhiteSpace())
+            try
             {
-                // check if the (legacy) password security supports this hash algorith and if so then use it
-                var deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig);
-                if (LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+                // Best case and most likely scenario, a modern hash supported by ASP.Net identity.
+                PasswordVerificationResult upstreamResult = base.VerifyHashedPassword(user, hashedPassword, providedPassword);
+                if (upstreamResult != PasswordVerificationResult.Failed)
                 {
-                    var result = LegacyPasswordSecurity.VerifyPassword(deserialized.HashAlgorithm, providedPassword, hashedPassword);
-
-                    //We need to special handle this case, apparently v8 still saves the user algorithm as {"hashAlgorithm":"HMACSHA256"}, when using legacy encoding and hasinging.
-                    if (result == false)
-                    {
-                        result = LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
-                    }
-
-                    return result
-                        ? PasswordVerificationResult.SuccessRehashNeeded
-                        : PasswordVerificationResult.Failed;
-                }
-
-                // We will explicitly detect names here
-                // The default is PBKDF2.ASPNETCORE.V3:
-                //      PBKDF2 with HMAC-SHA256, 128-bit salt, 256-bit subkey, 10000 iterations.
-                // The underlying class only lets us change 2 things which is the version: options.CompatibilityMode and the iteration count
-                // The PBKDF2.ASPNETCORE.V2 settings are:
-                //      PBKDF2 with HMAC-SHA1, 128-bit salt, 256-bit subkey, 1000 iterations.
-
-                switch (deserialized.HashAlgorithm)
-                {
-                    case Constants.Security.AspNetCoreV3PasswordHashAlgorithmName:
-                        return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
-                    case Constants.Security.AspNetCoreV2PasswordHashAlgorithmName:
-                        var legacyResult = _aspnetV2PasswordHasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
-                        if (legacyResult == PasswordVerificationResult.Success)
-                            return PasswordVerificationResult.SuccessRehashNeeded;
-                        return legacyResult;
+                    return upstreamResult;
                 }
             }
-
-            // else go the default (v3)
-            return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
-        }
-
-        private class V2PasswordHasherOptions : IOptions<PasswordHasherOptions>
-        {
-            public PasswordHasherOptions Value => new PasswordHasherOptions
+            catch (FormatException)
             {
-                CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
-            };
+                // hash wasn't a valid base64 encoded string, MS concat the salt bytes and hash bytes and base 64 encode both together.
+                // We however historically base 64 encoded the salt bytes and hash bytes separately then concat the strings so we got 2 sets of padding.
+                // both salt bytes and hash bytes lengths were not evenly divisible by 3 hence 2 sets of padding.
+
+                // We could check upfront with TryFromBase64String, but not whilst we target netstandard 2.0
+                // so might as well just deal with the exception.
+            }
+
+            // At this point we either have a legacy password or a bad attempt.
+
+            // Check the supported worst case scenario, a "useLegacyEncoding" password - HMACSHA1 but with password used as key so not unique for users sharing same password
+            // This was the standard for v4.
+            // Do this first because with useLegacyEncoding the algorithm stored in the database is irrelevant.
+            if (LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword))
+            {
+                return PasswordVerificationResult.SuccessRehashNeeded;
+            }
+
+            // For users we expect to know the historic algorithm.
+            // NOTE: MemberPasswordHasher subclasses this class to deal with the fact that PasswordConfig wasn't stored.
+            if (user.PasswordConfig.IsNullOrWhiteSpace())
+            {
+                return PasswordVerificationResult.Failed;
+            }
+
+            PersistedPasswordSettings? deserialized;
+            try
+            {
+                deserialized = _jsonSerializer.Deserialize<PersistedPasswordSettings>(user.PasswordConfig ?? string.Empty);
+            }
+            catch
+            {
+                return PasswordVerificationResult.Failed;
+            }
+
+            if (deserialized?.HashAlgorithm is null || !LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
+            {
+                return PasswordVerificationResult.Failed;
+            }
+
+            // Last chance must be HMACSHA256 or SHA1
+            return LegacyPasswordSecurity.VerifyPassword(deserialized.HashAlgorithm, providedPassword, hashedPassword)
+                ? PasswordVerificationResult.SuccessRehashNeeded
+                : PasswordVerificationResult.Failed;
         }
     }
 }

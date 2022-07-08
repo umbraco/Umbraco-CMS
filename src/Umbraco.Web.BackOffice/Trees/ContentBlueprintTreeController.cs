@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
+        protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
         {
             var rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
@@ -61,11 +61,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             var root = rootResult.Value;
 
-            //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
+            if (root is not null)
+            {
+                //this will load in a custom UI instead of the dashboard for the root node
+                root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.ContentBlueprints}/intro";
 
-            //check if there are any content blueprints
-            root.HasChildren = _contentService.GetBlueprintsForContentTypes().Any();
+                //check if there are any content blueprints
+                root.HasChildren = _contentService.GetBlueprintsForContentTypes()?.Any() ?? false;
+            }
+
 
             return root;
         }
@@ -80,13 +84,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 //get all blueprint content types
-                var contentTypeAliases = entities.Select(x => ((IContentEntitySlim) x).ContentTypeAlias).Distinct();
+                var contentTypeAliases = entities.Select(x => ((IContentEntitySlim)x).ContentTypeAlias).Distinct();
                 //get the ids
                 var contentTypeIds = _contentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
                 var docTypeEntities = contentTypeIds.Length == 0
-                    ? new IUmbracoEntity[0]
+                    ? new IEntitySlim[0]
                     : _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
                 nodes.AddRange(docTypeEntities
@@ -112,11 +116,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var ct = _contentTypeService.Get(intId);
             if (ct == null) return nodes;
 
-            var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);
+            var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim)x).ContentTypeAlias);
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {
-                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
+                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, Constants.Icons.Blueprint, false);
                     treeNode.Path = $"-1,{ct.Id},{entity.Id}";
                     return treeNode;
                 }));
@@ -131,24 +135,25 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 // root actions
-                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
+
             var cte = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentType);
             //only refresh & create if it's a content type
             if (cte != null)
             {
                 var ct = _contentTypeService.Get(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true);
-                createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+                createItem?.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct?.Alias);
 
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             return menu;
         }

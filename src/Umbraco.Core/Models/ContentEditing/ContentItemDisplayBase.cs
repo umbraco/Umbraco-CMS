@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// The name of the content type
         /// </summary>
         [DataMember(Name = "contentTypeName")]
-        public string ContentTypeName { get; set; }
+        public string? ContentTypeName { get; set; }
 
         /// <summary>
         /// Indicates if the content is configured as a list view container

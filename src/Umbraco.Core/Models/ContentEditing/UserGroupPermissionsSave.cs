@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -28,5 +29,14 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "permissions")]
         public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }
+
+        [Obsolete("This is not used and will be removed in Umbraco 10")]
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (AssignedPermissions.SelectMany(x => x.Value).Any(x => x.IsNullOrWhiteSpace()))
+            {
+                yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
+            }
+        }
     }
 }

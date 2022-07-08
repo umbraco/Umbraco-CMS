@@ -13,7 +13,7 @@
         /// <summary>
         /// The entity being sent to publish
         /// </summary>
-        public TEntity Entity
+        public TEntity? Entity
         {
             get { return EventObject; }
         }

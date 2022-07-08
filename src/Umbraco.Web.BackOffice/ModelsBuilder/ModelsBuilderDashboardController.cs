@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
             public bool Success { get; set; }
 
             [DataMember(Name = "message")]
-            public string Message { get; set; }
+            public string? Message { get; set; }
         }
 
         [DataContract]
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
             public ModelsMode Mode { get; set; }
 
             [DataMember(Name = "text")]
-            public string Text { get; set; }
+            public string? Text { get; set; }
 
             [DataMember(Name = "canGenerate")]
             public bool CanGenerate { get; set; }
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
             public bool OutOfDateModels { get; set; }
 
             [DataMember(Name = "lastError")]
-            public string LastError { get; set; }
+            public string? LastError { get; set; }
         }
 
         public enum OutOfDateType

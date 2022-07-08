@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Core.Cache
         // helper method to get an ICacheRefresher by its unique identifier
         private ICacheRefresher GetRefresherById(Guid refresherGuid)
         {
-            ICacheRefresher refresher = _cacheRefreshers[refresherGuid];
+            ICacheRefresher? refresher = _cacheRefreshers[refresherGuid];
             if (refresher == null)
             {
                 throw new InvalidOperationException($"No cache refresher found with id {refresherGuid}");

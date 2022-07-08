@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Deploy
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// </summary>
         /// <param name="udi">The entity identifier of the artifact.</param>
         /// <returns>The corresponding artifact, or null.</returns>
-        IArtifact GetArtifact(Udi udi);
+        IArtifact? GetArtifact(Udi udi);
 
         /// <summary>
         /// Gets an artifact.
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="differences">A collection of differences to append to, if not null.</param>
         /// <returns>A boolean value indicating whether the artifacts are identical.</returns>
         /// <remarks>ServiceConnectorBase{TArtifact} provides a very basic default implementation.</remarks>
-        bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference> differences = null);
+        bool Compare(IArtifact? art1, IArtifact? art2, ICollection<Difference>? differences = null);
     }
 
 }

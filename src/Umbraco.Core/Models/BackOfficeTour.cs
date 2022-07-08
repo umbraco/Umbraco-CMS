@@ -15,13 +15,13 @@ namespace Umbraco.Cms.Core.Models
         }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public string Alias { get; set; } = null!;
 
         [DataMember(Name = "group")]
-        public string Group { get; set; }
+        public string? Group { get; set; }
 
         [DataMember(Name = "groupOrder")]
         public int GroupOrder { get; set; }
@@ -36,12 +36,12 @@ namespace Umbraco.Cms.Core.Models
         public List<string> RequiredSections { get; set; }
 
         [DataMember(Name = "steps")]
-        public BackOfficeTourStep[] Steps { get; set; }
+        public BackOfficeTourStep[]? Steps { get; set; }
 
         [DataMember(Name = "culture")]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         [DataMember(Name = "contentType")]
-        public string ContentType { get; set; }
+        public string? ContentType { get; set; }
     }
 }

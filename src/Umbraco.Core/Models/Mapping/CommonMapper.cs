@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.ContentApps;
@@ -28,19 +28,19 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService;
         }
 
-        public UserProfile GetOwner(IContentBase source, MapperContext context)
+        public UserProfile? GetOwner(IContentBase source, MapperContext context)
         {
             var profile = source.GetCreatorProfile(_userService);
             return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public UserProfile GetCreator(IContent source, MapperContext context)
+        public UserProfile? GetCreator(IContent source, MapperContext context)
         {
             var profile = source.GetWriterProfile(_userService);
             return profile == null ? null : context.Map<IProfile, UserProfile>(profile);
         }
 
-        public ContentTypeBasic GetContentType(IContentBase source, MapperContext context)
+        public ContentTypeBasic? GetContentType(IContentBase source, MapperContext context)
         {
             var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(source);
             var contentTypeBasic = context.Map<IContentTypeComposition, ContentTypeBasic>(contentType);
@@ -48,6 +48,11 @@ namespace Umbraco.Cms.Core.Models.Mapping
         }
 
         public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source)
+        {
+            return GetContentAppsForEntity(source);
+        }
+
+        public IEnumerable<ContentApp> GetContentAppsForEntity(IEntity source)
         {
             var apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
 

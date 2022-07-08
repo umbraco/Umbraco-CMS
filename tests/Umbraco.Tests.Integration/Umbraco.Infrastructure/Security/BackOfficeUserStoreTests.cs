@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -23,9 +24,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
     {
         private IUserService UserService => GetRequiredService<IUserService>();
         private IEntityService EntityService => GetRequiredService<IEntityService>();
-        private IExternalLoginService ExternalLoginService => GetRequiredService<IExternalLoginService>();
+        private IExternalLoginWithKeyService ExternalLoginService => GetRequiredService<IExternalLoginWithKeyService>();
         private IUmbracoMapper UmbracoMapper => GetRequiredService<IUmbracoMapper>();
         private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
+        private ITwoFactorLoginService TwoFactorLoginService => GetRequiredService<ITwoFactorLoginService>();
 
         private BackOfficeUserStore GetUserStore()
             => new BackOfficeUserStore(
@@ -33,10 +35,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
                     UserService,
                     EntityService,
                     ExternalLoginService,
-                    Options.Create(GlobalSettings),
+                    new TestOptionsSnapshot<GlobalSettings>(GlobalSettings),
                     UmbracoMapper,
                     new BackOfficeErrorDescriber(TextService),
-                    AppCaches);
+                    AppCaches,
+                    TwoFactorLoginService
+                    );
 
         [Test]
         public async Task Can_Persist_Is_Approved()

@@ -54,12 +54,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [Required]
         [EmailAddress]
-        public string From { get; set; }
+        public string From { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets a value for the SMTP host.
         /// </summary>
-        public string Host { get; set; }
+        public string? Host { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the SMTP port.
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP pick-up directory.
         /// </summary>
-        public string PickupDirectoryLocation { get; set; }
+        public string? PickupDirectoryLocation { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the SMTP delivery method.
@@ -86,11 +86,11 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP user name.
         /// </summary>
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the SMTP password.
         /// </summary>
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
 }

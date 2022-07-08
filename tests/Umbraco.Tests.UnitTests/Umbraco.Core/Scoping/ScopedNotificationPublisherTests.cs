@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -16,6 +17,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
@@ -29,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             var notificationPublisherMock = new Mock<IScopedNotificationPublisher>();
             ScopeProvider scopeProvider = GetScopeProvider(out var eventAggregatorMock);
 
-            using (IScope scope = scopeProvider.CreateScope(notificationPublisher: notificationPublisherMock.Object))
+            using (ICoreScope scope = scopeProvider.CreateScope(notificationPublisher: notificationPublisherMock.Object))
             {
                 scope.Notifications.Publish(Mock.Of<INotification>());
                 scope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
@@ -38,7 +41,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 notificationPublisherMock.Verify(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()), Times.Once);
 
                 // Ensure that the custom scope provider is till used in inner scope.
-                using (IScope innerScope = scopeProvider.CreateScope())
+                using (ICoreScope innerScope = scopeProvider.CreateScope())
                 {
                     innerScope.Notifications.Publish(Mock.Of<INotification>());
                     innerScope.Notifications.PublishCancelable(Mock.Of<ICancelableNotification>());
@@ -90,11 +93,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             eventAggregatorMock = new Mock<IEventAggregator>();
 
             return new ScopeProvider(
+                Mock.Of<IDistributedLockingMechanismFactory>(),
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
-                Options.Create(new CoreDebugSettings()),
+                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
                 mediaFileManager,
-                loggerFactory.CreateLogger<ScopeProvider>(),
                 loggerFactory,
                 Mock.Of<IRequestCache>(),
                 eventAggregatorMock.Object

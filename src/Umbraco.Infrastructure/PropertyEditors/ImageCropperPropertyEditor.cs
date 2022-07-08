@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -36,13 +38,37 @@ namespace Umbraco.Cms.Core.PropertyEditors
         INotificationHandler<MemberDeletedNotification>
     {
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
         private readonly ILogger<ImageCropperPropertyEditor> _logger;
         private readonly IContentService _contentService;
+        private readonly IEditorConfigurationParser _editorConfigurationParser;
 
+        // Scheduled for removal in v12
+        [Obsolete("Please use constructor that takes an IEditorConfigurationParser instead")]
+        public ImageCropperPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILoggerFactory loggerFactory,
+            MediaFileManager mediaFileManager,
+            IOptionsMonitor<ContentSettings> contentSettings,
+            IDataTypeService dataTypeService,
+            IIOHelper ioHelper,
+            UploadAutoFillProperties uploadAutoFillProperties,
+            IContentService contentService)
+            : this(
+                dataValueEditorFactory,
+                loggerFactory,
+                mediaFileManager,
+                contentSettings,
+                dataTypeService,
+                ioHelper,
+                uploadAutoFillProperties,
+                contentService,
+                StaticServiceProvider.Instance.GetRequiredService<IEditorConfigurationParser>())
+        {
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
@@ -50,23 +76,27 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IDataValueEditorFactory dataValueEditorFactory,
             ILoggerFactory loggerFactory,
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             IIOHelper ioHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IContentService contentService)
+            IContentService contentService,
+            IEditorConfigurationParser editorConfigurationParser)
             : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
             _contentService = contentService;
+            _editorConfigurationParser = editorConfigurationParser;
             _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
-        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string? propertyEditorAlias, object? value, out string? mediaPath)
         {
             if (propertyEditorAlias == Alias &&
                 GetFileSrcFromPropertyValue(value, out _, false) is var mediaPathValue &&
@@ -84,13 +114,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ImageCropperPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ImageCropperPropertyValueEditor>(Attribute!);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
         /// </summary>
         /// <returns>The corresponding preValue editor.</returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor(_ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ImageCropperConfigurationEditor(_ioHelper, _editorConfigurationParser);
 
         /// <summary>
         /// Gets a value indicating whether a property is an image cropper field.
@@ -108,7 +138,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="writeLog">A value indicating whether to log the error.</param>
         /// <returns>The json object corresponding to the property value.</returns>
         /// <remarks>In case of an error, optionally logs the error and returns null.</remarks>
-        private JObject GetJObject(string value, bool writeLog)
+        private JObject? GetJObject(string value, bool writeLog)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -163,7 +193,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="deserializedValue">The deserialized <see cref="JObject"/> value</param>
         /// <param name="relative">Should the path returned be the application relative path</param>
         /// <returns></returns>
-        private string GetFileSrcFromPropertyValue(object propVal, out JObject deserializedValue, bool relative = true)
+        private string? GetFileSrcFromPropertyValue(object? propVal, out JObject? deserializedValue, bool relative = true)
         {
             deserializedValue = null;
             if (propVal == null || !(propVal is string str)) return null;
@@ -182,9 +212,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             if (deserializedValue?["src"] == null) return null;
-            var src = deserializedValue["src"].Value<string>();
+            var src = deserializedValue["src"]!.Value<string>();
 
-            return relative ? _mediaFileManager.FileSystem.GetRelativePath(src) : src;
+            return relative ? _mediaFileManager.FileSystem.GetRelativePath(src!) : src;
         }
 
         /// <summary>
@@ -208,10 +238,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         continue;
                     }
+
                     var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                    jo["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
-                    notification.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
+                    jo!["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
+                    notification.Copy.SetValue(property.Alias, jo.ToString(Formatting.None), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -264,7 +295,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     else
                     {
                         var jo = GetJObject(svalue, false);
-                        string src;
+                        string? src;
                         if (jo == null)
                         {
                             // so we have a non-empty string value that cannot be parsed into a json object
@@ -272,17 +303,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             // it can happen when an image is uploaded via the folder browser, in which case
                             // the property value will be the file source eg '/media/23454/hello.jpg' and we
                             // are fixing that anomaly here - does not make any sense at all but... bah...
-
-                            var dt = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
-                            var config = dt?.ConfigurationAs<ImageCropperConfiguration>();
                             src = svalue;
-                            var json = new
-                            {
-                                src = svalue,
-                                crops = config == null ? Array.Empty<ImageCropperConfiguration.Crop>() : config.Crops
-                            };
 
-                            property.SetValue(JsonConvert.SerializeObject(json), pvalue.Culture, pvalue.Segment);
+                            property.SetValue(JsonConvert.SerializeObject(new { src = svalue }, Formatting.None), pvalue.Culture, pvalue.Segment);
                         }
                         else
                         {

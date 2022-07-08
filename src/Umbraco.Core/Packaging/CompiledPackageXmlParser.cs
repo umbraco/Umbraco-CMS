@@ -30,13 +30,13 @@ namespace Umbraco.Cms.Core.Packaging
             if (info == null) throw new FormatException("The xml document is invalid");
             var package = info.Element("package");
             if (package == null) throw new FormatException("The xml document is invalid");
-            
+
             var def = new CompiledPackage
             {
                 // will be null because we don't know where this data is coming from and
                 // this value is irrelevant during install.
                 PackageFile = null,
-                Name = package.Element("name")?.Value,
+                Name = package.Element("name")?.Value ?? string.Empty,
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 MacroPartialViews = xml.Root.Element("MacroPartialViews")?.Elements("View") ?? Enumerable.Empty<XElement>(),
                 PartialViews = xml.Root.Element("PartialViews")?.Elements("View") ?? Enumerable.Empty<XElement>(),

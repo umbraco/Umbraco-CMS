@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions
@@ -9,18 +10,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions
             : base(context)
         { }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
-        public List<KeyValuePair<string, object>> Set { get; set; }
-        public List<KeyValuePair<string, object>> Where { get; set; }
+        public List<KeyValuePair<string, object?>>? Set { get; set; }
+        public List<KeyValuePair<string, object?>>? Where { get; set; }
         public bool IsAllRows { get; set; }
 
         protected override string GetSql()
         {
-            var updateItems = Set.Select(x => $"{SqlSyntax.GetQuotedColumnName(x.Key)} = {GetQuotedValue(x.Value)}");
+            var updateItems = Set?.Select(x => $"{SqlSyntax.GetQuotedColumnName(x.Key)} = {GetQuotedValue(x.Value)}");
             var whereClauses = IsAllRows
                 ? null
-                : Where.Select(x => $"{SqlSyntax.GetQuotedColumnName(x.Key)} {(x.Value == null ? "IS" : "=")} {GetQuotedValue(x.Value)}");
+                : Where?.Select(x => $"{SqlSyntax.GetQuotedColumnName(x.Key)} {(x.Value == null ? "IS" : "=")} {GetQuotedValue(x.Value)}");
 
             var whereClause = whereClauses == null
                 ? "(1=1)"
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions
 
             return string.Format(SqlSyntax.UpdateData,
                 SqlSyntax.GetQuotedTableName(TableName),
-                string.Join(", ", updateItems),
+                string.Join(", ", updateItems ?? Array.Empty<string>()),
                 whereClause);
         }
     }

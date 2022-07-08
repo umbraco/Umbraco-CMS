@@ -18,11 +18,11 @@ namespace Umbraco.Cms.Core.Configuration
             AssemblyVersion = umbracoCoreAssembly.GetName().Version;
 
             // gets the value indicated by the AssemblyFileVersion attribute
-            AssemblyFileVersion = System.Version.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version);
+            AssemblyFileVersion = System.Version.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? string.Empty);
 
             // gets the value indicated by the AssemblyInformationalVersion attribute
             // this is the true semantic version of the Umbraco Cms
-            SemanticVersion = SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
+            SemanticVersion = SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? string.Empty);
 
             // gets the non-semantic version
             Version = SemanticVersion.GetVersion(3);
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <para>Is the one that the CLR checks for compatibility. Therefore, it changes only on
         /// hard-breaking changes (for instance, on new major versions).</para>
         /// </remarks>
-        public Version AssemblyVersion { get; }
+        public Version? AssemblyVersion { get; }
 
         /// <summary>
         /// Gets the assembly file version of the Umbraco code.
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <remarks>
         /// <para>The assembly version is the value of the <see cref="AssemblyFileVersionAttribute"/>.</para>
         /// </remarks>
-        public Version AssemblyFileVersion { get; }
+        public Version? AssemblyFileVersion { get; }
 
         /// <summary>
         /// Gets the semantic version of the Umbraco code.

@@ -12,9 +12,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEntity>, IWriteRepository<TEntity>
         where TEntity : IFile
     {
-        protected FileRepository(IFileSystem fileSystem) => FileSystem = fileSystem;
+        protected FileRepository(IFileSystem? fileSystem) => FileSystem = fileSystem;
 
-        protected IFileSystem FileSystem { get; }
+        protected IFileSystem? FileSystem { get; }
 
         public virtual void AddFolder(string folderPath) => PersistNewItem(new Folder(folderPath));
 
@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public virtual void Save(TEntity entity)
         {
-            if (FileSystem.FileExists(entity.OriginalPath) == false)
+            if (FileSystem?.FileExists(entity.OriginalPath) == false)
             {
                 PersistNewItem(entity);
             }
@@ -36,11 +36,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public virtual void Delete(TEntity entity) => PersistDeletedItem(entity);
 
-        public abstract TEntity Get(TId id);
+        public abstract TEntity? Get(TId? id);
 
-        public abstract IEnumerable<TEntity> GetMany(params TId[] ids);
+        public abstract IEnumerable<TEntity> GetMany(params TId[]? ids);
 
-        public virtual bool Exists(TId id) => FileSystem.FileExists(id.ToString());
+        public virtual bool Exists(TId id) => FileSystem?.FileExists(id!.ToString()!) ?? false;
 
         #endregion
 
@@ -76,14 +76,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #endregion
 
-        internal virtual void PersistNewFolder(Folder entity) => FileSystem.CreateFolder(entity.Path);
+        internal virtual void PersistNewFolder(Folder entity) => FileSystem?.CreateFolder(entity.Path);
 
-        internal virtual void PersistDeletedFolder(Folder entity) => FileSystem.DeleteDirectory(entity.Path);
+        internal virtual void PersistDeletedFolder(Folder entity) => FileSystem?.DeleteDirectory(entity.Path);
 
         #region Abstract IUnitOfWorkRepository Methods
 
         protected virtual void PersistNewItem(TEntity entity)
         {
+            if (entity.Content is null || FileSystem is null)
+            {
+                return;
+            }
             using (Stream stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
@@ -92,12 +96,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
-                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
+                entity.VirtualPath = FileSystem?.GetUrl(entity.Path);
             }
         }
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
+            if (entity.Content is null || FileSystem is null)
+            {
+                return;
+            }
             using (Stream stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
@@ -113,7 +121,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (entity.Path.InvariantEquals(entity.OriginalPath) == false)
             {
                 //delete the original file
-                FileSystem.DeleteFile(entity.OriginalPath);
+                FileSystem?.DeleteFile(entity.OriginalPath);
                 //reset the original path on the file
                 entity.ResetOriginalPath();
             }
@@ -121,7 +129,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected virtual void PersistDeletedItem(TEntity entity)
         {
-            if (FileSystem.FileExists(entity.Path))
+            if (FileSystem?.FileExists(entity.Path) ?? false)
             {
                 FileSystem.DeleteFile(entity.Path);
             }
@@ -152,29 +160,37 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected IEnumerable<string> FindAllFiles(string path, string filter)
         {
             var list = new List<string>();
-            list.AddRange(FileSystem.GetFiles(path, filter));
-
-            IEnumerable<string> directories = FileSystem.GetDirectories(path);
-            foreach (var directory in directories)
+            var collection = FileSystem?.GetFiles(path, filter);
+            if (collection is not null)
             {
-                list.AddRange(FindAllFiles(directory, filter));
+                list.AddRange(collection);
+            }
+
+            IEnumerable<string>? directories = FileSystem?.GetDirectories(path);
+            if (directories is not null)
+            {
+                foreach (var directory in directories)
+                {
+                    list.AddRange(FindAllFiles(directory, filter));
+                }
             }
 
             return list;
         }
 
-        protected string GetFileContent(string filename)
+        protected string? GetFileContent(string? filename)
         {
-            if (FileSystem.FileExists(filename) == false)
+            if (filename is null || FileSystem?.FileExists(filename) == false)
             {
                 return null;
             }
 
             try
             {
-                using (Stream stream = FileSystem.OpenFile(filename))
-                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                using Stream? stream = FileSystem?.OpenFile(filename!);
+                if (stream is not null)
                 {
+                    using var reader = new StreamReader(stream, Encoding.UTF8, true);
                     return reader.ReadToEnd();
                 }
             }
@@ -182,37 +198,39 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 return null; // deal with race conds
             }
+
+            return null;
         }
 
         public Stream GetFileContentStream(string filepath)
         {
-            if (FileSystem.FileExists(filepath) == false)
+            if (FileSystem?.FileExists(filepath) == false)
             {
-                return null;
+                return Stream.Null;
             }
 
             try
             {
-                return FileSystem.OpenFile(filepath);
+                return FileSystem?.OpenFile(filepath) ?? Stream.Null;
             }
             catch
             {
-                return null; // deal with race conds
+                return Stream.Null; // deal with race conds
             }
         }
 
-        public void SetFileContent(string filepath, Stream content) => FileSystem.AddFile(filepath, content, true);
+        public void SetFileContent(string filepath, Stream content) => FileSystem?.AddFile(filepath, content, true);
 
         public long GetFileSize(string filename)
         {
-            if (FileSystem.FileExists(filename) == false)
+            if (FileSystem?.FileExists(filename) == false)
             {
                 return -1;
             }
 
             try
             {
-                return FileSystem.GetSize(filename);
+                return FileSystem!.GetSize(filename);
             }
             catch
             {

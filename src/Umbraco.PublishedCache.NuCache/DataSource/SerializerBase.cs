@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             return read(stream);
         }
 
-        protected string ReadStringObject(Stream stream, bool intern = false) // required 'cos string is not a struct
+        protected string? ReadStringObject(Stream stream, bool intern = false) // required 'cos string is not a struct
         {
             var type = PrimitiveSerializer.Char.ReadFrom(stream);
             if (type == PrefixNull) return null;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         protected double? ReadDoubleObject(Stream stream) => ReadStruct(stream, PrefixDouble, ReadDouble);
         protected DateTime? ReadDateTimeObject(Stream stream) => ReadStruct(stream, PrefixDateTime, ReadDateTime);
 
-        protected object ReadObject(Stream stream)
+        protected object? ReadObject(Stream stream)
             => ReadObject(PrimitiveSerializer.Char.ReadFrom(stream), stream);
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// This will incur boxing because the result is an object but in most cases the value will be a struct.
         /// When the type is known use the specific methods like <see cref="ReadInt(Stream)"/> instead
         /// </remarks>
-        protected object ReadObject(char type, Stream stream)
+        protected object? ReadObject(char type, Stream stream)
         {
             switch (type)
             {
@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// This method will incur boxing if the value is a struct. When the type is known use the <see cref="PrimitiveSerializer"/>
         /// to write the value directly.
         /// </remarks>
-        protected void WriteObject(object value, Stream stream)
+        protected void WriteObject(object? value, Stream stream)
         {
             if (value == null)
             {

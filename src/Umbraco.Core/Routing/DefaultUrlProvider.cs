@@ -19,15 +19,15 @@ namespace Umbraco.Cms.Core.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly ILocalizationService _localizationService;
-        private readonly ILocalizedTextService _localizedTextService;
+        private readonly ILocalizedTextService? _localizedTextService;
         private readonly ILogger<DefaultUrlProvider> _logger;
-        private readonly RequestHandlerSettings _requestSettings;
+        private RequestHandlerSettings _requestSettings;
         private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
         [Obsolete("Use ctor with all parameters")]
-        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger,
+        public DefaultUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger,
             ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
             : this(requestSettings, logger, siteDomainMapper, umbracoContextAccessor, uriUtility,
                 StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>())
@@ -35,19 +35,21 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         public DefaultUrlProvider(
-            IOptions<RequestHandlerSettings> requestSettings,
+            IOptionsMonitor<RequestHandlerSettings> requestSettings,
             ILogger<DefaultUrlProvider> logger,
             ISiteDomainMapper siteDomainMapper,
             IUmbracoContextAccessor umbracoContextAccessor,
             UriUtility uriUtility,
             ILocalizationService localizationService)
         {
-            _requestSettings = requestSettings.Value;
+            _requestSettings = requestSettings.CurrentValue;
             _logger = logger;
             _siteDomainMapper = siteDomainMapper;
             _umbracoContextAccessor = umbracoContextAccessor;
             _uriUtility = uriUtility;
             _localizationService = localizationService;
+
+            requestSettings.OnChange(x => _requestSettings = x);
         }
 
         #region GetOtherUrls
@@ -68,15 +70,15 @@ namespace Umbraco.Cms.Core.Routing
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            IPublishedContent node = umbracoContext.Content.GetById(id);
+            IPublishedContent? node = umbracoContext.Content?.GetById(id);
             if (node == null)
             {
                 yield break;
             }
 
             // look for domains, walking up the tree
-            IPublishedContent n = node;
-            IEnumerable<DomainAndUri> domainUris =
+            IPublishedContent? n = node;
+            IEnumerable<DomainAndUri>? domainUris =
                 DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id,
                     current, false);
             while (domainUris == null && n != null) // n is null at root
@@ -96,10 +98,10 @@ namespace Umbraco.Cms.Core.Routing
 
             foreach (DomainAndUri d in domainUris)
             {
-                var culture = d?.Culture;
+                var culture = d.Culture;
 
                 // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.Content.GetRouteById(id, culture);
+                var route = umbracoContext.Content?.GetRouteById(id, culture);
                 if (route == null)
                 {
                     continue;
@@ -120,7 +122,7 @@ namespace Umbraco.Cms.Core.Routing
         #region GetUrl
 
         /// <inheritdoc />
-        public virtual UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
+        public virtual UrlInfo? GetUrl(IPublishedContent content, UrlMode mode, string? culture, Uri current)
         {
             if (!current.IsAbsoluteUri)
             {
@@ -129,13 +131,18 @@ namespace Umbraco.Cms.Core.Routing
 
             IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // will not use cache if previewing
-            var route = umbracoContext.Content.GetRouteById(content.Id, culture);
+            var route = umbracoContext.Content?.GetRouteById(content.Id, culture);
 
             return GetUrlFromRoute(route, umbracoContext, content.Id, current, mode, culture);
         }
 
-        internal UrlInfo GetUrlFromRoute(string route, IUmbracoContext umbracoContext, int id, Uri current,
-            UrlMode mode, string culture)
+        internal UrlInfo? GetUrlFromRoute(
+            string? route,
+            IUmbracoContext umbracoContext,
+            int id,
+            Uri current,
+            UrlMode mode,
+            string? culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -149,12 +156,12 @@ namespace Umbraco.Cms.Core.Routing
             // route is /<path> or <domainRootId>/<path>
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
-            var domainUri = pos == 0
+            DomainAndUri? domainUri = pos == 0
                 ? null
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current, culture);
 
             var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
-            if (domainUri is not null || culture == defaultCulture || string.IsNullOrEmpty(culture))
+            if (domainUri is not null || string.IsNullOrEmpty(culture) || culture.Equals(defaultCulture, StringComparison.InvariantCultureIgnoreCase))
             {
                 var url = AssembleUrl(domainUri, path, current, mode).ToString();
                 return UrlInfo.Url(url, culture);
@@ -167,7 +174,7 @@ namespace Umbraco.Cms.Core.Routing
 
         #region Utilities
 
-        private Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlMode mode)
+        private Uri AssembleUrl(DomainAndUri? domainUri, string path, Uri current, UrlMode mode)
         {
             Uri uri;
 
@@ -183,7 +190,7 @@ namespace Umbraco.Cms.Core.Routing
                 switch (mode)
                 {
                     case UrlMode.Absolute:
-                        uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
+                        uri = new Uri(current!.GetLeftPart(UriPartial.Authority) + path);
                         break;
                     case UrlMode.Relative:
                     case UrlMode.Auto:

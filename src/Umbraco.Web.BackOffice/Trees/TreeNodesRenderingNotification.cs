@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Trees;
 
@@ -11,26 +12,57 @@ namespace Umbraco.Cms.Core.Notifications
     /// </remarks>
     public class TreeNodesRenderingNotification : INotification
     {
-        /// <summary>
-        /// The tree nodes being rendered
-        /// </summary>
-        public TreeNodeCollection Nodes { get; }
 
         /// <summary>
-        /// The query string of the current request
+        /// Initializes a new instance of the <see cref="TreeNodesRenderingNotification"/> class.
         /// </summary>
-        public FormCollection QueryString { get; }
+        /// <param name="nodes">The tree nodes being rendered</param>
+        /// <param name="queryString">The query string of the current request</param>
+        /// <param name="treeAlias">The alias of the tree rendered</param>
+        /// <param name="id">The id of the node rendered</param>
+        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias, string id)
+        {
+            Nodes = nodes;
+            QueryString = queryString;
+            TreeAlias = treeAlias;
+            Id = id;
+        }
 
         /// <summary>
-        /// The alias of the tree rendered
+        /// Initializes a new instance of the <see cref="TreeNodesRenderingNotification"/> class.
+        /// Constructor
         /// </summary>
-        public string TreeAlias { get; }
-
+        /// <param name="nodes">The tree nodes being rendered</param>
+        /// <param name="queryString">The query string of the current request</param>
+        /// <param name="treeAlias">The alias of the tree rendered</param>
+        [Obsolete("Use ctor with all parameters")]
         public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias)
         {
             Nodes = nodes;
             QueryString = queryString;
             TreeAlias = treeAlias;
+            Id = default;
         }
+
+        /// <summary>
+        /// Gets the tree nodes being rendered
+        /// </summary>
+        public TreeNodeCollection Nodes { get; }
+
+        /// <summary>
+        /// Gets the query string of the current request
+        /// </summary>
+        public FormCollection QueryString { get; }
+
+        /// <summary>
+        /// Gets the alias of the tree rendered
+        /// </summary>
+        public string TreeAlias { get; }
+
+        /// <summary>
+        /// Gets the id of the node rendered
+        /// </summary>
+        public string? Id { get; }
+
     }
 }

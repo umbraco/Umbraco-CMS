@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -9,10 +10,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services
 {
+    [Obsolete("Use the IUserDataService interface instead")]
     public class UserDataService : IUserDataService
     {
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
+
 
         public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
         {

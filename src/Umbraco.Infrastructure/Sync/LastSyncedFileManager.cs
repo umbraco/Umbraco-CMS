@@ -9,9 +9,9 @@ namespace Umbraco.Cms.Infrastructure.Sync
 {
     public sealed class LastSyncedFileManager
     {
-        private string _distCacheFile;
+        private string? _distCacheFile;
         private bool _lastIdReady;
-        private object _lastIdLock;
+        private object? _lastIdLock;
         private int _lastId;
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -24,6 +24,10 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// <param name="id">The id.</param>
         public void SaveLastSyncedId(int id)
         {
+            if (_lastIdLock is null)
+            {
+                return;
+            }
             lock (_lastIdLock)
             {
                 if (!_lastIdReady)

@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Collections
             return Enumerable.Empty<string>();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged; // noop
+        public event PropertyChangedEventHandler? PropertyChanged; // noop
         #endregion
     }
 }

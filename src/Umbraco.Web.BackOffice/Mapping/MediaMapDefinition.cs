@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -51,13 +51,13 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         // Umbraco.Code.MapAll
         private static void Map(IMedia source, ContentPropertyCollectionDto target, MapperContext context)
         {
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties).WhereNotNull();
         }
 
         // Umbraco.Code.MapAll -Properties -Errors -Edited -Updater -Alias -IsContainer
         private void Map(IMedia source, MediaItemDisplay target, MapperContext context)
         {
-            target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentApps = _commonMapper.GetContentAppsForEntity(source);
             target.ContentType = _commonMapper.GetContentType(source, context);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
             target.Path = source.Path;
-            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties);
+            target.Properties = context.MapEnumerable<IProperty, ContentPropertyBasic>(source.Properties).WhereNotNull();
             target.SortOrder = source.SortOrder;
             target.State = null;
             target.Trashed = source.Trashed;

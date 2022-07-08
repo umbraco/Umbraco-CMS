@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -23,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// Gets a dictionary of key/values directly from the database, no scope, nothing.
         /// </summary>
         /// <remarks>Used by <see cref="CoreRuntimeBootstrapper"/> to determine the runtime state.</remarks>
-        public static IReadOnlyDictionary<string, string> GetFromKeyValueTable(this IUmbracoDatabase database, string keyPrefix)
+        public static IReadOnlyDictionary<string, string?>? GetFromKeyValueTable(this IUmbracoDatabase database, string keyPrefix)
         {
             if (database is null) return null;
 
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             var whereParam = sqlSyntax.GetStringColumnWildcardComparison(
                 sqlSyntax.GetQuotedColumnName("key"),
                 0,
-                Querying.TextColumnType.NVarchar);
+                TextColumnType.NVarchar);
 
             var sql = database.SqlContext.Sql()
                 .Select<KeyValueDto>()
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 .Where(whereParam, keyPrefix + sqlSyntax.GetWildcardPlaceholder());
 
             return database.Fetch<KeyValueDto>(sql)
-                .ToDictionary(x => x.Key, x => x.Value);
+                .ToDictionary(x => x.Key!, x => x.Value);
         }
 
 

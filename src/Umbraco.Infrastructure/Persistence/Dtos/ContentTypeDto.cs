@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     internal class ContentTypeDto
     {
         public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentType;
-        private string _alias;
+        private string? _alias;
 
         [Column("pk")]
         [PrimaryKeyColumn(IdentitySeed = 700)]
@@ -22,21 +22,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
+        public string? Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
         [Column("icon")]
         [Index(IndexTypes.NonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         [Column("thumbnail")]
         [Constraint(Default = "folder.png")]
-        public string Thumbnail { get; set; }
+        public string? Thumbnail { get; set; }
 
         [Column("description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(1500)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Column("isContainer")]
         [Constraint(Default = "0")]
@@ -56,6 +56,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
-        public NodeDto NodeDto { get; set; }
+        public NodeDto NodeDto { get; set; } = null!;
     }
 }

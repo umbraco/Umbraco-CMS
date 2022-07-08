@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
@@ -24,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMainDom _mainDom;
-        private readonly KeepAliveSettings _keepAliveSettings;
+        private KeepAliveSettings _keepAliveSettings;
         private readonly ILogger<KeepAlive> _logger;
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRoleAccessor _serverRegistrar;
@@ -43,23 +44,25 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public KeepAlive(
             IHostingEnvironment hostingEnvironment,
             IMainDom mainDom,
-            IOptions<KeepAliveSettings> keepAliveSettings,
+            IOptionsMonitor<KeepAliveSettings> keepAliveSettings,
             ILogger<KeepAlive> logger,
             IProfilingLogger profilingLogger,
             IServerRoleAccessor serverRegistrar,
             IHttpClientFactory httpClientFactory)
-            : base(TimeSpan.FromMinutes(5), DefaultDelay)
+            : base(logger, TimeSpan.FromMinutes(5), DefaultDelay)
         {
             _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;
-            _keepAliveSettings = keepAliveSettings.Value;
+            _keepAliveSettings = keepAliveSettings.CurrentValue;
             _logger = logger;
             _profilingLogger = profilingLogger;
             _serverRegistrar = serverRegistrar;
             _httpClientFactory = httpClientFactory;
+
+            keepAliveSettings.OnChange(x => _keepAliveSettings = x);
         }
 
-        public override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object? state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {
@@ -94,12 +97,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 }
 
                 // If the config is an absolute path, just use it
-                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
+                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl!, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
 
                 try
                 {
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
-                    HttpClient httpClient = _httpClientFactory.CreateClient();
+                    HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.IgnoreCertificateErrors);
                     _ = await httpClient.SendAsync(request);
                 }
                 catch (Exception ex)

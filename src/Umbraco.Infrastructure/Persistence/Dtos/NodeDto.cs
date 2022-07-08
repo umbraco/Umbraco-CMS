@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Column("path")]
         [Length(150)]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Path")]
-        public string Path { get; set; }
+        public string Path { get; set; } = null!;
 
         [Column("sortOrder")]
         public int SortOrder { get; set; }
@@ -54,10 +54,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         [Column("nodeObjectType")] // TODO: db rename to 'objectType'
-        [NullSetting(NullSetting = NullSettings.Null)]        
+        [NullSetting(NullSetting = NullSettings.Null)]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType", ForColumns = "nodeObjectType,trashed", IncludeColumns = "uniqueId,parentId,level,path,sortOrder,nodeUser,text,createDate")]
         public Guid? NodeObjectType { get; set; }
 

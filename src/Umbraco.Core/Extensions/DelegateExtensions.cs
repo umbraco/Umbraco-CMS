@@ -10,7 +10,7 @@ namespace Umbraco.Extensions
 {
     public static class DelegateExtensions
     {
-        public static Attempt<T> RetryUntilSuccessOrTimeout<T>(this Func<Attempt<T>> task, TimeSpan timeout, TimeSpan pause)
+        public static Attempt<T?> RetryUntilSuccessOrTimeout<T>(this Func<Attempt<T?>> task, TimeSpan timeout, TimeSpan pause)
         {
             if (pause.TotalMilliseconds < 0)
             {
@@ -20,14 +20,14 @@ namespace Umbraco.Extensions
             do
             {
                 var result = task();
-                if (result) { return result; }
+                if (result.Success) { return result; }
                 Thread.Sleep((int)pause.TotalMilliseconds);
             }
             while (stopwatch.Elapsed < timeout);
-            return Attempt<T>.Fail();
+            return Attempt<T?>.Fail();
         }
 
-        public static Attempt<T> RetryUntilSuccessOrMaxAttempts<T>(this Func<int, Attempt<T>> task, int totalAttempts, TimeSpan pause)
+        public static Attempt<T?> RetryUntilSuccessOrMaxAttempts<T>(this Func<int, Attempt<T?>> task, int totalAttempts, TimeSpan pause)
         {
             if (pause.TotalMilliseconds < 0)
             {
@@ -38,11 +38,11 @@ namespace Umbraco.Extensions
             {
                 attempts++;
                 var result = task(attempts);
-                if (result) { return result; }
+                if (result.Success) { return result; }
                 Thread.Sleep((int)pause.TotalMilliseconds);
             }
             while (attempts < totalAttempts);
-            return Attempt<T>.Fail();
+            return Attempt<T?>.Fail();
         }
     }
 }

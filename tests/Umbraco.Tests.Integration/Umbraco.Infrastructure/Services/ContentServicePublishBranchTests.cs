@@ -440,13 +440,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private void CreateTypes(out IContentType iContentType, out IContentType vContentType)
         {
-            var globalSettings = new GlobalSettings();
-
-            var langDe = new Language(globalSettings, "de") { IsDefault = true };
+            var langDe = new Language("de", "German")
+            {
+                IsDefault = true
+            };
             LocalizationService.Save(langDe);
-            var langRu = new Language(globalSettings, "ru");
+            var langRu = new Language("ru", "Russian");
             LocalizationService.Save(langRu);
-            var langEs = new Language(globalSettings, "es");
+            var langEs = new Language("es", "Spanish");
             LocalizationService.Save(langEs);
 
             iContentType = new ContentType(ShortStringHelper, -1)

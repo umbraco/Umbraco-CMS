@@ -11,7 +11,7 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-
+        vm.initialState = {};
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
         vm.setPermissions = setPermissions;
@@ -23,12 +23,11 @@
 
         function onInit() {
             vm.loading = true;
-            contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
+            contentResource.getDetailedPermissions($scope.currentNode.id).then(userGroups => {
                 initData(userGroups);
                 vm.loading = false;
                 currentForm = angularHelper.getCurrentForm($scope);
             });
-
         }
 
         /**
@@ -45,6 +44,21 @@
               assignGroupPermissions(group);
             }
           });
+          vm.initialState = angular.copy(userGroups);
+        }
+
+        function resetData() {
+            vm.selectedUserGroups = [];
+            vm.availableUserGroups = angular.copy(vm.initialState);
+            vm.availableUserGroups.forEach(function (group) {
+                if (group.permissions) {
+                    //if there's explicit permissions assigned than it's selected
+                    group.selected = false;
+                    assignGroupPermissions(group);
+                }
+            });
+            currentForm = angularHelper.getCurrentForm($scope);
+
         }
 
         function setViewSate(state) {
@@ -57,7 +71,7 @@
             //if no permissions are explicitly set this means we need to show the defaults
             vm.selectedUserGroup.permissions = vm.selectedUserGroup.defaultPermissions;
           }
-          localizationService.localize("defaultdialogs_permissionsSetForGroup", [$scope.currentNode.name, vm.selectedUserGroup.name]).then(function (value) {
+          localizationService.localize("defaultdialogs_permissionsSetForGroup", [$scope.currentNode.name, vm.selectedUserGroup.name]).then(value => {
             vm.labels.permissionsSetForGroup = value;
           });
           setViewSate("managePermissions");
@@ -114,6 +128,7 @@
 
         function cancelManagePermissions() {
             setViewSate("manageGroups");
+            resetData();
         }
 
         function formatSaveModel(permissionsSave, selectedUserGroups, removedUserGroups) {
@@ -144,7 +159,7 @@
                 permissions: permissionsSave
             };
 
-            contentResource.savePermissions(saveModel).then(function (userGroups) {
+            contentResource.savePermissions(saveModel).then(userGroups => {
 
                 //re-assign model from server since it could have changed
                 initData(userGroups);
@@ -152,10 +167,11 @@
                 // clear dirty state on the form so we don't see the discard changes notification
                 // we use a timeout here because in some cases the initData reformats the userGroups model and triggers a change after the form state was changed
                 $timeout(function() {
-                  if(currentForm) {
-                    currentForm.$dirty = false;
+                  if (currentForm) {
+                     currentForm.$dirty = false;
                   }
                 });
+                
                 $scope.dialog.confirmDiscardChanges = false;
                 vm.saveState = "success";
                 vm.saveSuccces = true;
@@ -169,28 +185,33 @@
         function closeDialog() {
           // check if form has been changed. If it has show discard changes notification
           if (currentForm && currentForm.$dirty) {
-              localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
-                  function(values) {
-                      var overlay = {
-                          "view": "default",
-                          "title": values[0],
-                          "content": values[1],
-                          "disableBackdropClick": true,
-                          "disableEscKey": true,
-                          "submitButtonLabel": values[2],
-                          "closeButtonLabel": values[3],
-                          submit: function () {
-                              overlayService.close();
-                              navigationService.hideDialog();
-                          },
-                          close: function () {
-                              overlayService.close();
-                          }
-                      };
 
-                      overlayService.open(overlay);
-                  }
-              );
+            const labelKeys = [
+              "prompt_unsavedChanges",
+              "prompt_unsavedChangesWarning",
+              "prompt_discardChanges",
+              "prompt_stay"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(values => {
+                
+                const overlay = {
+                    view: "default",
+                    title: values[0],
+                    content: values[1],
+                    disableBackdropClick: true,
+                    disableEscKey: true,
+                    submitButtonLabel: values[2],
+                    closeButtonLabel: values[3],
+                    submit: () => {
+                        overlayService.close();
+                        navigationService.hideDialog();
+                    },
+                    close: () => overlayService.close()
+                };
+
+              overlayService.open(overlay);
+            });
           } else {
             navigationService.hideDialog();
           }
