@@ -1,0 +1,17 @@
+<div ng-controller="Umbraco.Editors.DataType.AuthorizedServiceEditController as vm">
+
+  <h2>Authorized Service: {{ vm.displayName }}</h2>
+
+  <p>Authorized? {{(vm.isAuthorized ? "Yes" : "No")}}</p>
+
+  <div ng-if="!vm.isAuthorized">
+    <a ng-href="{{vm.authorizationUrl}}">Click to authorize</a>
+  </div>
+
+  <!--
+  <div ng-if="vm.isAuthorized && vm.sampleRequest">
+    <a ng-click="vm.makeSampleRequest()">Make sample request</a>
+  </div>
+  -->
+
+</div>

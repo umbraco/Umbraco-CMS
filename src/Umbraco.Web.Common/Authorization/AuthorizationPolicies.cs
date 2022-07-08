@@ -59,6 +59,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
     public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);
     public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
+    public const string TreeAccessAuthorizedServices = nameof(TreeAccessAuthorizedServices);
 
     // Custom access based on multiple trees
     public const string TreeAccessDocumentsOrDocumentTypes = nameof(TreeAccessDocumentsOrDocumentTypes);

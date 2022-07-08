@@ -389,6 +389,12 @@ public static partial class UmbracoBuilderExtensions
             policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
         });
 
+        options.AddPolicy(AuthorizationPolicies.TreeAccessAuthorizedServices, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.AuthorizedServices));
+        });
+
         options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>
         {
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);

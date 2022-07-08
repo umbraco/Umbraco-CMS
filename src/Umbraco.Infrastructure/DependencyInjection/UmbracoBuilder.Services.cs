@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.OAuth;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
@@ -16,6 +17,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.OAuth;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -58,6 +60,11 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IUserDataService, SystemInformationTelemetryProvider>();
         builder.Services.AddTransient<IUsageInformationService, UsageInformationService>();
         builder.Services.AddTransient<IEditorConfigurationParser, EditorConfigurationParser>();
+
+        // TODO: register ISecretEncryptor with key from config:
+        // builder.Services.AddUnique<ISecretEncryptor, factory => new SecretEncryptor("")));
+        builder.Services.AddUnique<ITokenStorage, InMemoryTokenStorage>();
+        builder.Services.AddUnique<IAuthorizedServiceCaller, AuthorizedServiceCaller>();
 
         return builder;
     }

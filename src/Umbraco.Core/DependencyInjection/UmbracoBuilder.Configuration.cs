@@ -83,7 +83,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<PackageMigrationSettings>()
             .AddUmbracoOptions<ContentDashboardSettings>()
             .AddUmbracoOptions<HelpPageSettings>()
-            .AddUmbracoOptions<DataTypesSettings>();
+            .AddUmbracoOptions<DataTypesSettings>()
+            .AddUmbracoOptions<AuthorizedServiceSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

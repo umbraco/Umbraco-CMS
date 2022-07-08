@@ -299,6 +299,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetById(0, UmbracoEntityTypes.Media))
                         },
                         {
+                            "authorizedServiceApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<AuthorizedServiceController>(
+                                controller => controller.GetByAlias(string.Empty))
+                        },
+                        {
                             "dataTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<DataTypeController>(
                                 controller => controller.GetById(0))
                         },

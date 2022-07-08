@@ -124,6 +124,8 @@ public static partial class Constants
 
         public const string Languages = "languages";
 
+        public const string AuthorizedServices = "AuthorizedServices";
+
         /// <summary>
         ///     alias for the user types tree.
         /// </summary>
