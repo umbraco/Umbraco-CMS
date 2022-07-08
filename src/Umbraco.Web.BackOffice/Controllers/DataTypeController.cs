@@ -356,13 +356,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            Attempt<OperationResult<MoveOperationStatusType, IDataType>> result = _dataTypeService.Copy(toCopy, copy.ParentId);
+            Attempt<OperationResult<MoveOperationStatusType, IDataType>?> result = _dataTypeService.Copy(toCopy, copy.ParentId);
             if (result.Success)
             {
                 return Content(toCopy.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
-            switch (result.Result.Result)
+            switch (result.Result?.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();

@@ -434,12 +434,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
         }
 
-        public Attempt<OperationResult<MoveOperationStatusType, IDataType>> Copy(IDataType copying, int containerId)
+        public Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(IDataType copying, int containerId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
             IDataType copy;
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateCoreScope())
             {
                 try
                 {

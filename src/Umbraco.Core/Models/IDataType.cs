@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Models
         /// <para>The serialized Json is deserialized by the property editor, which by default should
         /// return a Dictionary{string, object} but could return a typed object e.g. MyEditor.Configuration.</para>
         /// </remarks>
-        object Configuration { get; set; }
+        object? Configuration { get; set; }
 
         IDataType DeepCloneWithResetIdentities();
     }
