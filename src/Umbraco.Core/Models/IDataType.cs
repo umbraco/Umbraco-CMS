@@ -35,6 +35,12 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         object? Configuration { get; set; }
 
-        IDataType DeepCloneWithResetIdentities();
+        IDataType DeepCloneWithResetIdentities()
+        {
+            var clone = (DataType)DeepClone();
+            clone.Key = Guid.Empty;
+            clone.ResetIdentity();
+            return clone;
+        }
     }
 }
