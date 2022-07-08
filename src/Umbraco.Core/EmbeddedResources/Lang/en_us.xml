@@ -88,6 +88,8 @@
   <area alias="apps">
     <key alias="umbContent">Content</key>
     <key alias="umbInfo">Info</key>
+    <key alias="umbUserGroup">Detail</key>
+    <key alias="umbUser">Detail</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Permission denied.</key>
