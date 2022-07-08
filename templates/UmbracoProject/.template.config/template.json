@@ -26,6 +26,12 @@
           "exclude": [
             ".gitignore"
           ]
+        },
+        {
+          "condition": "(!UseRuntimeMode)",
+          "exclude": [
+            "appsettings.Production.json"
+          ]
         }
       ]
     }
@@ -51,12 +57,19 @@
       "description": "The version of Umbraco.Cms to add as PackageReference.",
       "type": "parameter",
       "datatype": "string",
-      "defaultValue": "10.0.0-rc1",
+      "defaultValue": "10.0.0",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
     "UseHttpsRedirect": {
       "displayName": "Use HTTPS redirect",
       "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting.",
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "UseRuntimeMode": {
+      "displayName": "Use runtime mode",
+      "description": "Whether to use Development and Production runtime mode.",
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false"

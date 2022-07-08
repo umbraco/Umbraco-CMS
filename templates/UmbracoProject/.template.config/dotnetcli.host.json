@@ -13,6 +13,10 @@
       "longName": "use-https-redirect",
       "shortName": ""
     },
+    "UseRuntimeMode": {
+      "longName": "use-runtime-mode",
+      "shortName": ""
+    },
     "SkipRestore": {
       "longName": "no-restore",
       "shortName": ""

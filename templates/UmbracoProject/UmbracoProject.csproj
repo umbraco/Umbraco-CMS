@@ -10,8 +10,8 @@
     <PackageReference Include="Umbraco.Cms" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
 
-  <!-- Force Windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older Windows 10 and most, if not all, Windows Server editions will run NLS -->
   <ItemGroup>
+    <!-- Force Windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older Windows 10 and most, if not all, Windows Server editions will run NLS -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>
@@ -25,8 +25,8 @@
     <Folder Include="wwwroot" />
   </ItemGroup>
 
-  <!-- Remove RazorCompileOnBuild, RazorCompileOnPublish and CopyRazorGenerateFilesToPublishDirectory when not using ModelsMode InMemoryAuto -->
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(UseRuntimeMode)' != 'true'">
+    <!-- Remove RazorCompileOnBuild, RazorCompileOnPublish and CopyRazorGenerateFilesToPublishDirectory when not using ModelsMode InMemoryAuto -->
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
