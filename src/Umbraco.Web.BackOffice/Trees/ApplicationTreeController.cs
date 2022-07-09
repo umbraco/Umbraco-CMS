@@ -208,15 +208,20 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 throw new ArgumentNullException(nameof(tree));
             }
+            
+            // Force tree querystring param
+            Dictionary<string, StringValues>? d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            d["tree"] = tree.TreeAlias;
+            var qs = new FormCollection(d);
 
-            var childrenResult = await GetChildren(tree, id, querystring);
+            var childrenResult = await GetChildren(tree, id, qs);
             if (!(childrenResult?.Result is null))
             {
                 return new ActionResult<TreeRootNode>(childrenResult.Result);
             }
 
             var children = childrenResult?.Value;
-            var rootNodeResult = await GetRootNode(tree, querystring);
+            var rootNodeResult = await GetRootNode(tree, qs);
             if (!(rootNodeResult?.Result is null))
             {
                 return rootNodeResult.Result;
@@ -256,7 +261,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 throw new ArgumentNullException(nameof(tree));
             }
 
-            var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+            // Force tree querystring param
+            Dictionary<string, StringValues>? d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            d["tree"] = tree.TreeAlias;
+            var qs = new FormCollection(d);
+
+            var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", qs);
 
             // return null if the user isn't authorized to view that tree
             if (!((ForbidResult?)result.Result is null))
@@ -268,7 +278,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             TreeNode? rootNode = null;
             if (controller is not null)
             {
-                var rootNodeResult = await controller.GetRootNode(querystring);
+                var rootNodeResult = await controller.GetRootNode(qs);
                 if (!(rootNodeResult.Result is null))
                 {
                     return rootNodeResult.Result;
