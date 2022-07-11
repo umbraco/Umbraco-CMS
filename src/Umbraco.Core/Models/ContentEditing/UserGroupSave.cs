@@ -34,6 +34,9 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     [DataMember(Name = "startMediaId")]
     public int? StartMediaId { get; set; }
 
+    [DataMember(Name = "hasAccessToAllLanguages")]
+    public bool HasAccessToAllLanguages { get; set; }
+
     /// <summary>
     ///     The list of letters (permission codes) to assign as the default for the user group
     /// </summary>
@@ -49,11 +52,11 @@ public class UserGroupSave : EntityBasic, IValidatableObject
     [DataMember(Name = "assignedPermissions")]
     public IDictionary<int, IEnumerable<string>>? AssignedPermissions { get; set; }
 
-        /// <summary>
-        /// The ids of allowed languages
-        /// </summary>
-        [DataMember(Name = "allowedLanguages")]
-        public IEnumerable<int>? AllowedLanguages { get; set; }
+    /// <summary>
+    /// The ids of allowed languages
+    /// </summary>
+    [DataMember(Name = "allowedLanguages")]
+    public IEnumerable<int>? AllowedLanguages { get; set; }
 
     /// <summary>
     ///     The real persisted user group

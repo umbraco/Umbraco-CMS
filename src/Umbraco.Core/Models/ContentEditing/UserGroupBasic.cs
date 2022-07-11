@@ -24,6 +24,9 @@ public class UserGroupBasic : EntityBasic, INotificationModel
     [DataMember(Name = "mediaStartNode")]
     public EntityBasic? MediaStartNode { get; set; }
 
+    [DataMember(Name = "hasAccessToAllLanguages")]
+    public bool HasAccessToAllLanguages { get; set; }
+
     /// <summary>
     ///     The number of users assigned to this group
     /// </summary>

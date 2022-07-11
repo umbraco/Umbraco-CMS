@@ -22,6 +22,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private string _alias;
     private string? _icon;
     private string _name;
+    private bool _hasAccessToAllLanguages;
     private IEnumerable<string>? _permissions;
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
@@ -100,6 +101,13 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     {
         get => _name;
         set => SetPropertyValueAndDetectChanges(value, ref _name!, nameof(Name));
+    }
+
+    [DataMember]
+    public bool HasAccessToAllLanguages
+    {
+        get => _hasAccessToAllLanguages;
+        set => SetPropertyValueAndDetectChanges(value, ref _hasAccessToAllLanguages, nameof(HasAccessToAllLanguages));
     }
 
     /// <summary>

@@ -134,6 +134,7 @@ public class UserMapDefinition : IMapDefinition
         target.Name = source.Name;
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
         var id = GetIntId(source.Id);
         if (id > 0)
@@ -264,6 +265,7 @@ public class UserMapDefinition : IMapDefinition
         target.ParentId = -1;
         target.Path = "-1," + source.Id;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
         MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
     }
@@ -281,6 +283,7 @@ public class UserMapDefinition : IMapDefinition
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
         MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
     }
@@ -318,6 +321,7 @@ public class UserMapDefinition : IMapDefinition
         target.Path = "-1," + source.Id;
         target.UserCount = source.UserCount;
         target.IsSystemUserGroup = source.IsSystemUserGroup();
+        target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
 
         MapUserGroupBasic(target, source.AllowedLanguages, source.AllowedSections, source.StartContentId, source.StartMediaId, context);
 
