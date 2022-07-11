@@ -431,7 +431,7 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
         entity.Id = id;
 
         PersistAllowedSections(entity);
-            PersistAllowedLanguages(entity);
+        PersistAllowedLanguages(entity);
 
         entity.ResetDirtyProperties();
     }

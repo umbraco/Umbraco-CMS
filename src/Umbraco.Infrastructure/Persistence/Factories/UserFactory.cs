@@ -116,5 +116,6 @@ internal static class UserFactory
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
             group.DefaultPermissions == null
                 ? Enumerable.Empty<string>()
-                : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()));
+                : group.DefaultPermissions.ToCharArray().Select(x => x.ToString()),
+            group.HasAccessToAllLanguages);
 }
