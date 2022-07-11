@@ -402,7 +402,8 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 x => x.UpdateDate,
                 x => x.Alias,
                 x => x.DefaultPermissions,
-                x => x.Name)
+                x => x.Name,
+                x => x.HasAccessToAllLanguages)
             .AndBy<UserGroup2AppDto>(x => x.AppAlias, x => x.UserGroupId);
 
     protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
