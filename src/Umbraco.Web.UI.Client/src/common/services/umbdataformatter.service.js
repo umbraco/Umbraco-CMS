@@ -189,7 +189,7 @@
             /** formats the display model used to display the user group to the model used to save the user group*/
             formatUserGroupPostData: function (displayModel, action) {
                 //create the save model from the display model
-                var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'defaultPermissions', 'assignedPermissions', 'languages');
+                var saveModel = _.pick(displayModel, 'id', 'alias', 'name', 'icon', 'sections', 'users', 'defaultPermissions', 'assignedPermissions', 'languages', 'hasAccessToAllLanguages');
 
                 // the start nodes cannot be picked as the property name needs to change - assign manually
                 saveModel.startContentId = displayModel['contentStartNode'];
