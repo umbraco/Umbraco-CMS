@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Enable multi-level merging with src -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../src/'))" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <PackageType>Template</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>.</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>.</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icon.png" Visible="false" />
+    <Content Include="UmbracoPackage\**" Exclude="bin;obj" />
+    <Content Include="UmbracoProject\**" Exclude="bin;obj" />
+    <Content Include="..\src\Umbraco.Web.UI\Program.cs">
+      <Link>UmbracoProject\Program.cs</Link>
+      <PackagePath>UmbracoProject</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
+      <Link>UmbracoProject\Startup.cs</Link>
+      <PackagePath>UmbracoProject</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
+      <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\Partials\grid\**">
+      <Link>UmbracoProject\Views\Partials\grid\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <PackagePath>UmbracoProject\Views\Partials\grid</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\Views\_ViewImports.cshtml">
+      <Link>UmbracoProject\Views\_ViewImports.cshtml</Link>
+      <PackagePath>UmbracoProject\Views</PackagePath>
+    </Content>
+    <Content Include="..\src\Umbraco.Web.UI\wwwroot\favicon.ico">
+      <Link>UmbracoProject\wwwroot\favicon.ico</Link>
+      <PackagePath>UmbracoProject\wwwroot</PackagePath>
+    </Content>
+  </ItemGroup>
+</Project>

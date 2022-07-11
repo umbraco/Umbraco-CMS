@@ -1,29 +1,33 @@
-﻿using System.Data;
+using System.Data;
+using StackExchange.Profiling.Data;
 
-namespace Umbraco.Cms.Infrastructure.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence;
+
+internal static class DbCommandExtensions
 {
-    internal static class DbCommandExtensions
+    /// <summary>
+    ///     Unwraps a database command.
+    /// </summary>
+    /// <remarks>
+    ///     UmbracoDatabase wraps the original database connection in various layers (see
+    ///     OnConnectionOpened); this unwraps and returns the original database command.
+    /// </remarks>
+    public static IDbCommand UnwrapUmbraco(this IDbCommand command)
     {
-        /// <summary>
-        /// Unwraps a database command.
-        /// </summary>
-        /// <remarks>UmbracoDatabase wraps the original database connection in various layers (see
-        /// OnConnectionOpened); this unwraps and returns the original database command.</remarks>
-        public static IDbCommand UnwrapUmbraco(this IDbCommand command)
+        IDbCommand unwrapped;
+
+        IDbCommand c = command;
+        do
         {
-            IDbCommand unwrapped;
+            unwrapped = c;
 
-            var c = command;
-            do
+            if (unwrapped is ProfiledDbCommand profiled)
             {
-                unwrapped = c;
-
-                var profiled = unwrapped as StackExchange.Profiling.Data.ProfiledDbCommand;
-                if (profiled != null) unwrapped = profiled.InternalCommand;
-
-            } while (c != unwrapped);
-
-            return unwrapped;
+                unwrapped = profiled.InternalCommand;
+            }
         }
+        while (c != unwrapped);
+
+        return unwrapped;
     }
 }

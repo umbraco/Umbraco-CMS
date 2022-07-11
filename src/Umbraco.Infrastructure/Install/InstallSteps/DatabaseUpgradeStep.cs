@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -16,8 +13,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
-        "DatabaseUpgrade", 12, "")]
+    [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall, "DatabaseUpgrade", 12, "")]
     public class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly DatabaseBuilder _databaseBuilder;
@@ -42,8 +38,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override Task<InstallSetupResult?> ExecuteAsync(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
+            InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
+            InstallTrackingItem previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)
@@ -53,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
-                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                DatabaseBuilder.Result? result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
                 if (result?.Success == false)
                 {
@@ -66,28 +62,28 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
         public override bool RequiresExecution(object model)
         {
-            //if it's properly configured (i.e. the versions match) then no upgrade necessary
+            // If it's properly configured (i.e. the versions match) then no upgrade necessary
             if (_runtime.Level == RuntimeLevel.Run)
+            {
                 return false;
+            }
 
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the previous one completed - because it has stored some information we need
+            // This step relies on the previous one completed - because it has stored some information we need
+            InstallTrackingItem[] installSteps = InstallStatusTracker.GetStatus().ToArray();
             if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
             {
                 return false;
             }
 
-            var databaseSettings = _connectionStrings.Get(Core.Constants.System.UmbracoConnectionName);
-
-            if (databaseSettings.IsConnectionStringConfigured())
+            if (_connectionStrings.CurrentValue.IsConnectionStringConfigured())
             {
-                // a connection string was present, determine whether this is an install/upgrade
-                // return true (upgrade) if there is an installed version, else false (install)
-                var result = _databaseBuilder.ValidateSchema();
+                // A connection string was present, determine whether this is an install/upgrade
+                // Return true (upgrade) if there is an installed version, else false (install)
+                DatabaseSchemaResult? result = _databaseBuilder.ValidateSchema();
                 return result?.DetermineHasInstalledVersion() ?? false;
             }
 
-            //no connection string configured, probably a fresh install
+            // No connection string configured, probably a fresh install
             return false;
         }
     }

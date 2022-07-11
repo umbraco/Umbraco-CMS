@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.Hosting;
 
-namespace Umbraco.Cms.Web.Common.Hosting;
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.Hosting;
 
 /// <summary>
 ///     Umbraco specific extensions for the <see cref="IHostBuilder" /> interface.

@@ -1,9 +1,8 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Table;
+
+public interface ICreateTableWithColumnBuilder : IFluentBuilder, IExecutableBuilder
 {
-    public interface ICreateTableWithColumnBuilder : IFluentBuilder, IExecutableBuilder
-    {
-        ICreateTableColumnAsTypeBuilder WithColumn(string name);
-    }
+    ICreateTableColumnAsTypeBuilder WithColumn(string name);
 }
