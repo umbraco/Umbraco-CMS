@@ -74,9 +74,9 @@ public class UserGroupTests
     }
 
     [Test]
-    public void CheckIfAllowedLanugagesIsEmptyMeansAccessToAllLanguages()
+    public void CheckIfHasAccessToAllLanguagesGivesAccessToAllLanguages()
     {
-        IReadOnlyUserGroup userGrp = new UserGroup(new MockShortStringHelper());
+        IReadOnlyUserGroup userGrp = new UserGroup(new MockShortStringHelper()) { HasAccessToAllLanguages = true };
 
         Assert.Multiple(() =>
         {
