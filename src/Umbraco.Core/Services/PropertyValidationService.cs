@@ -160,8 +160,8 @@ namespace Umbraco.Cms.Core.Services
             var pvalues = property.Values.Where(x =>
                     x != pvalue && // don't revalidate pvalue
                     property.PropertyType.SupportsVariation(x.Culture, x.Segment, true) && // the value variation is ok
-                    (culture == "*" || (x.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
-                    (segment == "*" || (x.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
+                    (culture == "*" || x.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Segment.InvariantEquals(segment))) // the segment matches
                 .ToList();
 
             return pvalues.Count == 0 || pvalues.All(x => IsValidPropertyValue(property, x.EditedValue));
