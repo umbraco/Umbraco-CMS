@@ -11,7 +11,7 @@
                                hide-icon="true"
                                hide-description="true"
                                hide-alias="true"
-                               navigation="vm.user.navigation"
+                               navigation="vm.user.apps"
                                on-back="vm.goToPage(vm.breadcrumbs[0])"
                                show-back-button="vm.showBackButton">
             </umb-editor-header>
@@ -22,7 +22,7 @@
 
                     <umb-editor-sub-views
                         ng-if="!vm.loading"
-                        sub-views="vm.user.navigation"
+                        sub-views="vm.user.apps"
                         model="vm">
                     </umb-editor-sub-views>
 

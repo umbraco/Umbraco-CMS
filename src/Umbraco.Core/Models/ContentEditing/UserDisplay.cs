@@ -17,12 +17,18 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
             AvailableCultures = new Dictionary<string, string>();
             StartContentIds = new List<EntityBasic>();
             StartMediaIds = new List<EntityBasic>();
-            Navigation = new List<ContentApp>();
+            ContentApps = new List<ContentApp>();
+            Navigation = new List<EditorNavigation>();
         }
 
         [DataMember(Name = "navigation")]
         [ReadOnly(true)]
-        public IEnumerable<ContentApp> Navigation { get; set; }
+        [Obsolete("Use the ContentApps field instead. Will be removed in v12")]
+        public IEnumerable<EditorNavigation> Navigation { get; set; }
+
+        [DataMember(Name = "apps")]
+        [ReadOnly(true)]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
 
         /// <summary>
         /// Gets the available cultures (i.e. to populate a drop down)

@@ -85,7 +85,7 @@
       // get user
       usersResource.getUser($routeParams.id).then(function (user) {
         vm.user = user;
-        vm.user.navigation[0].active = true;
+        vm.user.apps[0].active = true;
         makeBreadcrumbs(vm.user);
         setUserDisplayState();
         formatDatesToLocal(vm.user);
@@ -160,7 +160,7 @@
         vm.page.saveButtonState = "busy";
 
         //save current nav to be restored later so that the tabs dont change
-        var currentNav = vm.user.navigation;
+        var currentNav = vm.user.apps;
 
         usersResource.saveUser(vm.user)
           .then(function (saved) {
@@ -175,7 +175,7 @@
 
             vm.user = _.omit(saved, "navigation");
             //restore
-            vm.user.navigation = currentNav;
+            vm.user.apps = currentNav;
             setUserDisplayState();
             formatDatesToLocal(vm.user);
 
