@@ -336,10 +336,20 @@ internal class ContentMapDefinition : IMapDefinition
 
     private IEnumerable<string> GetActions(IContent source, IContent? parent, MapperContext context)
     {
-        IBackOfficeSecurity? backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
+        context.Items.TryGetValue("CurrentUser", out var currentBackofficeUser);
 
-        //cannot check permissions without a context
-        if (backOfficeSecurity is null)
+        IUser? currentUser = null;
+
+        if (currentBackofficeUser is IUser currentIUserBackofficeUser)
+        {
+            currentUser = currentIUserBackofficeUser;
+        }
+        else if(_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
+        {
+            currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+        }
+
+        if (currentUser is null)
         {
             return Enumerable.Empty<string>();
         }
@@ -355,14 +365,11 @@ internal class ContentMapDefinition : IMapDefinition
         }
 
         // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
-        if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
-            context.Items.TryGetValue("Permissions", out var permissionsObject) &&
-            userObject is IUser currentUser &&
-            permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
+        if (context.Items.TryGetValue("Permissions", out var permissionsObject) && permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
         {
             // If we already have permissions for a given path,
             // and the current user is the same as was used to generate the permissions, return the stored permissions.
-            if (backOfficeSecurity.CurrentUser?.Id == currentUser.Id &&
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id == currentUser.Id &&
                 permissionsDict.TryGetValue(path, out EntityPermissionSet? permissions))
             {
                 return permissions.GetAllPermissions();
@@ -373,7 +380,7 @@ internal class ContentMapDefinition : IMapDefinition
         // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
         // reference exception :(
 
-        return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
+        return _userService.GetPermissionsForPath(currentUser, path).GetAllPermissions();
     }
 
     private UrlInfo[] GetUrls(IContent source)
