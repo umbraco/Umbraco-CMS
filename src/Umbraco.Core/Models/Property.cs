@@ -291,8 +291,8 @@ namespace Umbraco.Cms.Core.Models
             // and match the specified culture and segment (or anything when '*').
             var pvalues = _vvalues.Where(x =>
                     PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                    (culture == "*" || (x.Value.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
-                    (segment == "*" || (x.Value.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
                 .Select(x => x.Value);
 
             foreach (var pvalue in pvalues)
