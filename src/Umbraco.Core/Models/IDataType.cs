@@ -35,6 +35,11 @@ namespace Umbraco.Cms.Core.Models
         /// </remarks>
         object? Configuration { get; set; }
 
+        /// <summary>
+        /// Creates a deep clone of the current entity with its identity/alias reset
+        /// We have the default implementation here to avoid breaking changes for the user
+        /// </summary>
+        /// <returns></returns>
         IDataType DeepCloneWithResetIdentities()
         {
             var clone = (DataType)DeepClone();

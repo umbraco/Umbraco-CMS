@@ -446,8 +446,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (containerId > 0)
                     {
                         var container = _dataTypeContainerRepository.Get(containerId);
-                        if (container == null)
+                        if (container is null)
+                        {
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
+                        }
                     }
                     copy = copying.DeepCloneWithResetIdentities();
 

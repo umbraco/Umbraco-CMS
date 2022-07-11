@@ -351,7 +351,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult PostCopy(MoveOrCopy copy)
         {
             var toCopy = _dataTypeService.GetDataType(copy.Id);
-            if (toCopy == null)
+            if (toCopy is null)
             {
                 return NotFound();
             }
@@ -362,17 +362,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Content(toCopy.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
             }
 
-            switch (result.Result?.Result)
+            return result.Result?.Result switch
             {
-                case MoveOperationStatusType.FailedParentNotFound:
-                    return NotFound();
-                case MoveOperationStatusType.FailedCancelledByEvent:
-                    return ValidationProblem();
-                case MoveOperationStatusType.FailedNotAllowedByPath:
-                    return ValidationProblem(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                MoveOperationStatusType.FailedParentNotFound => NotFound(),
+                MoveOperationStatusType.FailedCancelledByEvent => ValidationProblem(),
+                MoveOperationStatusType.FailedNotAllowedByPath => ValidationProblem(
+                    _localizedTextService.Localize("moveOrCopy", "notAllowedByPath")),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public IActionResult PostRenameContainer(int id, string name)
