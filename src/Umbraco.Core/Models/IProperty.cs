@@ -1,40 +1,39 @@
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models;
+
+public interface IProperty : IEntity, IRememberBeingDirty
 {
-    public interface IProperty : IEntity, IRememberBeingDirty
-    {
+    ValueStorageType ValueStorageType { get; }
 
-        ValueStorageType ValueStorageType { get; }
-        /// <summary>
-        /// Returns the PropertyType, which this Property is based on
-        /// </summary>
-        IPropertyType PropertyType { get; }
+    /// <summary>
+    ///     Returns the PropertyType, which this Property is based on
+    /// </summary>
+    IPropertyType PropertyType { get; }
 
-        /// <summary>
-        /// Gets the list of values.
-        /// </summary>
-        IReadOnlyCollection<IPropertyValue> Values { get; set; }
+    /// <summary>
+    ///     Gets the list of values.
+    /// </summary>
+    IReadOnlyCollection<IPropertyValue> Values { get; set; }
 
-        /// <summary>
-        /// Returns the Alias of the PropertyType, which this Property is based on
-        /// </summary>
-        string Alias { get; }
+    /// <summary>
+    ///     Returns the Alias of the PropertyType, which this Property is based on
+    /// </summary>
+    string Alias { get; }
 
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        object? GetValue(string? culture = null, string? segment = null, bool published = false);
+    int PropertyTypeId { get; }
 
-        /// <summary>
-        /// Sets a value.
-        /// </summary>
-        void SetValue(object? value, string? culture = null, string? segment = null);
+    /// <summary>
+    ///     Gets the value.
+    /// </summary>
+    object? GetValue(string? culture = null, string? segment = null, bool published = false);
 
-        int PropertyTypeId { get; }
-        void PublishValues(string? culture = "*", string segment = "*");
-        void UnpublishValues(string? culture = "*", string segment = "*");
+    /// <summary>
+    ///     Sets a value.
+    /// </summary>
+    void SetValue(object? value, string? culture = null, string? segment = null);
 
-    }
+    void PublishValues(string? culture = "*", string segment = "*");
+
+    void UnpublishValues(string? culture = "*", string segment = "*");
 }

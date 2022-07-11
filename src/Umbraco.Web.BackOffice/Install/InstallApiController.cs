@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Logging;
@@ -19,235 +16,264 @@ using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Install
+namespace Umbraco.Cms.Web.BackOffice.Install;
+
+[UmbracoApiController]
+[AngularJsonOnlyConfiguration]
+[InstallAuthorize]
+[Area(Constants.Web.Mvc.InstallArea)]
+public class InstallApiController : ControllerBase
 {
-    [UmbracoApiController]
-    [AngularJsonOnlyConfiguration]
-    [InstallAuthorize]
-    [Area(Cms.Core.Constants.Web.Mvc.InstallArea)]
-    public class InstallApiController : ControllerBase
+    private readonly IBackOfficeSignInManager _backOfficeSignInManager;
+    private readonly IBackOfficeUserManager _backOfficeUserManager;
+    private readonly DatabaseBuilder _databaseBuilder;
+    private readonly InstallStatusTracker _installStatusTracker;
+    private readonly InstallStepCollection _installSteps;
+    private readonly ILogger<InstallApiController> _logger;
+    private readonly IProfilingLogger _proflog;
+    private readonly IRuntime _runtime;
+
+    public InstallApiController(
+        DatabaseBuilder databaseBuilder,
+        IProfilingLogger proflog,
+        ILogger<InstallApiController> logger,
+        InstallHelper installHelper,
+        InstallStepCollection installSteps,
+        InstallStatusTracker installStatusTracker,
+        IRuntime runtime,
+        IBackOfficeUserManager backOfficeUserManager,
+        IBackOfficeSignInManager backOfficeSignInManager)
     {
-        private readonly DatabaseBuilder _databaseBuilder;
-        private readonly InstallStatusTracker _installStatusTracker;
-        private readonly IRuntime _runtime;
-        private readonly IBackOfficeUserManager _backOfficeUserManager;
-        private readonly IBackOfficeSignInManager _backOfficeSignInManager;
-        private readonly InstallStepCollection _installSteps;
-        private readonly ILogger<InstallApiController> _logger;
-        private readonly IProfilingLogger _proflog;
+        _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+        _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
+        _installSteps = installSteps;
+        _installStatusTracker = installStatusTracker;
+        _runtime = runtime;
+        _backOfficeUserManager = backOfficeUserManager;
+        _backOfficeSignInManager = backOfficeSignInManager;
+        InstallHelper = installHelper;
+        _logger = logger;
+    }
 
-        public InstallApiController(
-            DatabaseBuilder databaseBuilder,
-            IProfilingLogger proflog,
-            ILogger<InstallApiController> logger,
-            InstallHelper installHelper,
-            InstallStepCollection installSteps,
-            InstallStatusTracker installStatusTracker,
-            IRuntime runtime,
-            IBackOfficeUserManager backOfficeUserManager,
-            IBackOfficeSignInManager backOfficeSignInManager)
+
+    internal InstallHelper InstallHelper { get; }
+
+    public bool PostValidateDatabaseConnection(DatabaseModel databaseSettings)
+        => _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, true);
+
+    /// <summary>
+    ///     Gets the install setup.
+    /// </summary>
+    public InstallSetup GetSetup()
+    {
+        var setup = new InstallSetup();
+
+        // TODO: Check for user/site token
+
+        var steps = new List<InstallSetupStep>();
+
+        InstallSetupStep[] installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
+
+        //only get the steps that are targeting the current install type
+        steps.AddRange(installSteps);
+        setup.Steps = steps;
+
+        _installStatusTracker.Initialize(setup.InstallId, installSteps);
+
+        return setup;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> CompleteInstall()
+    {
+        await _runtime.RestartAsync();
+
+        BackOfficeIdentityUser identityUser =
+            await _backOfficeUserManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
+        _backOfficeSignInManager.SignInAsync(identityUser, false);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    ///     Installs.
+    /// </summary>
+    public async Task<ActionResult<InstallProgressResultModel>> PostPerformInstall(InstallInstructions installModel)
+    {
+        if (installModel == null)
         {
-            _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
-            _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
-            _installSteps = installSteps;
-            _installStatusTracker = installStatusTracker;
-            _runtime = runtime;
-            _backOfficeUserManager = backOfficeUserManager;
-            _backOfficeSignInManager = backOfficeSignInManager;
-            InstallHelper = installHelper;
-            _logger = logger;
+            throw new ArgumentNullException(nameof(installModel));
         }
 
-
-        internal InstallHelper InstallHelper { get; }
-
-        public bool PostValidateDatabaseConnection(DatabaseModel databaseSettings)
-            => _databaseBuilder.ConfigureDatabaseConnection(databaseSettings, isTrialRun: true);
-
-        /// <summary>
-        ///     Gets the install setup.
-        /// </summary>
-        public InstallSetup GetSetup()
+        InstallTrackingItem[] status = InstallStatusTracker.GetStatus().ToArray();
+        //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
+        if (status.Any() == false)
         {
-            var setup = new InstallSetup();
-
-            // TODO: Check for user/site token
-
-            var steps = new List<InstallSetupStep>();
-
-            var installSteps = _installSteps.GetStepsForCurrentInstallType().ToArray();
-
-            //only get the steps that are targeting the current install type
-            steps.AddRange(installSteps);
-            setup.Steps = steps;
-
-            _installStatusTracker.Initialize(setup.InstallId, installSteps);
-
-            return setup;
+            status = _installStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CompleteInstall()
+        //create a new queue of the non-finished ones
+        var queue = new Queue<InstallTrackingItem>(status.Where(x => x.IsComplete == false));
+        while (queue.Count > 0)
         {
+            InstallTrackingItem item = queue.Dequeue();
+            InstallSetupStep step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
-            await _runtime.RestartAsync();
+            // if this step has any instructions then extract them
+            var instruction = GetInstruction(installModel, item, step);
 
-            var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            _backOfficeSignInManager.SignInAsync(identityUser, false);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        ///     Installs.
-        /// </summary>
-        public async Task<ActionResult<InstallProgressResultModel>> PostPerformInstall(InstallInstructions installModel)
-        {
-            if (installModel == null) throw new ArgumentNullException(nameof(installModel));
-
-            var status = InstallStatusTracker.GetStatus().ToArray();
-            //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
-            if (status.Any() == false)
+            // if this step doesn't require execution then continue to the next one, this is just a fail-safe check.
+            if (StepRequiresExecution(step, instruction) == false)
             {
-                status = _installStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
+                // set this as complete and continue
+                _installStatusTracker.SetComplete(installModel.InstallId, item.Name);
+                continue;
             }
 
-            //create a new queue of the non-finished ones
-            var queue = new Queue<InstallTrackingItem>(status.Where(x => x.IsComplete == false));
-            while (queue.Count > 0)
+            try
             {
-                var item = queue.Dequeue();
-                var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
+                InstallSetupResult? setupData = await ExecuteStepAsync(step, instruction);
 
-                // if this step has any instructions then extract them
-                var instruction = GetInstruction(installModel, item, step);
+                // update the status
+                _installStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData?.SavedStepData);
 
-                // if this step doesn't require execution then continue to the next one, this is just a fail-safe check.
-                if (StepRequiresExecution(step, instruction) == false)
+                // determine's the next step in the queue and dequeue's any items that don't need to execute
+                var nextStep = IterateSteps(step, queue, installModel.InstallId, installModel);
+
+                // check if there's a custom view to return for this step
+                if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                 {
-                    // set this as complete and continue
-                    _installStatusTracker.SetComplete(installModel.InstallId, item.Name);
-                    continue;
+                    return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
                 }
 
-                try
+                return new InstallProgressResultModel(false, step.Name, nextStep);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during installation step {Step}", step.Name);
+
+                if (ex is TargetInvocationException && ex.InnerException != null)
                 {
-                    var setupData = await ExecuteStepAsync(step, instruction);
-
-                    // update the status
-                    _installStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData?.SavedStepData);
-
-                    // determine's the next step in the queue and dequeue's any items that don't need to execute
-                    var nextStep = IterateSteps(step, queue, installModel.InstallId, installModel);
-
-                    // check if there's a custom view to return for this step
-                    if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
-                    {
-                        return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View,
-                            setupData.ViewModel);
-                    }
-
-                    return new InstallProgressResultModel(false, step.Name, nextStep);
+                    ex = ex.InnerException;
                 }
-                catch (Exception ex)
+
+                if (ex is InstallException installException)
                 {
-                    _logger.LogError(ex, "An error occurred during installation step {Step}",
-                        step.Name);
-
-                    if (ex is TargetInvocationException && ex.InnerException != null)
-                    {
-                        ex = ex.InnerException;
-                    }
-
-                    var installException = ex as InstallException;
-                    if (installException != null)
-                    {
-                        return new ValidationErrorResult(new
-                        {
-                            view = installException.View,
-                            model = installException.ViewModel,
-                            message = installException.Message
-                        });
-                    }
-
                     return new ValidationErrorResult(new
                     {
-                        step = step.Name,
-                        view = "error",
-                        message = ex.Message
+                        view = installException.View,
+                        model = installException.ViewModel,
+                        message = installException.Message
                     });
                 }
-            }
 
-            _installStatusTracker.Reset();
-            return new InstallProgressResultModel(true, "", "");
+                return new ValidationErrorResult(new { step = step.Name, view = "error", message = ex.Message });
+            }
         }
 
-        private static object? GetInstruction(InstallInstructions installModel, InstallTrackingItem item,
-            InstallSetupStep step)
-        {
-            object? instruction = null;
-            installModel.Instructions?.TryGetValue(item.Name, out instruction); // else null
+        _installStatusTracker.Reset();
+        return new InstallProgressResultModel(true, string.Empty, string.Empty);
+    }
 
-            if (instruction is JObject jObject)
+    private static object? GetInstruction(InstallInstructions installModel, InstallTrackingItem item, InstallSetupStep step)
+    {
+        object? instruction = null;
+        installModel.Instructions?.TryGetValue(item.Name, out instruction); // else null
+
+        if (instruction is JObject jObject)
+        {
+            instruction = jObject?.ToObject(step.StepType);
+        }
+
+        return instruction;
+    }
+
+    /// <summary>
+    ///     We'll peek ahead and check if it's RequiresExecution is returning true. If it
+    ///     is not, we'll dequeue that step and peek ahead again (recurse)
+    /// </summary>
+    /// <param name="current"></param>
+    /// <param name="queue"></param>
+    /// <param name="installId"></param>
+    /// <param name="installModel"></param>
+    /// <returns></returns>
+    private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId, InstallInstructions installModel)
+    {
+        while (queue.Count > 0)
+        {
+            InstallTrackingItem item = queue.Peek();
+
+            // if the current step restarts the app pool then we must simply return the next one in the queue,
+            // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution
+            // will rely on that too.
+            if (current.PerformsAppRestart)
             {
-                instruction = jObject?.ToObject(step.StepType);
+                return item.Name;
             }
 
-            return instruction;
-        }
+            InstallSetupStep step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
 
-        /// <summary>
-        ///     We'll peek ahead and check if it's RequiresExecution is returning true. If it
-        ///     is not, we'll dequeue that step and peek ahead again (recurse)
-        /// </summary>
-        /// <param name="current"></param>
-        /// <param name="queue"></param>
-        /// <param name="installId"></param>
-        /// <param name="installModel"></param>
-        /// <returns></returns>
-        private string IterateSteps(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId,
-            InstallInstructions installModel)
-        {
-            while (queue.Count > 0)
+            // if this step has any instructions then extract them
+            var instruction = GetInstruction(installModel, item, step);
+
+            // if the step requires execution then return its name
+            if (StepRequiresExecution(step, instruction))
             {
-                var item = queue.Peek();
-
-                // if the current step restarts the app pool then we must simply return the next one in the queue,
-                // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution
-                // will rely on that too.
-                if (current.PerformsAppRestart)
-                    return item.Name;
-
-                var step = _installSteps.GetAllSteps().Single(x => x.Name == item.Name);
-
-                // if this step has any instructions then extract them
-                var instruction = GetInstruction(installModel, item, step);
-
-                // if the step requires execution then return its name
-                if (StepRequiresExecution(step, instruction))
-                    return step.Name;
-
-                // no longer requires execution, could be due to a new config change during installation
-                // dequeue
-                queue.Dequeue();
-
-                // complete
-                _installStatusTracker.SetComplete(installId, step.Name);
-
-                // and continue
-                current = step;
+                return step.Name;
             }
 
-            return string.Empty;
+            // no longer requires execution, could be due to a new config change during installation
+            // dequeue
+            queue.Dequeue();
+
+            // complete
+            _installStatusTracker.SetComplete(installId, step.Name);
+
+            // and continue
+            current = step;
         }
 
-        // determines whether the step requires execution
-        internal bool StepRequiresExecution(InstallSetupStep step, object? instruction)
-        {
-            if (step == null) throw new ArgumentNullException(nameof(step));
+        return string.Empty;
+    }
 
-            var modelAttempt = instruction.TryConvertTo(step.StepType);
+    // determines whether the step requires execution
+    internal bool StepRequiresExecution(InstallSetupStep step, object? instruction)
+    {
+        if (step == null)
+        {
+            throw new ArgumentNullException(nameof(step));
+        }
+
+        Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
+        if (!modelAttempt.Success)
+        {
+            throw new InvalidCastException(
+                $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
+        }
+
+        var model = modelAttempt.Result;
+        Type genericStepType = typeof(InstallSetupStep<>);
+        Type[] typeArgs = { step.StepType };
+        Type typedStepType = genericStepType.MakeGenericType(typeArgs);
+        try
+        {
+            MethodInfo method = typedStepType.GetMethods().Single(x => x.Name == "RequiresExecution");
+            var result = (bool?)method.Invoke(step, new[] { model });
+            return result ?? false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Checking if step requires execution ({Step}) failed.", step.Name);
+            throw;
+        }
+    }
+
+    // executes the step
+    internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object? instruction)
+    {
+        using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.", "Step completed"))
+        {
+            Attempt<object?> modelAttempt = instruction.TryConvertTo(step.StepType);
             if (!modelAttempt.Success)
             {
                 throw new InvalidCastException(
@@ -255,51 +281,19 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             }
 
             var model = modelAttempt.Result;
-            var genericStepType = typeof(InstallSetupStep<>);
+            Type genericStepType = typeof(InstallSetupStep<>);
             Type[] typeArgs = { step.StepType };
-            var typedStepType = genericStepType.MakeGenericType(typeArgs);
+            Type typedStepType = genericStepType.MakeGenericType(typeArgs);
             try
             {
-                var method = typedStepType.GetMethods().Single(x => x.Name == "RequiresExecution");
-                var result =  (bool?) method.Invoke(step, new[] { model });
-                return result ?? false;
+                MethodInfo method = typedStepType.GetMethods().Single(x => x.Name == "ExecuteAsync");
+                var task = (Task<InstallSetupResult>?)method.Invoke(step, new[] { model });
+                return await task!;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Checking if step requires execution ({Step}) failed.",
-                    step.Name);
+                _logger.LogError(ex, "Installation step {Step} failed.", step.Name);
                 throw;
-            }
-        }
-
-        // executes the step
-        internal async Task<InstallSetupResult> ExecuteStepAsync(InstallSetupStep step, object? instruction)
-        {
-            using (_proflog.TraceDuration<InstallApiController>($"Executing installation step: '{step.Name}'.",
-                "Step completed"))
-            {
-                var modelAttempt = instruction.TryConvertTo(step.StepType);
-                if (!modelAttempt.Success)
-                {
-                    throw new InvalidCastException(
-                        $"Cannot cast/convert {step.GetType().FullName} into {step.StepType.FullName}");
-                }
-
-                var model = modelAttempt.Result;
-                var genericStepType = typeof(InstallSetupStep<>);
-                Type[] typeArgs = { step.StepType };
-                var typedStepType = genericStepType.MakeGenericType(typeArgs);
-                try
-                {
-                    var method = typedStepType.GetMethods().Single(x => x.Name == "ExecuteAsync");
-                    var task = (Task<InstallSetupResult>?) method.Invoke(step, new[] { model });
-                    return await task!;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Installation step {Step} failed.", step.Name);
-                    throw;
-                }
             }
         }
     }

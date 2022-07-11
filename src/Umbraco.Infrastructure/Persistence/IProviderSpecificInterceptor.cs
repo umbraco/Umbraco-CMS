@@ -23,6 +23,6 @@ public interface IProviderSpecificDataInterceptor : IProviderSpecificInterceptor
 {
 }
 
-public interface IProviderSpecificTransactionInterceptor: IProviderSpecificInterceptor, ITransactionInterceptor
+public interface IProviderSpecificTransactionInterceptor : IProviderSpecificInterceptor, ITransactionInterceptor
 {
 }

@@ -4,44 +4,39 @@
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Cms.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders;
+
+public class EntitySlimBuilder
+    : BuilderBase<EntitySlim>,
+        IWithIdBuilder,
+        IWithParentIdBuilder
 {
-    public class EntitySlimBuilder
-        : BuilderBase<EntitySlim>,
-            IWithIdBuilder,
-            IWithParentIdBuilder
+    private int? _id;
+    private int? _parentId;
+
+    int? IWithIdBuilder.Id
     {
-        private int? _id;
-        private int? _parentId;
+        get => _id;
+        set => _id = value;
+    }
 
-        public override EntitySlim Build()
-        {
-            var id = _id ?? 1;
-            var parentId = _parentId ?? -1;
+    int? IWithParentIdBuilder.ParentId
+    {
+        get => _parentId;
+        set => _parentId = value;
+    }
 
-            return new EntitySlim
-            {
-                Id = id,
-                ParentId = parentId,
-            };
-        }
+    public override EntitySlim Build()
+    {
+        var id = _id ?? 1;
+        var parentId = _parentId ?? -1;
 
-        public EntitySlimBuilder WithNoParentId()
-        {
-            _parentId = 0;
-            return this;
-        }
+        return new EntitySlim { Id = id, ParentId = parentId };
+    }
 
-        int? IWithIdBuilder.Id
-        {
-            get => _id;
-            set => _id = value;
-        }
-
-        int? IWithParentIdBuilder.ParentId
-        {
-            get => _parentId;
-            set => _parentId = value;
-        }
+    public EntitySlimBuilder WithNoParentId()
+    {
+        _parentId = 0;
+        return this;
     }
 }
