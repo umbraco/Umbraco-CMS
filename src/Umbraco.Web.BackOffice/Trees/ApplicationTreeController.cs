@@ -35,7 +35,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IControllerFactory _controllerFactory;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
 
-        /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTreeController"/> class.
         /// </summary>
         public ApplicationTreeController(
@@ -210,9 +209,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             
             // Force tree querystring param
-            Dictionary<string, StringValues>? d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
-            d["tree"] = tree.TreeAlias;
-            var qs = new FormCollection(d);
+            Dictionary<string, StringValues>? td = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            td["tree"] = tree.TreeAlias;
+            var qs = new FormCollection(td);
 
             var childrenResult = await GetChildren(tree, id, qs);
             if (!(childrenResult?.Result is null))
@@ -262,9 +261,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             // Force tree querystring param
-            Dictionary<string, StringValues>? d = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
-            d["tree"] = tree.TreeAlias;
-            var qs = new FormCollection(d);
+            Dictionary<string, StringValues>? td = querystring?.ToDictionary(x => x.Key, x => x.Value) ?? new Dictionary<string, StringValues>();
+            td["tree"] = tree.TreeAlias;
+            var qs = new FormCollection(td);
 
             var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", qs);
 
