@@ -143,7 +143,7 @@ public class ContentBlueprintTreeController : TreeController
         if (id == Constants.System.RootString)
         {
             // root actions
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             return menu;
         }
@@ -155,7 +155,7 @@ public class ContentBlueprintTreeController : TreeController
         {
             IContentType? ct = _contentTypeService.Get(cte.Id);
             MenuItem? createItem =
-                menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionCreateBlueprintFromContent>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             createItem?.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct?.Alias);
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -163,7 +163,7 @@ public class ContentBlueprintTreeController : TreeController
             return menu;
         }
 
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         return menu;
     }

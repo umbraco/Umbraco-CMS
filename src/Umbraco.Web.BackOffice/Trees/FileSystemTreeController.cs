@@ -60,8 +60,10 @@ public abstract class FileSystemTreeController : TreeController
 
                 var name = Path.GetFileName(directory);
                 TreeNode? node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name,
-                    "icon-folder", hasChildren);
+                    Constants.Icons.Folder, hasChildren);
+
                 OnRenderFolderNode(ref node);
+
                 if (node != null)
                 {
                     nodes.Add(node);
@@ -97,7 +99,9 @@ public abstract class FileSystemTreeController : TreeController
 
                 var name = Path.GetFileName(file);
                 TreeNode? node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
+
                 OnRenderFileNode(ref node);
+
                 if (node != null)
                 {
                     nodes.Add(node);
@@ -118,8 +122,9 @@ public abstract class FileSystemTreeController : TreeController
 
         TreeNode? root = rootResult.Value;
 
-        //check if there are any children
+            //check if there are any children
         ActionResult<TreeNodeCollection> treeNodesResult = GetTreeNodes(Constants.System.RootString, queryStrings);
+
         if (!(treeNodesResult.Result is null))
         {
             return treeNodesResult.Result;
@@ -137,12 +142,14 @@ public abstract class FileSystemTreeController : TreeController
     {
         MenuItemCollection menu = MenuItemCollectionFactory.Create();
 
-        //set the default to create
+            //set the default to create
         menu.DefaultMenuAlias = ActionNew.ActionAlias;
-        //create action
-        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-        //refresh action
-        menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
+            //create action
+        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+
+            //refresh action
+        menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;
     }
@@ -151,23 +158,24 @@ public abstract class FileSystemTreeController : TreeController
     {
         MenuItemCollection menu = MenuItemCollectionFactory.Create();
 
-        //set the default to create
+            //set the default to create
         menu.DefaultMenuAlias = ActionNew.ActionAlias;
+
         //create action
-        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         var hasChildren = FileSystem is not null &&
                           (FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any());
 
-        //We can only delete folders if it doesn't have any children (folders or files)
+            //We can only delete folders if it doesn't have any children (folders or files)
         if (hasChildren == false)
         {
             //delete action
-            menu.Items.Add<ActionDelete>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
-        //refresh action
-        menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            //refresh action
+        menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;
     }
@@ -177,7 +185,7 @@ public abstract class FileSystemTreeController : TreeController
         MenuItemCollection menu = MenuItemCollectionFactory.Create();
 
         //if it's not a directory then we only allow to delete the item
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         return menu;
     }

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Interfaces;
 using Umbraco.Extensions;
@@ -22,6 +23,8 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     private readonly ModelsBuilderSettings _modelsBuilderSettings;
     private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
     private readonly IUmbracoVersion _version;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
+
 
     public SystemInformationTelemetryProvider(
         IUmbracoVersion version,
@@ -30,12 +33,14 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         IOptionsMonitor<HostingSettings> hostingSettings,
         IOptionsMonitor<GlobalSettings> globalSettings,
         IHostEnvironment hostEnvironment,
-        IUmbracoDatabaseFactory umbracoDatabaseFactory)
+        IUmbracoDatabaseFactory umbracoDatabaseFactory,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _version = version;
         _localizationService = localizationService;
         _hostEnvironment = hostEnvironment;
         _umbracoDatabaseFactory = umbracoDatabaseFactory;
+        _serverRoleAccessor = serverRoleAccessor;
 
         _globalSettings = globalSettings.CurrentValue;
         _hostingSettings = hostingSettings.CurrentValue;
@@ -60,6 +65,8 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
 
     private string DatabaseProvider => _umbracoDatabaseFactory.CreateDatabase().DatabaseType.GetProviderName();
 
+    private string CurrentServerRole => _serverRoleAccessor.CurrentServerRole.ToString();
+
     public IEnumerable<UsageInformation> GetInformation() =>
         new UsageInformation[]
         {
@@ -70,6 +77,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.CustomUmbracoPath, UmbracoPathCustomized),
             new(Constants.Telemetry.AspEnvironment, AspEnvironment), new(Constants.Telemetry.IsDebug, IsDebug),
             new(Constants.Telemetry.DatabaseProvider, DatabaseProvider),
+            new(Constants.Telemetry.CurrentServerRole, CurrentServerRole),
         };
 
     public IEnumerable<UserData> GetUserData() =>
@@ -82,6 +90,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
             new("Current Webserver", CurrentWebServer), new("Models Builder Mode", ModelsBuilderMode),
             new("Debug Mode", IsDebug.ToString()), new("Database Provider", DatabaseProvider),
+            new("Current Server Role", CurrentServerRole),
         };
 
     private bool IsRunningInProcessIIS()

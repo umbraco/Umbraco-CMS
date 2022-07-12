@@ -43,10 +43,10 @@ public class CodeFileController : BackOfficeNotificationsController
     private readonly IHostingEnvironment _hostingEnvironment;
 
     private readonly ILocalizedTextService _localizedTextService;
-    private readonly PartialViewMacroSnippetCollection _partialViewMacroSnippetCollection;
-    private readonly PartialViewSnippetCollection _partialViewSnippetCollection;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly PartialViewSnippetCollection _partialViewSnippetCollection;
+    private readonly PartialViewMacroSnippetCollection _partialViewMacroSnippetCollection;
 
     [ActivatorUtilitiesConstructor]
     public CodeFileController(
@@ -383,7 +383,7 @@ public class CodeFileController : BackOfficeNotificationsController
                     codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
                     if (snippetName.IsNullOrWhiteSpace() == false)
                     {
-                        codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
+                            codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
                     }
                 }
 

@@ -469,6 +469,8 @@ public class ContentController : ContentControllerBase
         {
             display.DocumentType.Name =
                 _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Name);
+            display.DocumentType.Description =
+                _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Description);
         }
 
         //remove the listview app if it exists

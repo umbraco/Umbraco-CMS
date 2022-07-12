@@ -1,3 +1,4 @@
+﻿using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories;
@@ -44,9 +45,24 @@ public interface IRedirectUrlRepository : IReadWriteQueryRepository<Guid, IRedir
     ///     Gets the most recent redirect URL corresponding to an Umbraco redirect URL route.
     /// </summary>
     /// <param name="url">The Umbraco redirect URL route.</param>
+    /// <returns>The most recent redirect URL corresponding to the route.</returns>
+    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url);
+
+    /// <summary>
+    /// Gets the most recent redirect URL corresponding to an Umbraco redirect URL route.
+    /// </summary>
+    /// <param name="url">The Umbraco redirect URL route.</param>
     /// <param name="culture">The culture the domain is associated with</param>
     /// <returns>The most recent redirect URL corresponding to the route.</returns>
     IRedirectUrl? GetMostRecentUrl(string url, string culture);
+
+    /// <summary>
+    /// Gets the most recent redirect URL corresponding to an Umbraco redirect URL route.
+    /// </summary>
+    /// <param name="url">The Umbraco redirect URL route.</param>
+    /// <param name="culture">The culture the domain is associated with</param>
+    /// <returns>The most recent redirect URL corresponding to the route.</returns>
+    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture);
 
     /// <summary>
     ///     Gets all redirect URLs for a content item.

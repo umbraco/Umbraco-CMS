@@ -124,14 +124,15 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
             // if the user's start node is not the root then the only menu item to display is refresh
             if (UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+                menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
                 return menu;
             }
 
             // root actions
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionSort>(LocalizedTextService, true, true);
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionSort>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
+
             return menu;
         }
 
@@ -146,7 +147,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
             return NotFound();
         }
 
-        //if the user has no path access for this node, all they can do is refresh
+            //if the user has no path access for this node, all they can do is refresh
         if (!_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasMediaPathAccess(item, _entityService,
                 _appCaches) ?? false)
         {
@@ -155,25 +156,25 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
         }
 
 
-        //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
+            //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
         if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
             .Contains(RecycleBinId.ToInvariantString()))
         {
-            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
             menu.DefaultMenuAlias = null;
         }
         else
         {
             //return a normal node menu:
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionSort>(LocalizedTextService);
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionSort>(LocalizedTextService, useLegacyIcon: false);
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
@@ -183,7 +184,7 @@ public class MediaTreeController : ContentTreeControllerBase, ISearchableTree, I
     }
 
     /// <summary>
-    ///     Returns true or false if the current user has access to the node based on the user's allowed start node (path)
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
     ///     access
     /// </summary>
     /// <param name="id"></param>

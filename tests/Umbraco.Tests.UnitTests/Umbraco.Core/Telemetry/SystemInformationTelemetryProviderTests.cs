@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
@@ -110,13 +111,11 @@ public class SystemInformationTelemetryProviderTests
         return new SystemInformationTelemetryProvider(
             Mock.Of<IUmbracoVersion>(),
             Mock.Of<ILocalizationService>(),
-            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x =>
-                x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
+            Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings{ ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
-            Mock.Of<IOptionsMonitor<GlobalSettings>>(x =>
-                x.CurrentValue == new GlobalSettings { UmbracoPath = umbracoPath }),
+            Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == new GlobalSettings { UmbracoPath = umbracoPath }),
             hostEnvironment.Object,
-            Mock.Of<IUmbracoDatabaseFactory>(x =>
-                x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)));
+            Mock.Of<IUmbracoDatabaseFactory>(x => x.CreateDatabase() == Mock.Of<IUmbracoDatabase>(y => y.DatabaseType == DatabaseType.SQLite)),
+            Mock.Of<IServerRoleAccessor>());
     }
 }

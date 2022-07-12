@@ -1,3 +1,4 @@
+using System.Xml;
 using System.Globalization;
 using System.Net.Mime;
 using System.Text;
@@ -10,11 +11,15 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Packaging;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -38,6 +43,9 @@ public class DictionaryController : BackOfficeNotificationsController
     private readonly ILocalizedTextService _localizedTextService;
     private readonly ILogger<DictionaryController> _logger;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IEntityXmlSerializer _serializer;
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly PackageDataInstallation _packageDataInstallation;
 
     public DictionaryController(
         ILogger<DictionaryController> logger,
@@ -45,7 +53,10 @@ public class DictionaryController : BackOfficeNotificationsController
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IOptionsSnapshot<GlobalSettings> globalSettings,
         ILocalizedTextService localizedTextService,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IEntityXmlSerializer serializer,
+        IHostingEnvironment hostingEnvironment,
+        PackageDataInstallation packageDataInstallation)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -54,6 +65,9 @@ public class DictionaryController : BackOfficeNotificationsController
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+        _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+        _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
     }
 
     /// <summary>
@@ -381,6 +395,135 @@ public class DictionaryController : BackOfficeNotificationsController
 
             GetChildItemsForList(childItem, level + 1, list);
         }
+    }
+
+    public IActionResult ExportDictionary(int id, bool includeChildren = false)
+    {
+        IDictionaryItem? dictionaryItem = _localizationService.GetDictionaryItemById(id);
+        if (dictionaryItem == null)
+        {
+            throw new NullReferenceException("No dictionary item found with id " + id);
+        }
+
+        XElement xml = _serializer.Serialize(dictionaryItem, includeChildren);
+
+        var fileName = $"{dictionaryItem.ItemKey}.udt";
+        // Set custom header so umbRequestHelper.downloadFile can save the correct filename
+        HttpContext.Response.Headers.Add("x-filename", fileName);
+
+        return File(Encoding.UTF8.GetBytes(xml.ToDataString()), MediaTypeNames.Application.Octet, fileName);
+    }
+
+    public IActionResult ImportDictionary(string file, int parentId)
+    {
+        if (string.IsNullOrWhiteSpace(file))
+        {
+            return NotFound();
+        }
+
+        var filePath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data), file);
+        if (!System.IO.File.Exists(filePath))
+        {
+            return NotFound();
+        }
+
+        var xd = new XmlDocument { XmlResolver = null };
+        xd.Load(filePath);
+
+        var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0;
+        var element = XElement.Parse(xd.InnerXml);
+
+        IDictionaryItem? parentDictionaryItem = _localizationService.GetDictionaryItemById(parentId);
+        IEnumerable<IDictionaryItem> dictionaryItems = _packageDataInstallation
+            .ImportDictionaryItem(element, userId, parentDictionaryItem?.Key);
+
+        // Try to clean up the temporary file.
+        try
+        {
+            System.IO.File.Delete(filePath);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cleaning up temporary udt file in {File}", filePath);
+        }
+
+        var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItems.FirstOrDefault());
+        return Content(model!.Path, MediaTypeNames.Text.Plain, Encoding.UTF8);
+    }
+
+    public ActionResult<DictionaryImportModel> Upload(IFormFile file)
+    {
+        if (file == null)
+        {
+            return ValidationProblem(
+                _localizedTextService.Localize("media", "failedFileUpload"),
+                _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+        }
+
+        var fileName = file.FileName.Trim(Constants.CharArrays.DoubleQuote);
+        var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+        var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
+        var tempPath = Path.Combine(root, fileName);
+
+        if (!Path.GetFullPath(tempPath).StartsWith(Path.GetFullPath(root)))
+        {
+            return ValidationProblem(
+                _localizedTextService.Localize("media", "failedFileUpload"),
+                _localizedTextService.Localize("media", "invalidFileName"));
+        }
+
+        if (!ext.InvariantEquals("udt"))
+        {
+            return ValidationProblem(
+                _localizedTextService.Localize("media", "failedFileUpload"),
+                _localizedTextService.Localize("media", "disallowedFileType"));
+        }
+
+        using (FileStream stream = System.IO.File.Create(tempPath))
+        {
+            file.CopyToAsync(stream).GetAwaiter().GetResult();
+        }
+
+        var xd = new XmlDocument { XmlResolver = null };
+        xd.Load(tempPath);
+
+        if (xd.DocumentElement == null)
+        {
+            return ValidationProblem(
+                _localizedTextService.Localize("media", "failedFileUpload"),
+                _localizedTextService.Localize("speechBubbles", "fileErrorNotFound"));
+        }
+
+        var model = new DictionaryImportModel()
+        {
+            TempFileName = tempPath,
+            DictionaryItems = new List<DictionaryPreviewImportModel>(),
+        };
+
+        var level = 1;
+        var currentParent = string.Empty;
+        foreach (XmlNode dictionaryItem in xd.GetElementsByTagName("DictionaryItem"))
+        {
+            var name = dictionaryItem.Attributes?.GetNamedItem("Name")?.Value ?? string.Empty;
+            var parentKey = dictionaryItem?.ParentNode?.Attributes?.GetNamedItem("Key")?.Value ?? string.Empty;
+
+            if (parentKey != currentParent || level == 1)
+            {
+                level += 1;
+                currentParent = parentKey;
+            }
+
+            model.DictionaryItems.Add(new DictionaryPreviewImportModel() { Level = level, Name = name });
+        }
+
+        if (!model.DictionaryItems.Any())
+        {
+            return ValidationProblem(
+                _localizedTextService.Localize("media", "failedFileUpload"),
+                _localizedTextService.Localize("dictionary", "noItemsInFile"));
+        }
+
+        return model;
     }
 
     private static Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
