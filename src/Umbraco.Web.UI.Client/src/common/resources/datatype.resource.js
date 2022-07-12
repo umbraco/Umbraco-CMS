@@ -391,6 +391,38 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "PostRenameContainer",
                         { id: id, name: encodeURIComponent(name) })),
                 "Failed to rename the folder with id " + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#hasValues
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Checks for values stored for the data type
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.hasValues(id)
+         *    .then(function(data) {
+         *        console.log(data.hasValues);
+         *    }, function(err) {
+         *      console.log("failed to check if data type has values", err);
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of data type
+         * @returns {Promise} resourcePromise object.
+         */
+        hasValues: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "hasvalues",
+                        { id }
+                    )),
+                "Failed to check if the data type with " + id + " has values");
         }
     };
 }

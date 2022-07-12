@@ -1,8 +1,7 @@
-﻿using System;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IPublicAccessRepository : IReadWriteQueryRepository<Guid, PublicAccessEntry>
 {
-    public interface IPublicAccessRepository : IReadWriteQueryRepository<Guid, PublicAccessEntry>
-    { }
 }

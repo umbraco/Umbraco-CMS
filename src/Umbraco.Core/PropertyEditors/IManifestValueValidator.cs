@@ -1,14 +1,13 @@
-﻿namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+/// <summary>
+///     Defines a value validator that can be referenced in a manifest.
+/// </summary>
+/// <remarks>If the manifest can be configured, then it should expose a Configuration property.</remarks>
+public interface IManifestValueValidator : IValueValidator
 {
     /// <summary>
-    /// Defines a value validator that can be referenced in a manifest.
+    ///     Gets the name of the validator.
     /// </summary>
-    /// <remarks>If the manifest can be configured, then it should expose a Configuration property.</remarks>
-    public interface IManifestValueValidator : IValueValidator
-    {
-        /// <summary>
-        /// Gets the name of the validator.
-        /// </summary>
-        string ValidationName { get; }
-    }
+    string ValidationName { get; }
 }
