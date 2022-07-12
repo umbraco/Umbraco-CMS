@@ -1,17 +1,16 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint;
+
+public interface ICreateConstraintColumnsBuilder : IFluentBuilder
 {
-    public interface ICreateConstraintColumnsBuilder : IFluentBuilder
-    {
-        /// <summary>
-        /// Specifies the constraint column.
-        /// </summary>
-        IExecutableBuilder Column(string columnName);
+    /// <summary>
+    ///     Specifies the constraint column.
+    /// </summary>
+    IExecutableBuilder Column(string columnName);
 
-        /// <summary>
-        /// Specifies the constraint columns.
-        /// </summary>
-        IExecutableBuilder Columns(string[] columnNames);
-    }
+    /// <summary>
+    ///     Specifies the constraint columns.
+    /// </summary>
+    IExecutableBuilder Columns(string[] columnNames);
 }

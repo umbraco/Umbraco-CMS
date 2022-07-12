@@ -1,11 +1,8 @@
-﻿using System;
+namespace Umbraco.Cms.Core.Install.Models;
 
-namespace Umbraco.Cms.Core.Install.Models
+[Flags]
+public enum InstallationType
 {
-    [Flags]
-    public enum InstallationType
-    {
-        NewInstall =    1 << 0,    // 1
-        Upgrade =       1 << 1,       // 2
-    }
+    NewInstall = 1 << 0, // 1
+    Upgrade = 1 << 1, // 2
 }

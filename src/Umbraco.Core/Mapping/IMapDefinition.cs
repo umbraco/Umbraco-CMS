@@ -1,13 +1,12 @@
-﻿namespace Umbraco.Cms.Core.Mapping
+namespace Umbraco.Cms.Core.Mapping;
+
+/// <summary>
+///     Defines maps for <see cref="IUmbracoMapper" />.
+/// </summary>
+public interface IMapDefinition
 {
     /// <summary>
-    /// Defines maps for <see cref="UmbracoMapper"/>.
+    ///     Defines maps.
     /// </summary>
-    public interface IMapDefinition
-    {
-        /// <summary>
-        /// Defines maps.
-        /// </summary>
-        void DefineMaps(IUmbracoMapper mapper);
-    }
+    void DefineMaps(IUmbracoMapper mapper);
 }

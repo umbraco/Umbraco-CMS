@@ -1,10 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces;
+
+public interface IWithAliasBuilder
 {
-    public interface IWithAliasBuilder
-    {
-        string Alias { get; set; }
-    }
+    string Alias { get; set; }
 }

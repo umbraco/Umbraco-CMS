@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -48,17 +44,18 @@ namespace Umbraco.Cms
     namespace Infrastructure.Services
     {
         /// <summary>
-        /// Implements <see cref="ICacheInstructionService"/> providing a service for retrieving and saving cache instructions.
+        ///     Implements <see cref="ICacheInstructionService" /> providing a service for retrieving and saving cache
+        ///     instructions.
         /// </summary>
         public class CacheInstructionService : RepositoryService, ICacheInstructionService
         {
             private readonly ICacheInstructionRepository _cacheInstructionRepository;
-            private readonly IProfilingLogger _profilingLogger;
-            private readonly ILogger<CacheInstructionService> _logger;
             private readonly GlobalSettings _globalSettings;
+            private readonly ILogger<CacheInstructionService> _logger;
+            private readonly IProfilingLogger _profilingLogger;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
+            ///     Initializes a new instance of the <see cref="CacheInstructionService" /> class.
             /// </summary>
             public CacheInstructionService(
                 ICoreScopeProvider provider,
@@ -76,56 +73,50 @@ namespace Umbraco.Cms
                 _globalSettings = globalSettings.Value;
             }
 
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public bool IsColdBootRequired(int lastId)
             {
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                if (lastId <= 0)
                 {
-                    if (lastId <= 0)
-                    {
-                        var count = _cacheInstructionRepository.CountAll();
+                    var count = _cacheInstructionRepository.CountAll();
 
-                        // If there are instructions but we haven't synced, then a cold boot is necessary.
-                        if (count > 0)
-                        {
-                            return true;
-                        }
-                    }
-                    else
+                    // If there are instructions but we haven't synced, then a cold boot is necessary.
+                    if (count > 0)
                     {
-                        // If the last synced instruction is not found in the db, then a cold boot is necessary.
-                        if (!_cacheInstructionRepository.Exists(lastId))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
-
-                    return false;
                 }
+                else
+                {
+                    // If the last synced instruction is not found in the db, then a cold boot is necessary.
+                    if (!_cacheInstructionRepository.Exists(lastId))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
             {
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-                {
-                    // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                    // row so we will sum these numbers to get the actual count.
-                    count = _cacheInstructionRepository.CountPendingInstructions(lastId);
-                    return count > limit;
-                }
+                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                // row so we will sum these numbers to get the actual count.
+                count = _cacheInstructionRepository.CountPendingInstructions(lastId);
+                return count > limit;
             }
 
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public int GetMaxInstructionId()
             {
-                using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-                {
-                    return _cacheInstructionRepository.GetMaxId();
-                }
+                using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+                return _cacheInstructionRepository.GetMaxId();
             }
 
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public void DeliverInstructions(IEnumerable<RefreshInstruction> instructions, string localIdentity)
             {
                 CacheInstruction entity = CreateCacheInstruction(instructions, localIdentity);
@@ -137,7 +128,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity)
             {
                 // Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount.
@@ -154,12 +145,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions,
-                string localIdentity) =>
-                new CacheInstruction(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None),
-                    localIdentity, instructions.Sum(x => x.JsonIdCount));
-
-            /// <inheritdoc/>
+            /// <inheritdoc />
             public ProcessInstructionsResult ProcessInstructions(
                 CacheRefresherCollection cacheRefreshers,
                 ServerRole serverRole,
@@ -171,11 +157,10 @@ namespace Umbraco.Cms
                 using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
-                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken,
-                        localIdentity, ref lastId);
+                    var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                     // Check for pruning throttling.
-                    if (cancellationToken.IsCancellationRequested || (DateTime.UtcNow - lastPruned) <=
+                    if (cancellationToken.IsCancellationRequested || DateTime.UtcNow - lastPruned <=
                         _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                     {
                         scope.Complete();
@@ -200,15 +185,17 @@ namespace Umbraco.Cms
                 }
             }
 
+            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity) =>
+                new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
+
             /// <summary>
-            /// Process instructions from the database.
+            ///     Process instructions from the database.
             /// </summary>
             /// <remarks>
-            /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
+            ///     Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
             /// </remarks>
             /// <returns>Number of instructions processed.</returns>
-            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers,
-                CancellationToken cancellationToken, string localIdentity, ref int lastId)
+            private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, ref int lastId)
             {
                 // NOTE:
                 // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -264,8 +251,7 @@ namespace Umbraco.Cms
                     List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                     // Process as per-normal.
-                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed,
-                        cancellationToken, ref lastId);
+                    var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                     // If they couldn't be all processed (i.e. we're shutting down) then exit.
                     if (success == false)
@@ -282,7 +268,7 @@ namespace Umbraco.Cms
             }
 
             /// <summary>
-            /// Attempts to deserialize the instructions to a JArray.
+            ///     Attempts to deserialize the instructions to a JArray.
             /// </summary>
             private bool TryDeserializeInstructions(CacheInstruction instruction, out JArray? jsonInstructions)
             {
@@ -300,16 +286,14 @@ namespace Umbraco.Cms
                 }
                 catch (JsonException ex)
                 {
-                    _logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
-                        instruction.Id,
-                        instruction.Instructions);
+                    _logger.LogError(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').", instruction.Id, instruction.Instructions);
                     jsonInstructions = null;
                     return false;
                 }
             }
 
             /// <summary>
-            /// Parses out the individual instructions to be processed.
+            ///     Parses out the individual instructions to be processed.
             /// </summary>
             private static List<RefreshInstruction> GetAllInstructions(IEnumerable<JToken>? jsonInstructions)
             {
@@ -342,10 +326,10 @@ namespace Umbraco.Cms
             }
 
             /// <summary>
-            /// Processes the instruction batch and checks for errors.
+            ///     Processes the instruction batch and checks for errors.
             /// </summary>
             /// <param name="processed">
-            /// Tracks which instructions have already been processed to avoid duplicates
+            ///     Tracks which instructions have already been processed to avoid duplicates
             /// </param>
             /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
             /// </returns>
@@ -385,10 +369,11 @@ namespace Umbraco.Cms
             }
 
             /// <summary>
-            /// Executes the instructions against the cache refresher instances.
+            ///     Executes the instructions against the cache refresher instances.
             /// </summary>
             /// <returns>
-            /// Returns true if all instructions were processed, otherwise false if the processing was interrupted (i.e. by app shutdown).
+            ///     Returns true if all instructions were processed, otherwise false if the processing was interrupted (i.e. by app
+            ///     shutdown).
             /// </returns>
             private bool NotifyRefreshers(
                 CacheRefresherCollection cacheRefreshers,
@@ -474,8 +459,7 @@ namespace Umbraco.Cms
                 }
             }
 
-            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier,
-                string? jsonPayload)
+            private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string? jsonPayload)
             {
                 IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
                 if (jsonPayload is not null)
@@ -516,12 +500,13 @@ namespace Umbraco.Cms
             }
 
             /// <summary>
-            /// Remove old instructions from the database
+            ///     Remove old instructions from the database
             /// </summary>
             /// <remarks>
-            /// Always leave the last (most recent) record in the db table, this is so that not all instructions are removed which would cause
-            /// the site to cold boot if there's been no instruction activity for more than TimeToRetainInstructions.
-            /// See: http://issues.umbraco.org/issue/U4-7643#comment=67-25085
+            ///     Always leave the last (most recent) record in the db table, this is so that not all instructions are removed which
+            ///     would cause
+            ///     the site to cold boot if there's been no instruction activity for more than TimeToRetainInstructions.
+            ///     See: http://issues.umbraco.org/issue/U4-7643#comment=67-25085
             /// </remarks>
             private void PruneOldInstructions()
             {

@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Cms.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors;
+
+public class
+    DataEditorCollectionBuilder : LazyCollectionBuilderBase<DataEditorCollectionBuilder, DataEditorCollection, IDataEditor>
 {
-    public class DataEditorCollectionBuilder : LazyCollectionBuilderBase<DataEditorCollectionBuilder, DataEditorCollection, IDataEditor>
-    {
-        protected override DataEditorCollectionBuilder This => this;
-    }
+    protected override DataEditorCollectionBuilder This => this;
 }
