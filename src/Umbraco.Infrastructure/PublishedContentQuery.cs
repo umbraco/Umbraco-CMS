@@ -18,8 +18,6 @@ namespace Umbraco.Cms.Infrastructure;
 /// <seealso cref="Umbraco.Cms.Core.IPublishedContentQuery" />
 public class PublishedContentQuery : IPublishedContentQuery
 {
-    private static readonly HashSet<string> _itemIdFieldNameHashSet = new() {ExamineFieldNames.ItemIdFieldName};
-
     private readonly IExamineManager _examineManager;
     private readonly IPublishedSnapshot _publishedSnapshot;
     private readonly IVariationContextAccessor _variationContextAccessor;
