@@ -23,8 +23,7 @@ public class PublishedContentQuery : IPublishedContentQuery
     private readonly IExamineManager _examineManager;
     private readonly IPublishedSnapshot _publishedSnapshot;
     private readonly IVariationContextAccessor _variationContextAccessor;
-
-    private static readonly HashSet<string> s_returnedQueryFields =
+    private static readonly HashSet<string> _returnedQueryFields =
         new() { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName };
 
     /// <summary>
@@ -297,7 +296,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         }
 
             // Filter selected fields because results are loaded from the published snapshot based on these
-            IOrdering? queryExecutor = ordering.SelectFields(s_returnedQueryFields);
+            IOrdering? queryExecutor = ordering.SelectFields(_returnedQueryFields);
 
 
         ISearchResults? results = skip == 0 && take == 0
@@ -332,7 +331,7 @@ public class PublishedContentQuery : IPublishedContentQuery
         if (query is IOrdering ordering)
         {
                 // Filter selected fields because results are loaded from the published snapshot based on these
-                query = ordering.SelectFields(s_returnedQueryFields);
+                query = ordering.SelectFields(_returnedQueryFields);
         }
 
         ISearchResults? results = skip == 0 && take == 0
