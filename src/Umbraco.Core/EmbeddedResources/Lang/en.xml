@@ -2646,8 +2646,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="learningBaseDescription">
       <![CDATA[
         <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
-      ]]>    
-    </key
+      ]]>
+    </key>
     <key alias="getStarted">To get you started</key>
   </area>
   <area alias="settingsDashboard">
