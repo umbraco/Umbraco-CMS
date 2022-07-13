@@ -49,6 +49,7 @@ public class DictionaryController : BackOfficeNotificationsController
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly PackageDataInstallation _packageDataInstallation;
 
+    [ActivatorUtilitiesConstructor]
     public DictionaryController(
         ILogger<DictionaryController> logger,
         ILocalizationService localizationService,
