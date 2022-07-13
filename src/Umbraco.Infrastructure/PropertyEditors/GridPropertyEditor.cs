@@ -1,9 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.IO;
@@ -168,9 +165,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 IImageUrlGenerator imageUrlGenerator,
                 IJsonSerializer jsonSerializer,
                 IIOHelper ioHelper)
-                : this (dataValueEditorFactory, attribute, backOfficeSecurityAccessor, localizedTextService,
-                        imageSourceParser, pastedImages, shortStringHelper, imageUrlGenerator, jsonSerializer, ioHelper,
-                        StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
+                : this(
+                    dataValueEditorFactory,
+                    attribute,
+                    backOfficeSecurityAccessor,
+                    localizedTextService,
+                    imageSourceParser,
+                    pastedImages,
+                    shortStringHelper,
+                    imageUrlGenerator,
+                    jsonSerializer,
+                    ioHelper,
+                    StaticServiceProvider.Instance.GetRequiredService<IHtmlMacroParameterParser>())
             {
             }
 
@@ -185,18 +191,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
             {
                 if (editorValue.Value == null)
+                {
                     return null;
+                }
 
                 // editorValue.Value is a JSON string of the grid
                 var rawJson = editorValue.Value.ToString();
                 if (rawJson.IsNullOrWhiteSpace())
+                {
                     return null;
+                }
 
                 var config = editorValue.DataTypeConfiguration as GridConfiguration;
-                var mediaParent = config?.MediaParentId;
-                var mediaParentId = mediaParent?.Guid ?? Guid.Empty;
+                GuidUdi? mediaParent = config?.MediaParentId;
+                Guid mediaParentId = mediaParent?.Guid ?? Guid.Empty;
 
-                var grid = DeserializeGridValue(rawJson!, out var rtes, out _, out _);
+                GridValue? grid = DeserializeGridValue(rawJson!, out var rtes, out _, out _);
 
                 var userId = _backOfficeSecurityAccessor?.BackOfficeSecurity?.CurrentUser?.Id ?? Constants.Security.SuperUserId;
 
@@ -205,7 +215,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     return JsonConvert.SerializeObject(grid, Formatting.None);
                 }
                 // Process the rte values
-                foreach (var rte in rtes)
+                foreach (GridValue.GridControl rte in rtes)
                 {
                     // Parse the HTML
                     var html = rte.Value?.ToString();
@@ -226,7 +236,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// Ensures that the rich text editor values are processed within the grid
             /// </summary>
             /// <param name="property"></param>
-            /// <param name="dataTypeService"></param>
             /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
@@ -234,16 +243,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 var val = property.GetValue(culture, segment)?.ToString();
                 if (val.IsNullOrWhiteSpace())
+                {
                     return string.Empty;
+                }
 
-                var grid = DeserializeGridValue(val!, out var rtes, out _, out _);
+                GridValue? grid = DeserializeGridValue(val!, out var rtes, out _, out _);
 
                 if (rtes is null)
                 {
                     return null;
                 }
                 //process the rte values
-                foreach (var rte in rtes.ToList())
+                foreach (GridValue.GridControl rte in rtes.ToList())
                 {
                     var html = rte.Value?.ToString();
 
@@ -260,10 +271,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             private GridValue? DeserializeGridValue(string rawJson, out IEnumerable<GridValue.GridControl>? richTextValues, out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl>? macroValues)
             {
-                var grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
+                GridValue? grid = JsonConvert.DeserializeObject<GridValue>(rawJson);
 
                 // Find all controls that use the RTE editor
-                var controls = grid?.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls)).ToArray();
+                GridValue.GridControl[]? controls = grid?.Sections.SelectMany(x => x.Rows.SelectMany(r => r.Areas).SelectMany(a => a.Controls)).ToArray();
                 richTextValues = controls?.Where(x => x.Editor.Alias.ToLowerInvariant() == "rte");
                 mediaValues = controls?.Where(x => x.Editor.Alias.ToLowerInvariant() == "media");
 
@@ -287,7 +298,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     yield break;
                 }
 
-                DeserializeGridValue(rawJson!, out var richTextEditorValues, out var mediaValues, out var macroValues);
+                DeserializeGridValue(rawJson!, out IEnumerable<GridValue.GridControl>? richTextEditorValues, out IEnumerable<GridValue.GridControl>? mediaValues, out IEnumerable<GridValue.GridControl>? macroValues);
 
                 if (richTextEditorValues is not null)
                 {
@@ -300,8 +311,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 if (mediaValues is not null)
                 {
-                    foreach (var umbracoEntityReference in mediaValues.Where(x => x.Value.HasValues)
-                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                    foreach (UmbracoEntityReference umbracoEntityReference in mediaValues.Where(x => x.Value?.HasValues ?? false)
+                                 .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value!["udi"])))
                     {
                         yield return umbracoEntityReference;
                     }
@@ -309,7 +320,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
                 if (macroValues is not null)
                 {
-                    foreach (var umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
+                    foreach (UmbracoEntityReference umbracoEntityReference in _macroParameterParser.FindUmbracoEntityReferencesFromGridControlMacros(macroValues))
                     {
                         yield return umbracoEntityReference;
                     }

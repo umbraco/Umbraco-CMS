@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -22,10 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope :
-        ICoreScope,
-        IScope,
-        Core.Scoping.IScope
+    internal class Scope : ICoreScope, IScope, Core.Scoping.IScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
@@ -40,7 +33,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         private readonly bool? _scopeFileSystem;
 
         private readonly ScopeProvider _scopeProvider;
-        private bool _callContext;
         private bool? _completed;
         private IUmbracoDatabase? _database;
 
@@ -93,7 +85,6 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             _eventDispatcher = eventDispatcher;
             _notificationPublisher = notificationPublisher;
             _scopeFileSystem = scopeFileSystems;
-            _callContext = callContext;
             _autoComplete = autoComplete;
             Detachable = detachable;
             _dictionaryLocker = new object();
@@ -101,8 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
-            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8),
-                Thread.CurrentThread.ManagedThreadId);
+            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
             if (detachable)
             {
@@ -130,6 +120,8 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     _fscope = fileSystems.Shadow();
                 }
 
+                _acquiredLocks = new Queue<IDistributedLock>();
+
                 return;
             }
 
@@ -144,8 +136,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     parent.RepositoryCacheMode > repositoryCacheMode)
                 {
                     throw new ArgumentException(
-                        $"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.",
-                        nameof(repositoryCacheMode));
+                        $"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
                 }
 
                 // cannot specify a dispatcher!
@@ -157,8 +148,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 // Only the outermost scope can specify the notification publisher
                 if (_notificationPublisher != null)
                 {
-                    throw new ArgumentException("Value cannot be specified on nested scope.",
-                        nameof(notificationPublisher));
+                    throw new ArgumentException("Value cannot be specified on nested scope.", nameof(notificationPublisher));
                 }
 
                 // cannot specify a different fs scope!
@@ -166,8 +156,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
                 {
                     throw new ArgumentException(
-                        $"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.",
-                        nameof(scopeFileSystems));
+                        $"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
                 }
             }
             else
@@ -257,24 +246,15 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         {
         }
 
+        [Obsolete("Scopes are never stored on HttpContext.Items anymore, so CallContext is always true.")]
         // a value indicating whether to force call-context
         public bool CallContext
         {
-            get
+            get => true;
+            set
             {
-                if (_callContext)
-                {
-                    return true;
-                }
-
-                if (ParentScope != null)
-                {
-                    return ParentScope.CallContext;
-                }
-
-                return false;
+                // NOOP - always true.
             }
-            set => _callContext = value;
         }
 
         public bool ScopedFileSystems
@@ -476,6 +456,19 @@ namespace Umbraco.Cms.Infrastructure.Scoping
             }
         }
 
+        public int Depth
+        {
+            get
+            {
+                if (ParentScope == null)
+                {
+                    return 0;
+                }
+
+                return ParentScope.Depth + 1;
+            }
+        }
+
         public IScopedNotificationPublisher Notifications
         {
             get
@@ -549,7 +542,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 }
             }
 
-            _scopeProvider.PopAmbientScope(this); // might be null = this is how scopes are removed from context objects
+            _scopeProvider.PopAmbientScope(); // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
@@ -694,14 +687,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                                 switch (currentType)
                                 {
                                     case DistributedLockType.ReadLock:
-                                        EagerReadLockInner(currentInstanceId,
-                                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                                            collectedIds.ToArray());
+                                        EagerReadLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                         break;
                                     case DistributedLockType.WriteLock:
-                                        EagerWriteLockInner(currentInstanceId,
-                                            currentTimeout == TimeSpan.Zero ? null : currentTimeout,
-                                            collectedIds.ToArray());
+                                        EagerWriteLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                         break;
                                 }
 
@@ -720,12 +709,10 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                         switch (currentType)
                         {
                             case DistributedLockType.ReadLock:
-                                EagerReadLockInner(currentInstanceId,
-                                    currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                EagerReadLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                 break;
                             case DistributedLockType.WriteLock:
-                                EagerWriteLockInner(currentInstanceId,
-                                    currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                EagerWriteLockInner(currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
                                 break;
                         }
                     }
@@ -774,8 +761,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="dict">Lock dictionary to report on.</param>
         /// <param name="builder">String builder to write to.</param>
         /// <param name="dictName">The name to report the dictionary as.</param>
-        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder,
-            string dictName)
+        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
         {
             if (dict?.Count > 0)
             {
@@ -901,7 +887,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                     // by Deploy which I don't fully understand since there is limited tests on this in the CMS
                     if (OrigScope != _scopeProvider.AmbientScope)
                     {
-                        _scopeProvider.PopAmbientScope(_scopeProvider.AmbientScope);
+                        _scopeProvider.PopAmbientScope();
                     }
 
                     if (OrigContext != _scopeProvider.AmbientContext)
@@ -919,8 +905,7 @@ namespace Umbraco.Cms.Infrastructure.Scoping
                 HandleScopedFileSystems,
                 HandleScopedNotifications,
                 HandleScopeContext,
-                HandleDetachedScopes
-            );
+                HandleDetachedScopes);
         }
 
         private static void TryFinally(params Action[] actions)
@@ -1204,7 +1189,14 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainReadLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+        {
+            if (_acquiredLocks == null)
+            {
+                throw new InvalidOperationException($"Cannot obtain a read lock as the {nameof(_acquiredLocks)} queue is null.");
+            }
+
+            _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.ReadLock(lockId, timeout));
+        }
 
         /// <summary>
         ///     Obtains a write lock with a custom timeout.
@@ -1212,6 +1204,13 @@ namespace Umbraco.Cms.Infrastructure.Scoping
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
         private void ObtainWriteLock(int lockId, TimeSpan? timeout)
-            => _acquiredLocks!.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+        {
+            if (_acquiredLocks == null)
+            {
+                throw new InvalidOperationException($"Cannot obtain a write lock as the {nameof(_acquiredLocks)} queue is null.");
+            }
+
+            _acquiredLocks.Enqueue(_scopeProvider.DistributedLockingMechanismFactory.DistributedLockingMechanism.WriteLock(lockId, timeout));
+        }
     }
 }

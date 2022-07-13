@@ -1,17 +1,18 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.Hosting;
 
-namespace Umbraco.Cms.Web.Common.Hosting;
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.Hosting;
 
 /// <summary>
-/// Umbraco specific extensions for the <see cref="IHostBuilder"/> interface.
+///     Umbraco specific extensions for the <see cref="IHostBuilder" /> interface.
 /// </summary>
 public static class HostBuilderExtensions
 {
     /// <summary>
-    /// Configures an existing <see cref="IHostBuilder"/> with defaults for an Umbraco application.
+    ///     Configures an existing <see cref="IHostBuilder" /> with defaults for an Umbraco application.
     /// </summary>
     public static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder)
     {
@@ -19,8 +20,8 @@ public static class HostBuilderExtensions
         builder.ConfigureAppConfiguration(config
             => config.AddJsonFile(
                 "appsettings.Local.json",
-                optional: true,
-                reloadOnChange: true));
+                true,
+                true));
 
 #endif
         builder.ConfigureLogging(x => x.ClearProviders());

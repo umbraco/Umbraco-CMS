@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
+﻿using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
@@ -17,7 +16,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
     /// </summary>
     public abstract class RetryStrategy
     {
-        #region Public members
         /// <summary>
         /// The default number of retry attempts.
         /// </summary>
@@ -53,8 +51,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
         /// whereas the subsequent retries will remain subject to retry interval.
         /// </summary>
         public static readonly bool DefaultFirstFastRetry = true;
-
-        #endregion
 
         /// <summary>
         /// Returns a default policy that does no retries, it just invokes action exactly once.

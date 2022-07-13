@@ -1,135 +1,133 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Events
+namespace Umbraco.Cms.Core.Events;
+
+public class ScopedNotificationPublisher : IScopedNotificationPublisher
 {
-    public class ScopedNotificationPublisher : IScopedNotificationPublisher
+    private readonly IEventAggregator _eventAggregator;
+    private readonly object _locker = new();
+    private readonly List<INotification> _notificationOnScopeCompleted;
+    private bool _isSuppressed;
+
+    public ScopedNotificationPublisher(IEventAggregator eventAggregator)
     {
-        private readonly IEventAggregator _eventAggregator;
-        private readonly List<INotification> _notificationOnScopeCompleted;
-        private readonly object _locker = new object();
-        private bool _isSuppressed = false;
+        _eventAggregator = eventAggregator;
+        _notificationOnScopeCompleted = new List<INotification>();
+    }
 
-        public ScopedNotificationPublisher(IEventAggregator eventAggregator)
+    public bool PublishCancelable(ICancelableNotification notification)
+    {
+        if (notification == null)
         {
-            _eventAggregator = eventAggregator;
-            _notificationOnScopeCompleted = new List<INotification>();
+            throw new ArgumentNullException(nameof(notification));
         }
 
-        public bool PublishCancelable(ICancelableNotification notification)
+        if (_isSuppressed)
         {
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            if (_isSuppressed)
-            {
-                return false;
-            }
-
-            _eventAggregator.Publish(notification);
-            return notification.Cancel;
+            return false;
         }
 
-        public async Task<bool> PublishCancelableAsync(ICancelableNotification notification)
+        _eventAggregator.Publish(notification);
+        return notification.Cancel;
+    }
+
+    public async Task<bool> PublishCancelableAsync(ICancelableNotification notification)
+    {
+        if (notification == null)
         {
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            if (_isSuppressed)
-            {
-                return false;
-            }
-
-            var task = _eventAggregator.PublishAsync(notification);
-            if (task is not null)
-            {
-                await task;
-            }
-
-            return notification.Cancel;
+            throw new ArgumentNullException(nameof(notification));
         }
 
-        public void Publish(INotification notification)
+        if (_isSuppressed)
         {
-            if (notification == null)
-            {
-                throw new ArgumentNullException(nameof(notification));
-            }
-
-            if (_isSuppressed)
-            {
-                return;
-            }
-
-            _notificationOnScopeCompleted.Add(notification);
+            return false;
         }
 
-        public void ScopeExit(bool completed)
+        Task task = _eventAggregator.PublishAsync(notification);
+        if (task is not null)
         {
-            try
+            await task;
+        }
+
+        return notification.Cancel;
+    }
+
+    public void Publish(INotification notification)
+    {
+        if (notification == null)
+        {
+            throw new ArgumentNullException(nameof(notification));
+        }
+
+        if (_isSuppressed)
+        {
+            return;
+        }
+
+        _notificationOnScopeCompleted.Add(notification);
+    }
+
+    public void ScopeExit(bool completed)
+    {
+        try
+        {
+            if (completed)
             {
-                if (completed)
+                foreach (INotification notification in _notificationOnScopeCompleted)
                 {
-                    foreach (INotification notification in _notificationOnScopeCompleted)
+                    _eventAggregator.Publish(notification);
+                }
+            }
+        }
+        finally
+        {
+            _notificationOnScopeCompleted.Clear();
+        }
+    }
+
+    public IDisposable Suppress()
+    {
+        lock (_locker)
+        {
+            if (_isSuppressed)
+            {
+                throw new InvalidOperationException("Notifications are already suppressed");
+            }
+
+            return new Suppressor(this);
+        }
+    }
+
+    private class Suppressor : IDisposable
+    {
+        private readonly ScopedNotificationPublisher _scopedNotificationPublisher;
+        private bool _disposedValue;
+
+        public Suppressor(ScopedNotificationPublisher scopedNotificationPublisher)
+        {
+            _scopedNotificationPublisher = scopedNotificationPublisher;
+            _scopedNotificationPublisher._isSuppressed = true;
+        }
+
+        public void Dispose() => Dispose(true);
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    lock (_scopedNotificationPublisher._locker)
                     {
-                        _eventAggregator.Publish(notification);
+                        _scopedNotificationPublisher._isSuppressed = false;
                     }
                 }
-            }
-            finally
-            {
-                _notificationOnScopeCompleted.Clear();
-            }
-        }
 
-        public IDisposable Suppress()
-        {
-            lock(_locker)
-            {
-                if (_isSuppressed)
-                {
-                    throw new InvalidOperationException("Notifications are already suppressed");
-                }
-                return new Suppressor(this);
+                _disposedValue = true;
             }
-        }
-
-        private class Suppressor : IDisposable
-        {
-            private bool _disposedValue;
-            private readonly ScopedNotificationPublisher _scopedNotificationPublisher;
-
-            public Suppressor(ScopedNotificationPublisher scopedNotificationPublisher)
-            {
-                _scopedNotificationPublisher = scopedNotificationPublisher;
-                _scopedNotificationPublisher._isSuppressed = true;
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!_disposedValue)
-                {
-                    if (disposing)
-                    {
-                        lock (_scopedNotificationPublisher._locker)
-                        {
-                            _scopedNotificationPublisher._isSuppressed = false;
-                        }
-                    }
-                    _disposedValue = true;
-                }
-            }
-            public void Dispose() => Dispose(disposing: true);
         }
     }
 }

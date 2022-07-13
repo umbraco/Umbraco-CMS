@@ -1028,12 +1028,14 @@
     <key alias="resetPasswordEmailCopySubject">Umbraco: Nulstil adgangskode</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>Dit brugernavn til at logge på Umbraco backoffice er: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>her</strong></a> for at nulstille din adgangskode eller kopier/indsæt denne URL i din browser:</p><p><em>%1%</em></p>]]></key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Sikkerhedskode</key>
+    <key alias="mfaSecurityCodeMessage">Din sikkerhedskode er: %0%</key>
     <key alias="2faTitle">Sidste skridt</key>
-    <key alias="2faText">Det er påkrævet at du verificerer din identitet.</key>
-    <key alias="2faMultipleText">Vælg venligst en autentificeringsmetode</key>
+    <key alias="2faText">Det er påkrævet at du bekræfter din identitet.</key>
+    <key alias="2faMultipleText">Vælg venligst en godkendelsesmetode</key>
     <key alias="2faCodeInput">Kode</key>
-    <key alias="2faCodeInputHelp">Indtast venligst koden fra dit device</key>
-    <key alias="2faInvalidCode">Koden kunne ikke genkendes</key>
+    <key alias="2faCodeInputHelp">Indtast venligst bekræftelseskoden</key>
+    <key alias="2faInvalidCode">Ugyldig kode indtastet</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -2181,18 +2183,19 @@ Mange hilsner fra Umbraco robotten
       være muligt. Indholdet vil blive vist som ikke understøttet indhold.
     </key>
     <key alias="blockConfigurationOverlayTitle"><![CDATA[Konfiguration af '%0%']]></key>
+    <key alias="elementTypeDoesNotExist">Kan ikke redigeres fordi elementtypen ikke eksisterer.</key>
     <key alias="thumbnail">Billede</key>
     <key alias="addThumbnail">Tilføj billede</key>
     <key alias="tabCreateEmpty">Opret ny</key>
     <key alias="tabClipboard">Udklipsholder</key>
     <key alias="tabBlockSettings">Indstillinger</key>
     <key alias="headlineAdvanced">Avanceret</key>
-    <key alias="forceHideContentEditor">Skjuld indholds editoren</key>
+    <key alias="forceHideContentEditor">Skjul indholdseditoren</key>
     <key alias="blockHasChanges">Du har lavet ændringer til dette indhold. Er du sikker på at du vil kassere dem?</key>
     <key alias="confirmCancelBlockCreationHeadline">Annuller oprettelse?</key>
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
-    <key alias="elementTypeDoesNotExistHeadline">Error!</key>
-    <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="elementTypeDoesNotExistHeadline">Fejl!</key>
+    <key alias="elementTypeDoesNotExistDescription">Elementtypen for denne blok eksisterer ikke længere</key>
     <key alias="addBlock">Tilføj indhold</key>
     <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>

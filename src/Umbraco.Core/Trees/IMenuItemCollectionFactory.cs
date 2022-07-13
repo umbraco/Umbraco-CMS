@@ -1,15 +1,13 @@
-namespace Umbraco.Cms.Core.Trees
-{
+namespace Umbraco.Cms.Core.Trees;
 
+/// <summary>
+///     Represents a factory to create <see cref="MenuItemCollection" />.
+/// </summary>
+public interface IMenuItemCollectionFactory
+{
     /// <summary>
-    /// Represents a factory to create <see cref="MenuItemCollection"/>.
+    ///     Creates an empty <see cref="MenuItemCollection" />.
     /// </summary>
-    public interface IMenuItemCollectionFactory
-    {
-        /// <summary>
-        /// Creates an empty <see cref="MenuItemCollection"/>.
-        /// </summary>
-        /// <returns>An empty <see cref="MenuItemCollection"/>.</returns>
-        MenuItemCollection Create();
-    }
+    /// <returns>An empty <see cref="MenuItemCollection" />.</returns>
+    MenuItemCollection Create();
 }
