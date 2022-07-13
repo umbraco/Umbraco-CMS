@@ -20,6 +20,8 @@ using Umbraco.Extensions;
 using Umbraco.Cms.Infrastructure.Packaging;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
@@ -60,14 +62,34 @@ public class DictionaryController : BackOfficeNotificationsController
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-        _backofficeSecurityAccessor = backofficeSecurityAccessor ??
-                                      throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+        _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
         _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
+    }
+
+    [Obsolete("Please use ctor that also takes an IEntityXmlSerializer, IHostingEnvironment & PackageDataInstallation instead, scheduled for removal in v12")]
+    public DictionaryController(
+        ILogger<DictionaryController> logger,
+        ILocalizationService localizationService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        ILocalizedTextService localizedTextService,
+        IUmbracoMapper umbracoMapper)
+    : this(
+        logger,
+        localizationService,
+        backofficeSecurityAccessor,
+        globalSettings,
+        localizedTextService,
+        umbracoMapper,
+        StaticServiceProvider.Instance.GetRequiredService<IEntityXmlSerializer>(),
+        StaticServiceProvider.Instance.GetRequiredService<IHostingEnvironment>(),
+        StaticServiceProvider.Instance.GetRequiredService<PackageDataInstallation>())
+    {
     }
 
     /// <summary>
