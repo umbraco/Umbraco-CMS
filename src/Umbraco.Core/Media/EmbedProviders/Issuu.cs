@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
 /// <summary>
-///     Embed Provider for Issuu.
+///     Embed Provider for Issuu the popular platform to create interactive flipbooks, social media posts, GIFs, and more from a single piece of static content.
 /// </summary>
 public class Issuu : OEmbedProviderBase
 {

@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
 /// <summary>
-///     Embed Provider for Twitter.
+///     Embed Provider for Twitter the popular online service for microblogging and social networking.
 /// </summary>
 public class Twitter : OEmbedProviderBase
 {

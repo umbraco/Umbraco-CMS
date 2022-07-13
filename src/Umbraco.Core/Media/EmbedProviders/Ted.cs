@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
 /// <summary>
-///     Embed Provider for Ted.
+///     Embed Provider for Ted that posts talks online for free distribution.
 /// </summary>
 public class Ted : OEmbedProviderBase
 {

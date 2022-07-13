@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Serialization;
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
 /// <summary>
-///     Embed Provider for Getty Images.
+///     Embed Provider for Getty Images supplier of stock images, editorial photography, video and music for business and consumers.
 /// </summary>
 public class GettyImages : OEmbedProviderBase
 {

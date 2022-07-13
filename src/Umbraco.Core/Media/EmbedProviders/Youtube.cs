@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
 /// <summary>
-///     Embed Provider for YouTube.
+///     Embed Provider for YouTube the popular online video sharing and social media platform provider.
 /// </summary>
 public class YouTube : OEmbedProviderBase
 {
