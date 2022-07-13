@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
+namespace Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Models
+public class SimpleValidationModel
 {
-    public class SimpleValidationModel
+    public SimpleValidationModel(IDictionary<string, object> modelState, string message = "The request is invalid.")
     {
-        public SimpleValidationModel(IDictionary<string, object> modelState, string message = "The request is invalid.")
-        {
-            Message = message;
-            ModelState = modelState;
-        }
-
-        public string Message { get; }
-        public IDictionary<string, object> ModelState { get;  }
+        Message = message;
+        ModelState = modelState;
     }
+
+    public string Message { get; }
+
+    public IDictionary<string, object> ModelState { get; }
 }

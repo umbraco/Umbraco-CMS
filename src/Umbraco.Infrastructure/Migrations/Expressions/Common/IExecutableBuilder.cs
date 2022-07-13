@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+
+public interface IExecutableBuilder
 {
-    public interface IExecutableBuilder
-    {
-        /// <summary>
-        /// Executes.
-        /// </summary>
-        void Do();
-    }
+    /// <summary>
+    ///     Executes.
+    /// </summary>
+    void Do();
 }

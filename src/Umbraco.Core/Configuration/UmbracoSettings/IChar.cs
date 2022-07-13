@@ -1,9 +1,8 @@
-namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
-{
-    public interface IChar
-    {
-        string Char { get; }
+namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
 
-        string Replacement { get; }
-    }
+public interface IChar
+{
+    string Char { get; }
+
+    string Replacement { get; }
 }

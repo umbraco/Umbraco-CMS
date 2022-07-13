@@ -123,6 +123,7 @@
     <key alias="listBullet">Punktlista</key>
     <key alias="listNumeric">Numrerad lista</key>
     <key alias="macroInsert">Infoga macro</key>
+    <key alias="noDocumentTypesCreateNew">Skapa en ny dokumenttyp</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="publishAndClose">Publicera och stäng</key>
     <key alias="relations">Ändra relation</key>

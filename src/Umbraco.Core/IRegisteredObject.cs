@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core;
+
+public interface IRegisteredObject
 {
-    public interface IRegisteredObject
-    {
-        void Stop(bool immediate);
-    }
+    void Stop(bool immediate);
 }

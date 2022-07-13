@@ -45,7 +45,10 @@
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.errorMsg = "";
-        vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
+        const tempUrl = new URL(Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl, window.location.origin);
+        tempUrl.searchParams.append("redirectUrl", decodeURIComponent($location.search().returnPath ?? ""))
+
+        vm.externalLoginFormAction = tempUrl.pathname + tempUrl.search;
         vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
         vm.externalLoginProviders.forEach(x => {
             x.customView = externalLoginInfoService.getLoginProviderView(x);
@@ -224,8 +227,8 @@
 
             if (formHelper.submitForm({ scope: $scope, formCtrl: vm.loginForm })) {
                 //if the login and password are not empty we need to automatically
-                // validate them - this is because if there are validation errors on the server	
-                // then the user has to change both username & password to resubmit which isn't ideal,	            
+                // validate them - this is because if there are validation errors on the server
+                // then the user has to change both username & password to resubmit which isn't ideal,
                 // so if they're not empty, we'll just make sure to set them to valid.
                 if (vm.login && vm.password && vm.login.length > 0 && vm.password.length > 0) {
                     vm.loginForm.username.$setValidity('auth', true);
