@@ -23,15 +23,13 @@
 
             <umb-editor-container>
                 <umb-box>
-                    <umb-box-content ng-if="vm.runtimeModeProduction">
-                      <div class="umb-alert umb-alert--info">
-                        <localize key="template_runtimeModeProduction">Template content is not editable when using runtime mode <code>Production</code>.</localize>
-                      </div>
-                    </umb-box-content>
+        
+                    <umb-box-content>
+                        <div class="umb-alert umb-alert--info mb3" ng-if="vm.runtimeModeProduction">
+                          <localize key="template_runtimeModeProduction">Template content is not editable when using runtime mode <code>Production</code>.</localize>
+                        </div>
 
-                    <umb-box-content ng-if="!vm.runtimeModeProduction">
-
-                        <div class="flex" style="margin-bottom: 30px;">
+                        <div class="flex mb3" ng-if="!vm.runtimeModeProduction">
 
                             <div class="flex">
 
@@ -99,7 +97,7 @@
 
                         <div
                             data-element="code-editor"
-                            auto-scale="85"
+                            auto-scale="90"
                             umb-ace-editor="vm.aceOption"
                             model="vm.template.content">
                         </div>
