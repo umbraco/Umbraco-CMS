@@ -1,18 +1,17 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing;
+
+/// <inheritdoc />
+/// <summary>
+///     The dictionary translation display model
+/// </summary>
+[DataContract(Name = "dictionaryTranslation", Namespace = "")]
+public class DictionaryTranslationDisplay : DictionaryTranslationSave
 {
-    /// <inheritdoc />
     /// <summary>
-    /// The dictionary translation display model
+    ///     Gets or sets the display name.
     /// </summary>
-    [DataContract(Name = "dictionaryTranslation", Namespace = "")]
-    public class DictionaryTranslationDisplay : DictionaryTranslationSave
-    {
-        /// <summary>
-        /// Gets or sets the display name.
-        /// </summary>
-        [DataMember(Name = "displayName")]
-        public string? DisplayName { get; set; }
-    }
+    [DataMember(Name = "displayName")]
+    public string? DisplayName { get; set; }
 }

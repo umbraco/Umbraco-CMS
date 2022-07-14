@@ -1,19 +1,17 @@
-using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class SendingAllowedChildrenNotification : INotification
 {
-    public class SendingAllowedChildrenNotification : INotification
+    public SendingAllowedChildrenNotification(IEnumerable<ContentTypeBasic> children, IUmbracoContext umbracoContext)
     {
-        public IUmbracoContext UmbracoContext { get; }
-
-        public IEnumerable<ContentTypeBasic> Children { get; set; }
-
-        public SendingAllowedChildrenNotification(IEnumerable<ContentTypeBasic> children, IUmbracoContext umbracoContext)
-        {
-            UmbracoContext = umbracoContext;
-            Children = children;
-        }
+        UmbracoContext = umbracoContext;
+        Children = children;
     }
+
+    public IUmbracoContext UmbracoContext { get; }
+
+    public IEnumerable<ContentTypeBasic> Children { get; set; }
 }

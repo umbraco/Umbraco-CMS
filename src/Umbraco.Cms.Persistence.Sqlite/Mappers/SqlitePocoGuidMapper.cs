@@ -8,7 +8,7 @@ public class SqlitePocoGuidMapper : DefaultMapper
     {
         if (destType == typeof(Guid))
         {
-            return (value) =>
+            return value =>
             {
                 var result = Guid.Parse($"{value}");
                 return result;
@@ -17,7 +17,7 @@ public class SqlitePocoGuidMapper : DefaultMapper
 
         if (destType == typeof(Guid?))
         {
-            return (value) =>
+            return value =>
             {
                 if (Guid.TryParse($"{value}", out Guid result))
                 {
