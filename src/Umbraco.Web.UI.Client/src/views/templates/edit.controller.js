@@ -83,9 +83,7 @@
     vm.save = function (suppressNotification) {
       vm.page.saveButtonState = "busy";
 
-      if (vm.editor) {
-        vm.template.content = vm.editor.getValue();
-      }
+      vm.template.content = vm.editor.getValue();
 
       contentEditingHelper.contentEditorPerformSave({
         saveMethod: templateResource.save,
@@ -228,7 +226,10 @@
         onLoad: function (_editor) {
           vm.editor = _editor;
 
-          //Update the auto-complete method to use ctrl+alt+space
+          // Set read-only when using runtime mode Production
+          _editor.setReadOnly(vm.runtimeModeProduction);
+
+          // Update the auto-complete method to use ctrl+alt+space
           _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
 
           // Unassigns the keybinding (That was previously auto-complete)
