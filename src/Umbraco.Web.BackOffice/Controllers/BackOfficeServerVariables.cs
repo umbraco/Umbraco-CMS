@@ -597,7 +597,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 { "assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString() }
             };
 
-
+            app.Add("runtimeMode", _runtimeSettings.Mode.ToString());
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());

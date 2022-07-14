@@ -12,6 +12,7 @@
             <umb-editor-header
                 name="vm.template.name"
                 alias="vm.template.alias"
+                alias-locked="vm.runtimeModeProduction"
                 key="vm.template.key"
                 description="vm.template.virtualPath"
                 description-locked="true"
@@ -22,7 +23,13 @@
 
             <umb-editor-container>
                 <umb-box>
-                    <umb-box-content>
+                    <umb-box-content ng-if="vm.runtimeModeProduction">
+                      <div class="umb-alert umb-alert--info">
+                        <localize key="template_runtimeModeProduction">Template content is not editable when using runtime mode <code>Production</code>.</localize>
+                      </div>
+                    </umb-box-content>
+
+                    <umb-box-content ng-if="!vm.runtimeModeProduction">
 
                         <div class="flex" style="margin-bottom: 30px;">
 
@@ -106,6 +113,7 @@
                 <umb-editor-footer-content-left>
 
                     <umb-keyboard-shortcuts-overview
+                        ng-if="!vm.runtimeModeProduction"
                         model="vm.page.keyboardShortcutsOverview"
                         show-overlay="vm.showKeyboardShortcut"
                         on-close="vm.closeShortcuts()">
