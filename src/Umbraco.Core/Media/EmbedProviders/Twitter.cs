@@ -2,8 +2,10 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
-public class Twitter : EmbedProviderBase
+/// <summary>
+///     Embed Provider for Twitter the popular online service for microblogging and social networking.
+/// </summary>
+public class Twitter : OEmbedProviderBase
 {
     public Twitter(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

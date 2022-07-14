@@ -3,8 +3,10 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
-public class Soundcloud : EmbedProviderBase
+/// <summary>
+///     Embed Provider for SoundCloud the popular online audio distribution platform and music sharing provider.
+/// </summary>
+public class Soundcloud : OEmbedProviderBase
 {
     public Soundcloud(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)

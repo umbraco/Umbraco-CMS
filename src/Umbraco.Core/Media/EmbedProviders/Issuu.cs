@@ -3,8 +3,10 @@ using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders;
 
-// TODO(V10) : change base class to OEmbedProviderBase
-public class Issuu : EmbedProviderBase
+/// <summary>
+///     Embed Provider for Issuu the popular platform to create interactive flipbooks, social media posts, GIFs, and more from a single piece of static content.
+/// </summary>
+public class Issuu : OEmbedProviderBase
 {
     public Issuu(IJsonSerializer jsonSerializer)
         : base(jsonSerializer)
