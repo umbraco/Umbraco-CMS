@@ -330,7 +330,7 @@ public static class FriendlyPublishedContentExtensions
     ///         However, if an empty string is specified only invariant children are returned.
     ///     </para>
     /// </remarks>
-    public static IEnumerable<IPublishedContent>? Children(this IPublishedContent content, string? culture = null)
+    public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, string? culture = null)
         => content.Children(VariationContextAccessor, culture);
 
     /// <summary>
