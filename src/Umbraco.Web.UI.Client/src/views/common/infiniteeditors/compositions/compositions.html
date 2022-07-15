@@ -16,45 +16,52 @@
             <umb-box>
                 <umb-box-content>
 
-                    <div class="umb-control-group">
+                  <div ng-if="model.availableCompositeContentTypes.length !== 0">
 
-                        <umb-search-filter
-                            input-id="composition-search"
-                            model="searchTerm"
-                            label-key="placeholders_filter"
-                            text="Type to filter..."
-                            css-class="w-100"
-                            auto-focus="true">
-                        </umb-search-filter>
-
+                    <div class="mb2">
+                      <localize key="contentTypeEditor_compositionsDescription">
+                        Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or
+                        merged if a tab with an identical name exists.
+                      </localize>
                     </div>
 
                     <div class="umb-control-group">
-                        <localize key="contentTypeEditor_compositionsDescription">Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or
-                        merged if a tab with an identical name exists.</localize>
+
+                      <umb-search-filter input-id="composition-search"
+                                         model="searchTerm"
+                                         label-key="placeholders_filter"
+                                         text="Type to filter..."
+                                         css-class="w-100"
+                                         auto-focus="true">
+                      </umb-search-filter>
+
                     </div>
 
-                    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
-                                     position="center">
+                  </div>
+
+                    <div ng-if="model.availableCompositeContentTypes.length === 0">
+
+                      <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1">
                         <localize key="contentTypeEditor_noAvailableCompositions">There are no Content Types available to use as a composition.</localize>
-                    </umb-empty-state>
+                      </div>
 
-                    <umb-empty-state ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
+                      <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1">
                         <localize key="contentTypeEditor_compositionInUse">This Content Type is used in a composition, and therefore cannot be composed itself.</localize>
-                    </umb-empty-state>
+                      </div>
 
-                    <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
+                      <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
                         <h5><localize key="contentTypeEditor_compositionUsageHeading">Where is this composition used?</localize></h5>
                         <p><localize key="contentTypeEditor_compositionUsageSpecification">This composition is currently used in the composition of the following Content Types:</localize></p>
                         <ul class="umb-checkbox-list">
-                            <li class="umb-checkbox-list__item"
-                                ng-repeat="contentTypeEntity in model.whereCompositionUsed">
-                                <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
-                                    <umb-icon icon="{{contentTypeEntity.contentType.icon}}"></umb-icon>
-                                    &nbsp;{{contentTypeEntity.contentType.name}}
-                                </a>
-                            </li>
+                          <li class="umb-checkbox-list__item"
+                              ng-repeat="contentTypeEntity in model.whereCompositionUsed">
+                            <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
+                              <umb-icon icon="{{contentTypeEntity.contentType.icon}}"></umb-icon>
+                              &nbsp;{{contentTypeEntity.contentType.name}}
+                            </a>
+                          </li>
                         </ul>
+                      </div>
                     </div>
 
                     <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
