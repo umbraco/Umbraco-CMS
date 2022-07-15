@@ -57,10 +57,13 @@ public class TemplateRepositoryTest : UmbracoIntegrationTest
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
+
     private IViewHelper ViewHelper => GetRequiredService<IViewHelper>();
 
+    private IOptionsMonitor<RuntimeSettings> RuntimeSettings => GetRequiredService<IOptionsMonitor<RuntimeSettings>>();
+
     private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, Mock.Of<IOptionsMonitor<RuntimeSettings>>());
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper, RuntimeSettings);
 
     [Test]
     public void Can_Instantiate_Repository()
