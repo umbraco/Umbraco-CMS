@@ -13,7 +13,8 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL": "https://localhost:HTTPS_PORT_FROM_TEMPLATE"
       }
     },
     "Umbraco.Web.UI": {
@@ -22,7 +23,8 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:HTTPS_PORT_FROM_TEMPLATE;http://localhost:HTTP_PORT_FROM_TEMPLATE",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL": "https://localhost:HTTPS_PORT_FROM_TEMPLATE"
       }      
     }
   }
