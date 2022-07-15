@@ -79,6 +79,9 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
+            var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
+            runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
+
             var templateRepo = new TemplateRepository(
                 (IScopeAccessor)provider,
                 AppCaches.Disabled,
@@ -87,7 +90,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 IOHelper,
                 ShortStringHelper,
                 Mock.Of<IViewHelper>(),
-                Mock.Of<IOptionsMonitor<RuntimeSettings>>());
+                runtimeSettingsMock.Object);
             var repository = ContentTypeRepository;
             Template[] templates =
             {
