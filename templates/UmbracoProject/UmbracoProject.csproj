@@ -20,15 +20,19 @@
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(UseRuntimeMode)' != 'true'">
+  <!--#if (!UseRuntimeMode) -->
+  
+  <PropertyGroup>
     <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
-
-  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\build\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
-  <ItemGroup Condition="'$(PackageProjectName)' != ''">
+  <!--#endif -->
+  <!--#if (PackageProjectName != '')
+  
+  <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\build\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" />
+  <ItemGroup>
     <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
   </ItemGroup>
+  #endif -->
 </Project>
