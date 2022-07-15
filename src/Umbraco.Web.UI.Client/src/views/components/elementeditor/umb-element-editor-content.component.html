@@ -33,7 +33,7 @@
              ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
 
             <div class="umb-group-panel__header">
-                <div id="group-{{group.id}}">{{ group.label }}</div>
+                <div id="group-{{group.id}}"><h2>{{ group.label }}</h2></div>
             </div>
 
             <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
