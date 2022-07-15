@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual("val-fr1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "fr-FR"));
             Assert.AreEqual("val-uk1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "en-UK"));
 
-            Assert.IsNull(publishedContent.Name(VariationContextAccessor)); // no invariant name for varying content
+            Assert.AreEqual(publishedContent.Name(VariationContextAccessor), string.Empty); // no invariant name for varying content
             Assert.AreEqual("name-fr1", publishedContent.Name(VariationContextAccessor, "fr-FR"));
             Assert.AreEqual("name-uk1", publishedContent.Name(VariationContextAccessor, "en-UK"));
 
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual("val-fr2", draftContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "fr-FR"));
             Assert.AreEqual("val-uk2", draftContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "en-UK"));
 
-            Assert.IsNull(draftContent.Name(VariationContextAccessor)); // no invariant name for varying content
+            Assert.AreEqual(draftContent.Name(VariationContextAccessor), string.Empty); // no invariant name for varying content
             Assert.AreEqual("name-fr2", draftContent.Name(VariationContextAccessor, "fr-FR"));
             Assert.AreEqual("name-uk2", draftContent.Name(VariationContextAccessor, "en-UK"));
 

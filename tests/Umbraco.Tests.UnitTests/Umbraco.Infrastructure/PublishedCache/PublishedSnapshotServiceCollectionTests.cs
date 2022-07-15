@@ -622,26 +622,26 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             AssertDocuments(documents);
 
             documents = snapshot.Content.GetById(1).Children(VariationContextAccessor, "*").ToArray();
-            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments(documents, "N4-fr-FR", string.Empty, "N6-fr-FR");
             AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
             documents = snapshot.Content.GetById(1).Children(VariationContextAccessor, "en-US").ToArray();
-            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments(documents, "N4-fr-FR", string.Empty, "N6-fr-FR");
             AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
             documents = snapshot.Content.GetById(1).ChildrenForAllCultures.ToArray();
-            AssertDocuments(documents, "N4-fr-FR", null, "N6-fr-FR");
+            AssertDocuments(documents, "N4-fr-FR", string.Empty, "N6-fr-FR");
             AssertDocuments("en-US", documents, "N4-en-US", "N5-en-US", "N6-en-US");
 
 
             documents = snapshot.Content.GetAtRoot("*").ToArray();
-            AssertDocuments(documents, "N1-fr-FR", null, "N3-fr-FR");
+            AssertDocuments(documents, "N1-fr-FR", string.Empty, "N3-fr-FR");
 
             documents = snapshot.Content.GetById(1).DescendantsOrSelf(VariationContextAccessor).ToArray();
             AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", "N12-fr-FR", "N6-fr-FR");
 
             documents = snapshot.Content.GetById(1).DescendantsOrSelf(VariationContextAccessor, "*").ToArray();
-            AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", null /*11*/, "N12-fr-FR", null /*5*/, "N6-fr-FR");
+            AssertDocuments(documents, "N1-fr-FR", "N4-fr-FR", string.Empty /*11*/, "N12-fr-FR", string.Empty /*5*/, "N6-fr-FR");
         }
 
         [Test]
