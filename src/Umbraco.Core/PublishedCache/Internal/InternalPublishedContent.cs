@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public int SortOrder { get; set; }
 
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ??= GetCultures();
 
@@ -63,13 +63,13 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public int ParentId { get; set; }
 
-        public IEnumerable<int>? ChildIds { get; set; }
+        public IEnumerable<int> ChildIds { get; set; } = Enumerable.Empty<int>();
 
         public IPublishedContent? Parent { get; set; }
 
-        public IEnumerable<IPublishedContent>? Children { get; set; }
+        public IEnumerable<IPublishedContent> Children { get; set; } = Enumerable.Empty<IPublishedContent>();
 
-        public IEnumerable<IPublishedContent>? ChildrenForAllCultures => Children;
+        public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
         public IPublishedContentType ContentType { get; set; }
 

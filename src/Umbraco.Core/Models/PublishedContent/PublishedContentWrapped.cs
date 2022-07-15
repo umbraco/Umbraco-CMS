@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual int Id => _content.Id;
 
         /// <inheritdoc />
-        public virtual string? Name => _content.Name;
+        public virtual string Name => _content.Name;
 
         /// <inheritdoc />
         public virtual string? UrlSegment => _content.UrlSegment;
@@ -112,10 +112,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual IPublishedContent? Parent => _content.Parent;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent>? Children => _content.Children;
+        public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent>? ChildrenForAllCultures => _content.ChildrenForAllCultures;
+        public virtual IEnumerable<IPublishedContent> ChildrenForAllCultures => _content.ChildrenForAllCultures;
 
         #endregion
 

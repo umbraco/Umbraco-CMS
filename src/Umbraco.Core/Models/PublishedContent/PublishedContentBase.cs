@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Umbraco.Extensions;
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract int Id { get; }
 
         /// <inheritdoc />
-        public virtual string? Name => this.Name(_variationContextAccessor);
+        public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
         public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public abstract IPublishedContent? Parent { get; }
 
         /// <inheritdoc />
-        public virtual IEnumerable<IPublishedContent>? Children => this.Children(_variationContextAccessor);
+        public virtual IEnumerable<IPublishedContent> Children => this.Children(_variationContextAccessor);
 
         /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> ChildrenForAllCultures { get; }
