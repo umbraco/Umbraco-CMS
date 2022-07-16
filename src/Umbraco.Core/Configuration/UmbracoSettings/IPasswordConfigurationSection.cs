@@ -1,21 +1,20 @@
-﻿namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
+namespace Umbraco.Cms.Core.Configuration.UmbracoSettings;
+
+public interface IPasswordConfigurationSection : IUmbracoConfigurationSection
 {
-    public interface IPasswordConfigurationSection : IUmbracoConfigurationSection
-    {
-        int RequiredLength { get; }
+    int RequiredLength { get; }
 
-        bool RequireNonLetterOrDigit { get; }
+    bool RequireNonLetterOrDigit { get; }
 
-        bool RequireDigit { get; }
+    bool RequireDigit { get; }
 
-        bool RequireLowercase { get; }
+    bool RequireLowercase { get; }
 
-        bool RequireUppercase { get; }
+    bool RequireUppercase { get; }
 
-        bool UseLegacyEncoding { get; }
+    bool UseLegacyEncoding { get; }
 
-        string HashAlgorithmType { get; }
+    string HashAlgorithmType { get; }
 
-        int MaxFailedAccessAttemptsBeforeLockout { get; }
-    }
+    int MaxFailedAccessAttemptsBeforeLockout { get; }
 }

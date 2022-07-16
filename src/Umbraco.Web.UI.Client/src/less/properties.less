@@ -47,16 +47,17 @@
     flex-direction: row;
 }
 
-.date-wrapper-mini--checkbox{
+.date-wrapper-mini--checkbox {
     margin: 0 0 0 28px;
 }
 
 .date-wrapper-mini__date {
     display: flex;
-    
+    flex-direction: column;
     margin-left: 5px;
     margin-top: 5px;
     margin-bottom: 10px;
+    flex: 1 1 50%;
     
     &:first-of-type {
         margin-left: 0;
@@ -67,8 +68,8 @@
     }
 }
 
-.date-wrapper-mini__date .flatpickr-input > a {
-    
+.date-wrapper-mini__date .flatpickr-input > a,
+.date-wrapper-mini__date .flatpickr-input > button {
     display: flex;
     align-items: center;
     justify-content: center;

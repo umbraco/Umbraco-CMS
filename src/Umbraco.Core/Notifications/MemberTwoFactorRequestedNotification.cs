@@ -1,14 +1,8 @@
-﻿using System;
+namespace Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Core.Notifications
+public class MemberTwoFactorRequestedNotification : INotification
 {
-    public class MemberTwoFactorRequestedNotification : INotification
-    {
-        public MemberTwoFactorRequestedNotification(Guid? memberKey)
-        {
-            MemberKey = memberKey;
-        }
+    public MemberTwoFactorRequestedNotification(Guid? memberKey) => MemberKey = memberKey;
 
-        public Guid? MemberKey { get; }
-    }
+    public Guid? MemberKey { get; }
 }

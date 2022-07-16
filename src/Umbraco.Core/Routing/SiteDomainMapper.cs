@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
@@ -235,8 +231,7 @@ namespace Umbraco.Cms.Core.Routing
         #region Map domains
 
         /// <inheritdoc />
-        public virtual DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current,
-            string? culture, string? defaultCulture)
+        public virtual DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, string? culture, string? defaultCulture)
         {
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
             Dictionary<string, string[]>? qualifiedSites = GetQualifiedSites(current);
@@ -245,8 +240,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris,
-            Uri current, bool excludeDefault, string? culture, string? defaultCulture)
+        public virtual IEnumerable<DomainAndUri> MapDomains(IReadOnlyCollection<DomainAndUri> domainAndUris, Uri current, bool excludeDefault, string? culture, string? defaultCulture)
         {
             // TODO: ignoring cultures entirely?
 
@@ -277,8 +271,7 @@ namespace Umbraco.Cms.Core.Routing
                     {
                         // it is illegal to call MapDomain if domainAndUris is empty
                         // also, domainAndUris should NOT contain current, hence the test on hinted
-                        DomainAndUri? mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture,
-                            defaultCulture); // what GetUrl would get
+                        DomainAndUri? mainDomain = MapDomain(domainAndUris, qualifiedSites, currentAuthority, culture, defaultCulture); // what GetUrl would get
                         ret = ret.Where(d => d != mainDomain);
                     }
                 }
@@ -368,16 +361,19 @@ namespace Umbraco.Cms.Core.Routing
                     kvp => kvp.Value.Select(d =>
                             new Uri(UriUtilityCore.StartWithScheme(d, current.Scheme))
                                 .GetLeftPart(UriPartial.Authority))
-                        .ToArray()
-                );
+                        .ToArray());
 
             // .ToDictionary will evaluate and create the dictionary immediately
             // the new value is .ToArray so it will also be evaluated immediately
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private DomainAndUri? MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris,
-            Dictionary<string, string[]>? qualifiedSites, string currentAuthority, string? culture, string? defaultCulture)
+        private DomainAndUri? MapDomain(
+            IReadOnlyCollection<DomainAndUri> domainAndUris,
+            Dictionary<string, string[]>? qualifiedSites,
+            string currentAuthority,
+            string? culture,
+            string? defaultCulture)
         {
             if (domainAndUris == null)
             {
