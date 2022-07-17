@@ -14,8 +14,22 @@ We also encourage community members to feel free to comment on others' pull requ
 
 ## Table of contents
 
-↖️ You can jump to any section by using the "table of contents" button ( ![Table of contents icon](img/tableofcontentsicon.svg) ) above.
-
+- [Before you start](#before-you-start)
+  * [Code of Conduct](#code-of-conduct)
+  * [What can I contribute?](#what-can-i-contribute)
+    + [Making larger changes](#making-larger-changes)
+    + [Pull request or package?](#pull-request-or-package)
+    + [Ownership and copyright](#ownership-and-copyright)
+- [Finding your first issue: Up for grabs](#finding-your-first-issue-up-for-grabs)
+- [Making your changes](#making-your-changes)
+    + [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
+    + [Style guide](#style-guide)
+    + [Questions?](#questions)
+- [Creating a pull request](#creating-a-pull-request)
+- [The review process](#the-review-process)
+  * [Dealing with requested changes](#dealing-with-requested-changes)
+    + [No longer available?](#no-longer-available)
+  * [The Core Collaborators team](#the-core-collaborators-team)
 
 ## Before you start
 

@@ -4,50 +4,44 @@
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Cms.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders;
+
+public class ContentPropertyBasicBuilder<TParent> : ChildBuilderBase<TParent, ContentPropertyBasic>,
+    IWithIdBuilder, IWithAliasBuilder
 {
-    public class ContentPropertyBasicBuilder<TParent> : ChildBuilderBase<TParent, ContentPropertyBasic>,
-        IWithIdBuilder, IWithAliasBuilder
+    private string _alias;
+    private int? _id;
+    private object _value;
+
+    public ContentPropertyBasicBuilder(TParent parentBuilder)
+        : base(parentBuilder)
     {
-        private int? _id;
-        private string _alias;
-        private object _value;
+    }
 
-        public ContentPropertyBasicBuilder(TParent parentBuilder)
-            : base(parentBuilder)
-        {
-        }
+    string IWithAliasBuilder.Alias
+    {
+        get => _alias;
+        set => _alias = value;
+    }
 
-        public override ContentPropertyBasic Build()
-        {
-            var alias = _alias ?? null;
-            var id = _id ?? 0;
-            var value = _value ?? null;
+    int? IWithIdBuilder.Id
+    {
+        get => _id;
+        set => _id = value;
+    }
 
-            return new ContentPropertyBasic()
-            {
-                Alias = alias,
-                Id = id,
-                Value = value
-            };
-        }
+    public override ContentPropertyBasic Build()
+    {
+        var alias = _alias;
+        var id = _id ?? 0;
+        var value = _value;
 
-        public ContentPropertyBasicBuilder<TParent> WithValue(object value)
-        {
-            _value = value;
-            return this;
-        }
+        return new ContentPropertyBasic { Alias = alias, Id = id, Value = value };
+    }
 
-        int? IWithIdBuilder.Id
-        {
-            get => _id;
-            set => _id = value;
-        }
-
-        string IWithAliasBuilder.Alias
-        {
-            get => _alias;
-            set => _alias = value;
-        }
+    public ContentPropertyBasicBuilder<TParent> WithValue(object value)
+    {
+        _value = value;
+        return this;
     }
 }

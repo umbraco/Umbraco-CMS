@@ -10,24 +10,28 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 
-namespace Umbraco.TestData
+namespace Umbraco.TestData;
+
+public class LoadTestController : Controller
 {
-    public class LoadTestController : Controller
-    {
-        private static readonly Random s_random = new Random();
-        private static readonly object s_locko = new object();
+    private const string ContainerAlias = "LoadTestContainer";
+    private const string ContentAlias = "LoadTestContent";
+    private const int TextboxDefinitionId = -88;
+    private const int MaxCreate = 1000;
 
-        private static volatile int s_containerId = -1;
+    private const string FootHtml = @"</body>
+</html>";
 
-        private const string ContainerAlias = "LoadTestContainer";
-        private const string ContentAlias = "LoadTestContent";
-        private const int TextboxDefinitionId = -88;
-        private const int MaxCreate = 1000;
+    private static readonly Random s_random = new();
+    private static readonly object s_locko = new();
 
-        private static readonly string s_headHtml = @"<html>
+    private static volatile int s_containerId = -1;
+
+    private static readonly string s_headHtml = @"<html>
 <head>
   <title>LoadTest</title>
   <style>
@@ -48,10 +52,7 @@ namespace Umbraco.TestData
   </div>
 ";
 
-        private const string FootHtml = @"</body>
-</html>";
-
-        private static readonly string s_containerTemplateText = @"
+    private static readonly string s_containerTemplateText = @"
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @inject Umbraco.Cms.Core.Configuration.IUmbracoVersion _umbracoVersion
 @{
@@ -92,42 +93,43 @@ namespace Umbraco.TestData
 </div>
 " + FootHtml;
 
-        private readonly IContentTypeService _contentTypeService;
-        private readonly IContentService _contentService;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IFileService _fileService;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly Cms.Core.Hosting.IHostingEnvironment _hostingEnvironment;
-        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly IContentService _contentService;
 
-        public LoadTestController(
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            IDataTypeService dataTypeService,
-            IFileService fileService,
-            IShortStringHelper shortStringHelper,
-            Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IHostApplicationLifetime hostApplicationLifetime)
+    private readonly IContentTypeService _contentTypeService;
+    private readonly IDataTypeService _dataTypeService;
+    private readonly IFileService _fileService;
+    private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IShortStringHelper _shortStringHelper;
+
+    public LoadTestController(
+        IContentTypeService contentTypeService,
+        IContentService contentService,
+        IDataTypeService dataTypeService,
+        IFileService fileService,
+        IShortStringHelper shortStringHelper,
+        IHostingEnvironment hostingEnvironment,
+        IHostApplicationLifetime hostApplicationLifetime)
+    {
+        _contentTypeService = contentTypeService;
+        _contentService = contentService;
+        _dataTypeService = dataTypeService;
+        _fileService = fileService;
+        _shortStringHelper = shortStringHelper;
+        _hostingEnvironment = hostingEnvironment;
+        _hostApplicationLifetime = hostApplicationLifetime;
+    }
+
+
+    public IActionResult Index()
+    {
+        var res = EnsureInitialize();
+        if (res != null)
         {
-            _contentTypeService = contentTypeService;
-            _contentService = contentService;
-            _dataTypeService = dataTypeService;
-            _fileService = fileService;
-            _shortStringHelper = shortStringHelper;
-            _hostingEnvironment = hostingEnvironment;
-            _hostApplicationLifetime = hostApplicationLifetime;
+            return res;
         }
 
-
-        public IActionResult Index()
-        {
-            IActionResult res = EnsureInitialize();
-            if (res != null)
-            {
-                return res;
-            }
-
-            var html = @"Welcome. You can:
+        var html = @"Welcome. You can:
 <ul>
     <li><a href=""/LoadTestContainer"">List existing contents</a> (u:url)</li>
     <li><a href=""/LoadTest/Create?o=browser"">Create a content</a> (o:origin, r:restart, n:number)</li>
@@ -139,249 +141,250 @@ namespace Umbraco.TestData
 </ul>
 ";
 
-            return ContentHtml(html);
+        return ContentHtml(html);
+    }
+
+    private IActionResult EnsureInitialize()
+    {
+        if (s_containerId > 0)
+        {
+            return null;
         }
 
-        private IActionResult EnsureInitialize()
+        lock (s_locko)
         {
             if (s_containerId > 0)
             {
                 return null;
             }
 
-            lock (s_locko)
+            var contentType = _contentTypeService.Get(ContentAlias);
+            if (contentType == null)
             {
-                if (s_containerId > 0)
-                {
-                    return null;
-                }
-
-                IContentType contentType = _contentTypeService.Get(ContentAlias);
-                if (contentType == null)
-                {
-                    return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
-                }
-
-                IContentType containerType = _contentTypeService.Get(ContainerAlias);
-                if (containerType == null)
-                {
-                    return ContentHtml("Panic! Container type is missing.");
-                }
-
-                IContent container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
-                if (container == null)
-                {
-                    return ContentHtml("Panic! Container is missing.");
-                }
-
-                s_containerId = container.Id;
-                return null;
+                return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
             }
+
+            var containerType = _contentTypeService.Get(ContainerAlias);
+            if (containerType == null)
+            {
+                return ContentHtml("Panic! Container type is missing.");
+            }
+
+            var container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
+            if (container == null)
+            {
+                return ContentHtml("Panic! Container is missing.");
+            }
+
+            s_containerId = container.Id;
+            return null;
+        }
+    }
+
+    private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml, "text/html");
+
+    public IActionResult Install()
+    {
+        var contentType = new ContentType(_shortStringHelper, -1)
+        {
+            Alias = ContentAlias,
+            Name = "LoadTest Content",
+            Description = "Content for LoadTest",
+            Icon = "icon-document"
+        };
+        var def = _dataTypeService.GetDataType(TextboxDefinitionId);
+        contentType.AddPropertyType(new PropertyType(_shortStringHelper, def)
+        {
+            Name = "Origin",
+            Alias = "origin",
+            Description = "The origin of the content."
+        });
+        _contentTypeService.Save(contentType);
+
+        var containerTemplate = ImportTemplate(
+            "LoadTestContainer",
+            "LoadTestContainer",
+            s_containerTemplateText);
+
+        var containerType = new ContentType(_shortStringHelper, -1)
+        {
+            Alias = ContainerAlias,
+            Name = "LoadTest Container",
+            Description = "Container for LoadTest content",
+            Icon = "icon-document",
+            AllowedAsRoot = true,
+            IsContainer = true
+        };
+        containerType.AllowedContentTypes = containerType.AllowedContentTypes.Union(new[]
+        {
+            new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias)
+        });
+        containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
+        containerType.SetDefaultTemplate(containerTemplate);
+        _contentTypeService.Save(containerType);
+
+        var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
+        _contentService.SaveAndPublish(content);
+
+        return ContentHtml("Installed.");
+    }
+
+    private Template ImportTemplate(string name, string alias, string text, ITemplate master = null)
+    {
+        var t = new Template(_shortStringHelper, name, alias) { Content = text };
+        if (master != null)
+        {
+            t.SetMasterTemplate(master);
         }
 
-        private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml, "text/html");
+        _fileService.SaveTemplate(t);
+        return t;
+    }
 
-        public IActionResult Install()
+    public IActionResult Create(int n = 1, int r = 0, string o = null)
+    {
+        var res = EnsureInitialize();
+        if (res != null)
         {
-            var contentType = new ContentType(_shortStringHelper, -1)
-            {
-                Alias = ContentAlias,
-                Name = "LoadTest Content",
-                Description = "Content for LoadTest",
-                Icon = "icon-document"
-            };
-            IDataType def = _dataTypeService.GetDataType(TextboxDefinitionId);
-            contentType.AddPropertyType(new PropertyType(_shortStringHelper, def)
-            {
-                Name = "Origin",
-                Alias = "origin",
-                Description = "The origin of the content.",
-            });
-            _contentTypeService.Save(contentType);
+            return res;
+        }
 
-            Template containerTemplate = ImportTemplate(
-                 "LoadTestContainer",
-                 "LoadTestContainer",
-                 s_containerTemplateText);
+        if (r < 0)
+        {
+            r = 0;
+        }
 
-            var containerType = new ContentType(_shortStringHelper, -1)
-            {
-                Alias = ContainerAlias,
-                Name = "LoadTest Container",
-                Description = "Container for LoadTest content",
-                Icon = "icon-document",
-                AllowedAsRoot = true,
-                IsContainer = true
-            };
-            containerType.AllowedContentTypes = containerType.AllowedContentTypes.Union(new[]
-            {
-                new ContentTypeSort(new Lazy<int>(() => contentType.Id), 0, contentType.Alias),
-            });
-            containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
-            containerType.SetDefaultTemplate(containerTemplate);
-            _contentTypeService.Save(containerType);
+        if (r > 100)
+        {
+            r = 100;
+        }
 
-            IContent content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
+        var restart = GetRandom(0, 100) > 100 - r;
+
+        if (n < 1)
+        {
+            n = 1;
+        }
+
+        if (n > MaxCreate)
+        {
+            n = MaxCreate;
+        }
+
+        for (var i = 0; i < n; i++)
+        {
+            var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
+            var content = _contentService.Create(name, s_containerId, ContentAlias);
+            content.SetValue("origin", o);
             _contentService.SaveAndPublish(content);
-
-            return ContentHtml("Installed.");
         }
 
-        private Template ImportTemplate(string name, string alias, string text, ITemplate master = null)
-        {
-            var t = new Template(_shortStringHelper, name, alias) { Content = text };
-            if (master != null)
-            {
-                t.SetMasterTemplate(master);
-            }
-
-            _fileService.SaveTemplate(t);
-            return t;
-        }
-
-        public IActionResult Create(int n = 1, int r = 0, string o = null)
-        {
-            IActionResult res = EnsureInitialize();
-            if (res != null)
-            {
-                return res;
-            }
-
-            if (r < 0)
-            {
-                r = 0;
-            }
-
-            if (r > 100)
-            {
-                r = 100;
-            }
-
-            var restart = GetRandom(0, 100) > (100 - r);
-
-            if (n < 1)
-            {
-                n = 1;
-            }
-
-            if (n > MaxCreate)
-            {
-                n = MaxCreate;
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
-                IContent content = _contentService.Create(name, s_containerId, ContentAlias);
-                content.SetValue("origin", o);
-                _contentService.SaveAndPublish(content);
-            }
-
-            if (restart)
-            {
-                DoRestart();
-            }
-
-            return ContentHtml("Created " + n + " content"
-                + (restart ? ", and restarted" : "")
-                + ".");
-        }
-
-        private static int GetRandom(int minValue, int maxValue)
-        {
-            lock (s_locko)
-            {
-                return s_random.Next(minValue, maxValue);
-            }
-        }
-
-        public IActionResult Clear()
-        {
-            IActionResult res = EnsureInitialize();
-            if (res != null)
-            {
-                return res;
-            }
-
-            IContentType contentType = _contentTypeService.Get(ContentAlias);
-            _contentService.DeleteOfType(contentType.Id);
-
-            return ContentHtml("Cleared.");
-        }
-
-        private void DoRestart()
-        {
-            HttpContext.User = null;
-            Thread.CurrentPrincipal = null;
-            _hostApplicationLifetime.StopApplication();
-        }
-
-        public IActionResult ColdBootRestart()
-        {
-            Directory.Delete(_hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData,"DistCache")), true);
-
-            DoRestart();
-
-            return Content("Cold Boot Restarted.");
-        }
-
-        public IActionResult Restart()
+        if (restart)
         {
             DoRestart();
-
-            return ContentHtml("Restarted.");
         }
 
-        public IActionResult Die()
+        return ContentHtml("Created " + n + " content"
+                           + (restart ? ", and restarted" : string.Empty)
+                           + ".");
+    }
+
+    private static int GetRandom(int minValue, int maxValue)
+    {
+        lock (s_locko)
         {
-            var timer = new Timer(_ => throw new Exception("die!"));
-            _ = timer.Change(100, 0);
-
-            return ContentHtml("Dying.");
+            return s_random.Next(minValue, maxValue);
         }
+    }
 
-        public IActionResult Domains()
+    public IActionResult Clear()
+    {
+        var res = EnsureInitialize();
+        if (res != null)
         {
-            AppDomain currentDomain = AppDomain.CurrentDomain;
-            var currentName = currentDomain.FriendlyName;
-            var pos = currentName.IndexOf('-');
-            if (pos > 0)
-            {
-                currentName = currentName.Substring(0, pos);
-            }
-
-            var text = new StringBuilder();
-            text.Append("<div class=\"block\">Process ID: " + Process.GetCurrentProcess().Id + "</div>");
-            text.Append("<div class=\"block\">");
-
-            // TODO (V9): Commented out as I assume not available?
-            ////text.Append("<div>IIS Site: " + HostingEnvironment.ApplicationHost.GetSiteName() + "</div>");
-
-            text.Append("<div>App ID: " + currentName + "</div>");
-            //text.Append("<div>AppPool: " + Zbu.WebManagement.AppPoolHelper.GetCurrentApplicationPoolName() + "</div>");
-            text.Append("</div>");
-
-            text.Append("<div class=\"block\">Domains:<ul>");
-            text.Append("<li>Not implemented.</li>");
-            /*
-            foreach (var domain in Zbu.WebManagement.AppDomainHelper.GetAppDomains().OrderBy(x => x.Id))
-            {
-                var name = domain.FriendlyName;
-                pos = name.IndexOf('-');
-                if (pos > 0) name = name.Substring(0, pos);
-                text.Append("<li style=\""
-                    + (name != currentName ? "color: #cccccc;" : "")
-                    //+ (domain.Id == currentDomain.Id ? "" : "")
-                    + "\">"
-                    +"[" + domain.Id + "] " + name
-                    + (domain.IsDefaultAppDomain() ? " (default)" : "")
-                    + (domain.Id == currentDomain.Id ? " (current)" : "")
-                    + "</li>");
-            }
-            */
-            text.Append("</ul></div>");
-
-            return ContentHtml(text.ToString());
+            return res;
         }
+
+        var contentType = _contentTypeService.Get(ContentAlias);
+        _contentService.DeleteOfType(contentType.Id);
+
+        return ContentHtml("Cleared.");
+    }
+
+    private void DoRestart()
+    {
+        HttpContext.User = null;
+        Thread.CurrentPrincipal = null;
+        _hostApplicationLifetime.StopApplication();
+    }
+
+    public IActionResult ColdBootRestart()
+    {
+        Directory.Delete(
+            _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData, "DistCache")),
+            true);
+
+        DoRestart();
+
+        return Content("Cold Boot Restarted.");
+    }
+
+    public IActionResult Restart()
+    {
+        DoRestart();
+
+        return ContentHtml("Restarted.");
+    }
+
+    public IActionResult Die()
+    {
+        var timer = new Timer(_ => throw new Exception("die!"));
+        _ = timer.Change(100, 0);
+
+        return ContentHtml("Dying.");
+    }
+
+    public IActionResult Domains()
+    {
+        var currentDomain = AppDomain.CurrentDomain;
+        var currentName = currentDomain.FriendlyName;
+        var pos = currentName.IndexOf('-');
+        if (pos > 0)
+        {
+            currentName = currentName.Substring(0, pos);
+        }
+
+        var text = new StringBuilder();
+        text.Append("<div class=\"block\">Process ID: " + Process.GetCurrentProcess().Id + "</div>");
+        text.Append("<div class=\"block\">");
+
+        // TODO (V9): Commented out as I assume not available?
+        ////text.Append("<div>IIS Site: " + HostingEnvironment.ApplicationHost.GetSiteName() + "</div>");
+
+        text.Append("<div>App ID: " + currentName + "</div>");
+        //text.Append("<div>AppPool: " + Zbu.WebManagement.AppPoolHelper.GetCurrentApplicationPoolName() + "</div>");
+        text.Append("</div>");
+
+        text.Append("<div class=\"block\">Domains:<ul>");
+        text.Append("<li>Not implemented.</li>");
+        /*
+        foreach (var domain in Zbu.WebManagement.AppDomainHelper.GetAppDomains().OrderBy(x => x.Id))
+        {
+            var name = domain.FriendlyName;
+            pos = name.IndexOf('-');
+            if (pos > 0) name = name.Substring(0, pos);
+            text.Append("<li style=\""
+                + (name != currentName ? "color: #cccccc;" : "")
+                //+ (domain.Id == currentDomain.Id ? "" : "")
+                + "\">"
+                +"[" + domain.Id + "] " + name
+                + (domain.IsDefaultAppDomain() ? " (default)" : "")
+                + (domain.Id == currentDomain.Id ? " (current)" : "")
+                + "</li>");
+        }
+        */
+        text.Append("</ul></div>");
+
+        return ContentHtml(text.ToString());
     }
 }

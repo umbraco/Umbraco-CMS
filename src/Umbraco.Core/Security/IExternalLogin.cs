@@ -1,23 +1,22 @@
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+/// <summary>
+///     Used to persist external login data for a user
+/// </summary>
+public interface IExternalLogin
 {
     /// <summary>
-    /// Used to persist external login data for a user
+    ///     Gets the login provider
     /// </summary>
-    public interface IExternalLogin
-    {
-        /// <summary>
-        /// Gets the login provider
-        /// </summary>
-        string LoginProvider { get; }
+    string LoginProvider { get; }
 
-        /// <summary>
-        /// Gets the provider key
-        /// </summary>
-        string ProviderKey { get; }
+    /// <summary>
+    ///     Gets the provider key
+    /// </summary>
+    string ProviderKey { get; }
 
-        /// <summary>
-        /// Gets the user data
-        /// </summary>
-        string? UserData { get; }
-    }
+    /// <summary>
+    ///     Gets the user data
+    /// </summary>
+    string? UserData { get; }
 }

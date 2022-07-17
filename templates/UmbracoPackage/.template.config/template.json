@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json.schemastore.org/template",
+  "$schema": "https://json.schemastore.org/template.json",
   "author": "Umbraco HQ",
   "classifications": [
     "Web",
@@ -9,7 +9,7 @@
     "Plugin"
   ],
   "name": "Umbraco Package",
-  "description": "An empty Umbraco package/plugin project ready to get started",
+  "description": "An empty Umbraco package/plugin project ready to get started.",
   "groupIdentity": "Umbraco.Templates.UmbracoPackage",
   "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
   "shortName": "umbracopackage",
@@ -44,30 +44,14 @@
       "defaultValue": "10.0.0-rc1",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
-    "namespaceReplacer": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": "_"
-          },
-          {
-            "regex": "-",
-            "replacement": "_"
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": "_"
-          }
-        ]
-      },
+    "Namespace": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
+      "fileRename": "UmbracoPackage",
       "replaces": "UmbracoPackage"
     },
-    "msbuildReplacer": {
+    "MsBuildName": {
       "type": "generated",
       "generator": "regex",
       "dataType": "string",
