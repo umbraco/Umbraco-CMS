@@ -16,6 +16,9 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder,
     IPublishedContentValueSetBuilder
 {
+    private static readonly NoValue = new object[] { "n" };
+    private static readonly YesValue = new object[] { "y" };
+    
     private readonly IScopeProvider _scopeProvider;
 
     private readonly IShortStringHelper _shortStringHelper;
@@ -72,7 +75,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {
-                    UmbracoExamineFieldNames.PublishedFieldName, new object[] { c.Published ? "y" : "n" }
+                    UmbracoExamineFieldNames.PublishedFieldName, c.Published ? NoValue : YesValue
                 }, // Always add invariant published value
                 { "id", new object[] { c.Id } },
                 { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { c.Key } },
@@ -102,12 +105,12 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 },
                 { "writerID", new object[] { c.WriterId } },
                 { "templateID", new object[] { c.TemplateId ?? 0 } },
-                { UmbracoExamineFieldNames.VariesByCultureFieldName, new object[] { "n" } },
+                { UmbracoExamineFieldNames.VariesByCultureFieldName, NoValue },
             };
 
             if (isVariant)
             {
-                values[UmbracoExamineFieldNames.VariesByCultureFieldName] = new object[] { "y" };
+                values[UmbracoExamineFieldNames.VariesByCultureFieldName] = YesValue;
 
                 foreach (var culture in c.AvailableCultures)
                 {
