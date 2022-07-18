@@ -75,7 +75,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             {
                 { "icon", c.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>() },
                 {
-                    UmbracoExamineFieldNames.PublishedFieldName, c.Published ? NoValue : YesValue
+                    UmbracoExamineFieldNames.PublishedFieldName, c.Published ? YesValue : NoValue
                 }, // Always add invariant published value
                 { "id", new object[] { c.Id } },
                 { UmbracoExamineFieldNames.NodeKeyFieldName, new object[] { c.Key } },
