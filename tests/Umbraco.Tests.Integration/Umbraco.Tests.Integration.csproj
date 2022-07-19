@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <PackageId>Umbraco.Cms.Tests.Integration</PackageId>
     <Title>Umbraco CMS Integration Tests</Title>

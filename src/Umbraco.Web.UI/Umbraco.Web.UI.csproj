@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
   </PropertyGroup>
 
   <Import Project="..\..\build\NuSpecs\buildTransitive\Umbraco.Cms.props" />
-  
+
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="../Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="../Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj" />
@@ -37,7 +37,7 @@
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <RuntimeHostConfigurationOption Condition="$(RuntimeIdentifier.StartsWith('linux')) Or $(RuntimeIdentifier.StartsWith('win')) Or ('$(RuntimeIdentifier)' == '' And !$([MSBuild]::IsOSPlatform('osx')))" Include="System.Globalization.AppLocalIcu" Value="68.2.0.9" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
@@ -49,6 +49,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="umbraco" />
+  </ItemGroup>
+
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
@@ -58,7 +62,7 @@
   <PropertyGroup>
     <JsonSchemaPath>$(ProjectDir)umbraco/config/appsettings-schema.json</JsonSchemaPath>
   </PropertyGroup>
-  
+
   <Target Name="CheckPreconditions" BeforeTargets="Build">
     <Message Text="-CheckPreconditions-" Importance="high" />
     <Message Text="JsonSchemaPath:  $(JsonSchemaPath)" Importance="high" />
@@ -69,21 +73,21 @@
     <CallTarget Targets="AppsettingsBuild" Condition="!Exists('appsettings.json')" />
     <CallTarget Targets="AppsettingsDevBuild" Condition="!Exists('appsettings.Development.json')" />
   </Target>
-  
- 
-  
+
+
+
   <Target Name="JsonSchemaBuild">
     <!-- <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" /> -->
   </Target>
-  
+
   <Target Name="AppsettingsBuild">
      <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
      <Copy SourceFiles="$(Projectdir)/appsettings.template.json" DestinationFiles="$(ProjectDir)/appsettings.json" />
   </Target>
-  
+
   <Target Name="AppsettingsDevBuild">
     <Message Text="Generating appsettings.Development.json because it doesnt exist" Importance="High" />
     <Copy SourceFiles="$(ProjectDir)appsettings.Development.template.json" DestinationFiles="$(ProjectDir)appsettings.Development.json" />
   </Target>
-  
+
 </Project>

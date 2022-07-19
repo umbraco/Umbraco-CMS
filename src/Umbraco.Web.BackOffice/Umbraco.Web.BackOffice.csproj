@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <OutputType>Library</OutputType>
         <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
         <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
