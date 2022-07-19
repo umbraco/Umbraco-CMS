@@ -50,9 +50,9 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -70,9 +70,9 @@ stages:
                 vmImage: macOS-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -90,9 +90,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -117,9 +117,9 @@ stages:
               vmImage: ubuntu-latest
           steps:
               - task: UseDotNet@2
-                displayName: Use .Net 6.x
+                displayName: Use .Net 7.x
                 inputs:
-                    version: 6.x
+                    version: 7.x
               - task: DotNetCoreCLI@2
                 displayName: dotnet build
                 inputs:
@@ -144,9 +144,9 @@ stages:
             vmImage: ubuntu-latest
           steps:
             - task: UseDotNet@2
-              displayName: Use .Net 6.x
+              displayName: Use .Net 7.x
               inputs:
-                version: 6.x
+                version: 7.x
             - task: DotNetCoreCLI@2
               displayName: dotnet build
               inputs:
@@ -170,9 +170,9 @@ stages:
               vmImage: macOS-latest
           steps:
               - task: UseDotNet@2
-                displayName: Use .Net 6.x
+                displayName: Use .Net 7.x
                 inputs:
-                    version: 6.x
+                    version: 7.x
               - task: DotNetCoreCLI@2
                 displayName: dotnet build
                 inputs:
@@ -195,9 +195,9 @@ stages:
               vmImage: windows-latest
           steps:
               - task: UseDotNet@2
-                displayName: Use .Net 6.x
+                displayName: Use .Net 7.x
                 inputs:
-                    version: 6.x
+                    version: 7.x
               - powershell: sqllocaldb start mssqllocaldb
                 displayName: Start MSSQL LocalDb
               - task: DotNetCoreCLI@2
@@ -243,9 +243,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
 
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
@@ -259,7 +259,7 @@ stages:
                 - task: NodeTool@0
                   displayName: Use Node $(nodeVersion)
                   inputs:
-                       versionSpec: $(nodeVersion)
+                    versionSpec: $(nodeVersion)
                 - task: Npm@1
                   displayName: npm ci (Client)
                   inputs:
@@ -277,46 +277,46 @@ stages:
                 - task: PowerShell@1
                   displayName: Generate Cypress.env.json
                   inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
+                    scriptType: inlineScript
+                    inlineScript: >
+                      @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
                 - task: Npm@1
                   name: PrepareTask
                   displayName: npm ci (AcceptanceTest)
                   inputs:
-                      command: ci
-                      workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
+                    command: ci
+                    workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
                 - task: PowerShell@2
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      targetType: inline
-                      workingDirectory: tests\Umbraco.Tests.AcceptanceTest
-                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                    targetType: inline
+                    workingDirectory: tests\Umbraco.Tests.AcceptanceTest
+                    script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
                 - task: PublishTestResults@2
                   condition: always()
                   inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Desktop"
-#                - task: Npm@1
-#                  displayName: Run Cypress (Tablet portrait)
-#                  condition: always()
-#                  inputs:
-#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-#                      command: 'custom'
-#                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
-#
-#                - task: Npm@1
-#                  displayName: Run Cypress (Mobile protrait)
-#                  condition: always()
-#                  inputs:
-#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-#                      command: 'custom'
-#                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
+                    testResultsFormat: 'JUnit'
+                    testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+                    mergeTestResults: true
+                    testRunTitle: "Test results Desktop"
+              #                - task: Npm@1
+              #                  displayName: Run Cypress (Tablet portrait)
+              #                  condition: always()
+              #                  inputs:
+              #                      workingDir: tests\Umbraco.Tests.AcceptanceTest
+              #                      command: 'custom'
+              #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
+              #
+              #                - task: Npm@1
+              #                  displayName: Run Cypress (Mobile protrait)
+              #                  condition: always()
+              #                  inputs:
+              #                      workingDir: tests\Umbraco.Tests.AcceptanceTest
+              #                      command: 'custom'
+              #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
                   inputs:
@@ -326,19 +326,19 @@ stages:
           - job: Linux_Acceptance_tests_SqlServer
             displayName: Linux (SQL Server)
             variables:
-                - name: UmbracoDatabaseServer
-                  value: localhost
-                - name: UmbracoDatabaseName
-                  value: Cypress
-                - name: ConnectionStrings__umbracoDbDSN
-                  value: Server=localhost,1433;Database=$(UmbracoDatabaseName);User Id=sa;Password=$(SA_PASSWORD);
+              - name: UmbracoDatabaseServer
+                value: localhost
+              - name: UmbracoDatabaseName
+                value: Cypress
+              - name: ConnectionStrings__umbracoDbDSN
+                value: Server=localhost,1433;Database=$(UmbracoDatabaseName);User Id=sa;Password=$(SA_PASSWORD);
             services:
-                mssql: mssql
+              mssql: mssql
             pool:
-                vmImage: ubuntu-latest
+              vmImage: ubuntu-latest
             steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+              - task: UseDotNet@2
+                displayName: Use .Net 6.x
                   inputs:
                       version: 6.x
                 - task: Bash@3
@@ -441,9 +441,9 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: NodeTool@0
                   displayName: Use Node $(nodeVersion)
                   inputs:
@@ -520,9 +520,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: NuGetToolInstaller@1
                   displayName: Use NuGet Latest
                 - task: NuGetCommand@2
@@ -658,9 +658,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 6.x
+                  displayName: Use .Net 7.x
                   inputs:
-                      version: 6.x
+                      version: 7.x
                 - task: PowerShell@2
                   displayName: 'Prep build tool -  C# Docs'
                   inputs:
