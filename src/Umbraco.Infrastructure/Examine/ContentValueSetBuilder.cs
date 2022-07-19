@@ -16,9 +16,9 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentValueSetBuilder,
     IPublishedContentValueSetBuilder
 {
-    private static readonly NoValue = new object[] { "n" };
-    private static readonly YesValue = new object[] { "y" };
-    
+    private static readonly object[] NoValue = new[] { "n" };
+    private static readonly object[] YesValue = new[] { "y" };
+
     private readonly IScopeProvider _scopeProvider;
 
     private readonly IShortStringHelper _shortStringHelper;
