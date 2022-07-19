@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
@@ -10,12 +6,12 @@ namespace Umbraco.Cms.Core.Deploy
     public abstract class ArtifactBase<TUdi> : IArtifact
         where TUdi : Udi
     {
-        protected ArtifactBase(TUdi udi, IEnumerable<ArtifactDependency> dependencies = null)
+        protected ArtifactBase(TUdi udi, IEnumerable<ArtifactDependency>? dependencies = null)
         {
             Udi = udi ?? throw new ArgumentNullException("udi");
             Name = Udi.ToString();
 
-            Dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
+            _dependencies = dependencies ?? Enumerable.Empty<ArtifactDependency>();
             _checksum = new Lazy<string>(GetChecksum);
         }
 
@@ -24,8 +20,6 @@ namespace Umbraco.Cms.Core.Deploy
         private IEnumerable<ArtifactDependency> _dependencies;
 
         protected abstract string GetChecksum();
-
-        #region Abstract implementation of IArtifactSignature
 
         Udi IArtifactSignature.Udi => Udi;
 
@@ -49,10 +43,8 @@ namespace Umbraco.Cms.Core.Deploy
             set => _dependencies = value.OrderBy(x => x.Udi);
         }
 
-        #endregion
-
         public string Name { get; set; }
 
-        public string Alias { get; set; }
+        public string Alias { get; set; } = string.Empty;
     }
 }

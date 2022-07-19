@@ -306,7 +306,7 @@
 
 // Opacity
 .opacity(@opacity) {
-  opacity: @opacity / 100;
+  opacity: (@opacity / 100);
 }
 
 // Position
@@ -421,6 +421,7 @@
 // Limit width of specific property editors
 .umb-property-editor--limit-width {
     max-width: @propertyEditorLimitedWidth;
+    word-break: break-all;
 }
 
 // Horizontal dividers
@@ -468,7 +469,7 @@
 // Vertically center elements in the navbar.
 // Example: an element has a height of 30px, so write out `.navbarVerticalAlign(30px);` to calculate the appropriate top margin.
 .navbarVerticalAlign(@elementHeight) {
-  margin-top: (@navbarHeight - @elementHeight) / 2;
+  margin-top: ((@navbarHeight - @elementHeight) / 2);
 }
 
 
@@ -486,20 +487,20 @@
 // Table columns
 .tableColumns(@columnSpan: 1) {
   float: none; // undo default grid column styles
-  width: ((@gridColumnWidth) * @columnSpan) + (@gridGutterWidth * (@columnSpan - 1)) - 16; // 16 is total padding on left and right of table cells
+  width: ((@gridColumnWidth * @columnSpan) + (@gridGutterWidth * (@columnSpan - 1)) - 16); // 16 is total padding on left and right of table cells
   margin-left: 0; // undo default grid column styles
 }
 
 // Make a Grid
 // Use .makeRow and .makeColumn to assign semantic layouts grid system behavior
 .makeRow() {
-  margin-left: @gridGutterWidth * -1;
+  margin-left: (@gridGutterWidth * -1);
   .clearfix();
 }
 .makeColumn(@columns: 1, @offset: 0) {
   float: left;
-  margin-left: (@gridColumnWidth * @offset) + (@gridGutterWidth * (@offset - 1)) + (@gridGutterWidth * 2);
-  width: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1));
+  margin-left: ((@gridColumnWidth * @offset) + (@gridGutterWidth * (@offset - 1)) + (@gridGutterWidth * 2));
+  width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)));
 }
 
 // The Grid
@@ -509,26 +510,26 @@
 
     .spanX (@index) when (@index > 0) {
       .span@{index} { .span(@index); }
-      .spanX(@index - 1);
+      .spanX((@index - 1));
     }
     .spanX (0) {}
 
     .offsetX (@index) when (@index > 0) {
       .offset@{index} { .offset(@index); }
-      .offsetX(@index - 1);
+      .offsetX((@index - 1));
     }
     .offsetX (0) {}
 
     .offset (@columns) {
-      margin-left: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns + 1));
+      margin-left: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns + 1)));
     }
 
     .span (@columns) {
-      width: (@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1));
+      width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)));
     }
 
     .row {
-      margin-left: @gridGutterWidth * -1;
+      margin-left: (@gridGutterWidth * -1);
       .clearfix();
     }
 
@@ -554,27 +555,27 @@
 
     .spanX (@index) when (@index > 0) {
       .span@{index} { .span(@index); }
-      .spanX(@index - 1);
+      .spanX((@index - 1));
     }
     .spanX (0) {}
 
     .offsetX (@index) when (@index > 0) {
       .offset@{index} { .offset(@index); }
       .offset@{index}:first-child { .offsetFirstChild(@index); }
-      .offsetX(@index - 1);
+      .offsetX((@index - 1));
     }
     .offsetX (0) {}
 
     .offset (@columns) {
-      margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth*2);
+      margin-left: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth * 2));
     }
 
     .offsetFirstChild (@columns) {
-      margin-left: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth);
+      margin-left: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)) + (@fluidGridGutterWidth));
     }
 
     .span (@columns) {
-      width: (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
+      width: ((@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1)));
     }
 
     .row-fluid {
@@ -605,12 +606,12 @@
 
     .spanX (@index) when (@index > 0) {
       input.span@{index}, textarea.span@{index}, .uneditable-input.span@{index} { .span(@index); }
-      .spanX(@index - 1);
+      .spanX((@index - 1));
     }
     .spanX (0) {}
 
     .span(@columns) {
-      width: ((@gridColumnWidth) * @columns) + (@gridGutterWidth * (@columns - 1)) - 14;
+      width: ((@gridColumnWidth * @columns) + (@gridGutterWidth * (@columns - 1)) - 14);
     }
 
     input,

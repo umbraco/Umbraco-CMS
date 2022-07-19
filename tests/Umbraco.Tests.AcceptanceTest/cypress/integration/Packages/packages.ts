@@ -34,7 +34,7 @@ context('Packages', () => {
             mediaUdis: [],
             mediaLoadChildNodes: false
         }
-        const url = "https://localhost:44331/umbraco/backoffice/umbracoapi/package/PostSavePackage";
+        const url = "/umbraco/backoffice/umbracoapi/package/PostSavePackage";
         cy.umbracoApiRequest(url, 'POST', newPackage);
     }
 
@@ -117,13 +117,14 @@ context('Packages', () => {
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
         cy.umbracoEnsurePackageNameNotExists(packageName);
-    
+
         CreateSimplePackage();
 
         // Navigate to create package section
         cy.umbracoSection('packages');
         cy.contains('Created').click();
         cy.contains('Delete').click();
+        cy.wait(100);
         cy.contains('Yes, delete').click();
 
         // Assert

@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+public interface IBackOfficeSecurityAccessor
 {
-    public interface IBackOfficeSecurityAccessor
-    {
-        IBackOfficeSecurity BackOfficeSecurity { get; }
-    }
+    IBackOfficeSecurity? BackOfficeSecurity { get; }
 }

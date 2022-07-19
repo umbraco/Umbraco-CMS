@@ -16,127 +16,119 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security;
+
+[TestFixture]
+public class MemberSignInManagerTests
 {
-    [TestFixture]
-    public class MemberSignInManagerTests
+    private Mock<ILogger<SignInManager<MemberIdentityUser>>> _mockLogger;
+    private readonly Mock<MemberManager> _memberManager = MockMemberManager();
+
+    public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
+        => new(userMgr, Options.Create(new IdentityOptions()));
+
+    public MemberSignInManager CreateSut()
     {
-        private Mock<ILogger<SignInManager<MemberIdentityUser>>> _mockLogger;
-        private readonly Mock<MemberManager> _memberManager = MockMemberManager();
-
-        public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
-            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new IdentityOptions()));
-
-        public MemberSignInManager CreateSut()
-        {
-            // This all needs to be setup because internally aspnet resolves a bunch
-            // of services from the HttpContext.RequestServices.
-            var serviceProviderFactory = new DefaultServiceProviderFactory();
-            var serviceCollection = new ServiceCollection();
-            serviceCollection
-                .AddLogging()
-                .AddAuthentication()
-                .AddCookie(IdentityConstants.ApplicationScheme)
-                .AddCookie(IdentityConstants.ExternalScheme, o =>
-                {
-                    o.Cookie.Name = IdentityConstants.ExternalScheme;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                })
-                .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
-                {
-                    o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                })
-                .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
-                {
-                    o.Cookie.Name = IdentityConstants.TwoFactorRememberMeScheme;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                });
-            IServiceProvider serviceProvider = serviceProviderFactory.CreateServiceProvider(serviceCollection);
-            var httpContextFactory = new DefaultHttpContextFactory(serviceProvider);
-            IFeatureCollection features = new DefaultHttpContext().Features;
-            features.Set<IHttpConnectionFeature>(new HttpConnectionFeature
+        // This all needs to be setup because internally aspnet resolves a bunch
+        // of services from the HttpContext.RequestServices.
+        var serviceProviderFactory = new DefaultServiceProviderFactory();
+        var serviceCollection = new ServiceCollection();
+        serviceCollection
+            .AddLogging()
+            .AddAuthentication()
+            .AddCookie(IdentityConstants.ApplicationScheme)
+            .AddCookie(IdentityConstants.ExternalScheme, o =>
             {
-                LocalIpAddress = IPAddress.Parse("127.0.0.1")
+                o.Cookie.Name = IdentityConstants.ExternalScheme;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
+            {
+                o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
+            {
+                o.Cookie.Name = IdentityConstants.TwoFactorRememberMeScheme;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
-            HttpContext httpContext = httpContextFactory.Create(features);
+        var serviceProvider = serviceProviderFactory.CreateServiceProvider(serviceCollection);
+        var httpContextFactory = new DefaultHttpContextFactory(serviceProvider);
+        var features = new DefaultHttpContext().Features;
+        features.Set<IHttpConnectionFeature>(new HttpConnectionFeature { LocalIpAddress = IPAddress.Parse("127.0.0.1") });
+        var httpContext = httpContextFactory.Create(features);
 
-            _mockLogger = new Mock<ILogger<SignInManager<MemberIdentityUser>>>();
-            return new MemberSignInManager(
-                    _memberManager.Object,
-                    Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext),
-                    CreateClaimsFactory(_memberManager.Object),
-                    Mock.Of<IOptions<IdentityOptions>>(),
-                    _mockLogger.Object,
-                    Mock.Of<IAuthenticationSchemeProvider>(),
-                    Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
-                    Mock.Of<IMemberExternalLoginProviders>(),
-                    Mock.Of<IEventAggregator>()
-                    );
-        }
-        private static Mock<MemberManager> MockMemberManager()
-            => new Mock<MemberManager>(
-                    Mock.Of<IIpResolver>(),
-                    Mock.Of<IMemberUserStore>(),
-                    Options.Create(new IdentityOptions()),
-                    Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
-                    Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),
-                    Enumerable.Empty<IPasswordValidator<MemberIdentityUser>>(),
-                    new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
-                    Mock.Of<IServiceProvider>(),
-                    Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
-                    Options.Create(new MemberPasswordConfigurationSettings()),
-                    Mock.Of<IPublicAccessService>(),
-                    Mock.Of<IHttpContextAccessor>());
+        _mockLogger = new Mock<ILogger<SignInManager<MemberIdentityUser>>>();
+        return new MemberSignInManager(
+            _memberManager.Object,
+            Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext),
+            CreateClaimsFactory(_memberManager.Object),
+            Mock.Of<IOptions<IdentityOptions>>(),
+            _mockLogger.Object,
+            Mock.Of<IAuthenticationSchemeProvider>(),
+            Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
+            Mock.Of<IMemberExternalLoginProviders>(),
+            Mock.Of<IEventAggregator>());
+    }
 
-        [Test]
-        public async Task WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()
-        {
-            //arrange
-            var userId = "bo8w3d32q9b98";            
-            MemberSignInManager sut = CreateSut();
-            var fakeUser = new MemberIdentityUser(777)
-            {
-                UserName = "TestUser",
-            };
-            var password = "testPassword";
-            var lockoutOnFailure = false;
-            var isPersistent = true;
+    private static Mock<MemberManager> MockMemberManager()
+        => new(
+            Mock.Of<IIpResolver>(),
+            Mock.Of<IMemberUserStore>(),
+            Options.Create(new IdentityOptions()),
+            Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
+            Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),
+            Enumerable.Empty<IPasswordValidator<MemberIdentityUser>>(),
+            new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
+            Mock.Of<IServiceProvider>(),
+            Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
+            new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
+            Mock.Of<IPublicAccessService>(),
+            Mock.Of<IHttpContextAccessor>());
 
-            _memberManager.Setup(x => x.GetUserIdAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync(userId);
-            _memberManager.Setup(x => x.GetUserNameAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync(fakeUser.UserName);
-            _memberManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(fakeUser);
-            _memberManager.Setup(x => x.CheckPasswordAsync(fakeUser, password)).ReturnsAsync(true);
-            _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
-            _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
+    [Test]
+    public async Task
+        WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()
+    {
+        // arrange
+        var userId = "bo8w3d32q9b98";
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
+        var password = "testPassword";
+        var lockoutOnFailure = false;
+        var isPersistent = true;
 
-            //act
-            SignInResult actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
+        _memberManager.Setup(x => x.GetUserIdAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync(userId);
+        _memberManager.Setup(x => x.GetUserNameAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync(fakeUser.UserName);
+        _memberManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(fakeUser);
+        _memberManager.Setup(x => x.CheckPasswordAsync(fakeUser, password)).ReturnsAsync(true);
+        _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
+        _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
 
-            //assert
-            Assert.IsTrue(actual.Succeeded);
-        }
+        // act
+        var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
 
-        [Test]
-        public async Task WhenPasswordSignInAsyncIsCalled_AndTheResultFails_ThenASignInFailedResultShouldBeReturnedAsync()
-        {
-            //arrange
-            MemberSignInManager sut = CreateSut();
-            var fakeUser = new MemberIdentityUser(777)
-            {
-                UserName = "TestUser",
-            };
-            var password = "testPassword";
-            var lockoutOnFailure = false;
-            var isPersistent = true;
+        // assert
+        Assert.IsTrue(actual.Succeeded);
+    }
 
-            //act
-            SignInResult actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
+    [Test]
+    public async Task WhenPasswordSignInAsyncIsCalled_AndTheResultFails_ThenASignInFailedResultShouldBeReturnedAsync()
+    {
+        // arrange
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser" };
+        var password = "testPassword";
+        var lockoutOnFailure = false;
+        var isPersistent = true;
 
-            //assert
-            Assert.IsFalse(actual.Succeeded);
-        }
+        // act
+        var actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
+
+        // assert
+        Assert.IsFalse(actual.Succeeded);
     }
 }

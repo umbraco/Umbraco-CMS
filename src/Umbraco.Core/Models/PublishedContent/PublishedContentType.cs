@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -14,7 +11,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     [DebuggerDisplay("{Alias}")]
     public class PublishedContentType : IPublishedContentType
     {
-        private readonly IPublishedPropertyType[] _propertyTypes;
+        private readonly IPublishedPropertyType[] _propertyTypes = null!;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -30,7 +27,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 .ToList();
 
             if (ItemType == PublishedItemType.Member)
+            {
                 EnsureMemberProperties(propertyTypes, factory);
+            }
 
             _propertyTypes = propertyTypes.ToArray();
 
@@ -46,9 +45,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
             : this(key, id, alias, itemType, compositionAliases, variations, isElement)
         {
-            var propertyTypesA = propertyTypes.ToArray();
-            foreach (var propertyType in propertyTypesA)
+            PublishedPropertyType[] propertyTypesA = propertyTypes.ToArray();
+            foreach (PublishedPropertyType propertyType in propertyTypesA)
+            {
                 propertyType.ContentType = this;
+            }
+
             _propertyTypes = propertyTypesA;
 
             InitializeIndexes();
@@ -58,9 +60,12 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
             : this (Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
         {
-            var propertyTypesA = propertyTypes.ToArray();
-            foreach (var propertyType in propertyTypesA)
+            PublishedPropertyType[] propertyTypesA = propertyTypes.ToArray();
+            foreach (PublishedPropertyType propertyType in propertyTypesA)
+            {
                 propertyType.ContentType = this;
+            }
+
             _propertyTypes = propertyTypesA;
 
             InitializeIndexes();
@@ -102,11 +107,17 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         private void InitializeIndexes()
         {
-            for (var i = 0; i < _propertyTypes.Length; i++)
+            if (_propertyTypes is not null)
             {
-                var propertyType = _propertyTypes[i];
-                _indexes[propertyType.Alias] = i;
-                _indexes[propertyType.Alias.ToLowerInvariant()] = i;
+                for (var i = 0; i < _propertyTypes.Length; i++)
+                {
+                    IPublishedPropertyType propertyType = _propertyTypes[i];
+                    if (propertyType.Alias is not null)
+                    {
+                        _indexes[propertyType.Alias] = i;
+                        _indexes[propertyType.Alias.ToLowerInvariant()] = i;
+                    }
+                }
             }
         }
 
@@ -115,17 +126,21 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         // same alias does not exist already.
         private void EnsureMemberProperties(List<IPublishedPropertyType> propertyTypes, IPublishedContentTypeFactory factory)
         {
-            var aliases = new HashSet<string>(propertyTypes.Select(x => x.Alias), StringComparer.OrdinalIgnoreCase);
+            var aliases = new HashSet<string?>(propertyTypes.Select(x => x.Alias), StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (alias, dataTypeId) in BuiltinMemberProperties)
+            foreach (var (alias, dataTypeId) in _builtinMemberProperties)
             {
-                if (aliases.Contains(alias)) continue;
+                if (aliases.Contains(alias))
+                {
+                    continue;
+                }
+
                 propertyTypes.Add(factory.CreateCorePropertyType(this, alias, dataTypeId, ContentVariation.Nothing));
             }
         }
 
         // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
-        private static readonly Dictionary<string, int> BuiltinMemberProperties = new Dictionary<string, int>
+        private static readonly Dictionary<string, int> _builtinMemberProperties = new Dictionary<string, int>
         {
             { nameof(IMember.Email), Constants.DataTypes.Textbox },
             { nameof(IMember.Username), Constants.DataTypes.Textbox },
@@ -168,15 +183,23 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         /// <inheritdoc />
         public int GetPropertyIndex(string alias)
         {
-            if (_indexes.TryGetValue(alias, out var index)) return index; // fastest
-            if (_indexes.TryGetValue(alias.ToLowerInvariant(), out index)) return index; // slower
+            if (_indexes.TryGetValue(alias, out var index))
+            {
+                return index; // fastest
+            }
+
+            if (_indexes.TryGetValue(alias.ToLowerInvariant(), out index))
+            {
+                return index; // slower
+            }
+
             return -1;
         }
 
         // virtual for unit tests
         // TODO: explain why
         /// <inheritdoc />
-        public virtual IPublishedPropertyType GetPropertyType(string alias)
+        public virtual IPublishedPropertyType? GetPropertyType(string alias)
         {
             var index = GetPropertyIndex(alias);
             return GetPropertyType(index);
@@ -185,9 +208,9 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         // virtual for unit tests
         // TODO: explain why
         /// <inheritdoc />
-        public virtual IPublishedPropertyType GetPropertyType(int index)
+        public virtual IPublishedPropertyType? GetPropertyType(int index)
         {
-            return index >= 0 && index < _propertyTypes.Length ? _propertyTypes[index] : null;
+            return index >= 0 && _propertyTypes is not null && index < _propertyTypes.Length ? _propertyTypes[index] : null;
         }
 
         /// <inheritdoc />

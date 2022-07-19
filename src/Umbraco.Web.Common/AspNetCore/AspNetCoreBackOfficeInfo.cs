@@ -5,34 +5,39 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using static Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore;
+
+public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
 {
-    public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
+    private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+    private readonly IHostingEnvironment _hostingEnvironment;
+    private string? _getAbsoluteUrl;
+
+    public AspNetCoreBackOfficeInfo(
+        IOptionsMonitor<GlobalSettings> globalSettings,
+        IHostingEnvironment hostingEnviroment)
     {
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private string _getAbsoluteUrl;
-        public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
-        {
-            _globalSettings = globalSettings;
-            _hostingEnvironment = hostingEnviroment;
+        _globalSettings = globalSettings;
+        _hostingEnvironment = hostingEnviroment;
+    }
 
-        }
-
-        public string GetAbsoluteUrl
+    public string GetAbsoluteUrl
+    {
+        get
         {
-            get
+            if (_getAbsoluteUrl is null)
             {
-                if (_getAbsoluteUrl is null)
+                if (_hostingEnvironment.ApplicationMainUrl is null)
                 {
-                    if(_hostingEnvironment.ApplicationMainUrl is null)
-                    {
-                        return "";
-                    }
-                    _getAbsoluteUrl = WebPath.Combine(_hostingEnvironment.ApplicationMainUrl.ToString(), _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
+                    return string.Empty;
                 }
-                return _getAbsoluteUrl;
+
+                _getAbsoluteUrl = WebPath.Combine(
+                    _hostingEnvironment.ApplicationMainUrl.ToString(),
+                    _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
             }
+
+            return _getAbsoluteUrl;
         }
     }
 }

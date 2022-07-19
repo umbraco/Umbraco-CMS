@@ -1,19 +1,33 @@
-﻿namespace Umbraco.Cms.Core.Actions
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+namespace Umbraco.Cms.Core.Actions;
+
+/// <summary>
+///     This action is invoked when a document is being unpublished
+/// </summary>
+public class ActionUnpublish : IAction
 {
-
     /// <summary>
-    /// This action is invoked when a document is being unpublished
+    ///     The unique action letter
     /// </summary>
-    public class ActionUnpublish : IAction
-    {
-        public const char ActionLetter = 'Z';
+    public const char ActionLetter = 'Z';
 
-        public char Letter => ActionLetter;
-        public string Alias => "unpublish";
-        public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
-        public string Icon => "circle-dotted";
-        public bool ShowInNotifier => false;
-        public bool CanBePermissionAssigned => true;
-    }
+    /// <inheritdoc />
+    public char Letter => ActionLetter;
 
+    /// <inheritdoc />
+    public string Alias => "unpublish";
+
+    /// <inheritdoc />
+    public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
+
+    /// <inheritdoc />
+    public string Icon => "icon-circle-dotted";
+
+    /// <inheritdoc />
+    public bool ShowInNotifier => false;
+
+    /// <inheritdoc />
+    public bool CanBePermissionAssigned => true;
 }

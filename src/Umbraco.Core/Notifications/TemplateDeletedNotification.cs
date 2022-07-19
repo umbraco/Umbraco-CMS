@@ -4,12 +4,12 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public class TemplateDeletedNotification : DeletedNotification<ITemplate>
 {
-    public class TemplateDeletedNotification : DeletedNotification<ITemplate>
+    public TemplateDeletedNotification(ITemplate target, EventMessages messages)
+        : base(target, messages)
     {
-        public TemplateDeletedNotification(ITemplate target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }
