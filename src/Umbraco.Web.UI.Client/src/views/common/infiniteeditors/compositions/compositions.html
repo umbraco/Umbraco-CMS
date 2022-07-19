@@ -28,7 +28,7 @@
                     <div class="umb-control-group">
 
                       <umb-search-filter input-id="composition-search"
-                                         model="searchTerm"
+                                         model="vm.searchTerm"
                                          label-key="placeholders_filter"
                                          text="Type to filter..."
                                          css-class="w-100"
@@ -65,13 +65,13 @@
                     </div>
 
                     <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
-                        <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
+                        <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:vm.searchTerm">
                             <li ng-show="vm.availableGroups.length > 1">
                                 <umb-icon icon="icon-folder" class="umb-checkbox-list__item-icon"></umb-icon>
                                 {{group.containerPath}}
                             </li>
                             <li class="umb-checkbox-list__item"
-                                ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:searchTerm"
+                                ng-repeat="compositeContentType in group.compositeContentTypes | orderBy:'contentType.name' | filter:vm.searchTerm"
                                 ng-class="{'-disabled': (compositeContentType.allowed === false && !compositeContentType.selected) || compositeContentType.inherited, '-selected': compositeContentType.selected}">
 
                                 <div class="umb-checkbox-list__item-checkbox" ng-class="{'-selected': compositeContentType.selected }">
