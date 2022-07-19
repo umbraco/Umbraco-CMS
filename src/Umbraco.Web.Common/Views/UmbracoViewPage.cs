@@ -128,7 +128,7 @@ public abstract class UmbracoViewPage<TModel> : RazorPage<TModel>
     {
         // filter / add preview banner
         // ASP.NET default value is text/html
-        if (Context.Response.ContentType.InvariantContains("text/html"))
+        if (Context.Response.ContentType?.InvariantContains("text/html") ?? false)
         {
             if (((UmbracoContext?.IsDebug ?? false) || (UmbracoContext?.InPreviewMode ?? false))
                 && tagHelperOutput.TagName != null

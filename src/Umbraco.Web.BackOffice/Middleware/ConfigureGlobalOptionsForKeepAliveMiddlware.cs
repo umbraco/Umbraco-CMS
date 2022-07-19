@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Web.BackOffice.Middleware
 {
     /// <summary>
-    /// Ensures the Keep Alive middleware is part of 
+    /// Ensures the Keep Alive middleware is part of
     /// </summary>
     public sealed class ConfigureGlobalOptionsForKeepAliveMiddlware : IPostConfigureOptions<GlobalSettings>
     {
@@ -17,6 +17,6 @@ namespace Umbraco.Cms.Web.BackOffice.Middleware
         /// </summary>
         /// <param name="name"></param>
         /// <param name="options"></param>
-        public void PostConfigure(string name, GlobalSettings options) => options.ReservedUrls += _keepAliveSettings.Value.KeepAlivePingUrl;
+        public void PostConfigure(string? name, GlobalSettings options) => options.ReservedUrls += _keepAliveSettings.Value.KeepAlivePingUrl;
     }
 }

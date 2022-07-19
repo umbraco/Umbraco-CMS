@@ -114,6 +114,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             }
 
             var userId = currentIdentity.GetUserId();
+            if (userId is null)
+            {
+                return false;
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {

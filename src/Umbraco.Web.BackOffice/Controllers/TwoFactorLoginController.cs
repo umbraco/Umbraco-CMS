@@ -64,6 +64,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public async Task<ActionResult<IEnumerable<UserTwoFactorProviderModel>>> Get2FAProvidersForUser(int userId)
         {
             var user = await _backOfficeUserManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+            {
+                throw new InvalidOperationException("Could not find user");
+            }
 
             var enabledProviderNameHashSet = new HashSet<string>(await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(user.Key));
 

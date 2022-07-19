@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         }
 
         /// <inheritdoc />
-        public void Configure(string name, CookieAuthenticationOptions options)
+        public void Configure(string? name, CookieAuthenticationOptions options)
         {
             if (name != Constants.Security.BackOfficeAuthenticationType)
             {

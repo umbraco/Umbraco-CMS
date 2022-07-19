@@ -188,7 +188,7 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
                 return null;
             }
 
-            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User);
+            _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext?.User!);
         }
 
         return _currentMember;

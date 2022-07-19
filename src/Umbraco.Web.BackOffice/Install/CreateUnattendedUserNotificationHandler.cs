@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             // Uses same approach as NewInstall Step
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IBackOfficeUserManager backOfficeUserManager = scope.ServiceProvider.GetRequiredService<IBackOfficeUserManager>();
-            BackOfficeIdentityUser membershipUser = await backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+            BackOfficeIdentityUser? membershipUser = await backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
             if (membershipUser == null)
             {
                 throw new InvalidOperationException($"No user found in membership provider with id of {Core.Constants.Security.SuperUserIdAsString}.");

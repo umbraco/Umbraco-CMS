@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
 
             var coreIcons = iconFolder
                 .Where(x => !x.IsDirectory && x.Name.EndsWith(".svg"))
-                .Select(x => new FileInfo(x.PhysicalPath));
+                .Select(x => new FileInfo(x.PhysicalPath!));
 
             icons.UnionWith(coreIcons);
 

@@ -181,7 +181,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<IActionResult> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
-            var user = await _userManager.FindByIdAsync(User.Identity?.GetUserId());
+            var userId = User.Identity?.GetUserId();
+            if (userId is null)
+            {
+                throw new InvalidOperationException("Could not find userId");
+            }
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new InvalidOperationException("Could not find user");
 
             var authType = (await _signInManager.GetExternalAuthenticationSchemesAsync())
@@ -476,12 +481,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (provider == "Email")
             {
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
-
                 await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.TwoFactorAuth);
             }
             else if (provider == "Phone")
             {
-                await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), message);
+                var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+                if (phoneNumber is not null)
+                {
+                    await _smsSender.SendSmsAsync(phoneNumber, message);
+                }
             }
 
             return Ok();
@@ -530,6 +538,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
         {
             var identityUser = await _userManager.FindByIdAsync(model.UserId.ToString(CultureInfo.InvariantCulture));
+            if (identityUser is null)
+            {
+                return new ValidationErrorResult("Could not find user");
+            }
 
             var result = await _userManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
             if (result.Succeeded)

@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             var userId = changingPasswordModel.Id.ToString();
-            TUser identityUser = await userMgr.FindByIdAsync(userId);
+            TUser? identityUser = await userMgr.FindByIdAsync(userId);
             if (identityUser == null)
             {
                 // this really shouldn't ever happen... but just in case

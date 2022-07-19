@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="redirectUrl">The external login URL users should be redirected to during the login flow.</param>
         /// <param name="userId">The current user's identifier, which will be used to provide CSRF protection.</param>
         /// <returns>A configured <see cref="AuthenticationProperties"/>.</returns>
-        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string? redirectUrl, string? userId = null)
+        public override AuthenticationProperties ConfigureExternalAuthenticationProperties(string? provider, string? redirectUrl, string? userId = null)
         {
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // to be able to use our own XsrfKey/LoginProviderKey because the default is private :/
@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             else
             {
                 //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
-                var autoLinkUser = await UserManager.FindByEmailAsync(email);
+                var autoLinkUser = await UserManager.FindByEmailAsync(email!);
                 if (autoLinkUser != null)
                 {
                     try
@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     var name = loginInfo.Principal?.Identity?.Name;
                     if (name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
 
-                    autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
+                    autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email!, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
 
                     foreach (var userGroup in autoLinkOptions.DefaultUserGroups)
                     {

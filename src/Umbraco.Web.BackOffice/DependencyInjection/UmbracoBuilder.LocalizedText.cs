@@ -50,7 +50,7 @@ namespace Umbraco.Extensions
 
             IEnumerable<LocalizedTextServiceSupplementaryFileSource> userLangFileSources = contentFileProvider.GetDirectoryContents(userConfigLangFolder)
                     .Where(x => x.IsDirectory && x.Name.InvariantEquals("lang"))
-                    .Select(x => new DirectoryInfo(x.PhysicalPath))
+                    .Select(x => new DirectoryInfo(x.PhysicalPath!))
                     .SelectMany(x => x.GetFiles("*.user.xml", SearchOption.TopDirectoryOnly))
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
@@ -95,7 +95,7 @@ namespace Umbraco.Extensions
                     // request all the files out of the path, these will have physicalPath set.
                     var files = fileProvider.GetDirectoryContents(langFolderPath)
                         .Where(x => x.Name.InvariantEndsWith(".xml") && !string.IsNullOrEmpty(x.PhysicalPath))
-                        .Select(x => new FileInfo(x.PhysicalPath))
+                        .Select(x => new FileInfo(x.PhysicalPath!))
                         .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, overwriteCoreKeys))
                         .ToList();
 

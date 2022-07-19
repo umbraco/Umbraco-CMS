@@ -58,7 +58,7 @@ public static class HttpContextExtensions
     /// <summary>
     ///     Get the value in the request form or query string for the key
     /// </summary>
-    public static string GetRequestValue(this HttpContext context, string key)
+    public static string? GetRequestValue(this HttpContext context, string key)
     {
         HttpRequest request = context.Request;
         if (!request.HasFormContentType)
@@ -66,7 +66,7 @@ public static class HttpContextExtensions
             return request.Query[key];
         }
 
-        string value = request.Form[key];
+        string? value = request.Form[key];
         return value ?? request.Query[key];
     }
 

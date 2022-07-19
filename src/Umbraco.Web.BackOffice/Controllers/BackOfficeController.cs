@@ -383,7 +383,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         public async Task<IActionResult> ExternalLinkLoginCallback()
         {
-            BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
+            BackOfficeIdentityUser? user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 // ... this should really not happen

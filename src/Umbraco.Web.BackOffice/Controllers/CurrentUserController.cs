@@ -189,7 +189,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString());
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString();
+            if (userId is null)
+            {
+                throw new InvalidOperationException("Could not find user Id");
+            }
+            var user = await _backOfficeUserManager.FindByIdAsync(userId);
             if (user == null) throw new InvalidOperationException("Could not find user");
 
             var result = await _backOfficeUserManager.AddPasswordAsync(user, newPassword);
@@ -278,7 +283,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0)?.ToString(CultureInfo.InvariantCulture));
+            var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0)
+                ?.ToString(CultureInfo.InvariantCulture);
+            if (userId is null)
+            {
+                throw new InvalidOperationException("Could not find user Id");
+            }
+
+            BackOfficeIdentityUser? identityUser = await _backOfficeUserManager.FindByIdAsync(userId);
+
+            if (identityUser is null)
+            {
+                throw new InvalidOperationException("Could not find user");
+            }
 
             // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
             // but there didn't used to be)

@@ -93,7 +93,10 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             await _runtime.RestartAsync();
 
             var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
-            _backOfficeSignInManager.SignInAsync(identityUser, false);
+            if (identityUser is not null)
+            {
+                _backOfficeSignInManager.SignInAsync(identityUser, false);
+            }
 
             return NoContent();
         }
