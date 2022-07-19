@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -32,6 +29,7 @@ namespace Umbraco.Cms.Core.Routing
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             Mode = routingSettings.Value.UrlProviderMode;
+
         }
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -48,20 +46,20 @@ namespace Umbraco.Cms.Core.Routing
 
         #region GetUrl
 
-        private IPublishedContent GetDocument(int id)
+        private IPublishedContent? GetDocument(int id)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetDocument(Guid id)
+        private IPublishedContent? GetDocument(Guid id)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Content.GetById(id);
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            return umbracoContext.Content?.GetById(id);
         }
-        private IPublishedContent GetMedia(Guid id)
+        private IPublishedContent? GetMedia(Guid id)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            return umbracoContext.Media.GetById(id);
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            return umbracoContext.Media?.GetById(id);
         }
 
         /// <summary>
@@ -72,7 +70,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -83,7 +81,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(int id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(int id, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -100,39 +98,43 @@ namespace Umbraco.Cms.Core.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
         {
             if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
+            {
                 return "#";
+            }
 
             if (mode == UrlMode.Default)
+            {
                 mode = Mode;
+            }
 
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
             // (but only for variant content of course)
-            if (content.ContentType.VariesByCulture())
+            // We need to check all ancestors because urls are variant even for invariant content, if an ancestor is variant.
+            if (culture == null && content.AncestorsOrSelf().Any(x => x.ContentType.VariesByCulture()))
             {
-                if (culture == null)
-                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
             }
 
             if (current == null)
             {
-                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-            
 
-            var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
-                .FirstOrDefault(u => u != null);
+
+            UrlInfo? url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
+                .FirstOrDefault(u => u is not null);
             return url?.Text ?? "#"; // legacy wants this
         }
 
-        public string GetUrlFromRoute(int id, string route, string culture)
+        public string GetUrlFromRoute(int id, string? route, string? culture)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-            var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            DefaultUrlProvider? provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
                 : provider.GetUrlFromRoute(route, umbracoContext, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
@@ -155,7 +157,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return GetOtherUrls(id, umbracoContext.CleanedUmbracoUrl);
         }
 
@@ -187,8 +189,8 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="propertyAlias"></param>
         /// <param name="current"></param>
         /// <returns></returns>
-        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
-            => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
+        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
+            => GetMediaUrl( GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
         /// Gets the URL of a media item.
@@ -203,18 +205,24 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>The URL is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the media is multi-lingual, gets the URL for the specified culture or,
         /// when no culture is specified, the current culture.</para>
-        /// <para>If the provider is unable to provide a URL, it returns <see cref="String.Empty"/>.</para>
+        /// <para>If the provider is unable to provide a URL, it returns <see cref="string.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
+        public string GetMediaUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri? current = null)
         {
             if (propertyAlias == null)
+            {
                 throw new ArgumentNullException(nameof(propertyAlias));
+            }
 
             if (content == null)
-                return "";
+            {
+                return string.Empty;
+            }
 
             if (mode == UrlMode.Default)
+            {
                 mode = Mode;
+            }
 
             // this the ONLY place where we deal with default culture - IMediaUrlProvider always receive a culture
             // be nice with tests, assume things can be null, ultimately fall back to invariant
@@ -222,21 +230,23 @@ namespace Umbraco.Cms.Core.Routing
             if (content.ContentType.VariesByCulture())
             {
                 if (culture == null)
-                    culture = _variationContextAccessor?.VariationContext?.Culture ?? "";
+                {
+                    culture = _variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+                }
             }
 
             if (current == null)
             {
-                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                IUmbracoContext umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-                
 
-            var url = _mediaUrlProviders.Select(provider =>
+
+            UrlInfo? url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))
-                .FirstOrDefault(u => u != null);
+                .FirstOrDefault(u => u is not null);
 
-            return url?.Text ?? "";
+            return url?.Text ?? string.Empty;
         }
 
         #endregion

@@ -1,37 +1,31 @@
-using System;
-using System.Collections.Generic;
+namespace Umbraco.Cms.Core.Persistence.Repositories;
 
-namespace Umbraco.Cms.Core.Persistence.Repositories
+/// <summary>
+///     Provides cache keys for repositories.
+/// </summary>
+public static class RepositoryCacheKeys
 {
-    /// <summary>
-    /// Provides cache keys for repositories.
-    /// </summary>
-    public static class RepositoryCacheKeys
+    // used to cache keys so we don't keep allocating strings
+    private static readonly Dictionary<Type, string> Keys = new();
+
+    public static string GetKey<T>()
     {
-        // used to cache keys so we don't keep allocating strings
-        private static readonly Dictionary<Type, string> s_keys = new Dictionary<Type, string>();
+        Type type = typeof(T);
+        return Keys.TryGetValue(type, out var key) ? key : Keys[type] = "uRepo_" + type.Name + "_";
+    }
 
-        public static string GetKey<T>()
+    public static string GetKey<T, TId>(TId? id)
+    {
+        if (EqualityComparer<TId?>.Default.Equals(id, default))
         {
-            Type type = typeof(T);
-            return s_keys.TryGetValue(type, out var key) ? key : (s_keys[type] = "uRepo_" + type.Name + "_");
+            return string.Empty;
         }
 
-        public static string GetKey<T, TId>(TId id)
+        if (typeof(TId).IsValueType)
         {
-            if (EqualityComparer<TId>.Default.Equals(id, default))
-            {
-                return string.Empty;
-            }
-
-            if (typeof(TId).IsValueType)
-            {
-                return GetKey<T>() + id;
-            }
-            else
-            {
-                return GetKey<T>() + id.ToString().ToUpperInvariant();
-            }
+            return GetKey<T>() + id;
         }
+
+        return GetKey<T>() + id?.ToString()?.ToUpperInvariant();
     }
 }

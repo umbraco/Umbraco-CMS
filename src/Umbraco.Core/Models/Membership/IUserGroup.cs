@@ -1,44 +1,44 @@
-﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership;
+
+public interface IUserGroup : IEntity, IRememberBeingDirty
 {
-    public interface IUserGroup : IEntity, IRememberBeingDirty
-    {
-        string Alias { get; set; }
+    string Alias { get; set; }
 
-        int? StartContentId { get; set; }
-        int? StartMediaId { get; set; }
+    int? StartContentId { get; set; }
 
-        /// <summary>
-        /// The icon
-        /// </summary>
-        string Icon { get; set; }
+    int? StartMediaId { get; set; }
 
-        /// <summary>
-        /// The name
-        /// </summary>
-        string Name { get; set; }
+    /// <summary>
+    ///     The icon
+    /// </summary>
+    string? Icon { get; set; }
 
-        /// <summary>
-        /// The set of default permissions
-        /// </summary>
-        /// <remarks>
-        /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
-        /// </remarks>
-        IEnumerable<string> Permissions { get; set; }
+    /// <summary>
+    ///     The name
+    /// </summary>
+    string? Name { get; set; }
 
-        IEnumerable<string> AllowedSections { get; }
+    /// <summary>
+    ///     The set of default permissions
+    /// </summary>
+    /// <remarks>
+    ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
+    ///     flexible permissions structure in the future.
+    /// </remarks>
+    IEnumerable<string>? Permissions { get; set; }
 
-        void RemoveAllowedSection(string sectionAlias);
+    IEnumerable<string> AllowedSections { get; }
 
-        void AddAllowedSection(string sectionAlias);
+    /// <summary>
+    ///     Specifies the number of users assigned to this group
+    /// </summary>
+    int UserCount { get; }
 
-        void ClearAllowedSections();
+    void RemoveAllowedSection(string sectionAlias);
 
-        /// <summary>
-        /// Specifies the number of users assigned to this group
-        /// </summary>
-        int UserCount { get; }
-    }
+    void AddAllowedSection(string sectionAlias);
+
+    void ClearAllowedSections();
 }

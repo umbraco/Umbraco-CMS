@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services;
+
+public interface IUsageInformationService
 {
-    public interface IUsageInformationService
-    {
-        IEnumerable<UsageInformation> GetDetailed();
-    }
+    IEnumerable<UsageInformation>? GetDetailed();
 }

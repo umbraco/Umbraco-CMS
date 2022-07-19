@@ -1,10 +1,6 @@
-namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security;
+
+public class NoopHtmlSanitizer : IHtmlSanitizer
 {
-    public class NoopHtmlSanitizer : IHtmlSanitizer
-    {
-        public string Sanitize(string html)
-        {
-            return html;
-        }
-    }
+    public string Sanitize(string html) => html;
 }

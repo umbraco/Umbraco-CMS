@@ -1,92 +1,103 @@
 using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees;
+
+[Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
+[Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4,
+    TreeGroup = Constants.Trees.Groups.Settings)]
+[PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
+[CoreTree]
+public class MacrosTreeController : TreeController
 {
-    [Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
-    [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
-    [CoreTree]
-    public class MacrosTreeController : TreeController
+    private readonly IMacroService _macroService;
+    private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
+
+    public MacrosTreeController(ILocalizedTextService localizedTextService,
+        UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+        IMenuItemCollectionFactory menuItemCollectionFactory, IMacroService macroService,
+        IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection,
+        eventAggregator)
     {
-        private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
-        private readonly IMacroService  _macroService;
+        _menuItemCollectionFactory = menuItemCollectionFactory;
+        _macroService = macroService;
+    }
 
-        public MacrosTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, IMacroService macroService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
+    protected override ActionResult<TreeNode?> CreateRootNode(FormCollection queryStrings)
+    {
+        ActionResult<TreeNode?> rootResult = base.CreateRootNode(queryStrings);
+        if (!(rootResult.Result is null))
         {
-            _menuItemCollectionFactory = menuItemCollectionFactory;
-            _macroService = macroService;
+            return rootResult;
         }
 
-        protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
-        {
-            var rootResult = base.CreateRootNode(queryStrings);
-            if (!(rootResult.Result is null))
-            {
-                return rootResult;
-            }
-            var root = rootResult.Value;
+        TreeNode? root = rootResult.Value;
 
-            //check if there are any macros
+        if (root is not null)
+        {
+            // Check if there are any macros
             root.HasChildren = _macroService.GetAll().Any();
-            return root;
         }
 
-        protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+        return root;
+    }
+
+    protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
+    {
+        var nodes = new TreeNodeCollection();
+
+        if (id == Constants.System.RootString)
         {
-            var nodes = new TreeNodeCollection();
-
-            if (id == Constants.System.RootString)
+            foreach (IMacro macro in _macroService.GetAll().OrderBy(m => m.Name))
             {
-                foreach (var macro in _macroService.GetAll().OrderBy(m => m.Name))
-                {
-                    nodes.Add(CreateTreeNode(
-                        macro.Id.ToString(),
-                        id,
-                        queryStrings,
-                        macro.Name,
-                        Constants.Icons.Macro,
-                        false));
-                }
+                nodes.Add(CreateTreeNode(
+                    macro.Id.ToString(),
+                    id,
+                    queryStrings,
+                    macro.Name,
+                    Constants.Icons.Macro,
+                    false));
             }
-
-            return nodes;
         }
 
-        protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
+        return nodes;
+    }
+
+    protected override ActionResult<MenuItemCollection> GetMenuForNode(string id, FormCollection queryStrings)
+    {
+        MenuItemCollection menu = _menuItemCollectionFactory.Create();
+
+        if (id == Constants.System.RootString)
         {
-            var menu = _menuItemCollectionFactory.Create();
+            //Create the normal create action
+            menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
-            if (id == Constants.System.RootString)
-            {
-                //Create the normal create action
-                menu.Items.Add<ActionNew>(LocalizedTextService);
-
-                //refresh action
-                menu.Items.Add(new RefreshNode(LocalizedTextService, true));
-
-                return menu;
-            }
-
-            var macro = _macroService.GetById(int.Parse(id, CultureInfo.InvariantCulture));
-            if (macro == null) return menu;
-
-            //add delete option for all macros
-            menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+            //refresh action
+            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
             return menu;
         }
+
+        IMacro? macro = _macroService.GetById(int.Parse(id, CultureInfo.InvariantCulture));
+        if (macro == null)
+        {
+            return menu;
+        }
+
+        //add delete option for all macros
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+
+        return menu;
     }
 }

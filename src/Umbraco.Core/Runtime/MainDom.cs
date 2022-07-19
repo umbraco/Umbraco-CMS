@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
@@ -23,11 +18,11 @@ namespace Umbraco.Cms.Core.Runtime
         #region Vars
 
         private readonly ILogger<MainDom> _logger;
-        private IApplicationShutdownRegistry _hostingEnvironment;
+        private IApplicationShutdownRegistry? _hostingEnvironment;
         private readonly IMainDomLock _mainDomLock;
 
         // our own lock for local consistency
-        private object _locko = new object();
+        private object _locko = new();
 
         private bool _isInitialized;
         // indicates whether...
@@ -35,12 +30,12 @@ namespace Umbraco.Cms.Core.Runtime
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
-        private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
+        private readonly List<KeyValuePair<int, Action>> _callbacks = new();
 
         private const int LockTimeoutMilliseconds = 40000; // 40 seconds
 
-        private Task _listenTask;
-        private Task _listenCompleteTask;
+        private Task? _listenTask;
+        private Task? _listenCompleteTask;
 
         #endregion
 
@@ -64,7 +59,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 hostingEnvironment.RegisterObject(this);
                 return Acquire();
-            }).Value;
+            })!.Value;
         }
 
         /// <summary>
@@ -76,7 +71,7 @@ namespace Umbraco.Cms.Core.Runtime
         /// <returns>A value indicating whether it was possible to register.</returns>
         /// <remarks>If registering is successful, then the <paramref name="install"/> action
         /// is guaranteed to execute before the AppDomain releases the main domain status.</remarks>
-        public bool Register(Action install = null, Action release = null, int weight = 100)
+        public bool Register(Action? install = null, Action? release = null, int weight = 100)
         {
             lock (_locko)
             {
@@ -114,14 +109,22 @@ namespace Umbraco.Cms.Core.Runtime
             lock (_locko)
             {
                 _logger.LogDebug("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
-                if (_signaled) return;
-                if (_isMainDom == false) return; // probably not needed
+                if (_signaled)
+                {
+                    return;
+                }
+
+                if (_isMainDom == false)
+                {
+                    return; // probably not needed
+                }
+
                 _signaled = true;
 
                 try
                 {
                     _logger.LogInformation("Stopping ({SignalSource})", source);
-                    foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
+                    foreach (Action callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
                         {
@@ -189,7 +192,8 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 // Listen for the signal from another AppDomain coming online to release the lock
                 _listenTask = _mainDomLock.ListenAsync();
-                _listenCompleteTask = _listenTask.ContinueWith(t =>
+                _listenCompleteTask = _listenTask.ContinueWith(
+                    t =>
                 {
                     if (_listenTask.Exception != null)
                     {
@@ -201,7 +205,8 @@ namespace Umbraco.Cms.Core.Runtime
                     }
 
                     OnSignal("signal");
-                }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                },
+                    TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             }
             catch (OperationCanceledException ex)
             {
@@ -246,18 +251,18 @@ namespace Umbraco.Cms.Core.Runtime
 
         // This code added to correctly implement the disposable pattern.
 
-        private bool disposedValue = false; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
                     _mainDomLock.Dispose();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

@@ -4,12 +4,12 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Notifications
+namespace Umbraco.Cms.Core.Notifications;
+
+public sealed class MediaDeletedNotification : DeletedNotification<IMedia>
 {
-    public sealed class MediaDeletedNotification : DeletedNotification<IMedia>
+    public MediaDeletedNotification(IMedia target, EventMessages messages)
+        : base(target, messages)
     {
-        public MediaDeletedNotification(IMedia target, EventMessages messages) : base(target, messages)
-        {
-        }
     }
 }

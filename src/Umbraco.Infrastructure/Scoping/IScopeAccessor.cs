@@ -1,17 +1,10 @@
-﻿// Copyright (c) Umbraco.
-// See LICENSE for more details.
+namespace Umbraco.Cms.Infrastructure.Scoping;
 
-namespace Umbraco.Cms.Core.Scoping
+public interface IScopeAccessor
 {
     /// <summary>
-    /// Provides access to the ambient scope.
+    ///     Gets the ambient scope.
     /// </summary>
-    public interface IScopeAccessor
-    {
-        /// <summary>
-        /// Gets the ambient scope.
-        /// </summary>
-        /// <remarks>Returns <c>null</c> if there is no ambient scope.</remarks>
-        IScope AmbientScope { get; }
-    }
+    /// <remarks>Returns <c>null</c> if there is no ambient scope.</remarks>
+    IScope? AmbientScope { get; }
 }

@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services;
+
+public interface IUserDataService
 {
-    public interface IUserDataService
-    {
-        IEnumerable<UserData> GetUserData();
-    }
+    IEnumerable<UserData> GetUserData();
 }

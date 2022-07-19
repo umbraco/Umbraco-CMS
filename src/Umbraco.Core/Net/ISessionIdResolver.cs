@@ -1,7 +1,6 @@
-namespace Umbraco.Cms.Core.Net
+namespace Umbraco.Cms.Core.Net;
+
+public interface ISessionIdResolver
 {
-    public interface ISessionIdResolver
-    {
-        string SessionId { get; }
-    }
+    string? SessionId { get; }
 }

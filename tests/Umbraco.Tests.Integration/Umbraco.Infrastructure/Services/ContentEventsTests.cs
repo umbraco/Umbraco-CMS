@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         }
                         else
                         {
-                            xstate += "=" + (x.Published ? (_documentRepository.IsPathPublished(x) ? "p" : "m") : "u");
+                            xstate += "=" + (x.Published ? _documentRepository.IsPathPublished(x) ? "p" : "m" : "u");
                         }
 
                         return $"{x.Id}.{xstate}";
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             public override string ToString() => $"{Message:000}: {Sender.Replace(" ", string.Empty)}/{Name}/{Args}";
         }
 
-        private static readonly string[] s_propertiesImpactingAllVersions = { "SortOrder", "ParentId", "Level", "Path", "Trashed" };
+        private static readonly string[] _propertiesImpactingAllVersions = { "SortOrder", "ParentId", "Level", "Path", "Trashed" };
 
         private static bool HasChangesImpactingAllVersions(IContent icontent)
         {
@@ -357,7 +357,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ////return content.IsEntityDirty();
 
             // have to be more precise & specify properties
-            return s_propertiesImpactingAllVersions.Any(content.IsPropertyDirty);
+            return _propertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
         private void WriteEvents()
@@ -374,7 +374,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         #region Utils
 
         private IEnumerable<IContent> Children(IContent content)
-            => ContentService.GetPagedChildren(content.Id, 0, int.MaxValue, out long total);
+            => ContentService.GetPagedChildren(content.Id, 0, int.MaxValue, out _);
 
         #endregion
 
@@ -999,7 +999,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void EmptyRecycleBinContent()
         {
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ContentService.EmptyRecycleBin();
 
             IContent content = CreateContent();
             Assert.IsNotNull(content);
@@ -1007,7 +1007,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.MoveToRecycleBin(content);
 
             ResetEvents();
-            ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
+            ContentService.EmptyRecycleBin();
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);

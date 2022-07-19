@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+namespace Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Services
+public interface IInstallationService
 {
-    public interface IInstallationService
-    {
-        Task LogInstall(InstallLog installLog);
-    }
+    Task LogInstall(InstallLog installLog);
 }
