@@ -9,39 +9,31 @@
   "symbolInfo": [
     {
       "id": "UmbracoVersion",
-      "isVisible": "true"
+      "isVisible": true
     },
     {
       "id": "UseHttpsRedirect",
-      "isVisible": "true"
+      "isVisible": true
     },
     {
       "id": "SkipRestore",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserName",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserEmail",
-      "isVisible": "true"
-    },
-    {
-      "id": "UnattendedUserPassword",
-      "isVisible": "true"
+      "isVisible": true
     },
     {
       "id": "ConnectionString",
-      "isVisible": "true"
+      "isVisible": true
+    },
+    {
+      "id": "ConnectionStringProviderName",
+      "isVisible": true
+    },
+    {
+      "id": "DevelopmentDatabaseType",
+      "isVisible": true
     },
     {
       "id": "NoNodesViewPath",
-      "isVisible": "true"
-    },
-    {
-      "id": "PackageProjectName",
-      "isVisible": "true"
+      "isVisible": true
     }
   ]
 }
