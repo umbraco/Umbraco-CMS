@@ -97,6 +97,7 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
         OnRepositoryRefreshed(serializer, member, false);
     }
 
+    /// <inheritdoc/>
     public void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
@@ -107,9 +108,18 @@ public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepositor
             | ContentCacheDataSerializerEntityType.Media
             | ContentCacheDataSerializerEntityType.Member);
 
-        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
-        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
-        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
+        if(contentTypeIds != null)
+        {
+            RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
+        }
+        if (mediaTypeIds != null)
+        {
+            RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
+        }
+        if (memberTypeIds != null)
+        {
+            RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
+        }
     }
 
     // assumes content tree lock
