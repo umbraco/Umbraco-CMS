@@ -69,13 +69,13 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     protected UserGroupBuilder UserGroupBuilderInstance { get; } = new();
 
     [SetUp]
-    public void Setup()
+    public virtual void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
         var hostBuilder = CreateHostBuilder();
 
         _host = hostBuilder.Build();
-        UseTestDatabase(_host.Services);
+        BeforeHostStart(_host);
         _host.Start();
 
         if (TestOptions.Boot)
@@ -84,13 +84,17 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         }
     }
 
+    protected virtual void BeforeHostStart(IHost host)
+    {
+        UseTestDatabase(host.Services);
+    }
     [TearDown]
-    public void TearDownAsync() => _host.StopAsync();
+    public virtual void TearDownAsync() => _host.StopAsync();
 
     /// <summary>
     ///     Create the Generic Host and execute startup ConfigureServices/Configure calls
     /// </summary>
-    private IHostBuilder CreateHostBuilder()
+    protected virtual IHostBuilder CreateHostBuilder()
     {
         var hostBuilder = Host.CreateDefaultBuilder()
             .ConfigureUmbracoDefaults()
@@ -125,7 +129,7 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         return hostBuilder;
     }
 
-    protected void ConfigureServices(IServiceCollection services)
+    protected virtual void ConfigureServices(IServiceCollection services)
     {
         services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
         var webHostEnvironment = TestHelper.GetWebHostEnvironment();

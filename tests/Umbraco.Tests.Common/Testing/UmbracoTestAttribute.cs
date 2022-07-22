@@ -78,6 +78,9 @@ public class UmbracoTestAttribute : TestOptionAttributeBase
         set => _typeLoader.Set(value);
     }
 
+    /// <summary>
+    /// If Boot is false, we don't want the CoreRuntime hosted service to start
+    /// </summary>
     public bool Boot { get => _boot.ValueOrDefault(false); set => _boot.Set(value); }
 
     protected override TestOptionAttributeBase Merge(TestOptionAttributeBase other)
