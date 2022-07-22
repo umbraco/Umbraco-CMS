@@ -61,6 +61,25 @@ public interface IPublishedSnapshotService : IDisposable
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null);
 
+
+    /// <summary>
+    ///     Rebuilds all internal database caches (but does not reload).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Forces the snapshot service to rebuild its internal database caches. For instance, some caches
+    ///         may rely on a database table to store pre-serialized version of documents.
+    ///     </para>
+    ///     <para>
+    ///         This does *not* reload the caches. Caches need to be reloaded, for instance via
+    ///         <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.
+    ///     </para>
+    /// </remarks>
+    void RebuildAll()
+    {
+        Rebuild(Array.Empty<int>(),Array.Empty<int>(), Array.Empty<int>());
+    }
+
     /* An IPublishedCachesService implementation can rely on transaction-level events to update
      * its internal, database-level data, as these events are purely internal. However, it cannot
      * rely on cache refreshers CacheUpdated events to update itself, as these events are external
