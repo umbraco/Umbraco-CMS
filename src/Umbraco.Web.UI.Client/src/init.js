@@ -133,7 +133,7 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         //global state query strings without force re-loading views.
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
-            if (!currentRouteParams?.params) {
+            if (!currentRouteParams || !currentRouteParams.params) {
                 //if there is no current route then always route which is done with reload
                 $route.reload();
             } else {
