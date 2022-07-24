@@ -172,4 +172,3 @@ app.run(['$rootScope', '$route', '$location', '$cookies', 'urlHelper', 'appState
         appState.setGlobalState("touchDevice", touchDevice);
 
     }]);
-    
