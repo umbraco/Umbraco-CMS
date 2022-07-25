@@ -192,11 +192,9 @@ public class EntityController : UmbracoAuthorizedJsonController
         [HttpGet]
         public async Task<IDictionary<string, TreeSearchResult>> SearchAll(string query)
         {
-            var result = new Dictionary<string, TreeSearchResult>();
-
             if (string.IsNullOrEmpty(query))
             {
-                return result;
+                return new Dictionary<string, TreeSearchResult>();
             }
 
             var culture = ClientCulture();
@@ -224,12 +222,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
             var taskResults = await Task.WhenAll(searchTasks);
 
-            foreach (var taskResult in taskResults)
-            {
-                result[taskResult.Key] = taskResult.Value;
-            }
-
-            return result;
+            return new Dictionary<string, TreeSearchResult>(taskResults);
         }
 
         private static async Task<KeyValuePair<string, TreeSearchResult>> ExecuteSearchAsync(
