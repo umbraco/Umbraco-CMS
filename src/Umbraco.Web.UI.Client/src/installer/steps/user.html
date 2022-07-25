@@ -66,16 +66,30 @@
             </div>
           </div>
 
+          <div ng-if="installer.current.model.quickInstallSettings" ng-style="{'opacity': myForm.$invalid ? '0.4' : ''}">
+            <div class="control-group">
+              <label class="control-label" for="dbType">Database</label>
+              <div class="controls">
+                <div class="input-readonly-text">
+                  <strong>Provider:</strong> {{installer.current.model.quickInstallSettings.displayName}}
+                  <br /><strong>Name:</strong> {{installer.current.model.quickInstallSettings.defaultDatabaseName}}</div>
+              </div>
+            </div>
+          </div>
+
           <div class="control-group" ng-class="{disabled:myForm.$invalid}">
             <div class="controls">
-              <input ng-if="installer.current.model.quickInstallAvailable" type="submit" ng-disabled="myForm.$invalid"
-                value="Install" class="btn btn-success" />
-              <button
-                ng-if="installer.current.model.quickInstallAvailable && installer.current.model.customInstallAvailable"
-                class="btn btn-info control-customize" ng-disabled="myForm.$invalid"
-                ng-click="validateAndForward()">Customize</button>
+              <div ng-if="installer.current.model.quickInstallSettings">
+                <button ng-disabled="myForm.$invalid" class="btn btn-success">
+                  Install
+                </button>
+                <button
+                  ng-if="installer.current.model.quickInstallSettings && installer.current.model.customInstallAvailable"
+                  class="btn btn-info control-customize" ng-disabled="myForm.$invalid"
+                  ng-click="validateAndForward()">Change Database</button>
+              </div>
 
-              <button ng-if="!installer.current.model.quickInstallAvailable" class="btn btn-primary control-customize"
+              <button ng-if="!installer.current.model.quickInstallSettings" class="btn btn-primary control-customize"
                 ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Next</button>
             </div>
           </div>
