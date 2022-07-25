@@ -1797,7 +1797,7 @@ public class ContentController : ContentControllerBase
 
     private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent? content)
     {
-        if (content?.ParentId != -1 && content?.HasIdentity == false)
+        if (content?.ParentId is not -1 && content?.HasIdentity is false)
         {
             content = _contentService.GetById(content.ParentId);
         }
