@@ -1047,7 +1047,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="login">
     <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
+    <key alias="greeting1">Happy marvelous Monday</key>
     <key alias="greeting2">Happy tubular Tuesday</key>
     <key alias="greeting3">Happy wonderful Wednesday</key>
     <key alias="greeting4">Happy thunderous Thursday</key>
@@ -2642,6 +2642,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       <![CDATA[
             <p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco. And visit <a href="https://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> for even more Umbraco videos</p>
         ]]>
+    </key>
+    <key alias="learningBaseDescription">
+      <![CDATA[
+        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
+      ]]>
     </key>
     <key alias="getStarted">To get you started</key>
   </area>

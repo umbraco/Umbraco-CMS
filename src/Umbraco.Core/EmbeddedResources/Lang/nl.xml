@@ -2296,6 +2296,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="labelUsedByMediaTypes">Gebruikt in Mediatypes</key>
     <key alias="labelUsedByMemberTypes">Gebruikt in Ledentypes</key>
     <key alias="usedByProperties">Gebruikt door</key>
+    <key alias="labelUsedByItems">Heeft verwijzingen vanuit de volgende items</key>
     <key alias="labelUsedByDocuments">Gebruikt in Documenten</key>
     <key alias="labelUsedByMembers">Gebruikt in Leden</key>
     <key alias="labelUsedByMedia">Gebruikt in Media</key>

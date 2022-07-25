@@ -1,5 +1,5 @@
-namespace Umbraco.Cms.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories;
+
+public interface IMemberTypeContainerRepository : IEntityContainerRepository
 {
-    public interface IMemberTypeContainerRepository : IEntityContainerRepository
-    { }
 }

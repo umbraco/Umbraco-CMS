@@ -10,61 +10,54 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.Integration
+namespace Umbraco.Cms.Tests.Integration;
+
+[TestFixture]
+[UmbracoTest(Boot = true)]
+public class ComponentRuntimeTests : UmbracoIntegrationTest
 {
-    [TestFixture]
-    [UmbracoTest(Boot = true)]
-    public class ComponentRuntimeTests : UmbracoIntegrationTest
+    // ensure composers are added
+    protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddComposers();
+
+    /// <summary>
+    ///     This will boot up umbraco with components enabled to show they initialize and shutdown
+    /// </summary>
+    [Test]
+    public async Task Start_And_Stop_Umbraco_With_Components_Enabled()
     {
-        // ensure composers are added
-        protected override void CustomTestSetup(IUmbracoBuilder builder)
-        {
-            builder.AddComposers();
-        }
+        var runtime = Services.GetRequiredService<IRuntime>();
+        var runtimeState = Services.GetRequiredService<IRuntimeState>();
+        var mainDom = Services.GetRequiredService<IMainDom>();
+        var components = Services.GetRequiredService<ComponentCollection>();
 
-        /// <summary>
-        /// This will boot up umbraco with components enabled to show they initialize and shutdown
-        /// </summary>
-        [Test]
-        public async Task Start_And_Stop_Umbraco_With_Components_Enabled()
-        {
-            IRuntime runtime = Services.GetRequiredService<IRuntime>();
-            IRuntimeState runtimeState = Services.GetRequiredService<IRuntimeState>();
-            IMainDom mainDom = Services.GetRequiredService<IMainDom>();
-            ComponentCollection components = Services.GetRequiredService<ComponentCollection>();
+        var myComponent = components.OfType<MyComponent>().First();
 
-            MyComponent myComponent = components.OfType<MyComponent>().First();
+        Assert.IsTrue(mainDom.IsMainDom);
+        Assert.IsNull(runtimeState.BootFailedException);
+        Assert.IsTrue(myComponent.IsInit, "The component was not initialized");
 
-            Assert.IsTrue(mainDom.IsMainDom);
-            Assert.IsNull(runtimeState.BootFailedException);
-            Assert.IsTrue(myComponent.IsInit, "The component was not initialized");
+        // force stop now
+        await runtime.StopAsync(CancellationToken.None);
+        Assert.IsTrue(myComponent.IsTerminated, "The component was not terminated");
+    }
 
-            // force stop now
-            await runtime.StopAsync(CancellationToken.None);
-            Assert.IsTrue(myComponent.IsTerminated, "The component was not terminated");
-        }
+    public class MyComposer : IComposer
+    {
+        public void Compose(IUmbracoBuilder builder) => builder.Components().Append<MyComponent>();
+    }
 
-        public class MyComposer : IComposer
-        {
-            public void Compose(IUmbracoBuilder builder) => builder.Components().Append<MyComponent>();
-        }
+    public class MyComponent : IComponent
+    {
+        private readonly ILogger<MyComponent> _logger;
 
-        public class MyComponent : IComponent
-        {
-            public bool IsInit { get; private set; }
+        public MyComponent(ILogger<MyComponent> logger) => _logger = logger;
+        public bool IsInit { get; private set; }
 
-            public bool IsTerminated { get; private set; }
+        public bool IsTerminated { get; private set; }
 
-            private readonly ILogger<MyComponent> _logger;
+        public void Initialize() => IsInit = true;
 
-            public MyComponent(ILogger<MyComponent> logger) => _logger = logger;
-
-            public void Initialize() => IsInit = true;
-
-            public void Terminate() => IsTerminated = true;
-
-        }
+        public void Terminate() => IsTerminated = true;
     }
 }

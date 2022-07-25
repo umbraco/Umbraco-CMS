@@ -7,13 +7,16 @@
   </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.8.0" />
-      <PackageReference Include="NJsonSchema" Version="10.6.10" />
+      <PackageReference Include="CommandLineParser" Version="2.9.1" />
+      <PackageReference Include="NJsonSchema" Version="10.7.2" />
       <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
       <PackageReference Include="Umbraco.Deploy.Core" Version="9.3.1" />
-      <PackageReference Include="Umbraco.Forms.Core" Version="9.3.0" />
+      <PackageReference Include="Umbraco.Forms.Core" Version="10.0.0-rc1" />
       <PackageReference Include="Umbraco.Deploy.Core" Version="9.4.0" />
       <PackageReference Include="Umbraco.Forms.Core" Version="9.4.0" />
+      <PackageReference Update="Nerdbank.GitVersioning">
+        <Version>3.5.107</Version>
+      </PackageReference>
     </ItemGroup>
 
   <ItemGroup>
