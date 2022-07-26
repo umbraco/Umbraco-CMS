@@ -1,4 +1,4 @@
-﻿// Core variables and mixins
+// Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
 @import "colors.less";
@@ -29,27 +29,25 @@
   display: none !important;
 }
 
-
-html {
+body {
   background: url('../img/installer.svg') no-repeat center center fixed;
   background-size: cover;
-}
-
-body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;
   width: 100%;
   font-family: @baseFontFamily;
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
   color: @textColor;
-  vertical-align: middle;
   text-align: center;
   // better font rendering
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  // center items
+  display: grid;
+  place-items: center center;
 }
 
 #logo {
@@ -61,16 +59,13 @@ body {
 }
 
 #installer {
-  margin: auto;
   background: @white;
-  width: 80%;
-  max-width: 750px;
-  height: 640px;
+  width: min-content;
   text-align: left;
-  padding: 30px;
+  padding: 3rem;
   z-index: 667;
   border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 0 2px 4px rgba(0, 0, 0, 0.16);
 }
 
 #overlay {
@@ -174,15 +169,6 @@ input.ng-dirty.ng-invalid {
 
 #installer legend {
   clear: both;
-}
-
-.absolute-center {
-  margin: auto;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
 }
 
 .fade-hide,
