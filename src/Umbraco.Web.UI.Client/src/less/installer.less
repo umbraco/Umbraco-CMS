@@ -148,6 +148,21 @@ input.ng-dirty.ng-invalid {
   opacity: 0.6;
 }
 
+.installer-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  gap: 75px;
+}
+
+.user-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-col {
+  min-height: 500px
+}
+
 
 #installer label.control-label,
 #installer .constrol-label {
