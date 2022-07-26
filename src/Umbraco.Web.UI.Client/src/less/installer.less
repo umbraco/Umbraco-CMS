@@ -1,4 +1,4 @@
-// Core variables and mixins
+﻿// Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
 @import "colors.less";
@@ -139,6 +139,14 @@ legend {
   font-weight: bold
 }
 
+#installer input {
+  width: 100%;
+
+  &[type=checkbox] {
+    width: auto;
+  }
+}
+
 input.ng-dirty.ng-invalid {
   border-color: @pink;
   color: @pink;
@@ -176,6 +184,15 @@ input.ng-dirty.ng-invalid {
     display: block;
     color: @gray-3;
   }
+}
+
+.control-actions {
+  margin-top: 2rem;
+}
+
+.controls-space-between {
+  display: flex;
+  justify-content: space-between;;
 }
 
 #installer .input-readonly-text {
@@ -283,10 +300,12 @@ select {
 }
 
 #consentSliderWrapper {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 #consentSlider {
+  width: 300px;
+
   .noUi-target {
     background: linear-gradient(to bottom, @grayLighter 0%, @grayLighter 100%);
     box-shadow: none;
