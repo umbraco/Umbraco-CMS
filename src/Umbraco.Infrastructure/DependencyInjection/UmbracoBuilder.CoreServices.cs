@@ -86,11 +86,12 @@ public static partial class UmbracoBuilderExtensions
 
         // Add runtime mode validation
         builder.Services.AddSingleton<IRuntimeModeValidationService, RuntimeModeValidationService>();
-        builder.Services.AddTransient<IRuntimeModeValidator, JITOptimizerValidator>();
-        builder.Services.AddTransient<IRuntimeModeValidator, UmbracoApplicationUrlValidator>();
-        builder.Services.AddTransient<IRuntimeModeValidator, UseHttpsValidator>();
-        builder.Services.AddTransient<IRuntimeModeValidator, RuntimeMinificationValidator>();
-        builder.Services.AddTransient<IRuntimeModeValidator, ModelsBuilderModeValidator>();
+        builder.RuntimeModeValidators()
+            .Add<JITOptimizerValidator>()
+            .Add<UmbracoApplicationUrlValidator>()
+            .Add<UseHttpsValidator>()
+            .Add<RuntimeMinificationValidator>()
+            .Add<ModelsBuilderModeValidator>();
 
         // composers
         builder

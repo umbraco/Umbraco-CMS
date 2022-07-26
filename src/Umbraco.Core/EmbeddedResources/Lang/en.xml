@@ -1630,6 +1630,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabRules">Editor</key>
   </area>
   <area alias="template">
+    <key alias="runtimeModeProduction"><![CDATA[Content is not editable when using runtime mode <code>Production</code>.]]></key>
     <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
     <key alias="edittemplate">Edit template</key>
     <key alias="insertSections">Sections</key>

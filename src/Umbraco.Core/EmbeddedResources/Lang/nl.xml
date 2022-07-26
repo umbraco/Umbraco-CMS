@@ -1444,6 +1444,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tabRules">Rich Text Editor</key>
   </area>
   <area alias="template">
+    <key alias="runtimeModeProduction"><![CDATA[Inhoud kan niet worden bewerkt in de runtime-modus <code>Production</code>.]]></key>
     <key alias="deleteByIdFailed">Kan sjabloon met ID %0% niet verwijderen</key>
     <key alias="edittemplate">Sjabloon aanpassen</key>
     <key alias="insertSections">Secties</key>
