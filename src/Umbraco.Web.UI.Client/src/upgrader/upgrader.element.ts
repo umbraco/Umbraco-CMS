@@ -59,7 +59,7 @@ export class UmbUpgrader extends UmbContextProviderMixin(LitElement) {
 
 				<p>Simply click <strong>continue</strong> below to be guided through the rest of the upgrade.</p>
 
-				<form @submit=${this._continue}>
+				<form @submit=${this._handleSubmit}>
 					<p>
 						<uui-button
 							type="submit"
@@ -101,7 +101,7 @@ export class UmbUpgrader extends UmbContextProviderMixin(LitElement) {
 		this.fetching = false;
 	}
 
-	private _continue = async (e: SubmitEvent) => {
+	_handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
 		this.errorMessage = '';
 		this.upgrading = true;
