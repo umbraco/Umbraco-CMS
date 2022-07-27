@@ -17,3 +17,5 @@ export const getUserSections = fetcher.path('/user/sections').method('get').crea
 export const getInstallSettings = fetcher.path('/install/settings').method('get').create();
 export const postInstallValidateDatabase = fetcher.path('/install/validateDatabase').method('post').create();
 export const postInstallSetup = fetcher.path('/install/setup').method('post').create();
+export const getUpgradeSettings = fetcher.path('/upgrade/settings').method('get').create();
+export const PostUpgradeAuthorize = fetcher.path('/upgrade/authorize').method('post').create();
