@@ -25,7 +25,9 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier 'src/**/*.ts'",
     "format:fix": "npm run format -- --write",
-    "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts"
+    "generate:api": "npx openapi-typescript schemas/**/*.yml --output schemas/generated-schema.ts",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "engines": {
     "node": ">=16.0.0 <17",
@@ -40,7 +42,13 @@
     "rxjs": "^7.5.6"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.9",
     "@open-wc/testing": "^3.1.6",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/builder-vite": "^0.2.2",
+    "@storybook/web-components": "^6.5.9",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
@@ -48,12 +56,15 @@
     "@web/dev-server-esbuild": "^0.3.1",
     "@web/test-runner": "^0.13.31",
     "@web/test-runner-playwright": "^0.8.9",
+    "babel-loader": "^8.2.5",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.3.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lit": "^1.6.1",
     "eslint-plugin-lit-a11y": "^2.2.1",
+    "eslint-plugin-storybook": "^0.6.1",
+    "lit-html": "^2.2.7",
     "msw": "^0.44.2",
     "prettier": "2.7.1",
     "typescript": "^4.7.4",
