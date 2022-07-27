@@ -89,6 +89,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /upgrade/settings:
+    get:
+      operationId: GetUpgradeSettings
+      responses:
+        '200':
+          description: 200 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeSettingsResponse'
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /upgrade/authorize:
+    post:
+      operationId: PostUpgradeAuthorize
+      parameters: []
+      responses:
+        '201':
+          description: 201 response
+        '400':
+          description: 400 response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /user:
     get:
       operationId: GetUser
@@ -339,6 +368,25 @@ components:
           type: string
       required:
         - version
+    UpgradeSettingsResponse:
+      type: object
+      properties:
+        currentState:
+          type: string
+        newState:
+          type: string
+        newVersion:
+          type: string
+        oldVersion:
+          type: string
+        reportUrl:
+          type: string
+      required:
+        - currentState
+        - newState
+        - newVersion
+        - oldVersion
+        - reportUrl
     UserResponse:
       type: object
       properties:

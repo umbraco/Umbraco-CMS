@@ -1,5 +1,6 @@
 import './installer';
 import './server';
+import './upgrader';
 import './user';
 
 import { api } from '@airtasker/spot';
