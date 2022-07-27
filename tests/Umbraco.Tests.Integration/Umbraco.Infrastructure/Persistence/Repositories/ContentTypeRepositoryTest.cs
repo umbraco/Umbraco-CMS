@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -77,6 +79,9 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
+            var runtimeSettingsMock = new Mock<IOptionsMonitor<RuntimeSettings>>();
+            runtimeSettingsMock.Setup(x => x.CurrentValue).Returns(new RuntimeSettings());
+
             var templateRepo = new TemplateRepository(
                 (IScopeAccessor)provider,
                 AppCaches.Disabled,
@@ -84,7 +89,8 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
                 FileSystems,
                 IOHelper,
                 ShortStringHelper,
-                Mock.Of<IViewHelper>());
+                Mock.Of<IViewHelper>(),
+                runtimeSettingsMock.Object);
             var repository = ContentTypeRepository;
             Template[] templates =
             {
