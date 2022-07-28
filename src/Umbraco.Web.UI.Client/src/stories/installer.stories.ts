@@ -1,6 +1,6 @@
 import { Story, Meta } from '@storybook/web-components';
 import { html } from 'lit-html';
-import './installer.element';
+import '../installer/installer.element';
 
 export default {
 	title: 'Installer/Installer',
