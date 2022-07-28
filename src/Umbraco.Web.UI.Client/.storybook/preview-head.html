@@ -1,0 +1,22 @@
+<style>
+	body {
+		padding: 0px !important;
+	}
+</style>
+
+<script>
+	(function () {
+		window.addEventListener('load', () => {
+			var body = document.querySelector('body');
+			window.addEventListener('keydown', (e) => {
+				if (e.ctrlKey === true && e.key === 'g') {
+					if (body.hasAttribute('baseline-grid')) {
+						body.removeAttribute('baseline-grid');
+					} else {
+						body.setAttribute('baseline-grid', '');
+					}
+				}
+			});
+		});
+	})();
+</script>
