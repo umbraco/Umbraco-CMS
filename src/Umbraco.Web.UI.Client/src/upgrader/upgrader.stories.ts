@@ -26,7 +26,7 @@ export default {
 	},
 } as Meta<UmbUpgraderView>;
 
-const Template: Story = ({ fetching, upgrading, errorMessage, settings }) =>
+const Template: Story<UmbUpgraderView> = ({ fetching, upgrading, errorMessage, settings }) =>
 	html`<umb-upgrader-view
 		.fetching=${fetching}
 		.upgrading=${upgrading}
@@ -34,11 +34,6 @@ const Template: Story = ({ fetching, upgrading, errorMessage, settings }) =>
 		.settings=${settings}></umb-upgrader-view>`;
 
 export const Overview = Template.bind({});
-
-export const Fetching = Template.bind({});
-Fetching.args = {
-	fetching: true,
-};
 
 export const Upgrading = Template.bind({});
 Upgrading.args = {
