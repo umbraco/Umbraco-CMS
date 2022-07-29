@@ -1,11 +1,10 @@
-import '@umbraco-ui/uui-css/dist/uui-css.css';
 import '@umbraco-ui/uui';
-// This imports and runs the MSW
-import '../src/index.ts';
+import '@umbraco-ui/uui-css/dist/uui-css.css';
 
 export const parameters = {
-	actions: { argTypesRegex: '^on[A-Z].*' },
+	actions: { argTypesRegex: '^on.*' },
 	controls: {
+		expanded: true,
 		matchers: {
 			color: /(background|color)$/i,
 			date: /Date$/,
