@@ -7,7 +7,7 @@ import { UmbracoUpgrader } from '../core/models';
 
 /**
  * @element umb-upgrader-view
- * @fires {SubmitEvent} onAuthorizeUpgrade - fires when the user clicks the continue button
+ * @fires {CustomEvent<SubmitEvent>} onAuthorizeUpgrade - fires when the user clicks the continue button
  */
 @customElement('umb-upgrader-view')
 export class UmbUpgraderView extends LitElement {

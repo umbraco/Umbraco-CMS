@@ -6,6 +6,9 @@ import { customElement, state } from 'lit/decorators.js';
 import { getUpgradeSettings, PostUpgradeAuthorize } from '../core/api/fetcher';
 import { UmbracoUpgrader } from '../core/models';
 
+/**
+ * @element umb-upgrader
+ */
 @customElement('umb-upgrader')
 export class UmbUpgrader extends LitElement {
 	@state()
@@ -50,20 +53,22 @@ export class UmbUpgrader extends LitElement {
 		this.fetching = false;
 	}
 
-	_handleSubmit = async () => {
+	_handleSubmit = async (e: CustomEvent<SubmitEvent>) => {
+		e.stopPropagation();
 		this.errorMessage = '';
 		this.upgrading = true;
 
 		try {
 			await PostUpgradeAuthorize({});
-
 			history.pushState(null, '', '/');
 		} catch (e) {
 			if (e instanceof PostUpgradeAuthorize.Error) {
 				const error = e.getActualType();
 				if (error.status === 400) {
-					this.errorMessage = error.data.detail || 'Unknown error';
+					this.errorMessage = error.data.detail || 'Unknown error, please try again';
 				}
+			} else {
+				this.errorMessage = 'Unknown error, please try again';
 			}
 		}
 
