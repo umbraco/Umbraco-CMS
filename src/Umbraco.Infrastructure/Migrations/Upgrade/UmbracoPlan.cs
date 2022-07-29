@@ -74,6 +74,10 @@ public class UmbracoPlan : MigrationPlan
         // To 11.4.0
         To<V_11_4_0.AlterKeyValueDataType>("{FFB6B9B0-F1A8-45E9-9CD7-25700577D1CA}");
 
+        // TO 10.2.0
+        To<TablesIndexesFixup>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
+        To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
         // To 12.0.0
         To<V_12_0_0.UseNvarcharInsteadOfNText>("{888A0D5D-51E4-4C7E-AA0A-01306523C7FB}");
         To<V_12_0_0.ResetCache>("{539F2F83-FBA7-4C48-81A3-75081A56BB9D}");

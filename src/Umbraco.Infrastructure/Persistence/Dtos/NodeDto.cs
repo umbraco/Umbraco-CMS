@@ -40,6 +40,7 @@ public class NodeDto
     public string Path { get; set; } = null!;
 
     [Column("sortOrder")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ObjectType_trashed_sorted", ForColumns = "nodeObjectType,trashed,sortOrder,id", IncludeColumns = "uniqueID,parentID,level,path,nodeUser,text,createDate")]
     public int SortOrder { get; set; }
 
     [Column("trashed")]
