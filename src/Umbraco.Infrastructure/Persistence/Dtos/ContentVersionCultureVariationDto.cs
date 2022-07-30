@@ -18,8 +18,7 @@ internal class ContentVersionCultureVariationDto
 
     [Column("versionId")]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,languageId")]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName, ForColumns = "versionId", IncludeColumns = "id,languageId,name,date,availableUserId")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,languageId", IncludeColumns = "id,name,date,availableUserId")]
     public int VersionId { get; set; }
 
     [Column("languageId")]
