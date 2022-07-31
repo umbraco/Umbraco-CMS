@@ -291,7 +291,7 @@ public class UmbracoPlan : MigrationPlan
         To<AddMemberPropertiesAsColumns>("{B7E0D53C-2B0E-418B-AB07-2DDE486E225F}");
 
         // TO 10.2.0
-        To<TablesIndexesFixup>("{1187192D-EDB5-4619-955D-91D48D738871}");
+        To<TablesIndexesImprovement>("{1187192D-EDB5-4619-955D-91D48D738871}");
         To<AddUserGroup2LanguageTable>("{D0B3D29D-F4D5-43E3-BA67-9D49256F3266}");
         To<AddHasAccessToAllLanguagesColumn>("{79D8217B-5920-4C0E-8E9A-3CF8FA021882}");
     }

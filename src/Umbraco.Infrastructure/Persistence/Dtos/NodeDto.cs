@@ -27,6 +27,7 @@ public class NodeDto
     [Column("parentId")]
     [ForeignKey(typeof(NodeDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_ParentId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_parentId_nodeObjectType", ForColumns = "parentID,nodeObjectType", IncludeColumns = "trashed,nodeUser,level,path,sortOrder,uniqueID,text,createDate")]
     public int ParentId { get; set; }
 
     // NOTE: This index is primarily for the nucache data lookup, see https://github.com/umbraco/Umbraco-CMS/pull/8365#issuecomment-673404177
