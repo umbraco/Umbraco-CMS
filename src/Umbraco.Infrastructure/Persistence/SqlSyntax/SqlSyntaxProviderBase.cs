@@ -66,9 +66,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
     public string DefaultValueFormat { get; } = "DEFAULT ({0})";
 
-    public int DefaultStringLength { get; } = 255;
+    public ColumnSize DefaultStringLength { get; } = 255;
 
-    public int DefaultDecimalPrecision { get; } = 20;
+    public ColumnSize DefaultDecimalPrecision { get; } = 20;
 
     public int DefaultDecimalScale { get; } = 9;
 
@@ -547,9 +547,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
         if (column.CustomDbType.HasValue)
         {
-            if (column.Size != default)
+            if (column.Size != ColumnSize.Default)
             {
-                return GetSpecialDbType(column.CustomDbType.Value, column.Size);
+                return GetSpecialDbType(column.CustomDbType.Value, column.Size.Size);
             }
 
             return GetSpecialDbType(column.CustomDbType.Value);
@@ -561,19 +561,19 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
 
         if (type == typeof(string))
         {
-            var valueOrDefault = column.Size != default ? column.Size : DefaultStringLength;
+            var valueOrDefault = column.Size != ColumnSize.Default ? column.Size : DefaultStringLength;
             return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
         }
 
         if (type == typeof(decimal))
         {
-            var precision = column.Size != default ? column.Size : DefaultDecimalPrecision;
+            var precision = column.Size != ColumnSize.Default ? column.Size : DefaultDecimalPrecision;
             var scale = column.Precision != default ? column.Precision : DefaultDecimalScale;
             return string.Format(DecimalColumnDefinitionFormat, precision, scale);
         }
 
         var definition = DbTypeMap.ColumnTypeMap[type];
-        var dbTypeDefinition = column.Size != default
+        var dbTypeDefinition = column.Size != ColumnSize.Default
             ? $"{definition}({column.Size})"
             : definition;
         //NOTE Precision is left out

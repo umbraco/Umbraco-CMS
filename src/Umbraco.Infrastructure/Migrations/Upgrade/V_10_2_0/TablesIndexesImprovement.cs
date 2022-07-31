@@ -11,8 +11,8 @@ public class TablesIndexesImprovement : MigrationBase
 
     protected override void Migrate()
     {
-        AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.PropertyData, "textValue");
-        AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.NodeData, "data");
+        AlterColumn<PropertyDataDto>(Constants.DatabaseSchema.Tables.PropertyData, "textValue");
+        AlterColumn<ContentNuDto>(Constants.DatabaseSchema.Tables.NodeData, "data");
 
         var nodeDtoTrashedIndex = $"IX_{NodeDto.TableName}_ObjectType_trashed_sorted";
         DeleteIndex<NodeDto>(nodeDtoTrashedIndex);
@@ -22,7 +22,7 @@ public class TablesIndexesImprovement : MigrationBase
         DeleteIndex<RedirectUrlDto>(redirectUrlCreateDateUtcIndex);
         CreateIndex<RedirectUrlDto>(redirectUrlCreateDateUtcIndex);
 
-        var contentVersionCultureVariationVersionIdIndex = $"IX_{ContentVersionCultureVariationDto.TableName}";
+        var contentVersionCultureVariationVersionIdIndex = $"IX_{ContentVersionCultureVariationDto.TableName}_VersionId";
         DeleteIndex<ContentVersionCultureVariationDto>(contentVersionCultureVariationVersionIdIndex);
         CreateIndex<ContentVersionCultureVariationDto>(contentVersionCultureVariationVersionIdIndex);
 
