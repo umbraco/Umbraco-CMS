@@ -23,7 +23,7 @@ internal class PropertyDataDto
 
     [Column("versionId")]
     [ForeignKey(typeof(ContentVersionDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_VersionId", ForColumns = "versionId,propertyTypeId,languageId,segment", IncludeColumns = "varcharValue")]
     public int VersionId { get; set; }
 
     [Column("propertyTypeId")]
