@@ -110,7 +110,7 @@ internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
 
             AddSchemaTableRow(
                 col.Name,
-                col.Size > 0 ? col.Size : null,
+                col.Size.Type == ColumnSizeType.Numeric && col.Size.Size > 0 ? col.Size.Size : null,
                 col.Precision > 0 ? (short?)col.Precision : null,
                 null,
                 col.IsUnique,

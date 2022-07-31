@@ -66,6 +66,7 @@ internal class PropertyDataDto
 
     [Column("textValue")]
     [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(ColumnSizeType.Max)]
     public string? TextValue { get; set; }
 
     [ResultColumn]

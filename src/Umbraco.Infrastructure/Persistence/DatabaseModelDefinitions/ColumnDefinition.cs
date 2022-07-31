@@ -21,7 +21,7 @@ public class ColumnDefinition
 
     public virtual int Seeding { get; set; }
 
-    public virtual int Size { get; set; }
+    public virtual ColumnSize Size { get; set; }
 
     public virtual int Precision { get; set; }
 

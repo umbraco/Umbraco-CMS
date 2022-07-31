@@ -29,6 +29,7 @@ public class ContentNuDto
     /// </remarks>
     [Column("data")]
     [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(ColumnSizeType.Max)]
     public string? Data { get; set; }
 
     [Column("rv")]
