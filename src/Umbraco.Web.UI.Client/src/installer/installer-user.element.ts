@@ -57,10 +57,10 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 	];
 
 	@state()
-	private _userFormData!: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
+	private _userFormData?: { name: string; password: string; email: string; subscribeToNewsletter: boolean };
 
 	@state()
-	private _installerStore!: UmbInstallerContext;
+	private _installerStore?: UmbInstallerContext;
 
 	private installerStoreSubscription?: Subscription;
 
@@ -101,7 +101,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 		const email = formData.get('email');
 		const subscribeToNewsletter = formData.has('subscribeToNewsletter');
 
-		this._installerStore.appendData({ user: { name, password, email, subscribeToNewsletter } });
+		this._installerStore?.appendData({ user: { name, password, email, subscribeToNewsletter } });
 		this.dispatchEvent(new CustomEvent('next', { bubbles: true, composed: true }));
 	};
 
@@ -115,7 +115,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 						<uui-input
 							type="text"
 							id="name"
-							.value=${this._userFormData.name}
+							.value=${this._userFormData?.name}
 							name="name"
 							required
 							required-message="Name is required"></uui-input>
@@ -126,7 +126,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 						<uui-input
 							type="email"
 							id="email"
-							.value=${this._userFormData.email}
+							.value=${this._userFormData?.email}
 							name="email"
 							required
 							required-message="Email is required"></uui-input>
@@ -137,7 +137,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 						<uui-input-password
 							id="password"
 							name="password"
-							.value=${this._userFormData.password}
+							.value=${this._userFormData?.password}
 							required
 							required-message="Password is required"></uui-input-password>
 					</uui-form-layout-item>
@@ -146,7 +146,7 @@ export class UmbInstallerUser extends UmbContextConsumerMixin(LitElement) {
 						<uui-checkbox
 							name="subscribeToNewsletter"
 							label="Remember me"
-							.checked=${this._userFormData.subscribeToNewsletter}>
+							.checked=${this._userFormData?.subscribeToNewsletter || false}>
 							Keep me updated on Umbraco Versions, Security Bulletins and Community News
 						</uui-checkbox>
 					</uui-form-layout-item>

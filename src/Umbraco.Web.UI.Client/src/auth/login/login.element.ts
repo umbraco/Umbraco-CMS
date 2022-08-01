@@ -1,11 +1,12 @@
+import '../auth-layout.element';
+
 import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { query } from 'router-slot';
 
 import { postUserLogin } from '../../core/api/fetcher';
-
-import '../auth-layout.element';
 
 @customElement('umb-login')
 export default class UmbLogin extends LitElement {
@@ -46,7 +47,11 @@ export default class UmbLogin extends LitElement {
 		try {
 			await postUserLogin({ username, password, persist });
 			this._loggingIn = false;
-			history.pushState(null, '', '/section');
+			let { redirectTo } = query();
+			if (!redirectTo) {
+				redirectTo = '/section';
+			}
+			history.pushState(null, '', redirectTo);
 		} catch (error) {
 			console.log(error);
 			this._loggingIn = false;

@@ -50,17 +50,17 @@ export class UmbInstallerLayout extends LitElement {
 
 	render() {
 		return html`<div>
-			<div id="background"></div>
+			<div id="background" aria-hidden="true"></div>
 
-			<div id="logo">
+			<div id="logo" aria-hidden="true">
 				<img src="/umbraco_logo_white.svg" alt="Umbraco" />
 			</div>
 
-			<div id="container">
+			<main id="container">
 				<div id="box">
 					<slot></slot>
 				</div>
-			</div>
+			</main>
 		</div>`;
 	}
 }

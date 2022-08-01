@@ -4,13 +4,13 @@ import 'router-slot';
 import { UUIIconRegistryEssential } from '@umbraco-ui/uui';
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { Guard, IRoute } from 'router-slot/model';
 
 import { getServerStatus } from './core/api/fetcher';
 import { UmbContextProviderMixin } from './core/context';
 import { UmbExtensionManifest, UmbExtensionManifestCore, UmbExtensionRegistry } from './core/extension';
 import { ServerStatus } from './core/models';
 import { internalManifests } from './temp-internal-manifests';
-import { IRoute } from 'router-slot/model';
 
 @customElement('umb-app')
 export class UmbApp extends UmbContextProviderMixin(LitElement) {
@@ -36,12 +36,12 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		{
 			path: 'upgrade',
 			component: () => import('./upgrader/upgrader.element'),
-			guards: [this._isAuthorizedGuard.bind(this)],
+			guards: [this._isAuthorizedGuard('/upgrade')],
 		},
 		{
 			path: '**',
 			component: () => import('./backoffice/backoffice.element'),
-			guards: [this._isAuthorizedGuard.bind(this)],
+			guards: [this._isAuthorizedGuard()],
 		},
 	];
 
@@ -98,13 +98,21 @@ export class UmbApp extends UmbContextProviderMixin(LitElement) {
 		return sessionStorage.getItem('is-authenticated') === 'true';
 	}
 
-	private _isAuthorizedGuard(): boolean {
-		if (this._isAuthorized()) {
-			return true;
-		}
+	private _isAuthorizedGuard(redirectTo?: string): Guard {
+		return () => {
+			if (this._isAuthorized()) {
+				return true;
+			}
 
-		history.replaceState(null, '', '/login');
-		return false;
+			let returnPath = '/login';
+
+			if (redirectTo) {
+				returnPath += `?redirectTo=${redirectTo}`;
+			}
+
+			history.replaceState(null, '', returnPath);
+			return false;
+		};
 	}
 
 	private async _registerExtensionManifestsFromServer() {

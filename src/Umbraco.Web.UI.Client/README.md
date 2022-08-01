@@ -14,7 +14,7 @@ As an example to show the installer instead of the login screen, set the followi
 in the `.env.local` file to indicate that Umbraco has not been installed:
 
 ```bash
-VITE_UMBRACO_INSTALL_STATUS=false
+VITE_UMBRACO_INSTALL_STATUS=must-install
 ```
 
 ## Environments
