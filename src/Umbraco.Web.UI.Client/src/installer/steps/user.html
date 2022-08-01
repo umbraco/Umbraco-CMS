@@ -2,8 +2,8 @@
   <h1>Install Umbraco</h1>
 
   <p>
-    Enter your name, email and password to install Umbraco with its default
-    settings, alternatively you can customize your installation
+    Enter credentials for the default administrator user and choose the level of
+    consent for telemetry data of your Umbraco installation.
   </p>
 
   <form
@@ -113,7 +113,7 @@
 
       <div class="installer-col telemetry-col">
         <div class="control-group">
-          <label class="control-label">Telemetry</label>
+          <label class="control-label">Consent for telemetry data</label>
           <div class="controls">
             <div id="consentSliderWrapper">
               <div id="consentSlider"></div>
@@ -121,6 +121,7 @@
           </div>
 
           <small ng-bind-html="telemetryDescription"></small>
+          <p><small>This can be changed later in the Settings panel.</small></p>
         </div>
       </div>
     </div>
