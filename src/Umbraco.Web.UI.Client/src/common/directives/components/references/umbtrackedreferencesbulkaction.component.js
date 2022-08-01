@@ -7,7 +7,7 @@
 
     function umbTrackedReferencesBulkActionController($q, trackedReferencesResource, localizationService)
     {
-        var vm = this;
+        const vm = this;
 
         vm.referencedItemsTitle = "These items are referenced";
 
@@ -29,7 +29,7 @@
 
             loadContentBulkActionUsage().then(function () {
                 vm.loading = false;
-                if(vm.onLoadingComplete) {
+                if (vm.onLoadingComplete) {
                     vm.onLoadingComplete();
                 }
             });

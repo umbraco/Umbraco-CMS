@@ -7,7 +7,7 @@
 
     function umbTrackedReferencesController($q, trackedReferencesResource, localizationService) {
 
-        var vm = this;
+        const vm = this;
 
         vm.changeReferencesPageNumber = changeReferencesPageNumber;
         vm.changeDescendantsPageNumber = changeDescendantsPageNumber;
@@ -40,7 +40,7 @@
             // when vm.id == 0 it means that this is a new item, so it has no references yet
             if (vm.id === 0) {
                 vm.loading = false;
-                if(vm.onLoadingComplete) {
+                if (vm.onLoadingComplete) {
                     vm.onLoadingComplete();
                 }
                 return;
@@ -56,7 +56,7 @@
 
             $q.all(promises).then(function () {
                 vm.loading = false;
-                if(vm.onLoadingComplete) {
+                if (vm.onLoadingComplete) {
                     vm.onLoadingComplete();
                 }
             });

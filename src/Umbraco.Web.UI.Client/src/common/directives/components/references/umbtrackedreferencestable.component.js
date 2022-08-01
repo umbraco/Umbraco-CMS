@@ -7,7 +7,7 @@
 
     function umbTrackedReferencesTableController(editorService, udiParser, navigationService, overlayService)
     {
-        var vm = this;
+        const vm = this;
 
         vm.changePageNumber = changePageNumber;
         vm.getUrl = getUrl;
@@ -19,17 +19,24 @@
 
         function getUrl(itemUdi, itemId) {
             // extract the entity type from the udi
-            var udi = udiParser.parse(itemUdi);
+            const udi = udiParser.parse(itemUdi);
 
             if (udi) {
-                var entityType = udi.entityType;
+                let section = udi.entityType;
+                let tree = udi.entityType;
 
-                if(udi.entityType === "document") {
-                    entityType = "content";
+                if (udi.entityType === "document") {
+                    section = "content";
                 }
-                return "#/" + entityType + "/" + entityType + "/edit/" + itemId;
+                else if (udi.entityType === "document-blueprint") {
+                    section = "settings";
+                    tree = "contentBlueprints";
+                }
+                
+                return `#/${section}/${tree}/edit/${itemId}`;
             }
-	          return "#";
+            
+	        return "#";
 	    }
 
         function close() {
