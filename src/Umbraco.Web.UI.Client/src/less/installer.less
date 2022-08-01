@@ -160,7 +160,7 @@ input.ng-dirty.ng-invalid {
 .installer-cols {
   display: grid;
   grid-template-columns: repeat(2, minmax(300px, 1fr));
-  gap: 75px;
+  gap: 120px;
 }
 
 .user-col {
@@ -184,6 +184,10 @@ input.ng-dirty.ng-invalid {
   small {
     display: block;
     color: @gray-3;
+  }
+
+  &.-with-border {
+    border: 1px solid @inputBorder;
   }
 }
 
