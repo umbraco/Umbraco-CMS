@@ -27,6 +27,7 @@
 
                 if (udi.entityType === "document") {
                     section = "content";
+                    tree = "content";
                 }
                 else if (udi.entityType === "document-blueprint") {
                     section = "settings";
