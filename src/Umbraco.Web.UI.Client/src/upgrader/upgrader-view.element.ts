@@ -3,6 +3,7 @@ import '../installer/installer-layout.element';
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+
 import { UmbracoUpgrader } from '../core/models';
 
 /**
@@ -25,7 +26,7 @@ export class UmbUpgraderView extends LitElement {
 	];
 
 	@property({ type: Boolean })
-	fetching = true;
+	fetching = false;
 
 	@property({ type: Boolean })
 	upgrading = false;
@@ -89,11 +90,7 @@ export class UmbUpgraderView extends LitElement {
 	}
 
 	render() {
-		return html` <umb-installer-layout>
-			<div id="container" class="uui-text">
-				${this.fetching ? html`<div class="center"><uui-loader></uui-loader></div>` : this._renderLayout()}
-			</div>
-		</umb-installer-layout>`;
+		return html` ${this.fetching ? html`<div class="center"><uui-loader></uui-loader></div>` : this._renderLayout()} `;
 	}
 
 	_handleSubmit = async (e: SubmitEvent) => {

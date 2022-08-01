@@ -10,6 +10,7 @@ export default {
 	args: {
 		errorMessage: '',
 		upgrading: false,
+		fetching: false,
 		settings: {
 			currentState: '2b20c6e7',
 			newState: '2b20c6e8',
@@ -23,19 +24,32 @@ export default {
 			handles: ['onAuthorizeUpgrade'],
 		},
 	},
+	decorators: [
+		(story) =>
+			html`<div
+				style="margin:2rem; max-width:400px;border:1px solid #ccc;border-radius:30px 0px 0px 30px;padding:var(--uui-size-layout-4) var(--uui-size-layout-4) var(--uui-size-layout-2) var(--uui-size-layout-4);">
+				${story()}
+			</div>`,
+	],
 } as Meta<UmbUpgraderView>;
 
-const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings }) =>
+const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings, fetching }) =>
 	html`<umb-upgrader-view
 		.upgrading=${upgrading}
 		.errorMessage=${errorMessage}
-		.settings=${settings}></umb-upgrader-view>`;
+		.settings=${settings}
+		.fetching=${fetching}></umb-upgrader-view>`;
 
 export const Overview = Template.bind({});
 
 export const Upgrading = Template.bind({});
 Upgrading.args = {
 	upgrading: true,
+};
+
+export const Fetching = Template.bind({});
+Fetching.args = {
+	fetching: true,
 };
 
 export const Error = Template.bind({});
