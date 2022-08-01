@@ -89,11 +89,7 @@ export class UmbUpgraderView extends LitElement {
 	}
 
 	render() {
-		return html` <umb-installer-layout>
-			<div id="container" class="uui-text">
-				${this.fetching ? html`<div class="center"><uui-loader></uui-loader></div>` : this._renderLayout()}
-			</div>
-		</umb-installer-layout>`;
+		return html` ${this.fetching ? html`<div class="center"><uui-loader></uui-loader></div>` : this._renderLayout()} `;
 	}
 
 	_handleSubmit = async (e: SubmitEvent) => {

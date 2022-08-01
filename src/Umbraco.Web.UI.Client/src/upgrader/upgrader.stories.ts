@@ -24,6 +24,13 @@ export default {
 			handles: ['onAuthorizeUpgrade'],
 		},
 	},
+	decorators: [
+		(story) =>
+			html`<div
+				style="margin:2rem; max-width:400px;border:1px solid #ccc;border-radius:30px 0px 0px 30px;padding:var(--uui-size-layout-4) var(--uui-size-layout-4) var(--uui-size-layout-2) var(--uui-size-layout-4);">
+				${story()}
+			</div>`,
+	],
 } as Meta<UmbUpgraderView>;
 
 const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings, fetching }) =>
@@ -40,13 +47,12 @@ Upgrading.args = {
 	upgrading: true,
 };
 
-export const fetching = Template.bind({});
-fetching.args = {
-	fetching: true
-}
+export const Fetching = Template.bind({});
+Fetching.args = {
+	fetching: true,
+};
 
 export const Error = Template.bind({});
 Error.args = {
 	errorMessage: 'Something went wrong',
 };
-
