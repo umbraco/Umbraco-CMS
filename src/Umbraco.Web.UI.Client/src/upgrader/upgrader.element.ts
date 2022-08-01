@@ -29,12 +29,14 @@ export class UmbUpgrader extends LitElement {
 	}
 
 	render() {
-		return html`<umb-upgrader-view
-			.fetching=${this.fetching}
-			.upgrading=${this.upgrading}
-			.settings=${this.upgradeSettings}
-			.errorMessage=${this.errorMessage}
-			@onAuthorizeUpgrade=${this._handleSubmit}></umb-upgrader-view>`;
+		return html`<umb-installer-layout>
+			<umb-upgrader-view
+				.fetching=${this.fetching}
+				.upgrading=${this.upgrading}
+				.settings=${this.upgradeSettings}
+				.errorMessage=${this.errorMessage}
+				@onAuthorizeUpgrade=${this._handleSubmit}></umb-upgrader-view>
+		</umb-installer-layout>`;
 	}
 
 	private async _setup() {
