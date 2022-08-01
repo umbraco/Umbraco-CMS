@@ -81,7 +81,7 @@ public class MacrosTreeController : TreeController
         if (id == Constants.System.RootString)
         {
             //Create the normal create action
-            menu.Items.Add<ActionNew>(LocalizedTextService);
+            menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
             //refresh action
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -96,7 +96,7 @@ public class MacrosTreeController : TreeController
         }
 
         //add delete option for all macros
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         return menu;
     }

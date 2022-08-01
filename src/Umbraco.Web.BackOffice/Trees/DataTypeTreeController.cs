@@ -144,7 +144,7 @@ public class DataTypeTreeController : TreeController, ISearchableTree
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
             return menu;
         }
@@ -153,20 +153,21 @@ public class DataTypeTreeController : TreeController, ISearchableTree
             UmbracoObjectTypes.DataTypeContainer);
         if (container != null)
         {
-            //set the default to create
+                //set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
             {
-                Icon = "icon icon-edit"
+                Icon = "icon-edit",
+                UseLegacyIcon = false,
             });
 
             if (container.HasChildren == false)
             {
                 //can delete data type
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -177,10 +178,10 @@ public class DataTypeTreeController : TreeController, ISearchableTree
 
             if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id, CultureInfo.InvariantCulture)) == false)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
-            menu.Items.Add<ActionMove>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
         }
 
         return menu;

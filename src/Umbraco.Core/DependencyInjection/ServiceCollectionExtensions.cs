@@ -47,19 +47,19 @@ public static class ServiceCollectionExtensions
     public static void AddMultipleUnique<TService1, TService2, TImplementing>(
         this IServiceCollection services)
         where TService1 : class
-            where TService2 : class
-            where TImplementing : class, TService1, TService2
-            => services.AddMultipleUnique<TService1, TService2, TImplementing>(ServiceLifetime.Singleton);
+        where TService2 : class
+        where TImplementing : class, TService1, TService2
+        => services.AddMultipleUnique<TService1, TService2, TImplementing>(ServiceLifetime.Singleton);
 
-        /// <summary>
-        /// Adds services of types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/> with a shared implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <remarks>
-        /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
-        /// </remarks>
-        public static void AddMultipleUnique<TService1, TService2, TImplementing>(
-            this IServiceCollection services,
-            ServiceLifetime lifetime)
+    /// <summary>
+    /// Adds services of types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/> with a shared implementation type of <typeparamref name="TImplementing"/> to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <remarks>
+    /// Removes all previous registrations for the types <typeparamref name="TService1"/> &amp; <typeparamref name="TService2"/>.
+    /// </remarks>
+    public static void AddMultipleUnique<TService1, TService2, TImplementing>(
+        this IServiceCollection services,
+        ServiceLifetime lifetime)
         where TService1 : class
         where TService2 : class
         where TImplementing : class, TService1, TService2
@@ -88,18 +88,18 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Func<IServiceProvider, TService> factory)
         where TService : class
-            => services.AddUnique(factory, ServiceLifetime.Singleton);
+        => services.AddUnique(factory, ServiceLifetime.Singleton);
 
-        /// <summary>
-        /// Adds a service of type <typeparamref name="TService"/> with an implementation factory method to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <remarks>
-        /// Removes all previous registrations for the type <typeparamref name="TService"/>.
-        /// </remarks>
-        public static void AddUnique<TService>(
-            this IServiceCollection services,
-            Func<IServiceProvider, TService> factory,
-            ServiceLifetime lifetime)
+    /// <summary>
+    /// Adds a service of type <typeparamref name="TService"/> with an implementation factory method to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    /// <remarks>
+    /// Removes all previous registrations for the type <typeparamref name="TService"/>.
+    /// </remarks>
+    public static void AddUnique<TService>(
+        this IServiceCollection services,
+        Func<IServiceProvider, TService> factory,
+        ServiceLifetime lifetime)
         where TService : class
     {
         services.RemoveAll<TService>();

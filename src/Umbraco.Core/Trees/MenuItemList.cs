@@ -32,9 +32,20 @@ public class MenuItemList : List<MenuItem>
     /// <param name="textService">The <see cref="ILocalizedTextService" /> used to localize the action name based on its alias</param>
     /// <param name="opensDialog">Whether or not this action opens a dialog</param>
     public MenuItem? Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+        where T : IAction => Add<T>(textService, hasSeparator, opensDialog, useLegacyIcon: true);
+
+    /// <summary>
+    ///     Adds a menu item with a dictionary which is merged to the AdditionalData bag
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="hasSeparator"></param>
+    /// <param name="textService">The <see cref="ILocalizedTextService" /> used to localize the action name based on its alias</param>
+    /// <param name="opensDialog">Whether or not this action opens a dialog</param>
+    /// <param name="useLegacyIcon">Whether or not this action should use legacy icon prefixed with "icon-" or full icon name is specified.</param>
+    public MenuItem? Add<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
         where T : IAction
     {
-        MenuItem? item = CreateMenuItem<T>(textService, hasSeparator, opensDialog);
+        MenuItem? item = CreateMenuItem<T>(textService, hasSeparator, opensDialog, useLegacyIcon);
         if (item != null)
         {
             Add(item);
@@ -44,7 +55,7 @@ public class MenuItemList : List<MenuItem>
         return null;
     }
 
-    private MenuItem? CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false)
+    private MenuItem? CreateMenuItem<T>(ILocalizedTextService textService, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
         where T : IAction
     {
         T? item = _actionCollection.GetAction<T>();
@@ -61,6 +72,7 @@ public class MenuItemList : List<MenuItem>
             SeparatorBefore = hasSeparator,
             OpensDialog = opensDialog,
             TextDescription = textDescription,
+            UseLegacyIcon = useLegacyIcon,
         };
 
         return menuItem;
