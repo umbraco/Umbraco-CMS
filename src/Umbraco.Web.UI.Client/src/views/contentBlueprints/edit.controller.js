@@ -7,6 +7,9 @@
  * The controller for the content editor
  */
 function ContentBlueprintEditController($scope, $routeParams, contentResource) {
+
+    var infiniteMode = $scope.model && $scope.model.infiniteMode;
+
     function getScaffold() {
         return contentResource.getScaffold(-1, $routeParams.doctype)
             .then(function (scaffold) {
@@ -36,7 +39,7 @@ function ContentBlueprintEditController($scope, $routeParams, contentResource) {
         return content;
     }
 
-    $scope.contentId = $routeParams.id;
+    $scope.contentId = infiniteMode ? $scope.model.id : $routeParams.id;
     $scope.isNew = $routeParams.id === "-1";
     $scope.saveMethod = contentResource.saveBlueprint;
     $scope.getMethod = getBlueprintById;

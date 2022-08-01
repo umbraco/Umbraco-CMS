@@ -46,16 +46,15 @@
 
         function referenceAnchorClicked($event, reference) {
 
-
             if ($event.shiftKey || $event.ctrlKey || $event.metaKey) {
                 // we will let the browser take over here.
                 return;
             }
-
+            
             $event.preventDefault();
             close();
 
-            var editorModel = {
+            let editorModel = {
                 id: reference.id,
                 submit: function (model) {
                     editorService.close();
@@ -68,25 +67,30 @@
             overlayService.close();
 
             // extract the entity type from the udi
-            var udi = udiParser.parse(reference.udi);
+            const udi = udiParser.parse(reference.udi);
 
-            if (udi && udi.entityType === "document")
+            if (udi)
             {
-                editorService.contentEditor(editorModel);
-                return;
-            }
+                if (udi.entityType === "document-blueprint") {
+                    editorService.contentBlueprintEditor(editorModel);
+                    return;
+                }
 
-            if (udi && udi.entityType === "media")
-            {
-                editorService.mediaEditor(editorModel);
-                return;
-            }
+                if (udi.entityType === "document") {
+                    editorService.contentEditor(editorModel);
+                    return;
+                }
 
-            if (udi && udi.entityType === "member")
-            {
-                editorModel.id = reference.key;
-                editorService.memberEditor(editorModel);
-                return;
+                if (udi.entityType === "media") {
+                    editorService.mediaEditor(editorModel);
+                    return;
+                }
+
+                if (udi.entityType === "member") {
+                    editorModel.id = reference.key;
+                    editorService.memberEditor(editorModel);
+                    return;
+                }
             }
         }
     }

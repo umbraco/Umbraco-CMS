@@ -336,6 +336,29 @@ When building a custom infinite editor view you can use the same components as a
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#contentBlueprintEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a content template (blueprint) editor in infinite editing, the submit callback returns the updated content item.
+         *
+         * @param {object} editor rendering options.
+         * @param {string} editor.id The id of the content item.
+         * @param {boolean} editor.create Create new content item.
+         * @param {function} editor.submit Callback function when the publish and close button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
+         * @param {string} editor.parentId If editor.create is true, provide parentId for the creation of the content item.
+         * @param {string} editor.documentTypeAlias If editor.create is true, provide document type alias for the creation of the content item.
+         * @param {boolean} editor.allowSaveAndClose If editor is being used in infinite editing allows the editor to close when the save action is performed.
+         * @returns {object} editor object
+         */
+        function contentBlueprintEditor(editor) {
+            editor.view = "views/contentBlueprints/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#contentEditor
          * @methodOf umbraco.services.editorService
          *
@@ -1125,6 +1148,7 @@ When building a custom infinite editor view you can use the same components as a
             close: close,
             closeAll: closeAll,
             mediaEditor: mediaEditor,
+            contentBlueprintEditor: contentBlueprintEditor,
             contentEditor: contentEditor,
             contentPicker: contentPicker,
             contentTypePicker: contentTypePicker,
