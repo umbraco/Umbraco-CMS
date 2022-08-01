@@ -7,12 +7,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 [AttributeUsage(AttributeTargets.Property)]
 public class LengthAttribute : Attribute
 {
-    public LengthAttribute(int length) => Length = new ColumnSize(length);
-
-    public LengthAttribute(ColumnSizeType type) => Length = new ColumnSize(type);
+    public LengthAttribute(int length) => Length = length;
 
     /// <summary>
     ///     Gets or sets the length of a column
     /// </summary>
-    public ColumnSize Length { get; }
+    public int Length { get; }
 }

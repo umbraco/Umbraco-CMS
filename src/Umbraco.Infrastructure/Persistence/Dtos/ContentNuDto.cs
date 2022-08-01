@@ -30,7 +30,6 @@ public class ContentNuDto
     [Column("data")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(ColumnSizeType.Max)]
     public string? Data { get; set; }
 
     [Column("rv")]
