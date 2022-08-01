@@ -440,6 +440,7 @@ public class UserMapDefinition : IMapDefinition
     private void Map(IUser source, UserDetail target, MapperContext context)
     {
         target.AllowedSections = source.AllowedSections;
+        target.AllowedLanguageIds = source.CalculateAllowedLanguageIds(_localizationService);
         target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
         target.Email = source.Email;
