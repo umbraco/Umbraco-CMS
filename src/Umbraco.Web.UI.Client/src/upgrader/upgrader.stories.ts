@@ -40,7 +40,13 @@ Upgrading.args = {
 	upgrading: true,
 };
 
+export const fetching = Template.bind({});
+fetching.args = {
+	fetching: true
+}
+
 export const Error = Template.bind({});
 Error.args = {
 	errorMessage: 'Something went wrong',
 };
+
