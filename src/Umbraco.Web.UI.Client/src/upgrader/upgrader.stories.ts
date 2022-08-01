@@ -10,6 +10,7 @@ export default {
 	args: {
 		errorMessage: '',
 		upgrading: false,
+		fetching: false,
 		settings: {
 			currentState: '2b20c6e7',
 			newState: '2b20c6e8',
@@ -25,11 +26,12 @@ export default {
 	},
 } as Meta<UmbUpgraderView>;
 
-const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings }) =>
+const Template: Story<UmbUpgraderView> = ({ upgrading, errorMessage, settings, fetching }) =>
 	html`<umb-upgrader-view
 		.upgrading=${upgrading}
 		.errorMessage=${errorMessage}
-		.settings=${settings}></umb-upgrader-view>`;
+		.settings=${settings}
+		.fetching=${fetching}></umb-upgrader-view>`;
 
 export const Overview = Template.bind({});
 
