@@ -11,9 +11,6 @@ public class TablesIndexesImprovement : MigrationBase
 
     protected override void Migrate()
     {
-        AlterColumn<PropertyDataDto>(Constants.DatabaseSchema.Tables.PropertyData, "textValue");
-        AlterColumn<ContentNuDto>(Constants.DatabaseSchema.Tables.NodeData, "data");
-
         var nodeDtoTrashedIndex = $"IX_{NodeDto.TableName}_ObjectType_trashed_sorted";
         DeleteIndex<NodeDto>(nodeDtoTrashedIndex);
         CreateIndex<NodeDto>(nodeDtoTrashedIndex);

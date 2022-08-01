@@ -28,8 +28,8 @@ public class ContentNuDto
     ///     Pretty much anything that would require a 1:M lookup is serialized here
     /// </remarks>
     [Column("data")]
+    [SpecialDbType(SpecialDbTypes.NTEXT)]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Length(ColumnSizeType.Max)]
     public string? Data { get; set; }
 
     [Column("rv")]
