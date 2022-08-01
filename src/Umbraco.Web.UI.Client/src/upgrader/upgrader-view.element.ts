@@ -1,8 +1,7 @@
-import '../installer/installer-layout.element';
-
 import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+
 import { UmbracoUpgrader } from '../core/models';
 
 /**
@@ -25,7 +24,7 @@ export class UmbUpgraderView extends LitElement {
 	];
 
 	@property({ type: Boolean })
-	fetching = true;
+	fetching = false;
 
 	@property({ type: Boolean })
 	upgrading = false;
