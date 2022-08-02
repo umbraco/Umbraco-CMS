@@ -67,6 +67,7 @@
     "eslint-plugin-storybook": "^0.6.1",
     "lit-html": "^2.2.7",
     "msw": "^0.44.2",
+    "msw-storybook-addon": "^1.6.3",
     "prettier": "2.7.1",
     "typescript": "^4.7.4",
     "vite": "^3.0.3"
