@@ -271,8 +271,8 @@ public class DictionaryController : BackOfficeNotificationsController
             return ValidationProblem("Dictionary item does not exist");
         }
 
-        CultureInfo? userCulture =
-            _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.GetUserCulture(_localizedTextService, _globalSettings);
+        var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        CultureInfo? userCulture = currentUser?.GetUserCulture(_localizedTextService, _globalSettings);
 
         if (dictionary.NameIsDirty)
         {
@@ -293,9 +293,15 @@ public class DictionaryController : BackOfficeNotificationsController
             dictionaryItem.ItemKey = dictionary.Name!;
         }
 
+        var allowedLanguageIds = currentUser?.CalculateAllowedLanguageIds(_localizationService);
+        var allowedLanguageIdHashSet =allowedLanguageIds is null ? new HashSet<int>() : new HashSet<int>(allowedLanguageIds);
+
         foreach (DictionaryTranslationSave translation in dictionary.Translations)
         {
-            _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            if (allowedLanguageIdHashSet.Contains(translation.LanguageId))
+            {
+                _localizationService.AddOrUpdateDictionaryValue(dictionaryItem, _localizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            }
         }
 
         try
