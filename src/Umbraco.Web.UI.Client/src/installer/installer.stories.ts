@@ -85,13 +85,21 @@ Step1User.parameters = {
 	},
 };
 
-export const Step2Database: Story = () => html`<umb-installer-database></umb-installer-database>`;
-Step2Database.storyName = 'Step 2: Database';
-Step2Database.parameters = {
+export const Step2Telemetry: Story = () => html`<umb-installer-consent></umb-installer-consent>`;
+Step2Telemetry.storyName = 'Step 2: Telemetry data';
+Step2Telemetry.parameters = {
 	actions: {
 		handles: ['previous', 'next'],
 	},
 };
 
-export const Step3Installing: Story = () => html`<umb-installer-installing></umb-installer-installing>`;
-Step3Installing.storyName = 'Step 3: Installing';
+export const Step3Database: Story = () => html`<umb-installer-database></umb-installer-database>`;
+Step3Database.storyName = 'Step 3: Database';
+Step3Database.parameters = {
+	actions: {
+		handles: ['previous', 'next'],
+	},
+};
+
+export const Step4Installing: Story = () => html`<umb-installer-installing></umb-installer-installing>`;
+Step4Installing.storyName = 'Step 4: Installing';
