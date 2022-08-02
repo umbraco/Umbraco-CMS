@@ -384,7 +384,7 @@
             block._copy = copyBlock.bind(null, block);
         }
 
-        function addNewBlock(parentBlock, areaKey, index, contentElementTypeKey) {
+        function addNewBlock(parentBlock, areaKey, index, contentElementTypeKey, options) {
 
             // Create layout entry. (not added to property model jet.)
             var layoutEntry = modelObject.create(contentElementTypeKey);
@@ -401,9 +401,20 @@
                 return false;
             }
 
-            // set columnSpan to maximum allowed span for this BlockType:
-            const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
-            layoutEntry.columnSpan = maximumColumnSpan;
+            // fit in row?
+            if (options.fitInRow === true) {
+                // TODO: find the best way to add this in with the rest of the row?
+
+                const minColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.min(prev, option.columnSpan), 1);
+                layoutEntry.columnSpan = minColumnSpan;
+                
+            } else {
+
+                // set columnSpan to maximum allowed span for this BlockType:
+                const maximumColumnSpan = blockObject.config.columnSpanOptions.reduce((prev, option) => Math.max(prev, option.columnSpan), 1);
+                layoutEntry.columnSpan = maximumColumnSpan;
+
+            }
 
             // add layout entry at the decided location in layout.
             if(parentBlock != null) {
@@ -582,11 +593,13 @@
         }
 
         vm.requestShowCreate = requestShowCreate;
-        function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent) {
+        function requestShowCreate(parentBlock, areaKey, createIndex, mouseEvent, options) {
 
             if (vm.blockTypePickerIsOpen === true) {
                 return;
             }
+
+            options = options || {};
 
             const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
 
@@ -594,13 +607,13 @@
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
-                wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockType.blockConfigModel.contentElementTypeKey);
+                wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockType.blockConfigModel.contentElementTypeKey, options);
 
                 if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                     userFlowWhenBlockWasCreated(parentBlock, areaKey, createIndex);
                 }
             } else {
-                showCreateDialog(parentBlock, areaKey, createIndex);
+                showCreateDialog(parentBlock, areaKey, createIndex, options);
             }
 
         }
@@ -610,7 +623,7 @@
         }
 
         vm.showCreateDialog = showCreateDialog;
-        function showCreateDialog(parentBlock, areaKey, createIndex, openClipboard) {
+        function showCreateDialog(parentBlock, areaKey, createIndex, openClipboard, options) {
 
             if (vm.blockTypePickerIsOpen === true) {
                 return;
@@ -655,7 +668,7 @@
                 submit: function(blockPickerModel, mouseEvent) {
                     var wasAdded = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey, options);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
