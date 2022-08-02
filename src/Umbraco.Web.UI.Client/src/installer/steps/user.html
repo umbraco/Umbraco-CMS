@@ -113,15 +113,18 @@
 
       <div class="installer-col telemetry-col">
         <div class="control-group">
-          <label class="control-label">Consent for telemetry data</label>
+          <label class="control-label">
+            Consent for telemetry data
+            <br /><small>
+              This can be changed later in the Settings panel.
+            </small>
+          </label>
           <div class="controls">
             <div id="consentSliderWrapper">
               <div id="consentSlider"></div>
             </div>
           </div>
-
-          <small ng-bind-html="telemetryDescription"></small>
-          <p><small>This can be changed later in the Settings panel.</small></p>
+          <p><small ng-bind-html="telemetryDescription"></small></p>
         </div>
       </div>
     </div>
