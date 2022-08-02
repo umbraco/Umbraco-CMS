@@ -5,7 +5,7 @@ import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbNodeStore } from '../../core/stores/node.store';
 import { map, Subscription } from 'rxjs';
 import { DocumentNode } from '../../mocks/data/content.data';
-import { UmbNotificationService } from '../../core/services/notification.service';
+import { UmbNotificationService } from '../../core/services/notification/notification.service';
 import { UmbExtensionManifest, UmbExtensionManifestEditorView, UmbExtensionRegistry } from '../../core/extension';
 import { IRoutingInfo, RouterSlot } from 'router-slot';
 
@@ -13,6 +13,7 @@ import { IRoutingInfo, RouterSlot } from 'router-slot';
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
 import '../editor-views/editor-view-node-edit.element';
 import '../editor-views/editor-view-node-info.element';
+import { UmbNotificationDefaultData } from '../../core/services/notification/layouts/default/notification-layout-default.element';
 
 @customElement('umb-node-editor')
 export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
@@ -156,7 +157,8 @@ export class UmbNodeEditor extends UmbContextConsumerMixin(LitElement) {
 		// TODO: What if store is not present, what if node is not loaded....
 		if (this._node) {
 			this._nodeStore?.save([this._node]).then(() => {
-				this._notificationService?.peek('Document saved');
+				const data: UmbNotificationDefaultData = { message: 'Document Saved' };
+				this._notificationService?.peek('positive', { data });
 			});
 		}
 	}
