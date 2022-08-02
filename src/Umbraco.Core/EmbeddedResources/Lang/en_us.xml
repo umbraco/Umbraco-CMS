@@ -2528,7 +2528,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
-    <key alias="settingsAnalytics">Analytics</key>
+    <key alias="settingsAnalytics">Telemetry data</key>
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
@@ -2886,8 +2886,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="searchResults">items returned</key>
   </area>
   <area alias="analytics">
-    <key alias="consentForAnalytics">Consent for analytics</key>
-    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
+    <key alias="consentForAnalytics">Consent for telemetry data</key>
+    <key alias="analyticsLevelSavedSuccess">Telemetry level saved!</key>
     <key alias="analyticsDescription">
       <![CDATA[
       In order to improve Umbraco and add new functionality based on as relevant information as possible,
@@ -2903,12 +2903,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="detailedLevelDescription">
       <![CDATA[
           We will send:
-          <br>- Anonymized site ID, umbraco version, and packages installed.
-          <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
-          <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.
-          <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.
-          <br>
-          <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+          <ul>
+            <li>Anonymized site ID, umbraco version, and packages installed.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+          </ul>
+          <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
           <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
        ]]>
     </key>
