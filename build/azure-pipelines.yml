@@ -101,7 +101,6 @@ stages:
               command: pack
               packagesToPack: umbraco.sln
               packDirectory: $(Build.ArtifactStagingDirectory)/nupkg
-              nobuild: true
               arguments: '--no-restore --configuration $(buildConfiguration)'
           - script: |
               sha="$(Build.SourceVersion)"
