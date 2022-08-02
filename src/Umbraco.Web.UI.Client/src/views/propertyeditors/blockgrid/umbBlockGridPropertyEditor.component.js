@@ -629,6 +629,8 @@
                 return;
             }
 
+            options = options || {};
+
             const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
 
             if (availableTypes.length === 0) {
@@ -680,11 +682,24 @@
                 },
                 close: function() {
                     // if opened by a inline creator button(index less than length), we want to move the focus away, to hide line-creator.
-                    if (createIndex < vm.layout.length) {
-                        // TODO: handle areas:
-                        const blockOfInterest = parentLayoutEntry ? parentLayoutEntry.items[Math.max(createIndex-1, 0)].$block : vm.layout[Math.max(createIndex-1, 0)].$block
-                        vm.setBlockFocus(blockOfInterest);
+                    
+                    // add layout entry at the decided location in layout.
+                    if(parentBlock != null) {
+                        var area = parentBlock.layout.areas.find(x => x.key === areaKey);
+                        if(!area) {
+                            console.error("Could not find area in block creation close flow");
+                        }
+                        if (createIndex < area.items.length) {
+                            const blockOfInterest = area.items[Math.max(createIndex-1, 0)].$block;
+                            vm.setBlockFocus(blockOfInterest);
+                        }
+                    } else {
+                        if (createIndex < vm.layout.length) {
+                            const blockOfInterest = vm.layout[Math.max(createIndex-1, 0)].$block;
+                            vm.setBlockFocus(blockOfInterest);
+                        }
                     }
+                    
 
                     editorService.close();
                     vm.blockTypePickerIsOpen = false;
