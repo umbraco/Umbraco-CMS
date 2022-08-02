@@ -7,17 +7,17 @@ export default class UmbModalHandler {
 	public key: string;
 	public modal: any;
 
-	constructor(elementName: string) {
+	constructor(elementName: string, modalElementName: string) {
 		this.key = Date.now().toString(); //TODO better key
 		this._elementName = elementName;
-		this._createLayoutElement();
+		this._createLayoutElement(modalElementName);
 		this._closePromise = new Promise((res) => {
 			this._closeResolver = res;
 		});
 	}
 
-	private _createLayoutElement() {
-		this.modal = document.createElement('uui-modal-sidebar');
+	private _createLayoutElement(modalElementName: string) {
+		this.modal = document.createElement(modalElementName);
 		this.modal.size = 'small'; //TODO make meta object for settings
 		this.element = document.createElement(this._elementName);
 		this.modal.appendChild(this.element);

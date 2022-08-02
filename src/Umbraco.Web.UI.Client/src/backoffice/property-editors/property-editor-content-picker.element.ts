@@ -3,9 +3,9 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, query } from 'lit/decorators.js';
 
 import '@umbraco-ui/uui-modal';
+import '@umbraco-ui/uui-modal-sidebar';
 import '@umbraco-ui/uui-modal-container';
 import '@umbraco-ui/uui-modal-dialog';
-import { UUIModalSidebarElement } from '@umbraco-ui/uui-modal-sidebar';
 import { UmbContextConsumerMixin } from '../../core/context';
 import { UmbModalService } from '../../core/services/modal.service';
 
@@ -33,9 +33,6 @@ class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement)
 		`,
 	];
 
-	@query('uui-modal-sidebar')
-	sidebar?: UUIModalSidebarElement;
-
 	private _modalService?: UmbModalService;
 
 	constructor() {
@@ -46,7 +43,7 @@ class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement)
 	}
 
 	private _open() {
-		const modalHandler = this._modalService?.open('umb-modal-content-picker');
+		const modalHandler = this._modalService?.openSidebar('umb-modal-content-picker');
 		modalHandler?.onClose().then((result) => {
 			console.log('result', result);
 		});
