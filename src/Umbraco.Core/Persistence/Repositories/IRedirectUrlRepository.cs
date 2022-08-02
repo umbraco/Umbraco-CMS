@@ -46,7 +46,7 @@ public interface IRedirectUrlRepository : IReadWriteQueryRepository<Guid, IRedir
     /// </summary>
     /// <param name="url">The Umbraco redirect URL route.</param>
     /// <returns>The most recent redirect URL corresponding to the route.</returns>
-    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url) => Task.FromResult(GetMostRecentUrl(url));
+    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url);
 
     /// <summary>
     /// Gets the most recent redirect URL corresponding to an Umbraco redirect URL route.
@@ -62,7 +62,7 @@ public interface IRedirectUrlRepository : IReadWriteQueryRepository<Guid, IRedir
     /// <param name="url">The Umbraco redirect URL route.</param>
     /// <param name="culture">The culture the domain is associated with</param>
     /// <returns>The most recent redirect URL corresponding to the route.</returns>
-    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture) => Task.FromResult(GetMostRecentUrl(url, culture));
+    Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture);
 
     /// <summary>
     ///     Gets all redirect URLs for a content item.

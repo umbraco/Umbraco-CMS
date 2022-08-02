@@ -60,7 +60,7 @@ public interface IRedirectUrlService : IService
     /// <param name="url">The Umbraco redirect URL route.</param>
     /// <param name="culture">The culture of the request.</param>
     /// <returns>The most recent redirect URLs corresponding to the route.</returns>
-    Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture) => Task.FromResult(GetMostRecentRedirectUrl(url, culture));
+    Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture);
 
         /// <summary>
     ///     Gets all redirect URLs for a content item.
