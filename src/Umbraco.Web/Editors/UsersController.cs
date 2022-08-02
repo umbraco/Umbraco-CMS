@@ -120,8 +120,9 @@ namespace Umbraco.Web.Editors
             var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+            const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-            if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (allowedAvatarFileTypes.Contains(ext) == true && Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
