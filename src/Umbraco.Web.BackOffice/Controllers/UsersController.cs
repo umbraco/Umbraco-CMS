@@ -226,8 +226,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var fileName = file.FileName.Trim(new[] { '\"' }).TrimEnd();
             var safeFileName = fileName.ToSafeFileName(shortStringHelper);
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+            const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-            if (contentSettings.DisallowedUploadFiles.Contains(ext) == false)
+            if (allowedAvatarFileTypes.Contains(ext) == true && contentSettings.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
