@@ -62,11 +62,11 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager) 
+        public UsersController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper, BackOfficeUserManager<BackOfficeIdentityUser> backOfficeUserManager)
             : base(umbracoContext, umbracoHelper, backOfficeUserManager)
         {
         }
-        
+
         /// <summary>
         /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
         /// </summary>
@@ -122,8 +122,9 @@ namespace Umbraco.Web.Editors
             var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
+            const string allowedAvatarFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif,webp";
 
-            if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
+            if (allowedAvatarFileTypes.Contains(ext) == true && UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
                 user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
@@ -156,7 +157,7 @@ namespace Umbraco.Web.Editors
             var filePath = found.Avatar;
 
             //if the filePath is already null it will mean that the user doesn't have a custom avatar and their gravatar is currently
-            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value 
+            //being used (if they have one). This means they want to remove their gravatar too which we can do by setting a special value
             //for the avatar.
             if (filePath.IsNullOrWhiteSpace() == false)
             {
@@ -279,7 +280,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             if (UmbracoConfig.For.UmbracoSettings().Security.UsernameIsEmail)
             {
                 //ensure they are the same if we're using it
@@ -348,7 +349,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Invites a user
         /// </summary>
-        /// <param name="userSave"></param> 
+        /// <param name="userSave"></param>
         /// <returns></returns>
         /// <remarks>
         /// This will email the user an invite and generate a token that will be validated in the email
@@ -364,7 +365,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             if (EmailSender.CanSendRequiredEmail == false)
             {
                 throw new HttpResponseException(
@@ -383,7 +384,7 @@ namespace Umbraco.Web.Editors
                 user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
             }
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
-            
+
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
@@ -534,7 +535,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, canSaveUser.Result));
             }
-            
+
             var hasErrors = false;
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
@@ -570,7 +571,7 @@ namespace Umbraco.Web.Editors
             {
                 userSave.Username = userSave.Email;
             }
-            
+
             if (userSave.ChangePassword != null)
             {
                 var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
@@ -579,7 +580,7 @@ namespace Umbraco.Web.Editors
                 var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
                 if (passwordChangeResult.Success)
                 {
-                    //need to re-get the user 
+                    //need to re-get the user
                     found = Services.UserService.GetUserById(intId.Result);
                 }
                 else
@@ -602,7 +603,7 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(user);
 
             var display = Mapper.Map<UserDisplay>(user);
-            
+
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
             return display;
         }
@@ -659,7 +660,7 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));            
+                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -682,7 +683,7 @@ namespace Umbraco.Web.Editors
                 }
                 var user = await UserManager.FindByIdAsync(userIds[0]);
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));                
+                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
             }
 
             foreach (var u in userIds)
@@ -743,7 +744,7 @@ namespace Umbraco.Web.Editors
 
             var userName = user.Name;
             Services.UserService.Delete(user, true);
-            
+
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
         }
@@ -761,6 +762,6 @@ namespace Umbraco.Web.Editors
             [DataMember(Name = "userStates")]
             public IDictionary<UserState, int> UserStates { get; set; }
         }
-        
+
     }
 }
