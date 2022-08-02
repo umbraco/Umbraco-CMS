@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public bool ForceHideContentEditorInOverlay { get; set; }
         }
 
-        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of root blocks")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
         [DataContract]
