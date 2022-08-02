@@ -454,24 +454,24 @@
 
         function getAllowedTypesOfArea(parentBlock, areaKey) {
 
-            if(areaKey == null) {
-                return vm.availableBlockTypes;
+            if(areaKey == null || parentBlock == null) {
+                return vm.availableBlockTypes.filter(x => x.blockConfigModel.allowAtRoot);
             }
 
             const area = parentBlock.layout.areas.find(x => x.key === areaKey);
 
             if(area && area?.$config.onlySpecifiedAllowance) {
 
-                const allowedTypes = [];
+                const allowedElementTypeKeys = [];
 
                 area.$config.specifiedAllowance?.forEach(allowance => {
                     // Future room for group support:
                     if(allowance.elementTypeKey != null) {
-                        allowedTypes.push(allowance.elementTypeKey);
+                        allowedElementTypeKeys.push(allowance.elementTypeKey);
                     }
                 });
 
-                return allowedTypes;
+                return vm.availableBlockTypes.filter(x => allowedElementTypeKeys.indexOf(x.blockConfigModel.contentElementTypeKey) !== -1);
             }
             return vm.availableBlockTypes;
         }
@@ -605,7 +605,7 @@
 
             if (availableTypes.length === 1) {
                 var wasAdded = false;
-                var blockType = vm.availableBlockTypes[0];
+                var blockType = availableTypes[0];
 
                 wasAdded = addNewBlock(parentBlock, areaKey, createIndex, blockType.blockConfigModel.contentElementTypeKey, options);
 
