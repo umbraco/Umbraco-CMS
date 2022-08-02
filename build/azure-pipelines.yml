@@ -99,7 +99,7 @@ stages:
             displayName: Run dotnet pack
             inputs:
               command: pack
-              projects: umbraco.sln
+              packagesToPack: umbraco.sln
               packDirectory: $(Build.ArtifactStagingDirectory)/nupkg
               nobuild: true
               arguments: '--no-restore --configuration $(buildConfiguration)'
