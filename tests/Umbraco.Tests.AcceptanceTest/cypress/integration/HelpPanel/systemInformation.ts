@@ -20,7 +20,22 @@ context('System Information', () => {
 
     it('Check System Info Displays', () => {
         openSystemInformation();
-        cy.get('.table').find('tr').should('have.length', 13);
+        
+        // Assert
+        cy.get('.table').find('tr').should('contain', 'Server OS');
+        cy.get('.table').find('tr').should('contain', 'Server Framework');
+        cy.get('.table').find('tr').should('contain', 'Default Language');
+        cy.get('.table').find('tr').should('contain', 'Umbraco Version');
+        cy.get('.table').find('tr').should('contain', 'Current Culture');
+        cy.get('.table').find('tr').should('contain', 'Current UI Culture');
+        cy.get('.table').find('tr').should('contain', 'Current Webserver');
+        cy.get('.table').find('tr').should('contain', 'Models Builder Mode');
+        cy.get('.table').find('tr').should('contain', 'Debug Mode');
+        cy.get('.table').find('tr').should('contain', 'Database Provider');
+        cy.get('.table').find('tr').should('contain', 'Current Server Role');
+        cy.get('.table').find('tr').should('contain', 'Browser');
+        cy.get('.table').find('tr').should('contain', 'Browser OS');
+        cy.contains('Default Language').parent().should('contain', 'en-US');
         cy.contains('Current Culture').parent().should('contain', 'en-US');
         cy.contains('Current UI Culture').parent().should('contain', 'en-US');
     });

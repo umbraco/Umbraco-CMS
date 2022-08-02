@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
@@ -23,7 +23,7 @@ public class ActionUnpublish : IAction
     public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
 
     /// <inheritdoc />
-    public string Icon => "circle-dotted";
+    public string Icon => "icon-circle-dotted";
 
     /// <inheritdoc />
     public bool ShowInNotifier => false;

@@ -29,11 +29,18 @@ internal class RuntimeModeValidationService : IRuntimeModeValidationService
         var validationMessages = new List<string>();
 
         // Runtime mode validators are registered transient, but this service is registered as singleton
-        foreach (var runtimeModeValidator in _serviceProvider.GetServices<IRuntimeModeValidator>())
+        using (var scope = _serviceProvider.CreateScope())
         {
-            if (runtimeModeValidator.Validate(runtimeMode, out var validationMessage) == false)
+            var runtimeModeValidators = scope.ServiceProvider.GetService<RuntimeModeValidatorCollection>();
+            if (runtimeModeValidators is not null)
             {
-                validationMessages.Add(validationMessage);
+                foreach (var runtimeModeValidator in runtimeModeValidators)
+                {
+                    if (runtimeModeValidator.Validate(runtimeMode, out var validationMessage) == false)
+                    {
+                        validationMessages.Add(validationMessage);
+                    }
+                }
             }
         }
 

@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
 
-    var vm = this;
+    const vm = this;
 
     vm.openMemberGroupPicker = openMemberGroupPicker;
     vm.remove = remove;
@@ -13,12 +13,13 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         return str.replace(rgxtrim, '');
     }
 
-    var removeAllEntriesAction = {
-        labelKey: 'clipboard_labelForRemoveAllEntries',
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
         labelTokens: [],
-        icon: 'trash',
+        icon: "icon-trash",
         method: removeAllEntries,
-        isDisabled: true
+        isDisabled: true,
+        useLegacyIcon: false
     };
 
     $scope.renderModel = [];

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models.Entities;
@@ -198,8 +198,8 @@ public class Property : EntityBase, IProperty
         // and match the specified culture and segment (or anything when '*').
         IEnumerable<IPropertyValue> pvalues = _vvalues.Where(x =>
                 PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment, true) && // the value variation is ok
-                (culture == "*" || (x.Value.Culture?.InvariantEquals(culture) ?? false)) && // the culture matches
-                (segment == "*" || (x.Value.Segment?.InvariantEquals(segment) ?? false))) // the segment matches
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
             .Select(x => x.Value);
 
         foreach (IPropertyValue pvalue in pvalues)

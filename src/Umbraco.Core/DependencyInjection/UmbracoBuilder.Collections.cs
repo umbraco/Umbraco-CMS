@@ -204,20 +204,12 @@ public static partial class UmbracoBuilderExtensions
         => builder.WithCollectionBuilder<DashboardCollectionBuilder>();
 
     /// <summary>
-    /// Gets the partial view snippets collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
     public static PartialViewSnippetCollectionBuilder? PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
 
-    /// <summary>
-    /// Gets the partial view macro snippets collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
     public static PartialViewMacroSnippetCollectionBuilder? PartialViewMacroSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
-    /// <summary>
     /// Gets the cache refreshers collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>

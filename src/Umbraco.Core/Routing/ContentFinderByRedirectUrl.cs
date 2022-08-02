@@ -45,11 +45,11 @@ public class ContentFinderByRedirectUrl : IContentFinder
     ///     Optionally, can also assign the template or anything else on the document request, although that is not
     ///     required.
     /// </remarks>
-    public Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
+    public async Task<bool> TryFindContent(IPublishedRequestBuilder frequest)
     {
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return Task.FromResult(false);
+            return false;
         }
 
         var route = frequest.Domain != null
@@ -57,7 +57,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
               DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.AbsolutePathDecoded)
             : frequest.AbsolutePathDecoded;
 
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture);
+        IRedirectUrl? redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(route, frequest.Culture);
 
         if (redirectUrl == null)
         {
@@ -66,7 +66,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
                 _logger.LogDebug("No match for route: {Route}", route);
             }
 
-            return Task.FromResult(false);
+            return false;
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
@@ -78,7 +78,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
                 _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
             }
 
-            return Task.FromResult(false);
+            return false;
         }
 
         // Appending any querystring from the incoming request to the redirect URL
@@ -99,6 +99,6 @@ public class ContentFinderByRedirectUrl : IContentFinder
             .SetCacheExtensions(new List<string> { "no-store, must-revalidate" })
             .SetHeaders(new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } });
 
-        return Task.FromResult(true);
+        return true;
     }
 }

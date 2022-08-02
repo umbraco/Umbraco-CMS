@@ -792,4 +792,45 @@ context('Content', () => {
     cy.umbracoEnsureMacroNameNotExists(macroName);
     cy.umbracoEnsurePartialViewMacroFileNameNotExists(macroFileName);
   });
+
+  it('Create content with the same name', () => {
+    const documentTypeName = "TestType";
+    const nodeName = "Home";
+    const expectedNodeName = nodeName + " (1)";
+
+    cy.umbracoEnsureDocumentTypeNameNotExists(documentTypeName);
+    cy.deleteAllContent();
+
+    const documentType = new DocumentTypeBuilder()
+        .withName(documentTypeName)
+        .withAllowAsRoot(true)
+        .build();
+
+    cy.saveDocumentType(documentType).then((generatedDocumentType) => {
+      const rootContentNode = new ContentBuilder()
+          .withAction("saveNew")
+          .withContentTypeAlias(generatedDocumentType["alias"])
+          .addVariant()
+          .withName(nodeName)
+          .withSave(true)
+          .done()
+          .build();
+
+      cy.saveContent(rootContentNode)
+    });
+
+    refreshContentTree();
+
+    cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
+    cy.umbracoContextMenuAction("action-create").click();
+    cy.get('.umb-action-link').contains(documentTypeName).click();
+    cy.umbracoEditorHeaderName(nodeName);
+    cy.umbracoButtonByLabelKey("buttons_saveAndPublish").click();
+
+    cy.umbracoSuccessNotification().should('be.visible');
+    cy.umbracoTreeItem("content", [expectedNodeName]).should('be.visible');
+
+    cy.umbracoEnsureDocumentTypeNameNotExists(documentTypeName);
+    cy.deleteAllContent();
+  });
 });
