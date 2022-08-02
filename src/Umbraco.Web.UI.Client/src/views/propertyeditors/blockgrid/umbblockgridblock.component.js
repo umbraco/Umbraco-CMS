@@ -33,13 +33,6 @@
         var model = this;
 
         model.$onInit = function () {
-            // This is ugly and is only necessary because we are not using components and instead
-            // relying on ng-include. It is definitely possible to compile the contents
-            // of the view into the DOM using $templateCache and $http instead of using
-            // ng - include which means that the controllerAs flows directly to the view.
-            // This would mean that any custom components would need to be updated instead of relying on $scope.
-            // Guess we'll leave it for now but means all things need to be copied to the $scope and then all
-            // primitives need to be watched.
 
             // let the Block know about its form
             model.block.setParentForm(model.parentForm);
