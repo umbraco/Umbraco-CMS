@@ -28,24 +28,23 @@
                             <span ng-bind="variant.displayName"></span>
                             <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
                         </span>
-            <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                        <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
                             <span ng-bind="variant.segment"></span>
                             <span class="__secondarytitle"> — {{variant.language.name}}</span>
                             <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
                         </span>
-            <span class="umb-variant-selector-entry__description"
-                  ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                        <span class="umb-variant-selector-entry__description"
+                              ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state variant="variant"></umb-variant-state>
                             <span ng-if="variant.isMandatory"> - </span>
                             <span ng-class="{'text-error': (variant.publish === false) }" ng-if="variant.isMandatory"><localize
                               key="general_mandatory">Mandatory</localize></span>
                         </span>
-            <span class="umb-variant-selector-entry__description"
-                  ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                        <span class="umb-variant-selector-entry__description"
+                              ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <span class="text-error"
                                   ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                         </span>
-
           </umb-checkbox>
 
           <umb-variant-notification-list notifications="variant.notifications"></umb-variant-notification-list>
@@ -78,20 +77,20 @@
                     <span ng-bind="variant.displayName"></span>
                     <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
                 </span>
-        <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
+                <span class="umb-variant-selector-entry__title" ng-if="variant.segment && variant.language">
                     <span ng-bind="variant.segment"></span>
                     <span class="__secondarytitle"> — {{variant.language.name}}</span>
                     <strong class="umb-control-required" ng-if="variant.isMandatory">*</strong>
                 </span>
-        <span class="umb-variant-selector-entry__description"
-              ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
+                <span class="umb-variant-selector-entry__description"
+                      ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                     <umb-variant-state variant="variant"></umb-variant-state>
                     <span ng-if="variant.isMandatory"> - </span>
                     <span ng-class="{'text-error': (variant.publish === false) }" ng-if="variant.isMandatory"><localize
                       key="languages_mandatoryLanguage">Mandatory language</localize></span>
                 </span>
-        <span class="umb-variant-selector-entry__description"
-              ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                <span class="umb-variant-selector-entry__description"
+                      ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                     <span class="text-error"
                           ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>
                 </span>
