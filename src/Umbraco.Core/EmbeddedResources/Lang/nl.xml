@@ -2510,6 +2510,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
     <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
     <key alias="addBlock">Inhoud toevoegen</key>
+    <key alias="addThis">Voeg %0% toe</key>
     <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in
       blokken.
     </key>
