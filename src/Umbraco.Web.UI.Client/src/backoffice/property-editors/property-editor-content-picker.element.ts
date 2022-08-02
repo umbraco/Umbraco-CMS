@@ -44,8 +44,8 @@ class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement)
 
 	private _open() {
 		const modalHandler = this._modalService?.openSidebar('umb-modal-content-picker');
-		modalHandler?.onClose().then((result) => {
-			console.log('result', result);
+		modalHandler?.onClose.then(() => {
+			console.log('Closed the modal for:', this);
 		});
 	}
 

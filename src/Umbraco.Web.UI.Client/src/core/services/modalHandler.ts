@@ -11,24 +11,27 @@ export default class UmbModalHandler {
 		this.key = Date.now().toString(); //TODO better key
 		this._elementName = elementName;
 		this._createLayoutElement(modalElementName);
-		this._closePromise = new Promise((res) => {
-			this._closeResolver = res;
+		this._closePromise = new Promise((resolve) => {
+			this._closeResolver = resolve;
 		});
 	}
 
 	private _createLayoutElement(modalElementName: string) {
 		this.modal = document.createElement(modalElementName);
+		this.modal.addEventListener('close-end', () => {
+			this._closeResolver();
+		});
 		this.modal.size = 'small'; //TODO make meta object for settings
 		this.element = document.createElement(this._elementName);
 		this.modal.appendChild(this.element);
 		this.element.modalHandler = this;
 	}
 
-	public close(...args: any) {
-		this._closeResolver(...args);
+	public close() {
+		this.modal.close();
 	}
 
-	public onClose(): Promise<any> {
+	public get onClose(): Promise<any> {
 		return this._closePromise;
 	}
 }
