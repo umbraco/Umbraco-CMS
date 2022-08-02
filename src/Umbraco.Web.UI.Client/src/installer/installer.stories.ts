@@ -71,7 +71,7 @@ class UmbInstallerContext extends UmbContextProviderMixin(LitElement) {
 }
 
 export default {
-	title: 'Installer/Installer',
+	title: 'Components/Installer/Steps',
 	component: 'umb-installer',
 	id: 'installer',
 	decorators: [(story) => html`<mock-installer-context>${story()}</mock-installer-context>`],
