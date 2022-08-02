@@ -2,7 +2,7 @@
   <umb-box>
     <umb-box-content>
       <h3 class="bold">
-        <localize key="analytics_consentForAnalytics">Consent for analytics</localize>
+        <localize key="analytics_consentForAnalytics">Consent for telemetry data</localize>
       </h3>
       <div class="umb-healthcheck-help-text">
         <localize key="analytics_analyticsDescription">
@@ -23,21 +23,15 @@
         </div>
 
         <div ng-if="vm.sliderVal === 'Minimal'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_minimalLevelDescription">We'll only send an anonymous site ID to let us know that the
             site exists.
           </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Basic'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_basicLevelDescription">We'll send site ID, umbraco version and packages installed
           </localize>
         </div>
         <div ng-if="vm.sliderVal === 'Detailed'">
-          <b>{{vm.sliderVal}}</b>
-          <br>
           <localize key="analytics_detailedLevelDescription">
             We will send:
             <ul>
