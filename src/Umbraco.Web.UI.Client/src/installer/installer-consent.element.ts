@@ -2,6 +2,7 @@ import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Subscription } from 'rxjs';
+
 import { UmbContextConsumerMixin } from '../core/context';
 import { TelemetryModel } from '../core/models';
 import { UmbInstallerContext } from './installer-context';
@@ -125,7 +126,7 @@ export class UmbInstallerConsent extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<div id="container" class="uui-text">
-				<h1>Consent Level</h1>
+				<h1>Consent for telemetry data</h1>
 				${this._renderSlider()}
 				<div id="buttons">
 					<uui-button label="Back" @click=${this._onBack} look="secondary"></uui-button>

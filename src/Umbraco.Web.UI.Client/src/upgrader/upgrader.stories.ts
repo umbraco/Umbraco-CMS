@@ -6,7 +6,7 @@ import { html } from 'lit-html';
 import { UmbUpgraderView } from './upgrader-view.element';
 
 export default {
-	title: 'Upgrader/Upgrader',
+	title: 'Components/Upgrader/States',
 	args: {
 		errorMessage: '',
 		upgrading: false,
