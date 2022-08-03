@@ -15,7 +15,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         labelTokens: [],
         icon: "icon-trash",
         method: removeAllEntries,
-        isDisabled: true,
+        isDisabled: !$scope.allowRemove,
         useLegacyIcon: false
     };
 
@@ -79,10 +79,10 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
-            
+
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1 || $scope.readonly;
 
-            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0;
+            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0 || $scope.readonly;
             
             //Update value
             $scope.model.value = $scope.renderModel;
