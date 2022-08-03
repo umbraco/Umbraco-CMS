@@ -145,8 +145,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// </summary>
     /// <param name="username"></param>
     /// <param name="includeSecurityData">
-    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start
-    ///     nodes).
+    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
     ///     This is really only used for a shim in order to upgrade to 7.6.
     /// </param>
     /// <returns>
@@ -164,7 +163,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
     /// </param>
     /// <returns>
-    ///     A non cached <see cref="IUser" /> instance
+    ///     A non cached <see cref="IUser"/> instance
     /// </returns>
     public IUser? Get(int? id, bool includeSecurityData) =>
         GetWith(sql => sql.Where<UserDto>(x => x.Id == id), includeSecurityData);
