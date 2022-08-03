@@ -35,7 +35,8 @@ export default class UmbModalHandler {
 		this.element.modalHandler = this;
 	}
 
-	public close() {
+	public close(...args: any) {
+		this._closeResolver(...args);
 		this.modal.close();
 	}
 
