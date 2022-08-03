@@ -37,7 +37,7 @@
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:ng-sortable'] = () => {
-                return vm.entries;
+                return vm;
             };
 
             var removed, nextSibling;
@@ -45,36 +45,41 @@
             // Borrowed concept from: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             // TODO: investigate usage of Store options prop.
             function _sync(evt) {
-                var items = vm.entries;
+                var entries = vm.entries;
 
                 var oldIndex = evt.oldIndex,
                     newIndex = evt.newIndex;
 
-                // If not the same layout array, then:
+                // If not the same gridLayoutContainerEl, then test for transfer option:
                 if (gridLayoutContainerEl !== evt.from) {
-                    var prevItems = evt.from['Sortable:ng-sortable']();
+                    const fromEntriesController = evt.from['Sortable:ng-sortable']();
 
-                    removed = prevItems[oldIndex];
+                    // TODO: Test if we can transfer:
+
+                    // Perform the transfer:
+                    var prevEntries = fromEntriesController.entries;
+
+                    removed = prevEntries[oldIndex];
 
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
                         removed = Utilities.copy(removed);
-                        prevItems.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevItems.splice(oldIndex, 1)[0]);
+                        prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
 
                         if (evt.from.contains(evt.clone)) {
                             evt.from.removeChild(evt.clone);
                         }
                     }
                     else {
-                        prevItems.splice(oldIndex, 1);
+                        prevEntries.splice(oldIndex, 1);
                     }
 
-                    items.splice(newIndex, 0, removed);
+                    entries.splice(newIndex, 0, removed);
 
                     // TODO: fix issue when dragging one level out. I currently do not think below ine is necessary as this is updated through angularJS.
                     //evt.from.insertBefore(evt.item, nextSibling); // revert element
                 }
                 else {
-                    items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
+                    entries.splice(newIndex, 0, entries.splice(oldIndex, 1)[0]);
 
                     // TODO: I don't think this is necessary, I would like to prove it purpose:
                     // move ng-repeat comment node to right position:
