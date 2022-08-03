@@ -51,7 +51,7 @@
     "@storybook/web-components": "^6.5.9",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
     "@web/dev-server-esbuild": "^0.3.1",
     "@web/test-runner": "^0.13.31",
