@@ -218,8 +218,8 @@
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
             const startY = layoutItemRect.top - layoutContainerRect.top;
-            const endX = e.offsetX;
-            const endY = e.offsetY;
+            const endX = e.clientX  - layoutContainerRect.left;
+            const endY = e.clientY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
             const endCol = newSpans.startCol + newSpans.columnSpan;
@@ -248,8 +248,8 @@
 
             const startX = layoutItemRect.left - layoutContainerRect.left;
             const startY = layoutItemRect.top - layoutContainerRect.top;
-            const endX = e.offsetX;
-            const endY = e.offsetY;
+            const endX = e.clientX  - layoutContainerRect.left;
+            const endY = e.clientY - layoutContainerRect.top;
 
             const newSpans = getNewSpans(startX, startY, endX, endY);
 
