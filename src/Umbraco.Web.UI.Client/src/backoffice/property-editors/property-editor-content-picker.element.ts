@@ -43,14 +43,22 @@ class UmbPropertyEditorContentPicker extends UmbContextConsumerMixin(LitElement)
 	}
 
 	private _open() {
-		const modalHandler = this._modalService?.openSidebar('umb-modal-content-picker');
+		const modalHandler = this._modalService?.openSidebar('umb-modal-content-picker', { size: 'small' });
 		modalHandler?.onClose.then(() => {
 			console.log('Closed the modal for:', this);
 		});
 	}
 
+	private _tempOpenDialog() {
+		//TODO: remove this
+		this._modalService?.openDialog('umb-modal-content-picker');
+	}
+
 	render() {
-		return html` <uui-button look="primary" @click=${this._open} label="open">Open</uui-button> `;
+		return html`
+			<uui-button look="primary" @click=${this._open} label="open">Open sidebar</uui-button>
+			<uui-button look="primary" @click=${this._tempOpenDialog} label="open">Open dialog</uui-button>
+		`;
 	}
 }
 
