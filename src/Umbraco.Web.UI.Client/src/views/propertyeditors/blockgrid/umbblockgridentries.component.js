@@ -70,16 +70,17 @@
 
                     items.splice(newIndex, 0, removed);
 
-                    // TODO: fix issue when dragging one level out.
-                    evt.from.insertBefore(evt.item, nextSibling); // revert element
+                    // TODO: fix issue when dragging one level out. I currently do not think below ine is necessary as this is updated through angularJS.
+                    //evt.from.insertBefore(evt.item, nextSibling); // revert element
                 }
                 else {
                     items.splice(newIndex, 0, items.splice(oldIndex, 1)[0]);
 
+                    // TODO: I don't think this is necessary, I would like to prove it purpose:
                     // move ng-repeat comment node to right position:
-                    if (nextSibling.nodeType === Node.COMMENT_NODE) {
+                    /*if (nextSibling.nodeType === Node.COMMENT_NODE) {
                         evt.from.insertBefore(nextSibling, evt.item.nextSibling);
-                    }
+                    }*/
                 }
 
                 $scope.$apply();
