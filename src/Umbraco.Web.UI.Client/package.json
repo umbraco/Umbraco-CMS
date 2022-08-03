@@ -63,7 +63,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-lit": "^1.6.1",
     "eslint-plugin-lit-a11y": "^2.2.1",
-    "eslint-plugin-storybook": "^0.6.1",
+    "eslint-plugin-storybook": "^0.6.2",
     "lit-html": "^2.2.7",
     "msw": "^0.44.2",
     "prettier": "2.7.1",
