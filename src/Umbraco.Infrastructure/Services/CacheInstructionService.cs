@@ -331,6 +331,7 @@ namespace Umbraco.Cms
             /// <param name="processed">
             ///     Tracks which instructions have already been processed to avoid duplicates
             /// </param>
+            /// <returns>
             /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
             /// </returns>
             private bool ProcessDatabaseInstructions(
