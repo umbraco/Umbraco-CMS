@@ -305,7 +305,7 @@ stages:
           - powershell: sqllocaldb start mssqllocaldb
             displayName: Start localdb (Windows only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
-          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest 
+          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(SA_PASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2019-latest
             displayName: Start SQL Server (Linux only)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
           - task: DotNetCoreCLI@2
@@ -494,7 +494,6 @@ stages:
     displayName: NuGet release
     dependsOn:
       - Deploy_MyGet
-      - Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
@@ -523,6 +522,7 @@ stages:
     dependsOn:
       - Build
       - Deploy_NuGet
+      - Build_Docs
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:

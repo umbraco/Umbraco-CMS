@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService, contentEditingHelper) {
+  function ScheduleContentController($scope, $timeout, editorState, localizationService, dateHelper, userService, contentEditingHelper) {
 
         var vm = this;
 
@@ -21,11 +21,15 @@
         var origDates = [];
 
         function onInit() {
+            
+            //when this is null, we don't check permissions
+            vm.currentNodePermissions = contentEditingHelper.getPermissionsForContent();
+            vm.canUnpublish = vm.currentNodePermissions ? vm.currentNodePermissions.canUnpublish : true;
 
             vm.variants = $scope.model.variants;
             vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
 
-            if(!$scope.model.title) {
+            if (!$scope.model.title) {
                 localizationService.localize("general_scheduledPublishing").then(value => {
                     $scope.model.title = value;
                 });
@@ -66,18 +70,25 @@
                     var now = new Date();
                     var nowFormatted = moment(now).format("YYYY-MM-DD HH:mm");
 
-                    var datePickerConfig = {
+                    const datePickerPublishConfig  = {
                         enableTime: true,
                         dateFormat: "Y-m-d H:i",
                         time_24hr: true,
                         minDate: nowFormatted,
-                        defaultDate: nowFormatted
+                        defaultDate: nowFormatted,
+                        clickOpens: true
                     };
+                    
+                    const datePickerUnpublishConfig = Utilities.extend({}, datePickerPublishConfig, {
+                        clickOpens: vm.canUnpublish
+                    });
 
-                    variant.datePickerConfig = datePickerConfig;
+
+                    variant.datePickerPublishConfig = datePickerPublishConfig;
+                    variant.datePickerUnpublishConfig = datePickerUnpublishConfig;
                     
                     // format all dates to local
-                    if(variant.releaseDate || variant.expireDate) {
+                    if (variant.releaseDate || variant.expireDate) {
                         formatDatesToLocal(variant);
                     }
                 });
@@ -353,7 +364,8 @@
                 // remove properties only needed for this dialog
                 delete variant.releaseDateFormatted;
                 delete variant.expireDateFormatted;
-                delete variant.datePickerConfig;
+                delete variant.datePickerPublishConfig;
+                delete variant.datePickerUnpublishConfig;
                 delete variant.releaseDatePickerInstance;
                 delete variant.expireDatePickerInstance;
                 delete variant.releaseDatePickerOpen;

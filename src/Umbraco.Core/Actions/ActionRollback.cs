@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
@@ -23,7 +23,7 @@ public class ActionRollback : IAction
     public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
 
     /// <inheritdoc />
-    public string Icon => "undo";
+    public string Icon => "icon-undo";
 
     /// <inheritdoc />
     public bool ShowInNotifier => true;

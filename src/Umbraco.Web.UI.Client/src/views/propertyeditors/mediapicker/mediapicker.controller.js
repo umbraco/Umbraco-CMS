@@ -3,7 +3,7 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
     function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, overlayService, clipboardService) {
 
-        var vm = this;
+        const vm = this;
 
         vm.labels = {};
         vm.labels.deletedItem = "";
@@ -351,20 +351,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             });
         }
 
-        var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+        let copyAllEntriesAction = {
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: ['Media'],
-            icon: "documents",
+            icon: "icon-documents",
             method: copyAllEntries,
-            isDisabled: true
+            isDisabled: true,
+            useLegacyIcon: false
         }
 
-        var removeAllEntriesAction = {
-            labelKey: 'clipboard_labelForRemoveAllEntries',
+        let removeAllEntriesAction = {
+            labelKey: "clipboard_labelForRemoveAllEntries",
             labelTokens: [],
-            icon: 'trash',
+            icon: "icon-trash",
             method: removeAllEntries,
-            isDisabled: true
+            isDisabled: true,
+            useLegacyIcon: false
         };
 
         if (multiPicker === true) {

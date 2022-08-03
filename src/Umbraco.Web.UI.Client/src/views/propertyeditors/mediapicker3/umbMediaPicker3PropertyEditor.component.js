@@ -33,8 +33,8 @@
         var unsubscribe = [];
 
         // Property actions:
-        var copyAllMediasAction = null;
-        var removeAllMediasAction = null;
+        let copyAllMediasAction = null;
+        let removeAllMediasAction = null;
 
         var vm = this;
 
@@ -83,17 +83,19 @@
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
-                icon: "documents",
+                icon: "icon-documents",
                 method: requestCopyAllMedias,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             removeAllMediasAction = {
-                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelKey: "clipboard_labelForRemoveAllEntries",
                 labelTokens: [],
-                icon: 'trash',
+                icon: "icon-trash",
                 method: requestRemoveAllMedia,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [];

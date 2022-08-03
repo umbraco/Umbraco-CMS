@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
 
-    var vm = this;
+    const vm = this;
 
     vm.openMemberGroupPicker = openMemberGroupPicker;
     vm.remove = remove;
@@ -18,12 +18,13 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     $scope.allowAdd = !$scope.readonly;
     $scope.groupIds = [];
 
-    var removeAllEntriesAction = {
-        labelKey: 'clipboard_labelForRemoveAllEntries',
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
         labelTokens: [],
-        icon: 'trash',
+        icon: "icon-trash",
         method: removeAllEntries,
-        isDisabled: !$scope.allowRemove
+        isDisabled: !$scope.allowRemove,
+        useLegacyIcon: false
     };
 
     if ($scope.model.config && $scope.umbProperty) {

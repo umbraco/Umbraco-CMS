@@ -10,7 +10,8 @@
             ng-trim="false"
             ng-required="model.validation.mandatory"
             aria-required="{{model.validation.mandatory}}"
-            ng-readonly="readonly">
+            ng-readonly="readonly"
+            aria-invalid="{{validLength ? false : true}}">
         </textarea>
 
         <span ng-messages="textareaFieldForm.textarea.$error" show-validation-on-submit >

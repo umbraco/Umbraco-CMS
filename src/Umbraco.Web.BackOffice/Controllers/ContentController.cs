@@ -528,6 +528,8 @@ public class ContentController : ContentControllerBase
         {
             display.DocumentType.Name =
                 _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Name);
+            display.DocumentType.Description =
+                _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, display.DocumentType.Description);
         }
 
         //remove the listview app if it exists
@@ -1860,6 +1862,11 @@ public class ContentController : ContentControllerBase
 
     private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent? content)
     {
+        if (content?.ParentId is not -1 && content?.HasIdentity is false)
+        {
+            content = _contentService.GetById(content.ParentId);
+        }
+
         if (content?.ParentId == -1)
         {
             return content.PublishedCultures;

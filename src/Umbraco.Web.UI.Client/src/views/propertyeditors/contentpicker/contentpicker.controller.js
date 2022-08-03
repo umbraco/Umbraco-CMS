@@ -117,12 +117,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         }
     };
 
-    var removeAllEntriesAction = {
-        labelKey: 'clipboard_labelForRemoveAllEntries',
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
         labelTokens: [],
-        icon: 'trash',
+        icon: "icon-trash",
         method: removeAllEntries,
-        isDisabled: true
+        isDisabled: true,
+        useLegacyIcon: false
     };
 
     if ($scope.model.config) {

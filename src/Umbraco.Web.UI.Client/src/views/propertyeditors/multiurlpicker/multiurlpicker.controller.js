@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService, overlayService) {
 
     var vm = {
         labels: {
@@ -10,10 +10,27 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
     $scope.allowEdit = !$scope.readonly;
     $scope.allowRemove = !$scope.readonly;
 
+    let removeAllEntriesAction = {
+        labelKey: "clipboard_labelForRemoveAllEntries",
+        labelTokens: [],
+        icon: "icon-trash",
+        method: removeAllEntries,
+        isDisabled: true,
+        useLegacyIcon: false
+    };
+
     $scope.renderModel = [];
 
     if ($scope.preview) {
         return;
+    }
+
+    if ($scope.model.config && parseInt($scope.model.config.maxNumber) !== 1 && $scope.umbProperty) {
+        var propertyActions = [
+          removeAllEntriesAction
+        ];
+
+        $scope.umbProperty.setPropertyActions(propertyActions);
     }
 
     if (!Array.isArray($scope.model.value)) {
@@ -62,7 +79,11 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             else {
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
+            
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1 || $scope.readonly;
+
+            removeAllEntriesAction.isDisabled = $scope.renderModel.length === 0;
+            
             //Update value
             $scope.model.value = $scope.renderModel;
         }
@@ -72,8 +93,14 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         if (!$scope.allowRemove) return;
 
         $scope.renderModel.splice($index, 1);
-
+        
         setDirty();
+    };
+
+    $scope.clear = function ($index) {
+      $scope.renderModel = [];
+
+      setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
@@ -150,6 +177,22 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
         if ($scope.multiUrlPickerForm) {
             $scope.multiUrlPickerForm.modelValue.$setDirty();
         }
+    }
+
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+          overlayService.confirmDelete({
+            title: data[1],
+            content: data[0],
+            close: function () {
+              overlayService.close();
+            },
+            submit: function () {
+              $scope.clear();
+              overlayService.close();
+            }
+          });
+        });
     }
 
     function init() {

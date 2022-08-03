@@ -137,9 +137,10 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
                         "/list/" + memberType.Alias)));
         }
 
-        //There is no menu for any of these nodes
+            //There is no menu for any of these nodes
         nodes.ForEach(x => x.MenuUrl = null);
-        //All nodes are containers
+
+            //All nodes are containers
         nodes.ForEach(x => x.AdditionalData.Add("isContainer", true));
 
         return nodes;
@@ -156,14 +157,15 @@ public class MemberTreeController : TreeController, ISearchableTree, ITreeNodeCo
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             //Create the normal create action
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+
             return menu;
         }
 
         //add delete option for all members
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? false)
         {

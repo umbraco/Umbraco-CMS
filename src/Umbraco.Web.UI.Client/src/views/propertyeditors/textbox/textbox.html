@@ -8,7 +8,7 @@
                val-server="value"
                ng-required="model.validation.mandatory"
                aria-required="{{model.validation.mandatory}}"
-               aria-invalid="False"
+               aria-invalid="{{validLength ? false : true}}"
                ng-trim="false"
                ng-change="change()"
                ng-readonly="readonly" />

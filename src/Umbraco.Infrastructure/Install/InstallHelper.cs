@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -24,6 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
+        private readonly IFireAndForgetRunner _fireAndForgetRunner;
         private InstallationType? _installationType;
 
         public InstallHelper(
@@ -34,7 +37,8 @@ namespace Umbraco.Cms.Infrastructure.Install
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory)
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
+            IFireAndForgetRunner fireAndForgetRunner)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
@@ -44,9 +48,34 @@ namespace Umbraco.Cms.Infrastructure.Install
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
+            _fireAndForgetRunner = fireAndForgetRunner;
 
             // We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
             GetInstallationType();
+        }
+
+        [Obsolete("Please use constructor that takes an IFireAndForgetRunner instead, scheduled for removal in Umbraco 12")]
+        public InstallHelper(
+            DatabaseBuilder databaseBuilder,
+            ILogger<InstallHelper> logger,
+            IUmbracoVersion umbracoVersion,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IInstallationService installationService,
+            ICookieManager cookieManager,
+            IUserAgentProvider userAgentProvider,
+            IUmbracoDatabaseFactory umbracoDatabaseFactory)
+            : this(
+                databaseBuilder,
+                logger,
+                umbracoVersion,
+                connectionStrings,
+                installationService,
+                cookieManager,
+                userAgentProvider,
+                umbracoDatabaseFactory,
+                StaticServiceProvider.Instance.GetRequiredService<IFireAndForgetRunner>())
+        {
+
         }
 
         public InstallationType GetInstallationType() => _installationType ??= IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade;
@@ -87,7 +116,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                     userAgent: userAgent,
                     dbProvider: dbProvider);
 
-                await _installationService.LogInstall(installLog);
+                _fireAndForgetRunner.RunFireAndForget(() => _installationService.LogInstall(installLog));
             }
             catch (Exception ex)
             {

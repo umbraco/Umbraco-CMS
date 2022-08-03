@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     /**
@@ -67,7 +67,8 @@
 
     function NestedContentController($scope, $interpolate, $filter, serverValidationManager, contentResource, localizationService, iconHelper, clipboardService, eventsService, overlayService, $attrs) {
 
-        var vm = this;
+        const vm = this;
+        
         var model = $scope.$parent.$parent.model;
 
         vm.readonly = false;
@@ -106,7 +107,8 @@
         if (vm.maxItems === 0)
             vm.maxItems = 1000;
 
-        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;;
+        vm.singleMode = vm.minItems === 1 && vm.maxItems === 1 && model.config.contentTypes.length === 1;
+        vm.expandsOnLoad = Object.toBoolean(model.config.expandsOnLoad)
         vm.showIcons = Object.toBoolean(model.config.showIcons);
         vm.wideMode = Object.toBoolean(model.config.hideLabel);
         vm.hasContentTypes = model.config.contentTypes.length > 0;
@@ -148,17 +150,27 @@
             });
         }
 
-        var copyAllEntriesAction = {
-            labelKey: 'clipboard_labelForCopyAllEntries',
+        let copyAllEntriesAction = {
+            labelKey: "clipboard_labelForCopyAllEntries",
             labelTokens: [model.label],
-            icon: 'documents',
+            icon: "icon-documents",
             method: copyAllEntries,
-            isDisabled: true
-        }
+            isDisabled: true,
+            useLegacyIcon: false
+        };
 
+        let removeAllEntriesAction = {
+            labelKey: "clipboard_labelForRemoveAllEntries",
+            labelTokens: [],
+            icon: "icon-trash",
+            method: removeAllEntries,
+            isDisabled: true,
+            useLegacyIcon: false
+        };
+        
+        function removeAllEntries() {
 
-        var removeAllEntries = function () {
-            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],
@@ -174,22 +186,12 @@
                 });
             });
         }
-
-        var removeAllEntriesAction = {
-            labelKey: 'clipboard_labelForRemoveAllEntries',
-            labelTokens: [],
-            icon: 'trash',
-            method: removeAllEntries,
-            isDisabled: true
-        };
-
+        
         // helper to force the current form into the dirty state
         function setDirty() {
-
             if (vm.umbProperty) {
                 vm.umbProperty.setDirty();
             }
-
         };
 
         function addNode(alias) {
@@ -630,8 +632,8 @@
                 modelWasChanged = true;
             }
 
-            // If there is only one item, set it as current node
-            if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+            // If there is only one item and expandsOnLoad property is true, set it as current node
+            if (vm.singleMode || (vm.expandsOnLoad && vm.nodes.length === 1)) {
                 setCurrentNode(vm.nodes[0], false);
             }
 
@@ -742,8 +744,6 @@
             copyAllEntriesAction.isDisabled = !model.value || !model.value.length;
             removeAllEntriesAction.isDisabled = copyAllEntriesAction.isDisabled || vm.readonly;
         }
-
-
 
         var propertyActions = [
             copyAllEntriesAction,

@@ -111,7 +111,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
             // root actions
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             menu.Items.Add(new RefreshNode(LocalizedTextService));
             return menu;
         }
@@ -123,41 +123,42 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
             // set the default to create
             menu.DefaultMenuAlias = ActionNew.ActionAlias;
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
             {
-                Icon = "icon icon-edit"
+                Icon = "icon-edit",
+                UseLegacyIcon = false,
             });
 
             if (container.HasChildren == false)
             {
                 // can delete doc type
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                    menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
         }
         else
         {
             IMediaType? ct = _mediaTypeService.Get(int.Parse(id, CultureInfo.InvariantCulture));
             IMediaType? parent = ct == null ? null : _mediaTypeService.Get(ct.ParentId);
 
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
             // no move action if this is a child doc type
             if (parent == null)
             {
-                menu.Items.Add<ActionMove>(LocalizedTextService, true, true);
+                menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
             }
 
-            menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true);
+            menu.Items.Add<ActionCopy>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             if (ct?.IsSystemMediaType() == false)
             {
-                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+                menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
             }
 
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
         }
 
         return menu;

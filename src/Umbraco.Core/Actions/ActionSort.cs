@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Actions;
@@ -23,7 +23,7 @@ public class ActionSort : IAction
     public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
 
     /// <inheritdoc />
-    public string Icon => "navigation-vertical";
+    public string Icon => "icon-navigation-vertical";
 
     /// <inheritdoc />
     public bool ShowInNotifier => true;
