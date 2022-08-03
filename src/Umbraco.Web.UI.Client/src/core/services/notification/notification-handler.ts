@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { UmbNotificationOptions, UmbNotificationData, UmbNotificationColor } from './notification.service';
+import type { UmbNotificationOptions, UmbNotificationData, UmbNotificationColor } from './';
+
+import './layouts/default';
 
 /**
  * @export

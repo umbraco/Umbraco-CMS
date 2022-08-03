@@ -1,6 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs';
-import { UmbNotificationHandler } from './notification-handler';
-import './layouts/default/notification-layout-default.element';
+import { UmbNotificationHandler } from './';
 
 export type UmbNotificationData = any;
 

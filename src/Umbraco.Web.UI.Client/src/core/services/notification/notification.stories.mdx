@@ -25,7 +25,7 @@ import type { UmbNotificationService } from './core/services/notification';
 
 class MyElement extends UmbContextConsumerMixin(LitElement) {
 
-  private _notificationService: UmbNotificationService;
+  private _notificationService?: UmbNotificationService;
 
   constructor () {
     super();
@@ -50,7 +50,7 @@ import type { UmbNotificationService, UmbNotificationDefaultData } from './core/
 
 class MyElement extends UmbContextConsumerMixin(LitElement) {
 
-  private _notificationService: UmbNotificationService;
+  private _notificationService?: UmbNotificationService;
 
   constructor () {
     super();
@@ -131,7 +131,7 @@ import type { UmbNotificationCustomData } from './custom-notification-layout';
 
 class MyElement extends LitElement {
 
-  private _notificationService: UmbNotificationService;
+  private _notificationService?: UmbNotificationService;
 
   constructor () {
     super();

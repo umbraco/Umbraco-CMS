@@ -4,8 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Subscription } from 'rxjs';
 import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationHandler } from '../../core/services/notification/notification-handler';
-import { UmbNotificationService } from '../../core/services/notification/notification.service';
+import type { UmbNotificationService, UmbNotificationHandler } from '../../core/services/notification';
 
 @customElement('umb-backoffice-notification-container')
 export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(LitElement) {

@@ -1,8 +1,8 @@
 import { assert, expect } from '@open-wc/testing';
 import { validate as uuidValidate } from 'uuid';
 import { UmbNotificationHandler } from './notification-handler';
-import type { UmbNotificationDefaultData } from './layouts/default/notification-layout-default.element';
-import type { UmbNotificationOptions } from './notification.service';
+import type { UmbNotificationDefaultData } from './layouts/default';
+import type { UmbNotificationOptions } from './';
 
 describe('UCPNotificationHandler', () => {
   let notificationHandler: UmbNotificationHandler;

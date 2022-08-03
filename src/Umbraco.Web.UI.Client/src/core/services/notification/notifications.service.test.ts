@@ -1,12 +1,8 @@
-import { html, expect } from '@open-wc/testing';
-import { UmbNotificationService } from './notification.service';
-import { UmbNotificationHandler } from './notification-handler';
+import { expect } from '@open-wc/testing';
+import { UmbNotificationService, UmbNotificationHandler } from './';
 
 describe('UCPNotificationService', () => {
   let notificationService: UmbNotificationService;
-  const options = {
-    data: { message: 'Notification message' }
-  };
 
   beforeEach(async () => {
     notificationService = new UmbNotificationService();
