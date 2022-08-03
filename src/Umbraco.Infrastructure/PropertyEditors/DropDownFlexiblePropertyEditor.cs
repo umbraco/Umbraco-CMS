@@ -45,6 +45,7 @@ public class DropDownFlexiblePropertyEditor : DataEditor
         _textService = textService;
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     protected override IDataValueEditor CreateValueEditor() =>

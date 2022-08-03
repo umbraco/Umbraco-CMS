@@ -40,6 +40,7 @@ public class ListViewPropertyEditor : DataEditor
     {
         _iioHelper = iioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     /// <inheritdoc />

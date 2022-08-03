@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService, $attrs) {
 
         var unsubscribe = [];
         var modelObject;
@@ -41,6 +41,19 @@
         var liveEditing = true;
 
         var vm = this;
+
+        vm.readonly = false;
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+
+            vm.sortableOptions.disabled = vm.readonly;
+            vm.blockEditorApi.readonly = vm.readonly;
+
+            if (deleteAllBlocksAction) {
+                deleteAllBlocksAction.isDisabled = vm.readonly;
+            }
+        });
 
         vm.loading = true;
         vm.currentBlockInFocus = null;
@@ -254,6 +267,14 @@
                     prop.culture = vm.umbProperty.property.culture;
                 });
             });
+
+            // set the scaffolded allowed actions to the allowed actions of the document
+            content.allowedActions = vm.umbVariantContent.content.allowedActions;
+
+            // set the scaffolded variants' allowed actions to the allowed actions of the current variant
+            content.variants.forEach(variant => {
+                variant.allowedActions = vm.umbVariantContent.editor.content.allowedActions;
+            });
         }
 
         function getBlockObject(entry) {
@@ -424,6 +445,7 @@
                 title: blockObject.label,
                 view: "views/common/infiniteeditors/blockeditor/blockeditor.html",
                 size: blockObject.config.editorSize || "medium",
+                hideSubmitButton: vm.readonly,
                 submit: function(blockEditorModel) {
 
                     if (liveEditing === false) {
@@ -718,6 +740,8 @@
         }
 
         function requestDeleteBlock(block) {
+            if (vm.readonly) return;
+            
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
                     title: data[0],
@@ -762,7 +786,8 @@
             copyBlock: copyBlock,
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
-            openSettingsForBlock: openSettingsForBlock
+            openSettingsForBlock: openSettingsForBlock,
+            readonly: vm.readonly
         };
 
         vm.sortableOptions = {
@@ -775,6 +800,7 @@
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readonly,
             update: function (ev, ui) {
                 setDirty();
             }
@@ -787,7 +813,7 @@
                 copyAllBlocksAction.isDisabled = vm.layout.length === 0;
             }
             if (deleteAllBlocksAction) {
-                deleteAllBlocksAction.isDisabled = vm.layout.length === 0;
+                deleteAllBlocksAction.isDisabled = vm.layout.length === 0 || vm.readonly;
             }
 
             // validate limits:

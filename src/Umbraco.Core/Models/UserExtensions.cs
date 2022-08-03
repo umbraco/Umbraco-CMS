@@ -188,6 +188,15 @@ public static class UserExtensions
     /// <summary>
     ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
     /// </summary>
+    public static int[]? CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
+    {
+        var hasAccessToAllLanguages = user.Groups.Any(x => x.HasAccessToAllLanguages);
+
+        return hasAccessToAllLanguages
+            ? localizationService.GetAllLanguages().Select(x => x.Id).ToArray()
+            : user.Groups.SelectMany(x => x.AllowedLanguages).Distinct().ToArray();
+    }
+
     public static int[]? CalculateContentStartNodeIds(this IUser user, IEntityService entityService, AppCaches appCaches)
     {
         var cacheKey = CacheKeys.UserAllContentStartNodesPrefix + user.Id;

@@ -11,7 +11,6 @@ public class MemberGroupPickerPropertyEditor : DataEditor
 {
     public MemberGroupPickerPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory)
-        : base(dataValueEditorFactory)
-    {
-    }
+        : base(dataValueEditorFactory) =>
+        SupportsReadOnly = true;
 }

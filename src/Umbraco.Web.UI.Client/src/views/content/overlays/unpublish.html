@@ -21,7 +21,7 @@
                                       name="unpublishVariantSelector"
                                       model="variant.save"
                                       on-change="vm.changeSelection(variant)"
-                                      disabled="variant.disabled"
+                                      disabled="variant.disabled || variant.notAllowed"
                                       server-validation-field="{{variant.htmlId}}">
 
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
@@ -37,6 +37,10 @@
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-if="variant.isMandatory"> - </span>
                                 <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="general_mandatory">Mandatory</localize></span>
+                                <span ng-if="variant.notAllowed"> - </span>
+                                <span ng-if="variant.notAllowed" class="text-error">
+                                    <localize key="content_variantUnpublishNotAllowed"></localize>
+                                </span>
                             </span>
                             <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                                 <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>

@@ -44,6 +44,7 @@ public class ContentPickerPropertyEditor : DataEditor
     {
         _ioHelper = ioHelper;
         _editorConfigurationParser = editorConfigurationParser;
+        SupportsReadOnly = true;
     }
 
     protected override IConfigurationEditor CreateConfigurationEditor() =>

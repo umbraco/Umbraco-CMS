@@ -107,6 +107,15 @@
     text-decoration: none;
 }
 
+.umb-node-preview-add:disabled {
+    cursor: not-allowed;
+
+    &:hover {
+        border-color: @ui-action-discreet-border;
+        color: @ui-action-discreet-type;
+    }
+}
+
 .umb-editor-wrapper .umb-node-preview-add {
     .umb-property-editor--limit-width();
 }
