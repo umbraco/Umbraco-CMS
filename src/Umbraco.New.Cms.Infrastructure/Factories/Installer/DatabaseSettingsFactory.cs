@@ -24,6 +24,7 @@ public class DatabaseSettingsFactory : IDatabaseSettingsFactory
         _mapper = mapper;
     }
 
+    /// <inheritdoc/>
     public ICollection<DatabaseSettingsModel> GetDatabaseSettings()
     {
         ConnectionStrings? connectionString = _connectionStrings.CurrentValue;

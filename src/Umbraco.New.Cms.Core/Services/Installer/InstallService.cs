@@ -22,6 +22,7 @@ public class InstallService : IInstallService
         _runtimeState = runtimeState;
     }
 
+    /// <inheritdoc/>
     public async Task Install(InstallData model)
     {
         if (_runtimeState.Level != RuntimeLevel.Install)
