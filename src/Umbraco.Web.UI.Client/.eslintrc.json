@@ -23,6 +23,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:lit/recommended",
     "plugin:lit-a11y/recommended",
+		"plugin:storybook/recommended",
     "prettier"
   ],
   "env": {
