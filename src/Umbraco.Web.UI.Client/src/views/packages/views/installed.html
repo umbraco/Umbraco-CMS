@@ -17,7 +17,7 @@
                             </div>
                             <div class="umb-package-list__item-content">
                                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
-                                <div class="umb-package-list__item-description">{{ installedPackage.version }}</div>
+                                <div class="umb-package-list__item-description">Version: {{ installedPackage.version }}</div>
                                 <div class="umb-package-list__item-description">
                                     <localize ng-if="installedPackage.hasMigrations && !installedPackage.hasPendingMigrations"
                                               key="packager_packageMigrationsNonePending">No pending migrations</localize>
