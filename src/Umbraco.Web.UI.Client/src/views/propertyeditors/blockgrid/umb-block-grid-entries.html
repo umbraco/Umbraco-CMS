@@ -1,6 +1,15 @@
-<div class="umb-block-grid__layout-container">
+<div 
+    class="umb-block-grid__layout-container"
+    ng-class="{'--not-allowed-for-drop': vm.showNotAllowedUI}"
+>
+
+    <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
+
+    </div>
+
     <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
+        ng-class="{'--has-areas': layoutEntry.areas.length > 0}"
         data-content-element-type-alias="{{layoutEntry.$block.content.contentTypeAlias}}"
         data-content-element-type-key="{{layoutEntry.$block.content.contentTypeKey}}"
         data-element-udi="{{layoutEntry.contentUdi}}"
@@ -22,6 +31,8 @@
     </umb-block-grid-entry>
 
 </div>
+
+
 <div class="umb-block-grid__actions">
     <button
             id="{{vm.model.alias}}"

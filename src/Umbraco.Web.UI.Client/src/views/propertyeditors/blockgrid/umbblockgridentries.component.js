@@ -26,6 +26,7 @@
     function BlockGridEntriesController($element, $scope) {
 
         var vm = this;
+        vm.showNotAllowedUI = false;
 
         vm.$onInit = function () {
             initializeSortable();
@@ -35,16 +36,25 @@
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
 
+        vm.showNotAllowed = function() {
+            vm.showNotAllowedUI = true;
+            $scope.$evalAsync();
+        }
+        vm.hideNotAllowed = function() {
+            vm.showNotAllowedUI = false;
+            $scope.$evalAsync();
+        }
+
         function initializeSortable() {
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
+            var _lastGridLayoutContainerEl = null;
 
             // Setup DOM method for communication between sortables:
             gridLayoutContainerEl['Sortable:controller'] = () => {
                 return vm;
             };
 
-            var movingBlock;
             //var nextSibling;
 
             // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
@@ -60,7 +70,7 @@
                 if (gridLayoutContainerEl !== evt.from) {
                     const fromCtrl = evt.from['Sortable:controller']();
                     const prevEntries = fromCtrl.entries;
-                    movingBlock = prevEntries[oldIndex];
+                    const movingBlock = prevEntries[oldIndex];
 
                     // Perform the transfer:
 
@@ -103,21 +113,29 @@
                 }
 
                 // TODO: Consider if this should be moved/delegated into each handler?
-                var movingBlock;
-                if (evt.dragged) {
+                const movingBlock = evt.dragged;
+                /*if (evt.dragged) {
                     movingBlock = evt.dragged;
-                } /*else {
+                } else {
                     if(gridLayoutContainerEl !== evt.from) {
                         movingBlock = evt.from['Sortable:controller']().entries[evt.oldIndex];
                     } else {
                         movingBlock = vm.entries[evt.oldIndex];
                     }
                 }*/
+
+                if(_lastGridLayoutContainerEl !== contextVM && _lastGridLayoutContainerEl !== null) {
+                    _lastGridLayoutContainerEl.hideNotAllowed();
+                }
+                _lastGridLayoutContainerEl = contextVM;
                 
                 // TODO: Test if we can transfer:
                 if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
+                    _lastGridLayoutContainerEl.hideNotAllowed();
+                    _lastGridLayoutContainerEl = null;
                     return true;
                 }
+                contextVM.showNotAllowed();
                 return false;
             }
 
@@ -180,6 +198,13 @@
                 onMove: function (evt) {
                     // same properties as onEnd
                     return _indication(evt)
+                },
+                onEnd: function(evt) {
+                    // ensure not-allowed indication is removed.
+                    if(_lastGridLayoutContainerEl) {
+                        _lastGridLayoutContainerEl.hideNotAllowed();
+                        _lastGridLayoutContainerEl = null;
+                    }
                 }
                 /*
                 setData: function (dataTransfer, dragEl) {

@@ -437,3 +437,21 @@ umb-block-grid-block {
         100% { background-color: rgba(@blueMidLight, 0.22); }
     }
 }
+
+
+
+
+/** make sure block with areas stay on top, so they don't look like they are 'not-allowed'*/
+.umb-block-grid__layout-container.--not-allowed-for-drop {
+    .umb-block-grid__layout-item.--has-areas {
+        z-index: 2;
+    }
+}
+
+.umb-block-grid__not-allowed-box {
+    position: absolute;
+    inset: 0;
+    z-index:1;
+    background:rgba(255, 0 ,0 , 0.2);
+    pointer-events: none;
+}
