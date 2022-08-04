@@ -31,15 +31,8 @@
             initializeSortable();
         };
 
-        vm.acceptBlock = function(movingBlock) {
-            if(vm.parentBlock) {
-                console.log("Area");
-                return true;
-            } else {
-                console.log("root");
-                return false;
-            }
-            return false;
+        vm.acceptBlock = function(contentTypeKey) {
+            return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
         }
 
         function initializeSortable() {
@@ -103,7 +96,6 @@
             function _indication(evt) {
 
                 // If not the same gridLayoutContainerEl, then test for transfer option:
-                console.log("_indication", evt)
 
                 var contextVM = vm;
                 if (gridLayoutContainerEl !== evt.to) {
@@ -114,16 +106,16 @@
                 var movingBlock;
                 if (evt.dragged) {
                     movingBlock = evt.dragged;
-                } else {
+                } /*else {
                     if(gridLayoutContainerEl !== evt.from) {
-                        movingBlock = evt.from['Sortable:controller']().entries[oldIndex];
+                        movingBlock = evt.from['Sortable:controller']().entries[evt.oldIndex];
                     } else {
-                        movingBlock = vm.entries[oldIndex];
+                        movingBlock = vm.entries[evt.oldIndex];
                     }
-                }
+                }*/
                 
                 // TODO: Test if we can transfer:
-                if(contextVM.acceptBlock(movingBlock) === true) {
+                if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
                     return true;
                 }
                 return false;
@@ -171,16 +163,16 @@
                     $scope.$apply();
                 },*/
                 onAdd: function (evt) {
-                    if(_indication(evt) === false) {
+                    /*if(_indication(evt) === false) {
                         return false;
-                    }
+                    }*/
                     _sync(evt);
                     $scope.$apply();
                 },
                 onUpdate: function (evt) {
-                    if(_indication(evt) === false) {
+                    /*if(_indication(evt) === false) {
                         return false;
-                    }
+                    }*/
                     _sync(evt);
                     $scope.$apply();
                 },

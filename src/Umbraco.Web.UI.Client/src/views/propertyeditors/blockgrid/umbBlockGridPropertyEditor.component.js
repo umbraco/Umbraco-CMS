@@ -453,7 +453,13 @@
             return null;
         }
 
-        function getAllowedTypesOfArea(parentBlock, areaKey) {
+        // Used by umbblockgridentries.component to check for drag n' drop allowance:
+        vm.isElementTypeKeyAllowedAt = isElementTypeKeyAllowedAt;
+        function isElementTypeKeyAllowedAt(parentBlock, areaKey, contentElementTypeKey) {
+            return getAllowedTypesOf(parentBlock, areaKey).filter(x => x.blockConfigModel.contentElementTypeKey === contentElementTypeKey).length > 0;
+        }
+        
+        function getAllowedTypesOf(parentBlock, areaKey) {
 
             if(areaKey == null || parentBlock == null) {
                 return vm.availableBlockTypes.filter(x => x.blockConfigModel.allowAtRoot);
@@ -602,7 +608,7 @@
 
             options = options || {};
 
-            const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
+            const availableTypes = getAllowedTypesOf(parentBlock, areaKey);
 
             if (availableTypes.length === 1) {
                 var wasAdded = false;
@@ -632,7 +638,7 @@
 
             options = options || {};
 
-            const availableTypes = getAllowedTypesOfArea(parentBlock, areaKey);
+            const availableTypes = getAllowedTypesOf(parentBlock, areaKey);
 
             if (availableTypes.length === 0) {
                 return;
