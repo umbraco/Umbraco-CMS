@@ -2,11 +2,11 @@ import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { UmbContextConsumerMixin } from '../../core/context';
-import type { DataTypeEntity } from '../../mocks/data/data-type.data';
-import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../core/extension';
+import { UmbContextConsumerMixin } from '../../../../core/context';
+import type { DataTypeEntity } from '../../../../mocks/data/data-type.data';
+import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../../../core/extension';
 import { Subscription, distinctUntilChanged } from 'rxjs';
-import { UmbDataTypeContext } from '../editors/data-type/data-type.context';
+import { UmbDataTypeContext } from '../data-type.context';
 import { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-editor-view-data-type-edit')
