@@ -37,6 +37,7 @@
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="chooseWhereToCopy">Choose where to copy</key>
     <key alias="chooseWhereToMove">Choose where to move</key>
+    <key alias="chooseWhereToImport">Choose where to import</key>
     <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
     <key alias="infiniteEditorChooseWhereToCopy">Choose where to copy the selected item(s)</key>
     <key alias="infiniteEditorChooseWhereToMove">Choose where to move the selected item(s)</key>
@@ -319,6 +320,11 @@
     <key alias="createEmpty">Create new</key>
     <key alias="createFromClipboard">Paste from clipboard</key>
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
+    <key alias="variantSaveNotAllowed">Save is not allowed</key>
+    <key alias="variantPublishNotAllowed">Publish is not allowed</key>
+    <key alias="variantSendForApprovalNotAllowed">Send for approval is not allowed</key>
+    <key alias="variantScheduleNotAllowed">Schedule is not allowed</key>
+    <key alias="variantUnpublishNotAllowed">Unpublish is not allowed</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
@@ -553,6 +559,7 @@
     <key alias="selectMemberGroup">Select member group</key>
     <key alias="selectMemberType">Select member type</key>
     <key alias="selectNode">Select node</key>
+    <key alias="selectLanguages">Select languages</key>
     <key alias="selectSections">Select sections</key>
     <key alias="selectUser">Select user</key>
     <key alias="selectUsers">Select users</key>
@@ -579,9 +586,14 @@
     <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
+    <key alias="importDictionaryItemHelp">
+      To import a dictionary item, find the ".udt" file on your computer by clicking the
+      "Import" button (you'll be asked for confirmation on the next screen)
+    </key>
     <key alias="itemDoesNotExists">Dictionary item does not exist.</key>
     <key alias="parentDoesNotExists">Parent item does not exist.</key>
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="noItemsInFile">There are no dictionary items in this file.</key>
     <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
@@ -845,6 +857,7 @@
     <key alias="noItemsInList">No items have been added</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
+    <key alias="shared">Shared</key>
     <key alias="show">Show</key>
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
@@ -1634,6 +1647,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
     <key alias="documentTypeExportedSuccess">Document Type was exported to file</key>
     <key alias="documentTypeExportedError">An error occurred while exporting the Document Type</key>
+    <key alias="dictionaryItemExportedSuccess">Dictionary item(s) was exported to file</key>
+    <key alias="dictionaryItemExportedError">An error occurred while exporting the dictionary item(s)</key>
+    <key alias="dictionaryItemImported">The following dictionary item(s) has been imported!</key>
     <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
     <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not
       published
@@ -1674,6 +1690,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tabRules">Rich Text Editor</key>
   </area>
   <area alias="template">
+    <key alias="runtimeModeProduction"><![CDATA[Content is not editable when using runtime mode <code>Production</code>.]]></key>
     <key alias="deleteByIdFailed">Failed to delete template with ID %0%</key>
     <key alias="edittemplate">Edit template</key>
     <key alias="insertSections">Sections</key>
@@ -1949,6 +1966,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="fallbackLanguage">Fall back language</key>
     <key alias="none">none</key>
+    <key alias="invariantPropertyUnlockHelp"><![CDATA[<strong>%0%</strong> is shared across all languages.]]></key>
   </area>
   <area alias="macro">
     <key alias="addParameter">Add parameter</key>
@@ -2157,6 +2175,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="permissionsGranularHelp">Set permissions for specific nodes</key>
     <key alias="profile">Profile</key>
     <key alias="searchAllChildren">Search all children</key>
+    <key alias="languagesHelp">Limit the languages users have access to edit</key>
+    <key alias="allowAccessToAllLanguages">Allow access to all languages</key>
     <key alias="sectionsHelp">Add sections to give users access</key>
     <key alias="selectUserGroups">Select user groups</key>
     <key alias="noStartNode">No start node selected</key>
@@ -2518,7 +2538,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsPublishedStatus">Published Status</key>
     <key alias="settingsModelsBuilder">Models Builder</key>
     <key alias="settingsHealthCheck">Health Check</key>
-    <key alias="settingsAnalytics">Analytics</key>
+    <key alias="settingsAnalytics">Telemetry data</key>
     <key alias="settingsProfiler">Profiling</key>
     <key alias="memberIntro">Getting Started</key>
     <key alias="formsInstall">Install Umbraco Forms</key>
@@ -2876,8 +2896,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="searchResults">items returned</key>
   </area>
   <area alias="analytics">
-    <key alias="consentForAnalytics">Consent for analytics</key>
-    <key alias="analyticsLevelSavedSuccess">Analytics level saved!</key>
+    <key alias="consentForAnalytics">Consent for telemetry data</key>
+    <key alias="analyticsLevelSavedSuccess">Telemetry level saved!</key>
     <key alias="analyticsDescription">
       <![CDATA[
       In order to improve Umbraco and add new functionality based on as relevant information as possible,
@@ -2893,12 +2913,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="detailedLevelDescription">
       <![CDATA[
           We will send:
-          <br>- Anonymized site ID, umbraco version, and packages installed.
-          <br>- Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.
-          <br>- System information: Webserver, server OS, server framework, server OS language, and database provider.
-          <br>- Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.
-          <br>
-          <br><i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
+          <ul>
+            <li>Anonymized site ID, umbraco version, and packages installed.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
+            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+          </ul>
+          <i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
           <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</i>
        ]]>
     </key>

@@ -225,7 +225,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
             return dbType.EscapeSqlIdentifier(columnName);
         }
 
-        return base.GetColumn(dbType, tableName, columnName, columnAlias, referenceName, forInsert);
+        return base.GetColumn(dbType, tableName, columnName, columnAlias!, referenceName, forInsert);
     }
 
     public override string FormatPrimaryKey(TableDefinition table)

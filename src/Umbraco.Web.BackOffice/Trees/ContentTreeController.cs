@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees;
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
 [SearchableTree("searchResultFormatter", "configureContentResult", 10)]
-public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
+public class ContentTreeController : ContentTreeControllerBase, ISearchableTreeWithCulture
 {
     private readonly ActionCollection _actions;
     private readonly AppCaches _appCaches;
@@ -103,7 +103,6 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         IEnumerable<SearchResultEntity> results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out var totalFound, searchFrom);
         return new EntitySearchResults(results, totalFound);
     }
-
 
     /// <inheritdoc />
     protected override TreeNode? GetSingleTreeNode(IEntitySlim entity, string parentId, FormCollection? queryStrings)
@@ -196,8 +195,8 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
                 .Select(x => new MenuItem(x));
 
             //these two are the standard items
-            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-            menu.Items.Add<ActionSort>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+            menu.Items.Add<ActionSort>(LocalizedTextService, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
 
             //filter the standard items
             FilterUserAllowedMenuItems(menu, nodeActions);
@@ -301,23 +300,24 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     protected MenuItemCollection GetAllNodeMenuItems(IUmbracoEntity item)
     {
         MenuItemCollection menu = _menuItemCollectionFactory.Create();
-        AddActionNode<ActionNew>(item, menu, opensDialog: true);
-        AddActionNode<ActionDelete>(item, menu, opensDialog: true);
-        AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
-        AddActionNode<ActionMove>(item, menu, true, true);
-        AddActionNode<ActionCopy>(item, menu, opensDialog: true);
-        AddActionNode<ActionSort>(item, menu, true, true);
-        AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
-        AddActionNode<ActionRights>(item, menu, opensDialog: true);
-        AddActionNode<ActionProtect>(item, menu, true, true);
+        AddActionNode<ActionNew>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionDelete>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionMove>(item, menu, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionCopy>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionSort>(item, menu, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionRights>(item, menu, opensDialog: true, useLegacyIcon: false);
+        AddActionNode<ActionProtect>(item, menu, hasSeparator: true, opensDialog: true, useLegacyIcon: false);
 
         if (_emailSender.CanSendRequiredEmail())
         {
             menu.Items.Add(new MenuItem("notify", LocalizedTextService)
             {
-                Icon = "megaphone",
+                Icon = "icon-megaphone",
                 SeparatorBefore = true,
-                OpensDialog = true
+                OpensDialog = true,
+                UseLegacyIcon = false
             });
         }
 
@@ -337,9 +337,9 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
     protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
     {
         MenuItemCollection menu = _menuItemCollectionFactory.Create();
-        menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
-        menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);
-        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
+        menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+        menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
+        menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
 
         menu.Items.Add(new RefreshNode(LocalizedTextService, true));
 
@@ -392,9 +392,15 @@ public class ContentTreeController : ContentTreeControllerBase, ISearchableTree
         }
     }
 
-    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false)
+    private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool opensDialog = false, bool useLegacyIcon = true)
         where TAction : IAction
     {
-        MenuItem? menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog);
+        MenuItem? menuItem = menu.Items.Add<TAction>(LocalizedTextService, hasSeparator, opensDialog, useLegacyIcon);
+    }
+
+    public async Task<EntitySearchResults> SearchAsync(string query, int pageSize, long pageIndex, string? searchFrom = null, string? culture = null)
+    {
+        var results = _treeSearcher.ExamineSearch(query, UmbracoEntityTypes.Document, pageSize, pageIndex, out long totalFound, culture: culture, searchFrom: searchFrom);
+        return new EntitySearchResults(results, totalFound);
     }
 }

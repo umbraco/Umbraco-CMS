@@ -258,8 +258,7 @@ public abstract class DatabaseServerMessenger : ServerMessengerBase, IDisposable
         return InitializeColdBootState();
     }
 
-    // <summary>
-
+    /// <summary>
     /// Initializes a server that has never synchronized before.
     /// </summary>
     /// <remarks>

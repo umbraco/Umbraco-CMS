@@ -1,0 +1,17 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.Dictionary.ExportController">
+  <div class="umb-dialog-body form-horizontal" ng-cloak>
+      <umb-pane>
+        <umb-control-group localize="label" label="@defaultdialogs_includeDescendants">
+          <umb-toggle checked="includeChildren" on-click="toggleHandler()"></umb-toggle>
+        </umb-control-group>
+      </umb-pane>
+  </div>
+  <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+    <button type="button" class="btn btn-link" ng-click="cancel()">
+      <localize key="general_cancel">Cancel</localize>
+    </button>
+    <button class="btn btn-primary" ng-click="export()">
+      <localize key="actions_export">Export</localize>
+    </button>
+  </div>
+</div>

@@ -28,13 +28,13 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource, $attrs) {
 
         var unsubscribe = [];
 
         // Property actions:
-        var copyAllMediasAction = null;
-        var removeAllMediasAction = null;
+        let copyAllMediasAction = null;
+        let removeAllMediasAction = null;
 
         var vm = this;
 
@@ -42,6 +42,10 @@
 
         vm.activeMediaEntry = null;
         vm.supportCopy = clipboardService.isSupported();
+
+        vm.allowAddMedia = true;
+        vm.allowRemoveMedia = true;
+        vm.allowEditMedia = true;
 
         vm.addMediaAt = addMediaAt;
         vm.editMedia = editMedia;
@@ -53,6 +57,16 @@
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
             vm.labels.content_createEmpty = data[1];
+        });
+
+        $attrs.$observe('readonly', (value) => {
+            vm.readonly = value !== undefined;
+
+            vm.allowAddMedia = !vm.readonly;
+            vm.allowRemoveMedia = !vm.readonly;
+            vm.allowEditMedia = !vm.readonly;
+
+            vm.sortableOptions.disabled = vm.readonly;
         });
 
         vm.$onInit = function() {
@@ -69,17 +83,19 @@
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
                 labelTokens: [vm.model.label],
-                icon: "documents",
+                icon: "icon-documents",
                 method: requestCopyAllMedias,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             removeAllMediasAction = {
-                labelKey: 'clipboard_labelForRemoveAllEntries',
+                labelKey: "clipboard_labelForRemoveAllEntries",
                 labelTokens: [],
-                icon: 'trash',
+                icon: "icon-trash",
                 method: requestRemoveAllMedia,
-                isDisabled: true
+                isDisabled: true,
+                useLegacyIcon: false
             };
 
             var propertyActions = [];
@@ -144,6 +160,8 @@
         }
 
         function addMediaAt(createIndex, $event) {
+            if (!vm.allowAddMedia) return;
+
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
@@ -203,6 +221,7 @@
 
         // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
+            if (!vm.allowAddMedia) return;
 
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
@@ -238,12 +257,15 @@
         }
 
         function resetCrop(cropEntry) {
+            if (!vm.allowEditMedia) return;
+
             Object.assign(cropEntry, vm.model.config.crops.find( c => c.alias === cropEntry.alias));
             cropEntry.coordinates = null;
             setDirty();
         }
 
         function updateMediaEntryData(mediaEntry) {
+            if (!vm.allowEditMedia) return;
 
             mediaEntry.crops = mediaEntry.crops || [];
             mediaEntry.focalPoint = mediaEntry.focalPoint || {
@@ -263,6 +285,8 @@
         }
 
         function removeMedia(media) {
+            if (!vm.allowRemoveMedia) return;
+
             var index = vm.model.value.indexOf(media);
             if (index !== -1) {
                 vm.model.value.splice(index, 1);
@@ -270,6 +294,8 @@
         }
 
         function deleteAllMedias() {
+            if (!vm.allowRemoveMedia) return;
+
             vm.model.value = [];
         }
 
@@ -278,6 +304,7 @@
         }
 
         function editMedia(mediaEntry, options, $event) {
+            if (!vm.allowEditMedia) return;
 
             if($event)
             $event.stopPropagation();
@@ -370,6 +397,7 @@
         }
 
         function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {
+            if (!vm.allowAddMedia) return;
 
             if (pasteEntry === undefined) {
                 return false;
@@ -408,6 +436,7 @@
             distance: 5,
             tolerance: "pointer",
             scroll: true,
+            disabled: vm.readonly,
             update: function (ev, ui) {
                 setDirty();
             }
@@ -420,7 +449,7 @@
                 copyAllMediasAction.isDisabled = vm.model.value.length === 0;
             }
             if (removeAllMediasAction) {
-                removeAllMediasAction.isDisabled = vm.model.value.length === 0;
+                removeAllMediasAction.isDisabled = vm.model.value.length === 0 || !vm.allowRemoveMedia;
             }
 
             // validate limits:

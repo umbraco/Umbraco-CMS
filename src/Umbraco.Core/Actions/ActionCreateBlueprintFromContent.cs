@@ -18,7 +18,7 @@ public class ActionCreateBlueprintFromContent : IAction
     public bool CanBePermissionAssigned => true;
 
     /// <inheritdoc />
-    public string Icon => "blueprint";
+    public string Icon => Constants.Icons.Blueprint;
 
     /// <inheritdoc />
     public string Alias => "createblueprint";

@@ -44,10 +44,10 @@ public class RelationTypeTreeController : TreeController
         if (id == Constants.System.RootString)
         {
             //Create the normal create action
-            menu.Items.Add<ActionNew>(LocalizedTextService);
+            menu.Items.Add<ActionNew>(LocalizedTextService, useLegacyIcon: false);
 
             //refresh action
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
             return menu;
         }
@@ -60,7 +60,7 @@ public class RelationTypeTreeController : TreeController
 
         if (relationType.IsSystemRelationType() == false)
         {
-            menu.Items.Add<ActionDelete>(LocalizedTextService);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, useLegacyIcon: false);
         }
 
         return menu;
@@ -73,8 +73,7 @@ public class RelationTypeTreeController : TreeController
         if (id == Constants.System.RootString)
         {
             nodes.AddRange(_relationService.GetAllRelationTypes()
-                .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name,
-                    "icon-trafic", false)));
+                .Select(rt => CreateTreeNode(rt.Id.ToString(), id, queryStrings, rt.Name, "icon-trafic", hasChildren: false)));
         }
 
         return nodes;

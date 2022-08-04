@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
-  "version": "10.1.0-alpha.1",
+  "version": "10.2.0-alpha.1",
   "assemblyVersion": {
     "precision": "Build" // optional. Use when you want a more precise assembly version than the default major.minor.
   },

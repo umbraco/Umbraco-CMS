@@ -484,7 +484,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
-                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()}
+                        {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
+                        {"allowEditInvariantFromNonDefault", _securitySettings.AllowEditInvariantFromNonDefault},
                     }
                 },
                 {
@@ -597,7 +598,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 { "assemblyVersion", _umbracoVersion.AssemblyVersion?.ToString() }
             };
 
-
+            app.Add("runtimeMode", _runtimeSettings.Mode.ToString());
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());

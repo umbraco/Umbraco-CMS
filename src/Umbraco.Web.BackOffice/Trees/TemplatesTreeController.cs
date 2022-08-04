@@ -119,14 +119,14 @@ public class TemplatesTreeController : TreeController, ISearchableTree
         MenuItemCollection menu = _menuItemCollectionFactory.Create();
 
         //Create the normal create action
-        MenuItem? item = menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
+        MenuItem? item = menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true, useLegacyIcon: false);
         item?.NavigateToRoute(
             $"{queryStrings.GetRequiredValue<string>("application")}/templates/edit/{id}?create=true");
 
         if (id == Constants.System.RootString)
         {
-            //refresh action
-            menu.Items.Add(new RefreshNode(LocalizedTextService, true));
+                //refresh action
+            menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
             return menu;
         }
@@ -139,16 +139,15 @@ public class TemplatesTreeController : TreeController, ISearchableTree
 
         EntitySlim entity = FromTemplate(template);
 
-        //don't allow delete if it has child layouts
+            //don't allow delete if it has child layouts
         if (template.IsMasterTemplate == false)
         {
             //add delete option if it doesn't have children
-            menu.Items.Add<ActionDelete>(LocalizedTextService, true, true);
+            menu.Items.Add<ActionDelete>(LocalizedTextService, hasSeparator: true, opensDialog: true);
         }
 
-        //add refresh
-        menu.Items.Add(new RefreshNode(LocalizedTextService, true));
-
+            //add refresh
+        menu.Items.Add(new RefreshNode(LocalizedTextService, separatorBefore: true));
 
         return menu;
     }

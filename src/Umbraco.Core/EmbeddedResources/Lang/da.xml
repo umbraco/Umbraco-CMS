@@ -536,6 +536,7 @@
     <key alias="selectMemberGroup">Vælg medlemsgruppe</key>
     <key alias="selectMemberType">Vælg medlemstype</key>
     <key alias="selectNode">Vælg node</key>
+    <key alias="selectLanguages">Vælg sprog</key>
     <key alias="selectSections">Vælg sektioner</key>
     <key alias="selectUser">Vælg bruger</key>
     <key alias="selectUsers">Vælg brugere</key>
@@ -1028,12 +1029,14 @@
     <key alias="resetPasswordEmailCopySubject">Umbraco: Nulstil adgangskode</key>
     <key alias="resetPasswordEmailCopyFormat">
       <![CDATA[<p>Dit brugernavn til at logge på Umbraco backoffice er: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>her</strong></a> for at nulstille din adgangskode eller kopier/indsæt denne URL i din browser:</p><p><em>%1%</em></p>]]></key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Sikkerhedskode</key>
+    <key alias="mfaSecurityCodeMessage">Din sikkerhedskode er: %0%</key>
     <key alias="2faTitle">Sidste skridt</key>
-    <key alias="2faText">Det er påkrævet at du verificerer din identitet.</key>
-    <key alias="2faMultipleText">Vælg venligst en autentificeringsmetode</key>
+    <key alias="2faText">Det er påkrævet at du bekræfter din identitet.</key>
+    <key alias="2faMultipleText">Vælg venligst en godkendelsesmetode</key>
     <key alias="2faCodeInput">Kode</key>
-    <key alias="2faCodeInputHelp">Indtast venligst koden fra dit device</key>
-    <key alias="2faInvalidCode">Koden kunne ikke genkendes</key>
+    <key alias="2faCodeInputHelp">Indtast venligst bekræftelseskoden</key>
+    <key alias="2faInvalidCode">Ugyldig kode indtastet</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -1867,6 +1870,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
+    <key alias="languagesHelp">Tilføj sprog for at give brugerne adgang til at redigere</key>
     <key alias="sectionsHelp">Tilføj sektioner for at give brugerne adgang</key>
     <key alias="selectUserGroups">Vælg brugergrupper</key>
     <key alias="noStartNode">Ingen startnode valgt</key>

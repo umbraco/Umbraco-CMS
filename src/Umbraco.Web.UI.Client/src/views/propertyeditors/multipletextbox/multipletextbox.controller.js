@@ -10,7 +10,8 @@
         containment: 'parent',
         cursor: 'move',
         items: '> div.textbox-wrapper',
-        tolerance: 'pointer'
+        tolerance: 'pointer',
+        disabled: $scope.readonly
     };
 
     if (!$scope.model.value) {
@@ -28,6 +29,9 @@
 
     $scope.paste = function (event, index) {
         event.preventDefault();
+
+        if ($scope.readonly) return;
+
         var text = (event.clipboardData || window.clipboardData || event.originalEvent.clipboardData).getData('text');
         var lines = text.split(/\r?\n/).map(line => { return { value: line, hasFocus: false } });
 
@@ -50,10 +54,11 @@
     }
 
     $scope.addRemoveOnKeyDown = function (event, index) {
+        event.preventDefault();
+
+        if ($scope.readonly) return;
 
         var txtBoxValue = $scope.model.value[index];
-
-        event.preventDefault();
 
         switch (event.keyCode) {
             case 13:
@@ -106,7 +111,13 @@
         validate();
     };
 
-    $scope.add = function () {
+    $scope.add = function ($event) {
+        if ($scope.readonly) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            return;
+        }
+
         if ($scope.model.config.max <= 0 || $scope.model.value.length < $scope.model.config.max) {
             $scope.model.value.push({ value: "" });
 
@@ -118,6 +129,8 @@
     };
 
     $scope.remove = function (index) {
+        if ($scope.readonly) return;
+
         // Make sure not to trigger other prompts when remove is triggered
         $scope.hidePrompt();
 
@@ -131,6 +144,7 @@
     };
 
     $scope.showPrompt = function (idx, item) {
+        if ($scope.readonly) return;
 
         var i = $scope.model.value.indexOf(item);
 
