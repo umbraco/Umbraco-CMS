@@ -21,7 +21,7 @@ export class UmbNotificationLayoutDefaultElement extends LitElement {
 
 	render() {
 		return html`
-			<uui-toast-notification-layout headline="${ifDefined(this.data.headline)}" class="uui-text">
+			<uui-toast-notification-layout id="layout" headline="${ifDefined(this.data.headline)}" class="uui-text">
 				<div id="message">${this.data.message}</div>
 			</uui-toast-notification-layout>
 		`;
