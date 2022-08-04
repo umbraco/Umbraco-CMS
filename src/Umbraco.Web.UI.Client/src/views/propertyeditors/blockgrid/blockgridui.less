@@ -24,6 +24,10 @@
     */
 }
 
+.umb-block-grid__root-container {
+    position: relative;
+}
+
 .umb-block-grid__layout-item {
     position: relative;
 }
@@ -452,6 +456,12 @@ umb-block-grid-block {
     position: absolute;
     inset: 0;
     z-index:1;
-    background:rgba(255, 0 ,0 , 0.2);
+    border: 1px solid @red;
     pointer-events: none;
+
+    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__scalebox__pulse {
+        0%   { background-color: rgba(@red, 0.33); }
+        100% { background-color: rgba(@red, 0.22); }
+    }
 }

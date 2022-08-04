@@ -2,11 +2,6 @@
     class="umb-block-grid__layout-container"
     ng-class="{'--not-allowed-for-drop': vm.showNotAllowedUI}"
 >
-
-    <div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
-
-    </div>
-
     <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
         ng-class="{'--has-areas': layoutEntry.areas.length > 0}"
@@ -29,6 +24,10 @@
     >
 
     </umb-block-grid-entry>
+
+</div>
+
+<div ng-if="vm.showNotAllowedUI" class="umb-block-grid__not-allowed-box">
 
 </div>
 
