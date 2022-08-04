@@ -3,17 +3,17 @@ import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
-import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../core/context';
-import { UmbNotificationService } from '../../core/services/notification.service';
-import { UmbDataTypeStore } from '../../core/stores/data-type.store';
-import { DataTypeEntity } from '../../mocks/data/data-type.data';
-import { UmbDataTypeContext } from './data-type/data-type.context';
+import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
+import { UmbNotificationService } from '../../../core/services/notification.service';
+import { UmbDataTypeStore } from '../../../core/stores/data-type.store';
+import { DataTypeEntity } from '../../../mocks/data/data-type.data';
+import { UmbDataTypeContext } from './data-type.context';
 
-import '../../backoffice/components/editor-entity.element';
+import '../../components/editor-entity.element';
 
 // Lazy load
 // TODO: Make this dynamic, use load-extensions method to loop over extensions for this node.
-import '../editor-views/editor-view-data-type-edit.element';
+import '../../editor-views/editor-view-data-type-edit.element';
 
 @customElement('umb-editor-data-type')
 export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContextConsumerMixin(LitElement)) {

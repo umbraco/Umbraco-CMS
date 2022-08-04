@@ -20,7 +20,7 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
 		// TODO: who should own this logic? Should it be each tree/editor that knows sub-routes?
 		{
 			path: 'data-type/:id',
-			component: () => import('../../editors/editor-data-type.element'),
+			component: () => import('../../editors/data-type/editor-data-type.element'),
 			setup(component: any, info: IRoutingInfo) {
 				component.id = info.match.params.id;
 			},
