@@ -129,7 +129,6 @@
                 }
                 _lastGridLayoutContainerEl = contextVM;
                 
-                // TODO: Test if we can transfer:
                 if(contextVM.acceptBlock(movingBlock.dataset.contentElementTypeKey) === true) {
                     _lastGridLayoutContainerEl.hideNotAllowed();
                     _lastGridLayoutContainerEl = null;
