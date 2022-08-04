@@ -31,38 +31,48 @@
             initializeSortable();
         };
 
+        vm.acceptBlock = function(movingBlock) {
+            if(vm.parentBlock) {
+                console.log("Area");
+                return true;
+            } else {
+                console.log("root");
+                return false;
+            }
+            return false;
+        }
+
         function initializeSortable() {
 
             const gridLayoutContainerEl = $element[0].querySelector('.umb-block-grid__layout-container');
 
             // Setup DOM method for communication between sortables:
-            gridLayoutContainerEl['Sortable:ng-sortable'] = () => {
+            gridLayoutContainerEl['Sortable:controller'] = () => {
                 return vm;
             };
 
-            var removed, nextSibling;
+            var movingBlock;
+            //var nextSibling;
 
-            // Borrowed concept from: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
-            // TODO: investigate usage of Store options prop.
+            // Borrowed concept from, its not identical as more has been implemented: https://github.com/SortableJS/angular-legacy-sortablejs/blob/master/angular-legacy-sortable.js
             function _sync(evt) {
-                var entries = vm.entries;
 
-                var oldIndex = evt.oldIndex,
-                    newIndex = evt.newIndex;
+                console.log("_sync")
+
+
+                const oldIndex = evt.oldIndex,
+                      newIndex = evt.newIndex;
 
                 // If not the same gridLayoutContainerEl, then test for transfer option:
                 if (gridLayoutContainerEl !== evt.from) {
-                    const fromEntriesController = evt.from['Sortable:ng-sortable']();
-
-                    // TODO: Test if we can transfer:
+                    const fromCtrl = evt.from['Sortable:controller']();
+                    const prevEntries = fromCtrl.entries;
+                    movingBlock = prevEntries[oldIndex];
 
                     // Perform the transfer:
-                    var prevEntries = fromEntriesController.entries;
-
-                    removed = prevEntries[oldIndex];
 
                     if (Sortable.active && Sortable.active.lastPullMode === 'clone') {
-                        removed = Utilities.copy(removed);
+                        movingBlock = Utilities.copy(movingBlock);
                         prevEntries.splice(Sortable.utils.index(evt.clone, sortable.options.draggable), 0, prevEntries.splice(oldIndex, 1)[0]);
 
                         if (evt.from.contains(evt.clone)) {
@@ -73,13 +83,14 @@
                         prevEntries.splice(oldIndex, 1);
                     }
 
-                    entries.splice(newIndex, 0, removed);
+                    vm.entries.splice(newIndex, 0, movingBlock);
 
-                    // TODO: fix issue when dragging one level out. I currently do not think below ine is necessary as this is updated through angularJS.
+                    // TODO: fix issue when dragging one level out. I currently do not think below line is necessary as this is updated through angularJS.
                     //evt.from.insertBefore(evt.item, nextSibling); // revert element
+                    
                 }
                 else {
-                    entries.splice(newIndex, 0, entries.splice(oldIndex, 1)[0]);
+                    vm.entries.splice(newIndex, 0, vm.entries.splice(oldIndex, 1)[0]);
 
                     // TODO: I don't think this is necessary, I would like to prove it purpose:
                     // move ng-repeat comment node to right position:
@@ -87,8 +98,35 @@
                         evt.from.insertBefore(nextSibling, evt.item.nextSibling);
                     }*/
                 }
+            }
 
-                $scope.$apply();
+            function _indication(evt) {
+
+                // If not the same gridLayoutContainerEl, then test for transfer option:
+                console.log("_indication", evt)
+
+                var contextVM = vm;
+                if (gridLayoutContainerEl !== evt.to) {
+                    contextVM = evt.to['Sortable:controller']();
+                }
+
+                // TODO: Consider if this should be moved/delegated into each handler?
+                var movingBlock;
+                if (evt.dragged) {
+                    movingBlock = evt.dragged;
+                } else {
+                    if(gridLayoutContainerEl !== evt.from) {
+                        movingBlock = evt.from['Sortable:controller']().entries[oldIndex];
+                    } else {
+                        movingBlock = vm.entries[oldIndex];
+                    }
+                }
+                
+                // TODO: Test if we can transfer:
+                if(contextVM.acceptBlock(movingBlock) === true) {
+                    return true;
+                }
+                return false;
             }
 
             const sortable = Sortable.create(gridLayoutContainerEl, {
@@ -99,7 +137,7 @@
                 //touchStartThreshold: 0, // px, how many pixels the point should move before cancelling a delayed drag event
                 //disabled: false, // Disables the sortable if set to true.
                 //store: null,  // @see Store
-                animation: 150,  // ms, animation speed moving items when sorting, `0` — without animation
+                animation: 120,  // ms, animation speed moving items when sorting, `0` — without animation
                 easing: "cubic-bezier(1, 0, 0, 1)", // Easing for animation. Defaults to null. See https://easings.net/ for examples.
                 //handle: "umb-block-grid-block",  // Drag handle selector within list items,
                 cancel: '',
@@ -128,16 +166,28 @@
                 //removeCloneOnHide: true, // Remove the clone element when it is not showing, rather than just hiding it
                 //emptyInsertThreshold: 5, // px, distance mouse must be from empty sortable to insert drag element into it
 
-                onStart: function (/**Event*/evt) {
-                    nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
+                /*onStart: function (evt) {
+                    //nextSibling = evt.from === evt.item.parentNode ? evt.item.nextSibling : evt.clone.nextSibling;
                     $scope.$apply();
-                },
+                },*/
                 onAdd: function (evt) {
+                    if(_indication(evt) === false) {
+                        return false;
+                    }
                     _sync(evt);
                     $scope.$apply();
                 },
                 onUpdate: function (evt) {
+                    if(_indication(evt) === false) {
+                        return false;
+                    }
                     _sync(evt);
+                    $scope.$apply();
+                },
+                // Called by any change to the list (add / update / remove)
+                onMove: function (evt) {
+                    // same properties as onEnd
+                    return _indication(evt)
                 }
                 /*
                 setData: function (dataTransfer, dragEl) {
@@ -176,16 +226,7 @@
                 onAdd: function (evt) {
                     // same properties as onEnd
                 },
-
-                // Changed sorting within list
-                onUpdate: function (evt) {
-                    // same properties as onEnd
-                },
-
-                // Called by any change to the list (add / update / remove)
-                onSort: function (evt) {
-                    // same properties as onEnd
-                },
+                
 
                 // Element is removed from the list into another list
                 onRemove: function (evt) {

@@ -283,9 +283,10 @@
 
             var defaultViewFolderPath = "views/propertyeditors/blockgrid/blockgridentryeditors/";
 
-            if (block.config.unsupported === true)
+            if (block.config.unsupported === true) {
                 block.view = defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
-                
+            }
+            
             block.view = defaultViewFolderPath + "gridblock/gridblock.editor.html";
         }
 

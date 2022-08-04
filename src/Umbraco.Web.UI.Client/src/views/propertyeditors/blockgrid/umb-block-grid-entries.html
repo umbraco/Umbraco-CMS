@@ -2,6 +2,7 @@
     <umb-block-grid-entry ng-repeat="layoutEntry in vm.entries track by layoutEntry.$block.key"
         class="umb-block-grid__layout-item"
         data-content-element-type-alias="{{layoutEntry.$block.content.contentTypeAlias}}"
+        data-content-element-type-key="{{layoutEntry.$block.content.contentTypeKey}}"
         data-element-udi="{{layoutEntry.contentUdi}}"
         data-col-span="{{layoutEntry.columnSpan}}"
         data-row-span="{{layoutEntry.rowSpan}}"
