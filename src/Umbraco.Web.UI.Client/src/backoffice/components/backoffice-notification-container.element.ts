@@ -47,8 +47,8 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 	}
 
 	private _closedNotificationHandler(notificationHandler: UmbNotificationHandler) {
-    notificationHandler.close();
-  }
+		notificationHandler.close();
+	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
@@ -61,7 +61,10 @@ export class UmbBackofficeNotificationContainer extends UmbContextConsumerMixin(
 				${repeat(
 					this._notifications,
 					(notification: UmbNotificationHandler) => notification.key,
-					(notification) => html`<uui-toast-notification color="${notification.color}" .autoClose="${notification.duration}"  @closed="${() => this._closedNotificationHandler(notification)}">
+					(notification) => html`<uui-toast-notification
+						color="${notification.color}"
+						.autoClose="${notification.duration}"
+						@closed="${() => this._closedNotificationHandler(notification)}">
 						${notification.element}
 					</uui-toast-notification>`
 				)}
