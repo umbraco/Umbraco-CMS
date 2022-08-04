@@ -281,8 +281,6 @@
             let addCol = 0;
             let addRow = 0;
 
-            console.log($event.originalEvent);
-
             switch ($event.originalEvent.key) {
                 case 'ArrowUp':
                     addRow = -1;
