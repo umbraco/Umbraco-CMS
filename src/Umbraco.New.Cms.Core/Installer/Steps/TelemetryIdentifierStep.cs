@@ -19,8 +19,6 @@ public class TelemetryIdentifierStep : IInstallStep
         _siteIdentifierService = siteIdentifierService;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
-
     public Task ExecuteAsync(InstallData model)
     {
         _siteIdentifierService.TryCreateSiteIdentifier(out _);

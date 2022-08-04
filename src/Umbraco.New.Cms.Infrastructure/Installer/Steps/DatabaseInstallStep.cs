@@ -19,8 +19,6 @@ public class DatabaseInstallStep : IInstallStep
         _databaseBuilder = databaseBuilder;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
-
     public Task ExecuteAsync(InstallData model)
     {
         if (_runtime.Level == RuntimeLevel.Run)

@@ -30,8 +30,6 @@ public class DatabaseConfigureStep : IInstallStep
         _mapper = mapper;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall;
-
     public Task ExecuteAsync(InstallData model)
     {
         DatabaseModel databaseModel = _mapper.Map<DatabaseModel>(model.Database)!;

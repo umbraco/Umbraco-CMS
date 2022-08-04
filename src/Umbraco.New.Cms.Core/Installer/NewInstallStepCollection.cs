@@ -9,10 +9,4 @@ public class NewInstallStepCollection : BuilderCollectionBase<IInstallStep>
         : base(items)
     {
     }
-
-    public IEnumerable<IInstallStep> GetInstallSteps()
-        => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.NewInstall));
-
-    public IEnumerable<IInstallStep> GetUpgradeSteps()
-        => this.Where(x => x.InstallationTypeTarget.HasFlag(InstallationType.Upgrade));
 }

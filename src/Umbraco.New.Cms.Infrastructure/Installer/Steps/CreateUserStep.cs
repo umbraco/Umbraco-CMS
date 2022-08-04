@@ -54,8 +54,6 @@ public class CreateUserStep : IInstallStep
         _metricsConsentService = metricsConsentService;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall;
-
     public async Task ExecuteAsync(InstallData model)
     {
             IUser? admin = _userService.GetUserById(Constants.Security.SuperUserId);

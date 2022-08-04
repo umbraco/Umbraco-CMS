@@ -19,8 +19,6 @@ public class FilePermissionsStep : IInstallStep
         _localizedTextService = localizedTextService;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
-
     public Task ExecuteAsync(InstallData model)
     {
         // validate file permissions

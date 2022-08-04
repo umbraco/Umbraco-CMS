@@ -11,8 +11,6 @@ public class RegisterInstallCompleteStep : IInstallStep
 
     public RegisterInstallCompleteStep(InstallHelper installHelper) => _installHelper = installHelper;
 
-    public InstallationType InstallationTypeTarget => InstallationType.NewInstall | InstallationType.Upgrade;
-
     public Task ExecuteAsync(InstallData model) => _installHelper.SetInstallStatusAsync(true, string.Empty);
 
     public Task<bool> RequiresExecutionAsync(InstallData model) => Task.FromResult(true);

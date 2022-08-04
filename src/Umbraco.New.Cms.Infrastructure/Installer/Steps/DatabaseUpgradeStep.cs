@@ -34,8 +34,6 @@ public class DatabaseUpgradeStep : IInstallStep
         _keyValueService = keyValueService;
     }
 
-    public InstallationType InstallationTypeTarget => InstallationType.Upgrade | InstallationType.NewInstall;
-
     public Task ExecuteAsync(InstallData model)
     {
         _logger.LogInformation("Running 'Upgrade' service");
