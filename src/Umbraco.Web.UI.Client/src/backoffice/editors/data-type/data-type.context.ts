@@ -11,7 +11,8 @@ export class UmbDataTypeContext {
 	});
 	public readonly data: Observable<DataTypeEntity> = this._data.asObservable();
 
-	constructor(dataType: DataTypeEntity) {
+	constructor(dataType?: DataTypeEntity) {
+		if (!dataType) return;
 		this._data.next(dataType);
 	}
 

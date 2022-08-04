@@ -1,11 +1,11 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { DataTypeEntity } from '../../mocks/data/data-type.data';
 import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../core/extension';
-import { Subscription } from 'rxjs';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbDataTypeContext } from '../editors/data-type/data-type.context';
 import { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 
@@ -50,9 +50,11 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 	private _useDataType() {
 		this._dataTypeSubscription?.unsubscribe();
 
-		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeEntity) => {
-			this._dataType = dataType;
-		});
+		this._dataTypeSubscription = this._dataTypeContext?.data
+			.pipe(distinctUntilChanged())
+			.subscribe((dataType: DataTypeEntity) => {
+				this._dataType = dataType;
+			});
 	}
 
 	private _handleChange(event: UUIComboboxListEvent) {

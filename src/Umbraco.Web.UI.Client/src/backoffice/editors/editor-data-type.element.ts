@@ -2,7 +2,7 @@ import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui'
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Subscription } from 'rxjs';
+import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../core/context';
 import { UmbNotificationService } from '../../core/services/notification.service';
 import { UmbDataTypeStore } from '../../core/stores/data-type.store';
@@ -37,7 +37,7 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	@state()
 	private _saveButtonState?: UUIButtonState;
 
-	private _dataTypeContext?: UmbDataTypeContext;
+	private _dataTypeContext = new UmbDataTypeContext();
 	private _dataTypeContextSubscription?: Subscription;
 
 	private _dataTypeStore?: UmbDataTypeStore;
@@ -56,24 +56,24 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		this.consumeContext('umbNotificationService', (service: UmbNotificationService) => {
 			this._notificationService = service;
 		});
+
+		this.provideContext('umbDataType', this._dataTypeContext);
 	}
 
 	private _useDataType() {
 		this._dataTypeStoreSubscription?.unsubscribe();
 
+		// TODO: This should be done in a better way, but for now it works.
 		this._dataTypeStoreSubscription = this._dataTypeStore?.getById(parseInt(this.id)).subscribe((dataType) => {
 			if (!dataType) return; // TODO: Handle nicely if there is no node.
 
-			// provide context to all views
-			// TODO: This should be done in a better way, but for now it works.
-			this._dataTypeContext = new UmbDataTypeContext(dataType);
-
 			this._dataTypeContextSubscription?.unsubscribe();
-			this._dataTypeContextSubscription = this._dataTypeContext.data.subscribe((data) => {
+
+			this._dataTypeContext?.update(dataType);
+
+			this._dataTypeContextSubscription = this._dataTypeContext.data.pipe(distinctUntilChanged()).subscribe((data) => {
 				this._dataType = data;
 			});
-
-			this.provideContext('umbDataType', this._dataTypeContext);
 		});
 	}
 
