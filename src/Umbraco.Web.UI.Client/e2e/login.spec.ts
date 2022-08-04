@@ -1,7 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-import config from '../playwright.config';
-
 test('login', async ({ page }) => {
 	// Go to /login
 	await page.goto('/login');
@@ -15,5 +13,5 @@ test('login', async ({ page }) => {
 	// Click [aria-label="Login"]
 	await page.locator('[aria-label="Login"]').click();
 
-	await expect(page).toHaveURL(`${config.use?.baseURL}/section/content/dashboard/welcome`);
+	await expect(page).toHaveURL(`/section/content/dashboard/welcome`);
 });
