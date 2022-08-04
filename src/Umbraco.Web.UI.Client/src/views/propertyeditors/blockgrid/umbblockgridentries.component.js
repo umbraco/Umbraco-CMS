@@ -88,7 +88,7 @@
 
                     vm.entries.splice(newIndex, 0, movingBlock);
 
-                    // TODO: fix issue when dragging one level out. I currently do not think below line is necessary as this is updated through angularJS.
+                    // I currently do not think below line is necessary as this is updated through angularJS. This was giving trouble/errors.
                     //evt.from.insertBefore(evt.item, nextSibling); // revert element
                     
                 }
@@ -112,7 +112,6 @@
                     contextVM = evt.to['Sortable:controller']();
                 }
 
-                // TODO: Consider if this should be moved/delegated into each handler?
                 const movingBlock = evt.dragged;
                 /*if (evt.dragged) {
                     movingBlock = evt.dragged;
