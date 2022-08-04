@@ -21,7 +21,7 @@
     "preview": "vite preview --open",
     "test": "web-test-runner --coverage",
     "test:watch": "web-test-runner --watch",
-    "lint": "eslint . --ext .ts --cache",
+    "lint": "eslint src/**/* e2e/**/* --cache",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier 'src/**/*.ts'",
     "format:fix": "npm run format -- --write",
