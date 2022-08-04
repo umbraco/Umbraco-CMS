@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-editor-layout')
 class UmbEditorLayout extends LitElement {
@@ -60,7 +60,7 @@ class UmbEditorLayout extends LitElement {
 			<div id="editor-frame">
 				<div id="header">
 					<slot name="name"></slot>
-					<slot name="apps"></slot>
+					<slot name="views"></slot>
 				</div>
 				<uui-scroll-container id="main">
 					<slot></slot>

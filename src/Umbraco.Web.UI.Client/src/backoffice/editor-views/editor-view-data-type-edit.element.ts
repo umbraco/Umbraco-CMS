@@ -5,18 +5,25 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { UmbContextConsumerMixin } from '../../core/context';
 import type { DataTypeEntity } from '../../mocks/data/data-type.data';
 import type { UmbExtensionManifestPropertyEditorUI, UmbExtensionRegistry } from '../../core/extension';
+import { Subscription } from 'rxjs';
+import { UmbDataTypeContext } from '../editors/data-type/data-type.context';
+import { UUIComboboxListElement, UUIComboboxListEvent } from '@umbraco-ui/uui';
 
 @customElement('umb-editor-view-data-type-edit')
 export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(LitElement) {
 	static styles = [UUITextStyles, css``];
 
-	@property({ type: Object })
-	dataType?: DataTypeEntity;
+	@state()
+	_dataType?: DataTypeEntity;
 
 	@state()
 	private _propertyEditorUIs: Array<UmbExtensionManifestPropertyEditorUI> = [];
 
 	private _extensionRegistry?: UmbExtensionRegistry;
+	private _dataTypeContext?: UmbDataTypeContext;
+
+	private _propertyEditorUIsSubscription?: Subscription;
+	private _dataTypeSubscription?: Subscription;
 
 	constructor() {
 		super();
@@ -25,23 +32,54 @@ export class UmbEditorViewDataTypeEditElement extends UmbContextConsumerMixin(Li
 			this._extensionRegistry = registry;
 			this._usePropertyEditorUIs();
 		});
+
+		this.consumeContext('umbDataType', (dataTypeContext) => {
+			this._dataTypeContext = dataTypeContext;
+			this._useDataType();
+		});
 	}
 
 	private _usePropertyEditorUIs() {
-		this._extensionRegistry?.extensionsOfType('propertyEditorUI').subscribe((propertyEditorUIs) => {
-			this._propertyEditorUIs = propertyEditorUIs;
+		this._propertyEditorUIsSubscription = this._extensionRegistry
+			?.extensionsOfType('propertyEditorUI')
+			.subscribe((propertyEditorUIs) => {
+				this._propertyEditorUIs = propertyEditorUIs;
+			});
+	}
+
+	private _useDataType() {
+		this._dataTypeSubscription?.unsubscribe();
+
+		this._dataTypeSubscription = this._dataTypeContext?.data.subscribe((dataType: DataTypeEntity) => {
+			this._dataType = dataType;
 		});
+	}
+
+	private _handleChange(event: UUIComboboxListEvent) {
+		if (!this._dataType) return;
+
+		const target = event.composedPath()[0] as UUIComboboxListElement;
+		const value = target.value as string;
+
+		this._dataTypeContext?.update({ propertyEditorUIAlias: value });
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+
+		this._propertyEditorUIsSubscription?.unsubscribe();
+		this._dataTypeSubscription?.unsubscribe();
 	}
 
 	render() {
 		return html`
 			<uui-box>
 				<h3>Property Editor (Model/Schema?)</h3>
-				Selector goes here
+				Selector goes here ${this._dataType?.propertyEditorUIAlias}
 
 				<!-- TODO: temp property editor ui selector. Change when we have dialogs -->
 				<h3>Property Editor UI</h3>
-				<uui-combobox-list value="${ifDefined(this.dataType?.propertyEditorUIAlias)}">
+				<uui-combobox-list value="${ifDefined(this._dataType?.propertyEditorUIAlias)}" @change="${this._handleChange}">
 					${this._propertyEditorUIs.map(
 						(propertyEditorUI) =>
 							html`<uui-combobox-list-option style="padding: 8px; margin: 0;" value="${propertyEditorUI.alias}">

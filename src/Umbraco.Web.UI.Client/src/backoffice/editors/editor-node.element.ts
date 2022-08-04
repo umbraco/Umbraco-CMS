@@ -214,7 +214,7 @@ export class UmbEditorNodeElement extends UmbContextConsumerMixin(LitElement) {
 		return html`
 			<umb-editor-layout>
 				<uui-input slot="name" .value="${this._node?.name}"></uui-input>
-				<uui-tab-group slot="apps">
+				<uui-tab-group slot="views">
 					${this._editorViews.map(
 						(view: UmbExtensionManifestEditorView) => html`
 							<uui-tab
