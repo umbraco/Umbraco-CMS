@@ -1,5 +1,7 @@
 import { UmbExtensionManifestCore } from './core/extension';
 
+// TODO: consider moving weight from meta to the main part of the manifest. We need it for every extension.
+// TODO: consider adding a label property as part of the meta. It might make sense to have an "extension" name label where one is needed.
 export const internalManifests: Array<UmbExtensionManifestCore> = [
 	{
 		type: 'section',
@@ -129,6 +131,21 @@ export const internalManifests: Array<UmbExtensionManifestCore> = [
 			// this is a temp solution
 			editors: ['Umb.Editor.DataType'],
 			pathname: 'edit',
+			weight: 90,
+			icon: 'edit',
+		},
+	},
+	{
+		type: 'editorView',
+		alias: 'Umb.EditorView.DocumentTypeDesign',
+		name: 'Design',
+		elementName: 'umb-editor-view-document-type-design',
+		js: () => import('./backoffice/editors/document-type/views/editor-view-document-type-design.element'),
+		meta: {
+			// TODO: how do we want to filter where editor views are shown? https://our.umbraco.com/documentation/extending/Content-Apps/#setting-up-the-plugin
+			// this is a temp solution
+			editors: ['Umb.Editor.DocumentType'],
+			pathname: 'design',
 			weight: 90,
 			icon: 'edit',
 		},

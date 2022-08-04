@@ -26,6 +26,13 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
 			},
 		},
 		{
+			path: 'document-type/:id',
+			component: () => import('../../editors/document-type/editor-document-type.element'),
+			setup(component: any, info: IRoutingInfo) {
+				component.id = info.match.params.id;
+			},
+		},
+		{
 			path: '**',
 			redirectTo: 'dashboard',
 		},

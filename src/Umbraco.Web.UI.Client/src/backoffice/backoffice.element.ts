@@ -5,6 +5,7 @@ import { css, html, LitElement } from 'lit';
 import { UmbContextProviderMixin } from '../core/context';
 import { UmbNotificationService } from '../core/services/notification.service';
 import { UmbDataTypeStore } from '../core/stores/data-type.store';
+import { UmbDocumentTypeStore } from '../core/stores/document-type.store';
 import { UmbNodeStore } from '../core/stores/node.store';
 
 import './components/backoffice-header.element';
@@ -39,6 +40,7 @@ export default class UmbBackoffice extends UmbContextProviderMixin(LitElement) {
 
 		this.provideContext('umbNodeStore', new UmbNodeStore());
 		this.provideContext('umbDataTypeStore', new UmbDataTypeStore());
+		this.provideContext('umbDocumentTypeStore', new UmbDocumentTypeStore());
 		this.provideContext('umbNotificationService', new UmbNotificationService());
 	}
 

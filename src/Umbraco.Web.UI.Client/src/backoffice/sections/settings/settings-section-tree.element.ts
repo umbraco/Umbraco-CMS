@@ -1,7 +1,8 @@
 import { css, html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { data } from '../../../mocks/data/data-type.data';
+import { data as dataTypeData } from '../../../mocks/data/data-type.data';
+import { data as documentTypeData } from '../../../mocks/data/document-type.data';
 
 @customElement('umb-settings-section-tree')
 class UmbSettingsSectionTree extends LitElement {
@@ -16,7 +17,10 @@ class UmbSettingsSectionTree extends LitElement {
 
 	// TODO: implement dynamic tree data
 	@state()
-	_dataTypes: Array<any> = data;
+	_dataTypes: Array<any> = dataTypeData;
+
+	@state()
+	_documentTypes: Array<any> = documentTypeData;
 
 	render() {
 		return html`
@@ -30,6 +34,15 @@ class UmbSettingsSectionTree extends LitElement {
 				${this._dataTypes.map(
 					(dataType) => html`
 						<uui-menu-item label="${dataType.name}" href="/section/settings/data-type/${dataType.id}"></uui-menu-item>
+					`
+				)}
+			</uui-menu-item>
+			<uui-menu-item label="Document Types" has-children>
+				${this._documentTypes.map(
+					(documentType) => html`
+						<uui-menu-item
+							label="${documentType.name}"
+							href="/section/settings/document-type/${documentType.id}"></uui-menu-item>
 					`
 				)}
 			</uui-menu-item>
