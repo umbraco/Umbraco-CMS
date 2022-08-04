@@ -16,11 +16,12 @@
                                 <img ng-if="installedPackage.iconUrl" ng-src="{{installedPackage.iconUrl}}" />
                             </div>
                             <div class="umb-package-list__item-content">
-                              <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
-                              <div class="umb-package-list__item-description">
-                                <localize ng-if="installedPackage.hasMigrations && !installedPackage.hasPendingMigrations"
-                                          key="packager_packageMigrationsNonePending">No pending migrations</localize>
-                              </div>
+                                <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
+                                <div class="umb-package-list__item-description">{{ installedPackage.version }}</div>
+                                <div class="umb-package-list__item-description">
+                                    <localize ng-if="installedPackage.hasMigrations && !installedPackage.hasPendingMigrations"
+                                              key="packager_packageMigrationsNonePending">No pending migrations</localize>
+                                </div>
                             </div>
                           <!-- TODO: Show migrations up to date if they are -->
                         </td>
