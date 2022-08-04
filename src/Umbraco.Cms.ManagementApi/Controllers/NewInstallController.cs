@@ -80,16 +80,4 @@ public class NewInstallController : Controller
         var backOfficePath = _globalSettings.GetBackOfficePath(_hostingEnvironment);
         return Created(backOfficePath, null);
     }
-
-    [HttpPost("upgrade")]
-    [MapToApiVersion("1.0")]
-    [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Upgrade()
-    {
-        await _installService.Upgrade();
-        return Ok();
-    }
 }

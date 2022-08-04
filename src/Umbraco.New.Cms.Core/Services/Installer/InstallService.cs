@@ -32,19 +32,6 @@ public class InstallService : IInstallService
         await RunSteps(_installSteps, model);
     }
 
-    public async Task Upgrade()
-    {
-        if (_runtimeState.Level != RuntimeLevel.Upgrade)
-        {
-            throw new InvalidOperationException($"Runtime level must be Upgrade to upgrade but was: {_runtimeState.Level}");
-        }
-
-        // Need to figure out how to handle the install data, this is only needed when installing, not upgrading.
-        var model = new InstallData();
-
-        await RunSteps(_installSteps, model);
-    }
-
     private async Task RunSteps(IEnumerable<IInstallStep> steps, InstallData model)
     {
         foreach (IInstallStep step in steps)
