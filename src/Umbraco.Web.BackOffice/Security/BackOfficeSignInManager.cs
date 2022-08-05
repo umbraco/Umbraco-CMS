@@ -230,6 +230,12 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
 
         autoLinkUser = BackOfficeIdentityUser.CreateNew(_globalSettings, email, email, autoLinkOptions.GetUserAutoLinkCulture(_globalSettings), name);
 
+        // Enable the user if not approved - user cannot sign in otherwise.
+        if (!autoLinkUser.IsApproved)
+        {
+            autoLinkUser.IsApproved = true;
+        }
+
         foreach (var userGroup in autoLinkOptions.DefaultUserGroups)
         {
             autoLinkUser.AddRole(userGroup);
