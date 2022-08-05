@@ -15,7 +15,7 @@ export class UmbSettingsSection extends UmbContextConsumerMixin(LitElement) {
 		},
 		{
 			path: 'extensions',
-			component: () => import('../../editors/editor-extensions.element'),
+			component: () => import('../../editors/extensions/editor-extensions.element'),
 		},
 		// TODO: who should own this logic? Should it be each tree/editor that knows sub-routes?
 		{

@@ -1,8 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Subscription } from 'rxjs';
-import { UmbContextConsumerMixin } from '../../core/context';
-import { UmbExtensionManifest, UmbExtensionRegistry } from '../../core/extension';
+import { UmbContextConsumerMixin } from '../../../core/context';
+import { UmbExtensionManifest, UmbExtensionRegistry } from '../../../core/extension';
 
 @customElement('umb-editor-extensions')
 export class UmbEditorExtensionsElement extends UmbContextConsumerMixin(LitElement) {
