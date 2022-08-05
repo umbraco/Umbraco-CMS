@@ -6,6 +6,7 @@
       <Nullable>enable</Nullable>
       <IsPackable>false</IsPackable>
       <WarningsAsErrors>nullable</WarningsAsErrors>
+      <EnablePackageValidation>false</EnablePackageValidation>
     </PropertyGroup>
 
     <ItemGroup>

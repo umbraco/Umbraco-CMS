@@ -7,6 +7,7 @@
       <RootNamespace>Umbraco.New.Cms.Core</RootNamespace>
       <IsPackable>false</IsPackable>
       <WarningsAsErrors>nullable</WarningsAsErrors>
+      <EnablePackageValidation>false</EnablePackageValidation>
     </PropertyGroup>
 
     <ItemGroup>

@@ -7,6 +7,7 @@
       <WarningsAsErrors>nullable</WarningsAsErrors>
       <RootNamespace>Umbraco.Cms.ManagementApi</RootNamespace>
       <IsPackable>false</IsPackable>
+      <EnablePackageValidation>false</EnablePackageValidation>
     </PropertyGroup>
 
     <ItemGroup>
