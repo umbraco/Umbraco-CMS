@@ -1,6 +1,6 @@
 import { UmbData } from './data';
 
-export interface DocumentNode {
+export interface NodeEntity {
 	id: number;
 	key: string;
 	name: string;
@@ -20,7 +20,7 @@ export interface NodeProperty {
 
 export interface NodePropertyData {
 	alias: string;
-	value: unknown;
+	value: any;
 }
 
 /* TODO:
@@ -30,7 +30,7 @@ We would like the tree items to stay up to date, without requesting the server a
 
 If we split entityData into its own object, then that could go in the entityStore and be merged with the nodeStore (we would have a subscription on both).
 */
-export const data: Array<DocumentNode> = [
+export const data: Array<NodeEntity> = [
 	{
 		id: 1,
 		key: '74e4008a-ea4f-4793-b924-15e02fd380d1',
@@ -135,7 +135,7 @@ export const data: Array<DocumentNode> = [
 ];
 
 // Temp mocked database
-class UmbContentData extends UmbData<DocumentNode> {
+class UmbContentData extends UmbData<NodeEntity> {
 	constructor() {
 		super(data);
 	}

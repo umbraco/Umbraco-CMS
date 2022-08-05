@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement } from 'lit/decorators.js';
 
 @customElement('umb-editor-layout')
 class UmbEditorLayout extends LitElement {
@@ -24,11 +24,9 @@ class UmbEditorLayout extends LitElement {
 			#header {
 				background-color: var(--uui-color-surface);
 				width: 100%;
-				display: flex;
-				flex: none;
-				gap: 16px;
-				align-items: center;
 				border-bottom: 1px solid var(--uui-color-border);
+				box-sizing: border-box;
+				padding: 0 var(--uui-size-6);
 			}
 
 			#main {
@@ -40,14 +38,9 @@ class UmbEditorLayout extends LitElement {
 			}
 
 			#footer {
-				display: flex;
-				flex: none;
-				justify-content: end;
-				align-items: center;
 				height: 70px;
 				width: 100%;
-				gap: 16px;
-				padding-right: 24px;
+				padding: 0 var(--uui-size-6);
 				border-top: 1px solid var(--uui-color-border);
 				background-color: var(--uui-color-surface);
 				box-sizing: border-box;
@@ -59,15 +52,14 @@ class UmbEditorLayout extends LitElement {
 		return html`
 			<div id="editor-frame">
 				<div id="header">
-					<slot name="name"></slot>
-					<slot name="views"></slot>
+					<slot name="header"></slot>
 				</div>
 				<uui-scroll-container id="main">
 					<slot></slot>
 				</uui-scroll-container>
 				<div id="footer">
 					<!-- only show footer if slot has elements -->
-					<slot name="actions"></slot>
+					<slot name="footer"></slot>
 				</div>
 			</div>
 		`;

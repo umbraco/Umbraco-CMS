@@ -17,14 +17,32 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 				height: 100%;
 			}
 
+			#header {
+				display: flex;
+				gap: 16px;
+				align-items: center;
+			}
+
+			#footer {
+				display: flex;
+				height: 100%;
+				align-items: center;
+				gap: 16px;
+			}
+
+			#actions {
+				display: block;
+				margin-left: auto;
+			}
+
 			uui-input {
 				width: 100%;
-				margin-left: 16px;
 			}
 
 			uui-tab-group {
 				--uui-tab-divider: var(--uui-color-border);
 				border-left: 1px solid var(--uui-color-border);
+				border-right: 1px solid var(--uui-color-border);
 				flex-wrap: nowrap;
 				height: 60px;
 			}
@@ -126,27 +144,31 @@ class UmbEditorEntity extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<umb-editor-layout>
-				<uui-input slot="name" .value="${this.name}"></uui-input>
-
-				<uui-tab-group slot="views">
-					${this._editorViews.map(
-						(view: UmbExtensionManifestEditorView) => html`
-							<uui-tab
-								.label="${view.name}"
-								href="${this._routerFolder}/view/${view.meta.pathname}"
-								?active="${this._currentView.includes(view.meta.pathname)}">
-								<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
-								${view.name}
-							</uui-tab>
-						`
-					)}
-				</uui-tab-group>
+				<div id="header" slot="header">
+					<slot id="icon" name="icon"></slot>
+					<uui-input .value="${this.name}"></uui-input>
+					<uui-tab-group slot="views">
+						${this._editorViews.map(
+							(view: UmbExtensionManifestEditorView) => html`
+								<uui-tab
+									.label="${view.name}"
+									href="${this._routerFolder}/view/${view.meta.pathname}"
+									?active="${this._currentView.includes(view.meta.pathname)}">
+									<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
+									${view.name}
+								</uui-tab>
+							`
+						)}
+					</uui-tab-group>
+				</div>
 
 				<router-slot .routes="${this._routes}"></router-slot>
-
 				<slot></slot>
 
-				<slot name="actions" slot="actions"></slot>
+				<div id="footer" slot="footer">
+					<slot name="footer"></slot>
+					<slot id="actions" name="actions"></slot>
+				</div>
 			</umb-editor-layout>
 		`;
 	}

@@ -17,7 +17,7 @@ export class UmbDataTypeContext {
 	}
 
 	// TODO: figure out how we want to update data
-	public update(data: any) {
+	public update(data: Partial<DataTypeEntity>) {
 		this._data.next({ ...this._data.getValue(), ...data });
 	}
 

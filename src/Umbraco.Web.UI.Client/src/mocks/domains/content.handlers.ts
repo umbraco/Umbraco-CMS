@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { DocumentNode, umbContentData } from '../data/content.data';
+import { NodeEntity, umbContentData } from '../data/content.data';
 
 // TODO: add schema
 export const handlers = [
@@ -14,7 +14,7 @@ export const handlers = [
 		return res(ctx.status(200), ctx.json([document]));
 	}),
 
-	rest.post<DocumentNode[]>('/umbraco/backoffice/content/save', (req, res, ctx) => {
+	rest.post<NodeEntity[]>('/umbraco/backoffice/content/save', (req, res, ctx) => {
 		const data = req.body;
 		if (!data) return;
 

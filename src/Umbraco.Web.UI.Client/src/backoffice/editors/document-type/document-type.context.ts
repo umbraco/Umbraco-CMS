@@ -17,7 +17,7 @@ export class UmbDocumentTypeContext {
 	}
 
 	// TODO: figure out how we want to update data
-	public update(data: any) {
+	public update(data: Partial<DocumentTypeEntity>) {
 		this._data.next({ ...this._data.getValue(), ...data });
 	}
 

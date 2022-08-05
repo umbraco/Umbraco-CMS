@@ -111,6 +111,10 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 				alias="Umb.Editor.DocumentType"
 				name="${ifDefined(this._documentType?.name)}"
 				@input="${this._handleInput}">
+				<div slot="icon">Icon</div>
+
+				<div slot="footer">Keyboard Shortcuts</div>
+
 				<!-- TODO: these could be extensions points too -->
 				<div slot="actions">
 					<uui-button
