@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { customElement, state } from 'lit/decorators.js';
-import { NodeEntity, NodeProperty } from '../../../../mocks/data/content.data';
+import { NodeProperty, NodePropertyData } from '../../../../mocks/data/content.data';
 import { UmbContextConsumerMixin } from '../../../../core/context';
 import { UmbNodeContext } from '../node.context';
 import { Subscription, distinctUntilChanged } from 'rxjs';
@@ -13,14 +13,16 @@ export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
 		css`
 			hr {
 				border: 0;
-				/* TODO: Use correct color property */
-				border-top: 1px solid #e7e7e7;
+				border-top: 1px solid var(--uui-color-border);
 			}
 		`,
 	];
 
 	@state()
-	_node?: NodeEntity;
+	_properties: NodeProperty[] = [];
+
+	@state()
+	_data: NodePropertyData[] = [];
 
 	private _nodeContext?: UmbNodeContext;
 	private _nodeContextSubscription?: Subscription;
@@ -35,8 +37,11 @@ export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
 	}
 
 	private _useNode() {
-		this._nodeContextSubscription = this._nodeContext?.data.pipe(distinctUntilChanged()).subscribe((data) => {
-			this._node = data;
+		this._nodeContextSubscription?.unsubscribe();
+
+		this._nodeContextSubscription = this._nodeContext?.data.pipe(distinctUntilChanged()).subscribe((node) => {
+			this._properties = node.properties;
+			this._data = node.data;
 		});
 	}
 
@@ -48,11 +53,11 @@ export class UmbEditorViewNodeEdit extends UmbContextConsumerMixin(LitElement) {
 	render() {
 		return html`
 			<uui-box>
-				${this._node?.properties.map(
+				${this._properties.map(
 					(property: NodeProperty) => html`
 						<umb-node-property
 							.property=${property}
-							.value=${this._node?.data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
+							.value=${this._data.find((data) => data.alias === property.alias)?.value}></umb-node-property>
 						<hr />
 					`
 				)}
