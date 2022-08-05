@@ -8,12 +8,12 @@
             "**/*.csproj"
           ],
           "exclude": [
-            "**/obj/**",
-            "**/bin/**",
-            "**/Umbraco.Web.csproj",
-            "**/Umbraco.Web.UI.csproj",
-            "**/Umbraco.Cms.StaticAssets.csproj",
-            "**/JsonSchema.csproj"
+            "JsonSchema/**",
+            "Umbraco.Cms.StaticAssets/**",
+            "Umbraco.Web/**",
+            "Umbraco.Web.UI/**",
+            "Umbraco.Web.UI.Client/**",
+            "Umbraco.Web.UI.Docs/**"
           ]
         }
       ],
@@ -26,39 +26,20 @@
       {
         "files": [
           "api/**.yml",
-          "api/index.md"
-        ]
-      },
-      {
-        "files": [
-          "articles/**.md",
-          "articles/**/toc.yml",
           "toc.yml",
-          "*.md"
-        ],
-        "exclude": [
-          "obj/**"
-        ]
-      }
-    ],
-    "overwrite": [
-      {
-        "files": [
-          "**.md"
-        ],
-        "exclude": [
-          "obj/**"
+          "index.md"
         ]
       }
     ],
     "globalMetadata": {
-      "_appTitle": "Umbraco c# Api docs",
+      "_appTitle": "Umbraco C# API Docs",
       "_enableSearch": true,
-      "_disableContribution": false
+      "_disableContribution": true
     },
     "dest": "_site",
     "template": [
-      "default", "umbracotemplate"
+      "default",
+      "umbracotemplate"
     ]
   }
 }
