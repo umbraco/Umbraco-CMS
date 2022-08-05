@@ -9,18 +9,18 @@ export const handlers = [
 		if (!id) return;
 
 		const int = parseInt(id);
-		const document = umbDataTypeData.getById(int);
+		const dataType = umbDataTypeData.getById(int);
 
-		return res(ctx.status(200), ctx.json([document]));
+		return res(ctx.status(200), ctx.json([dataType]));
 	}),
 
 	rest.get('/umbraco/backoffice/data-type/by-key/:key', (req, res, ctx) => {
 		const key = req.params.key as string;
 		if (!key) return;
 
-		const document = umbDataTypeData.getByKey(key);
+		const dataType = umbDataTypeData.getByKey(key);
 
-		return res(ctx.status(200), ctx.json([document]));
+		return res(ctx.status(200), ctx.json([dataType]));
 	}),
 
 	rest.post<DataTypeEntity[]>('/umbraco/backoffice/data-type/save', (req, res, ctx) => {

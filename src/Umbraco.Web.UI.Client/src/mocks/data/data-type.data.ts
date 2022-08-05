@@ -1,3 +1,5 @@
+import { UmbData } from './data';
+
 export interface DataTypeEntity {
 	id: number;
 	key: string;
@@ -34,34 +36,9 @@ export const data: Array<DataTypeEntity> = [
 ];
 
 // Temp mocked database
-class UmbDataTypeData {
-	private _data: Array<DataTypeEntity> = [];
-
+class UmbDataTypeData extends UmbData<DataTypeEntity> {
 	constructor() {
-		this._data = data;
-	}
-
-	getById(id: number) {
-		return this._data.find((item) => item.id === id);
-	}
-
-	getByKey(key: string) {
-		return this._data.find((item) => item.key === key);
-	}
-
-	save(nodes: DataTypeEntity[]) {
-		nodes.forEach((node) => {
-			const foundIndex = this._data.findIndex((item) => item.id === node.id);
-			if (foundIndex !== -1) {
-				// replace
-				this._data[foundIndex] = node;
-			} else {
-				// new
-				this._data.push(node);
-			}
-		});
-		//console.log('save:', nodes);
-		return nodes;
+		super(data);
 	}
 }
 

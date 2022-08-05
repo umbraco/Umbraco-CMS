@@ -1,3 +1,5 @@
+import { UmbData } from './data';
+
 export interface DocumentNode {
 	id: number;
 	key: string;
@@ -133,30 +135,9 @@ export const data: Array<DocumentNode> = [
 ];
 
 // Temp mocked database
-class UmbContentData {
-	private _data: Array<DocumentNode> = [];
-
+class UmbContentData extends UmbData<DocumentNode> {
 	constructor() {
-		this._data = data;
-	}
-
-	getById(id: number) {
-		return this._data.find((item) => item.id === id);
-	}
-
-	save(nodes: DocumentNode[]) {
-		nodes.forEach((node) => {
-			const foundIndex = this._data.findIndex((item) => item.id === node.id);
-			if (foundIndex !== -1) {
-				// replace
-				this._data[foundIndex] = node;
-			} else {
-				// new
-				this._data.push(node);
-			}
-		});
-		//console.log('save:', nodes);
-		return nodes;
+		super(data);
 	}
 }
 
