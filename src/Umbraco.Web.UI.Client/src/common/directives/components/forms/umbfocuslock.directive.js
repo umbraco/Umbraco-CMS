@@ -149,6 +149,12 @@
                 // Whenever the DOM changes ensure the list of focused elements is updated
                 function domChange() {
                     getFocusableElements();
+
+                    // When an element is remove or become not focusable, but focus is on it,
+                    // we need to ensure a now focus inside the trap, else the focus can escape the trap.
+                    if (focusableElements.filter(elm => elm == document.activeElement).length === 0) {
+                        setElementFocus();
+                    }
                 }
 
                 // Start observing the target node for configured mutations
