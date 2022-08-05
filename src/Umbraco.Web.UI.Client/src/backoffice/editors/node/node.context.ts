@@ -26,7 +26,7 @@ export class UmbNodeContext {
 	});
 	public readonly data: Observable<NodeEntity> = this._data.asObservable();
 
-	constructor(node?: NodeEntity) {
+	constructor(node: NodeEntity) {
 		if (!node) return;
 		this._data.next(node);
 	}

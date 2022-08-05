@@ -59,7 +59,7 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 	private _nodeStore?: UmbNodeStore;
 	private _nodeStoreSubscription?: Subscription;
 
-	private _nodeContext = new UmbNodeContext();
+	private _nodeContext?: UmbNodeContext;
 	private _nodeContextSubscription?: Subscription;
 
 	private _notificationService?: UmbNotificationService;
@@ -77,8 +77,6 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 		});
 
 		this.addEventListener('property-value-change', this._onPropertyValueChange);
-
-		this.provideContext('umbNodeContext', this._nodeContext);
 	}
 
 	private _onPropertyValueChange = (e: Event) => {
@@ -109,7 +107,12 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 
 			this._nodeContextSubscription?.unsubscribe();
 
-			this._nodeContext?.update(node);
+			if (!this._nodeContext) {
+				this._nodeContext = new UmbNodeContext(node);
+				this.provideContext('umbNodeContext', this._nodeContext);
+			} else {
+				this._nodeContext.update(node);
+			}
 
 			this._nodeContextSubscription = this._nodeContext.data.pipe(distinctUntilChanged()).subscribe((data) => {
 				this._node = data;
