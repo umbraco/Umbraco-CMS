@@ -101,7 +101,10 @@ export class UmbEditorDocumentTypeElement extends UmbContextProviderMixin(UmbCon
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
-			this._documentTypeContext?.update({ name: target.value });
+
+			if (typeof target?.value === 'string') {
+				this._documentTypeContext?.update({ name: target.value });
+			}
 		}
 	}
 

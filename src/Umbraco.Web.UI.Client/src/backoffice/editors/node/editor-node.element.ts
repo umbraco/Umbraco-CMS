@@ -1,6 +1,8 @@
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { UmbContextConsumerMixin, UmbContextProviderMixin } from '../../../core/context';
 import { UmbNodeStore } from '../../../core/stores/node.store';
 import { distinctUntilChanged, Subscription } from 'rxjs';
@@ -139,9 +141,20 @@ export class UmbEditorNodeElement extends UmbContextProviderMixin(UmbContextCons
 		delete this._node;
 	}
 
+	// TODO. find a way where we don't have to do this for all editors.
+	private _handleInput(event: UUIInputEvent) {
+		if (event instanceof UUIInputEvent) {
+			const target = event.composedPath()[0] as UUIInputElement;
+
+			if (typeof target?.value === 'string') {
+				this._nodeContext?.update({ name: target.value });
+			}
+		}
+	}
+
 	render() {
 		return html`
-			<umb-editor-entity alias="Umb.Editor.Node">
+			<umb-editor-entity alias="Umb.Editor.Node" name="${ifDefined(this._node?.name)}" @input="${this._handleInput}">
 				<div slot="footer">Breadcrumbs</div>
 
 				<div slot="actions">

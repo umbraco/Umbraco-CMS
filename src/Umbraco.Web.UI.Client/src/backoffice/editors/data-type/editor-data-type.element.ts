@@ -2,6 +2,7 @@ import { UUIButtonState, UUIInputElement, UUIInputEvent } from '@umbraco-ui/uui'
 import { UUITextStyles } from '@umbraco-ui/uui-css/lib';
 import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit-html/directives/if-defined.js';
 import { Subscription, distinctUntilChanged } from 'rxjs';
 import { UmbContextProviderMixin, UmbContextConsumerMixin } from '../../../core/context';
 import { UmbNotificationService } from '../../../core/services/notification.service';
@@ -96,7 +97,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 	private _handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
-			this._dataTypeContext?.update({ name: target.value });
+
+			if (typeof target?.value === 'string') {
+				this._dataTypeContext?.update({ name: target.value });
+			}
 		}
 	}
 
@@ -110,7 +114,10 @@ export class UmbEditorDataTypeElement extends UmbContextProviderMixin(UmbContext
 		return html`
 			${this._dataType
 				? html`
-						<umb-editor-entity alias="Umb.Editor.DataType" name="${this._dataType.name}" @input="${this._handleInput}">
+						<umb-editor-entity
+							alias="Umb.Editor.DataType"
+							name="${ifDefined(this._dataType?.name)}"
+							@input="${this._handleInput}">
 							<!-- TODO: these could be extensions points too -->
 							<div slot="actions">
 								<uui-button
