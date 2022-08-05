@@ -86,7 +86,7 @@ public class PackageMigrationRunner
                     throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
                 }
 
-                using (_profilingLogger.TraceDuration<PackageMigrationRunner>(
+                using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<PackageMigrationRunner>(
                            "Starting unattended package migration for " + migrationName,
                            "Unattended upgrade completed for " + migrationName))
                 {

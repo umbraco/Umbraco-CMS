@@ -23,13 +23,13 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
 
     public void Initialize()
     {
-        using (_profilingLogger.DebugDuration<ComponentCollection>(
+        using (_profilingLogger.IsEnabled(Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<ComponentCollection>(
                    $"Initializing. (log components when >{LogThresholdMilliseconds}ms)", "Initialized."))
         {
             foreach (IComponent component in this)
             {
                 Type componentType = component.GetType();
-                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                using (_profilingLogger.IsEnabled(Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<ComponentCollection>(
                     $"Initializing {componentType.FullName}.",
                     $"Initialized {componentType.FullName}.",
                     thresholdMilliseconds: LogThresholdMilliseconds))
@@ -42,14 +42,14 @@ public class ComponentCollection : BuilderCollectionBase<IComponent>
 
     public void Terminate()
     {
-        using (_profilingLogger.DebugDuration<ComponentCollection>(
+        using (_profilingLogger.IsEnabled(Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<ComponentCollection>(
                    $"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
         {
             // terminate components in reverse order
             foreach (IComponent component in this.Reverse())
             {
                 Type componentType = component.GetType();
-                using (_profilingLogger.DebugDuration<ComponentCollection>(
+                using (_profilingLogger.IsEnabled(Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<ComponentCollection>(
                     $"Terminating {componentType.FullName}.",
                     $"Terminated {componentType.FullName}.",
                     thresholdMilliseconds: LogThresholdMilliseconds))

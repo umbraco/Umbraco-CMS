@@ -381,7 +381,7 @@ public class MacroRenderer : IMacroRenderer
         }
 
         var macroInfo = $"Render Macro: {macro.Name}, cache: {macro.CacheDuration}";
-        using (_profilingLogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
+        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<MacroRenderer>(macroInfo, "Rendered Macro."))
         {
             // parse macro parameters ie replace the special [#key], [$key], etc. syntaxes
             foreach (MacroPropertyModel prop in macro.Properties)
@@ -433,7 +433,7 @@ public class MacroRenderer : IMacroRenderer
     /// </summary>
     private Attempt<MacroContent?> ExecuteMacroWithErrorWrapper(MacroModel macro, string msgIn, string msgOut, Func<MacroContent> getMacroContent, Func<string> msgErr)
     {
-        using (_profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
+        using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<MacroRenderer>(msgIn, msgOut))
         {
             return ExecuteProfileMacroWithErrorWrapper(macro, msgIn, getMacroContent, msgErr);
         }

@@ -244,7 +244,7 @@ public class CoreRuntime : IRuntime
 
     private void AcquireMainDom()
     {
-        using DisposableTimer? timer = _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
+        using DisposableTimer? timer = _profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Acquired.");
 
         try
         {
@@ -265,7 +265,7 @@ public class CoreRuntime : IRuntime
             return;
         }
 
-        using DisposableTimer? timer =
+        using DisposableTimer? timer = _profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null :
             _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
 
         try

@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
-                using (_profilingLogger.DebugDuration<InMemoryModelFactory>("Get models.", "Got models."))
+                using (_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<InMemoryModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
