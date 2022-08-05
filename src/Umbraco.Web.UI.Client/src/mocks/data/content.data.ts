@@ -132,6 +132,27 @@ export const data: Array<NodeEntity> = [
 			},
 		],
 	},
+	{
+		id: 3,
+		key: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
+		name: 'Document 3',
+		alias: 'document3',
+		icon: 'document',
+		properties: [
+			{
+				alias: 'myDescription',
+				label: 'Description',
+				description: 'Textarea property',
+				dataTypeKey: 'dt-2',
+			},
+		],
+		data: [
+			{
+				alias: 'myDescription',
+				value: 'Every day, a rabbit in a military costume greets me at the front door',
+			},
+		],
+	},
 ];
 
 // Temp mocked database
