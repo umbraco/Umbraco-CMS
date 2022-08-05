@@ -18,7 +18,8 @@
                 blockEditorApi: "<",
                 entries: "<",
                 areaKey: "<?",
-                parentBlock: "<?"
+                parentBlock: "<?",
+                parentForm: "<?"
             }
         }
     );
@@ -28,9 +29,35 @@
         var vm = this;
         vm.showNotAllowedUI = false;
 
+        vm.invalidAmount = false;
+
+        vm.areaConfig = null;
+
         vm.$onInit = function () {
             initializeSortable();
+
+            if(vm.parentBlock) {
+                vm.areaConfig = vm.parentBlock.config.areas.find(area => area.key === vm.areaKey);
+            }
+            $scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true);
         };
+
+        function onLocalAmountOfBlocksChanged() {
+
+            if (vm.parentForm && vm.areaConfig) {
+
+                var isMinRequirementGood = vm.entries.length >= vm.areaConfig.minAllowed;
+                vm.parentForm.areaMinCount.$setValidity("areaMinCount", isMinRequirementGood);
+
+                var isMaxRequirementGood = vm.entries.length <= vm.areaConfig.maxAllowed;
+                vm.parentForm.areaMaxCount.$setValidity("areaMaxCount", isMaxRequirementGood);
+                
+
+                vm.invalidAmount = !isMinRequirementGood || !isMaxRequirementGood;
+                $element.toggleClass("--invalid", vm.invalidAmount);
+
+            }
+        }
 
         vm.acceptBlock = function(contentTypeKey) {
             return vm.blockEditorApi.internal.isElementTypeKeyAllowedAt(vm.parentBlock, vm.areaKey, contentTypeKey);
@@ -287,6 +314,6 @@
             // TODO: setDirty if sort has happened.
 
         }
-    }   
+    }
 
 })();

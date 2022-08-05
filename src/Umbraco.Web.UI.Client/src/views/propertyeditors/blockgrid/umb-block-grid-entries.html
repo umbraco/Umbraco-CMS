@@ -31,7 +31,6 @@
 
 </div>
 
-
 <div class="umb-block-grid__actions">
     <button
             id="{{vm.model.alias}}"
@@ -54,4 +53,28 @@
             <localize key="blockEditor_tabClipboard">Clipboard</localize>
         </span>
     </button>
+</div>
+
+
+
+<input type="hidden" name="areaMinCount" ng-model="vm.entries" val-server="areaMinCount" />
+<input type="hidden" name="areaMaxCount" ng-model="vm.entries" val-server="areaMaxCount" />
+
+<div ng-if="vm.invalidAmount" class="umb-block-grid__entries-validation-message">
+
+    <div ng-messages="vm.parentForm.areaMinCount.$error">
+        <div ng-message="areaMinCount">
+            <localize key="validation_entriesShort" tokens="[vm.areaConfig.minAllowed, vm.areaConfig.minAllowed - vm.entries.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+        </div>
+        <span ng-message="valServer" ng-bind-html="vm.parentForm.areaMinCount.errorMsg"></span>
+    </div>
+
+    <div ng-messages="vm.parentForm.areaMaxCount.$error">
+        <div ng-message="areaMaxCount">
+            <localize key="validation_entriesShort" tokens="[vm.areaConfig.maxAllowed, vm.entries.length - vm.areaConfig.maxAllowed]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+        </div>
+        <span ng-message="valServer" ng-bind-html="vm.parentForm.areaMaxCount.errorMsg"></span>
+    </div>
+   
+
 </div>

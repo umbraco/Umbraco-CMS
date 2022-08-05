@@ -459,9 +459,23 @@ umb-block-grid-block {
     border: 1px solid @red;
     pointer-events: none;
 
-    animation: umb-block-grid__scalebox__pulse 400ms ease-in-out alternate infinite;
-    @keyframes umb-block-grid__scalebox__pulse {
+    animation: umb-block-grid__not-allowed-box__pulse 400ms ease-in-out alternate infinite;
+    @keyframes umb-block-grid__not-allowed-box__pulse {
         0%   { background-color: rgba(@red, 0.33); }
         100% { background-color: rgba(@red, 0.22); }
     }
+}
+
+
+umb-block-grid-entries.--invalid {
+    border: 2px solid @errorBackground;
+    border-radius: 3px;
+}
+
+.umb-block-grid__entries-validation-message {
+
+    background-color: @errorBackground;
+    color: @errorText;
+    padding: 3px 6px;
+
 }
