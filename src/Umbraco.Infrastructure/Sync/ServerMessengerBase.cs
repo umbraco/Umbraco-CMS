@@ -229,10 +229,12 @@ public abstract class ServerMessengerBase : IServerMessenger
         {
             throw new ArgumentNullException(nameof(refresher));
         }
-
-        StaticApplicationLogging.Logger.LogDebug(
+        if (StaticApplicationLogging.Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            StaticApplicationLogging.Logger.LogDebug(
             "Invoking refresher {RefresherType} on local server for message type RefreshByPayload",
             refresher.GetType());
+        }
 
         var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
         if (payloadRefresher == null)
@@ -261,9 +263,11 @@ public abstract class ServerMessengerBase : IServerMessenger
         {
             throw new ArgumentNullException(nameof(refresher));
         }
-
-        StaticApplicationLogging.Logger.LogDebug(
+        if (StaticApplicationLogging.Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            StaticApplicationLogging.Logger.LogDebug(
             "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+        }
 
         switch (messageType)
         {
@@ -351,9 +355,11 @@ public abstract class ServerMessengerBase : IServerMessenger
         {
             throw new ArgumentNullException(nameof(refresher));
         }
-
-        StaticApplicationLogging.Logger.LogDebug(
+        if (StaticApplicationLogging.Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            StaticApplicationLogging.Logger.LogDebug(
             "Invoking refresher {RefresherType} on local server for message type {MessageType}", refresher.GetType(), messageType);
+        }
 
         var typedRefresher = refresher as ICacheRefresher<T>;
 

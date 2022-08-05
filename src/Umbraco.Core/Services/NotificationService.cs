@@ -582,7 +582,10 @@ public class NotificationService : INotificationService
     private void Process(BlockingCollection<NotificationRequest> notificationRequests) =>
         ThreadPool.QueueUserWorkItem(state =>
         {
-            _logger.LogDebug("Begin processing notifications.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Begin processing notifications.");
+            }
             while (true)
             {
                 // stay on for 8s
@@ -592,7 +595,10 @@ public class NotificationService : INotificationService
                     {
                         _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter()
                             .GetResult();
-                        _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -611,8 +617,10 @@ public class NotificationService : INotificationService
                     break;
                 }
             }
-
-            _logger.LogDebug("Done processing notifications.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Done processing notifications.");
+            }
         });
 
     private class NotificationRequest

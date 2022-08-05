@@ -53,14 +53,20 @@ public class DisposableTimer : DisposableObjectSlim
                 case LogLevel.Debug:
                     if (startMessageArgs == null)
                     {
-                        logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                        }
                     }
                     else
                     {
-                        var args = new object[startMessageArgs.Length + 1];
-                        startMessageArgs.CopyTo(args, 0);
-                        args[startMessageArgs.Length] = _timingId;
-                        logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            var args = new object[startMessageArgs.Length + 1];
+                            startMessageArgs.CopyTo(args, 0);
+                            args[startMessageArgs.Length] = _timingId;
+                            logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                        }
                     }
 
                     break;
@@ -139,19 +145,25 @@ public class DisposableTimer : DisposableObjectSlim
                     case LogLevel.Debug:
                         if (_endMessageArgs == null)
                         {
-                            _logger.LogDebug(
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug(
                                 "{EndMessage} ({Duration}ms) [Timing {TimingId}]",
                                 _endMessage,
                                 Stopwatch.ElapsedMilliseconds,
                                 _timingId);
+                            }
                         }
                         else
                         {
-                            var args = new object[_endMessageArgs.Length + 2];
-                            _endMessageArgs.CopyTo(args, 0);
-                            args[^1] = Stopwatch.ElapsedMilliseconds;
-                            args[args.Length] = _timingId;
-                            _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                var args = new object[_endMessageArgs.Length + 2];
+                                _endMessageArgs.CopyTo(args, 0);
+                                args[^1] = Stopwatch.ElapsedMilliseconds;
+                                args[args.Length] = _timingId;
+                                _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
+                            }
                         }
 
                         break;

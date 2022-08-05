@@ -53,7 +53,10 @@ public sealed class HtmlUrlParser
         {
             // find all relative URLs (ie. URLs that contain ~)
             MatchCollection tags = ResolveUrlPattern.Matches(text);
-            _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
+            }
             foreach (Match tag in tags)
             {
                 var url = string.Empty;

@@ -126,7 +126,10 @@ internal class ComposerGraph
 
         // bit verbose but should help for troubleshooting
         // var text = "Ordered Composers: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComposerTypes) + Environment.NewLine;
-        _logger.LogDebug("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
+        }
 
         return sortedComposerTypes;
     }

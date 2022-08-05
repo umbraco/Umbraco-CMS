@@ -271,12 +271,17 @@ public class CoreRuntime : IRuntime
         try
         {
             State.DetermineRuntimeLevel();
-
-            _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", State.Level, State.Reason);
+            }
 
             if (State.Level == RuntimeLevel.Upgrade)
             {
-                _logger.LogDebug("Configure database factory for upgrades.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Configure database factory for upgrades.");
+                }
                 _databaseFactory.ConfigureForUpgrade();
             }
         }

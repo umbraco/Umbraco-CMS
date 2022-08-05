@@ -69,10 +69,16 @@ public class KeepAlive : RecurringHostedServiceBase
         switch (_serverRegistrar.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers.");
+                }
                 return;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role.");
+                }
                 return;
         }
 

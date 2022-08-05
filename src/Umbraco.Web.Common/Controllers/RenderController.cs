@@ -54,12 +54,14 @@ public class RenderController : UmbracoPageController, IRenderController
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         IPublishedRequest pcr = UmbracoRouteValues.PublishedRequest;
-
-        _logger.LogDebug(
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug(
             "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}",
             pcr.PublishedContent?.Id ?? -1,
             pcr.ResponseStatusCode,
             pcr.Culture);
+        }
 
         UmbracoRouteResult routeStatus = pcr.GetRouteResult();
         switch (routeStatus)

@@ -191,8 +191,10 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             Suspendable.ExamineEvents.SuspendIndexers(_logger);
             return false; //exit, do not continue
         }
-
-        _logger.LogDebug("Examine shutdown registered with MainDom");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Examine shutdown registered with MainDom");
+        }
 
         var registeredIndexers =
             _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);

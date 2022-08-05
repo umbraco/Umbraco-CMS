@@ -16,8 +16,11 @@ public class PreValueMigratorCollection : BuilderCollectionBase<IPreValueMigrato
     public IPreValueMigrator? GetMigrator(string editorAlias)
     {
         IPreValueMigrator? migrator = this.FirstOrDefault(x => x.CanMigrate(editorAlias));
-        _logger.LogDebug("Getting migrator for \"{EditorAlias}\" = {MigratorType}", editorAlias,
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting migrator for \"{EditorAlias}\" = {MigratorType}", editorAlias,
             migrator == null ? "<null>" : migrator.GetType().Name);
+        }
         return migrator;
     }
 }

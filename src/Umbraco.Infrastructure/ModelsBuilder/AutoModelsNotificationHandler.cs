@@ -87,8 +87,10 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
         {
             return;
         }
-
-        _logger.LogDebug("Requested to generate models.");
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Requested to generate models.");
+        }
 
         Interlocked.Exchange(ref _req, 1);
     }
@@ -105,7 +107,10 @@ public sealed class AutoModelsNotificationHandler : INotificationHandler<Umbraco
         {
             try
             {
-                _logger.LogDebug("Generate models...");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Generate models...");
+                }
                 _logger.LogInformation("Generate models now.");
                 _modelGenerator.GenerateModels();
                 _mbErrors.Clear();
