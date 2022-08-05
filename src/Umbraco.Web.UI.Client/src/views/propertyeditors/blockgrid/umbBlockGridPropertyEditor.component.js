@@ -459,6 +459,9 @@
             return getAllowedTypesOf(parentBlock, areaKey).filter(x => x.blockConfigModel.contentElementTypeKey === contentElementTypeKey).length > 0;
         }
         
+
+        // Used by umbblockgridentries.component to check how many block types that are available for creation in an area:
+        vm.getAllowedTypesOf = getAllowedTypesOf;
         function getAllowedTypesOf(parentBlock, areaKey) {
 
             if(areaKey == null || parentBlock == null) {

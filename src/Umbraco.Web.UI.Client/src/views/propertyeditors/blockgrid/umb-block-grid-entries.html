@@ -36,10 +36,10 @@
             id="{{vm.model.alias}}"
             type="button"
             class="btn-reset umb-block-grid__create-button umb-outline"
-            ng-disabled="vm.blockEditorApi.internal.availableBlockTypes.length === 0"
+            ng-disabled="vm.locallyAvailableBlockTypes.length === 0"
             ng-click="vm.blockEditorApi.requestShowCreate(vm.parentBlock, vm.areaKey, vm.entries.length, $event)">
-        <localize ng-if="vm.blockEditorApi.internal.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
-        <localize ng-if="vm.blockEditorApi.internal.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.blockEditorApi.internal.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+        <localize ng-if="vm.locallyAvailableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+        <localize ng-if="vm.locallyAvailableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.locallyAvailableBlockTypes[0].elementTypeModel.name]">Add content</localize>
     </button>
     <button type="button"
             class="btn-reset umb-block-grid__clipboard-button umb-outline"

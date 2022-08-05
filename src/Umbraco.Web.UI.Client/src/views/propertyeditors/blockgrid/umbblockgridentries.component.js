@@ -28,10 +28,9 @@
 
         var vm = this;
         vm.showNotAllowedUI = false;
-
         vm.invalidAmount = false;
-
         vm.areaConfig = null;
+        vm.locallyAvailableBlockTypes = 0;
 
         vm.$onInit = function () {
             initializeSortable();
@@ -39,6 +38,9 @@
             if(vm.parentBlock) {
                 vm.areaConfig = vm.parentBlock.config.areas.find(area => area.key === vm.areaKey);
             }
+            
+            vm.locallyAvailableBlockTypes = vm.blockEditorApi.internal.getAllowedTypesOf(vm.parentBlock, vm.areaKey);
+
             $scope.$watch('vm.entries', onLocalAmountOfBlocksChanged, true);
         };
 
