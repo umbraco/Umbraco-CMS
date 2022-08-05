@@ -149,9 +149,12 @@ public class UmbracoRequestMiddleware : IMiddleware
 
         try
         {
-            // Verbose log start of every request
-            LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
-            _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
+            {
+                // Verbose log start of every request
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
+                _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
+            }
 
             try
             {
@@ -179,14 +182,17 @@ public class UmbracoRequestMiddleware : IMiddleware
         }
         finally
         {
-            // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
-            // strange since we always logged the beginning, so now we just log start/end of all requests)
-            LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
-            _logger.LogTrace(
-                "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)",
-                httpRequestId,
-                pathAndQuery,
-                DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace))
+            {
+                // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
+                // strange since we always logged the beginning, so now we just log start/end of all requests)
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid? httpRequestId, _requestCache);
+                _logger.LogTrace(
+                    "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)",
+                    httpRequestId,
+                    pathAndQuery,
+                    DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+            }
 
             try
             {
